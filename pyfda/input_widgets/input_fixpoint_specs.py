@@ -322,7 +322,8 @@ class Input_Fixpoint_Specs(QWidget):
         self.layH_fx_wdg.setContentsMargins(0, margins[1], 0, margins[3])
         # self.layH_fx_wdg.setContentsMargins(*params['wdg_margins'])
         wdg_fx_dyn = QWidget(self)
-        wdg_fx_dyn.setStyleSheet(".QWidget { background-color:none; }")
+        # The following has no effect?
+        # wdg_fx_dyn.setStyleSheet(".QWidget { background-color:none; }")
         wdg_fx_dyn.setLayout(self.layH_fx_wdg)
 
 # ------------------------------------------------------------------------------
@@ -663,12 +664,9 @@ class Input_Fixpoint_Specs(QWidget):
                         # f"\n\t{fx_mod.__name__}.{fx_filt_ui_class.__name__}")
             # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
             self.fx_filt_ui = fx_filt_ui_class()  # instantiate the fixpoint widget
-            # set lightblue background with transparency for fixpoint widget
-            self.fx_filt_ui.setStyleSheet(
-               ".QFrame { background-color: rgba(173, 216, 230, 25%)}")
-            # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
             # and add it to layout:
             self.layH_fx_wdg.addWidget(self.fx_filt_ui, stretch=1)
+            # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
             self.dict2ui()  # update fixpoint widgets from dictionary
 
             # ---- connect signals to fx_filt_ui ----
