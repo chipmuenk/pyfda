@@ -246,8 +246,6 @@ qss_dark = """
     QHeaderView::section{background-color:#101010;}
     QHeaderView::section:checked{background-color:blue;}
 
-    QCheckBox::indicator{border: 2px solid #606060;}
-    QCheckBox::indicator:checked{background-color: lightblue;}
 
     /* Applies to all widgets */
     * [state="normal"]{background-color: #404040; color: white;}
@@ -323,8 +321,6 @@ qss_light = """
     QHeaderView::section{background-color:#808080; color:white;}
     QHeaderView::section:checked{background-color:blue; color:white;}
 
-    QCheckBox::indicator{border: 2px solid #808080;}
-    QCheckBox::indicator:checked{background-color: lightblue;}
 
     /* Applies to all widgets */
     * [state="normal"]{background-color: white; border-color: #303030;}
@@ -529,6 +525,9 @@ qss_common = """
                 /* Dynamic fixpoint widget */
                 #fx_filt_ui .QFrame {background-color: lightblue;}
                 #fx_filt_ui QFrame {color: black;}
+
+                QCheckBox::indicator{border: 2px solid #808080;}
+                QCheckBox::indicator:checked{background-color: lightblue;}
 
                 /* Table Corner Button */
                 QTableView QTableCornerButton::section{background-color:lightblue; border-color: green;}
