@@ -539,17 +539,8 @@ qss_common = """
                     padding-top: 2px; padding-bottom: 2px;
                     selection-background-color: orange;}
 
-                /* QPushButton[state="changed"]{
-                    background-color: yellow; color: black;} */
-
-                /* QPushButton[state="error"]{
-                    background-color: red; color: white;} */
-
-                /* QPushButton[state="ok"]{
-                    background-color: green; color: white;
-                    } */
-
-                /* Highlight button when pressed from checked / not checked state */
+                /* Highlight button when pressed from checked / not checked state 
+                   Also works for PushButton and QPushButtonRT */
                 QPushButton:pressed:checked, QPushButton:pressed:!checked
                     {background-color:orange; color:white}
 
