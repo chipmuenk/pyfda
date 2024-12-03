@@ -258,6 +258,10 @@ qss_dark = """
     /*QPushButtonRT:!checked > QLabel{
                     background-color:#505050; color:white; font-weight: bold;}*/
 
+    /* this doesn't work 
+    QPushButtonRT > QLabel{color:white;}
+    QPushButtonRT{color:white;} */
+
     QDialog{background-color: #404040;}
     QMessageBox{background-color:#404040;}
 
