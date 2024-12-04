@@ -231,7 +231,7 @@ qss_dark = """
 
      /* The tab _widget_ frame for all TabWidgets */
     QTabWidget {background-color: #303030;} /* Background for tabs except input tabs */
-    /* background of input tabs, here QTabWidget is encompassed by QScrollArea */
+    /* background for input tabs, here QTabWidget is encompassed by QScrollArea */
     QScrollArea{color:white; background-color:#303030;}
     QTabWidget::pane{background-color: #606060;} /* background of tab widget content */
     /* NavigationToolbar needs to have the same color as above */
@@ -248,7 +248,7 @@ qss_dark = """
     * [state="normal"], * [state=""]{background-color: #A04040; color: white;} */
 
     QTextEdit{background-color: #505050;}
-    QLineEdit{background-color: #505050; color: white;  border-color: #A0A0A0;}
+    QLineEdit{background-color: #505050; border-color: #A0A0A0;}
     QLineEdit:disabled{background-color: #505050; color: #A0A0A0}
     QPushButton:disabled{background-color: #505050; color: #A0A0A0}
     QComboBox:disabled{background-color: #505050; color: #A0A0A0}
@@ -307,13 +307,12 @@ qss_light = """
 
     /* The tab _widget_ frame for all TabWidgets */
     QTabWidget{background-color: #F0F0F0;} /* Background for tabs except input tabs */
-    /* background of input tabs, here QTabWidget is encompassed by QScrollArea */
+    /* background for input tabs, here QTabWidget is encompassed by QScrollArea */
     QScrollArea{color:black; background-color:#F0F0F0;} /* background of input tabs */
     QTabWidget::pane{background-color: #F0F0F0;} /* background of tab widget content */
     /* NavigationToolbar needs to have the same color as above */
-    /* NavigationToolbar2QT{background-color:#F0F0F0;} */
-
-    QTextEdit{background-color: white;}
+    NavigationToolbar2QT{background-color:#F0F0F0;}
+    /* QTabBar {background-color: pink;} */ /* background of Tabs, normally defined by pane */
 
     QTableView{alternate-background-color:#C0C0C0;
         background-color:#F0F0F0; gridline-color: #A0A0A0;}
@@ -321,9 +320,10 @@ qss_light = """
     QHeaderView::section{background-color:#808080; color:white;}
     QHeaderView::section:checked{background-color:blue; color:white;}
 
-    /* Applies to all widgets
+    /* Applies to all widgets in "normal" state
     * [state="normal"]{background-color: white; border-color: #303030;} */
 
+    QTextEdit{background-color: white;}
     QLineEdit{background-color: white; border-color: #303030;}
     QLineEdit:disabled{background-color:#C0C0C0; color: white;}
     QPushButton:disabled{background-color: #C0C0C0; color: white}
