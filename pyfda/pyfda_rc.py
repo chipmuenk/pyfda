@@ -284,7 +284,7 @@ qss_dark = """
         QComboBox::item:checked {font-weight: bold;}
     */
 
-    QProgressBar{color: black;}
+    QProgressBar::chunk{background-color: #505050;}
 
     QSplitter::handle:vertical {
         background-color: qlineargradient(spread:pad, x1:0, y1:0, x2:1, y2:0,
@@ -344,6 +344,8 @@ qss_light = """
     /* Style for the spinbox and combobox itself */
     /* QSpinBox, QComboBox{background-color: #e0e0e0; border: 1px solid gray;
             padding: 1px; selection-background-color: orange;}*/
+
+    QProgressBar::chunk{background-color: #F0F0F0;}
 
     QSplitter::handle:vertical {
         background-color: qlineargradient(spread:pad, x1:0, y1:0, x2:1, y2:0,
@@ -576,7 +578,6 @@ qss_common = """
 
                 QProgressBar{text-align: center; font-weight: bold;
                              border: 1px solid #303030;}
-                QProgressBar::chunk{background-color: lightblue;}
 
             """
 # QApplication.setStyle(QStyleFactory.create('Cleanlooks')) re-create default styles
