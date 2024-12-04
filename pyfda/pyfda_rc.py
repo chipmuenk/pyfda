@@ -267,9 +267,7 @@ qss_dark = """
 
     QPlainTextEdit{background-color: black}
 
-    /* Style for the spinbox and combobox itself */
-    /* Color of Combobox widget and border */
-
+    /* Style for the spinbox and combobox itself (color and border) */
     QSpinBox, QComboBox{
         background-color: #505050;
         border: 1px solid #C0C0C0;
@@ -341,7 +339,7 @@ qss_light = """
 
     QPlainTextEdit{background-color: white}
 
-    /* Style for the spinbox and combobox itself */
+    /* Style for the spinbox and combobox itself (color and border) */
     /* QSpinBox, QComboBox{background-color: #e0e0e0; border: 1px solid gray;
             padding: 1px; selection-background-color: orange;}*/
 
@@ -545,7 +543,7 @@ qss_common = """
                     padding-top: 2px; padding-bottom: 2px;
                     selection-background-color: orange;}
 
-                /* Highlight button when pressed from checked / not checked state 
+                /* Highlight button when pressed from checked / not checked state
                    Also works for PushButton and QPushButtonRT */
                 QPushButton:pressed:checked, QPushButton:pressed:!checked
                     {background-color:orange; color:white}
