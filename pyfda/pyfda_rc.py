@@ -260,7 +260,7 @@ qss_dark = """
                     background-color:#505050; color:white; font-weight: bold;}
 
     /* this doesn't work */
-    QPushButton QLabel{color:white;}
+    QPushButtonRT QLabel{color:white;}
 
     QDialog{background-color: #404040;}
     QMessageBox{background-color:#404040;}
@@ -331,8 +331,14 @@ qss_light = """
     QPushButton:disabled{background-color: #C0C0C0; color: white}
     QComboBox:disabled{background-color: #C0C0C0; color: white}
 
-    QPushButton, QPushButtonRT > QLabel{
+    QPushButton{
             background-color: #C0C0C0; color: black; font-weight: bold;}
+
+    QPushButtonRT:!checked QLabel{
+            background-color: #C0C0C0; color: black; font-weight: bold;}
+
+    /* this doesn't work */
+    QPushButtonRT QLabel{color:black;}
 
     QDialog{background-color: #F0F0F0;}
     QMessageBox{background-color: #F0F0F0}
@@ -548,14 +554,13 @@ qss_common = """
                 QPushButton:pressed:checked, QPushButton:pressed:!checked
                     {background-color:orange; color:white}
 
-                .QPushButton:checked, PushButton:checked{
-                    background-color:lightblue; color:black; font-weight: bold;}
+                /* 'border' must be defined to avoid "grey dots" due to transparent borders
+                https://stackoverflow.com/questions/24718722/how-to-style-qpushbuttons-checked-state-to-remove-grey-dots */
+                QPushButton:checked, QPushButtonRT:checked, PushButton:checked{
+                    background-color:lightblue; border: lightblue; color:black; font-weight: bold;}
 
-                QPushButtonRT:checked QLabel{
-                    color:green; font-weight: bold;}
-
-                QPushButtonRT:checked {
-                    background-color: pink; font-weight: bold;}
+                /* QPushButtonRT:checked QLabel{
+                    color:green; font-weight: bold;} */
 
                 /* TODO: This creates black text for QPushButtonRT ?!
                 QPushButtonRT:checked > QLabel{
