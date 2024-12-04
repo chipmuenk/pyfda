@@ -346,8 +346,15 @@ qss_light = """
     QPlainTextEdit{background-color: white}
 
     /* Style for the spinbox and combobox itself (color and border) */
-    /* QSpinBox, QComboBox{background-color: #e0e0e0; border: 1px solid gray;
-            padding: 1px; selection-background-color: orange;}*/
+    QSpinBox, QComboBox{
+        background-color: #F0F0F0;
+        border: 1px solid #404040;
+        }
+    /* Background color for dropdown items / border color around dropdown menu */
+    QComboBox QAbstractItemView {
+        background-color: #C0C0C0;
+        border: 1px solid orange;
+        }
 
     QProgressBar::chunk{background-color: #F0F0F0;}
 
