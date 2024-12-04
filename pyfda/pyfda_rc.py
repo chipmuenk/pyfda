@@ -255,12 +255,12 @@ qss_dark = """
 
     QPushButton{
             background-color: #505050; color: white; font-weight: bold;}
-    /*QPushButtonRT:!checked > QLabel{
-                    background-color:#505050; color:white; font-weight: bold;}*/
 
-    /* this doesn't work 
-    QPushButtonRT > QLabel{color:white;}
-    QPushButtonRT{color:white;} */
+    QPushButtonRT:!checked QLabel{
+                    background-color:#505050; color:white; font-weight: bold;}
+
+    /* this doesn't work */
+    QPushButton QLabel{color:white;}
 
     QDialog{background-color: #404040;}
     QMessageBox{background-color:#404040;}
@@ -548,8 +548,18 @@ qss_common = """
                 QPushButton:pressed:checked, QPushButton:pressed:!checked
                     {background-color:orange; color:white}
 
-                QPushButton:checked, PushButton:checked, QPushButtonRT:checked > QLabel{
+                .QPushButton:checked, PushButton:checked{
                     background-color:lightblue; color:black; font-weight: bold;}
+
+                QPushButtonRT:checked QLabel{
+                    color:green; font-weight: bold;}
+
+                QPushButtonRT:checked {
+                    background-color: pink; font-weight: bold;}
+
+                /* TODO: This creates black text for QPushButtonRT ?!
+                QPushButtonRT:checked > QLabel{
+                    background-color:lightblue; font-weight: bold;}*/
 
                 /* QSplitter styling adopted from
                 http://stackoverflow.com/questions/6832499/qsplitter-show-a-divider-or-a-margin-between-the-two-widgets
