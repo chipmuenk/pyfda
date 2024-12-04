@@ -255,8 +255,12 @@ qss_dark = """
 
     QPushButton{
             background-color: #505050; color: white; font-weight: bold;}
-    /*QPushButtonRT:!checked > QLabel{
-                    background-color:#505050; color:white; font-weight: bold;}*/
+
+    QPushButtonRT:!checked QLabel{
+                    background-color:#505050; color:white; font-weight: bold;}
+
+    /* this doesn't work */
+    QPushButton QLabel{color:white;}
 
     QDialog{background-color: #404040;}
     QMessageBox{background-color:#404040;}
@@ -472,7 +476,7 @@ qss_common = """
                 * [state="ok"]{background-color: green; color: white;}
                 * [state="changed"]{background-color: yellow; color: black;}
                 * [state="running"]{background-color: orange; color: white;}
-                * [state="highlight"]{background-color: lightblue;}
+                /* * [state="highlight"]{background-color: lightblue;} */
                 /* 'unused', e.g. for lineedit fields with some filter designs */
                 * [state="unused"], *[state="u"]{background-color: white; color:#303030}
                 * [state="failed"], * [state="error"]{
@@ -539,22 +543,23 @@ qss_common = """
                     padding-top: 2px; padding-bottom: 2px;
                     selection-background-color: orange;}
 
-                /* QPushButton[state="changed"]{
-                    background-color: yellow; color: black;} */
-
-                /* QPushButton[state="error"]{
-                    background-color: red; color: white;} */
-
-                /* QPushButton[state="ok"]{
-                    background-color: green; color: white;
-                    } */
-
-                /* Highlight button when pressed from checked / not checked state */
+                /* Highlight button when pressed from checked / not checked state 
+                   Also works for PushButton and QPushButtonRT */
                 QPushButton:pressed:checked, QPushButton:pressed:!checked
                     {background-color:orange; color:white}
 
-                QPushButton:checked, PushButton:checked, QPushButtonRT:checked > QLabel{
+                .QPushButton:checked, PushButton:checked{
                     background-color:lightblue; color:black; font-weight: bold;}
+
+                QPushButtonRT:checked QLabel{
+                    color:green; font-weight: bold;}
+
+                QPushButtonRT:checked {
+                    background-color: pink; font-weight: bold;}
+
+                /* TODO: This creates black text for QPushButtonRT ?!
+                QPushButtonRT:checked > QLabel{
+                    background-color:lightblue; font-weight: bold;}*/
 
                 /* QSplitter styling adopted from
                 http://stackoverflow.com/questions/6832499/qsplitter-show-a-divider-or-a-margin-between-the-two-widgets
