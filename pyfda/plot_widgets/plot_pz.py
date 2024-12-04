@@ -107,7 +107,8 @@ class Plot_PZ(QWidget):
         qcmb_box_populate(
             self.cmb_overlay, self.cmb_overlay_items, self.cmb_overlay_default)
 
-        self.but_log = PushButton(" Log.", checked=True, objectName="but_log")
+        self.but_log = PushButton(" Log.", objectName="but_log")
+        self.but_log.setChecked(True)
         self.but_log.setToolTip("<span>Log. scale for overlays.</span>")
 
         self.diaRad_Hf = QDial(self)
@@ -137,7 +138,8 @@ class Plot_PZ(QWidget):
         self.lblTopdB = QLabel("dB", self)
         self.lblTopdB.setVisible(self.but_log.isChecked())
 
-        self.but_fir_poles = PushButton(" FIR Poles ", checked=True)
+        self.but_fir_poles = PushButton(" FIR Poles ")
+        self.but_fir_poles.setChecked(True)
         self.but_fir_poles.setToolTip("<span>Show FIR poles at the origin.</span>")
 
         layHControls = QHBoxLayout()

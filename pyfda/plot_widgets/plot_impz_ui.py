@@ -171,11 +171,10 @@ class PlotImpz_UI(QWidget):
         # ----------- ---------------------------------------------------
         # Run control widgets
         # ---------------------------------------------------------------
-        self.but_auto_run = QPushButton(" Auto", objectName="but_auto_run")
+        self.but_auto_run = PushButton(" Auto", objectName="but_auto_run")
         self.but_auto_run.setToolTip("<span>Update response automatically when "
                                      "parameters have been changed.</span>")
-        # self.but_auto_run.setMaximumWidth(qtext_width(text=" Auto "))
-        self.but_auto_run.setCheckable(True)
+        # self.but_auto_run.setCheckable(True)
         self.but_auto_run.setChecked(True)
 
         but_height = self.but_auto_run.sizeHint().height()
@@ -372,11 +371,10 @@ class PlotImpz_UI(QWidget):
                                            "i.e. scale by f_S</span>")
         self.chk_byfs_spgr_time.setChecked(True)
 
-        self.but_log_spgr_time = QPushButton("dB", objectName="but_log_spgr")
+        self.but_log_spgr_time = PushButton("dB", objectName="but_log_spgr")
         self.but_log_spgr_time.setMaximumWidth(qtext_width(text=" dB"))
         self.but_log_spgr_time.setToolTip(
             "<span>Logarithmic scale for spectrogram.</span>")
-        self.but_log_spgr_time.setCheckable(True)
         self.but_log_spgr_time.setChecked(True)
 
         self.lbl_time_nfft_spgr = QLabel(
@@ -512,11 +510,9 @@ class PlotImpz_UI(QWidget):
         self.cmb_plt_freq_resp.setToolTip(
             "<span>Plot style for response.</span>")
 
-        self.but_log_freq = QPushButton("dB", objectName="but_log_freq")
-        self.but_log_freq.setMaximumWidth(qtext_width(" dB"))
+        self.but_log_freq = PushButton("dB", objectName="but_log_freq")
         self.but_log_freq.setToolTip(
             "<span>Logarithmic scale for y-axis.</span>")
-        self.but_log_freq.setCheckable(True)
         self.but_log_freq.setChecked(True)
 
         self.lbl_log_bottom_freq = QLabel(to_html("min =", frmt='bi'), self)
@@ -553,18 +549,14 @@ class PlotImpz_UI(QWidget):
         self.but_freq_norm_impz.setChecked(True)
         self.but_freq_norm_impz.setObjectName("freq_norm_impz")
 
-        self.but_freq_show_info = QPushButton("Info", objectName="but_show_info_freq")
-        self.but_freq_show_info.setMaximumWidth(qtext_width(" Info "))
+        self.but_freq_show_info = PushButton(" Info ", objectName="but_show_info_freq")
         self.but_freq_show_info.setToolTip(
             "<span>Show signal power in legend.</span>")
-        self.but_freq_show_info.setCheckable(True)
         self.but_freq_show_info.setChecked(False)
 
-        self.but_freq_index_k = QPushButton("k", objectName="but_show_index_k")
-        self.but_freq_index_k.setMaximumWidth(qtext_width(" k "))
+        self.but_freq_index_k = PushButton(" k ", objectName="but_show_index_k")
         self.but_freq_index_k.setToolTip(
             "<span>Frequency indices instead of frequencies.</span>")
-        self.but_freq_index_k.setCheckable(True)
         self.but_freq_index_k.setChecked(fb.fil[0]["tab_yn"]["display_index_k"])
 
         layH_ctrl_freq_0 = QHBoxLayout()

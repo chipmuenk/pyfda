@@ -25,6 +25,7 @@ import scipy.signal as sig
 import pyfda.filterbroker as fb  # importing filterbroker initializes all its globals
 import pyfda.filter_factory as ff  # importing filterbroker initializes all its globals
 from pyfda.libs.pyfda_lib import lin2unit, mod_version, to_html, safe_eval
+from pyfda.libs.pyfda_qt_lib import PushButton
 from pyfda.input_widgets.input_info_about import AboutWindow
 from pyfda.pyfda_rc import params
 
@@ -83,23 +84,18 @@ class Input_Info(QWidget):
 
         # ============== UI Layout =====================================
         # widget / subwindow for filter infos
-#        self.butFiltPerf = QToolButton("H(f)", self)
-        self.butFiltPerf = QPushButton(self)
-        self.butFiltPerf.setText("H(f)")
-        self.butFiltPerf.setCheckable(True)
+        self.butFiltPerf = PushButton("H(f)")
         self.butFiltPerf.setChecked(True)
         self.butFiltPerf.setToolTip("Display frequency response at test frequencies.")
 
-        self.butDebug = QPushButton(self)
-        self.butDebug.setText("Debug")
-        self.butDebug.setCheckable(True)
+        self.butDebug = PushButton("Debug")
         self.butDebug.setChecked(False)
         self.butDebug.setToolTip("Show debugging options.")
 
-        self.butAbout = QPushButton("About", self)  # pop-up "About" window
+        self.butAbout = PushButton("About")  # pop-up "About" window
+        self.butAbout.setCheckable(False)
 
-        self.butSettings = QPushButton("Settings", self)  #
-        self.butSettings.setCheckable(True)
+        self.butSettings = PushButton("Settings")  #
         self.butSettings.setChecked(False)
         self.butSettings.setToolTip("Display and set some settings")
 
@@ -109,25 +105,22 @@ class Input_Info(QWidget):
         layHControls1.addWidget(self.butSettings)
         layHControls1.addWidget(self.butDebug)
 
-        self.butDocstring = QPushButton("Doc$", self)
-        self.butDocstring.setCheckable(True)
+        self.butDocstring = PushButton("Doc$")
         self.butDocstring.setChecked(False)
         self.butDocstring.setToolTip("Display docstring from python filter method.")
 
-        self.butRichText = QPushButton("RTF", self)
+        self.butRichText = PushButton("RTF")
         self.butRichText.setCheckable(HAS_DOCUTILS)
         self.butRichText.setChecked(HAS_DOCUTILS)
         self.butRichText.setEnabled(HAS_DOCUTILS)
         self.butRichText.setToolTip("Render documentation in Rich Text Format.")
 
-        self.butFiltDict = QPushButton("FiltDict", self)
+        self.butFiltDict = PushButton("FiltDict")
         self.butFiltDict.setToolTip("Show filter dictionary for debugging.")
-        self.butFiltDict.setCheckable(True)
         self.butFiltDict.setChecked(False)
 
-        self.butFiltTree = QPushButton("FiltTree", self)
+        self.butFiltTree = PushButton("FiltTree")
         self.butFiltTree.setToolTip("Show filter tree for debugging.")
-        self.butFiltTree.setCheckable(True)
         self.butFiltTree.setChecked(False)
 
         layHControls2 = QHBoxLayout()

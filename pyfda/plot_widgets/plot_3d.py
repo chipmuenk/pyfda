@@ -91,11 +91,11 @@ class Plot_3D(QWidget):
 
 # ------------------------------------------------------------------------------
     def _construct_UI(self):
-        self.but_log = PushButton("dB", checked=False, objectName="but_log")
+        self.but_log = PushButton("dB", objectName="but_log")
         self.but_log.setToolTip("Logarithmic scale")
 
-        self.but_plot_in_UC = PushButton("|z| < 1 ", checked=False,
-                                         objectName="but_plot_in_UC")
+        self.but_plot_in_UC = PushButton("|z| < 1 ", objectName="but_plot_in_UC")
+        self.but_plot_in_UC.setChecked(True)
         self.but_plot_in_UC.setToolTip("Only plot H(z) within the unit circle")
 
         self.lblBottom = QLabel(to_html("Bottom =", frmt='bi'), self)
@@ -112,13 +112,16 @@ class Plot_3D(QWidget):
         self.lblTopdB = QLabel("dB", self)
         self.lblTopdB.setVisible(self.but_log.isChecked())
 
-        self.plt_UC = PushButton("UC", checked=True, objectName="plt_UC")
+        self.plt_UC = PushButton("UC", objectName="plt_UC")
+        self.plt_UC.setChecked(True)
         self.plt_UC.setToolTip("Plot unit circle")
 
-        self.but_PZ = PushButton("P/Z ", checked=True, objectName="but_PZ")
+        self.but_PZ = PushButton("P/Z ", objectName="but_PZ")
+        self.but_PZ.setChecked(True)
         self.but_PZ.setToolTip("Plot poles and zeros")
 
-        self.but_Hf = PushButton("H(f) ", checked=True, objectName="but_Hf")
+        self.but_Hf = PushButton("H(f) ", objectName="but_Hf")
+        self.but_Hf.setChecked(True)
         self.but_Hf.setToolTip("Plot H(f) along the unit circle")
 
         modes = ['None', 'Mesh', 'Surf', 'Contour']
@@ -128,17 +131,18 @@ class Plot_3D(QWidget):
         self.cmbMode3D.setCurrentIndex(0)
         self.cmbMode3D.setSizeAdjustPolicy(QComboBox.AdjustToContents)
 
-        self.but_colormap_r = PushButton("reverse", checked=True, objectName="but_colormap_r")
+        self.but_colormap_r = PushButton("reverse", objectName="but_colormap_r")
+        self.but_colormap_r.setChecked(True)
         self.but_colormap_r.setToolTip("reverse colormap")
 
         self.cmbColormap = QComboBox(self)
         self._init_cmb_colormap(cmap_init=self.cmap_default)
         self.cmbColormap.setToolTip("Select colormap")
 
-        self.but_colbar = PushButton("Colorbar ", checked=False, objectName="chkColBar")
+        self.but_colbar = PushButton("Colorbar ", objectName="chkColBar")
         self.but_colbar.setToolTip("Show colorbar")
 
-        self.but_lighting = PushButton("Lighting", checked=False, objectName="but_lighting")
+        self.but_lighting = PushButton("Lighting", objectName="but_lighting")
         self.but_lighting.setToolTip("Enable light source")
 
         self.lblAlpha = QLabel(to_html("Alpha", frmt='bi'), self)
@@ -161,8 +165,7 @@ class Plot_3D(QWidget):
         self.diaHatch.setWrapping(False)
         self.diaHatch.setToolTip("Set line density for various plots.")
 
-        self.but_contour_2d = PushButton("Contour2D ", checked=False,
-                                         objectName="chkContour2D")
+        self.but_contour_2d = PushButton("Contour2D ", objectName="chkContour2D")
         self.but_contour_2d.setToolTip("Plot 2D-contours at z =0")
 
         # ----------------------------------------------------------------------

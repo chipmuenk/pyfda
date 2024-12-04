@@ -131,7 +131,7 @@ class Plot_Hf(QWidget):
 
         self.cmb_units_a.setSizeAdjustPolicy(QComboBox.AdjustToContents)
 
-        self.but_zerophase = PushButton(" Zero phase ", checked=False)
+        self.but_zerophase = PushButton(" Zero phase ")
         self.but_zerophase.setToolTip(
             "<span>Remove linear phase calculated from filter order.\n"
             "Attention: This makes no sense for a non-linear phase system!</span>")
@@ -143,13 +143,13 @@ class Plot_Hf(QWidget):
         self.cmbInset.setCurrentIndex(0)
         self.inset_idx = 0  # store previous index for comparison
 
-        self.but_specs = PushButton("Specs ", checked=False)
+        self.but_specs = PushButton("Specs ")
         self.but_specs.setToolTip("Display filter specs as hatched regions")
 
-        self.but_phase = PushButton("Phase ", checked=False)
+        self.but_phase = PushButton("Phase ")
         self.but_phase.setToolTip("Overlay phase")
 
-        self.but_align = PushButton("Align", checked=True)
+        self.but_align = PushButton("Align")
         self.but_align.setToolTip(
             "<span>Try to align gridlines for magnitude and phase "
             "(doesn't work in all cases).</span>")

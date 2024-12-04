@@ -176,13 +176,13 @@ class Tran_IO_UI(QWidget):
         self.cmb_file_format = QComboBox()
         qcmb_box_populate(self.cmb_file_format, self.cmb_file_format_items,
                           self.cmb_file_format_init)
-        self.but_csv_options = PushButton(self, icon=QIcon(':/csv_options.svg'),
-                                          checked=False)
+        self.but_csv_options = PushButton(self, icon=QIcon(':/csv_options.svg'))
         self.but_csv_options.setToolTip(
             "<span>Select CSV format and whether "
             "to copy to/from clipboard or file.</span>")
 
-        self.but_int_as_float = PushButton("Int2Float ", checked=True)
+        self.but_int_as_float = PushButton("Int2Float ")
+        self.but_int_as_float.setChecked(True)
         self.but_int_as_float.setToolTip(
             "<span>Represent <i>W</i> bit integer WAV formats as float when importing "
             "and exporting so that 1.0 is equivalent to 2<sup>W</sup>.</span>")

@@ -131,7 +131,6 @@ class FreqUnits(QWidget):
         self.led_f_s.installEventFilter(self)  # filter events
 
         self.butLock = PushButton(self, icon=QIcon(':/lock-unlocked.svg'))
-        self.butLock.setIcon(QIcon(':/lock-unlocked.svg'))
         self.butLock.setToolTip(
             "<span><b>Unlocked:</b> When f_S is changed, all frequency related "
             "widgets are updated, normalized frequencies stay the same.<br />"
@@ -155,7 +154,8 @@ class FreqUnits(QWidget):
         self.cmb_f_units.setSizeAdjustPolicy(QComboBox.AdjustToContents)
         self.cmb_f_range.setSizeAdjustPolicy(QComboBox.AdjustToContents)
 
-        self.butSort = PushButton(self, icon=QIcon(':/sort-ascending.svg'), checked=True)
+        self.butSort = PushButton(self, icon=QIcon(':/sort-ascending.svg'))
+        self.butSort.setChecked(True)
         self.butSort.setToolTip("Sort frequencies in ascending order when pushed.")
         self.butSort.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
 
