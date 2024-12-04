@@ -121,10 +121,13 @@ class QPushButtonRT(QPushButton):
         return
 
     def sizeHint(self):
+        is_checked = self.isChecked()
+        self.setChecked(False)
         s = QPushButton.sizeHint(self)
         w = self.__lbl.sizeHint()
         s.setWidth(w.width() + 2 * self.margin)
         # s.setHeight(w.height())
+        self.setChecked(is_checked)
         return s
 
     # def clicked(self):
