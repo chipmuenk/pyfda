@@ -245,7 +245,7 @@ qss_dark = """
     QHeaderView::section:checked{background-color:blue;}
 
     /* Applies to all widgets in "normal" state
-    * [state="normal"], * [state=""]{background-color: #A04040; color: white;} */
+    * [state="normal"]{background-color: #A04040; color: white;} TODO: border-color? */
 
     QTextEdit{background-color: #505050;}
     QLineEdit{background-color: #505050; border-color: #A0A0A0;}
