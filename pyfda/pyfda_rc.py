@@ -476,7 +476,7 @@ qss_common = """
                 * [state="ok"]{background-color: green; color: white;}
                 * [state="changed"]{background-color: yellow; color: black;}
                 * [state="running"]{background-color: orange; color: white;}
-                * [state="highlight"]{background-color: lightblue;}
+                /* * [state="highlight"]{background-color: lightblue;} */
                 /* 'unused', e.g. for lineedit fields with some filter designs */
                 * [state="unused"], *[state="u"]{background-color: white; color:#303030}
                 * [state="failed"], * [state="error"]{
