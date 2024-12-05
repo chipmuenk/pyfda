@@ -100,6 +100,7 @@ class AmplitudeSpecs(QWidget):
         # fields are added and hidden dynamically in _show_entries and _hide_entries()
         self.layGSpecs.addLayout(layHTitle, 0, 0, 1, 2)
         self.layGSpecs.setAlignment(Qt.AlignLeft)
+        self.layGSpecs.setAlignment(Qt.AlignTop)
 
         # This is the top level widget, encompassing the other widgets
         self.frmMain = QFrame(self)
