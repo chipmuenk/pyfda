@@ -122,7 +122,7 @@ class QPushButtonRT(QPushButton):
 
     def sizeHint(self):
         is_checked = self.isChecked()
-        self.setChecked(False)
+        self.setChecked(False)  # always base sizeHint on unchecked state
         s = QPushButton.sizeHint(self)
         w = self.__lbl.sizeHint()
         s.setWidth(w.width() + 2 * self.margin)
