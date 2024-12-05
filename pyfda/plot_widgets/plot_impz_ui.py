@@ -554,9 +554,10 @@ class PlotImpz_UI(QWidget):
             "<span>Show signal power in legend.</span>")
         self.but_freq_show_info.setChecked(False)
 
-        self.but_freq_index_k = PushButton(" k ", objectName="but_show_index_k")
+        self.but_freq_index_k = QPushButtonRT(text=" <i>k</i> ", objectName="but_show_index_k")
         self.but_freq_index_k.setToolTip(
             "<span>Frequency indices instead of frequencies.</span>")
+        self.but_freq_index_k.setCheckable(True)
         self.but_freq_index_k.setChecked(fb.fil[0]["tab_yn"]["display_index_k"])
 
         layH_ctrl_freq_0 = QHBoxLayout()
