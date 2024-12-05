@@ -132,10 +132,10 @@ class FreqUnits(QWidget):
 
         self.butLock = PushButton(self, icon=QIcon(':/lock-unlocked.svg'))
         self.butLock.setToolTip(
-            "<span><b>Unlocked:</b> When f_S is changed, all frequency related "
-            "widgets are updated, normalized frequencies stay the same.<br />"
-            "<b>Locked:</b> When f_S is changed, displayed absolute frequency "
-            "values don't change but normalized frequencies do.</span>")
+            "<span><b>Unlocked:</b> When <i>f<sub>S</sub></i> is changed, all frequency "
+            "related widgets are updated, normalized frequencies stay the same.<br />"
+            "<b>Locked:</b> When <i>f<sub>S</sub></i> is changed, displayed absolute "
+            "frequency values don't change but normalized frequencies do.</span>")
 
         layHF_S = QHBoxLayout()
         layHF_S.addWidget(self.led_f_s)
@@ -156,7 +156,7 @@ class FreqUnits(QWidget):
 
         self.butSort = PushButton(self, icon=QIcon(':/sort-ascending.svg'))
         self.butSort.setChecked(True)
-        self.butSort.setToolTip("Sort frequencies in ascending order when pushed.")
+        self.butSort.setToolTip("Sort frequencies in ascending order when activated.")
         self.butSort.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
 
         self.layHUnits = QHBoxLayout()

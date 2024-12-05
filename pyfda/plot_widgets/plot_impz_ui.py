@@ -556,7 +556,7 @@ class PlotImpz_UI(QWidget):
 
         self.but_freq_index_k = QPushButtonRT(text=" <i>k</i> ", objectName="but_show_index_k")
         self.but_freq_index_k.setToolTip(
-            "<span>Frequency indices instead of frequencies.</span>")
+            "<span>Show FFT indices instead of frequencies.</span>")
         self.but_freq_index_k.setCheckable(True)
         self.but_freq_index_k.setChecked(fb.fil[0]["tab_yn"]["display_index_k"])
 
