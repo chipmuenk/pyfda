@@ -1367,8 +1367,7 @@ class Plot_Impz(QWidget):
             self.ax_i.set_ylabel(H_i_str + r'$\rightarrow $')
             self.ax_i.legend(h_i, l_i, loc='best', fontsize='small', fancybox=True,
                              framealpha=0.7)
-        # else:
-        #    self.ax_r.set_xlabel(fb.fil[0]['plt_tLabel'])
+
         self.ax_r.set_ylabel(H_str + r'$\rightarrow $')
 
         # --------------- Spectrogram -----------------------------------------
@@ -2028,7 +2027,10 @@ class Plot_Impz(QWidget):
                                   framealpha=0.7)
                 self.ax_f2.set_ylabel(H_Fi_str)
 
-            self.axes_f[-1].set_xlabel(fb.fil[0]['plt_fLabel'])
+            if self.ui.but_freq_index_k.isChecked():
+                self.axes_f[-1].set_xlabel(r'$k \; \rightarrow$')
+            else:
+                self.axes_f[-1].set_xlabel(fb.fil[0]['plt_fLabel'])
             self.ax_f1.set_ylabel(H_Fr_str)
             # self.ax_f1.set_xlim(fb.fil[0]['freqSpecsRange'])
             self.ax_f1.set_xlim(F_range)
