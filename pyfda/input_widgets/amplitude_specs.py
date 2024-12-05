@@ -91,9 +91,9 @@ class AmplitudeSpecs(QWidget):
 
         layHTitle = QHBoxLayout()  # layout for title and unit
         layHTitle.addWidget(lblTitle)
+        layHTitle.addStretch(5)
         layHTitle.addWidget(lblUnits, Qt.AlignLeft)
         layHTitle.addWidget(self.cmbUnitsA, Qt.AlignLeft)
-        layHTitle.addStretch(1)
 
         self.layGSpecs = QGridLayout()  # sublayout for spec fields
         # set the title as the first (fixed) entry in grid layout. The other
