@@ -45,6 +45,20 @@ datas += [('pyfda/fixpoint_widgets/*.png', 'pyfda/fixpoint_widgets'),
     ('./*.md', '.'),
     ('pyfda/*.md', 'pyfda')]
 
+# Add all json files from jschon package (used by amaranth) to datas. The directory
+# specified in the second part of the datas tuple is only the jschon/... dir part, e.g.
+# ('python3.10/site-packages/jschon/catalog/json-schema-2020-12/schema.json',
+#  'jschon/catalog/json-schema-2020-12')
+import os
+import importlib
+jschon_root = os.path.dirname(importlib.import_module('jschon').__file__)  # root dir for jschon package
+json_files = [(os.path.join(root, name),
+               os.path.join('jschon', root.partition('jschon/')[2]))
+                for root, dirs, files in os.walk(jschon_root)
+                    for name in files
+                        if name.endswith(".json")]
+datas += json_files
+
 ## hiddenimports += ['html.parser'] # needed for markdown 3.3 compatibility
 ## hiddenimports += ['scipy.special.cython_special']
 ### Plot Widgets
@@ -65,6 +79,7 @@ hiddenimports += [
 ### Fixpoint Widgets
 hiddenimports += [
     'pyfda.fixpoint_widgets.fir_df.fir_df_pyfixp_ui',
+    'pyfda.fixpoint_widgets.fir_df.fir_df_amaranth_ui',
     'pyfda.fixpoint_widgets.iir_df1.iir_df1_pyfixp_ui']
 
 excludes = []
