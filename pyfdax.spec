@@ -34,11 +34,10 @@ from PyInstaller.utils.hooks import collect_submodules
 
 hiddenimports = []
 datas = []
-#hiddenimports = collect_submodules('scipy.signal')
-#datas += collect_data_files('scipy.signal')
-## datas += collect_data_files('scipy.fftpack') # windows only? Adds some *.py files
 
-# add images and configuration files
+# add data (graphic and configuration files) as a list of tuples where the
+# first tuple item is the file (full local path name) and the second the directory
+# name in the pyinstaller archive
 datas += [('pyfda/fixpoint_widgets/*.png', 'pyfda/fixpoint_widgets'),
     ('pyfda/fixpoint_widgets/fir_df/*.png', 'pyfda/fixpoint_widgets/fir_df'),
     ('pyfda/fixpoint_widgets/iir_df1/*.png', 'pyfda/fixpoint_widgets/iir_df1'),
