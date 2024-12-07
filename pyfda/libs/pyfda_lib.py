@@ -167,7 +167,9 @@ def cmp_version(mod: str, version: str) -> int:
         else:
             # get dict value without knowing the key:
             inst_ver = list(MODULES[mod].values())[0]
-            if inst_ver == '':
+            if inst_ver in {'', 'unknown'}:
+                logger.warning(
+                    f"Version number of module '{mod}' could not be determined.")
                 return -2
 
         if versiontuple(inst_ver) > versiontuple(version):
@@ -177,8 +179,7 @@ def cmp_version(mod: str, version: str) -> int:
         else:
             return -1
     except (TypeError, KeyError) as e:
-        logger.warning("Version number of {0} could not be determined.\n"
-                       "({1})".format(mod, e))
+        logger.warning(f"Version number of '{mod}' could not be determined:\n{e}")
         return -1
 
 
