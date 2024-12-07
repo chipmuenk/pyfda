@@ -62,16 +62,17 @@ hiddenimports += [
     'pyfda.filter_widgets.equiripple','pyfda.filter_widgets.firwin','pyfda.filter_widgets.ma',
     'pyfda.filter_widgets.bessel','pyfda.filter_widgets.butter','pyfda.filter_widgets.ellip',
     'pyfda.filter_widgets.cheby1','pyfda.filter_widgets.cheby2',
-	'pyfda.filter_widgets.manual'] 
+	'pyfda.filter_widgets.manual']
 ### Fixpoint Widgets
 hiddenimports += [
     'pyfda.fixpoint_widgets.fir_df.fir_df_pyfixp_ui',
     'pyfda.fixpoint_widgets.iir_df1.iir_df1_pyfixp_ui']
 
-excludes = collect_submodules('amaranth')
+excludes = []
+excludes += collect_submodules('amaranth')
 excludes += collect_submodules('tornado')
 excludes += collect_submodules('colorama')
-excludes += collect_submodules('tkinter') 
+excludes += collect_submodules('tkinter')
 excludes += collect_submodules('jedi')
 # excludes += collect_submodules('PIL')
 excludes += collect_submodules('nbconvert')
@@ -115,12 +116,12 @@ a.binaries = a.binaries - TOC([
  # ('opengl32sw.dll', None, None) # need to test
     ])
  # ('_ssl', None, None), # needed for?
- # libicudata.so.58' # central Qt library 
+ # libicudata.so.58' # central Qt library
  # libQt5Svg.so.5' # needed for icons
 
 
 # Delete data ...
-a.datas = [x for x in a.datas if 
+a.datas = [x for x in a.datas if
 	(not x[0].startswith('tk')
 	 and not x[0].startswith('IPython')
 	 # and not x[0].startswith('scipy/fftpack') # needed for windows
