@@ -83,7 +83,7 @@ hiddenimports += [
     'pyfda.fixpoint_widgets.iir_df1.iir_df1_pyfixp_ui']
 
 excludes = []
-excludes += collect_submodules('amaranth')
+# excludes += collect_submodules('amaranth')
 excludes += collect_submodules('tornado')
 excludes += collect_submodules('colorama')
 excludes += collect_submodules('tkinter')
