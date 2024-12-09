@@ -108,7 +108,6 @@ class QPushButtonRT(QPushButton):
         # Make QLabel transparent except for painted pixels
         self.__lbl.setAttribute(Qt.WA_TranslucentBackground)
         # Disable the delivery of mouse events to the QLabel widget and its children,
-        # passing the events along to QPushButton
         self.__lbl.setAttribute(Qt.WA_TransparentForMouseEvents)
         self.__lbl.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
         self.__lbl.setTextFormat(Qt.RichText)
