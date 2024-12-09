@@ -90,7 +90,7 @@ try:
         V_DOC = 'unknown'
     MODULES.update({'docutils': {'V_DOC': V_DOC}})
 except ImportError:
-    MODULES.update({'docutils': {'V_DOC': ''}})
+    MODULES.update({'docutils': {'V_DOC': 'n.a.'}})
 
 try:
     from mplcursors import __version__ as V_CUR
@@ -98,7 +98,7 @@ try:
         V_CUR = 'unknown'
     MODULES.update({'mplcursors': {'V_CUR': V_CUR}})
 except ImportError:
-    MODULES.update({'mplcursors': {'V_CUR': ''}})
+    MODULES.update({'mplcursors': {'V_CUR': 'n.a.'}})
 
 MODULES.update({'yosys': {'V_YO': dirs.YOSYS_VER}})
 
@@ -108,7 +108,7 @@ try:
         V_XLWT = 'unknown'
     MODULES.update({'xlwt': {'V_XLWT': V_XLWT}})
 except ImportError:
-    MODULES.update({'xlwt': {'V_XLWT': ''}})
+    MODULES.update({'xlwt': {'V_XLWT': 'n.a.'}})
 
 try:
     from xlsxwriter import __version__ as V_XLSX
@@ -116,7 +116,7 @@ try:
         V_XLSX = 'unknown'
     MODULES.update({'xlsx': {'V_XLSX': V_XLSX}})
 except ImportError:
-    MODULES.update({'xlsx': {'V_XLSX': ''}})
+    MODULES.update({'xlsx': {'V_XLSX': 'n.a.'}})
 
 try:
     from amaranth import __version__ as V_AM
@@ -124,7 +124,7 @@ try:
         V_AM = 'unknown'
     MODULES.update({'amaranth': {'V_AM': V_AM}})
 except ImportError:
-    MODULES.update({'amaranth': {'V_AM': ''}})
+    MODULES.update({'amaranth': {'V_AM': 'n.a.'}})
 
 
 # Remove module names as keys and return a dict with items like
@@ -174,8 +174,12 @@ def cmp_version(mod: str, version: str) -> int:
         return tuple(map(int, (v.split("."))))
 
     try:  # empty string / module not in list / returned '' as version number
-        if not mod or not mod in MODULES or list(MODULES[mod].values())[0] == '':
+        if not mod or not mod in MODULES\
+                or list(MODULES[mod].values())[0] in {'', 'n.a.'}:
             return -2
+        elif dirs.PYINSTALLER:
+            # pyfda is running from an self-extracting archive, version should be ok
+            return 1
         else:
             # get dict value without knowing the key:
             inst_ver = list(MODULES[mod].values())[0]
