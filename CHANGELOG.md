@@ -39,7 +39,7 @@ only be used under Ubuntu (or probably other Debian related distros)
 ### Bugfixes
 
 - Fix Python 3.12 related syntax warnings about invalid escape sequences by using raw strings
-- remove distutils.LooseVersion imports as this is no longer supported by Python 3.12 
+- remove distutils.LooseVersion imports as this is no longer supported by Python 3.12
 
 ## [v0.9.0](https://github.com/chipmuenk/pyfda/tree/v0.9.0) (2024-09-30)
 
@@ -67,7 +67,7 @@ only be used under Ubuntu (or probably other Debian related distros)
   reached (currently hardcoded)
 - For complex-valued time signals, display single-sided spectra as magnitude
   [issue \#242](https://github.com/chipmuenk/pyfda/issues/242)
-- Dark mode (needs to be set in `pyfda.conf` with `THEME = 'dark'`. When updating an existing installation, 
+- Dark mode (needs to be set in `pyfda.conf` with `THEME = 'dark'`. When updating an existing installation,
   recreate the config file first with `pyfdax -r`
 - New second-order sections export formats 'CMSIS DSP coefficients' and 'Scipy/Matlab SOS coefficients'
 - Add more infos in FFT Window viewer
