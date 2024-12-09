@@ -7,6 +7,7 @@
 [![MIT licensed](https://img.shields.io/badge/license-MIT-blue.svg)](./LICENSE)
 [![ReadTheDocs](https://readthedocs.org/projects/pyfda/badge/?version=main)](https://readthedocs.org/projects/pyfda/?version=main)
 [![build_pyinstaller](https://github.com/chipmuenk/pyfda/actions/workflows/build_pyinstaller.yml/badge.svg?branch=main)](https://github.com/chipmuenk/pyfda/actions/workflows/build_pyinstaller.yml)
+[![Anaconda-Server Badge](https://anaconda.org/conda-forge/pyfda/badges/version.svg)](https://anaconda.org/conda-forge/pyfda)
 [![build_flatpak](https://github.com/chipmuenk/pyfda/actions/workflows/build_flatpak.yml/badge.svg?branch=main)](https://github.com/chipmuenk/pyfda/actions/workflows/build_flatpak.yml)
 
 <!-- ![Total Github Downloads](https://img.shields.io/github/downloads/chipmuenk/pyfda/total?label=Total%20Github%20Downloads) -->
@@ -46,7 +47,9 @@ For details, see [INSTALLATION.md](INSTALLATION.md).
 
 Binaries can be downloaded under [Releases](https://github.com/chipmuenk/pyfda/releases) for versioned releases and for a latest release, automatically created for each push to the main branch.
 
-Self-extracting archives for **64 bit Windows**, **OS X** and **Ubuntu Linux** are created with **[pyInstaller](https://www.pyinstaller.org/)**. The archives self-extract to a temporary directory that is automatically deleted when pyfda is terminated (except when it crashes), they don't modify the system except for two ASCII configuration files and a log file. No additional software / libraries need to be installed, there is no interaction with existing python installations and you can simply overwrite or delete the executables when updating. After downloading the Linux archive, you need to make it executable (`chmod 775 pyfda_linux`).
+Self-extracting archives for **64 bit Windows**, **OS X** and **Ubuntu Linux** are created with **[pyInstaller](https://www.pyinstaller.org/)**. The archives self-extract to a temporary directory that is automatically deleted when pyfda is terminated (except when it crashes), they don't modify the system except for two ASCII configuration files and a log file. No additional software / libraries need to be installed, there is no interaction with existing python installations and you can simply overwrite or delete the executables when updating. 
+
+After downloading the Linux archive, you might need to make it executable (`chmod 775 pyfda_ubuntu`).
 
 Binaries for **Linux** are created as Flatpaks as well **(currently broken)** which can also be downloaded from [Flathub](https://flathub.org/apps/details/com.github.chipmuenk.pyfda) **(also broken)**. Many Linux distros have built-in flatpak support, for others it's easy to install with e.g. `sudo apt install flatpak`. For details check the [Flatpak](https://www.flatpak.org/) home page.
 
@@ -90,6 +93,7 @@ The following libraries are required and installed automatically by pip when mis
 
 - **[mplcursors](https://mplcursors.readthedocs.io/)** for annotating cursors
 - **[docutils](https://docutils.sourceforge.io)** for rich text in documentation
+- **[Amaranth HDL](https://github.com/amaranth-lang/amaranth)** for fixpoint simulation and Verilog export (work in progress, help wanted)
 - **xlwt** and / or **XlsxWriter** for exporting filter coefficients as *.xls(x) files
 
 ### conda
@@ -173,8 +177,6 @@ For details, see [CHANGELOG.md](./CHANGELOG.md).
 
 ## Planned features (help wanted)
 
-- Dark mode
-- Use [Amaranth](https://amaranth-lang.org/docs/amaranth/latest/intro.html) to simulate fixpoint filters and export them in HDL format
 - Graphical modification of poles / zeros
 - Document filter designs in PDF / HTML format
 - Design, analysis and export of filters as second-order sections, display and edit them in the P/Z widget
