@@ -167,7 +167,7 @@ mpl_rc_light = {
             'axes.facecolor'    : 'white',
             'axes.labelcolor'   : 'black',
             'axes.edgecolor'    : 'black',
-            'figure.facecolor'  : 'white',
+            'figure.facecolor'  : 'D0D0D0',
             'figure.edgecolor'  : '#808080',
             'savefig.facecolor' : 'white',
             'savefig.edgecolor' : 'white',
@@ -251,6 +251,7 @@ qss_dark = """
     QTextEdit{background-color: #505050;}
     QLineEdit{background-color: #505050; border-color: #A0A0A0;}
     QLineEdit:disabled{background-color: #505050; color: #A0A0A0}
+
     /* Style 'normal' background for all push buttons */
     QPushButton{background-color: #505050;}
     .QPushButton:disabled, PushButton:disabled{color: #A0A0A0;} /* background-color? */
@@ -297,22 +298,23 @@ qss_dark = """
 # light QSS theme
 # ---------------
 qss_light = """
+    /* Background color #D0D0D0 should be same as matplotlib figure.facecolor */
     QSplitter{background-color: #F0F0F0;} /* Top Level background */
     QWidget{color:black;}  /* nearly all widgets are derived from this */
     /* background of QWidget and QFrame widgets, not of derived widgets: */
-    .QWidget, .QFrame{background-color: white;}
+    .QWidget, .QFrame{background-color: #F0F0F0;}
 
     /* The tab _widget_ frame for all TabWidgets */
     QTabWidget{background-color: #F0F0F0;} /* Background for tabs except input tabs */
     /* background for input tabs, here QTabWidget is encompassed by QScrollArea */
     QScrollArea{color:black; background-color:#F0F0F0;} /* background of input tabs */
-    QTabWidget::pane{background-color: #F0F0F0;} /* background of tab widget content */
+    QTabWidget::pane{background-color: #E0E0E0;} /* background of tab widget content */
     /* NavigationToolbar needs to have the same color as above */
-    NavigationToolbar2QT{background-color:#F0F0F0;}
+    NavigationToolbar2QT{background-color:#E0E0E0;}
     /* QTabBar {background-color: pink;} */ /* background of Tabs, normally defined by pane */
 
     QTableView{alternate-background-color:#C0C0C0;
-        background-color:#F0F0F0; gridline-color: #A0A0A0;}
+        background-color:#D0D0D0; gridline-color: #A0A0A0;}
     QHeaderView{background-color:#D0D0D0;}
     QHeaderView::section{background-color:#808080; color:white;}
     QHeaderView::section:checked{background-color:blue; color:white;}
@@ -323,26 +325,22 @@ qss_light = """
     QTextEdit{background-color: white;}
     QLineEdit{background-color: white; border-color: #303030;}
     QLineEdit:disabled{background-color:#C0C0C0; color: white;}
-    QPushButton:disabled{background-color: #C0C0C0; color: white}
+
+    /* Style 'normal' background for all push buttons */
+    QPushButton{background-color: #C0C0C0;}
+    .QPushButton:disabled, PushButton:disabled{
+            background-color: #C0C0C0; color: white}
+
     QComboBox:disabled{background-color: #C0C0C0; color: white}
 
-    QPushButton{
-            background-color: #C0C0C0; color: black; font-weight: bold;}
-
-    QPushButtonRT:!checked QLabel{
-            background-color: #C0C0C0; color: black; font-weight: bold;}
-
-    /* this doesn't work */
-    QPushButtonRT QLabel{color:black;}
-
-    QDialog{background-color: #F0F0F0;}
-    QMessageBox{background-color: #F0F0F0}
+    QDialog{background-color: #D0D0D0;}
+    QMessageBox{background-color: #D0D0D0}
 
     QPlainTextEdit{background-color: white}
 
     /* Style for the spinbox and combobox itself (color and border) */
     QSpinBox, QComboBox{
-        background-color: #F0F0F0;
+        background-color: #D0D0D0;
         border: 1px solid #404040;
         }
     /* Background color for dropdown items / border color around dropdown menu */
