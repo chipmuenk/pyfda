@@ -18,7 +18,7 @@ import matplotlib.patches as mpl_patches
 
 from pyfda.libs.pyfda_lib import safe_eval, to_html, pprint_log
 from pyfda.libs.pyfda_qt_lib import (
-    qwindow_stay_on_top, qtext_width, QVLine, QHLine)
+    qwindow_stay_on_top, qtext_width, QVLine, QHLine, PushButton)
 from pyfda.libs.fft_windows_cmb_box import QFFTWinCmbBox
 from pyfda.plot_widgets.mpl_widget import MplWidget
 
@@ -27,7 +27,7 @@ import pyfda.filterbroker as fb
 
 from pyfda.libs.compat import (
     Qt, pyqtSignal, QHBoxLayout, QVBoxLayout, QDialog, QLabel, QLineEdit, QPushButtonRT,
-    QFrame, QFont, QPushButton, QTextBrowser, QSplitter, QTableWidget, QTableWidgetItem,
+    QFrame, QFont, QTextBrowser, QSplitter, QTableWidget, QTableWidgetItem,
     QSizePolicy, QHeaderView)
 import logging
 logger = logging.getLogger(__name__)
@@ -223,11 +223,9 @@ class Plot_FFT_win(QDialog):
         # By default, the enter key triggers the default 'dialog action' in QDialog
         # widgets. This would activate one of the pushbuttons if `default` wasn't False.
         self.lbl_title_time = QLabel("Time: ", objectName="medium")
-        self.but_log_t = QPushButton("dB", default=False, autoDefault=False,
+        self.but_log_t = PushButton("dB", default=False, autoDefault=False,
                                      objectName="chk_log_time")
         self.but_log_t.setMaximumWidth(qtext_width(" dB "))
-        self.but_log_t.setCheckable(True)
-        self.but_log_t.setChecked(False)
         self.but_log_t.setToolTip("Display in dB")
 
         self.led_log_bottom_t = QLineEdit(self)
@@ -241,15 +239,13 @@ class Plot_FFT_win(QDialog):
         self.lbl_log_bottom_t.setVisible(self.but_log_t.isChecked())
 
         self.lbl_title_freq = QLabel("Freq: ", objectName="medium")
-        self.but_norm_f = QPushButton("Max=1", default=False, autoDefault=False)
-        self.but_norm_f.setCheckable(True)
+        self.but_norm_f = PushButton("Max=1", default=False, autoDefault=False)
         self.but_norm_f.setChecked(True)
         self.but_norm_f.setMaximumWidth(qtext_width(text=" Max=1 "))
         self.but_norm_f.setToolTip(
             "Normalize window spectrum for a maximum of 1.")
 
-        self.but_half_f = QPushButton("0...½", default=False, autoDefault=False)
-        self.but_half_f.setCheckable(True)
+        self.but_half_f = PushButton("0...½", default=False, autoDefault=False)
         self.but_half_f.setChecked(True)
         self.but_half_f.setMaximumWidth(qtext_width(text=" 0...½ "))
         self.but_half_f.setToolTip(
@@ -257,11 +253,10 @@ class Plot_FFT_win(QDialog):
 
         # By default, the enter key triggers the default 'dialog action' in QDialog
         # widgets. This activates one of the pushbuttons.
-        self.but_log_f = QPushButton("dB", default=False, autoDefault=False,
+        self.but_log_f = PushButton("dB", default=False, autoDefault=False,
                                      objectName="chk_log_freq")
         self.but_log_f.setMaximumWidth(qtext_width(" dB "))
         self.but_log_f.setToolTip("<span>Display in dB.</span>")
-        self.but_log_f.setCheckable(True)
         self.but_log_f.setChecked(True)
 
         self.lbl_log_bottom_f = QLabel(to_html("min =", frmt='bi'), self)
