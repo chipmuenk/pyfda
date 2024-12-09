@@ -86,12 +86,16 @@ MODULES = {'python':       {'V_PY': V_PY},
 # ================ Optional Modules ============================
 try:
     from docutils import __version__ as V_DOC
+    if V_DOC == '':
+        V_DOC = 'unknown'
     MODULES.update({'docutils': {'V_DOC': V_DOC}})
 except ImportError:
     MODULES.update({'docutils': {'V_DOC': ''}})
 
 try:
     from mplcursors import __version__ as V_CUR
+    if V_CUR == '':
+        V_CUR = 'unknown'
     MODULES.update({'mplcursors': {'V_CUR': V_CUR}})
 except ImportError:
     MODULES.update({'mplcursors': {'V_CUR': ''}})
@@ -100,18 +104,24 @@ MODULES.update({'yosys': {'V_YO': dirs.YOSYS_VER}})
 
 try:
     from xlwt import __version__ as V_XLWT
+    if V_XLWT == '':
+        V_XLWT = 'unknown'
     MODULES.update({'xlwt': {'V_XLWT': V_XLWT}})
 except ImportError:
     MODULES.update({'xlwt': {'V_XLWT': ''}})
 
 try:
     from xlsxwriter import __version__ as V_XLSX
+    if V_XLSX == '':
+        V_XLSX = 'unknown'
     MODULES.update({'xlsx': {'V_XLSX': V_XLSX}})
 except ImportError:
     MODULES.update({'xlsx': {'V_XLSX': ''}})
 
 try:
     from amaranth import __version__ as V_AM
+    if V_AM == '':
+        V_AM = 'unknown'
     MODULES.update({'amaranth': {'V_AM': V_AM}})
 except ImportError:
     MODULES.update({'amaranth': {'V_AM': ''}})
@@ -148,6 +158,8 @@ def cmp_version(mod: str, version: str) -> int:
     result : int
         one of the following error codes:
 
+         :-3: version number could not be determined
+
          :-2: module is not installed
 
          :-1: version of installed module is lower than the specified version
@@ -161,16 +173,16 @@ def cmp_version(mod: str, version: str) -> int:
         """Convert strings like "1.2.3" to tuples like (1,2,3) for comparisons."""
         return tuple(map(int, (v.split("."))))
 
-    try:
-        if not mod or not mod in MODULES or not MODULES[mod].values():
+    try:  # empty string / module not in list / returned '' as version number
+        if not mod or not mod in MODULES or list(MODULES[mod].values())[0] == '':
             return -2
         else:
             # get dict value without knowing the key:
             inst_ver = list(MODULES[mod].values())[0]
-            if inst_ver in {'', 'unknown'}:
+            if inst_ver == 'unknown':
                 logger.warning(
                     f"Version number of module '{mod}' could not be determined.")
-                return -2
+                return -3
 
         if versiontuple(inst_ver) > versiontuple(version):
             return 1
