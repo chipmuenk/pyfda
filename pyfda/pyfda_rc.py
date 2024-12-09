@@ -224,12 +224,13 @@ else:
 # dark QSS theme
 # ---------------
 qss_dark = """
-    QSplitter{background-color: #606060;} /* Top Level background */
+    /* Background color #303030 should be same as matplotlib figure.facecolor */
+    QSplitter{background-color: #303030;} /* Top Level background */
     QWidget{color:white;}  /* nearly all widgets are derived from this */
     /* background of QWidget and QFrame widgets, not of derived widgets: */
     .QWidget, .QFrame{background-color: #303030;}
 
-     /* The tab _widget_ frame for all TabWidgets */
+    /* The tab _widget_ frame for all TabWidgets */
     QTabWidget {background-color: #303030;} /* Background for tabs except input tabs */
     /* background for input tabs, here QTabWidget is encompassed by QScrollArea */
     QScrollArea{color:white; background-color:#303030;}
@@ -250,17 +251,11 @@ qss_dark = """
     QTextEdit{background-color: #505050;}
     QLineEdit{background-color: #505050; border-color: #A0A0A0;}
     QLineEdit:disabled{background-color: #505050; color: #A0A0A0}
-    QPushButton:disabled{background-color: #505050; color: #A0A0A0}
+    /* Style 'normal' background for all push buttons */
+    QPushButton{background-color: #505050;}
+    .QPushButton:disabled, PushButton:disabled{color: #A0A0A0;} /* background-color? */
+
     QComboBox:disabled{background-color: #505050; color: #A0A0A0}
-
-    QPushButton{
-            background-color: #505050; color: white; font-weight: bold;}
-
-    QPushButtonRT:!checked QLabel{
-                    background-color:#505050; color:white; font-weight: bold;}
-
-    /* this doesn't work */
-    QPushButtonRT QLabel{color:white;}
 
     QDialog{background-color: #404040;}
     QMessageBox{background-color:#404040;}
@@ -489,7 +484,7 @@ qss_common = """
                 * [state="ok"]{background-color: green; color: white;}
                 * [state="changed"]{background-color: yellow; color: black;}
                 * [state="running"]{background-color: orange; color: white;}
-                /* * [state="highlight"]{background-color: lightblue;} */
+                * [state="highlight"]{background-color: lightblue; color: black;}
                 /* 'unused', e.g. for lineedit fields with some filter designs */
                 * [state="unused"], *[state="u"]{background-color: white; color:#303030}
                 * [state="failed"], * [state="error"]{
@@ -556,22 +551,17 @@ qss_common = """
                     padding-top: 2px; padding-bottom: 2px;
                     selection-background-color: orange;}
 
-                /* Highlight button when pressed from checked / not checked state
-                   Also works for PushButton and QPushButtonRT */
+
+                .QPushButton, PushButton{font-weight: bold;}
+                QPushButton QLabel{font-weight: bold}
+                /* Highlight push buttons when pressed from checked or unchecked state */
                 QPushButton:pressed:checked, QPushButton:pressed:!checked
-                    {background-color:orange; color:white}
-
-                /* 'border' must be defined to avoid "grey dots" due to transparent borders
+                    {background-color:orange;} /* color: white */
+                /* Define 'border' to avoid "grey dots" in all push buttons due to transparent border overlay
+                https://forum.qt.io/topic/41325/solved-background-of-checked-qpushbutton-with-stylesheet
                 https://stackoverflow.com/questions/24718722/how-to-style-qpushbuttons-checked-state-to-remove-grey-dots */
-                QPushButton:checked, QPushButtonRT:checked, PushButton:checked{
-                    background-color:lightblue; border: lightblue; color:black; font-weight: bold;}
-
-                /* QPushButtonRT:checked QLabel{
-                    color:green; font-weight: bold;} */
-
-                /* TODO: This creates black text for QPushButtonRT ?!
-                QPushButtonRT:checked > QLabel{
-                    background-color:lightblue; font-weight: bold;}*/
+                QPushButton:checked {background-color:lightblue; border: lightblue;}
+                .QPushButton:checked, PushButton:checked {color:black;}
 
                 /* QSplitter styling adopted from
                 http://stackoverflow.com/questions/6832499/qsplitter-show-a-divider-or-a-margin-between-the-two-widgets
