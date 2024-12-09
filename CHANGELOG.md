@@ -5,11 +5,12 @@
 ### Bugfixes
 
 - fix [issue \#258](https://github.com/chipmuenk/pyfda/issues/258) crashing binaries created with pyinstaller
-- fix look of combo boxes especially under Linux / MacOS which were still pretty unusable
+- fix look of combo boxes which were still pretty unusable especially under Linux / MacOS
 
 ### Updates
 
-- Update some UI default settings for better usability
+- Add Linux install script [PR \#257](https://github.com/chipmuenk/pyfda/pull/257)
+- Update some UI settings for better usability (especially dark mode)
 - Add some tool tips
 - Normalize data to given maximum value before saving in y[n] file tab.
 
