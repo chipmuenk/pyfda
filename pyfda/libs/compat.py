@@ -90,7 +90,7 @@ from matplotlib.backends.backend_qt5agg import NavigationToolbar2QT as Navigatio
 
 class QPushButtonRT(QPushButton):
     """
-    Subclass QPushButton to render rich text
+    Subclass QPushButton using QLabel to render rich text
     """
     def __init__(self, parent=None, text=None, margin=10, **kwargs):
         if parent is not None:
@@ -105,12 +105,12 @@ class QPushButtonRT(QPushButton):
         self.__lyt.setContentsMargins(margin, 0, 0, 0)  # L, T, R, B
         self.__lyt.setSpacing(0)
         self.setLayout(self.__lyt)
+        # Make QLabel transparent except for painted pixels
         self.__lbl.setAttribute(Qt.WA_TranslucentBackground)
+        # Disable the delivery of mouse events to the QLabel widget and its children,
+        # passing the events along to QPushButton
         self.__lbl.setAttribute(Qt.WA_TransparentForMouseEvents)
-        self.__lbl.setSizePolicy(
-            QSizePolicy.Expanding,
-            QSizePolicy.Expanding,
-        )
+        self.__lbl.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
         self.__lbl.setTextFormat(Qt.RichText)
         self.__lyt.addWidget(self.__lbl, Qt.AlignHCenter)
         return

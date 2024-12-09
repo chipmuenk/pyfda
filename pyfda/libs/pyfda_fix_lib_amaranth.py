@@ -172,7 +172,7 @@ if cmp_version("amaranth", "0.3") >= 0:
         # QO['N_over'] = 15  # TODO: this passes the value to the quantizer, but it's a dummy
         return sig_o, ovfl_o
 else:
-    logger.error('Module "amaranth" not found!')
+    logger.warning('Module "amaranth" not found!')
 
 # ==============================================================================
 if __name__ == '__main__':
