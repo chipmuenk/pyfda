@@ -133,8 +133,9 @@ class Plot_Hf(QWidget):
 
         self.but_zerophase = PushButton(" Zero phase ")
         self.but_zerophase.setToolTip(
-            "<span>Remove linear phase calculated from filter order.\n"
-            "Attention: This makes no sense for a non-linear phase system!</span>")
+            "<span>Subtract linear phase as calculated from filter order. "
+            "Only available for FIR filters and for unit 'V', it "
+            "only affects the display of phase and re / im components.</span>")
 
         self.lblInset = QLabel(to_html("Inset", "bi"), self)
         self.cmbInset = QComboBox(self, objectName="cmbInset")

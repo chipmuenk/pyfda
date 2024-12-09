@@ -16,7 +16,7 @@ magnitude frequency response.
 You can plot magnitude, real or imaginary part in V (linear), W (squared) or dB
 (log. scale).
 
-**Zero phase** removes the linear phase as calculated from the filter order. 
+**Zero phase** subtracts the linear phase as calculated from the filter order. 
 There is no check whether the design actually is linear phase, that's why results
 may be nonsensical. When the unit is dB or W , this option makes no sense and is
 not available. It also makes no sense when the magnitude of H(f) is plotted, but 
