@@ -4,11 +4,14 @@
 
 ### Bugfixes
 
+- fix [issue \#258](https://github.com/chipmuenk/pyfda/issues/258) crashing binaries created with pyinstaller
+- fix look of combo boxes especially under Linux / MacOS which were still pretty unusable
+
 ### Updates
 
-- Change some UI default settings for better usability
+- Update some UI default settings for better usability
 - Add some tool tips
-- Normalize data to given maximum value also before saving in y[n] file tab.
+- Normalize data to given maximum value before saving in y[n] file tab.
 
 ## [v0.9.3](https://github.com/chipmuenk/pyfda/tree/v0.9.3) (2024-11-04)
 
@@ -28,9 +31,6 @@ only be used under Ubuntu (or probably other Debian related distros)
 ### Bugfixes
 
 - Fix "IndexError: list assignment index out of range"
-    File "/home/cmuenker/Daten/design/python/git/pyfda/pyfda/filterbroker.py", line 486, in store_fil
-        fil_undo[undo_ptr] = copy.deepcopy(fil[0])
-    IndexError: list assignment index out of range
 - Fix broken badges on README.md
 - Fix broken build process for ReadTheDocs
 
