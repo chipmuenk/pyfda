@@ -246,7 +246,7 @@ qss_dark = """
     QHeaderView::section:checked{background-color:blue;}
 
     /* Applies to all widgets in "normal" state
-    * [state="normal"]{background-color: #A04040; color: white;} TODO: border-color? */
+    * [state="normal"]{background-color: #404040; color: white;} TODO: border-color? */
 
     QTextEdit{background-color: #505050;}
     QLineEdit{background-color: #505050; border-color: #A0A0A0;}
@@ -319,8 +319,8 @@ qss_light = """
     QHeaderView::section{background-color:#808080; color:white;}
     QHeaderView::section:checked{background-color:blue; color:white;}
 
-    /* Applies to all widgets in "normal" state
-    * [state="normal"]{background-color: white; border-color: #303030;} */
+    /* Applies to all widgets in "normal" state /*
+    * [state="normal"]{background-color: #C0C0C0;}
 
     QTextEdit{background-color: white;}
     QLineEdit{background-color: white; border-color: #303030;}
