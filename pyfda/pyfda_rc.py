@@ -557,8 +557,8 @@ qss_common = """
     /* Define 'border' to avoid "grey dots" in all push buttons due to transparent border overlay
     https://forum.qt.io/topic/41325/solved-background-of-checked-qpushbutton-with-stylesheet
     https://stackoverflow.com/questions/24718722/how-to-style-qpushbuttons-checked-state-to-remove-grey-dots */
-    QPushButton:checked {background-color:lightblue; border: lightblue;}
-    .QPushButton:checked, PushButton:checked {color:black;}
+    /*QPushButton:checked {background-color:lightblue; border: lightblue;}
+    .QPushButton:checked, PushButton:checked {color:black;}*/
 
     /* QSplitter styling adopted from
     http://stackoverflow.com/questions/6832499/qsplitter-show-a-divider-or-a-margin-between-the-two-widgets

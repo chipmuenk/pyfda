@@ -718,6 +718,10 @@ class PushButton(QPushButton):
         self.setObjectName(objectName)
         self.setCheckable(checkable)
         self.setChecked(checked)
+        self.style_button()
+
+        self.installEventFilter(self)
+
         if icon is None:
             self.w = qtext_width(text=txt, N_x=N_x, font=self.font())
             self.h = super(PushButton, self).sizeHint().height()
@@ -727,6 +731,26 @@ class PushButton(QPushButton):
             # use sizeHint of parent
             self.w = super(PushButton, self).sizeHint().width()
             self.h = super(PushButton, self).sizeHint().height()
+
+    def eventFilter(self, source, event):
+        if event.type() == QEvent.MouseButtonPress:
+            if event.button() == Qt.LeftButton:
+                logger.warning("left!")
+                # self.toggle()  # toggle checked state
+                # signal is passed to base class where "toggle" is performed
+                # -> logic is inverted here!
+                self.style_button()
+        # Call base class method to continue normal event processing:
+        return super(PushButton, self).eventFilter(source, event)
+
+    def style_button(self):
+        if self.isChecked():
+            # logger.warning("checked")
+            qstyle_widget(self, "normal")
+        else:
+            qstyle_widget(self, "highlight")
+
+
 
     def sizeHint(self) -> QtCore.QSize:
         return QSize(self.w, self.h)
