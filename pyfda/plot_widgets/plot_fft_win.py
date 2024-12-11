@@ -229,14 +229,14 @@ class Plot_FFT_win(QDialog):
         self.but_log_t.setToolTip("Display in dB")
 
         self.led_log_bottom_t = QLineEdit(self)
-        self.led_log_bottom_t.setVisible(self.but_log_t.isChecked())
+        self.led_log_bottom_t.setVisible(self.but_log_t.checked)
         self.led_log_bottom_t.setText(str(self.bottom_t))
         self.led_log_bottom_t.setMaximumWidth(qtext_width(N_x=6))
         self.led_log_bottom_t.setToolTip(
             "<span>Minimum display value for log. scale.</span>")
 
         self.lbl_log_bottom_t = QLabel(to_html("min =", frmt='bi'), self)
-        self.lbl_log_bottom_t.setVisible(self.but_log_t.isChecked())
+        self.lbl_log_bottom_t.setVisible(self.but_log_t.checked)
 
         self.lbl_title_freq = QLabel("Freq: ", objectName="medium")
         self.but_norm_f = PushButton("Max=1", default=False, autoDefault=False)
@@ -260,10 +260,10 @@ class Plot_FFT_win(QDialog):
         self.but_log_f.setChecked(True)
 
         self.lbl_log_bottom_f = QLabel(to_html("min =", frmt='bi'), self)
-        self.lbl_log_bottom_f.setVisible(self.but_log_f.isChecked())
+        self.lbl_log_bottom_f.setVisible(self.but_log_f.checked)
 
         self.led_log_bottom_f = QLineEdit(self)
-        self.led_log_bottom_f.setVisible(self.but_log_t.isChecked())
+        self.led_log_bottom_f.setVisible(self.but_log_t.checked)
         self.led_log_bottom_f.setText(str(self.bottom_f))
         self.led_log_bottom_f.setMaximumWidth(qtext_width(N_x=6))
         self.led_log_bottom_f.setToolTip(
@@ -547,7 +547,7 @@ class Plot_FFT_win(QDialog):
         self.max_a_err = self.Win[self.pad // 2] / (self.N_view * self.cgain)
 
         # Correct gain for periodic signals (coherent gain)
-        if self.but_norm_f.isChecked():
+        if self.but_norm_f.checked:
             self.Win /= (self.N_view * self.cgain)
 
         # calculate frequency of first zero and maximum sidelobe level,
@@ -636,13 +636,13 @@ class Plot_FFT_win(QDialog):
         self.ax_f.set_xlabel(fb.fil[0]['plt_fLabel'])
         self.ax_f.set_ylabel(r'$W(f) \; \rightarrow$')
 
-        if self.but_log_t.isChecked():
+        if self.but_log_t.checked:
             self.ax_t.plot(self.n, np.maximum(20 * np.log10(np.abs(self.win_view)),
                                               self.bottom_t))
         else:
             self.ax_t.plot(self.n, self.win_view)
 
-        if self.but_half_f.isChecked():
+        if self.but_half_f.checked:
             F = self.F[:len(self.F*self.pad)//2]
             k = self.k[:len(self.F*self.pad)//2]
             Win = self.Win[:len(self.F*self.pad)//2]
@@ -674,7 +674,7 @@ class Plot_FFT_win(QDialog):
             self.mainlobe_3dB_disp = self.mainlobe_3dB_freq
             self.mainlobe_3dB_unit = "f_S"
 
-        if self.but_log_f.isChecked():
+        if self.but_log_f.checked:
             self.ax_f.plot(x, np.maximum(
                 20 * np.log10(np.abs(Win)), self.bottom_f))
 
@@ -693,10 +693,10 @@ class Plot_FFT_win(QDialog):
             self.max_a_err_unit = "%"
 
 
-        self.led_log_bottom_t.setVisible(self.but_log_t.isChecked())
-        self.lbl_log_bottom_t.setVisible(self.but_log_t.isChecked())
-        self.led_log_bottom_f.setVisible(self.but_log_f.isChecked())
-        self.lbl_log_bottom_f.setVisible(self.but_log_f.isChecked())
+        self.led_log_bottom_t.setVisible(self.but_log_t.checked)
+        self.lbl_log_bottom_t.setVisible(self.but_log_t.checked)
+        self.led_log_bottom_f.setVisible(self.but_log_f.checked)
+        self.lbl_log_bottom_f.setVisible(self.but_log_f.checked)
 
         cur_id = self.cur_win_dict['id']
         cur_win_d = self.all_wins_dict[cur_id]

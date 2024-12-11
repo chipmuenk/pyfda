@@ -128,7 +128,7 @@ class Plot_PZ(QWidget):
         self.ledBottom.setMaximumWidth(qtext_width(N_x=8))
         self.ledBottom.setToolTip("Minimum display value.")
         self.lblBottomdB = QLabel("dB", self)
-        self.lblBottomdB.setVisible(self.but_log.isChecked())
+        self.lblBottomdB.setVisible(self.but_log.checked)
 
         self.lblTop = QLabel(to_html("Top =", frmt='bi'), self)
         self.ledTop = QLineEdit(self, objectName="ledTop")
@@ -136,7 +136,7 @@ class Plot_PZ(QWidget):
         self.ledTop.setToolTip("Maximum display value.")
         self.ledTop.setMaximumWidth(qtext_width(N_x=8))
         self.lblTopdB = QLabel("dB", self)
-        self.lblTopdB.setVisible(self.but_log.isChecked())
+        self.lblTopdB.setVisible(self.but_log.checked)
 
         self.but_fir_poles = PushButton(" FIR Poles ")
         self.but_fir_poles.setChecked(True)
@@ -205,7 +205,7 @@ class Plot_PZ(QWidget):
         """
         # clicking but_log triggered the slot or initialization
         if self.sender() is None or self.sender().objectName() == 'but_log':
-            if self.but_log.isChecked():
+            if self.but_log.checked:
                 self.ledBottom.setText(str(self.zmin_dB))
                 self.zmax_dB = np.round(20 * np.log10(self.zmax), 2)
                 self.ledTop.setText(str(self.zmax_dB))
@@ -215,7 +215,7 @@ class Plot_PZ(QWidget):
                 self.ledTop.setText(str(self.zmax))
 
         else:  # finishing a lineEdit field triggered the slot
-            if self.but_log.isChecked():
+            if self.but_log.checked:
                 self.zmin_dB = safe_eval(
                     self.ledBottom.text(), self.zmin_dB, return_type='float')
                 self.ledBottom.setText(str(self.zmin_dB))
@@ -256,10 +256,10 @@ class Plot_PZ(QWidget):
         contour = qget_cmb_box(self.cmb_overlay) in {"contour", "contourf"}
         self.ledBottom.setVisible(contour)
         self.lblBottom.setVisible(contour)
-        self.lblBottomdB.setVisible(contour and self.but_log.isChecked())
+        self.lblBottomdB.setVisible(contour and self.but_log.checked)
         self.ledTop.setVisible(contour)
         self.lblTop.setVisible(contour)
-        self.lblTopdB.setVisible(contour and self.but_log.isChecked())
+        self.lblTopdB.setVisible(contour and self.but_log.checked)
 
         if True:
             self.init_axes()
@@ -279,7 +279,7 @@ class Plot_PZ(QWidget):
 
         [z, p, k] = self.zplane(
             z=zpk[0], p=zpk[1], k=zpk[2], plt_ax=self.ax,
-            plt_poles=self.but_fir_poles.isChecked() or fb.fil[0]['ft'] == 'IIR',
+            plt_poles=self.but_fir_poles.checked or fb.fil[0]['ft'] == 'IIR',
             mps=p_marker[0], mpc=p_marker[1], mzs=z_marker[0], mzc=z_marker[1])
 
         self.ax.xaxis.set_minor_locator(AutoMinorLocator())  # enable minor ticks
@@ -512,14 +512,14 @@ class Plot_PZ(QWidget):
             np.arange(yl[0], yl[1], 0.01))
         z = x + 1j*y  # create coordinate grid for complex plane
 
-        if self.but_log.isChecked():
+        if self.but_log.checked:
             H_max = self.zmax_dB
             H_min = self.zmin_dB
         else:
             H_max = self.zmax
             H_min = self.zmin
         Hmag = H_mag(fb.fil[0]['ba'][0], fb.fil[0]['ba'][1], z, H_max, H_min=H_min,
-                     log=self.but_log.isChecked())
+                     log=self.but_log.checked)
 
         if overlay == "contour":
             self.ax.contour(x, y, Hmag, 20, alpha=0.5, cmap=self.cmap)
@@ -552,7 +552,7 @@ class Plot_PZ(QWidget):
         ba = fb.fil[0]['ba']
         w, H = sig.freqz(ba[0], ba[1], worN=params['N_FFT'], whole=True)
         H = np.abs(H)
-        if self.but_log.isChecked():
+        if self.but_log.checked:
             H = np.clip(np.log10(H), -6, None)  # clip to -120 dB
             H = H - np.max(H)  # shift scale to H_min ... 0
             H = 1 + (r-1) * (1 + H / abs(np.min(H)))  # scale to 1 ... r

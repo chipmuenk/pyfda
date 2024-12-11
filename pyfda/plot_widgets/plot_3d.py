@@ -103,14 +103,14 @@ class Plot_3D(QWidget):
         self.ledBottom.setText(str(self.zmin))
         self.ledBottom.setToolTip("Minimum display value.")
         self.lblBottomdB = QLabel("dB", self)
-        self.lblBottomdB.setVisible(self.but_log.isChecked())
+        self.lblBottomdB.setVisible(self.but_log.checked)
 
         self.lblTop = QLabel(to_html("Top =", frmt='bi'), self)
         self.ledTop = QLineEdit(self, objectName="ledTop")
         self.ledTop.setText(str(self.zmax))
         self.ledTop.setToolTip("Maximum display value.")
         self.lblTopdB = QLabel("dB", self)
-        self.lblTopdB.setVisible(self.but_log.isChecked())
+        self.lblTopdB.setVisible(self.but_log.checked)
 
         self.plt_UC = PushButton("UC", objectName="plt_UC")
         self.plt_UC.setChecked(True)
@@ -281,7 +281,7 @@ class Plot_3D(QWidget):
         dx = (self.xmax - self.xmin) / steps
         dy = (self.ymax - self.ymin) / steps  # grid size cartesian range
 
-        if self.but_plot_in_UC.isChecked():  # Plot circular range in 3D-Plot
+        if self.but_plot_in_UC.checked:  # Plot circular range in 3D-Plot
             [r, phi] = np.meshgrid(np.arange(rmin, rmax, dr),
                                    np.linspace(0, 2 * pi, steps, endpoint=True))
             self.x = r * cos(phi)
@@ -355,7 +355,7 @@ class Plot_3D(QWidget):
         Update min / max settings when lineEdits have been edited
         """
         if self.sender().objectName() == 'but_log':  # clicking but_log triggered the slot
-            if self.but_log.isChecked():
+            if self.but_log.checked:
                 self.ledBottom.setText(str(self.zmin_dB))
                 self.zmax_dB = np.round(20 * log10(self.zmax), 2)
                 self.ledTop.setText(str(self.zmax_dB))
@@ -369,7 +369,7 @@ class Plot_3D(QWidget):
                 self.lblBottomdB.setVisible(False)
 
         else:  # finishing a lineEdit field triggered the slot
-            if self.but_log.isChecked():
+            if self.but_log.checked:
                 self.zmin_dB = safe_eval(
                     self.ledBottom.text(), self.zmin_dB, return_type='float')
                 self.ledBottom.setText(str(self.zmin_dB))
@@ -412,7 +412,7 @@ class Plot_3D(QWidget):
         alpha = self.diaAlpha.value()/10.
 
         cmap = colormaps[str(self.cmbColormap.currentText())]
-        if self.but_colormap_r.isChecked():
+        if self.but_colormap_r.checked:
             cmap = cmap.reversed()  # use reversed colormap
 
         # Number of Lines /step size for H(f) stride, mesh, contour3d:
@@ -420,12 +420,12 @@ class Plot_3D(QWidget):
         NL = 3 * self.diaHatch.value() + 5
 
         surf_enabled = qget_cmb_box(self.cmbMode3D, data=False) in {'Surf', 'Contour'}\
-            or self.but_contour_2d.isChecked()
+            or self.but_contour_2d.checked
         self.cmbColormap.setEnabled(surf_enabled)
         self.but_colormap_r.setEnabled(surf_enabled)
         self.but_lighting.setEnabled(surf_enabled)
         self.but_colbar.setEnabled(surf_enabled)
-        self.diaAlpha.setEnabled(surf_enabled or self.but_contour_2d.isChecked())
+        self.diaAlpha.setEnabled(surf_enabled or self.but_contour_2d.checked)
 
         # cNorm  = colors.Normalize(vmin=0, vmax=values[-1])
         # scalarMap = cmx.ScalarMappable(norm=cNorm, cmap=jet)
@@ -447,7 +447,7 @@ class Plot_3D(QWidget):
         plevel_rel = 1.05  # height of plotted pole position relative to zmax
         zlevel_rel = 0.1  # height of plotted zero position relative to zmax
 
-        if self.but_log.isChecked():  # logarithmic scale
+        if self.but_log.checked:  # logarithmic scale
             # suppress "divide by zero in log10" warnings
             old_settings_seterr = np.seterr()
             np.seterr(divide='ignore')
@@ -486,13 +486,13 @@ class Plot_3D(QWidget):
 
         # calculate H(jw)| along the unity circle and |H(z)|, each clipped
         # between bottom and top
-        H_UC = H_mag(bb, aa, self.xy_UC, top, H_min=bottom, log=self.but_log.isChecked())
-        Hmag = H_mag(bb, aa, self.z, top, H_min=bottom, log=self.but_log.isChecked())
+        H_UC = H_mag(bb, aa, self.xy_UC, top, H_min=bottom, log=self.but_log.checked)
+        Hmag = H_mag(bb, aa, self.z, top, H_min=bottom, log=self.but_log.checked)
 
         # ===============================================================
         # Plot Unit Circle (UC)
         # ===============================================================
-        if self.plt_UC.isChecked():
+        if self.plt_UC.checked:
             #  Plot unit circle and marker at (1,0):
             self.ax3d.plot(self.xy_UC.real, self.xy_UC.imag,
                            ones(len(self.xy_UC)) * bottom, lw=2, color='k')
@@ -501,7 +501,7 @@ class Plot_3D(QWidget):
         # ===============================================================
         # Plot ||H(f)| along unit circle as 3D-lineplot
         # ===============================================================
-        if self.but_Hf.isChecked():
+        if self.but_Hf.checked:
             self.ax3d.plot(self.xy_UC.real, self.xy_UC.imag, H_UC, alpha=0.8, lw=4)
             # draw once more as dashed white line to improve visibility
             self.ax3d.plot(self.xy_UC.real, self.xy_UC.imag, H_UC, 'w--', lw=4)
@@ -517,7 +517,7 @@ class Plot_3D(QWidget):
         # ===============================================================
         # Plot Poles and Zeros
         # ===============================================================
-        if self.but_PZ.isChecked():
+        if self.but_PZ.checked:
 
             PN_SIZE = 8  # size of P/N symbols
 
@@ -570,7 +570,7 @@ class Plot_3D(QWidget):
                 mlab.show()
 
             else:
-                if self.but_lighting.isChecked():
+                if self.but_lighting.checked:
                     ls = LightSource(azdeg=0, altdeg=65)  # Create light source object
                     rgb = ls.shade(Hmag, cmap=cmap)  # Shade data, creating an rgb array
                     cmap_surf = None
@@ -600,7 +600,7 @@ class Plot_3D(QWidget):
         #       along the other axis?
         # TODO: colormap is created depending on the zdir = 'z' contour plot
         #       -> set limits of (all) other plots manually?
-        if self.but_contour_2d.isChecked():
+        if self.but_contour_2d.checked:
 #            self.ax3d.contourf(x, y, Hmag, 20, zdir='x', offset=xmin,
 #                         cmap=cmap, alpha = alpha)#, vmin = bottom)#, vmax = top, vmin = bottom)
 #            self.ax3d.contourf(x, y, Hmag, 20, zdir='y', offset=ymax,
@@ -610,7 +610,7 @@ class Plot_3D(QWidget):
                 cmap=cmap, alpha=alpha)
 
         # plot colorbar for suitable plot modes
-        if self.but_colbar.isChecked() and (self.but_contour_2d.isChecked() or
+        if self.but_colbar.checked and (self.but_contour_2d.checked or
                                             str(self.cmbMode3D.currentText())
                                             in {'Contour', 'Surf'}):
             self.colb = self.mplwidget.fig.colorbar(m_cb, ax=self.ax3d, shrink=0.8, 

@@ -134,7 +134,7 @@ class Input_Info(QWidget):
 
         self.frmControls2 = QFrame(self)
         self.frmControls2.setLayout(layHControls2)
-        self.frmControls2.setVisible(self.butDebug.isChecked())
+        self.frmControls2.setVisible(self.butDebug.checked)
         self.frmControls2.setContentsMargins(0, 0, 0, 0)
 
         lbl_settings_NFFT = QLabel(to_html("N_FFT =", frmt='bi'), self)
@@ -149,7 +149,7 @@ class Input_Info(QWidget):
 
         self.frmSettings = QFrame(self)
         self.frmSettings.setLayout(layGSettings)
-        self.frmSettings.setVisible(self.butSettings.isChecked())
+        self.frmSettings.setVisible(self.butSettings.checked)
         self.frmSettings.setContentsMargins(0, 0, 0, 0)
 
         layVControls = QVBoxLayout()
@@ -220,14 +220,14 @@ class Input_Info(QWidget):
         """
         Show / hide debug options depending on the state of the debug button
         """
-        self.frmControls2.setVisible(self.butDebug.isChecked())
+        self.frmControls2.setVisible(self.butDebug.checked)
 
 # ------------------------------------------------------------------------------
     def _show_settings(self):
         """
         Show / hide settings options depending on the state of the settings button
         """
-        self.frmSettings.setVisible(self.butSettings.isChecked())
+        self.frmSettings.setVisible(self.butSettings.checked)
 
     def _update_settings_nfft(self):
         """ Update value for self.par1 from QLineEdit Widget"""
@@ -252,7 +252,7 @@ class Input_Info(QWidget):
         Display info from filter design file and docstring
         """
         if hasattr(ff.fil_inst, 'info'):
-            if self.butRichText.isChecked():
+            if self.butRichText.checked:
                 self.txtFiltInfoBox.setText(publish_string(
                     self._clean_doc(ff.fil_inst.info), writer_name='html',
                     settings_overrides={'output_encoding': 'unicode'}))
@@ -261,8 +261,8 @@ class Input_Info(QWidget):
         else:
             self.txtFiltInfoBox.setText("")
 
-        if self.butDocstring.isChecked() and hasattr(ff.fil_inst, 'info_doc'):
-            if self.butRichText.isChecked():
+        if self.butDocstring.checked and hasattr(ff.fil_inst, 'info_doc'):
+            if self.butRichText.checked:
                 self.txtFiltInfoBox.append(
                     '<hr /><b>Python module docstring:</b>\n')
                 for doc in ff.fil_inst.info_doc:
@@ -336,8 +336,8 @@ class Input_Info(QWidget):
             return F_min, H_min, F_max, H_max
         # ------------------------------------------------------------------
 
-        self.tblFiltPerf.setVisible(self.butFiltPerf.isChecked())
-        if self.butFiltPerf.isChecked():
+        self.tblFiltPerf.setVisible(self.butFiltPerf.checked)
+        if self.butFiltPerf.checked:
 
             bb = fb.fil[0]['ba'][0]
             aa = fb.fil[0]['ba'][1]
@@ -499,7 +499,7 @@ class Input_Info(QWidget):
         """
         Print filter dict for debugging
         """
-        self.txtFiltDict.setVisible(self.butFiltDict.isChecked())
+        self.txtFiltDict.setVisible(self.butFiltDict.checked)
 
         fb_sorted = [str(key) + ' : ' + str(fb.fil[0][key])
                      for key in sorted(fb.fil[0].keys())]
@@ -512,7 +512,7 @@ class Input_Info(QWidget):
         """
         Print filter tree for debugging
         """
-        self.txtFiltTree.setVisible(self.butFiltTree.isChecked())
+        self.txtFiltTree.setVisible(self.butFiltTree.checked)
 
         ftree_sorted = ['<b>' + str(key) + ' : ' + '</b>' + str(fb.fil_tree[key])
                         for key in sorted(fb.fil_tree.keys())]

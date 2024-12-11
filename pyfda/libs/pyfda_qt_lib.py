@@ -717,7 +717,14 @@ class PushButton(QPushButton):
 
         self.setObjectName(objectName)
         self.setCheckable(checkable)
-        self.setChecked(checked)
+        self._checkable = checkable
+        if self._checkable:
+            self.setChecked(checked)
+            self.checked = checked
+        else:
+            self.setChecked(False)
+            self.checked = False           
+
         self.style_button()
 
         self.installEventFilter(self)
@@ -732,25 +739,33 @@ class PushButton(QPushButton):
             self.w = super(PushButton, self).sizeHint().width()
             self.h = super(PushButton, self).sizeHint().height()
 
+    def setChecked(self, checked: bool):
+        if self._checkable:
+            self.checked = checked
+            # self.setChecked(checked)
+            self.style_button()
+
+    def setCheckable(self, checkable: bool):
+        self._checkable = checkable
+        if not self._checkable:
+            self.setChecked(False)
+            self.checked = False
+            self.style_button()        
+
     def eventFilter(self, source, event):
         if event.type() == QEvent.MouseButtonPress:
-            if event.button() == Qt.LeftButton:
-                logger.warning("left!")
-                # self.toggle()  # toggle checked state
-                # signal is passed to base class where "toggle" is performed
-                # -> logic is inverted here!
+            if self._checkable and event.button() == Qt.LeftButton:
+                # signal is passed to base class where "self.toggle()" is performed
+                self.checked = not self.checked
                 self.style_button()
         # Call base class method to continue normal event processing:
         return super(PushButton, self).eventFilter(source, event)
 
     def style_button(self):
-        if self.isChecked():
-            # logger.warning("checked")
-            qstyle_widget(self, "normal")
-        else:
+        if self.checked:
             qstyle_widget(self, "highlight")
-
-
+        else:
+            qstyle_widget(self, "normal")
 
     def sizeHint(self) -> QtCore.QSize:
         return QSize(self.w, self.h)

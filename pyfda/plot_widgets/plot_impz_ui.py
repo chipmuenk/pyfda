@@ -174,7 +174,7 @@ class PlotImpz_UI(QWidget):
         self.but_auto_run = PushButton(" Auto", objectName="but_auto_run")
         self.but_auto_run.setToolTip("<span>Update response automatically when "
                                      "parameters have been changed.</span>")
-        # self.but_auto_run.setCheckable(True)
+        self.but_auto_run.setCheckable(True)
         self.but_auto_run.setChecked(True)
 
         but_height = self.but_auto_run.sizeHint().height()
@@ -399,8 +399,8 @@ class PlotImpz_UI(QWidget):
             "<span>Minimum display value for time and spectrogram plots with log. scale."
             "</span>")
         self.lbl_log_bottom_time.setVisible(
-            self.but_log_time.isChecked() or
-            ((self.plt_time_spgr != "none") and self.but_log_spgr_time.isChecked()))
+            self.but_log_time.checked or
+            ((self.plt_time_spgr != "none") and self.but_log_spgr_time.checked))
         self.led_log_bottom_time.setVisible(
             self.lbl_log_bottom_time.isVisible())
 
@@ -516,15 +516,15 @@ class PlotImpz_UI(QWidget):
         self.but_log_freq.setChecked(True)
 
         self.lbl_log_bottom_freq = QLabel(to_html("min =", frmt='bi'), self)
-        self.lbl_log_bottom_freq.setVisible(self.but_log_freq.isChecked())
+        self.lbl_log_bottom_freq.setVisible(self.but_log_freq.checked)
         self.led_log_bottom_freq = QLineEdit(self)
         self.led_log_bottom_freq.setText(str(self.bottom_f))
         self.led_log_bottom_freq.setMaximumWidth(qtext_width(N_x=8))
         self.led_log_bottom_freq.setToolTip(
             "<span>Minimum display value for log. scale.</span>")
-        self.led_log_bottom_freq.setVisible(self.but_log_freq.isChecked())
+        self.led_log_bottom_freq.setVisible(self.but_log_freq.checked)
 
-        if not self.but_log_freq.isChecked():
+        if not self.but_log_freq.checked:
             self.bottom_f = 0
 
         self.cmb_freq_display = QComboBox(self, objectName="cmb_re_im_freq")
@@ -719,7 +719,7 @@ class PlotImpz_UI(QWidget):
         Show / hide FFT widget depending on the state of the corresponding button
         When widget is shown, trigger an update of the window function.
         """
-        if self.but_fft_wdg.isChecked():
+        if self.but_fft_wdg.checked:
             self.win_viewer.show()
             self.emit({'view_changed': 'fft_win_type'}, sig_name='sig_tx_fft')
         else:
