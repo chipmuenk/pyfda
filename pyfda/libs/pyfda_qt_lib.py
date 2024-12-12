@@ -754,7 +754,7 @@ class PushButton(QPushButton):
 
     def eventFilter(self, source, event):
         if event.type() == QEvent.MouseButtonPress:
-            if self._checkable and event.button() == Qt.LeftButton:
+            if self.isEnabled() and self._checkable and event.button() == Qt.LeftButton:
                 # signal is passed to base class where "self.toggle()" is performed
                 self.checked = not self.checked
                 self.style_button()
