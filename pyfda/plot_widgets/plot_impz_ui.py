@@ -202,7 +202,8 @@ class PlotImpz_UI(QWidget):
         self.led_N_start.setToolTip("<span>First point to plot.</span>")
         self.led_N_start.setMaximumWidth(qtext_width(N_x=8))
 
-        self.but_N_auto = QPushButtonRT(self, to_html("N =", frmt="bi"), margin=5)
+        # self.but_N_auto = QPushButtonRT(self, to_html("N =", frmt="bi"), margin=5)
+        self.but_N_auto = PushButton(to_html("N =", frmt="bi"), rtf=True, margin=5)
         self.but_N_auto.setCheckable(True)
         self.but_N_auto.setChecked(True)
         self.but_N_auto.setToolTip(
