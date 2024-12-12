@@ -530,10 +530,10 @@ class Plot_Impz(QWidget):
         Triggered when checkbox "Autorun" is clicked or specs have been edited,
         requiring a recalculation.
 
-        When Autorun has been pushed (`but_auto_run.isChecked() == True`) and
+        When Autorun has been pushed (`but_auto_run.checked == True`) and
         calculation is required, automatically run `impz_init()`.
         """
-        if self.ui.but_auto_run.isChecked() and self.needs_calc:
+        if self.ui.but_auto_run.checked and self.needs_calc:
             self.impz_init()
 
     # --------------------------------------------------------------------------
@@ -591,7 +591,7 @@ class Plot_Impz(QWidget):
 
         if type(arg) == bool:
             self.needs_calc = True  # but_run has been pressed -> force run
-        elif not self.ui.but_auto_run.isChecked():  # "Auto" is not active, return
+        elif not self.ui.but_auto_run.checked:  # "Auto" is not active, return
             return
 
         if self.needs_calc:
