@@ -234,8 +234,8 @@ class Plot_Impz(QWidget):
         self.ui.led_time_ovlp_spgr.editingFinished.connect(self._spgr_ui2params)
         self.ui.cmb_mode_spgr_time.currentIndexChanged.connect(self.draw)
         self.ui.chk_byfs_spgr_time.clicked.connect(self.draw)
-        self.ui.but_fx_range_x.clicked.connect(self.draw)
-        self.ui.but_fx_range_y.clicked.connect(self.draw)
+        self.ui.chk_fx_range_x.clicked.connect(self.draw)
+        self.ui.chk_fx_range_y.clicked.connect(self.draw)
         self.ui.chk_win_time.clicked.connect(self.draw)
         # --- frequency domain plotting ---------------------------------------
         self.ui.cmb_plt_freq_resp.currentIndexChanged.connect(self.draw)
@@ -849,8 +849,8 @@ class Plot_Impz(QWidget):
         self.ui.cmb_plt_time_stmq.setVisible(fx_mode)  # cmb box time domain
         self.ui.lbl_plt_time_stmq.setVisible(fx_mode)  # cmb box time domain
         self.ui.lbl_fx_range.setVisible(fx_mode)  # display fx range limits
-        self.ui.but_fx_range_x.setVisible(fx_mode)  # display fx range limits
-        self.ui.but_fx_range_y.setVisible(fx_mode)  # display fx range limits
+        self.ui.chk_fx_range_x.setVisible(fx_mode)  # display fx range limits
+        self.ui.chk_fx_range_y.setVisible(fx_mode)  # display fx range limits
 
         # add / delete fixpoint entry to / from spectrogram combo box and set
         # `fx_str = "fixpoint"`` or `""``
@@ -1281,10 +1281,10 @@ class Plot_Impz(QWidget):
             else:
                 H_str = H_str + ' in V'
 
-        if self.ui.but_fx_range_x.isChecked() and fb.fil[0]['fx_sim']:
+        if self.ui.chk_fx_range_x.isChecked() and fb.fil[0]['fx_sim']:
             self.ax_r.axhline(fx_max_x, 0, 1, linestyle='--')
             self.ax_r.axhline(fx_min_x, 0, 1, linestyle='--')
-        if self.ui.but_fx_range_y.isChecked() and fb.fil[0]['fx_sim']:
+        if self.ui.chk_fx_range_y.isChecked() and fb.fil[0]['fx_sim']:
             self.ax_r.axhline(fx_max_y, 0, 1, linestyle='-.')
             self.ax_r.axhline(fx_min_y, 0, 1, linestyle='-.')
 

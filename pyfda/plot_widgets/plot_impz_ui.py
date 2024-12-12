@@ -264,11 +264,11 @@ class PlotImpz_UI(QWidget):
         self.win_viewer.hide()
 
         self.lbl_fx_range = QLabel(to_html("FX Range:", frmt='b'))
-        self.but_fx_range_x = QCheckBox("X", objectName="but_fx_range_x")
-        self.but_fx_range_x.setToolTip(
+        self.chk_fx_range_x = QCheckBox("X", objectName="chk_fx_range_x")
+        self.chk_fx_range_x.setToolTip(
              "<span>Display stimulus fixpoint range (---).</span>")
-        self.but_fx_range_y = QCheckBox("Y", objectName="but_fx_range_y")
-        self.but_fx_range_y.setToolTip(
+        self.chk_fx_range_y = QCheckBox("Y", objectName="chk_fx_range_y")
+        self.chk_fx_range_y.setToolTip(
              "<span>Display response fixpoint range (-.-).</span>")
 
         layH_ctrl_run = QHBoxLayout()
@@ -292,8 +292,8 @@ class PlotImpz_UI(QWidget):
         layH_ctrl_run.addWidget(self.qfft_win_select)
         layH_ctrl_run.addSpacing(20)
         layH_ctrl_run.addWidget(self.lbl_fx_range)
-        layH_ctrl_run.addWidget(self.but_fx_range_x)
-        layH_ctrl_run.addWidget(self.but_fx_range_y)
+        layH_ctrl_run.addWidget(self.chk_fx_range_x)
+        layH_ctrl_run.addWidget(self.chk_fx_range_y)
         layH_ctrl_run.addStretch(10)
 
         # layH_ctrl_run.setContentsMargins(*params['wdg_margins'])
