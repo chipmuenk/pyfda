@@ -717,32 +717,15 @@ class PushButton(QPushButton):
         Whether initial state is checked
     """
 
-    def __init__(self, text: str = "", rtf: bool = False, icon: QIcon = None,
-                  N_x: int = 8, margin: int = 10, checkable: bool = True, checked: bool = False,
-                  objectName="", **kwargs):
+    def __init__(self, text: str = "", icon: QIcon = None, N_x: int = 8,
+                 checkable: bool = True, checked: bool = False,
+                 objectName="", **kwargs):
 
         super().__init__(**kwargs)
 
         self.setObjectName(objectName)
-        self.rtf = rtf
 
-        if self.rtf:
-            self.lbl_rtf = QLabel(self)
-            self.margin = margin
-            if text is not None:
-                self.lbl_rtf.setText(text)
-            self.layH_main = QHBoxLayout()
-            self.layH_main.setContentsMargins(margin, 0, 0, 0)  # L, T, R, B
-            self.layH_main.setSpacing(0)
-            self.setLayout(self.layH_main)
-            # Make QLabel transparent except for painted pixels
-            self.lbl_rtf.setAttribute(Qt.WA_TranslucentBackground)
-            # Disable the delivery of mouse events to the QLabel widget and its children,
-            self.lbl_rtf.setAttribute(Qt.WA_TransparentForMouseEvents)
-            self.lbl_rtf.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
-            self.lbl_rtf.setTextFormat(Qt.RichText)
-            self.layH_main.addWidget(self.lbl_rtf, Qt.AlignHCenter)
-        elif icon is None:
+        if icon is None:
             self.w = qtext_width(text=text, N_x=N_x, font=self.font())
             self.h = super(PushButton, self).sizeHint().height()
             self.setText(text.strip())
@@ -768,7 +751,6 @@ class PushButton(QPushButton):
     def setChecked(self, checked: bool):
         if self._checkable:
             self.checked = checked
-            # self.setChecked(checked)
             self.style_button()
 
     def setCheckable(self, checkable: bool):
@@ -792,39 +774,118 @@ class PushButton(QPushButton):
             qstyle_widget(self, "highlight")
         else:
             qstyle_widget(self, "normal")
-        if self.rtf:
-            if self.checked:
-                qstyle_widget(self.lbl_rtf, "highlight")
-            else:
-                qstyle_widget(self.lbl_rtf, "normal")
 
     def sizeHint(self) -> QtCore.QSize:
-        if self.rtf:
-            s = QPushButton.sizeHint(self)
-            w = self.lbl_rtf.sizeHint()
-            s.setWidth(w.width() + 2 * self.margin)
-            return s
-        else:
-            return QSize(self.w, self.h)
-
-    # def sizeHint(self):  # from QPushButtonRT
-    #     is_checked = self.isChecked()
-    #     self.setChecked(False)  # always base sizeHint on unchecked state
-    #     s = QPushButton.sizeHint(self)
-    #     w = self.__lbl.sizeHint()
-    #     s.setWidth(w.width() + 2 * self.margin)
-    #     # s.setHeight(w.height())
-    #     self.setChecked(is_checked)
-    #     return s
+        return QSize(self.w, self.h)
 
     def minimumSizeHint(self) -> QtCore.QSize:
-        if self.rtf:
-            s = QPushButton.sizeHint(self)
-            w = self.lbl_rtf.sizeHint()
-            s.setWidth(w.width() + 2 * self.margin)
-            return s
+        return QSize(self.w, self.h)
+
+class PushButtonRT(QPushButton):
+    """
+    Subclass QPushButton using QLabel to render rich text
+
+    Parameters
+    ----------
+    text : str
+        Text for button (optional)
+
+    rtf : bool
+        Render text as rich text
+
+    N_x : int
+        Width in number of "x"
+
+    margin : int
+        margin for ?
+
+    checkable : bool
+        Whether button is checkable
+
+    checked : bool
+        Whether initial state is checked
+    """
+
+    def __init__(self, parent=None, text: str = "",
+                  N_x: int = 8, margin: int = 10, checkable: bool = True, checked: bool = False,
+                  objectName="", **kwargs):
+
+        if parent is not None:
+            super().__init__(parent, **kwargs)
         else:
-            return QSize(self.w, self.h)
+            super().__init__(**kwargs)
+
+        self.setObjectName(objectName)
+
+        self.lbl_rtf = QLabel(self)
+        self.margin = margin
+        if text is not None:
+            self.lbl_rtf.setText(text)
+        self.layH_main = QHBoxLayout()
+        self.layH_main.setContentsMargins(margin, 0, 0, 0)  # L, T, R, B
+        self.layH_main.setSpacing(0)
+        self.setLayout(self.layH_main)
+        # Make QLabel transparent except for painted pixels
+        self.lbl_rtf.setAttribute(Qt.WA_TranslucentBackground)
+        # Disable the delivery of mouse events to the QLabel widget and its children,
+        self.lbl_rtf.setAttribute(Qt.WA_TransparentForMouseEvents)
+        self.lbl_rtf.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+        self.lbl_rtf.setTextFormat(Qt.RichText)
+        self.layH_main.addWidget(self.lbl_rtf, Qt.AlignHCenter)
+
+        self.setCheckable(checkable)
+        self._checkable = checkable
+        if self._checkable:
+            self.setChecked(checked)
+            self.checked = checked
+        else:
+            self.setChecked(False)
+            self.checked = False
+
+        self.style_button()
+
+        self.installEventFilter(self)
+
+    def setChecked(self, checked: bool):
+        if self._checkable:
+            self.checked = checked
+            self.style_button()
+
+    def setCheckable(self, checkable: bool):
+        self._checkable = checkable
+        if not self._checkable:
+            self.setChecked(False)
+            self.checked = False
+            self.style_button()
+
+    def eventFilter(self, source, event):
+        if event.type() == QEvent.MouseButtonPress:
+            if self.isEnabled() and self._checkable and event.button() == Qt.LeftButton:
+                # signal is passed to base class where "self.toggle()" is performed
+                self.checked = not self.checked
+                self.style_button()
+        # Call base class method to continue normal event processing:
+        return super(PushButtonRT, self).eventFilter(source, event)
+
+    def style_button(self):
+        if self.checked:
+            qstyle_widget(self, "highlight")
+            qstyle_widget(self.lbl_rtf, "highlight")
+        else:
+            qstyle_widget(self, "normal")
+            qstyle_widget(self.lbl_rtf, "normal")
+
+    def sizeHint(self) -> QtCore.QSize:
+        s = QPushButton.sizeHint(self)
+        w = self.lbl_rtf.sizeHint()
+        s.setWidth(w.width() + 2 * self.margin)
+        return s
+
+    def minimumSizeHint(self) -> QtCore.QSize:
+        s = QPushButton.sizeHint(self)
+        w = self.lbl_rtf.sizeHint()
+        s.setWidth(w.width() + 2 * self.margin)
+        return s
 
 
 class RotatedButton(QPushButton):
