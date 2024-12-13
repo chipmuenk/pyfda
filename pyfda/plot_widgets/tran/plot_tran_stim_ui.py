@@ -288,12 +288,13 @@ class Plot_Tran_Stim_UI(QWidget):
             self.cmb_stim_modulation_item)
 
         # -------------------------------------
-        self.chk_step_err = QPushButton("Error", objectName="stim_step_err")
-        self.chk_step_err.setToolTip(
+        self.but_step_err = PushButton(
+            text="Error", objectName="stim_step_err")
+        self.but_step_err.setToolTip(
             "<span>Display the step response error.</span>")
-        self.chk_step_err.setMaximumWidth(qtext_width(text="Error "))
-        self.chk_step_err.setCheckable(True)
-        self.chk_step_err.setChecked(False)
+        # self.but_step_err.setMaximumWidth(qtext_width(text="Error "))
+        self.but_step_err.setCheckable(True)
+        self.but_step_err.setChecked(False)
         #
         self.but_file_io = PushButton("<", checkable=False)
         self.but_file_io.setToolTip(
@@ -321,7 +322,7 @@ class Plot_Tran_Stim_UI(QWidget):
         layHCmbStim.addWidget(self.but_stim_bl)
         layHCmbStim.addWidget(self.lblStimPar1)
         layHCmbStim.addWidget(self.ledStimPar1)
-        layHCmbStim.addWidget(self.chk_step_err)
+        layHCmbStim.addWidget(self.but_step_err)
 
         self.lblDC = QLabel(to_html("DC =", frmt='bi'), self)
         self.ledDC = QLineEdit(self, objectName="stimDC")
@@ -572,7 +573,7 @@ class Plot_Tran_Stim_UI(QWidget):
         # ----------------------------------------------------------------------
         # --- stimulus control ---
         self.but_stim_bl.clicked.connect(self._enable_stim_widgets)
-        self.chk_step_err.clicked.connect(self._enable_stim_widgets)
+        self.but_step_err.clicked.connect(self._enable_stim_widgets)
         self.cmbStimulus.currentIndexChanged.connect(self._enable_stim_widgets)
 
         self.cmb_stim_noise.currentIndexChanged.connect(self._update_noi)
@@ -827,7 +828,7 @@ class Plot_Tran_Stim_UI(QWidget):
         self.lblDC.setVisible("dc" in stim_wdg)
         self.ledDC.setVisible("dc" in stim_wdg)
 
-        self.chk_step_err.setVisible(self.stim == "step")
+        self.but_step_err.setVisible(self.stim == "step")
 
         self.lblStimPar1.setVisible("par1" in stim_wdg)
         self.ledStimPar1.setVisible("par1" in stim_wdg)

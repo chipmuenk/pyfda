@@ -772,7 +772,7 @@ class Plot_Impz(QWidget):
         """
         # step error calculation: calculate system DC response and subtract it
         # from the response
-        if self.stim_wdg.ui.stim == "step" and self.stim_wdg.ui.chk_step_err.isChecked():
+        if self.stim_wdg.ui.stim == "step" and self.stim_wdg.ui.but_step_err.checked:
             if len(self.sos) > 0:  # has second order sections
                 dc = sig.sosfreqz(self.sos, [0])  # yields (w(0), H(0))
             else:

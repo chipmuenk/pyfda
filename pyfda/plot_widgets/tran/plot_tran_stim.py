@@ -95,7 +95,7 @@ class Plot_Tran_Stim(QWidget):
                 self.title_str = r'Rect Impulse'
             # ------------------------------------------------------------------
             elif self.ui.stim == "step":
-                if self.ui.chk_step_err.isChecked():
+                if self.ui.but_step_err.checked:
                     self.title_str = r'Settling Error $\epsilon$'
                     self.H_str = r'$h_{\epsilon, \infty} - h_{\epsilon}[n]$'
                 else:
