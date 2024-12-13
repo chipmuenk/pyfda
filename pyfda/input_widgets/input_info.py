@@ -14,7 +14,7 @@ import pprint
 import textwrap
 
 from pyfda.libs.compat import (
-    QtGui, QWidget, QFont, QFrame, QPushButton, QLabel, QTableWidget, QTableWidgetItem,
+    QtGui, QWidget, QFont, QFrame, QLabel, QTableWidget, QTableWidgetItem,
     QTextBrowser, QTextCursor, QLineEdit, QVBoxLayout, QHBoxLayout, QGridLayout,
     QSplitter, Qt, pyqtSignal)
 
