@@ -12,12 +12,12 @@ Widget for entering weight specifications
 import sys
 
 from pyfda.libs.compat import (
-    QtCore, QWidget, QLabel, QLineEdit, QFrame, QFont, QToolButton,
+    QtCore, QWidget, QLabel, QLineEdit, QFrame, QFont,
     QVBoxLayout, QHBoxLayout, QGridLayout, pyqtSignal, QEvent)
 
 import pyfda.filterbroker as fb
 from pyfda.libs.pyfda_lib import to_html, safe_eval, pprint_log, first_item
-from pyfda.libs.pyfda_qt_lib import qstyle_widget
+from pyfda.libs.pyfda_qt_lib import qstyle_widget, PushButton
 from pyfda.pyfda_rc import params  # FMT string for QLineEdit fields, e.g. '{:.3g}'
 
 import logging
@@ -75,8 +75,8 @@ class WeightSpecs(QWidget):
         lblTitle.setFont(bfont)
         lblTitle.setWordWrap(True)
 
-        self.butReset = QToolButton(self)
-        self.butReset.setText("Reset")
+        self.butReset = PushButton(self, text="Reset", checkable=False)
+        # self.butReset.setText("Reset")
         self.butReset.setToolTip("Reset weights to 1")
 
         layHTitle = QHBoxLayout()       # Layout for title and reset button
