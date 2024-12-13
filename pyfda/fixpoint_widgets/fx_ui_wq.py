@@ -20,11 +20,11 @@ from pyfda.libs.tree_builder import merge_dicts_hierarchically
 import pyfda.libs.pyfda_fix_lib as fx
 
 from pyfda.libs.compat import (
-    Qt, QWidget, QLabel, QLineEdit, QComboBox, QPushButton, QIcon,
+    Qt, QWidget, QLabel, QLineEdit, QComboBox, QIcon,
     QVBoxLayout, QHBoxLayout, QGridLayout, QFrame, pyqtSignal)
 
 from pyfda.libs.pyfda_qt_lib import (
-    qcmb_box_populate, qget_cmb_box, qset_cmb_box, qstyle_widget)
+    qcmb_box_populate, qget_cmb_box, qset_cmb_box, qstyle_widget, PushButton)
 from pyfda.pyfda_rc import params
 from pyfda.libs.pyfda_lib import safe_eval, to_html
 
@@ -227,7 +227,7 @@ class FX_UI_WQ(QWidget):
                 f"""'auto/man' combo box.""")
         self.cmbW.setVisible(ui_dict['cmb_w_vis'] == 'on')
 
-        self.butLock = QPushButton(self)
+        self.butLock = PushButton(self, icon=QIcon(':/lock-locked.svg'))
         self.butLock.setCheckable(True)
         self.butLock.setChecked(False)
         self.butLock.setVisible(ui_dict['lock_vis'] == 'on')
@@ -315,7 +315,7 @@ class FX_UI_WQ(QWidget):
         # use only self.Q.q_dict from here on!!
 
         # initialize button icon
-        self.but_lock_update_icon(self.butLock.isChecked())
+        self.but_lock_update_icon(self.butLock.checked)
 
         # ----------------------------------------------------------------------
         # GLOBAL SIGNALS
@@ -338,12 +338,12 @@ class FX_UI_WQ(QWidget):
         self.update_ovfl_cnt()
 
     # --------------------------------------------------------------------------
-    def but_lock_checked(self, checked: bool) -> None:
+    def but_lock_checked(self) -> None:
         """
         Update the icon of the push button depending on its state (checked or not)
         and fire the signal {'ui_local_changed': 'butLock'}
         """
-        self.but_lock_update_icon(checked)
+        self.but_lock_update_icon(self.butLock.checked)
         self.emit({'sender_name': self.objectName(), 'ui_local_changed': 'butLock'})
 
     # --------------------------------------------------------------------------

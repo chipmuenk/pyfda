@@ -115,7 +115,7 @@ class Tran_IO_UI(QWidget):
         # ----------------------------------------------------------------------
 
         # ----------- LOAD ------------------------------------------------------------
-        self.but_select = PushButton("Select", checkable=False, objectName="large")
+        self.but_select = PushButton(self, "Select", checkable=False, objectName="large")
         self.but_select.setSizePolicy(QSizePolicy.Expanding,
                                     QSizePolicy.Expanding)
         self.but_select.setToolTip(
@@ -164,7 +164,7 @@ class Tran_IO_UI(QWidget):
         self.lbl_wordlength = QLabel(to_html("W =", frmt="bi"))
         self.lbl_wordlength_value = QLabel("None")
 
-        self.but_scale_to = PushButton("Scale to")
+        self.but_scale_to = PushButton(self, "Scale to")
         self.but_scale_to.setToolTip(
             self.tr("<span>When activated, scale maximum of data to the value below "
                     "before saving and after loading.</span>"))
@@ -181,7 +181,7 @@ class Tran_IO_UI(QWidget):
             "<span>Select CSV format and whether "
             "to copy to/from clipboard or file.</span>")
 
-        self.but_int_as_float = PushButton("Int2Float ")
+        self.but_int_as_float = PushButton(self, "Int2Float")
         self.but_int_as_float.setChecked(True)
         self.but_int_as_float.setToolTip(
             "<span>Represent <i>W</i> bit integer WAV formats as float when importing "
@@ -399,7 +399,7 @@ if __name__ == "__main__":
     mainw = Tran_IO_UI()
 
     layVMain = QVBoxLayout()
-    layVMain.addWidget(mainw.wdg_stim)
+    layVMain.addWidget(mainw.wdg_top)
 
     mainw.setLayout(layVMain)
     app.setActiveWindow(mainw)

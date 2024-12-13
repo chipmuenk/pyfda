@@ -84,19 +84,17 @@ class Input_Info(QWidget):
 
         # ============== UI Layout =====================================
         # widget / subwindow for filter infos
-        self.butFiltPerf = PushButton("H(f)")
-        self.butFiltPerf.setChecked(True)
+        self.butFiltPerf = PushButton(self, text="H(f)", checked=True)
         self.butFiltPerf.setToolTip("Display frequency response at test frequencies.")
 
-        self.butDebug = PushButton("Debug")
-        self.butDebug.setChecked(False)
+        self.butDebug = PushButton(self, "Debug", checked=False)
         self.butDebug.setToolTip("Show debugging options.")
 
-        self.butAbout = PushButton("About")  # pop-up "About" window
-        self.butAbout.setCheckable(False)
+        self.butAbout = PushButton(self, "About", checkable=False)  # pop-up "About" window
+        self.butAbout.setToolTip(
+            "<span>Show included modules and their versions.</span>")
 
-        self.butSettings = PushButton("Settings")  #
-        self.butSettings.setChecked(False)
+        self.butSettings = PushButton(self, "Settings", checked=False)
         self.butSettings.setToolTip("Display and set some settings")
 
         layHControls1 = QHBoxLayout()
@@ -105,23 +103,19 @@ class Input_Info(QWidget):
         layHControls1.addWidget(self.butSettings)
         layHControls1.addWidget(self.butDebug)
 
-        self.butDocstring = PushButton("Doc$")
-        self.butDocstring.setChecked(False)
+        self.butDocstring = PushButton(self, "Doc$", checked=False)
         self.butDocstring.setToolTip("Display docstring from python filter method.")
 
-        self.butRichText = PushButton("RTF")
-        self.butRichText.setCheckable(HAS_DOCUTILS)
-        self.butRichText.setChecked(HAS_DOCUTILS)
+        self.butRichText = PushButton(
+            self, "RTF", checkable=HAS_DOCUTILS, checked=HAS_DOCUTILS)
         self.butRichText.setEnabled(HAS_DOCUTILS)
         self.butRichText.setToolTip("Render documentation in Rich Text Format.")
 
-        self.butFiltDict = PushButton("FiltDict")
+        self.butFiltDict = PushButton(self, "FiltDict", checked=False)
         self.butFiltDict.setToolTip("Show filter dictionary for debugging.")
-        self.butFiltDict.setChecked(False)
 
-        self.butFiltTree = PushButton("FiltTree")
+        self.butFiltTree = PushButton(self, "FiltTree", checked=False)
         self.butFiltTree.setToolTip("Show filter tree for debugging.")
-        self.butFiltTree.setChecked(False)
 
         layHControls2 = QHBoxLayout()
         layHControls2.addWidget(self.butDocstring)

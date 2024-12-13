@@ -295,7 +295,7 @@ class Plot_Tran_Stim_UI(QWidget):
         self.but_step_err.setCheckable(True)
         self.but_step_err.setChecked(False)
         #
-        self.but_file_io = PushButton("<", checkable=False)
+        self.but_file_io = PushButton(self, "<", checkable=False)
         self.but_file_io.setToolTip(
             "<span>Use file length as number of data points.</span>")
         self.lbl_file_io = QLabel(to_html("&nbsp;File IO", frmt='bi'))

@@ -94,7 +94,7 @@ class Plot_Hf(QWidget):
         """
         Define and construct the subwidgets
         """
-        self.lbl_show_H_abs = QLabel(to_html('| H | ', frmt='b'))
+        self.lbl_show_H_abs = QLabel(to_html('| H |', frmt='b'))
         self.chk_show_H_abs = QCheckBox(self)
         self.chk_show_H_abs.setChecked(True)
         self.chk_show_H_abs.setToolTip("Show magnitude of H(F)")
@@ -131,7 +131,7 @@ class Plot_Hf(QWidget):
 
         self.cmb_units_a.setSizeAdjustPolicy(QComboBox.AdjustToContents)
 
-        self.but_zerophase = PushButton(" Zero phase ")
+        self.but_zerophase = PushButton(self, "Zero Phase")
         self.but_zerophase.setToolTip(
             "<span>Subtract linear phase as calculated from filter order. "
             "Only available for FIR filters and for unit 'V', it "
@@ -144,13 +144,13 @@ class Plot_Hf(QWidget):
         self.cmbInset.setCurrentIndex(0)
         self.inset_idx = 0  # store previous index for comparison
 
-        self.but_specs = PushButton("Specs ")
+        self.but_specs = PushButton(self, "Specs")
         self.but_specs.setToolTip("Display filter specs as hatched regions")
 
-        self.but_phase = PushButton("Phase ")
+        self.but_phase = PushButton(self, "Phase")
         self.but_phase.setToolTip("Overlay phase")
 
-        self.but_align = PushButton("Align")
+        self.but_align = PushButton(self, "Align")
         self.but_align.setToolTip(
             "<span>Try to align gridlines for magnitude and phase "
             "(doesn't work in all cases).</span>")

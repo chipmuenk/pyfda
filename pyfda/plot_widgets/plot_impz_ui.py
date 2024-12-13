@@ -171,7 +171,7 @@ class PlotImpz_UI(QWidget):
         # ----------- ---------------------------------------------------
         # Run control widgets
         # ---------------------------------------------------------------
-        self.but_auto_run = PushButton(" Auto", objectName="but_auto_run")
+        self.but_auto_run = PushButton(self, "Auto", objectName="but_auto_run")
         self.but_auto_run.setToolTip("<span>Update response automatically when "
                                      "parameters have been changed.</span>")
         self.but_auto_run.setCheckable(True)
@@ -348,7 +348,7 @@ class PlotImpz_UI(QWidget):
         line1 = QVLine()
         line2 = QVLine(width=5)
 
-        self.but_log_time = PushButton(" dB", objectName="but_log_time")
+        self.but_log_time = PushButton(self, "dB", objectName="but_log_time")
         self.but_log_time.setToolTip(
             "<span>Logarithmic scale for y-axis.</span>")
 
@@ -368,7 +368,7 @@ class PlotImpz_UI(QWidget):
                                            "i.e. scale by f_S</span>")
         self.chk_byfs_spgr_time.setChecked(True)
 
-        self.but_log_spgr_time = PushButton("dB", objectName="but_log_spgr")
+        self.but_log_spgr_time = PushButton(self, "dB", objectName="but_log_spgr")
         self.but_log_spgr_time.setMaximumWidth(qtext_width(text=" dB"))
         self.but_log_spgr_time.setToolTip(
             "<span>Logarithmic scale for spectrogram.</span>")
@@ -507,7 +507,7 @@ class PlotImpz_UI(QWidget):
         self.cmb_plt_freq_resp.setToolTip(
             "<span>Plot style for response.</span>")
 
-        self.but_log_freq = PushButton("dB", objectName="but_log_freq")
+        self.but_log_freq = PushButton(self, text="dB", objectName="but_log_freq")
         self.but_log_freq.setToolTip(
             "<span>Logarithmic scale for y-axis.</span>")
         self.but_log_freq.setChecked(True)
@@ -546,12 +546,12 @@ class PlotImpz_UI(QWidget):
         self.but_freq_norm_impz.setChecked(True)
         self.but_freq_norm_impz.setObjectName("freq_norm_impz")
 
-        self.but_freq_show_info = PushButton(" Info ", objectName="but_show_info_freq")
+        self.but_freq_show_info = PushButton(text="Info", objectName="but_show_info_freq")
         self.but_freq_show_info.setToolTip(
             "<span>Show signal power in legend.</span>")
         self.but_freq_show_info.setChecked(False)
 
-        self.but_freq_index_k = PushButtonRT(self, text = " <i>k</i> ", objectName="but_show_index_k")
+        self.but_freq_index_k = PushButtonRT(self, text = "<i>k</i>", objectName="but_show_index_k")
         self.but_freq_index_k.setToolTip(
             "<span>Show FFT indices instead of frequencies.</span>")
         self.but_freq_index_k.setCheckable(True)

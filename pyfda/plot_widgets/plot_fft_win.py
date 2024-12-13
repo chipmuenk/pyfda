@@ -223,7 +223,7 @@ class Plot_FFT_win(QDialog):
         # By default, the enter key triggers the default 'dialog action' in QDialog
         # widgets. This would activate one of the pushbuttons if `default` wasn't False.
         self.lbl_title_time = QLabel("Time: ", objectName="medium")
-        self.but_log_t = PushButton("dB", default=False, autoDefault=False,
+        self.but_log_t = PushButton(self, "dB", default=False, autoDefault=False,
                                      objectName="chk_log_time")
         self.but_log_t.setMaximumWidth(qtext_width(" dB "))
         self.but_log_t.setToolTip("Display in dB")
@@ -239,13 +239,13 @@ class Plot_FFT_win(QDialog):
         self.lbl_log_bottom_t.setVisible(self.but_log_t.checked)
 
         self.lbl_title_freq = QLabel("Freq: ", objectName="medium")
-        self.but_norm_f = PushButton("Max=1", default=False, autoDefault=False)
+        self.but_norm_f = PushButton(self, "Max=1", default=False, autoDefault=False)
         self.but_norm_f.setChecked(True)
         self.but_norm_f.setMaximumWidth(qtext_width(text=" Max=1 "))
         self.but_norm_f.setToolTip(
             "Normalize window spectrum for a maximum of 1.")
 
-        self.but_half_f = PushButton("0...½", default=False, autoDefault=False)
+        self.but_half_f = PushButton(self, "0...½", default=False, autoDefault=False)
         self.but_half_f.setChecked(True)
         self.but_half_f.setMaximumWidth(qtext_width(text=" 0...½ "))
         self.but_half_f.setToolTip(
@@ -253,7 +253,7 @@ class Plot_FFT_win(QDialog):
 
         # By default, the enter key triggers the default 'dialog action' in QDialog
         # widgets. This activates one of the pushbuttons.
-        self.but_log_f = PushButton("dB", default=False, autoDefault=False,
+        self.but_log_f = PushButton(self, "dB", default=False, autoDefault=False,
                                      objectName="chk_log_freq")
         self.but_log_f.setMaximumWidth(qtext_width(" dB "))
         self.but_log_f.setToolTip("<span>Display in dB.</span>")

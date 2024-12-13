@@ -14,7 +14,7 @@ from pyfda.libs.compat import (
     pyqtSignal, Qt, QWidget, QLabel, QLineEdit, QComboBox, QPushButton,
     QFrame, QSpinBox, QFont, QIcon, QVBoxLayout, QHBoxLayout)
 
-from pyfda.libs.pyfda_qt_lib import qstyle_widget, qcmb_box_populate
+from pyfda.libs.pyfda_qt_lib import qstyle_widget, qcmb_box_populate, PushButton
 from pyfda.libs.csv_option_box import CSV_option_box
 from pyfda.libs.pyfda_lib import to_html, first_item
 import pyfda.libs.pyfda_dirs as dirs
@@ -114,7 +114,7 @@ class Input_PZ_UI(QWidget):
         self.lblDigits = QLabel("Digits", self)
         self.lblDigits.setFont(self.bifont)
 
-        self.but_format = QPushButton(QIcon(':/star.svg'), "", self)
+        self.but_format = PushButton(self, icon=QIcon(':/star.svg'), checked=False)
         self.but_format.setToolTip(
             "<span><b>Formatted Data</b><br><br>"
             "When <b>inactive</b>: Import / export poles, zeros and gain <i>k</i> "
@@ -123,7 +123,6 @@ class Input_PZ_UI(QWidget):
             "coordinates with the selected number of digits etc.</span>"
             )
         q_icon_size = self.but_format.iconSize()
-        self.but_format.setCheckable(True)
 
         # self.cmbCausal = QComboBox(self)
         # causal_types = ['Causal', 'Acausal', 'Anticausal']
@@ -205,8 +204,7 @@ class Input_PZ_UI(QWidget):
         self.butClear.setIconSize(q_icon_size)
         self.butClear.setToolTip("Clear all table entries.")
 
-        self.but_file_clipboard = QPushButton(self)
-        self.but_file_clipboard.setIcon(QIcon(':/clipboard.svg'))
+        self.but_file_clipboard = PushButton(self, icon=QIcon(':/clipboard.svg'), checked=False)
         self.but_file_clipboard.setIconSize(q_icon_size)
         self.but_file_clipboard.setToolTip("Select between file and clipboard import / export.")
 
@@ -228,14 +226,12 @@ class Input_PZ_UI(QWidget):
             "forma with full precision.<br>"
             "Otherwise, export as displayed.</span>")
 
-        self.but_csv_options = QPushButton(self)
-        self.but_csv_options.setIcon(QIcon(':/csv_options.svg'))
+        self.but_csv_options = PushButton(self, icon=QIcon(':/csv_options.svg'), checked=False)
+        # self.but_csv_options.setIcon(QIcon(':/csv_options.svg'))
         self.but_csv_options.setIconSize(q_icon_size)
         self.but_csv_options.setToolTip(
             "<span>Select CSV format and whether "
             "to copy to/from clipboard or file.</span>")
-        self.but_csv_options.setCheckable(True)
-        self.but_csv_options.setChecked(False)
 
         self.load_save_clipboard = not self.load_save_clipboard  # is inverted next step
         self._set_load_save_icons()  # initialize icon / button settings
@@ -307,7 +303,7 @@ class Input_PZ_UI(QWidget):
         """
         if dirs.csv_options_handle is None:
             # no handle to the window? Create a new instance!
-            if self.but_csv_options.isChecked():
+            if self.but_csv_options.checked:
                 # Important: Handle to window must be class attribute otherwise it (and
                 # the attached window) is deleted immediately when it goes out of scope
                 dirs.csv_options_handle = CSV_option_box(self)

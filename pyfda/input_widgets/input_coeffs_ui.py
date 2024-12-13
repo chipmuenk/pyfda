@@ -139,7 +139,7 @@ class Input_Coeffs_UI(QWidget):
         q_icon_size = self.but_quant.iconSize()  # <- comment this for manual sizing
         self.but_quant.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
 
-        self.but_format = QPushButton(QIcon(':/star.svg'), "", self)
+        self.but_format = PushButton(self, icon=QIcon(':/star.svg'), checked=False)
         self.but_format.setToolTip(
             "<span><b>Formatted Data</b><br><br>"
             "When <b>inactive</b>: Import / export coefficients in float / complex "
@@ -148,7 +148,6 @@ class Input_Coeffs_UI(QWidget):
             "format, i.e. with the selected number of digits in Hex, Binary etc.</span>"
             )
         self.but_format.setIconSize(q_icon_size)
-        self.but_format.setCheckable(True)
 
         # layH_q_frmt = QHBoxLayout()
         # layH_q_frmt.addWidget(self.cmb_qfrmt)
@@ -219,8 +218,7 @@ class Input_Coeffs_UI(QWidget):
         self.butClear.setIconSize(q_icon_size)
         self.butClear.setToolTip("Clear all table entries.")
 
-        self.but_file_clipboard = QPushButton(self)
-        self.but_file_clipboard.setIcon(QIcon(':/clipboard.svg'))
+        self.but_file_clipboard = PushButton(self, icon=QIcon(':/clipboard.svg'), checked=False)
         self.but_file_clipboard.setIconSize(q_icon_size)
         self.but_file_clipboard.setToolTip("Select between file and clipboard import / export.")
 

@@ -34,7 +34,7 @@ API version info:
    :2.2: Rename `filter_classes` -> `classes`, remove Py2 compatibility
 """
 from pyfda.libs.compat import (QWidget, pyqtSignal, QComboBox, QIcon, QSize,
-                               QPushButton, QHBoxLayout, QVBoxLayout)
+                               QHBoxLayout, QVBoxLayout)
 import copy
 import numpy as np
 import scipy.signal as sig
@@ -44,7 +44,7 @@ from scipy.special import sinc
 import pyfda.filterbroker as fb  # importing filterbroker initializes all its globals
 import pyfda.libs.pyfda_dirs as dirs
 from pyfda.libs.pyfda_lib import fil_save, round_odd, pprint_log
-from pyfda.libs.pyfda_qt_lib import popup_warning, qset_cmb_box
+from pyfda.libs.pyfda_qt_lib import popup_warning, PushButton
 from pyfda.libs.fft_windows_cmb_box import QFFTWinCmbBox
 from pyfda.libs.pyfda_fft_windows_lib import all_wins_dict_ref
 from pyfda.plot_widgets.plot_fft_win import Plot_FFT_win
@@ -185,8 +185,7 @@ class Firwin(QWidget):
         self.win_viewer.hide()
 
         # button for opening FFT window
-        self.but_fft_wdg = QPushButton(self)
-        self.but_fft_wdg.setIcon(QIcon(":/fft.svg"))
+        self.but_fft_wdg = PushButton(self, icon=QIcon(":/fft.svg"))
         but_height = self.qfft_win_select.sizeHint().height()
         self.but_fft_wdg.setIconSize(QSize(but_height, but_height))
         self.but_fft_wdg.setFixedSize(QSize(but_height, but_height))
@@ -582,7 +581,7 @@ class Firwin(QWidget):
         Show / hide FFT widget depending on the state of the corresponding button
         When widget is shown, trigger an update of the window function.
         """
-        if self.but_fft_wdg.isChecked():
+        if self.but_fft_wdg.checked:
             self.win_viewer.show()
             self.emit({'view_changed': 'fft_win_type'}, sig_name='sig_tx_local')
         else:
