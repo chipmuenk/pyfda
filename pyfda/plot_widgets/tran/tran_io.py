@@ -158,7 +158,7 @@ class Tran_IO(QWidget):
 
         The sampling frequency needs to integer and at least 1.
         """
-        if not self.ui.but_f_s_wav_auto.isChecked() or f_s_wav is None:
+        if not self.ui.but_f_s_wav_auto.checked or f_s_wav is None:
             f_s_wav = self.ui.led_f_s_wav.text()
 
         self.f_s_wav = max(safe_eval(f_s_wav, alt_expr=self.f_s_wav,
@@ -371,7 +371,7 @@ class Tran_IO(QWidget):
             self.x_file = data
 
         self.emit({'data_changed': 'file_io'})
-        if self.ui.but_f_s_wav_auto.isChecked():
+        if self.ui.but_f_s_wav_auto.checked:
             fb.fil[0]['f_S'] = self.f_s_file
             fb.fil[0]['freq_specs_unit'] = 'Hz'
             self.emit({'view_changed': 'f_S'})

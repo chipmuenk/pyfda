@@ -846,6 +846,11 @@ class PushButtonRT(QPushButton):
 
         self.installEventFilter(self)
 
+    def setText(self, text):
+        self.lbl_rtf.setText(text)
+        self.updateGeometry()
+        return
+
     def setChecked(self, checked: bool):
         if self._checkable:
             self.checked = checked

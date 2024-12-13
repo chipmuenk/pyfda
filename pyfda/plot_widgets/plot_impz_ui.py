@@ -10,7 +10,7 @@
 Create the UI for the PlotImz class
 """
 from pyfda.libs.compat import (
-    QCheckBox, QWidget, QComboBox, QLineEdit, QLabel, QPushButton, QPushButtonRT,
+    QCheckBox, QWidget, QComboBox, QLineEdit, QLabel,
     QIcon, QProgressBar, pyqtSignal, QSize, QFrame,
     QHBoxLayout, QVBoxLayout, QGridLayout)
 
@@ -19,7 +19,7 @@ from pyfda.libs.pyfda_sig_lib import impz_len
 import pyfda.filterbroker as fb
 import pyfda.libs.pyfda_dirs as dirs
 from pyfda.libs.pyfda_qt_lib import (
-    qcmb_box_populate, qtext_width, QVLine, PushButton)
+    qcmb_box_populate, qtext_width, QVLine, PushButton, PushButtonRT)
 from pyfda.libs.fft_windows_cmb_box import QFFTWinCmbBox
 # FMT string for QLineEdit fields, e.g. '{:.3g}'
 from pyfda.pyfda_rc import params
@@ -202,8 +202,7 @@ class PlotImpz_UI(QWidget):
         self.led_N_start.setToolTip("<span>First point to plot.</span>")
         self.led_N_start.setMaximumWidth(qtext_width(N_x=8))
 
-        # self.but_N_auto = QPushButtonRT(self, to_html("N =", frmt="bi"), margin=5)
-        self.but_N_auto = PushButton(to_html("N =", frmt="bi"), rtf=True, margin=5)
+        self.but_N_auto = PushButtonRT(self, text = to_html("N =", frmt="bi"), margin=5)
         self.but_N_auto.setCheckable(True)
         self.but_N_auto.setChecked(True)
         self.but_N_auto.setToolTip(
@@ -217,7 +216,7 @@ class PlotImpz_UI(QWidget):
             "Disable <b><i>N</i> =</b> for manual entry.</span>")
         self.led_N_points.setMaximumWidth(qtext_width(N_x=8))
         # Enable entry field only for manual mode
-        self.led_N_points.setEnabled(not self.but_N_auto.isChecked())
+        self.led_N_points.setEnabled(not self.but_N_auto.checked)
 
         self.lbl_N_frame = QLabel(to_html("N_Frame", frmt='bi') + " =", self)
         self.lbl_N_frame.setVisible(False)
@@ -529,15 +528,15 @@ class PlotImpz_UI(QWidget):
         qcmb_box_populate(self.cmb_freq_display, self.cmb_freq_display_items,
                           self.cmb_freq_display_item)
 
-        self.but_Hf = QPushButtonRT(self, to_html("H_id", frmt="bi"), margin=5)
-        self.but_Hf.setObjectName("chk_Hf")
+        self.but_Hf = PushButtonRT(self, to_html("H_id", frmt="bi"), margin=5,
+                                   objectName="chk_Hf")
         self.but_Hf.setToolTip("<span>Show ideal frequency response, calculated "
                                "from the filter coefficients.</span>")
         self.but_Hf.setChecked(False)
         self.but_Hf.setCheckable(True)
 
-        self.but_freq_norm_impz = QPushButtonRT(text="<b><i>E<sub>X</sub></i> = 1</b>",
-                                                margin=5)
+        self.but_freq_norm_impz = PushButtonRT(
+            self, text="<b><i>E<sub>X</sub></i> = 1</b>", margin=5)
         self.but_freq_norm_impz.setToolTip(
             "<span>Normalize the FFT of an impulse stimulus with <i>N<sub>FFT</sub></i> "
             "to an energy <i>E<sub>X</sub></i> = 1. For a dirac pulse, this yields "
@@ -552,7 +551,7 @@ class PlotImpz_UI(QWidget):
             "<span>Show signal power in legend.</span>")
         self.but_freq_show_info.setChecked(False)
 
-        self.but_freq_index_k = QPushButtonRT(text=" <i>k</i> ", objectName="but_show_index_k")
+        self.but_freq_index_k = PushButtonRT(self, text = " <i>k</i> ", objectName="but_show_index_k")
         self.but_freq_index_k.setToolTip(
             "<span>Show FFT indices instead of frequencies.</span>")
         self.but_freq_index_k.setCheckable(True)
@@ -629,7 +628,7 @@ class PlotImpz_UI(QWidget):
 
     # -------------------------------------------------------------------------
     def update_N_auto(self):
-        if not self.but_N_auto.isChecked():
+        if not self.but_N_auto.checked:
             # manual entry of number of data points, enable data entry and return
             self.led_N_points.setEnabled(True)
             return
@@ -686,7 +685,7 @@ class PlotImpz_UI(QWidget):
             # calculate number of data points to be plotted
             self.N = self.N_end - self.N_start
         else:
-            if self.but_N_auto.isChecked():  # automatic calculation
+            if self.but_N_auto.checked:  # automatic calculation
                 self.N = impz_len(fb.fil[0]['ba'], level=-40)
 
             # total number of points to be calculated: N_end = N + N_start

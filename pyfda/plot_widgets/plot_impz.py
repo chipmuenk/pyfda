@@ -255,7 +255,7 @@ class Plot_Impz(QWidget):
         """
         Toggle setting of index_k button in filterbroker, update frequency scaling and call `draw()`
         """
-        fb.fil[0]["tab_yn"]["display_index_k"] = self.ui.but_freq_index_k.isChecked()
+        fb.fil[0]["tab_yn"]["display_index_k"] = self.ui.but_freq_index_k.checked
         self.stim_wdg.ui.normalize_freqs()
         self.draw()
 # ------------------------------------------------------------------------------
@@ -1632,20 +1632,20 @@ class Plot_Impz(QWidget):
 
         H_F_str = ""
         ejO_str = r"$(\mathrm{e}^{\mathrm{j} \Omega})$"
-        if self.plt_freq_enabled or self.ui.but_Hf.isChecked():
+        if self.plt_freq_enabled or self.ui.but_Hf.checked:
             if plt_stimulus:
                 H_F_str += r'$X$, '
             if plt_stimulus_q:
                 H_F_str += r'$X_Q$, '
             if plt_response:
                 H_F_str += r'$Y$, '
-            if self.ui.but_Hf.isChecked():
+            if self.ui.but_Hf.checked:
                 H_F_str += r'$H_{id}$, '
             H_F_str = H_F_str.rstrip(', ') + ejO_str
 
             F_range = fb.fil[0]['freqSpecsRange']
 
-            if self.ui.but_freq_index_k.isChecked():
+            if self.ui.but_freq_index_k.checked:
                 """
                 "'<i>k</i>' specifies frequencies w.r.t. " + to_html("f_S", frmt = 'i') +
                 " but plots graphs over the frequency index <i>k</i>.</span>",
@@ -1675,7 +1675,7 @@ class Plot_Impz(QWidget):
         # - Scale impulse response with N_FFT to calculate frequency response if requested
             if self.ui.but_freq_norm_impz.isVisible()\
                 and self.ui.but_freq_norm_impz.isEnabled()\
-                    and self.ui.but_freq_norm_impz.isChecked():
+                    and self.ui.but_freq_norm_impz.checked:
                 freq_resp = True  # calculate frequency response from impulse response
                 scale_impz = self.ui.N * self.ui.all_wins_dict['cgain']\
                     * self.stim_wdg.ui.scale_impz
@@ -1806,7 +1806,7 @@ class Plot_Impz(QWidget):
                         if self.en_mag_phi_f:
                             Y_i = angle_zero(Y)
 
-                if self.ui.but_Hf.isChecked():
+                if self.ui.but_Hf.checked:
                     if self.en_re_im_f:
                         H_id_r = np.maximum(20 * np.log10(np.abs(H_id.real)),
                                             self.ui.bottom_f)
@@ -1847,7 +1847,7 @@ class Plot_Impz(QWidget):
                         if self.en_mag_phi_f:
                             Y_i = angle_zero(Y)
 
-                if self.ui.but_Hf.isChecked():
+                if self.ui.but_Hf.checked:
                     if self.en_re_im_f:
                         H_id_r = H_id.real
                         H_id_i = H_id.imag
@@ -1888,7 +1888,7 @@ class Plot_Impz(QWidget):
             lbl_empty = "        "
 
             # -------------------- Plot H_id ----------------------------------
-            if self.ui.but_Hf.isChecked():
+            if self.ui.but_Hf.checked:
                 label_re = "$|H_{id}$" + ejO_str + "|"
                 if self.en_re_im_f:
                     label_re = "$H_{id,r}$" + ejO_str
@@ -1994,7 +1994,7 @@ class Plot_Impz(QWidget):
 
             # --------------- LEGEND (real part) ----------------------------------
             # The legend will fill the first column, then the next from top to bottom etc.
-            if self.plt_freq_enabled or self.ui.but_Hf.isChecked():
+            if self.plt_freq_enabled or self.ui.but_Hf.checked:
 
                 # labels = np.concatenate([labels, [r"$NENBW$:"], ["{0:.4g} {1}"\
                 # .format(nenbw, unit_nenbw)], [r"$CGAIN$:", "{0:.4g} {1}".format(nenbw,
@@ -2027,7 +2027,7 @@ class Plot_Impz(QWidget):
                                   framealpha=0.7)
                 self.ax_f2.set_ylabel(H_Fi_str)
 
-            if self.ui.but_freq_index_k.isChecked():
+            if self.ui.but_freq_index_k.checked:
                 self.axes_f[-1].set_xlabel(r'$k \; \rightarrow$')
             else:
                 self.axes_f[-1].set_xlabel(fb.fil[0]['plt_fLabel'])

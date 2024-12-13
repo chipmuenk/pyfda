@@ -18,7 +18,7 @@ import matplotlib.patches as mpl_patches
 
 from pyfda.libs.pyfda_lib import safe_eval, to_html, pprint_log
 from pyfda.libs.pyfda_qt_lib import (
-    qwindow_stay_on_top, qtext_width, QVLine, QHLine, PushButton)
+    qwindow_stay_on_top, qtext_width, QVLine, QHLine, PushButton, PushButtonRT)
 from pyfda.libs.fft_windows_cmb_box import QFFTWinCmbBox
 from pyfda.plot_widgets.mpl_widget import MplWidget
 
@@ -26,7 +26,7 @@ from pyfda.plot_widgets.mpl_widget import MplWidget
 import pyfda.filterbroker as fb
 
 from pyfda.libs.compat import (
-    Qt, pyqtSignal, QHBoxLayout, QVBoxLayout, QDialog, QLabel, QLineEdit, QPushButtonRT,
+    Qt, pyqtSignal, QHBoxLayout, QVBoxLayout, QDialog, QLabel, QLineEdit,
     QFrame, QFont, QTextBrowser, QSplitter, QTableWidget, QTableWidgetItem,
     QSizePolicy, QHeaderView)
 import logging
@@ -269,8 +269,8 @@ class Plot_FFT_win(QDialog):
         self.led_log_bottom_f.setToolTip(
             "<span>Minimum display value for log. scale.</span>")
 
-        self.but_bin_f = QPushButtonRT(self, "<b>&Delta; <i>f</i></b>", margin=5,
-                                       objectName="but_bin_f")
+        self.but_bin_f = PushButtonRT(
+            self, text="<b>&Delta; <i>f</i></b>", margin=5, objectName="but_bin_f")
         self.but_bin_f.setMaximumWidth(qtext_width(" bins "))
         self.but_bin_f.setToolTip(
             "<span>Display frequencies in bins or multiples of &Delta;<i>f = f<sub>S </sub>/N</i>."
@@ -651,7 +651,7 @@ class Plot_FFT_win(QDialog):
             k = fftshift(self.k)
             Win = fftshift(self.Win)
 
-        if self.but_bin_f.isChecked():
+        if self.but_bin_f.checked:
             self.ax_f.set_xlabel(r"$k \; \rightarrow$")
             x = k
 
