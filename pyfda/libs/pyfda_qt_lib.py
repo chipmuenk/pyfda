@@ -717,11 +717,14 @@ class PushButton(QPushButton):
         Whether initial state is checked
     """
 
-    def __init__(self, text: str = "", icon: QIcon = None, N_x: int = 8,
+    def __init__(self, parent=None, text: str = "", icon: QIcon = None, N_x: int = 8,
                  checkable: bool = True, checked: bool = False,
                  objectName="", **kwargs):
 
-        super().__init__(**kwargs)
+        if parent is not None:
+            super().__init__(parent, **kwargs)
+        else:
+            super().__init__(**kwargs)
 
         self.setObjectName(objectName)
 
