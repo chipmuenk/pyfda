@@ -255,8 +255,7 @@ class Plot_Tran_Stim_UI(QWidget):
         self.ledStimPar1.setText("0.5")
         self.ledStimPar1.setToolTip("Duty Cycle, 0 ... 1")
 
-        self.but_stim_bl = QPushButton(self, objectName="stim_bl")
-        self.but_stim_bl.setText("BL")
+        self.but_stim_bl = PushButton(self, text="BL", objectName="stim_bl")
         self.but_stim_bl.setToolTip(
             "<span>Bandlimit the signal to the Nyquist "
             "frequency to avoid aliasing. However, this is much slower "
