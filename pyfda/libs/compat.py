@@ -88,58 +88,58 @@ from matplotlib.backends.backend_qt5agg import NavigationToolbar2QT as Navigatio
 #         return self.getSaveFileName(**kwarg)
 
 
-class QPushButtonRT(QPushButton):
-    """
-    Subclass QPushButton using QLabel to render rich text
-    """
-    def __init__(self, parent=None, text=None, margin=10, **kwargs):
-        if parent is not None:
-            super().__init__(parent, **kwargs)
-        else:
-            super().__init__(**kwargs)
-        self.__lbl = QLabel(self)
-        self.margin = margin
-        if text is not None:
-            self.__lbl.setText(text)
-        self.__lyt = QHBoxLayout()
-        self.__lyt.setContentsMargins(margin, 0, 0, 0)  # L, T, R, B
-        self.__lyt.setSpacing(0)
-        self.setLayout(self.__lyt)
-        # Make QLabel transparent except for painted pixels
-        self.__lbl.setAttribute(Qt.WA_TranslucentBackground)
-        # Disable the delivery of mouse events to the QLabel widget and its children,
-        self.__lbl.setAttribute(Qt.WA_TransparentForMouseEvents)
-        self.__lbl.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
-        self.__lbl.setTextFormat(Qt.RichText)
-        self.__lyt.addWidget(self.__lbl, Qt.AlignHCenter)
-        return
+# class QPushButtonRT(QPushButton):
+#     """
+#     Subclass QPushButton using QLabel to render rich text
+#     """
+#     def __init__(self, parent=None, text=None, margin=10, **kwargs):
+#         if parent is not None:
+#             super().__init__(parent, **kwargs)
+#         else:
+#             super().__init__(**kwargs)
+#         self.__lbl = QLabel(self)
+#         self.margin = margin
+#         if text is not None:
+#             self.__lbl.setText(text)
+#         self.__lyt = QHBoxLayout()
+#         self.__lyt.setContentsMargins(margin, 0, 0, 0)  # L, T, R, B
+#         self.__lyt.setSpacing(0)
+#         self.setLayout(self.__lyt)
+#         # Make QLabel transparent except for painted pixels
+#         self.__lbl.setAttribute(Qt.WA_TranslucentBackground)
+#         # Disable the delivery of mouse events to the QLabel widget and its children,
+#         self.__lbl.setAttribute(Qt.WA_TransparentForMouseEvents)
+#         self.__lbl.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+#         self.__lbl.setTextFormat(Qt.RichText)
+#         self.__lyt.addWidget(self.__lbl, Qt.AlignHCenter)
+#         return
 
-    def setText(self, text):
-        self.__lbl.setText(text)
-        self.updateGeometry()
-        return
+#     def setText(self, text):
+#         self.__lbl.setText(text)
+#         self.updateGeometry()
+#         return
 
-    def sizeHint(self):
-        is_checked = self.isChecked()
-        self.setChecked(False)  # always base sizeHint on unchecked state
-        s = QPushButton.sizeHint(self)
-        w = self.__lbl.sizeHint()
-        s.setWidth(w.width() + 2 * self.margin)
-        # s.setHeight(w.height())
-        self.setChecked(is_checked)
-        return s
+#     def sizeHint(self):
+#         is_checked = self.isChecked()
+#         self.setChecked(False)  # always base sizeHint on unchecked state
+#         s = QPushButton.sizeHint(self)
+#         w = self.__lbl.sizeHint()
+#         s.setWidth(w.width() + 2 * self.margin)
+#         # s.setHeight(w.height())
+#         self.setChecked(is_checked)
+#         return s
 
-    # def clicked(self):
-    #     if self.isChecked():
-    #         self.__lbl.setText("chk!")
-    #     self.updateGeometry()
-    #     return
+#     # def clicked(self):
+#     #     if self.isChecked():
+#     #         self.__lbl.setText("chk!")
+#     #     self.updateGeometry()
+#     #     return
 
-    # def paintEvent(self, pe):
-    #     o = QStyleOption()
-    #     o.initFrom(self)
-    #     p = QPainter(self)
-    #     self.style().drawPrimitive(QStyle.PE_Widget, o, p, self)
+#     # def paintEvent(self, pe):
+#     #     o = QStyleOption()
+#     #     o.initFrom(self)
+#     #     p = QPainter(self)
+#     #     self.style().drawPrimitive(QStyle.PE_Widget, o, p, self)
 
 
 if __name__ == '__main__':

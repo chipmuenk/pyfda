@@ -9,16 +9,16 @@
 """
 Widget for loading and storing stimulus data from / to transient plotting widget
 """
-from pyfda.libs.compat import Qt, QWidget, pyqtSignal, QVBoxLayout, QDialog
+from pyfda.libs.compat import Qt, QWidget, pyqtSignal, QVBoxLayout, QDialog, QPushButton
 import numpy as np
 
 import pyfda.libs.pyfda_io_lib as io
 import pyfda.filterbroker as fb
 import pyfda.libs.pyfda_dirs as dirs
 
-from pyfda.libs.pyfda_lib import safe_eval, pprint_log, np_shape
+from pyfda.libs.pyfda_lib import safe_eval, pprint_log
 from pyfda.libs.pyfda_qt_lib import (
-    emit, qstyle_widget, qget_cmb_box, qset_cmb_box, qwindow_stay_on_top)
+    emit, qstyle_widget, qget_cmb_box, qset_cmb_box, qwindow_stay_on_top, PushButton)
 from pyfda.libs.csv_option_box import CSV_option_box
 
 from pyfda.pyfda_rc import params  # FMT string for QLineEdit fields, e.g. '{:.3g}'
@@ -54,8 +54,8 @@ class QFileDialogPlus(QDialog):
         """ initialize the User Interface """
         self.setWindowTitle("CSV Options")
 
-        butClose = QPushButton(self)
-        butClose.setText("Close")
+        butClose = QPushButton(self, text="Close")
+        # butClose.setText("Close")
 
         layVMain = QVBoxLayout()
         # layVMain.setAlignment(Qt.AlignTop) # only affects first widget (intended here)
@@ -158,7 +158,7 @@ class Tran_IO(QWidget):
 
         The sampling frequency needs to integer and at least 1.
         """
-        if not self.ui.but_f_s_wav_auto.isChecked() or f_s_wav is None:
+        if not self.ui.but_f_s_wav_auto.checked or f_s_wav is None:
             f_s_wav = self.ui.led_f_s_wav.text()
 
         self.f_s_wav = max(safe_eval(f_s_wav, alt_expr=self.f_s_wav,
@@ -371,7 +371,7 @@ class Tran_IO(QWidget):
             self.x_file = data
 
         self.emit({'data_changed': 'file_io'})
-        if self.ui.but_f_s_wav_auto.isChecked():
+        if self.ui.but_f_s_wav_auto.checked:
             fb.fil[0]['f_S'] = self.f_s_file
             fb.fil[0]['freq_specs_unit'] = 'Hz'
             self.emit({'view_changed': 'f_S'})
@@ -384,7 +384,7 @@ class Tran_IO(QWidget):
         """
         if dirs.csv_options_handle is None:
             # no handle to the window? Create a new instance!
-            if self.ui.but_csv_options.isChecked():
+            if self.ui.but_csv_options.checked:
                 # Important: Handle to window must be class attribute otherwise it (and
                 # the attached window) is deleted immediately when it goes out of scope
                 dirs.csv_options_handle = CSV_option_box(self)

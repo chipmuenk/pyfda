@@ -10,7 +10,7 @@
 Create the UI for the PlotImz class
 """
 from pyfda.libs.compat import (
-    QCheckBox, QWidget, QComboBox, QLineEdit, QLabel, QPushButton, QPushButtonRT,
+    QCheckBox, QWidget, QComboBox, QLineEdit, QLabel,
     QIcon, QProgressBar, pyqtSignal, QSize, QFrame,
     QHBoxLayout, QVBoxLayout, QGridLayout)
 
@@ -19,7 +19,7 @@ from pyfda.libs.pyfda_sig_lib import impz_len
 import pyfda.filterbroker as fb
 import pyfda.libs.pyfda_dirs as dirs
 from pyfda.libs.pyfda_qt_lib import (
-    qcmb_box_populate, qtext_width, QVLine, PushButton)
+    qcmb_box_populate, qtext_width, QVLine, PushButton, PushButtonRT)
 from pyfda.libs.fft_windows_cmb_box import QFFTWinCmbBox
 # FMT string for QLineEdit fields, e.g. '{:.3g}'
 from pyfda.pyfda_rc import params
@@ -171,17 +171,15 @@ class PlotImpz_UI(QWidget):
         # ----------- ---------------------------------------------------
         # Run control widgets
         # ---------------------------------------------------------------
-        self.but_auto_run = PushButton(" Auto", objectName="but_auto_run")
+        self.but_auto_run = PushButton(self, "Auto", objectName="but_auto_run")
         self.but_auto_run.setToolTip("<span>Update response automatically when "
                                      "parameters have been changed.</span>")
-        # self.but_auto_run.setCheckable(True)
+        self.but_auto_run.setCheckable(True)
         self.but_auto_run.setChecked(True)
 
         but_height = self.but_auto_run.sizeHint().height()
 
-        self.but_run = QPushButton(self)
-        self.but_run.setIcon(QIcon(":/play.svg"))
-
+        self.but_run = PushButton(self, icon=QIcon(":/play.svg"))
         self.but_run.setIconSize(QSize(but_height, but_height))
         self.but_run.setFixedSize(QSize(2 * but_height, but_height))
         self.but_run.setToolTip("Run simulation")
@@ -204,7 +202,7 @@ class PlotImpz_UI(QWidget):
         self.led_N_start.setToolTip("<span>First point to plot.</span>")
         self.led_N_start.setMaximumWidth(qtext_width(N_x=8))
 
-        self.but_N_auto = QPushButtonRT(self, to_html("N =", frmt="bi"), margin=5)
+        self.but_N_auto = PushButtonRT(self, text = to_html("N =", frmt="bi"), margin=5)
         self.but_N_auto.setCheckable(True)
         self.but_N_auto.setChecked(True)
         self.but_N_auto.setToolTip(
@@ -218,7 +216,7 @@ class PlotImpz_UI(QWidget):
             "Disable <b><i>N</i> =</b> for manual entry.</span>")
         self.led_N_points.setMaximumWidth(qtext_width(N_x=8))
         # Enable entry field only for manual mode
-        self.led_N_points.setEnabled(not self.but_N_auto.isChecked())
+        self.led_N_points.setEnabled(not self.but_N_auto.checked)
 
         self.lbl_N_frame = QLabel(to_html("N_Frame", frmt='bi') + " =", self)
         self.lbl_N_frame.setVisible(False)
@@ -244,8 +242,7 @@ class PlotImpz_UI(QWidget):
         self.lbl_stim_cmplx_warn.setStyleSheet("background-color : yellow;"
                                                "border : 1px solid grey")
 
-        self.but_fft_wdg = QPushButton(self)
-        self.but_fft_wdg.setIcon(QIcon(":/fft.svg"))
+        self.but_fft_wdg = PushButton(self, icon=QIcon(":/fft.svg"))
         self.but_fft_wdg.setIconSize(QSize(but_height, but_height))
         self.but_fft_wdg.setFixedSize(QSize(int(1.5 * but_height), but_height))
         self.but_fft_wdg.setToolTip('<span>Show / hide FFT widget (select window type '
@@ -267,11 +264,11 @@ class PlotImpz_UI(QWidget):
         self.win_viewer.hide()
 
         self.lbl_fx_range = QLabel(to_html("FX Range:", frmt='b'))
-        self.but_fx_range_x = QCheckBox("X", objectName="but_fx_range_x")
-        self.but_fx_range_x.setToolTip(
+        self.chk_fx_range_x = QCheckBox("X", objectName="chk_fx_range_x")
+        self.chk_fx_range_x.setToolTip(
              "<span>Display stimulus fixpoint range (---).</span>")
-        self.but_fx_range_y = QCheckBox("Y", objectName="but_fx_range_y")
-        self.but_fx_range_y.setToolTip(
+        self.chk_fx_range_y = QCheckBox("Y", objectName="chk_fx_range_y")
+        self.chk_fx_range_y.setToolTip(
              "<span>Display response fixpoint range (-.-).</span>")
 
         layH_ctrl_run = QHBoxLayout()
@@ -295,8 +292,8 @@ class PlotImpz_UI(QWidget):
         layH_ctrl_run.addWidget(self.qfft_win_select)
         layH_ctrl_run.addSpacing(20)
         layH_ctrl_run.addWidget(self.lbl_fx_range)
-        layH_ctrl_run.addWidget(self.but_fx_range_x)
-        layH_ctrl_run.addWidget(self.but_fx_range_y)
+        layH_ctrl_run.addWidget(self.chk_fx_range_x)
+        layH_ctrl_run.addWidget(self.chk_fx_range_y)
         layH_ctrl_run.addStretch(10)
 
         # layH_ctrl_run.setContentsMargins(*params['wdg_margins'])
@@ -351,7 +348,7 @@ class PlotImpz_UI(QWidget):
         line1 = QVLine()
         line2 = QVLine(width=5)
 
-        self.but_log_time = PushButton(" dB", objectName="but_log_time")
+        self.but_log_time = PushButton(self, "dB", objectName="but_log_time")
         self.but_log_time.setToolTip(
             "<span>Logarithmic scale for y-axis.</span>")
 
@@ -371,7 +368,7 @@ class PlotImpz_UI(QWidget):
                                            "i.e. scale by f_S</span>")
         self.chk_byfs_spgr_time.setChecked(True)
 
-        self.but_log_spgr_time = PushButton("dB", objectName="but_log_spgr")
+        self.but_log_spgr_time = PushButton(self, "dB", objectName="but_log_spgr")
         self.but_log_spgr_time.setMaximumWidth(qtext_width(text=" dB"))
         self.but_log_spgr_time.setToolTip(
             "<span>Logarithmic scale for spectrogram.</span>")
@@ -399,8 +396,8 @@ class PlotImpz_UI(QWidget):
             "<span>Minimum display value for time and spectrogram plots with log. scale."
             "</span>")
         self.lbl_log_bottom_time.setVisible(
-            self.but_log_time.isChecked() or
-            ((self.plt_time_spgr != "none") and self.but_log_spgr_time.isChecked()))
+            self.but_log_time.checked or
+            ((self.plt_time_spgr != "none") and self.but_log_spgr_time.checked))
         self.led_log_bottom_time.setVisible(
             self.lbl_log_bottom_time.isVisible())
 
@@ -510,36 +507,36 @@ class PlotImpz_UI(QWidget):
         self.cmb_plt_freq_resp.setToolTip(
             "<span>Plot style for response.</span>")
 
-        self.but_log_freq = PushButton("dB", objectName="but_log_freq")
+        self.but_log_freq = PushButton(self, text="dB", objectName="but_log_freq")
         self.but_log_freq.setToolTip(
             "<span>Logarithmic scale for y-axis.</span>")
         self.but_log_freq.setChecked(True)
 
         self.lbl_log_bottom_freq = QLabel(to_html("min =", frmt='bi'), self)
-        self.lbl_log_bottom_freq.setVisible(self.but_log_freq.isChecked())
+        self.lbl_log_bottom_freq.setVisible(self.but_log_freq.checked)
         self.led_log_bottom_freq = QLineEdit(self)
         self.led_log_bottom_freq.setText(str(self.bottom_f))
         self.led_log_bottom_freq.setMaximumWidth(qtext_width(N_x=8))
         self.led_log_bottom_freq.setToolTip(
             "<span>Minimum display value for log. scale.</span>")
-        self.led_log_bottom_freq.setVisible(self.but_log_freq.isChecked())
+        self.led_log_bottom_freq.setVisible(self.but_log_freq.checked)
 
-        if not self.but_log_freq.isChecked():
+        if not self.but_log_freq.checked:
             self.bottom_f = 0
 
         self.cmb_freq_display = QComboBox(self, objectName="cmb_re_im_freq")
         qcmb_box_populate(self.cmb_freq_display, self.cmb_freq_display_items,
                           self.cmb_freq_display_item)
 
-        self.but_Hf = QPushButtonRT(self, to_html("H_id", frmt="bi"), margin=5)
-        self.but_Hf.setObjectName("chk_Hf")
+        self.but_Hf = PushButtonRT(self, to_html("H_id", frmt="bi"), margin=5,
+                                   objectName="chk_Hf")
         self.but_Hf.setToolTip("<span>Show ideal frequency response, calculated "
                                "from the filter coefficients.</span>")
         self.but_Hf.setChecked(False)
         self.but_Hf.setCheckable(True)
 
-        self.but_freq_norm_impz = QPushButtonRT(text="<b><i>E<sub>X</sub></i> = 1</b>",
-                                                margin=5)
+        self.but_freq_norm_impz = PushButtonRT(
+            self, text="<b><i>E<sub>X</sub></i> = 1</b>", margin=5)
         self.but_freq_norm_impz.setToolTip(
             "<span>Normalize the FFT of an impulse stimulus with <i>N<sub>FFT</sub></i> "
             "to an energy <i>E<sub>X</sub></i> = 1. For a dirac pulse, this yields "
@@ -549,12 +546,12 @@ class PlotImpz_UI(QWidget):
         self.but_freq_norm_impz.setChecked(True)
         self.but_freq_norm_impz.setObjectName("freq_norm_impz")
 
-        self.but_freq_show_info = PushButton(" Info ", objectName="but_show_info_freq")
+        self.but_freq_show_info = PushButton(text="Info", objectName="but_show_info_freq")
         self.but_freq_show_info.setToolTip(
             "<span>Show signal power in legend.</span>")
         self.but_freq_show_info.setChecked(False)
 
-        self.but_freq_index_k = QPushButtonRT(text=" <i>k</i> ", objectName="but_show_index_k")
+        self.but_freq_index_k = PushButtonRT(self, text = "<i>k</i>", objectName="but_show_index_k")
         self.but_freq_index_k.setToolTip(
             "<span>Show FFT indices instead of frequencies.</span>")
         self.but_freq_index_k.setCheckable(True)
@@ -631,7 +628,7 @@ class PlotImpz_UI(QWidget):
 
     # -------------------------------------------------------------------------
     def update_N_auto(self):
-        if not self.but_N_auto.isChecked():
+        if not self.but_N_auto.checked:
             # manual entry of number of data points, enable data entry and return
             self.led_N_points.setEnabled(True)
             return
@@ -688,7 +685,7 @@ class PlotImpz_UI(QWidget):
             # calculate number of data points to be plotted
             self.N = self.N_end - self.N_start
         else:
-            if self.but_N_auto.isChecked():  # automatic calculation
+            if self.but_N_auto.checked:  # automatic calculation
                 self.N = impz_len(fb.fil[0]['ba'], level=-40)
 
             # total number of points to be calculated: N_end = N + N_start
@@ -719,7 +716,7 @@ class PlotImpz_UI(QWidget):
         Show / hide FFT widget depending on the state of the corresponding button
         When widget is shown, trigger an update of the window function.
         """
-        if self.but_fft_wdg.isChecked():
+        if self.but_fft_wdg.checked:
             self.win_viewer.show()
             self.emit({'view_changed': 'fft_win_type'}, sig_name='sig_tx_fft')
         else:

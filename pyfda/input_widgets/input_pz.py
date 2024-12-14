@@ -825,7 +825,7 @@ class Input_PZ(QWidget):
         or to file using a selected format
         """
         text = qtable2csv(
-            self.tblPZ, self.zpk, zpk=True, formatted=self.ui.but_format.isChecked())
+            self.tblPZ, self.zpk, zpk=True, formatted=self.ui.but_format.checked)
         if self.ui.load_save_clipboard:  # data to clipboard:
             fb.clipboard.setText(text)
         else:
@@ -843,7 +843,7 @@ class Input_PZ(QWidget):
         if self.ui.load_save_clipboard:  # data from clipboard
             data_str = file2array(
                 "", "", 'zpk', from_clipboard=True,
-                as_str = self.ui.but_format.isChecked())
+                as_str = self.ui.but_format.checked)
         else:  # data from file
             file_name, file_type = select_file(self, title="Import Poles / Zeros", mode="r",
                                     file_types=('csv', 'mat', 'npy', 'npz'))
@@ -853,7 +853,7 @@ class Input_PZ(QWidget):
                 data_str = file2array(
                     file_name, file_type, 'zpk',
                     from_clipboard=False,
-                    as_str = self.ui.but_format.isChecked())
+                    as_str = self.ui.but_format.checked)
 
         if data_str is None:  # file operation has been aborted
             return

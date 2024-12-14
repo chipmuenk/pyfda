@@ -234,8 +234,8 @@ class Plot_Impz(QWidget):
         self.ui.led_time_ovlp_spgr.editingFinished.connect(self._spgr_ui2params)
         self.ui.cmb_mode_spgr_time.currentIndexChanged.connect(self.draw)
         self.ui.chk_byfs_spgr_time.clicked.connect(self.draw)
-        self.ui.but_fx_range_x.clicked.connect(self.draw)
-        self.ui.but_fx_range_y.clicked.connect(self.draw)
+        self.ui.chk_fx_range_x.clicked.connect(self.draw)
+        self.ui.chk_fx_range_y.clicked.connect(self.draw)
         self.ui.chk_win_time.clicked.connect(self.draw)
         # --- frequency domain plotting ---------------------------------------
         self.ui.cmb_plt_freq_resp.currentIndexChanged.connect(self.draw)
@@ -255,7 +255,7 @@ class Plot_Impz(QWidget):
         """
         Toggle setting of index_k button in filterbroker, update frequency scaling and call `draw()`
         """
-        fb.fil[0]["tab_yn"]["display_index_k"] = self.ui.but_freq_index_k.isChecked()
+        fb.fil[0]["tab_yn"]["display_index_k"] = self.ui.but_freq_index_k.checked
         self.stim_wdg.ui.normalize_freqs()
         self.draw()
 # ------------------------------------------------------------------------------
@@ -530,10 +530,10 @@ class Plot_Impz(QWidget):
         Triggered when checkbox "Autorun" is clicked or specs have been edited,
         requiring a recalculation.
 
-        When Autorun has been pushed (`but_auto_run.isChecked() == True`) and
+        When Autorun has been pushed (`but_auto_run.checked == True`) and
         calculation is required, automatically run `impz_init()`.
         """
-        if self.ui.but_auto_run.isChecked() and self.needs_calc:
+        if self.ui.but_auto_run.checked and self.needs_calc:
             self.impz_init()
 
     # --------------------------------------------------------------------------
@@ -591,7 +591,7 @@ class Plot_Impz(QWidget):
 
         if type(arg) == bool:
             self.needs_calc = True  # but_run has been pressed -> force run
-        elif not self.ui.but_auto_run.isChecked():  # "Auto" is not active, return
+        elif not self.ui.but_auto_run.checked:  # "Auto" is not active, return
             return
 
         if self.needs_calc:
@@ -772,7 +772,7 @@ class Plot_Impz(QWidget):
         """
         # step error calculation: calculate system DC response and subtract it
         # from the response
-        if self.stim_wdg.ui.stim == "step" and self.stim_wdg.ui.chk_step_err.isChecked():
+        if self.stim_wdg.ui.stim == "step" and self.stim_wdg.ui.but_step_err.checked:
             if len(self.sos) > 0:  # has second order sections
                 dc = sig.sosfreqz(self.sos, [0])  # yields (w(0), H(0))
             else:
@@ -849,8 +849,8 @@ class Plot_Impz(QWidget):
         self.ui.cmb_plt_time_stmq.setVisible(fx_mode)  # cmb box time domain
         self.ui.lbl_plt_time_stmq.setVisible(fx_mode)  # cmb box time domain
         self.ui.lbl_fx_range.setVisible(fx_mode)  # display fx range limits
-        self.ui.but_fx_range_x.setVisible(fx_mode)  # display fx range limits
-        self.ui.but_fx_range_y.setVisible(fx_mode)  # display fx range limits
+        self.ui.chk_fx_range_x.setVisible(fx_mode)  # display fx range limits
+        self.ui.chk_fx_range_y.setVisible(fx_mode)  # display fx range limits
 
         # add / delete fixpoint entry to / from spectrogram combo box and set
         # `fx_str = "fixpoint"`` or `""``
@@ -1031,8 +1031,8 @@ class Plot_Impz(QWidget):
         else:
             self.ui.but_log_spgr_time.setEnabled(True)
 
-        log = self.ui.but_log_time.isChecked() or\
-            (self.ui.but_log_spgr_time.isChecked() and self.spgr)
+        log = self.ui.but_log_time.checked or\
+            (self.ui.but_log_spgr_time.checked and self.spgr)
         self.ui.lbl_log_bottom_time.setVisible(log)
         self.ui.led_log_bottom_time.setVisible(log)
         if log:
@@ -1049,7 +1049,7 @@ class Plot_Impz(QWidget):
         self.ui.bottom_f
         """
 
-        log = self.ui.but_log_freq.isChecked()
+        log = self.ui.but_log_freq.checked
         self.ui.lbl_log_bottom_freq.setVisible(log)
         self.ui.led_log_bottom_freq.setVisible(log)
         if log:
@@ -1211,7 +1211,7 @@ class Plot_Impz(QWidget):
         # fixpoint simulation enabled -> assign frame to x_q
         if fb.fil[0]['fx_sim'] and hasattr(self, 'x_q'):
             x_q = self.x_q[self.ui.N_start:N_end]
-            if self.ui.but_log_time.isChecked():
+            if self.ui.but_log_time.checked:
                 x_q = np.maximum(20 * np.log10(abs(x_q)), self.ui.bottom_t)
         else:
             x_q = None
@@ -1253,7 +1253,7 @@ class Plot_Impz(QWidget):
         lbl_x_r_interp = "$x(t)$"
 
         # log. scale for stimulus / response time domain:
-        if self.ui.but_log_time.isChecked():
+        if self.ui.but_log_time.checked:
             bottom_t = self.ui.bottom_t
 
             x_r = np.maximum(20 * np.log10(abs(x_r)), self.ui.bottom_t)
@@ -1281,10 +1281,10 @@ class Plot_Impz(QWidget):
             else:
                 H_str = H_str + ' in V'
 
-        if self.ui.but_fx_range_x.isChecked() and fb.fil[0]['fx_sim']:
+        if self.ui.chk_fx_range_x.isChecked() and fb.fil[0]['fx_sim']:
             self.ax_r.axhline(fx_max_x, 0, 1, linestyle='--')
             self.ax_r.axhline(fx_min_x, 0, 1, linestyle='--')
-        if self.ui.but_fx_range_y.isChecked() and fb.fil[0]['fx_sim']:
+        if self.ui.chk_fx_range_y.isChecked() and fb.fil[0]['fx_sim']:
             self.ax_r.axhline(fx_max_y, 0, 1, linestyle='-.')
             self.ax_r.axhline(fx_min_y, 0, 1, linestyle='-.')
 
@@ -1325,7 +1325,7 @@ class Plot_Impz(QWidget):
             l_r += [lbl_y_r]
         # --------------- Window plot ----------------------------------
         if self.ui.chk_win_time.isChecked():
-            if self.ui.but_log_time.isChecked():
+            if self.ui.but_log_time.checked:
                 win = np.maximum(
                     20 * np.log10(abs(self.ui.qfft_win_select.calc_window(self.ui.N))),
                     self.ui.bottom_t)
@@ -1417,7 +1417,7 @@ class Plot_Impz(QWidget):
             dB_scale = 20  # default log scale for magnitude in dB
             spgr_unit = r" in W / Hz"  # default unit for spectrogram
             scaling = "density"  # default scaling for spectrogram
-            if self.ui.but_log_spgr_time.isChecked():
+            if self.ui.but_log_spgr_time.checked:
                 dB_unit = "dB"
             else:
                 dB_unit = ""
@@ -1427,7 +1427,7 @@ class Plot_Impz(QWidget):
 
                 if self.ui.chk_byfs_spgr_time.isChecked():
                     # display result scaled by f_S
-                    if self.ui.but_log_spgr_time.isChecked():
+                    if self.ui.but_log_spgr_time.checked:
                         spgr_unit = r" in dB re W / Hz"
                     else:
                         spgr_unit = r" in W / Hz"
@@ -1454,7 +1454,7 @@ class Plot_Impz(QWidget):
                 mode = "psd"
 
             # ------- lin / log ----------------------
-            if self.ui.but_log_spgr_time.isChecked():
+            if self.ui.but_log_spgr_time.checked:
                 scale = 'dB'
                 # 10 log10 for 'psd', otherwise 20 log10
                 bottom_spgr = self.ui.bottom_t
@@ -1506,7 +1506,7 @@ class Plot_Impz(QWidget):
     #                           np.fft.fftshift(Sxx, axes=0), shading='gouraud')
                 # self.ax_s.colorbar(col_mesh)
 
-                if self.ui.but_log_spgr_time.isChecked():
+                if self.ui.but_log_spgr_time.checked:
                     Sxx = np.maximum(dB_scale * np.log10(np.abs(Sxx)), self.ui.bottom_t)
                 # shading: 'auto', 'gouraud', 'nearest'
                 col_mesh = self.ax_s.pcolormesh(t, f, Sxx, shading='auto')
@@ -1558,7 +1558,7 @@ class Plot_Impz(QWidget):
             or self.plt_freq_stmq != "none"\
             or self.plt_freq_resp != "none"
 
-        # if not self.ui.but_log_freq.isChecked() \
+        # if not self.ui.but_log_freq.checked \
         # and len(self.mplwidget_f.fig.get_axes()) == 2:
         # get rid of second axis when returning from log mode by clearing all
         #    self.mplwidget_f.fig.clear()
@@ -1577,7 +1577,7 @@ class Plot_Impz(QWidget):
         # for ax in self.axes_f:
         #    ax.cla()
 
-        if self.ui.but_log_freq.isChecked():
+        if self.ui.but_log_freq.checked:
             # and len(self.mplwidget_f.fig.get_axes()) == 1:??
             # create second axis scaled for noise power scale if it doesn't exist yet
             self.ax_f1_noise = self.ax_f1.twinx()
@@ -1632,20 +1632,20 @@ class Plot_Impz(QWidget):
 
         H_F_str = ""
         ejO_str = r"$(\mathrm{e}^{\mathrm{j} \Omega})$"
-        if self.plt_freq_enabled or self.ui.but_Hf.isChecked():
+        if self.plt_freq_enabled or self.ui.but_Hf.checked:
             if plt_stimulus:
                 H_F_str += r'$X$, '
             if plt_stimulus_q:
                 H_F_str += r'$X_Q$, '
             if plt_response:
                 H_F_str += r'$Y$, '
-            if self.ui.but_Hf.isChecked():
+            if self.ui.but_Hf.checked:
                 H_F_str += r'$H_{id}$, '
             H_F_str = H_F_str.rstrip(', ') + ejO_str
 
             F_range = fb.fil[0]['freqSpecsRange']
 
-            if self.ui.but_freq_index_k.isChecked():
+            if self.ui.but_freq_index_k.checked:
                 """
                 "'<i>k</i>' specifies frequencies w.r.t. " + to_html("f_S", frmt = 'i') +
                 " but plots graphs over the frequency index <i>k</i>.</span>",
@@ -1675,7 +1675,7 @@ class Plot_Impz(QWidget):
         # - Scale impulse response with N_FFT to calculate frequency response if requested
             if self.ui.but_freq_norm_impz.isVisible()\
                 and self.ui.but_freq_norm_impz.isEnabled()\
-                    and self.ui.but_freq_norm_impz.isChecked():
+                    and self.ui.but_freq_norm_impz.checked:
                 freq_resp = True  # calculate frequency response from impulse response
                 scale_impz = self.ui.N * self.ui.all_wins_dict['cgain']\
                     * self.stim_wdg.ui.scale_impz
@@ -1765,7 +1765,7 @@ class Plot_Impz(QWidget):
             # -----------------------------------------------------------------
             # Calculate log FFT and power if selected, set units
             # -----------------------------------------------------------------
-            if self.ui.but_log_freq.isChecked():
+            if self.ui.but_log_freq.checked:
                 unit = " in dBV"
                 unit_P = "dBW"
                 H_F_pre = "|"
@@ -1806,7 +1806,7 @@ class Plot_Impz(QWidget):
                         if self.en_mag_phi_f:
                             Y_i = angle_zero(Y)
 
-                if self.ui.but_Hf.isChecked():
+                if self.ui.but_Hf.checked:
                     if self.en_re_im_f:
                         H_id_r = np.maximum(20 * np.log10(np.abs(H_id.real)),
                                             self.ui.bottom_f)
@@ -1847,7 +1847,7 @@ class Plot_Impz(QWidget):
                         if self.en_mag_phi_f:
                             Y_i = angle_zero(Y)
 
-                if self.ui.but_Hf.isChecked():
+                if self.ui.but_Hf.checked:
                     if self.en_re_im_f:
                         H_id_r = H_id.real
                         H_id_i = H_id.imag
@@ -1878,7 +1878,7 @@ class Plot_Impz(QWidget):
             # -----------------------------------------------------------------
             # --------------- Plot stimuli and response -----------------------
             # -----------------------------------------------------------------
-            show_info = self.ui.but_freq_show_info.isChecked()
+            show_info = self.ui.but_freq_show_info.checked
             h_r = []  # plot handles (real / mag. part)
             h_i = []  # plot handles (imag. / phase part)
             l_r = []  # labels (real / mag. part)
@@ -1888,7 +1888,7 @@ class Plot_Impz(QWidget):
             lbl_empty = "        "
 
             # -------------------- Plot H_id ----------------------------------
-            if self.ui.but_Hf.isChecked():
+            if self.ui.but_Hf.checked:
                 label_re = "$|H_{id}$" + ejO_str + "|"
                 if self.en_re_im_f:
                     label_re = "$H_{id,r}$" + ejO_str
@@ -1994,7 +1994,7 @@ class Plot_Impz(QWidget):
 
             # --------------- LEGEND (real part) ----------------------------------
             # The legend will fill the first column, then the next from top to bottom etc.
-            if self.plt_freq_enabled or self.ui.but_Hf.isChecked():
+            if self.plt_freq_enabled or self.ui.but_Hf.checked:
 
                 # labels = np.concatenate([labels, [r"$NENBW$:"], ["{0:.4g} {1}"\
                 # .format(nenbw, unit_nenbw)], [r"$CGAIN$:", "{0:.4g} {1}".format(nenbw,
@@ -2027,7 +2027,7 @@ class Plot_Impz(QWidget):
                                   framealpha=0.7)
                 self.ax_f2.set_ylabel(H_Fi_str)
 
-            if self.ui.but_freq_index_k.isChecked():
+            if self.ui.but_freq_index_k.checked:
                 self.axes_f[-1].set_xlabel(r'$k \; \rightarrow$')
             else:
                 self.axes_f[-1].set_xlabel(fb.fil[0]['plt_fLabel'])
@@ -2036,7 +2036,7 @@ class Plot_Impz(QWidget):
             self.ax_f1.set_xlim(F_range)
             self.ax_f1.set_title("Spectrum of " + self.title_str)
 
-            if self.ui.but_log_freq.isChecked():
+            if self.ui.but_log_freq.checked:
                 # scale second axis for noise power
                 corr = 10*np.log10(self.ui.N) - nenbw  # nenbw is in dB
                 mn, mx = self.ax_f1.get_ylim()

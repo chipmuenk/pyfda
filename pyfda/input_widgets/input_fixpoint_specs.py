@@ -143,10 +143,10 @@ class Input_Fixpoint_Specs(QWidget):
                 """
                 fb.fil[0]['fxq']['QI'].update(self.wdg_wq_input.Q.q_dict)
                 if dict_sig['ui_local_changed'] == 'butLock'\
-                        and not self.wdg_wq_input.butLock.isChecked():
+                        and not self.wdg_wq_input.butLock.checked:
                     # butLock was deactivitated, don't do anything
                     return
-                elif self.wdg_wq_input.butLock.isChecked():
+                elif self.wdg_wq_input.butLock.checked:
                     # button lock was activated or wordlength settings have been changed
                     # with active lock -> copy input settings to output
                     fb.fil[0]['fxq']['QO']['WI'] = fb.fil[0]['fxq']['QI']['WI']
@@ -160,7 +160,7 @@ class Input_Fixpoint_Specs(QWidget):
                 """
                 fb.fil[0]['fxq']['QO'].update(self.wdg_wq_output.Q.q_dict)
 
-                if self.wdg_wq_input.butLock.isChecked():
+                if self.wdg_wq_input.butLock.checked:
                     fb.fil[0]['fxq']['QI']['WI'] = fb.fil[0]['fxq']['QO']['WI']
                     fb.fil[0]['fxq']['QI']['WF'] = fb.fil[0]['fxq']['QO']['WF']
             else:

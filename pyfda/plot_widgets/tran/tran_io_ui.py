@@ -11,13 +11,13 @@ Create the UI for the Tran_IO class
 """
 from PyQt5.QtWidgets import QSizePolicy
 from pyfda.libs.compat import (
-    QWidget, QComboBox, QLineEdit, QLabel, QPushButton, QPushButtonRT, QLineEdit, QFrame,
+    QWidget, QComboBox, QLineEdit, QLabel, QPushButton, QLineEdit, QFrame,
     QHBoxLayout, QVBoxLayout, QGridLayout, QIcon)
 
 from pyfda.libs.pyfda_lib import to_html
 from pyfda.libs.pyfda_qt_lib import (
-    QVLine, PushButton, qget_cmb_box, qcmb_box_populate, qcmb_box_add_items,
-    qcmb_box_del_item, qtext_width)
+    QVLine, PushButton, PushButtonRT, qget_cmb_box, qcmb_box_populate,
+    qcmb_box_add_items, qcmb_box_del_item, qtext_width)
 from pyfda.pyfda_rc import params  # FMT string for QLineEdit fields, e.g. '{:.3g}'
 
 import logging
@@ -115,7 +115,7 @@ class Tran_IO_UI(QWidget):
         # ----------------------------------------------------------------------
 
         # ----------- LOAD ------------------------------------------------------------
-        self.but_select = PushButton("Select", checkable=False, objectName="large")
+        self.but_select = PushButton(self, "Select", checkable=False, objectName="large")
         self.but_select.setSizePolicy(QSizePolicy.Expanding,
                                     QSizePolicy.Expanding)
         self.but_select.setToolTip(
@@ -164,7 +164,7 @@ class Tran_IO_UI(QWidget):
         self.lbl_wordlength = QLabel(to_html("W =", frmt="bi"))
         self.lbl_wordlength_value = QLabel("None")
 
-        self.but_scale_to = PushButton("Scale to")
+        self.but_scale_to = PushButton(self, "Scale to")
         self.but_scale_to.setToolTip(
             self.tr("<span>When activated, scale maximum of data to the value below "
                     "before saving and after loading.</span>"))
@@ -181,7 +181,7 @@ class Tran_IO_UI(QWidget):
             "<span>Select CSV format and whether "
             "to copy to/from clipboard or file.</span>")
 
-        self.but_int_as_float = PushButton("Int2Float ")
+        self.but_int_as_float = PushButton(self, "Int2Float")
         self.but_int_as_float.setChecked(True)
         self.but_int_as_float.setToolTip(
             "<span>Represent <i>W</i> bit integer WAV formats as float when importing "
@@ -190,7 +190,8 @@ class Tran_IO_UI(QWidget):
         layH_file_fmt_options.addWidget(self.but_csv_options)
         layH_file_fmt_options.addWidget(self.but_int_as_float)
 
-        self.but_f_s_wav_auto = QPushButtonRT(self, "<b>Auto <i>f<sub>S</sub></i></b>", margin=5)
+        self.but_f_s_wav_auto = PushButtonRT(
+            self, text="<b>Auto <i>f<sub>S</sub></i></b>", margin=5)
         self.but_f_s_wav_auto.setCheckable(True)
         self.but_f_s_wav_auto.setChecked(True)
         self.but_f_s_wav_auto.setToolTip(
@@ -398,7 +399,7 @@ if __name__ == "__main__":
     mainw = Tran_IO_UI()
 
     layVMain = QVBoxLayout()
-    layVMain.addWidget(mainw.wdg_stim)
+    layVMain.addWidget(mainw.wdg_top)
 
     mainw.setLayout(layVMain)
     app.setActiveWindow(mainw)

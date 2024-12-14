@@ -14,7 +14,7 @@ import pprint
 import textwrap
 
 from pyfda.libs.compat import (
-    QtGui, QWidget, QFont, QFrame, QPushButton, QLabel, QTableWidget, QTableWidgetItem,
+    QtGui, QWidget, QFont, QFrame, QLabel, QTableWidget, QTableWidgetItem,
     QTextBrowser, QTextCursor, QLineEdit, QVBoxLayout, QHBoxLayout, QGridLayout,
     QSplitter, Qt, pyqtSignal)
 
@@ -84,19 +84,17 @@ class Input_Info(QWidget):
 
         # ============== UI Layout =====================================
         # widget / subwindow for filter infos
-        self.butFiltPerf = PushButton("H(f)")
-        self.butFiltPerf.setChecked(True)
+        self.butFiltPerf = PushButton(self, text="H(f)", checked=True)
         self.butFiltPerf.setToolTip("Display frequency response at test frequencies.")
 
-        self.butDebug = PushButton("Debug")
-        self.butDebug.setChecked(False)
+        self.butDebug = PushButton(self, "Debug", checked=False)
         self.butDebug.setToolTip("Show debugging options.")
 
-        self.butAbout = PushButton("About")  # pop-up "About" window
-        self.butAbout.setCheckable(False)
+        self.butAbout = PushButton(self, "About", checkable=False)  # pop-up "About" window
+        self.butAbout.setToolTip(
+            "<span>Show included modules and their versions.</span>")
 
-        self.butSettings = PushButton("Settings")  #
-        self.butSettings.setChecked(False)
+        self.butSettings = PushButton(self, "Settings", checked=False)
         self.butSettings.setToolTip("Display and set some settings")
 
         layHControls1 = QHBoxLayout()
@@ -105,23 +103,19 @@ class Input_Info(QWidget):
         layHControls1.addWidget(self.butSettings)
         layHControls1.addWidget(self.butDebug)
 
-        self.butDocstring = PushButton("Doc$")
-        self.butDocstring.setChecked(False)
+        self.butDocstring = PushButton(self, "Doc$", checked=False)
         self.butDocstring.setToolTip("Display docstring from python filter method.")
 
-        self.butRichText = PushButton("RTF")
-        self.butRichText.setCheckable(HAS_DOCUTILS)
-        self.butRichText.setChecked(HAS_DOCUTILS)
+        self.butRichText = PushButton(
+            self, "RTF", checkable=HAS_DOCUTILS, checked=HAS_DOCUTILS)
         self.butRichText.setEnabled(HAS_DOCUTILS)
         self.butRichText.setToolTip("Render documentation in Rich Text Format.")
 
-        self.butFiltDict = PushButton("FiltDict")
+        self.butFiltDict = PushButton(self, "FiltDict", checked=False)
         self.butFiltDict.setToolTip("Show filter dictionary for debugging.")
-        self.butFiltDict.setChecked(False)
 
-        self.butFiltTree = PushButton("FiltTree")
+        self.butFiltTree = PushButton(self, "FiltTree", checked=False)
         self.butFiltTree.setToolTip("Show filter tree for debugging.")
-        self.butFiltTree.setChecked(False)
 
         layHControls2 = QHBoxLayout()
         layHControls2.addWidget(self.butDocstring)
@@ -134,7 +128,7 @@ class Input_Info(QWidget):
 
         self.frmControls2 = QFrame(self)
         self.frmControls2.setLayout(layHControls2)
-        self.frmControls2.setVisible(self.butDebug.isChecked())
+        self.frmControls2.setVisible(self.butDebug.checked)
         self.frmControls2.setContentsMargins(0, 0, 0, 0)
 
         lbl_settings_NFFT = QLabel(to_html("N_FFT =", frmt='bi'), self)
@@ -149,7 +143,7 @@ class Input_Info(QWidget):
 
         self.frmSettings = QFrame(self)
         self.frmSettings.setLayout(layGSettings)
-        self.frmSettings.setVisible(self.butSettings.isChecked())
+        self.frmSettings.setVisible(self.butSettings.checked)
         self.frmSettings.setContentsMargins(0, 0, 0, 0)
 
         layVControls = QVBoxLayout()
@@ -220,14 +214,14 @@ class Input_Info(QWidget):
         """
         Show / hide debug options depending on the state of the debug button
         """
-        self.frmControls2.setVisible(self.butDebug.isChecked())
+        self.frmControls2.setVisible(self.butDebug.checked)
 
 # ------------------------------------------------------------------------------
     def _show_settings(self):
         """
         Show / hide settings options depending on the state of the settings button
         """
-        self.frmSettings.setVisible(self.butSettings.isChecked())
+        self.frmSettings.setVisible(self.butSettings.checked)
 
     def _update_settings_nfft(self):
         """ Update value for self.par1 from QLineEdit Widget"""
@@ -252,7 +246,7 @@ class Input_Info(QWidget):
         Display info from filter design file and docstring
         """
         if hasattr(ff.fil_inst, 'info'):
-            if self.butRichText.isChecked():
+            if self.butRichText.checked:
                 self.txtFiltInfoBox.setText(publish_string(
                     self._clean_doc(ff.fil_inst.info), writer_name='html',
                     settings_overrides={'output_encoding': 'unicode'}))
@@ -261,8 +255,8 @@ class Input_Info(QWidget):
         else:
             self.txtFiltInfoBox.setText("")
 
-        if self.butDocstring.isChecked() and hasattr(ff.fil_inst, 'info_doc'):
-            if self.butRichText.isChecked():
+        if self.butDocstring.checked and hasattr(ff.fil_inst, 'info_doc'):
+            if self.butRichText.checked:
                 self.txtFiltInfoBox.append(
                     '<hr /><b>Python module docstring:</b>\n')
                 for doc in ff.fil_inst.info_doc:
@@ -336,8 +330,8 @@ class Input_Info(QWidget):
             return F_min, H_min, F_max, H_max
         # ------------------------------------------------------------------
 
-        self.tblFiltPerf.setVisible(self.butFiltPerf.isChecked())
-        if self.butFiltPerf.isChecked():
+        self.tblFiltPerf.setVisible(self.butFiltPerf.checked)
+        if self.butFiltPerf.checked:
 
             bb = fb.fil[0]['ba'][0]
             aa = fb.fil[0]['ba'][1]
@@ -499,7 +493,7 @@ class Input_Info(QWidget):
         """
         Print filter dict for debugging
         """
-        self.txtFiltDict.setVisible(self.butFiltDict.isChecked())
+        self.txtFiltDict.setVisible(self.butFiltDict.checked)
 
         fb_sorted = [str(key) + ' : ' + str(fb.fil[0][key])
                      for key in sorted(fb.fil[0].keys())]
@@ -512,7 +506,7 @@ class Input_Info(QWidget):
         """
         Print filter tree for debugging
         """
-        self.txtFiltTree.setVisible(self.butFiltTree.isChecked())
+        self.txtFiltTree.setVisible(self.butFiltTree.checked)
 
         ftree_sorted = ['<b>' + str(key) + ' : ' + '</b>' + str(fb.fil_tree[key])
                         for key in sorted(fb.fil_tree.keys())]
