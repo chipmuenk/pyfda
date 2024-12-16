@@ -255,6 +255,14 @@ qss_dark = """
     /* Style 'normal' background for all push buttons */
     QPushButton{background-color: #505050;}
     .QPushButton:disabled, PushButton:disabled{color: #A0A0A0;} /* background-color? */
+    /* Background color for the spinbox and combobox itself  */
+    QSpinBox, QComboBox{background-color: #505050;}
+    /* Background color for dropdown items */
+    QComboBox QAbstractItemView {background-color: #404040;}
+    /* Border for the spinbox and combobox itself */
+    /* QSpinBox, QComboBox{border: 1px solid #C0C0C0;} */
+    /* Border around dropdown menu */
+    /* QComboBox QAbstractItemView {border: 1px solid orange;} */
 
     QComboBox:disabled{background-color: #505050; color: #A0A0A0}
 
@@ -262,21 +270,6 @@ qss_dark = """
     QMessageBox{background-color:#404040;}
 
     QPlainTextEdit{background-color: black}
-
-    /* Style for the spinbox and combobox itself (color and border) */
-    QSpinBox, QComboBox{
-        background-color: #505050;
-        border: 1px solid #C0C0C0;
-        }
-    /* Background color for dropdown items / border color around dropdown menu */
-    QComboBox QAbstractItemView {
-        background-color: #404040;
-        border: 1px solid orange;
-    }
-    /* These break the Combobox layout
-        QComboBox::item:selected {background-color: orange;}
-        QComboBox::item:checked {font-weight: bold;}
-    */
 
     QProgressBar::chunk{background-color: #505050;}
     /* QProgressBar:disabled::chunk{...} */
@@ -332,23 +325,21 @@ qss_light = """
     .QPushButton:disabled, PushButton:disabled{
             background-color: #C0C0C0; color: white}
 
+    /* Background color for the spinbox and combobox itself */
+    QSpinBox, QComboBox{background-color: #D0D0D0;}
+    /* Background color for dropdown items */
+    QComboBox QAbstractItemView {background-color: #C0C0C0;}
+    /* Border for the spinbox and combobox itself */
+    /* QSpinBox, QComboBox{border: 1px solid #404040;} */
+    /* Border around dropdown menu */
+    /* QComboBox QAbstractItemView {border: 1px solid orange;} */
+
     QComboBox:disabled{background-color: #C0C0C0; color: white}
 
     QDialog{background-color: #D0D0D0;}
     QMessageBox{background-color: #D0D0D0;}
 
     QPlainTextEdit{background-color: white}
-
-    /* Style for the spinbox and combobox itself (color and border) */
-    QSpinBox, QComboBox{
-        background-color: #D0D0D0;
-        border: 1px solid #404040;
-        }
-    /* Background color for dropdown items / border color around dropdown menu */
-    QComboBox QAbstractItemView {
-        background-color: #C0C0C0;
-        border: 1px solid orange;
-        }
 
     QProgressBar::chunk{background-color: #F0F0F0;}
     /* QProgressBar:disabled::chunk{...} */
@@ -545,11 +536,15 @@ qss_common = """
     QTableView QTableCornerButton::section:pressed{background-color:red;}
 
     /* Padding of QSpin/Combobox and color of selected item */
-    QSpinBox, QComboBox{
+    /* QSpinBox, QComboBox{
         padding-left: 0.2em; padding-right: 1em;
         padding-top: 2px; padding-bottom: 2px;
-        selection-background-color: orange;}
-
+        selection-background-color: orange; }
+    */
+    /* These break the Combobox layout as well
+        QComboBox::item:selected {background-color: orange;}
+        QComboBox::item:checked {font-weight: bold;}
+    */
 
     .QPushButton, PushButton{font-weight: bold;}
     QPushButton QLabel{font-weight: bold}
