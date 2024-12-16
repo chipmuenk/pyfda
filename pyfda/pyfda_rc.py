@@ -246,7 +246,7 @@ qss_dark = """
     QHeaderView::section:checked{background-color:blue;}
 
     /* Applies to all widgets in "normal" state
-    * [state="normal"]{background-color: #404040; color: white;} TODO: border-color? */
+    * [state="normal"]{background-color: #404040; color: white;}
 
     QTextEdit{background-color: #505050;}
     QLineEdit{background-color: #505050; border-color: #A0A0A0;}
@@ -279,6 +279,7 @@ qss_dark = """
     */
 
     QProgressBar::chunk{background-color: #505050;}
+    /* QProgressBar:disabled::chunk{...} */
 
     QSplitter::handle:vertical {
         background-color: qlineargradient(spread:pad, x1:0, y1:0, x2:1, y2:0,
@@ -334,7 +335,7 @@ qss_light = """
     QComboBox:disabled{background-color: #C0C0C0; color: white}
 
     QDialog{background-color: #D0D0D0;}
-    QMessageBox{background-color: #D0D0D0}
+    QMessageBox{background-color: #D0D0D0;}
 
     QPlainTextEdit{background-color: white}
 
@@ -350,6 +351,7 @@ qss_light = """
         }
 
     QProgressBar::chunk{background-color: #F0F0F0;}
+    /* QProgressBar:disabled::chunk{...} */
 
     QSplitter::handle:vertical {
         background-color: qlineargradient(spread:pad, x1:0, y1:0, x2:1, y2:0,
@@ -560,6 +562,9 @@ qss_common = """
     /*QPushButton:checked {background-color:lightblue; border: lightblue;}
     .QPushButton:checked, PushButton:checked {color:black;}*/
 
+    QProgressBar{background-color: orange;} /* running */
+    QProgressBar{text-align: center; font-weight: bold; border: 1px solid #303030;}
+
     /* QSplitter styling adopted from
     http://stackoverflow.com/questions/6832499/qsplitter-show-a-divider-or-a-margin-between-the-two-widgets
     */
@@ -572,9 +577,6 @@ qss_common = """
         width: 8px;
         image: url(':/ellipses_h.svg');
         }
-
-    QProgressBar{text-align: center; font-weight: bold;
-                    border: 1px solid #303030;}
 
     """
 # QApplication.setStyle(QStyleFactory.create('Cleanlooks')) re-create default styles
