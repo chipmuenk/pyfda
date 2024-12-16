@@ -254,7 +254,9 @@ qss_dark = """
 
     /* Style 'normal' background for all push buttons */
     QPushButton{background-color: #505050;}
-    .QPushButton:disabled, PushButton:disabled{color: #A0A0A0;} /* background-color? */
+    .QPushButton:disabled, PushButton:disabled{
+        background-color: #707070; color: #A0A0A0;}
+
     /* Background color for the spinbox and combobox itself  */
     QSpinBox, QComboBox{background-color: #505050;}
     /* Background color for dropdown items */
