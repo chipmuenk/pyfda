@@ -486,7 +486,7 @@ qss_common = """
 
     #medium{font-size: 11pt; font-weight: bold; }
     #large{font-size: 12pt; font-weight: bold; }
-    #xlarge{font-size: 14pt; font-weight: black;}
+    #xlarge{font-size: 14pt; font-weight: bold;}
 
     /* Frame with control elements of all plot widgets */
     #frmControls{
