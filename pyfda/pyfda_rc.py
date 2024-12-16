@@ -239,6 +239,11 @@ qss_dark = """
     NavigationToolbar2QT{background-color:#606060;}
     /* QTabBar {background-color: pink;} */ /* background of Tabs, normally defined by pane */
 
+    QTextEdit{background-color: #505050;}
+    QLineEdit{background-color: #505050; border-color: #A0A0A0;}
+    /* QLineEdit{selection-background-color: darkgray;} */
+    QLineEdit:disabled{background-color: #505050; color: #A0A0A0}
+
     QTableView{alternate-background-color:#202020;
         background-color:#404040; gridline-color: white;}
     QHeaderView{background-color:#202020;}
@@ -247,10 +252,6 @@ qss_dark = """
 
     /* Applies to all widgets in "normal" state
     * [state="normal"]{background-color: #404040; color: white;}
-
-    QTextEdit{background-color: #505050;}
-    QLineEdit{background-color: #505050; border-color: #A0A0A0;}
-    QLineEdit:disabled{background-color: #505050; color: #A0A0A0}
 
     /* Style 'normal' background for all push buttons */
     QPushButton{background-color: #505050;}
@@ -309,6 +310,10 @@ qss_light = """
     NavigationToolbar2QT{background-color:#E0E0E0;}
     /* QTabBar {background-color: pink;} */ /* background of Tabs, normally defined by pane */
 
+    QTextEdit{background-color: #F0F0F0;}
+    QLineEdit{background-color: #F0F0F0; border-color: #303030;}
+    QLineEdit:disabled{background-color:#C0C0C0; color: white;}
+
     QTableView{alternate-background-color:#C0C0C0;
         background-color:#D0D0D0; gridline-color: #A0A0A0;}
     QHeaderView{background-color:#D0D0D0;}
@@ -317,10 +322,6 @@ qss_light = """
 
     /* Applies to all widgets in "normal" state /*
     * [state="normal"]{background-color: #C0C0C0;}
-
-    QTextEdit{background-color: white;}
-    QLineEdit{background-color: white; border-color: #303030;}
-    QLineEdit:disabled{background-color:#C0C0C0; color: white;}
 
     /* Style 'normal' background for all push buttons */
     QPushButton{background-color: #C0C0C0;}
