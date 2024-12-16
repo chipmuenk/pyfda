@@ -277,6 +277,34 @@ qss_dark = """
     QProgressBar::chunk{background-color: #505050;}
     /* QProgressBar:disabled::chunk{...} */
 
+    /*
+        QScrollBar:horizontal {
+            border: 2px solid grey;
+            background: #32CC99;
+            height: 15px;
+            margin: 0px 20px 0 20px;
+        }
+        QScrollBar::handle:horizontal {
+            background: white;
+            min-width: 20px;
+        }
+        QScrollBar::add-line:horizontal {
+            border: 2px solid grey;
+            background: #32CC99;
+            width: 20px;
+            subcontrol-position: right;
+            subcontrol-origin: margin;
+        }
+
+        QScrollBar::sub-line:horizontal {
+            border: 2px solid grey;
+            background: #32CC99;
+            width: 20px;
+            subcontrol-position: left;
+            subcontrol-origin: margin;
+        }
+    */
+
     QSplitter::handle:vertical {
         background-color: qlineargradient(spread:pad, x1:0, y1:0, x2:1, y2:0,
                             stop:0 #303030,
@@ -290,6 +318,7 @@ qss_dark = """
                             stop:0.5 #808080,
                             stop:1.0 #303030);
         }
+
     """
 # ---------------
 # light QSS theme
