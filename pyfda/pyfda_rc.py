@@ -331,7 +331,7 @@ qss_light = """
     /* Background color for the spinbox and combobox itself */
     QSpinBox, QComboBox{background-color: #D0D0D0;}
     /* Background color for dropdown items */
-    QComboBox QAbstractItemView {background-color: #C0C0C0;}
+    QComboBox QAbstractItemView {background-color: #F0F0F0;}
     /* Border for the spinbox and combobox itself */
     /* QSpinBox, QComboBox{border: 1px solid #404040;} */
     /* Border around dropdown menu */
@@ -339,8 +339,8 @@ qss_light = """
 
     QComboBox:disabled{background-color: #C0C0C0; color: white}
 
-    QDialog{background-color: #D0D0D0;}
-    QMessageBox{background-color: #D0D0D0;}
+    QDialog{background-color: #E0E0E0;}
+    QMessageBox{background-color: #E0E0E0;}
 
     QPlainTextEdit{background-color: white}
 
