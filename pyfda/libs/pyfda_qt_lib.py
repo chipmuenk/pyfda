@@ -729,7 +729,10 @@ class PushButton(QPushButton):
         self.setObjectName(objectName)
 
         if icon is None:
-            self.w = qtext_width(text=text, N_x=N_x, font=self.font())
+            doc_x = QtGui.QTextDocument("x")
+            doc_x.setDefaultFont(self.font())
+            w_x = int(doc_x.size().width())
+            self.w = qtext_width(text=text, N_x=N_x, bold=True, font=self.font()) + w_x
             self.h = super(PushButton, self).sizeHint().height()
             self.setText(text.strip())
         else:
