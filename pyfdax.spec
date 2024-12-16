@@ -53,7 +53,7 @@ import os
 import importlib
 jschon_root = os.path.dirname(importlib.import_module('jschon').__file__)  # root dir for jschon package
 json_files = [(os.path.join(root, name),
-               os.path.join('jschon', root.partition('jschon/')[2]))
+               os.path.join('jschon', root.partition('jschon' + os.sep)[2]))
                 for root, dirs, files in os.walk(jschon_root)
                     for name in files
                         if name.endswith(".json")]
