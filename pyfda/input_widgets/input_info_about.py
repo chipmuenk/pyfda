@@ -141,9 +141,11 @@ class AboutWindow(QDialog):
                 my_string = my_string.replace(k, v)
 
             # Remove remaining HTML tags and style settings
-            # . : match any character except newline
-            # * : match 0 or more repetitions of preceding RE
-            # ? : match 0 or one repetition of preceding REgii5t
+            # .  : match any character except newline
+            # *  : match 0 or more repetitions of preceding RE
+            # ?  : match 0 or one repetition of preceding RE
+            # *? : make the '*' non-greedy, i.e. match as few chars as possible, e.g.
+            #     only '<a>', not '<a> b <c>'
             clean = re.compile('<style>.*</style>|<.*?>')
             fb.clipboard.setText(re.sub(clean, '', my_string))
         else:
