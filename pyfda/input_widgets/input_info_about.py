@@ -140,8 +140,11 @@ class AboutWindow(QDialog):
             for k, v in mapping:
                 my_string = my_string.replace(k, v)
 
-            # Remove remaining HTML tags
-            clean = re.compile('<.*?>')
+            # Remove remaining HTML tags and style settings
+            # . : match any character except newline
+            # * : match 0 or more repetitions of preceding RE
+            # ? : match 0 or one repetition of preceding REgii5t
+            clean = re.compile('<style>.*</style>|<.*?>')
             fb.clipboard.setText(re.sub(clean, '', my_string))
         else:
             fb.clipboard.setText(my_string)  # copy untreated string
@@ -158,12 +161,13 @@ class AboutWindow(QDialog):
         """
 
         self.info_str = (
-            "<b><a href=https://www.github.com/chipmuenk/pyfda>pyfda</a> "
+            f"<head><style>a:link {{color: red}}</style></head>"
+            f"<body><b><a href=https://www.github.com/chipmuenk/pyfda>pyfda</a> "
             f"Version {version.__version__} (c) 2013 - 2024 Christian Münker</b><br />"
             "Design, analyze and synthesize digital filters. Docs @ "
             "<a href=https://pyfda.rtfd.org>pyfda.rtfd.org</a>"
             " (<a href=https://media.readthedocs.org/pdf/pyfda/latest/pyfda.pdf>pdf</a>)"
-            "<br />")
+            "<br /></body>")
 
         # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
@@ -216,7 +220,10 @@ class AboutWindow(QDialog):
                     extensions=['markdown.extensions.tables'])
             # pyinstaller needs explicit definition of extensions path
 
-        self.about_str = os_str + dirs_str + ver_str
+        self.about_str = (f"<head><style>a:link {{color: red}}</style></head>"
+                          f"<body>"
+                          f"{os_str + dirs_str + ver_str}"
+                          f"</body>")
 
 # ------------------------------------------------------------------------------
 
