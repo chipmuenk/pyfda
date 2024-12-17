@@ -161,7 +161,7 @@ class AboutWindow(QDialog):
         """
 
         self.info_str = (
-            f"<head><style>a:link {{color: red}}</style></head>"
+            f"<head><style>a:link {{color: {params['link_color']}}}</style></head>"
             f"<body><b><a href=https://www.github.com/chipmuenk/pyfda>pyfda</a> "
             f"Version {version.__version__} (c) 2013 - 2024 Christian Münker</b><br />"
             "Design, analyze and synthesize digital filters. Docs @ "
@@ -220,7 +220,7 @@ class AboutWindow(QDialog):
                     extensions=['markdown.extensions.tables'])
             # pyinstaller needs explicit definition of extensions path
 
-        self.about_str = (f"<head><style>a:link {{color: red}}</style></head>"
+        self.about_str = (f"<head><style>a:link {{color: {params['link_color']}}}</style></head>"
                           f"<body>"
                           f"{os_str + dirs_str + ver_str}"
                           f"</body>")
