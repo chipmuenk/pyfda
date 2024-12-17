@@ -234,9 +234,9 @@ qss_dark = """
     QTabWidget {background-color: #303030;} /* Background for tabs except input tabs */
     /* background for input tabs, here QTabWidget is encompassed by QScrollArea */
     QScrollArea{color:white; background-color:#303030;}
-    QTabWidget::pane{background-color: #606060;} /* background of tab widget content */
+    QTabWidget::pane{background-color: #707070;} /* background of tab widget content */
     /* NavigationToolbar needs to have the same color as above */
-    NavigationToolbar2QT{background-color:#606060;}
+    NavigationToolbar2QT{background-color:#707070;}
     /* QTabBar {background-color: pink;} */ /* background of Tabs, normally defined by pane */
 
     QTextEdit{background-color: #505050;}
@@ -584,6 +584,7 @@ qss_common = """
     QPushButton:pressed:checked, QPushButton:pressed:!checked
         {background-color:orange;} /* color: white */
     /* Define 'border' to avoid "grey dots" in all push buttons due to transparent border overlay
+       This breaks the default layout
     https://forum.qt.io/topic/41325/solved-background-of-checked-qpushbutton-with-stylesheet
     https://stackoverflow.com/questions/24718722/how-to-style-qpushbuttons-checked-state-to-remove-grey-dots */
     /*QPushButton:checked {background-color:lightblue; border: lightblue;}
