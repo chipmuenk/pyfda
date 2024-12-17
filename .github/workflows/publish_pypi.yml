@@ -19,7 +19,8 @@
 #    * <merge develop and main, push develop (default branch)
 #    * git tag v0.4.5           # create new local tag
 #    * git push origin tag v0.4.5  # push only tag to origin
-#    * git push                 # push changes to origin, sending a 'push' event
+#    * checkout main
+#    * git push                 # push changes to origin, sending a 'push main' event
 #    * <draft a (pre)release on Github from tag,
 #       sending a 'release' event>
 #
