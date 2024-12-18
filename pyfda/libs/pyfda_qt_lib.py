@@ -437,7 +437,6 @@ def qstyle_widget(widget, state):
     state = str(state)
     if state == 'u':
         state = 'unused'
-        # *[state="unused"], *[state="u"]{background-color:white; color:darkgrey}
     elif state == 'a':
         state = 'active'
     elif state == 'd':

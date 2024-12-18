@@ -252,6 +252,8 @@ qss_dark = """
 
     /* Applies to all widgets in "normal" state
     * [state="normal"]{background-color: #404040; color: white;}
+    /* 'unused', e.g. for lineedit fields with some filter designs */
+    * [state="unused"], *[state="u"]{background-color: #404040; color:#D0D0D0}
 
     /* Style 'normal' background for all push buttons */
     QPushButton{background-color: #505050;}
@@ -351,6 +353,8 @@ qss_light = """
 
     /* Applies to all widgets in "normal" state /*
     * [state="normal"]{background-color: #C0C0C0;}
+    /* 'unused', e.g. for lineedit fields with some filter designs */
+    * [state="unused"], *[state="u"]{background-color: white; color:#303030}
 
     /* Style 'normal' background for all push buttons */
     QPushButton{background-color: #C0C0C0;}
@@ -507,8 +511,6 @@ qss_common = """
     * [state="changed"]{background-color: yellow; color: black;}
     * [state="running"]{background-color: orange; color: white;}
     * [state="highlight"]{background-color: lightblue; color: black;}
-    /* 'unused', e.g. for lineedit fields with some filter designs */
-    * [state="unused"], *[state="u"]{background-color: white; color:#303030}
     * [state="error"]{background-color: red; color:white; font-weight:bold;}
 
     QWidget{font-size:10pt; font-family: Tahoma;}
