@@ -1720,7 +1720,7 @@ def fil_convert(fil_dict: dict, format_in) -> None:
                 a1 = chk[section, 3:]
                 if (np.amin(b1) < 1e-14 and np.amin(b1) > 0):
                     raise ValueError(
-                        "\t'fil_convert()': Bad coefficients, Order N is too high!")
+                        "\t'fil_convert()': Bad coefficients, required order N is too high or too low!")
 
         if 'zpk' not in format_in:
             try:

@@ -227,23 +227,24 @@ class FilterFactory(object):
                 self.err_code = getattr(fil_inst, method)(fil_dict)
                 #------------------------------------------------------------------
             except Exception as e:
-                err_string = "Method '{0}' of class '{1}':\n{2}"\
-                                    .format(method, type(fil_inst).__name__, e)
+                err_string =\
+                    f"Method '{method}' of class '{type(fil_inst).__name__}':\n{e}"
+
                 if e:
                     err_string += "\n" # add line break to error message
                 if "order n is too high" in str(e).lower():
                     self.err_code = 18
-                    err_string += "Try relaxing the specifications."
+                    err_string += "\tTry changing the specifications."
                 elif "failure to converge" in str(e).lower():
                     self.err_code = 19
-                    err_string += "Try relaxing the specifications."
+                    err_string += "\Try changing the specifications."
                 else:
                     self.err_code = 99
 
         if self.err_code is None:
             self.err_code = 0
         elif self.err_code > 0:
-                logger.error("ErrCode {0}: {1}".format(self.err_code, err_string))
+                logger.error(f"ErrCode {self.err_code}: {err_string}")
 
         return self.err_code
 
