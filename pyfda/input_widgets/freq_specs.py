@@ -275,16 +275,34 @@ class FreqSpecs(QWidget):
 
         # Check whether normalized freqs are inside the range ]0, 0.5[. If not, highlight
         # widget.
+        state = source.property("state")
+        err = False
         if fb.fil[0][f_label] <= 0:
             logger.warning(
                 f"Frequency {str(source.objectName())} has to be >= 0")
-            source.setProperty("state", "error")
+            err = True
         elif fb.fil[0][f_label] >= 0.5:
             logger.warning(
                 f"Frequency {str(source.objectName())} has to be < f_S /2.")
-            qstyle_widget(source, "error")
+            err = True
+        if not err:
+            if state in {'u', 'u_error', 'unused'}:
+                qstyle_widget(source, 'u')
+            elif state in {'a', 'active', 'error'}:
+                qstyle_widget(source, 'a')
+            elif state in {'d', 'disabled'}:
+                qstyle_widget(source, 'd')
+            else:
+                logger.warning(f"Unsupported state '{state}'!")
         else:
-            qstyle_widget(source, 'normal')
+            if state in {'u', 'u_error', 'unused'}:
+                qstyle_widget(source, 'u_error')
+            elif state in {'a', 'active', 'error'}:
+                qstyle_widget(source, 'error')
+            elif state in {'d', 'disabled'}:
+                qstyle_widget(source, 'd')
+            else:
+                logger.warning(f"Unsupported state '{state}'!")
 
         return
 
