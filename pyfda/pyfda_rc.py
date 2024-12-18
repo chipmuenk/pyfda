@@ -245,7 +245,7 @@ qss_dark = """
     QLineEdit:disabled{background-color: #707070; color: #A0A0A0}
 
     QTableView{alternate-background-color:#202020;
-        background-color:#404040; gridline-color: white;}
+        background-color:#505050; gridline-color: white;}
     QHeaderView{background-color:#202020;}
     QHeaderView::section{background-color:#101010;}
     QHeaderView::section:checked{background-color:blue;}
@@ -275,7 +275,7 @@ qss_dark = """
     QDialog{background-color: #404040;}
     QMessageBox{background-color:#404040;}
 
-    QPlainTextEdit{background-color: black}
+    QPlainTextEdit{background-color: #303030;}
 
     QProgressBar::chunk{background-color: #505050;}
     /* QProgressBar:disabled::chunk{...} */
