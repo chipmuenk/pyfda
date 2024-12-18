@@ -430,6 +430,7 @@ def qstyle_widget(widget, state):
     - 'changed': yellow, filter specs have been changed
     - 'running': orange, simulation is running
     - 'error'  : red, an error has occurred during filter design
+    - 'u_error' : pink, e.g. for unused frequency inputs with out-of-bounds values
     - 'u' or 'unused'  : grey text color
     - 'd' or 'disabled': background color darkgrey
     - 'a' or 'active'  : no special style defined

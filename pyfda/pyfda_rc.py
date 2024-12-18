@@ -242,7 +242,7 @@ qss_dark = """
     QTextEdit{background-color: #505050;}
     QLineEdit{background-color: #505050; border-color: #A0A0A0;}
     /* QLineEdit{selection-background-color: darkgray;} */
-    QLineEdit:disabled{background-color: #505050; color: #A0A0A0}
+    QLineEdit:disabled{background-color: #707070; color: #A0A0A0}
 
     QTableView{alternate-background-color:#202020;
         background-color:#404040; gridline-color: white;}
@@ -250,10 +250,11 @@ qss_dark = """
     QHeaderView::section{background-color:#101010;}
     QHeaderView::section:checked{background-color:blue;}
 
-    /* Applies to all widgets in "normal" state
-    * [state="normal"]{background-color: #404040; color: white;}
+    /* Applies to all widgets in "normal" resp. "active" state
+    * [state="normal"], * [state="active"], * [state="a"]
+        {background-color: #505050; color: white;}
     /* 'unused', e.g. for lineedit fields with some filter designs */
-    * [state="unused"], *[state="u"]{background-color: #404040; color:#D0D0D0}
+    * [state="unused"], *[state="u"]{background-color: #606060; color:lightblue}
 
     /* Style 'normal' background for all push buttons */
     QPushButton{background-color: #505050;}
@@ -351,10 +352,11 @@ qss_light = """
     QHeaderView::section{background-color:#808080; color:white;}
     QHeaderView::section:checked{background-color:blue; color:white;}
 
-    /* Applies to all widgets in "normal" state /*
-    * [state="normal"]{background-color: #C0C0C0;}
+    /* Applies to all widgets in "normal" resp. "active" state
+    * [state="normal"], * [state="active"], * [state="a"]
+            {background-color: #C0C0C0;}
     /* 'unused', e.g. for lineedit fields with some filter designs */
-    * [state="unused"], *[state="u"]{background-color: white; color:#303030}
+    * [state="unused"], *[state="u"]{background-color: #E0E0E0; color:blue}
 
     /* Style 'normal' background for all push buttons */
     QPushButton{background-color: #C0C0C0;}
@@ -512,6 +514,7 @@ qss_common = """
     * [state="running"]{background-color: orange; color: white;}
     * [state="highlight"]{background-color: lightblue; color: black;}
     * [state="error"]{background-color: red; color:white; font-weight:bold;}
+    * [state="u_error"]{background-color: pink; color:white; font-weight:bold;}
 
     QWidget{font-size:10pt; font-family: Tahoma;}
 
