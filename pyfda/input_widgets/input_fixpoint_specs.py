@@ -378,22 +378,16 @@ class Input_Fixpoint_Specs(QWidget):
 # ------------------------------------------------------------------------------
 #       Dynamically updated image of filter topology (label as placeholder)
 # ------------------------------------------------------------------------------
-        # allow setting background color
-        # lbl_fixp_img_palette = QPalette()
-        # lbl_fixp_img_palette.setColor(QPalette(window, Qt: white))
-        # lbl_fixp_img_palette.setBrush(self.backgroundRole(), QColor(150, 0, 0))
-        # lbl_fixp_img_palette.setColor(QPalette: WindowText, Qt: blue)
-
         self.lbl_fixp_img = QLabel("img not set", self)
-        self.lbl_fixp_img.setAutoFillBackground(True)
-        # self.lbl_fixp_img.setPalette(lbl_fixp_img_palette)
         # self.lbl_fixp_img.setSizePolicy(QSizePolicy.Minimum, QSizePolicy.Minimum)
 
         self.embed_fixp_img(self.no_fx_filter_img)
         layHImg = QHBoxLayout()
         layHImg.setContentsMargins(0, 0, 0, 0)
         layHImg.addWidget(self.lbl_fixp_img)  # , Qt.AlignCenter)
+        # embedd image into transparent QFrame
         self.frmImg = QFrame(self)
+        self.frmImg.setObjectName("transparent")
         self.frmImg.setLayout(layHImg)
         self.frmImg.setContentsMargins(*params['wdg_margins'])
 

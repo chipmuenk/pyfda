@@ -29,19 +29,9 @@ logger = logging.getLogger(__name__)
 # #############################################################################
 # General layout settings
 # #############################################################################
-# Get all available system styles:
-# from PyQt5.QtWidgets import QStyleFactory
-# from PyQt4.QtGui import QStyleFactory
-# print(QStyleFactory.keys())
-
-THEME = 'light'     # select 'dark' or 'light' theme or 'none' or use one of the
-                    # system styles like 'windows':
-# QT5 only:         fusion
-# MS Windows only:  windowsxp, windowsvista
-# Mac only:         macintosh
 
 mpl_ms = 8  # base size for matplotlib markers
-# Various parameters for calculation and plotting
+# Various parameters for calculation, plotting and UI
 params = {
     'N_FFT':  2048,   # number of FFT points for plot commands (freqz etc.)
     'FMT': '{:.3g}',  # format string for QLineEdit fields
@@ -64,7 +54,8 @@ params = {
     'wdg_margins_spc': (2, 2, 2, 2),  # widget margins with more vertical spacing
     'wdg_margins_0': (0, 0, 0, 0),  # set margins to zero
     'mpl_margins': (0, 0, 0, 0),  # margins around matplotlib widgets
-    'mpl_hatch_border': {'linewidth': 1.0, 'color': 'blue', 'linestyle': '--'}
+    'mpl_hatch_border': {'linewidth': 1.0, 'color': 'blue', 'linestyle': '--'},
+    'link_color': 'blue'  # link color in HTML text
           }
 
 mpl_params_dark = {
@@ -234,9 +225,9 @@ qss_dark = """
     QTabWidget {background-color: #303030;} /* Background for tabs except input tabs */
     /* background for input tabs, here QTabWidget is encompassed by QScrollArea */
     QScrollArea{color:white; background-color:#303030;}
-    QTabWidget::pane{background-color: #606060;} /* background of tab widget content */
+    QTabWidget::pane{background-color: #707070;} /* background of tab widget content */
     /* NavigationToolbar needs to have the same color as above */
-    NavigationToolbar2QT{background-color:#606060;}
+    NavigationToolbar2QT{background-color:#707070;}
     /* QTabBar {background-color: pink;} */ /* background of Tabs, normally defined by pane */
 
     QTextEdit{background-color: #505050;}
@@ -588,6 +579,7 @@ qss_common = """
     QPushButton:pressed:checked, QPushButton:pressed:!checked
         {background-color:orange;} /* color: white */
     /* Define 'border' to avoid "grey dots" in all push buttons due to transparent border overlay
+       This breaks the default layout
     https://forum.qt.io/topic/41325/solved-background-of-checked-qpushbutton-with-stylesheet
     https://stackoverflow.com/questions/24718722/how-to-style-qpushbuttons-checked-state-to-remove-grey-dots */
     /*QPushButton:checked {background-color:lightblue; border: lightblue;}
@@ -610,6 +602,14 @@ qss_common = """
         }
 
     """
+# Get all available system styles:
+# from PyQt5.QtWidgets import QStyleFactory
+# print(QStyleFactory.keys())
+
+# General:          fusion
+# MS Windows only:  windowsxp, windowsvista
+# Mac only:         macintosh
+
 # QApplication.setStyle(QStyleFactory.create('Cleanlooks')) re-create default styles
 
 
@@ -619,11 +619,13 @@ if THEME == 'dark':
     mpl_rc.update(mpl_rc_dark)
     params.update(mpl_params_dark)
     qss_rc = qss_common + qss_tab_bar + qss_dark
+    params['link_color'] = 'lightblue'
 
 elif THEME == 'light':
     mpl_rc.update(mpl_rc_light)
     params.update(mpl_params_light)
     qss_rc = qss_common + qss_tab_bar + qss_light
+    params['link_color'] = 'blue'
 
 elif THEME == 'none':
     mpl_rc.update(mpl_rc_light)

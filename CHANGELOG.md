@@ -1,6 +1,13 @@
 # Changelog
 
-## [v0.9.4](https://github.com/chipmuenk/pyfda/tree/v0.9.4) (2024-xxx)
+## [v0.9.5b1](https://github.com/chipmuenk/pyfda/tree/v0.9.5b1) (2024-12-16)
+
+### Bugfixes
+
+- Modify recipe `pyfdax.spec` for pyinstaller to always use operating system specific seperator `os.sep`. This failed sometimes for windows.
+- Improve qss definitions for combo boxes and push buttons, this should improve things especially for MacOS 
+
+## [v0.9.4](https://github.com/chipmuenk/pyfda/tree/v0.9.4) (2024-12-09)
 
 ### Bugfixes
 
