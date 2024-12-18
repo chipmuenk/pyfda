@@ -430,7 +430,7 @@ class Plot_Tran_Stim(QWidget):
 
             x[frm_slc] = safe_numexpr_eval(self.ui.stim_formula, (N_frame,), param_dict)
             if safe_numexpr_eval.err > 0:
-                qstyle_widget(self.ui.ledStimFormula, 'failed')
+                qstyle_widget(self.ui.ledStimFormula, "error")
             else:
                 qstyle_widget(self.ui.ledStimFormula, 'normal')
         else:

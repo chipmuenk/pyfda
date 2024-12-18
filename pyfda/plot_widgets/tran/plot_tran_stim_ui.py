@@ -696,7 +696,7 @@ class Plot_Tran_Stim_UI(QWidget):
                     source.setText(str(params['FMT'].format(var * scale)))
                     # highlight lineedit field in red when normalized frequency is > 0.5
                     if var >= 0.5 and "_f" in source.objectName():  # only test this for 'led_f1' and 'led_f2'
-                        qstyle_widget(source, 'failed')
+                        qstyle_widget(source, "error")
                     else:
                         qstyle_widget(source, 'normal')
                 except KeyError:
@@ -788,7 +788,7 @@ class Plot_Tran_Stim_UI(QWidget):
 
             # highlight lineedit field in red when normalized frequency is > 0.5
             if var >= 0.5 and "_f" in w:  # only test this for 'led_f1' and 'led_f2'
-                qstyle_widget(led, 'failed')
+                qstyle_widget(led, "error")
             else:
                 qstyle_widget(led, 'normal')
 

@@ -278,11 +278,11 @@ class FreqSpecs(QWidget):
         if fb.fil[0][f_label] <= 0:
             logger.warning(
                 f"Frequency {str(source.objectName())} has to be >= 0")
-            source.setProperty("state", 'failed')
+            source.setProperty("state", "error")
         elif fb.fil[0][f_label] >= 0.5:
             logger.warning(
                 f"Frequency {str(source.objectName())} has to be < f_S /2.")
-            qstyle_widget(source, 'failed')
+            qstyle_widget(source, "error")
         else:
             qstyle_widget(source, 'normal')
 

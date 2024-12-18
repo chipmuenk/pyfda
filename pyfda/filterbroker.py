@@ -49,7 +49,7 @@ clipboard = None
 
 base_dir = ""  #: Project base directory
 
-# State of filter design: 'ok', 'changed', 'error', 'failed', 'active'
+# State of filter design: 'ok', 'changed', 'error', 'active'
 design_filt_state = 'changed'
 
 UNDO_LEN = 20  # depth of circular undo buffer
