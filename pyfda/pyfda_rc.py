@@ -235,12 +235,6 @@ qss_dark = """
     /* QLineEdit{selection-background-color: darkgray;} */
     QLineEdit:disabled{background-color: #707070; color: #A0A0A0}
 
-    QTableView{alternate-background-color:#202020;
-        background-color:#505050; gridline-color: white;}
-    QHeaderView{background-color:#202020;}
-    QHeaderView::section{background-color:#101010;}
-    QHeaderView::section:checked{background-color:blue;}
-
     /* Applies to all widgets in "normal" resp. "active" state
     * [state="normal"], * [state="active"], * [state="a"]
         {background-color: #505050; color: white;}
@@ -267,6 +261,12 @@ qss_dark = """
     QMessageBox{background-color:#404040;}
 
     QPlainTextEdit{background-color: #303030;}
+
+    QTableView{alternate-background-color:#202020;
+        background-color:#505050; gridline-color: white;}
+    QHeaderView{background-color:#202020;}
+    QHeaderView::section{background-color:#101010;}
+    QHeaderView::section:checked{background-color:blue;}
 
     QProgressBar::chunk{background-color: #505050;}
     /* QProgressBar:disabled::chunk{...} */
@@ -337,12 +337,6 @@ qss_light = """
     QLineEdit{background-color: #F0F0F0; border-color: #303030;}
     QLineEdit:disabled{background-color:#C0C0C0; color: white;}
 
-    QTableView{alternate-background-color:#C0C0C0;
-        background-color:#D0D0D0; gridline-color: #A0A0A0;}
-    QHeaderView{background-color:#D0D0D0;}
-    QHeaderView::section{background-color:#808080; color:white;}
-    QHeaderView::section:checked{background-color:blue; color:white;}
-
     /* Applies to all widgets in "normal" resp. "active" state
     * [state="normal"], * [state="active"], * [state="a"]
             {background-color: #C0C0C0;}
@@ -369,6 +363,12 @@ qss_light = """
     QMessageBox{background-color: #E0E0E0;}
 
     QPlainTextEdit{background-color: white}
+
+    QTableView{alternate-background-color:#C0C0C0;
+        background-color:#D0D0D0; gridline-color: #A0A0A0;}
+    QHeaderView{background-color:#D0D0D0;}
+    QHeaderView::section{background-color:#808080; color:white;}
+    QHeaderView::section:checked{background-color:blue; color:white;}
 
     QProgressBar::chunk{background-color: #F0F0F0;}
     /* QProgressBar:disabled::chunk{...} */
