@@ -162,14 +162,13 @@ class AboutWindow(QDialog):
         `self.about_str`: OS, user name, directories, versions of installed software
         """
 
-        self.info_str = (
-            f"<head><style>a:link {{color: {params['link_color']}}}</style></head>"
-            f"<body><b><a href=https://www.github.com/chipmuenk/pyfda>pyfda</a> "
+        self.info_str = self.style_html_links(
+            "<b><a href=https://www.github.com/chipmuenk/pyfda>pyfda</a> "
             f"Version {version.__version__} (c) 2013 - 2024 Christian Münker</b><br />"
             "Design, analyze and synthesize digital filters. Docs @ "
             "<a href=https://pyfda.rtfd.org>pyfda.rtfd.org</a>"
             " (<a href=https://media.readthedocs.org/pdf/pyfda/latest/pyfda.pdf>pdf</a>)"
-            "<br /></body>")
+            "<br />")
 
         # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
@@ -222,25 +221,22 @@ class AboutWindow(QDialog):
                     extensions=['markdown.extensions.tables'])
             # pyinstaller needs explicit definition of extensions path
 
-        self.about_str = (f"<head><style>a:link {{color: {params['link_color']}}}</style></head>"
-                          f"<body>"
-                          f"{os_str + dirs_str + ver_str}"
-                          f"</body>")
+        self.about_str = os_str + dirs_str + ver_str
 
 # ------------------------------------------------------------------------------
 
     def display_about_str(self):
         """ Display general "About" info """
 
-        self.txtDisplay.setText(self.about_str + self.lic_str)
+        self.txtDisplay.setText(self.style_html_links(self.about_str + self.lic_str))
 
 # ------------------------------------------------------------------------------
 
     def display_changelog(self):
         """ Display changelog """
         with open(os.path.join(dirs.INSTALL_DIR, "..", "CHANGELOG.md"), 'r') as f:
-            lic_str = markdown.markdown(f.read(), output_format='html5')
-        self.txtDisplay.setText(lic_str)
+            log_str = markdown.markdown(f.read(), output_format='html5')
+        self.txtDisplay.setText(self.style_html_links(log_str))
 
 # ------------------------------------------------------------------------------
 
@@ -248,7 +244,7 @@ class AboutWindow(QDialog):
         """ Display MIT license """
         with open(os.path.join(dirs.INSTALL_DIR, "..", "LICENSE.md"), 'r') as f:
             lic_str = markdown.markdown(f.read(), output_format='html5')
-        self.txtDisplay.setText(lic_str)
+        self.txtDisplay.setText(self.style_html_links(lic_str))
 
 # ------------------------------------------------------------------------------
 
@@ -256,8 +252,14 @@ class AboutWindow(QDialog):
         """ Display GPL license """
         with open(os.path.join(dirs.INSTALL_DIR, "..", "LICENSE_GPLv3.md"), 'r') as f:
             lic_str = markdown.markdown(f.read(), output_format='html5')
-        self.txtDisplay.setText(lic_str)
+        self.txtDisplay.setText(self.style_html_links(lic_str))
 
+# ------------------------------------------------------------------------------
+
+    def style_html_links(self, text):
+        """ Embed HTML string between <body> tags with styling for links """
+        return (f"<head><style>a:link {{color: {params['link_color']}}}</style></head>"
+                f"<body>{text}</body>")
 
 # =============================================================================
 if __name__ == '__main__':
