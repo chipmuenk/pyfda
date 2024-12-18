@@ -430,7 +430,6 @@ def qstyle_widget(widget, state):
     - 'changed': yellow, filter specs have been changed
     - 'running': orange, simulation is running
     - 'error'  : red, an error has occurred during filter design
-    - 'failed' : pink, filter fails to meet target specs (not used yet)
     - 'u' or 'unused'  : grey text color
     - 'd' or 'disabled': background color darkgrey
     - 'a' or 'active'  : no special style defined
@@ -443,8 +442,7 @@ def qstyle_widget(widget, state):
         state = 'active'
     elif state == 'd':
         state = 'disabled'
-        # QLineEdit:disabled{background-color:darkgrey;}
-    # widget.setAttribute(Qt.WA_StyledBackground, True)
+
     widget.setProperty("state", state)
     widget.style().unpolish(widget)
     widget.style().polish(widget)

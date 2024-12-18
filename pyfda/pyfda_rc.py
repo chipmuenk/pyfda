@@ -509,8 +509,7 @@ qss_common = """
     * [state="highlight"]{background-color: lightblue; color: black;}
     /* 'unused', e.g. for lineedit fields with some filter designs */
     * [state="unused"], *[state="u"]{background-color: white; color:#303030}
-    * [state="failed"], * [state="error"]{
-        background-color: red; color:white; font-weight:800;}
+    * [state="error"]{background-color: red; color:white; font-weight:bold;}
 
     QWidget{font-size:10pt; font-family: Tahoma;}
 

@@ -385,7 +385,7 @@ class FX_UI_WQ(QWidget):
             if self.Q.q_dict['N_over'] == 0:
                 qstyle_widget(self.lbl_ovfl_count, "normal")
             else:
-                qstyle_widget(self.lbl_ovfl_count, "failed")
+                qstyle_widget(self.lbl_ovfl_count, "error")
         else:
             logger.error(f"Unknown option count_ovfl_vis = '{self.count_ovfl_vis}'")
         return
