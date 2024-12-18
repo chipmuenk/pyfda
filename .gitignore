@@ -71,3 +71,4 @@ target/
 *.blg
 *.bib.bak
 *.synctex
+.flatpak-builder
