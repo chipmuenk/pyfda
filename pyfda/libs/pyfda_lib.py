@@ -629,6 +629,72 @@ def pprint_log(d, N: int = 10, tab: str = "\t", debug: bool = False) -> str:
             s += 'Type: {type(d).__name__}'
     return s
 
+# ------------------------------------------------------------------------------
+def frmt2cmplx(string: str, default: float = 0.) -> complex:
+    """
+    Convert string to real or complex, cartesian or polar coordinates are processed
+    with various angle formats:
+    - 0.3<p/2 or 0.3<pi/2 or 0.3<π/2
+    """
+    def str2angle_rad(string: str) -> float:
+        """
+        Try to convert `string` to a corresponding angle in rad
+            Use the following regular expressions:
+            - 'P$' : matches P at the end of the string
+            - '^P' : matches P at beginning of string
+            - '|' : combine multiple matches with OR
+        """
+        logger.warning(f"angle: {string}")
+        scale = 1
+        if string[0] == "-":
+            scale = -1
+            string = string[1:]
+        else:
+            scale = 1
+        if re.search('°$|o$', string):
+            # "°" or "o" at end of string -> angle in degrees
+            scale *= np.pi / 180.
+            string = re.sub('o$|°$', '', string)
+        elif re.search('^π|^pi|^p', string):
+            # replace pi at the start of string by 1 and set scale = pi
+            scale *= np.pi
+            string = re.sub('^π|^pi|^p', '1', string)
+        elif re.search('π$|pi$|p$', string):
+            # remove pi at the end of string and set scale = pi
+            scale *= np.pi
+            string = re.sub('π$|pi$|p$', '', string)
+        elif re.search('π|pi|p', string):
+            # replace pi everywhere by "*1" and set scale = pi
+            scale *= np.pi
+            string = re.sub('π|pi|p', '*1', string)
+        else:
+            # angle in rad, also works when angle is a pure number
+            string = re.sub('rad$|r$', '', string)
+
+        return safe_eval(string) * scale
+    # -------------------------------------------
+
+    string = str(string).replace(" ", "")  # remove all blanks
+    # convert angle character to "<" and split string at "*<"
+    # When the "<" character is not found, this returns a list with 1 item
+    polar_str = string.replace("\u2220", '<').replace('*', '').split('<', 1)
+    if len(polar_str) == 1: # no angle found; real / imag / cartesian complex
+        return safe_eval(string, default, return_type='auto')
+    elif len(polar_str) == 2 and polar_str[0] == "": # pure angle, r = 1
+        phi = str2angle_rad(polar_str[1])
+        x = np.cos(phi)
+        y = np.sin(phi)
+    else:  # r and angle found
+        r = safe_eval(polar_str[0], sign='pos')
+        phi = str2angle_rad(polar_str[1])
+        x = r * np.cos(phi)
+        y = r * np.sin(phi)
+
+    if safe_eval.err > 0:
+        x = default.real
+        y = default.imag
+        logger.warning(f"Expression {string} could not be evaluated.")
+    return x + 1j * y
 
 # ------------------------------------------------------------------------------
 def safe_numexpr_eval(expr: str, fallback=None,
@@ -690,6 +756,9 @@ def safe_numexpr_eval(expr: str, fallback=None,
         # numbers like 1e3*1j are converted to 1e3**1*1j which is reduced by numexpr
         if "e" in expr and "j" in expr:
             expr = expr.replace("j", "*1j")
+
+        if "<" in expr:
+            return frmt2cmplx(expr)
 
     try:
         np_expr = numexpr.evaluate(expr.strip(), local_dict=local_dict)

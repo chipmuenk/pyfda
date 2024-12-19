@@ -14,7 +14,7 @@ import re
 from pprint import pformat
 
 from pyfda.libs.compat import (
-    QtCore, QWidget, QLineEdit, pyqtSignal, QEvent, QIcon,
+    QtCore, QWidget, QLineEdit, pyqtSignal, QEvent,
     QBrush, QColor, QSize, QStyledItemDelegate, QApplication,
     QTableWidget, QTableWidgetItem, Qt, QVBoxLayout)
 
@@ -27,7 +27,7 @@ from scipy.signal import freqz, zpk2tf
 
 import pyfda.filterbroker as fb  # importing filterbroker initializes all its globals
 import pyfda.libs.pyfda_dirs as dirs
-from pyfda.libs.pyfda_lib import qstr, fil_save, safe_eval, pprint_log
+from pyfda.libs.pyfda_lib import fil_save, safe_eval, frmt2cmplx, pprint_log
 from pyfda.pyfda_rc import params
 from pyfda.input_widgets.input_pz_ui import Input_PZ_UI
 
@@ -79,7 +79,7 @@ class ItemDelegate(QStyledItemDelegate):
         """
         Return item text as string transformed by self.displayText()
         """
-        return qstr(self.displayText(item.text(), QtCore.QLocale()))
+        return self.displayText(item.text(), QtCore.QLocale())
 
     # --------------------------------------------------------------------------
     def displayText(self, text: str, locale) -> str:
@@ -145,8 +145,7 @@ class ItemDelegate(QStyledItemDelegate):
 #            super(ItemDelegate, self).setModelData(editor, model, index)
 
         # convert entered string to complex, pass the old value as default
-        data = self.parent.frmt2cmplx(qstr(editor.text()),
-                                      self.parent.zpk[index.column()][index.row()])
+        data = frmt2cmplx(editor.text(), self.parent.zpk[index.column()][index.row()])
         model.setData(index, data)                          # store in QTableWidget
         self.parent.zpk[index.column()][index.row()] = data  # and in self.ba
         qstyle_widget(self.parent.ui.but_apply, 'changed')
@@ -759,57 +758,6 @@ class Input_PZ(QWidget):
         else:
             logger.error("Unknown format {0}.".format(frmt))
 
-    # ------------------------------------------------------------------------------
-    def frmt2cmplx(self, string: str, default: float = 0.) -> complex:
-        """
-        Convert string to real or complex, try to find out the format (cartesian,
-        polar with various angle formats)
-        """
-        def str2angle_rad(string: str) -> float:
-            """
-            Try to convert `string` to a corresponding angle in rad
-                Use the following regular expressions:
-                - '$' : matches the end of the string
-                - '|' : combine multiple matches with OR
-            """
-            if re.search('°$|o$', string):
-                # "°" in polar_str[1] or "o" in polar_str[1]:
-                scale = np.pi / 180.  # angle in degrees
-                string = re.sub('o|°', '', string)
-            elif re.search('π$|pi$|p$', string):
-                scale = np.pi
-                string = re.sub('π$|pi$|p$', '', string)
-            else:
-                # this case also works when angle is a pure number
-                scale = 1.  # angle in rad
-                string = re.sub('rad$|r$', '', string)
-
-            phi = safe_eval(string) * scale
-            return phi
-        # -------------------------------------------
-
-        string = str(string).replace(" ", "")  # remove all blanks
-        # convert angle character to "<" and split string at "*<"
-        # When the "<" character is not found, this returns a list with 1 item
-        polar_str = string.replace(self.angle_char, '<').replace('*', '').split('<', 1)
-        if len(polar_str) == 1: # no angle found; real / imag / cartesian complex
-            return safe_eval(string, default, return_type='auto')
-        elif len(polar_str) == 2 and polar_str[0] == "": # pure angle, r = 1
-            phi = str2angle_rad(polar_str[1])
-            x = np.cos(phi)
-            y = np.sin(phi)
-        else:  # r and angle found
-            r = safe_eval(polar_str[0], sign='pos')
-            phi = str2angle_rad(polar_str[1])
-            x = r * np.cos(phi)
-            y = r * np.sin(phi)
-
-        if safe_eval.err > 0:
-            x = default.real
-            y = default.imag
-            logger.warning(f"Expression {string} could not be evaluated.")
-        return x + 1j * y
-
     # --------------------------------------------------------------------------
     def export_table(self):
         """
@@ -850,7 +798,7 @@ class Input_PZ(QWidget):
         if data_str is None:  # file operation has been aborted
             return
 
-        conv = self.frmt2cmplx  # routine for converting to cartesian coordinates
+        conv = frmt2cmplx  # routine for converting to cartesian coordinates
 
         if np.ndim(data_str) > 1:
             num_cols, num_rows = np.shape(data_str)
