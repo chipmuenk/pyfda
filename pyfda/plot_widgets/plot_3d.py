@@ -594,17 +594,15 @@ class Plot_3D(QWidget):
 
         # ---------------------------------------------------------------
         # 2D-Contour plot
-        # TODO: 2D contour plots do not plot correctly together with 3D plots in
-        #       current matplotlib 1.4.3 -> disable them for now
         # TODO: zdir = x / y delivers unexpected results -> rather plot max(H)
         #       along the other axis?
         # TODO: colormap is created depending on the zdir = 'z' contour plot
         #       -> set limits of (all) other plots manually?
         if self.but_contour_2d.checked:
-#            self.ax3d.contourf(x, y, Hmag, 20, zdir='x', offset=xmin,
-#                         cmap=cmap, alpha = alpha)#, vmin = bottom)#, vmax = top, vmin = bottom)
-#            self.ax3d.contourf(x, y, Hmag, 20, zdir='y', offset=ymax,
-#                         cmap=cmap, alpha = alpha)#, vmin = bottom)#, vmax = top, vmin = bottom)
+            self.ax3d.contourf(self.x, self.y, Hmag, NL, zdir='x', offset=self.xmin,
+                cmap=cmap, alpha = alpha)#, vmin = bottom)#, vmax = top, vmin = bottom)
+            self.ax3d.contourf(self.x, self.y, Hmag, NL, zdir='y', offset=self.ymin,
+                cmap=cmap, alpha = alpha)#, vmin = bottom)#, vmax = top, vmin = bottom)
             s = self.ax3d.contourf(
                 self.x, self.y, Hmag, NL, zdir='z', offset=bottom - (top - bottom) * 0.05,
                 cmap=cmap, alpha=alpha)
