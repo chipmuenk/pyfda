@@ -644,7 +644,6 @@ def frmt2cmplx(string: str, default: float = 0.) -> complex:
             - '^P' : matches P at beginning of string
             - '|' : combine multiple matches with OR
         """
-        logger.warning(f"angle: {string}")
         scale = 1
         if string[0] == "-":
             scale = -1
@@ -693,7 +692,7 @@ def frmt2cmplx(string: str, default: float = 0.) -> complex:
     if safe_eval.err > 0:
         x = default.real
         y = default.imag
-        logger.warning(f"Expression {string} could not be evaluated.")
+        logger.warning(f"Expression '{string}' could not be evaluated.")
     return x + 1j * y
 
 # ------------------------------------------------------------------------------
@@ -763,22 +762,22 @@ def safe_numexpr_eval(expr: str, fallback=None,
     try:
         np_expr = numexpr.evaluate(expr.strip(), local_dict=local_dict)
     except SyntaxError as e:
-        logger.warning(f"numexpr: Syntax error in {expr}:\n\t{e}")
+        logger.warning(f"numexpr: Syntax error in '{expr}':\n\t{e}")
         safe_numexpr_eval.err = 1
     except AttributeError as e:
-        logger.warning(f"numexpr: Attribute error in {expr}:\n\t{e}")
+        logger.warning(f"numexpr: Attribute error in '{expr}':\n\t{e}")
         safe_numexpr_eval.err = 2
     except KeyError as e:
-        logger.warning(f"numexpr: Unknown variable in {expr}:\n\t{e}")
+        logger.warning(f"numexpr: Unknown variable in '{expr}':\n\t{e}")
         safe_numexpr_eval.err = 3
     except TypeError as e:
-        logger.warning(f"numexpr: Type error in {expr}:\n\t{e}")
+        logger.warning(f"numexpr: Type error in '{expr}':\n\t{e}")
         safe_numexpr_eval.err = 4
     except ValueError as e:
-        logger.warning(f"numexpr: Value error in {expr}:\n\t{e}")
+        logger.warning(f"numexpr: Value error in '{expr}':\n\t{e}")
         safe_numexpr_eval.err = 5
     except ZeroDivisionError:
-        logger.warning(f"numexpr: Zero division error in {expr}: \n\t{e}")
+        logger.warning(f"numexpr: Zero division error in '{expr}': \n\t{e}")
         safe_numexpr_eval.err = 6
 
     if np_expr is None:
