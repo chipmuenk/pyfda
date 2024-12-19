@@ -75,14 +75,14 @@ class ItemDelegate(QStyledItemDelegate):
             option.backgroundBrush.setColor(QColor(100, 0, 0, 80))
 
     # --------------------------------------------------------------------------
-    def text(self, item):
+    def text(self, item) -> str:
         """
         Return item text as string transformed by self.displayText()
         """
         return qstr(self.displayText(item.text(), QtCore.QLocale()))
 
     # --------------------------------------------------------------------------
-    def displayText(self, text, locale):
+    def displayText(self, text: str, locale) -> str:
         """
         Display `text` with selected format (cartesian / polar)
         and number of places
@@ -708,13 +708,13 @@ class Input_PZ(QWidget):
             qstyle_widget(self.ui.but_undo, 'changed')   # buttons as changed
 
     # ------------------------------------------------------------------------------
-    def cmplx2frmt(self, text, places=-1):
+    def cmplx2frmt(self, text: str, places=-1) -> str:
         """
-        Convert number "text" (real or complex or string) to the format defined
-        by cmbPZFrmt.
+        Convert number "text" (real or complex or string) to a string with the format
+        defined by cmbPZFrmt.
 
         Returns:
-            string
+            str
         """
         # convert to "normal" string and prettify via safe_eval:
         data = safe_eval(text, return_type='auto')

@@ -687,28 +687,29 @@ def safe_numexpr_eval(expr: str, fallback=None,
         np_expr = fallback  # fallback is the default numpy return value or None
         fallback_shape = np.shape(fallback)
         # expressions like 1e3j are rejected by numexpr, replace them by 1e3*1j
+        # numbers like 1e3*1j are converted to 1e3**1*1j which is reduced by numexpr
         if "e" in expr and "j" in expr:
             expr = expr.replace("j", "*1j")
 
     try:
         np_expr = numexpr.evaluate(expr.strip(), local_dict=local_dict)
     except SyntaxError as e:
-        logger.warning(f"numexpr: Syntax error:\n\t{e}")
+        logger.warning(f"numexpr: Syntax error in {expr}:\n\t{e}")
         safe_numexpr_eval.err = 1
     except AttributeError as e:
-        logger.warning(f"numexpr: Attribute error:\n\t{e}")
+        logger.warning(f"numexpr: Attribute error in {expr}:\n\t{e}")
         safe_numexpr_eval.err = 2
     except KeyError as e:
-        logger.warning(f"numexpr: Unknown variable {e}")
+        logger.warning(f"numexpr: Unknown variable in {expr}:\n\t{e}")
         safe_numexpr_eval.err = 3
     except TypeError as e:
-        logger.warning(f"numexpr: Type error\n\t{e}")
+        logger.warning(f"numexpr: Type error in {expr}:\n\t{e}")
         safe_numexpr_eval.err = 4
     except ValueError as e:
-        logger.warning(f"numexpr: Value error:\n\t{e}")
+        logger.warning(f"numexpr: Value error in {expr}:\n\t{e}")
         safe_numexpr_eval.err = 5
     except ZeroDivisionError:
-        logger.warning("numexpr: Zero division error in formula.")
+        logger.warning(f"numexpr: Zero division error in {expr}: \n\t{e}")
         safe_numexpr_eval.err = 6
 
     if np_expr is None:
@@ -722,7 +723,7 @@ def safe_numexpr_eval(expr: str, fallback=None,
         else:
             # return array of zeros in the shape of the fallback
             logger.warning(
-                f"numexpr: Expression has unexpected dimension {np.ndim(np_expr)}!")
+                f"numexpr: Expression has unexpected number of dimensions {np.ndim(np_expr)}!")
             safe_numexpr_eval.err = 11
 
             np_expr = np.zeros(fallback_shape)
