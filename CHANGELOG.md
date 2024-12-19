@@ -1,5 +1,17 @@
 # Changelog
 
+## [v0.9.5](https://github.com/chipmuenk/pyfda/tree/v0.9.5b1) (2024-12-xx)
+
+### Bugfixes
+
+- Make parsing of polar angles available for all input fields. Radius and phase
+  are separated by `∠` or `<`. Radius = 1 can be omitted. E.g.
+  - `0.5<45°` or  `0.5<45o` or `<-45o` or `0.5<-90/7o` in degrees
+  - `<.25p` or `<p/4` or `<2pi/3` or `2/3 <π/3` in multiples of pi
+  - `2<1.57rad` or `2<1.57r` or `2<1.57` in rad
+- Convert complex numbers in exponential formats like `1e3j` to `1e3*1j` to allow
+  parsing them with numexpr.
+
 ## [v0.9.5b1](https://github.com/chipmuenk/pyfda/tree/v0.9.5b1) (2024-12-16)
 
 ### Bugfixes
