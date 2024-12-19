@@ -271,6 +271,9 @@ qss_dark = """
     QProgressBar::chunk{background-color: #505050;}
     /* QProgressBar:disabled::chunk{...} */
 
+    QScrollBar {background: #707070; border-radius: 3px;}
+    QScrollBar::handle {background: #303030; border-radius: 3px; border: 1px solid #A0A0A0}
+
     QSplitter::handle:vertical {
         background-color: qlineargradient(spread:pad, x1:0, y1:0, x2:1, y2:0,
                             stop:0 #303030,
@@ -344,6 +347,9 @@ qss_light = """
 
     QProgressBar::chunk{background-color: #F0F0F0;}
     /* QProgressBar:disabled::chunk{...} */
+
+    QScrollBar {background: darkgrey; border-radius: 3px;}
+    QScrollBar::handle {background: lightgrey; border-radius: 3px;}
 
     QSplitter::handle:vertical {
         background-color: qlineargradient(spread:pad, x1:0, y1:0, x2:1, y2:0,
@@ -557,6 +563,24 @@ qss_common = """
     /* QSplitter styling adopted from
     http://stackoverflow.com/questions/6832499/qsplitter-show-a-divider-or-a-margin-between-the-two-widgets
     */
+
+    /* needed to avoid "grey stipples" under windows: */
+    QScrollBar::sub-page:horizontal, QScrollBar::add-page:horizontal,
+        QScrollBar::sub-page:vertical, QScrollBar::add-page:vertical
+        {background: transparent;}
+
+    QScrollBar:horizontal {height: 10px;}
+    QScrollBar:vertical {width: 10px;}
+
+    QScrollBar::handle:horizontal {min-width: 10px; image: url(':/ellipses_v.svg');}
+    QScrollBar::handle:vertical {
+        width: 20px; min-height: 10px; image: url(':/ellipses_h.svg');}
+
+    /* turn off buttons */
+    QScrollBar::add-line {
+        border: none; background: none;}
+    QScrollBar::sub-line {
+        border: none; background: none;}
 
     QSplitter::handle:vertical {
         height: 8px;
