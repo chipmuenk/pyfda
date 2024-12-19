@@ -789,34 +789,26 @@ class Input_PZ(QWidget):
         # -------------------------------------------
 
         string = str(string).replace(" ", "")  # remove all blanks
-        if qget_cmb_box(self.ui.cmbPZFrmt) == 'cartesian':
+        # convert angle character to "<" and split string at "*<"
+        # When the "<" character is not found, this returns a list with 1 item
+        polar_str = string.replace(self.angle_char, '<').replace('*', '').split('<', 1)
+        if len(polar_str) == 1: # no angle found; real / imag / cartesian complex
             return safe_eval(string, default, return_type='auto')
-        else:
-            # convert angle character to "<" and try to split string at "*<"
-            # When the "<" character is not found, this returns a list with 1 item!
-            polar_str = string.replace(self.angle_char, '<').replace('*', '')
-            polar_str = polar_str.split('<', 1)
+        elif len(polar_str) == 2 and polar_str[0] == "": # pure angle, r = 1
+            phi = str2angle_rad(polar_str[1])
+            x = np.cos(phi)
+            y = np.sin(phi)
+        else:  # r and angle found
+            r = safe_eval(polar_str[0], sign='pos')
+            phi = str2angle_rad(polar_str[1])
+            x = r * np.cos(phi)
+            y = r * np.sin(phi)
 
-            if len(polar_str) == 2 and polar_str[0] == "": # pure angle
-                phi = str2angle_rad(polar_str[1])
-                x = np.cos(phi)
-                y = np.sin(phi)
-            elif len(polar_str) == 1:  # no angle found; real / imag / cartesian complex
-                r = safe_eval(string, default, return_type='auto')
-                x = r.real
-                y = r.imag
-            else:  # r and angle found
-                r = safe_eval(polar_str[0], sign='pos')
-                phi = str2angle_rad(polar_str[1])
-
-                x = r * np.cos(phi)
-                y = r * np.sin(phi)
-
-            if safe_eval.err > 0:
-                x = default.real
-                y = default.imag
-                logger.warning(f"Expression {string} could not be evaluated.")
-            return x + 1j * y
+        if safe_eval.err > 0:
+            x = default.real
+            y = default.imag
+            logger.warning(f"Expression {string} could not be evaluated.")
+        return x + 1j * y
 
     # --------------------------------------------------------------------------
     def export_table(self):
