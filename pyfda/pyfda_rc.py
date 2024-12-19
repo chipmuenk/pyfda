@@ -365,8 +365,8 @@ qss_light = """
     QPlainTextEdit{background-color: white}
 
     QTableView{alternate-background-color:#C0C0C0;
-        background-color:#D0D0D0; gridline-color: #A0A0A0;}
-    QHeaderView{background-color:#D0D0D0;}
+        background-color:#F0F0F0; gridline-color: #A0A0A0;}
+    QHeaderView{background-color:#F0F0F0;}
     QHeaderView::section{background-color:#808080; color:white;}
     QHeaderView::section:checked{background-color:blue; color:white;}
 
