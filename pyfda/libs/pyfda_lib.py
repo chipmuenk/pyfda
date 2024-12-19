@@ -660,12 +660,6 @@ def safe_numexpr_eval(expr: str, fallback=None,
     """
     safe_numexpr_eval.err = 0  # function attribute, providing some sort of "memory"
     local_dict.update({'j': 1j, 'None': 0})
-    if type(fallback) == tuple:
-        np_expr = np.zeros(fallback)  # fallback defines the shape
-        fallback_shape = fallback
-    else:
-        np_expr = fallback  # fallback is the default numpy return value or None
-        fallback_shape = np.shape(fallback)
 
     if type(expr) != str or expr == "None":
         logger.warning(f"numexpr: Unsuitable input '{expr}' of type "
@@ -682,6 +676,20 @@ def safe_numexpr_eval(expr: str, fallback=None,
         expr = expr.replace(',', '.')  # ',' -> '.' for German-style numbers
         if expr[0] == '.':  # prepend '0' when the number starts with '.'
             expr = "0" + expr
+
+    if type(fallback) == tuple:
+        # output is expected to be a numpy array, input is a formula
+        np_expr = np.zeros(fallback)  # fallback defines the shape
+        fallback_shape = fallback
+    else:
+        # output is expected to be a scalar, manual entry of numeric values
+        # needs to be checked and cleaned more closely
+        np_expr = fallback  # fallback is the default numpy return value or None
+        fallback_shape = np.shape(fallback)
+        # expressions like 1e3j are rejected by numexpr, replace them by 1e3*1j
+        if "e" in expr and "j" in expr:
+            expr = expr.replace("j", "*1j")
+
     try:
         np_expr = numexpr.evaluate(expr.strip(), local_dict=local_dict)
     except SyntaxError as e:
