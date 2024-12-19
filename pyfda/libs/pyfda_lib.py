@@ -757,7 +757,7 @@ def safe_numexpr_eval(expr: str, fallback=None,
         if "e" in expr and "j" in expr:
             expr = expr.replace("j", "*1j")
 
-        if "<" in expr:
+        if "<" in expr or "\u2220" in expr:
             return frmt2cmplx(expr)
 
     try:
