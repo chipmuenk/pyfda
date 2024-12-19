@@ -334,7 +334,7 @@ qss_light = """
     /* QTabBar {background-color: pink;} */ /* background of Tabs, normally defined by pane */
 
     QTextEdit{background-color: #F0F0F0;}
-    QLineEdit{background-color: #F0F0F0; border-color: #303030;}
+    QLineEdit{background-color: white; border-color: #303030;}
     QLineEdit:disabled{background-color:#C0C0C0; color: white;}
 
     /* Applies to all widgets in "normal" resp. "active" state
