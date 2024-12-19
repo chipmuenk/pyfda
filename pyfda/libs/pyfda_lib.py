@@ -675,7 +675,7 @@ def frmt2cmplx(string: str, default: float = 0.) -> complex:
     # -------------------------------------------
 
     string = str(string).replace(" ", "")  # remove all blanks
-    # convert angle character to "<" and split string at "*<"
+    # convert angle character to "<" and split string at "<"
     # When the "<" character is not found, this returns a list with 1 item
     polar_str = string.replace("\u2220", '<').replace('*', '').split('<', 1)
     if len(polar_str) == 1: # no angle found; real / imag / cartesian complex
@@ -753,7 +753,7 @@ def safe_numexpr_eval(expr: str, fallback=None,
         np_expr = fallback  # fallback is the default numpy return value or None
         fallback_shape = np.shape(fallback)
         # expressions like 1e3j are rejected by numexpr, replace them by 1e3*1j
-        # numbers like 1e3*1j are converted to 1e3**1*1j which is reduced by numexpr
+        # numbers like 1e3*1j are converted to 1e3*1*1j which is reduced by numexpr
         if "e" in expr and "j" in expr:
             expr = expr.replace("j", "*1j")
 
