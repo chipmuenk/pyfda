@@ -271,34 +271,6 @@ qss_dark = """
     QProgressBar::chunk{background-color: #505050;}
     /* QProgressBar:disabled::chunk{...} */
 
-    /*
-        QScrollBar:horizontal {
-            border: 2px solid grey;
-            background: #32CC99;
-            height: 15px;
-            margin: 0px 20px 0 20px;
-        }
-        QScrollBar::handle:horizontal {
-            background: white;
-            min-width: 20px;
-        }
-        QScrollBar::add-line:horizontal {
-            border: 2px solid grey;
-            background: #32CC99;
-            width: 20px;
-            subcontrol-position: right;
-            subcontrol-origin: margin;
-        }
-
-        QScrollBar::sub-line:horizontal {
-            border: 2px solid grey;
-            background: #32CC99;
-            width: 20px;
-            subcontrol-position: left;
-            subcontrol-origin: margin;
-        }
-    */
-
     QSplitter::handle:vertical {
         background-color: qlineargradient(spread:pad, x1:0, y1:0, x2:1, y2:0,
                             stop:0 #303030,
@@ -381,17 +353,11 @@ qss_light = """
         }
 
     QSplitter::handle:horizontal {
-    background-color: qlineargradient(spread:pad, x1:0, y1:0, x2:0, y2:1,
+        background-color: qlineargradient(spread:pad, x1:0, y1:0, x2:0, y2:1,
                             stop:0 rgba(200, 200, 200, 0),
                             stop:0.5 rgba(160, 160, 160, 235),
                             stop:1.0 rgba(200, 200, 200, 0));
         }
-        /*
-        stop:0 rgba(255, 255, 255, 0),
-        stop:0.4 rgba(200, 200, 200, 255),
-        stop:0.5 rgba(101, 104, 113, 235),
-        stop:0.6 rgba(255, 255, 255, 0));
-        */
     """
 
 # common layout settings for QTabWidget
