@@ -641,12 +641,13 @@ def safe_numexpr_eval(expr: str, fallback=None,
     expr : str
         String to be evaluated and converted to a numpy array
 
-    fallback : array-like or tuple
+    fallback : array-like or tuple or None
         numpy array or scalar as a fallback when errors occur during evaluation,
         this also defines the expected shape of the returned numpy expression
 
         When fallback is a tuple (e.g. '(11,)'), provide an array of zeros with
-        the passed shape.
+        the passed shape. Currently, this is only used by the formula stimulus
+        in y[n]
 
     local_dict : dict
         dict with variables passed to `numexpr.evaluate`
