@@ -233,7 +233,7 @@ qss_dark = """
     QTextEdit{background-color: #505050;}
     QLineEdit{background-color: #505050; border-color: #A0A0A0;}
     /* QLineEdit{selection-background-color: darkgray;} */
-    QLineEdit:disabled{background-color: #707070; color: #A0A0A0}
+    QLineEdit:disabled{background-color: #707070; color: #B0B0B0}
 
     /* Applies to all widgets in "normal" resp. "active" state
     * [state="normal"], * [state="active"], * [state="a"]
