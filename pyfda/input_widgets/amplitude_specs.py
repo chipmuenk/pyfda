@@ -204,8 +204,10 @@ class AmplitudeSpecs(QWidget):
 
         tool_tipp_sb = "Min. attenuation resp. maximum level in (this) stop band"
         for i in range(num_new_labels):
-            # Update ALL labels and corresponding values
+            # Update ALL labels and corresponding values and style them
             self.qlabels[i].setText(to_html(new_labels[i], frmt='bi'))
+            qstyle_widget(self.qlabels[i], state)
+            self.qlabels[i].setStyleSheet("QLabel {background-color :none;}")
 
             self.qlineedit[i].setText(str(fb.fil[0][new_labels[i]]))
             self.qlineedit[i].setObjectName(new_labels[i])  # update ID

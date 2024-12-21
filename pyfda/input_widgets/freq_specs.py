@@ -200,9 +200,11 @@ class FreqSpecs(QWidget):
 
         f_range = " (0 &lt; <i>f</i> &lt; <i>f<sub>S </sub></i>/2)"
         for i in range(num_new_labels):
-            # Update ALL labels and corresponding values
+            # Update ALL labels and corresponding values and style them
             self.qlabels[i].setText(
                 to_html(new_labels[i][0].lower() + new_labels[i][1:], frmt='bi'))
+            qstyle_widget(self.qlabels[i], state)
+            self.qlabels[i].setStyleSheet("QLabel { background-color :none;}")
             self.qlineedit[i].setText(str(fb.fil[0][new_labels[i]]))
             self.qlineedit[i].setObjectName(new_labels[i])  # update ID
             qstyle_widget(self.qlineedit[i], state)
