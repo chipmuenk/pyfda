@@ -1,6 +1,6 @@
 # Changelog
 
-## [v0.9.5](https://github.com/chipmuenk/pyfda/tree/v0.9.5b1) (2024-12-xx)
+## [v0.9.5](https://github.com/chipmuenk/pyfda/tree/v0.9.5b1) (2024-12-22)
 
 ### Bugfixes
 
@@ -11,6 +11,7 @@
   - `2<1.57rad` or `2<1.57r` or `2<1.57` in rad
 - Convert complex numbers in exponential formats like `1e3j` to `1e3*1j` to allow
   parsing them with numexpr.
+- Lots of UI fixes, especially for dark mode
 
 ## [v0.9.5b1](https://github.com/chipmuenk/pyfda/tree/v0.9.5b1) (2024-12-16)
 
