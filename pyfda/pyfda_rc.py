@@ -569,12 +569,11 @@ qss_common = """
         QScrollBar::sub-page:vertical, QScrollBar::add-page:vertical
         {background: transparent;}
 
-    QScrollBar:horizontal {height: 10px;}
-    QScrollBar:vertical {width: 10px;}
+    QScrollBar:horizontal {height: 14px;}
+    QScrollBar:vertical {width: 14px;}
 
-    QScrollBar::handle:horizontal {min-width: 10px; image: url(':/ellipses_v.svg');}
-    QScrollBar::handle:vertical {
-        width: 20px; min-height: 10px; image: url(':/ellipses_h.svg');}
+    QScrollBar::handle:horizontal {min-width: 0px; image: url(':/scrollbar_handle.svg');}
+    QScrollBar::handle:vertical {min-height: 0px; image: url(':/scrollbar_handle.svg');}
 
     /* turn off buttons */
     QScrollBar::add-line {
