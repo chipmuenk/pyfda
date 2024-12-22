@@ -19,7 +19,7 @@ from pyfda.libs.pyfda_sig_lib import impz_len
 import pyfda.filterbroker as fb
 import pyfda.libs.pyfda_dirs as dirs
 from pyfda.libs.pyfda_qt_lib import (
-    qcmb_box_populate, qtext_width, QVLine, PushButton, PushButtonRT)
+    qcmb_box_populate, qstyle_widget, qtext_width, QVLine, PushButton, PushButtonRT)
 from pyfda.libs.fft_windows_cmb_box import QFFTWinCmbBox
 # FMT string for QLineEdit fields, e.g. '{:.3g}'
 from pyfda.pyfda_rc import params
@@ -239,8 +239,9 @@ class PlotImpz_UI(QWidget):
         self.lbl_stim_cmplx_warn.setToolTip(
             '<span>Signal is complex valued; '
             'single-sided and H<sub>id</sub> spectra may be wrong.</span>')
-        self.lbl_stim_cmplx_warn.setStyleSheet("background-color : yellow;"
-                                               "border : 1px solid grey")
+
+        self.lbl_stim_cmplx_warn.setStyleSheet("border : 1px solid grey")
+        qstyle_widget(self.lbl_stim_cmplx_warn, "changed")
 
         self.but_fft_wdg = PushButton(self, icon=QIcon(":/fft.svg"))
         self.but_fft_wdg.setIconSize(QSize(but_height, but_height))
