@@ -13,7 +13,8 @@ import sys
 import re
 from pyfda.libs.compat import (
     QtCore, Qt, QWidget, QLabel, QLineEdit, QFrame, QFont, QVBoxLayout, QHBoxLayout,
-    QGridLayout, pyqtSignal, QEvent)
+    QGridLayout, pyqtSignal, QEvent, QSizePolicy)
+from PyQt5 import QtWidgets
 
 import pyfda.filterbroker as fb
 from pyfda.libs.pyfda_lib import to_html, safe_eval, unique_roots, pprint_log, first_item
@@ -86,6 +87,7 @@ class FreqSpecs(QWidget):
         # Create a gridLayout consisting of QLabel and QLineEdit fields
         # for the frequency specs:
         self.layGSpecs = QGridLayout()  # sublayout for spec fields
+        # self.layGSpecs.setSizeConstraint(QtWidgets.QLayout.SetMinAndMaxSize)
         # set the title as the first (fixed) entry in grid layout. The other
         # fields are added and hidden dynamically in _show_entries and _hide_entries()
         self.layGSpecs.addLayout(layHTitle, 0, 0, 1, 2)
@@ -221,6 +223,7 @@ class FreqSpecs(QWidget):
 
         self.n_cur_labels = num_new_labels  # update number of currently visible labels
         self.sort_dict_freqs()  # sort frequency entries in dictionary and update display
+        # self.adjustSize()
 
     # --------------------------------------------------------------------------
     def recalc_freqs(self):

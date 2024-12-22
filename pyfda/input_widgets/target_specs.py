@@ -14,7 +14,8 @@ only amplitude and frequency specs.)
 import sys
 
 from pyfda.libs.compat import (
-    QWidget, QLabel, QFont, QFrame, pyqtSignal, Qt, QHBoxLayout, QVBoxLayout)
+    QWidget, QLabel, QFont, QFrame, pyqtSignal, Qt, QHBoxLayout, QVBoxLayout,
+    QSizePolicy)
 
 import pyfda.filterbroker as fb
 from pyfda.libs.pyfda_lib import pprint_log, first_item
@@ -59,10 +60,6 @@ class TargetSpecs(QWidget):
             self.emit(dict_sig, sig_name='sig_tx_local')
         elif 'data_changed' in dict_sig and dict_sig['data_changed'] == 'filter_loaded':
             self.emit(dict_sig, sig_name='sig_tx_local')
-        #  =================== UI_CHANGED =======================================
-        elif 'ui_global_changed' in dict_sig and dict_sig['ui_global_changed']\
-                in {'resized', 'tab'} and self.isVisible():
-            logger.warning("resize")
         else:
             return
 
