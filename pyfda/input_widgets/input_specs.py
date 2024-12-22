@@ -207,6 +207,7 @@ class Input_Specs(QWidget):
         # Subwidget for target specs (frequency and amplitude)
         self.t_specs = target_specs.TargetSpecs(self, title="Target Specifications",
                                                 objectName="target_specs_inst")
+        self.t_specs.setSizePolicy(QSizePolicy.MinimumExpanding, QSizePolicy.Minimum)
 
         # Subwidget for displaying infos on the design method
         self.lblMsg = QLabel(self)

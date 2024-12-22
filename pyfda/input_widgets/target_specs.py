@@ -59,6 +59,10 @@ class TargetSpecs(QWidget):
             self.emit(dict_sig, sig_name='sig_tx_local')
         elif 'data_changed' in dict_sig and dict_sig['data_changed'] == 'filter_loaded':
             self.emit(dict_sig, sig_name='sig_tx_local')
+        #  =================== UI_CHANGED =======================================
+        elif 'ui_global_changed' in dict_sig and dict_sig['ui_global_changed']\
+                in {'resized', 'tab'} and self.isVisible():
+            logger.warning("resize")
         else:
             return
 
@@ -71,6 +75,8 @@ class TargetSpecs(QWidget):
         # subwidget for Frequency Specs
         self.f_specs = freq_specs.FreqSpecs(self, title="Frequency",
                                             objectName="freq_specs_targ")
+        self.f_specs.setSizePolicy(QSizePolicy.MinimumExpanding, QSizePolicy.Minimum)
+
         # subwidget for Amplitude Specs
         self.a_specs = amplitude_specs.AmplitudeSpecs(self, title="Ripple",
                                                       objectName="amplitude_specs_targ")
