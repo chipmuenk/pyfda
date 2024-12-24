@@ -1,6 +1,14 @@
 # Changelog
 
-## [v0.9.5](https://github.com/chipmuenk/pyfda/tree/v0.9.5b1) (2024-12-22)
+## [v0.9.6](https://github.com/chipmuenk/pyfda/tree/v0.9.5b1) (2025-xx)
+
+### Bugfixes
+
+- Add styling for right-mouse context menu
+- Fix shrinking of input specification subwidgets instead of turning on scroll bars
+  by setting QSizePolicy() on input_specs widget
+
+## [v0.9.5](https://github.com/chipmuenk/pyfda/tree/v0.9.5) (2024-12-22)
 
 ### Bugfixes
 
