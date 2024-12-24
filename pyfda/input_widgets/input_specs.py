@@ -129,9 +129,9 @@ class Input_Specs(QWidget):
             # It is disabled for "Manual_IIR" and "Manual_FIR" filter classes
             self.color_design_button('changed')
         elif 'data_changed' in dict_sig and dict_sig['data_changed'] == 'filter_loaded':
-                # Update info string from filter dict & set button = "ok"
-                # This is only triggered from global signals
-                self.load_dict()
+            # Update info string from filter dict & set button = "ok"
+            # This is only triggered from global signals
+            self.load_dict()
 
         if propagate:
             # local signals are propagated with the class name and id of this widget,

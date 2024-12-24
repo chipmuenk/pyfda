@@ -21,7 +21,7 @@ from pyfda.libs.pyfda_lib import pprint_log
 import logging
 logger = logging.getLogger(__name__)
 
-SCROLL = True
+SCROLL = True  # enable scrolling
 
 
 class InputTabWidgets(QWidget):
