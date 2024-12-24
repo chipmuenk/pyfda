@@ -14,8 +14,7 @@ only amplitude and frequency specs.)
 import sys
 
 from pyfda.libs.compat import (
-    QWidget, QLabel, QFont, QFrame, pyqtSignal, Qt, QHBoxLayout, QVBoxLayout,
-    QSizePolicy)
+    QWidget, QLabel, QFont, QFrame, pyqtSignal, Qt, QHBoxLayout, QVBoxLayout)
 
 import pyfda.filterbroker as fb
 from pyfda.libs.pyfda_lib import pprint_log, first_item
@@ -72,8 +71,6 @@ class TargetSpecs(QWidget):
         # subwidget for Frequency Specs
         self.f_specs = freq_specs.FreqSpecs(self, title="Frequency",
                                             objectName="freq_specs_targ")
-        self.f_specs.setSizePolicy(QSizePolicy.MinimumExpanding, QSizePolicy.Minimum)
-
         # subwidget for Amplitude Specs
         self.a_specs = amplitude_specs.AmplitudeSpecs(self, title="Ripple",
                                                       objectName="amplitude_specs_targ")
