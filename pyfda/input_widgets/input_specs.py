@@ -240,6 +240,8 @@ class Input_Specs(QWidget):
         layVMain.setContentsMargins(*params['wdg_margins'])
 
         self.setLayout(layVMain)  # main layout of widget
+        # Required to prevent shrinking of subwidgets
+        self.setSizePolicy(QSizePolicy.Minimum, QSizePolicy.Minimum)
 
         # ----------------------------------------------------------------------
         # GLOBAL SIGNALS & SLOTs
