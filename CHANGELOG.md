@@ -1,6 +1,6 @@
 # Changelog
 
-## [v0.9.6](https://github.com/chipmuenk/pyfda/tree/v0.9.5b1) (2025-xx)
+## [v0.9.6](https://github.com/chipmuenk/pyfda/tree/v0.9.6) (2025-xx)
 
 ### Bugfixes
 
