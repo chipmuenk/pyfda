@@ -39,7 +39,6 @@ logger = logging.getLogger(__name__)
 
 # TODO: "Home" calls redraw for botb mpl widgets
 # TODO: changing the view on some widgets redraws h[n] unncessarily
-# TODO: Single-sided and double-sided spectra of pulses are identical - ok?
 
 classes = {'Plot_Impz': 'y[n] / Y(f)'}  #: Dict containing class name : display name
 
@@ -55,28 +54,31 @@ class Plot_Impz(QWidget):
     def __init__(self, objectName='plot_impz_inst'):
         super().__init__()
 
-        # arrays that need to be passed to subwidgets
         self.setObjectName(objectName)
+
+        # arrays that need to be passed to subwidgets
         self.x = self.y = self.x_q = None
 
         # create the UI part with buttons etc.
         self.ui = PlotImpz_UI()
 
-        # initial settings
+        ###### initial settings #################################################
         # ==================
         # flag whether specs have been changed and plots need to be recalculated
         self.needs_calc = True
         # same when fixpoint specs have been changed, only needed in Fixpoint mode
         self.needs_calc_fx = True
-        self.needs_redraw = [True] * 2  # flag which plot needs to be redrawn
+        self.needs_redraw = [True] * 2  # flags which plots need to be redrawn
         self.error = False
 
         set_fil_dict(['fx_sim'], False, backup=False)  # disable fixpoint mode initially
-        self.fx_mode_old = False
+        self.fx_mode_old = False  # previous setting of fixpoint mode
 
         self.tool_tip = "Impulse / transient response and their spectra"
         self.tab_label = "y[n]"
         self.active_tab = 0  # index for active tab
+
+        ###### Styles for lines and markers ######################################
         # markersize=None, markeredgewidth=None, markeredgecolor=None,
         # markerfacecolor=None, markerfacecoloralt='none', fillstyle=None,
         self.fmt_mkr_size = 8
@@ -91,7 +93,7 @@ class Plot_Impz(QWidget):
         self.fmt_plot_stmq = {'color': 'darkgreen', 'linewidth': 2, 'alpha': 0.5}
         self.fmt_mkr_stmq = {'marker': 'D', 'color': 'darkgreen', 'alpha': 0.5,
                              'ms': self.fmt_mkr_size}
-
+        # ########################################################################
         self._construct_UI()
 
         # --------------------------------------------
@@ -150,21 +152,17 @@ class Plot_Impz(QWidget):
         self.stim_wdg.ui.lbl_title_stim.setFixedWidth(
             self.ui.lbl_title_plot_time.sizeHint().width())
         self.file_io_wdg = Tran_IO(self)
-        # set "File:" label width to same width as "Plots:" label:
+        # set "File:" label (file_io_wdg) to same width as "Plots:" label (stim_wdg):
         self.file_io_wdg.ui.lbl_title_io_file.setFixedWidth(
             self.ui.lbl_title_plot_time.sizeHint().width())
 
         # This places the combo box for adding / using file data to the
         # run control toolbar:
         self.ui.frm_file_io.setLayout(self.stim_wdg.ui.layH_file_io)
-        # self.color = self.ui.frm_file_io.palette().color(QPalette.Background)
-        # logger.warning(f"color = {self.color.red()}, {self.color.green()}, {self.color.blue()}")
-        # self.stim_wdg.ui.cmb_file_io.setStyleSheet("border: 2px solid red;")
 
         self.tab_stim_w = QTabWidget(self)
         self.tab_stim_w.setObjectName("tab_stim_w")
         self.tab_stim_w.setTabPosition(QTabWidget.West)
-#        self.tab_stim_w.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Minimum)
 
         self.tab_stim_w.addTab(self.stim_wdg, QIcon(":/graph_90.svg"), "")
         self.tab_stim_w.setTabToolTip(0, "Stimuli")
