@@ -7,6 +7,8 @@
 - Add styling for right-mouse context menu
 - Fix shrinking of input specification subwidgets instead of turning on scroll bars
   by setting QSizePolicy() on input_specs widget
+- Fix scaling of loaded data in y[n] tab, int2float and scale_to buttons were disfunct
+  (regression error)
 
 ## [v0.9.5](https://github.com/chipmuenk/pyfda/tree/v0.9.5) (2024-12-22)
 
