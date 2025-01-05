@@ -59,9 +59,6 @@ class Plot_Impz(QWidget):
         # arrays that need to be passed to subwidgets
         self.x = self.y = self.x_q = None
 
-        # create the UI part with buttons etc.
-        self.ui = PlotImpz_UI()
-
         ###### initial settings #################################################
         # ==================
         # flag whether specs have been changed and plots need to be recalculated
@@ -94,6 +91,12 @@ class Plot_Impz(QWidget):
         self.fmt_mkr_stmq = {'marker': 'D', 'color': 'darkgreen', 'alpha': 0.5,
                              'ms': self.fmt_mkr_size}
         # ########################################################################
+
+        # create the UI part with buttons etc.
+        self.ui = PlotImpz_UI()
+        self.stim_wdg = Plot_Tran_Stim()
+        self.tran_io_wdg = Tran_IO(self)
+
         self._construct_UI()
 
         # --------------------------------------------
@@ -147,13 +150,11 @@ class Plot_Impz(QWidget):
         # ----------------------------------------------------------------------
         # Tabbed layout with vertical tabs ("west") for stimulus and audio
         # ----------------------------------------------------------------------
-        self.stim_wdg = Plot_Tran_Stim()
         # set "Stim:" label width to same width as "Plots:" label:
         self.stim_wdg.ui.lbl_title_stim.setFixedWidth(
             self.ui.lbl_title_plot_time.sizeHint().width())
-        self.file_io_wdg = Tran_IO(self)
-        # set "File:" label (file_io_wdg) to same width as "Plots:" label (stim_wdg):
-        self.file_io_wdg.ui.lbl_title_io_file.setFixedWidth(
+        # set "File:" label (tran_io_wdg) to same width as "Plots:" label (stim_wdg):
+        self.tran_io_wdg.ui.lbl_title_io_file.setFixedWidth(
             self.ui.lbl_title_plot_time.sizeHint().width())
 
         # This places the combo box for adding / using file data to the
@@ -167,7 +168,7 @@ class Plot_Impz(QWidget):
         self.tab_stim_w.addTab(self.stim_wdg, QIcon(":/graph_90.svg"), "")
         self.tab_stim_w.setTabToolTip(0, "Stimuli")
 
-        self.tab_stim_w.addTab(self.file_io_wdg, QIcon(":/file.svg"), "")
+        self.tab_stim_w.addTab(self.tran_io_wdg, QIcon(":/file.svg"), "")
         self.tab_stim_w.setTabToolTip(1, "File I/O")
 
         self.resize_stim_tab_widget()
@@ -199,11 +200,11 @@ class Plot_Impz(QWidget):
         # connect rx global events to process_sig_rx() and to listening subwidgets
         self.sig_rx.connect(self.process_sig_rx)
         self.sig_rx.connect(self.stim_wdg.sig_rx)
-        self.sig_rx.connect(self.file_io_wdg.sig_rx)
+        self.sig_rx.connect(self.tran_io_wdg.sig_rx)
         # connect UI and subwidgets tx events to process_sig_rx()
         self.ui.sig_tx.connect(self.process_sig_rx)
         self.stim_wdg.sig_tx.connect(self.process_sig_rx)
-        self.file_io_wdg.sig_tx.connect(self.process_sig_rx)
+        self.tran_io_wdg.sig_tx.connect(self.process_sig_rx)
         self.mplwidget_t.mplToolbar.sig_tx.connect(self.process_sig_rx_t)
         self.mplwidget_f.mplToolbar.sig_tx.connect(self.process_sig_rx_f)
         # self.mplwidget.mplToolbar.enable_plot(state = False) # disable initially
@@ -483,13 +484,13 @@ class Plot_Impz(QWidget):
         - if no file is loaded, do nothing. This shouldn't happen (check to be sure ...)
         - else set N_end = len(file_data) in the UI
         """
-        if not hasattr(self.file_io_wdg, 'N') or self.file_io_wdg.N == 0:
+        if not hasattr(self.tran_io_wdg, 'N') or self.tran_io_wdg.N == 0:
             self.ui.frm_file_io.setEnabled(False)
             logger.warning("No data loaded, you shouldn't see this message!")
         # File is loaded, copy file length to N_end
         else:
             # copy number of data points to N, disable N_auto, enable lineedit for N
-            self.ui.update_N(N_end = self.file_io_wdg.N)
+            self.ui.update_N(N_end = self.tran_io_wdg.N)
             self.ui.but_N_auto.setChecked(False)
             self.ui.led_N_points.setEnabled(True)
 
@@ -506,9 +507,9 @@ class Plot_Impz(QWidget):
         """
         # No file has been loaded or number of data points is zero
         #    -> disable file_io combobox:
-        if self.file_io_wdg.ui.but_load.property("state") != "ok" or\
-            not self.file_io_wdg.ui.but_load.isEnabled() or\
-                not hasattr(self.file_io_wdg, 'x') or self.file_io_wdg.x is None:
+        if self.tran_io_wdg.ui.but_load.property("state") != "ok" or\
+            not self.tran_io_wdg.ui.but_load.isEnabled() or\
+                not hasattr(self.tran_io_wdg, 'x') or self.tran_io_wdg.x is None:
             self.ui.frm_file_io.setEnabled(False)
             self.stim_wdg.ui.wdg_stim.setEnabled(True)
 
@@ -516,7 +517,7 @@ class Plot_Impz(QWidget):
         # widget if file_io is set to "use" (in contrast to "add")
         else:
             self.ui.frm_file_io.setEnabled(True)
-            self.stim_wdg.x_file = self.file_io_wdg.x_file
+            self.stim_wdg.x_file = self.tran_io_wdg.x_file
             self.stim_wdg.ui.wdg_stim.setEnabled(
                 qget_cmb_box(self.stim_wdg.ui.cmb_file_io) != "use")
 
@@ -577,7 +578,7 @@ class Plot_Impz(QWidget):
              self.stim_wdg.ui.cmb_stim_noise.currentText() == 'None')
             and self.stim_wdg.ui.DC == 0
             and self.stim_wdg.ui.cmb_stim == "impulse"
-            and self.file_io_wdg.ui.but_load.property("state") != "ok"
+            and self.tran_io_wdg.ui.but_load.property("state") != "ok"
             )
         self.ui.but_freq_norm_impz.setVisible(self.stim_wdg.ui.cmb_stim == "impulse")
 
@@ -611,8 +612,8 @@ class Plot_Impz(QWidget):
                     or (self.stim_wdg.ui.ledAmp1.isVisible and type(self.stim_wdg.ui.A1) == complex)\
                 or (self.stim_wdg.ui.ledAmp2.isVisible and type(self.stim_wdg.ui.A2) == complex)\
                     or np.any(np.iscomplex(np.asarray(fb.fil[0]['ba'])))\
-                or self.file_io_wdg.ui.but_load.property("state") == 'ok'\
-                    and np.iscomplexobj(self.file_io_wdg.x)\
+                or self.tran_io_wdg.ui.but_load.property("state") == 'ok'\
+                    and np.iscomplexobj(self.tran_io_wdg.x)\
                 or np.any(np.iscomplex(x_test)))
 
             self.ui.lbl_stim_cmplx_warn.setVisible(self.cmplx)
@@ -794,7 +795,7 @@ class Plot_Impz(QWidget):
         self.ui.but_run.setIcon(QIcon(":/play.svg"))
         qstyle_widget(self.ui.but_run, "normal")
         # update Tran_IO ui, depending on complex and fixpoint status
-        self.file_io_wdg.ui.update_ui(cmplx=self.cmplx, fx=fb.fil[0]['fx_sim'])
+        self.tran_io_wdg.ui.update_ui(cmplx=self.cmplx, fx=fb.fil[0]['fx_sim'])
 
         if fb.fil[0]['fx_sim']:
             self.emit({'fx_sim': 'finish'})
