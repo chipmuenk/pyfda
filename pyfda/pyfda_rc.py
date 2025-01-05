@@ -235,6 +235,8 @@ qss_dark = """
     /* QLineEdit{selection-background-color: darkgray;} */
     QLineEdit:disabled{background-color: #707070; color: #B0B0B0}
 
+    QFileDialog QWidget{background-color: #505050;}
+
     /* Applies to all widgets in "normal" resp. "active" state
     * [state="normal"], * [state="active"], * [state="a"]
         {background-color: #505050; color: white;}
@@ -313,6 +315,8 @@ qss_light = """
     QTextEdit{background-color: #F0F0F0;}
     QLineEdit{background-color: white; border-color: #303030;}
     QLineEdit:disabled{background-color:#C0C0C0; color: white;}
+
+    QFileDialog QWidget{background-color: #F0F0F0;}
 
     /* Applies to all widgets in "normal" resp. "active" state
     * [state="normal"], * [state="active"], * [state="a"]

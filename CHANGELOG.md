@@ -5,6 +5,7 @@
 ### Bugfixes
 
 - Add styling for right-mouse context menu
+- Add missing background color for QFileDialog
 - Fix shrinking of input specification subwidgets instead of turning on scroll bars
   by setting QSizePolicy() on input_specs widget
 - Fix scaling of loaded data in y[n] tab, int2float and scale_to buttons were disfunct
