@@ -237,7 +237,7 @@ class FilterFactory(object):
                     err_string += "\tTry changing the specifications."
                 elif "failure to converge" in str(e).lower():
                     self.err_code = 19
-                    err_string += "\Try changing the specifications."
+                    err_string += "\tTry changing the specifications."
                 else:
                     self.err_code = 99
 

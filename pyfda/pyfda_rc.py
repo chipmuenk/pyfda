@@ -235,6 +235,8 @@ qss_dark = """
     /* QLineEdit{selection-background-color: darkgray;} */
     QLineEdit:disabled{background-color: #707070; color: #B0B0B0}
 
+    QFileDialog QWidget{background-color: #505050;}
+
     /* Applies to all widgets in "normal" resp. "active" state
     * [state="normal"], * [state="active"], * [state="a"]
         {background-color: #505050; color: white;}
@@ -261,6 +263,8 @@ qss_dark = """
     QMessageBox{background-color:#404040;}
 
     QPlainTextEdit{background-color: #303030;}
+    /* Styling for context pop-up menu */
+    QMenu {background-color: #404040; border: 1px solid white; padding: 1px;}
 
     QTableView{alternate-background-color:#202020;
         background-color:#505050; gridline-color: white;}
@@ -312,6 +316,8 @@ qss_light = """
     QLineEdit{background-color: white; border-color: #303030;}
     QLineEdit:disabled{background-color:#C0C0C0; color: white;}
 
+    QFileDialog QWidget{background-color: #F0F0F0;}
+
     /* Applies to all widgets in "normal" resp. "active" state
     * [state="normal"], * [state="active"], * [state="a"]
             {background-color: #C0C0C0;}
@@ -338,6 +344,8 @@ qss_light = """
     QMessageBox{background-color: #E0E0E0;}
 
     QPlainTextEdit{background-color: white}
+    /* Styling for context pop-up menu */
+    QMenu {background-color: #E0E0E0; border: 1px solid grey; padding: 1px;}
 
     QTableView{alternate-background-color:#C0C0C0;
         background-color:#F0F0F0; gridline-color: #A0A0A0;}

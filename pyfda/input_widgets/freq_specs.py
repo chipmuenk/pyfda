@@ -223,7 +223,6 @@ class FreqSpecs(QWidget):
 
         self.n_cur_labels = num_new_labels  # update number of currently visible labels
         self.sort_dict_freqs()  # sort frequency entries in dictionary and update display
-        # self.adjustSize()
 
     # --------------------------------------------------------------------------
     def recalc_freqs(self):

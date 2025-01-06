@@ -129,9 +129,9 @@ class Input_Specs(QWidget):
             # It is disabled for "Manual_IIR" and "Manual_FIR" filter classes
             self.color_design_button('changed')
         elif 'data_changed' in dict_sig and dict_sig['data_changed'] == 'filter_loaded':
-                # Update info string from filter dict & set button = "ok"
-                # This is only triggered from global signals
-                self.load_dict()
+            # Update info string from filter dict & set button = "ok"
+            # This is only triggered from global signals
+            self.load_dict()
 
         if propagate:
             # local signals are propagated with the class name and id of this widget,
@@ -207,7 +207,6 @@ class Input_Specs(QWidget):
         # Subwidget for target specs (frequency and amplitude)
         self.t_specs = target_specs.TargetSpecs(self, title="Target Specifications",
                                                 objectName="target_specs_inst")
-        self.t_specs.setSizePolicy(QSizePolicy.MinimumExpanding, QSizePolicy.Minimum)
 
         # Subwidget for displaying infos on the design method
         self.lblMsg = QLabel(self)
@@ -240,6 +239,8 @@ class Input_Specs(QWidget):
         layVMain.setContentsMargins(*params['wdg_margins'])
 
         self.setLayout(layVMain)  # main layout of widget
+        # Required to prevent shrinking of subwidgets
+        self.setSizePolicy(QSizePolicy.Minimum, QSizePolicy.Minimum)
 
         # ----------------------------------------------------------------------
         # GLOBAL SIGNALS & SLOTs

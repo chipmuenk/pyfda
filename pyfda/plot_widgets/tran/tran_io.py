@@ -308,7 +308,7 @@ class Tran_IO(QWidget):
             * self.ui.led_scale_to.editingFinished
 
         It processes `self.data_raw` and yields `self.x_file` as a result which
-        is assigned as `self.stim_wdg.x_file = self.file_io_wdg.x_file` in the class
+        is assigned as `self.stim_wdg.x_file = self.tran_io_wdg.x_file` in the class
         `Plot_Impz()` when the signal `{'data_changed': 'file_io'}` is received.
 
         - For two channel `self.data_raw`, assign one channel or the sum of both channels
@@ -350,7 +350,7 @@ class Tran_IO(QWidget):
             scale_int = 1
             offset_int = 0
 
-            if self.ui.but_int_as_float.isChecked() == True:
+            if self.ui.but_int_as_float.checked:
                 if io.read_wav_info.sample_format == "int16":
                     scale_int = (1 << 15) - 1
                 elif io.read_wav_info.sample_format == "int24":
@@ -363,7 +363,7 @@ class Tran_IO(QWidget):
 
             data = (data - offset_int) / scale_int
 
-        if self.ui.but_scale_to.isChecked() == True:
+        if self.ui.but_scale_to.checked:
             self.norm = safe_eval(self.ui.led_scale_to.text(), self.norm, return_type="float")
             self.ui.led_scale_to.setText(str(self.norm))
             self.x_file = data * self.norm / np.max(np.abs(data))
@@ -459,14 +459,14 @@ class Tran_IO(QWidget):
                 # create 2D-array from 1D arrays and transpose them to row based form
                 data = np.vstack((data, data_r))
 
-        if self.ui.but_scale_to.isChecked():
+        if self.ui.but_scale_to.checked:
             # normalize data to 'self.norm' before saving
             data = data * self.norm / np.max(np.abs(data))
 
         if self.file_type == 'wav':
             # convert to selected data format
             frmt = qget_cmb_box(self.ui.cmb_data_format)
-            scale_int = self.ui.but_int_as_float.isChecked()
+            scale_int = self.ui.but_int_as_float.checked
             if frmt not in {'uint8', 'int16', 'int32', 'float32', 'float64'}:
                 logger.error(f"Unsupported format {frmt} for data export.")
                 return -1

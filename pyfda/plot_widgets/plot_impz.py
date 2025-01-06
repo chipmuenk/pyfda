@@ -39,7 +39,6 @@ logger = logging.getLogger(__name__)
 
 # TODO: "Home" calls redraw for botb mpl widgets
 # TODO: changing the view on some widgets redraws h[n] unncessarily
-# TODO: Single-sided and double-sided spectra of pulses are identical - ok?
 
 classes = {'Plot_Impz': 'y[n] / Y(f)'}  #: Dict containing class name : display name
 
@@ -55,28 +54,28 @@ class Plot_Impz(QWidget):
     def __init__(self, objectName='plot_impz_inst'):
         super().__init__()
 
-        # arrays that need to be passed to subwidgets
         self.setObjectName(objectName)
+
+        # arrays that need to be passed to subwidgets
         self.x = self.y = self.x_q = None
 
-        # create the UI part with buttons etc.
-        self.ui = PlotImpz_UI()
-
-        # initial settings
+        ###### initial settings #################################################
         # ==================
         # flag whether specs have been changed and plots need to be recalculated
         self.needs_calc = True
         # same when fixpoint specs have been changed, only needed in Fixpoint mode
         self.needs_calc_fx = True
-        self.needs_redraw = [True] * 2  # flag which plot needs to be redrawn
+        self.needs_redraw = [True] * 2  # flags which plots need to be redrawn
         self.error = False
 
         set_fil_dict(['fx_sim'], False, backup=False)  # disable fixpoint mode initially
-        self.fx_mode_old = False
+        self.fx_mode_old = False  # previous setting of fixpoint mode
 
         self.tool_tip = "Impulse / transient response and their spectra"
         self.tab_label = "y[n]"
         self.active_tab = 0  # index for active tab
+
+        ###### Styles for lines and markers ######################################
         # markersize=None, markeredgewidth=None, markeredgecolor=None,
         # markerfacecolor=None, markerfacecoloralt='none', fillstyle=None,
         self.fmt_mkr_size = 8
@@ -91,6 +90,12 @@ class Plot_Impz(QWidget):
         self.fmt_plot_stmq = {'color': 'darkgreen', 'linewidth': 2, 'alpha': 0.5}
         self.fmt_mkr_stmq = {'marker': 'D', 'color': 'darkgreen', 'alpha': 0.5,
                              'ms': self.fmt_mkr_size}
+        # ########################################################################
+
+        # create the UI part with buttons etc.
+        self.ui = PlotImpz_UI()
+        self.stim_wdg = Plot_Tran_Stim()
+        self.tran_io_wdg = Tran_IO(self)
 
         self._construct_UI()
 
@@ -145,31 +150,25 @@ class Plot_Impz(QWidget):
         # ----------------------------------------------------------------------
         # Tabbed layout with vertical tabs ("west") for stimulus and audio
         # ----------------------------------------------------------------------
-        self.stim_wdg = Plot_Tran_Stim()
         # set "Stim:" label width to same width as "Plots:" label:
         self.stim_wdg.ui.lbl_title_stim.setFixedWidth(
             self.ui.lbl_title_plot_time.sizeHint().width())
-        self.file_io_wdg = Tran_IO(self)
-        # set "File:" label width to same width as "Plots:" label:
-        self.file_io_wdg.ui.lbl_title_io_file.setFixedWidth(
+        # set "File:" label (tran_io_wdg) to same width as "Plots:" label (stim_wdg):
+        self.tran_io_wdg.ui.lbl_title_io_file.setFixedWidth(
             self.ui.lbl_title_plot_time.sizeHint().width())
 
         # This places the combo box for adding / using file data to the
         # run control toolbar:
         self.ui.frm_file_io.setLayout(self.stim_wdg.ui.layH_file_io)
-        # self.color = self.ui.frm_file_io.palette().color(QPalette.Background)
-        # logger.warning(f"color = {self.color.red()}, {self.color.green()}, {self.color.blue()}")
-        # self.stim_wdg.ui.cmb_file_io.setStyleSheet("border: 2px solid red;")
 
         self.tab_stim_w = QTabWidget(self)
         self.tab_stim_w.setObjectName("tab_stim_w")
         self.tab_stim_w.setTabPosition(QTabWidget.West)
-#        self.tab_stim_w.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Minimum)
 
         self.tab_stim_w.addTab(self.stim_wdg, QIcon(":/graph_90.svg"), "")
         self.tab_stim_w.setTabToolTip(0, "Stimuli")
 
-        self.tab_stim_w.addTab(self.file_io_wdg, QIcon(":/file.svg"), "")
+        self.tab_stim_w.addTab(self.tran_io_wdg, QIcon(":/file.svg"), "")
         self.tab_stim_w.setTabToolTip(1, "File I/O")
 
         self.resize_stim_tab_widget()
@@ -201,11 +200,11 @@ class Plot_Impz(QWidget):
         # connect rx global events to process_sig_rx() and to listening subwidgets
         self.sig_rx.connect(self.process_sig_rx)
         self.sig_rx.connect(self.stim_wdg.sig_rx)
-        self.sig_rx.connect(self.file_io_wdg.sig_rx)
+        self.sig_rx.connect(self.tran_io_wdg.sig_rx)
         # connect UI and subwidgets tx events to process_sig_rx()
         self.ui.sig_tx.connect(self.process_sig_rx)
         self.stim_wdg.sig_tx.connect(self.process_sig_rx)
-        self.file_io_wdg.sig_tx.connect(self.process_sig_rx)
+        self.tran_io_wdg.sig_tx.connect(self.process_sig_rx)
         self.mplwidget_t.mplToolbar.sig_tx.connect(self.process_sig_rx_t)
         self.mplwidget_f.mplToolbar.sig_tx.connect(self.process_sig_rx_f)
         # self.mplwidget.mplToolbar.enable_plot(state = False) # disable initially
@@ -264,9 +263,12 @@ class Plot_Impz(QWidget):
         Toggle visibility of stimulus options, depending on the state of the
         "Stimuli" button
         """
-        self.tab_stim_w.setVisible(qget_cmb_box(self.ui.cmb_ui_select) in {"stim", "plot_stim"})
-        self.ui.wdg_ctrl_freq.setVisible(qget_cmb_box(self.ui.cmb_ui_select) in {"plot", "plot_stim"})
-        self.ui.wdg_ctrl_time.setVisible(qget_cmb_box(self.ui.cmb_ui_select) in {"plot", "plot_stim"})
+        self.tab_stim_w.setVisible(
+            qget_cmb_box(self.ui.cmb_ui_select) in {"stim", "plot_stim"})
+        self.ui.wdg_ctrl_freq.setVisible(
+            qget_cmb_box(self.ui.cmb_ui_select) in {"plot", "plot_stim"})
+        self.ui.wdg_ctrl_time.setVisible(
+            qget_cmb_box(self.ui.cmb_ui_select) in {"plot", "plot_stim"})
 
 # ------------------------------------------------------------------------------
     def set_ui_level(self, ui_level):
@@ -296,7 +298,7 @@ class Plot_Impz(QWidget):
             self.tab_stim_w.setVisible(False)
             self.ui.wdg_ctrl_run.setVisible(False)
         else:
-            logger.warning(f"Undefined 'ui_level = {ui_level}!")
+            logger.warning("Undefined 'ui_level = %d!", ui_level)
 
 # ------------------------------------------------------------------------------
     def resize_stim_tab_widget(self):
@@ -425,9 +427,8 @@ class Plot_Impz(QWidget):
                 logger.error('Missing value for key "fx_sim".')
 
             else:
-                logger.error('Unknown value "{0}" for "fx_sim" key\n'
-                             '\treceived from "{1}"'.format(dict_sig['fx_sim'],
-                                                            dict_sig['class']))
+                logger.error(f'Unknown value "{dict_sig['fx_sim']}" for "fx_sim" key\n'
+                             f'\treceived from "{dict_sig['class']}"')
 
         # --- widget is visible, handle all signals except 'fx_sim' -----------
         elif self.isVisible():
@@ -485,13 +486,13 @@ class Plot_Impz(QWidget):
         - if no file is loaded, do nothing. This shouldn't happen (check to be sure ...)
         - else set N_end = len(file_data) in the UI
         """
-        if not hasattr(self.file_io_wdg, 'N') or self.file_io_wdg.N == 0:
+        if not hasattr(self.tran_io_wdg, 'N') or self.tran_io_wdg.N == 0:
             self.ui.frm_file_io.setEnabled(False)
             logger.warning("No data loaded, you shouldn't see this message!")
         # File is loaded, copy file length to N_end
         else:
             # copy number of data points to N, disable N_auto, enable lineedit for N
-            self.ui.update_N(N_end = self.file_io_wdg.N)
+            self.ui.update_N(N_end = self.tran_io_wdg.N)
             self.ui.but_N_auto.setChecked(False)
             self.ui.led_N_points.setEnabled(True)
 
@@ -508,9 +509,9 @@ class Plot_Impz(QWidget):
         """
         # No file has been loaded or number of data points is zero
         #    -> disable file_io combobox:
-        if self.file_io_wdg.ui.but_load.property("state") != "ok" or\
-            not self.file_io_wdg.ui.but_load.isEnabled() or\
-                not hasattr(self.file_io_wdg, 'x') or self.file_io_wdg.x is None:
+        if self.tran_io_wdg.ui.but_load.property("state") != "ok" or\
+            not self.tran_io_wdg.ui.but_load.isEnabled() or\
+                not hasattr(self.tran_io_wdg, 'x') or self.tran_io_wdg.x is None:
             self.ui.frm_file_io.setEnabled(False)
             self.stim_wdg.ui.wdg_stim.setEnabled(True)
 
@@ -518,7 +519,7 @@ class Plot_Impz(QWidget):
         # widget if file_io is set to "use" (in contrast to "add")
         else:
             self.ui.frm_file_io.setEnabled(True)
-            self.stim_wdg.x_file = self.file_io_wdg.x_file
+            self.stim_wdg.x_file = self.tran_io_wdg.x_file
             self.stim_wdg.ui.wdg_stim.setEnabled(
                 qget_cmb_box(self.stim_wdg.ui.cmb_file_io) != "use")
 
@@ -579,7 +580,7 @@ class Plot_Impz(QWidget):
              self.stim_wdg.ui.cmb_stim_noise.currentText() == 'None')
             and self.stim_wdg.ui.DC == 0
             and self.stim_wdg.ui.cmb_stim == "impulse"
-            and self.file_io_wdg.ui.but_load.property("state") != "ok"
+            and self.tran_io_wdg.ui.but_load.property("state") != "ok"
             )
         self.ui.but_freq_norm_impz.setVisible(self.stim_wdg.ui.cmb_stim == "impulse")
 
@@ -613,8 +614,8 @@ class Plot_Impz(QWidget):
                     or (self.stim_wdg.ui.ledAmp1.isVisible and type(self.stim_wdg.ui.A1) == complex)\
                 or (self.stim_wdg.ui.ledAmp2.isVisible and type(self.stim_wdg.ui.A2) == complex)\
                     or np.any(np.iscomplex(np.asarray(fb.fil[0]['ba'])))\
-                or self.file_io_wdg.ui.but_load.property("state") == 'ok'\
-                    and np.iscomplexobj(self.file_io_wdg.x)\
+                or self.tran_io_wdg.ui.but_load.property("state") == 'ok'\
+                    and np.iscomplexobj(self.tran_io_wdg.x)\
                 or np.any(np.iscomplex(x_test)))
 
             self.ui.lbl_stim_cmplx_warn.setVisible(self.cmplx)
@@ -722,7 +723,7 @@ class Plot_Impz(QWidget):
                     if self.fxfilter(self.x_q[frame]) is None:
                         logger.error("Fixpoint simulation returned empty results!")
                     else:
-                        logger.error("Simulator error {0}".format(e))
+                        logger.error("Simulator error %s", e)
                         fb.fx_results = None
                     self.error = True
 
@@ -796,7 +797,7 @@ class Plot_Impz(QWidget):
         self.ui.but_run.setIcon(QIcon(":/play.svg"))
         qstyle_widget(self.ui.but_run, "normal")
         # update Tran_IO ui, depending on complex and fixpoint status
-        self.file_io_wdg.ui.update_ui(cmplx=self.cmplx, fx=fb.fil[0]['fx_sim'])
+        self.tran_io_wdg.ui.update_ui(cmplx=self.cmplx, fx=fb.fil[0]['fx_sim'])
 
         if fb.fil[0]['fx_sim']:
             self.emit({'fx_sim': 'finish'})
@@ -834,12 +835,12 @@ class Plot_Impz(QWidget):
                 qset_cmb_box(self.ui.cmb_sim_select, "float", data=True)
         # Combobox modified, set fb.fil[0]['fx_sim'] according to combobox and start sim
         elif type(arg) == int:
-            fb.fil[0]['fx_sim'] = (qget_cmb_box(self.ui.cmb_sim_select) == 'fixpoint')
+            fb.fil[0]['fx_sim'] = qget_cmb_box(self.ui.cmb_sim_select) == 'fixpoint'
             self.emit({'fx_sim': 'specs_changed'})
             self.needs_calc = True
             self.calc_auto()  # run simulation if autostart has been selected
         else:
-            logger.error(f"Unknown argument '{arg}'!")
+            logger.error("Unknown argument '%s'!", arg)
             return
 
         fx_mode = fb.fil[0]['fx_sim']
@@ -966,15 +967,15 @@ class Plot_Impz(QWidget):
                     self.fx_max_y = -self.fx_min_y -\
                         1. / (1 << fb.fil[0]['fxq']['QO']['WF'])
                 else:
-                    logger.error(f"Undefined 'qfrmt = {get_fil_dict(['qfrmt'])}!")
+                    logger.error("Undefined qfrmt = '%s'!", get_fil_dict(['qfrmt']))
 
             except AttributeError as e:
-                logger.error("Attribute error: {0}".format(e))
+                logger.error("Attribute error: %s", e)
             except TypeError as e:
                 logger.error(
                     "Type error: 'fxqc_dict'={0},\n{1}".format(get_fil_dict(['fxq']), e))
             except ValueError as e:
-                logger.error("Value error: {0}".format(e))
+                logger.error("Value error: %s", e)
 
         idx = self.tab_mpl_w.currentIndex()
 
@@ -1156,9 +1157,6 @@ class Plot_Impz(QWidget):
         if self.spgr:
             self.ax_s = self.axes_time[-1]  # assign last axis
 
-        if False:  # not implemented / tested yet: complex data as 3D plot
-            self.ax3d = self.mplwidget_t.fig.add_subplot(111, projection='3d')
-
         for ax in self.axes_time:
             ax.xaxis.tick_bottom()  # remove axis ticks on top
             ax.yaxis.tick_left()  # remove axis ticks right
@@ -1178,6 +1176,7 @@ class Plot_Impz(QWidget):
             N_end = self.ui.N_end
 
         H_str = self.stim_wdg.H_str
+        H_i_str = 'undefined'  # this should always be overwritten
 
         self._init_axes_time()
         self._log_mode_time()
@@ -1422,7 +1421,7 @@ class Plot_Impz(QWidget):
             else:
                 dB_unit = ""
             if mode == "psd":
-                spgr_symb = r"$S_{{{0}}}$".format(sig_lbl.lower()+sig_lbl.lower())
+                spgr_symb = fr"$S_{{{sig_lbl.lower()+sig_lbl.lower()}}}$"
                 dB_scale = 10  # log scale for PSD
 
                 if self.ui.chk_byfs_spgr_time.isChecked():
@@ -1440,17 +1439,17 @@ class Plot_Impz(QWidget):
             elif mode in {"magnitude", "complex"}:
                 # "complex" cannot be plotted directly
                 spgr_pre = r"|"
-                spgr_symb = "${0}$".format(sig_lbl)
-                spgr_unit = r"| in {0}V".format(dB_unit)
+                spgr_symb = f"${sig_lbl}$"
+                spgr_unit = fr"| in {dB_unit}V"
 
             elif mode in {"angle", "phase"}:
                 spgr_unit = r" in rad"
-                spgr_symb = "${0}$".format(sig_lbl)
+                spgr_symb = f"${sig_lbl}$"
                 spgr_pre = r"$\angle$"
 
             else:
-                logger.warning("Unknown spectrogram mode {0}, falling back to 'psd'"
-                               .format(mode))
+                logger.warning(
+                    f"Unknown spectrogram mode '{mode}', falling back to 'psd'")
                 mode = "psd"
 
             # ------- lin / log ----------------------
@@ -1701,7 +1700,7 @@ class Plot_Impz(QWidget):
                 # to be multiplied by self.scale_i
                 Px = np.sum(np.square(np.abs(self.X))) * P_scale
                 if fb.fil[0]['freqSpecsRangeType'] == 'half' and not freq_resp:
-                        X = calc_ssb_spectrum(self.X, mag=self.cmplx) * scale_impz
+                    X = calc_ssb_spectrum(self.X, mag=self.cmplx) * scale_impz
                 else:
                     X = self.X * scale_impz
 
@@ -2055,7 +2054,7 @@ class Plot_Impz(QWidget):
         """
         idx = self.tab_mpl_w.currentIndex()
         self.tab_mpl_w.currentWidget().redraw()
-        logger.debug("Redrawing tab {0}".format(idx))
+        logger.debug("Redrawing tab %d", idx)
         self.needs_redraw[idx] = False
 #        self.mplwidget_t.redraw()
 

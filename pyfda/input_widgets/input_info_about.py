@@ -104,10 +104,6 @@ class AboutWindow(QDialog):
 
         layVMain.setContentsMargins(*params['wdg_margins_spc'])
         self.setLayout(layVMain)
-        # self.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
-        # self.resize(0,0)
-        # self.adjustSize()
-        # QApplication.processEvents()
 
         butClipboard.clicked.connect(
             lambda: self.to_clipboard(self.info_str + self.about_str))
