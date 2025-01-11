@@ -79,12 +79,15 @@ input_classes = OrderedDict(
      ('Input_PZ', {'name': 'P/Z', 'mod': 'pyfda.input_widgets.input_pz'}),
      ('Input_Info', {'name': 'Info', 'mod': 'pyfda.input_widgets.input_info'}),
      ('Input_Files', {'name': 'Files', 'mod': 'pyfda.input_widgets.input_files'}),
-     ('Input_Fixpoint_Specs', {'name': 'Fixpoint', 'mod': 'pyfda.input_widgets.input_fixpoint_specs'})
+     ('Input_Fixpoint_Specs', {'name': 'Fixpoint',
+                               'mod': 'pyfda.input_widgets.input_fixpoint_specs'})
      ])
 
 fixpoint_classes = OrderedDict(
-    [('FIR_DF_wdg', {'name': 'FIR_DF', 'mod': 'pyfda.fixpoint_widgets.fir_df', 'opt': ['Equiripple', 'Firwin']}),
-     ('Delay_wdg', {'name': 'Delay', 'mod': 'pyfda.fixpoint_widgets.delay1', 'opt': ['Equiripple']})
+    [('FIR_DF_wdg', {'name': 'FIR_DF',
+                     'mod': 'pyfda.fixpoint_widgets.fir_df', 'opt': ['Equiripple', 'Firwin']}),
+     ('Delay_wdg', {'name': 'Delay',
+                    'mod': 'pyfda.fixpoint_widgets.delay1', 'opt': ['Equiripple']})
      ])
 
 filter_classes = OrderedDict(
