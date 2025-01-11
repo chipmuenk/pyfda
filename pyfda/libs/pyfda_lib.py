@@ -429,33 +429,31 @@ def iter2ndarray(iterable, dtype=complex) -> np.ndarray:
     Convert an iterable (tuple, list, dict) to a numpy ndarray, egalizing
     different lengths of sub-iterables by adding zeros. This prevents
     problems with inhomogeneous arrays.
+
+    Return ndarray or None
     """
-    try:
-        if type(iterable) == np.ndarray:
-            # no need to convert argument
-            return iterable
-        elif type(iterable) in {tuple, list}:
-            arrs = []  # empty list for sub-arrays
-            max_l = 0  # maximum length of sub-arrays
-            for i in range(len(iterable)):
-                if np.isscalar(iterable[i]):
-                    arrs.append(np.array([iterable[i]]))
-                else:
-                    arrs.append(np.array(iterable[i]))
-                max_l = max(max_l, len(arrs[i]))
+    # try:
+    if type(iterable) == np.ndarray:
+        # no need to convert argument
+        return iterable
+    elif type(iterable) in {tuple, list}:
+        arrs = []  # empty list for sub-arrays
+        max_l = 0  # maximum length of sub-arrays
+        for i in range(len(iterable)):
+            if np.isscalar(iterable[i]):
+                arrs.append(np.array([iterable[i]]))
+            else:
+                arrs.append(np.array(iterable[i]))
+            max_l = max(max_l, len(arrs[i]))
 
-            # equalize lengths of sub-arrays by filling up with zeros and convert to arrays
-            for i in range(len(iterable)):
-                arrs[i] = np.asarray(np.append(arrs[i], np.zeros(max_l - len(arrs[i]))))
+        # equalize lengths of sub-arrays by filling up with zeros and convert to arrays
+        for i in range(len(iterable)):
+            arrs[i] = np.asarray(np.append(arrs[i], np.zeros(max_l - len(arrs[i]))))
 
-            return np.nan_to_num(np.array(arrs, dtype=dtype))  # convert list of arrays to two-dimensional array
-        else:
-            logger.error(f"Unsupported type '{type(iterable)}' for conversion to ndarray.")
-            return None
-    except Exception as e:
-        logger.error(f"Error '{e}'\nfor iterable =\n{iterable}")
+        return np.nan_to_num(np.array(arrs, dtype=dtype))  # convert list of arrays to two-dimensional array
+    else:
+        logger.error(f"Unsupported type '{type(iterable)}' of {iterable} for conversion to ndarray.")
         return None
-
 
 # -----------------------------------------------------------------------------
 def set_dict_defaults(d: dict, default_dict: dict) -> None:
