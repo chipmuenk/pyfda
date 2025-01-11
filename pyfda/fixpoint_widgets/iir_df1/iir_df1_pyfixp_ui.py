@@ -256,20 +256,30 @@ class IIR_DF1_pyfixp_UI(QWidget):
         The new value is written to the fixpoint coefficient dict
         `fb.fil[0]['fxq']['QCA']` and the UI is updated.
         """
-        WI_A = int(np.ceil(np.log2((np.abs(np.max(fb.fil[0]['ba'][1]))))))
+        try:
+            WI_A = int(np.ceil(np.log2((np.abs(np.max(fb.fil[0]['ba'][1]))))))
+        except OverflowError as e:
+            WI_A = 0
+            logger.warning("Overflow error in calculation of word length.")
+
         fb.fil[0]['fxq']['QCA']['WI'] = WI_A
         # update quantizer settings and UI
         self.wdg_wq_coeffs_a.dict2ui(fb.fil[0]['fxq']['QCA'])
 
     # --------------------------------------------------------------------------
     def calc_wi_coeffs_b(self):
+        logger.error("calc_wi")
         """
         Calculate required number of integer bits for the largest 'b' coefficient
 
         The new value is written to the fixpoint coefficient dict
         `fb.fil[0]['fxq']['QCB']` and the UI is updated.
         """
-        WI_B = int(np.ceil(np.log2((np.abs(np.max(fb.fil[0]['ba'][0]))))))
+        try:
+            WI_B = int(np.ceil(np.log2((np.abs(np.max(fb.fil[0]['ba'][0]))))))
+        except OverflowError as e:
+            WI_B = 0
+            logger.warning("Overflow error in calculation of word length.")
         fb.fil[0]['fxq']['QCB']['WI'] = max(WI_B, 0)
         # update quantizer settings and UI
         self.wdg_wq_coeffs_b.dict2ui(fb.fil[0]['fxq']['QCB'])
