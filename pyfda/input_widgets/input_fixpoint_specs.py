@@ -101,10 +101,8 @@ class Input_Fixpoint_Specs(QWidget):
         Process signals coming in from input and output quantizer subwidget and
         emit {'fx_sim': 'specs_changed'} in the end.
         """
-        # logger.warning(
-        #     f"SIG_RX_LOCAL(): vis={self.isVisible()}\n{pprint_log(dict_sig)}")
-        # logger.warning(
-        #    f"SIG_RX_LOCAL: vis={self.isVisible()}, fx_sim={fb.fil[0]['fx_sim']}\n{first_item(dict_sig)}")
+        logger.debug(
+           "SIG_RX_LOCAL(): vis = %s\n%s", self.isVisible(), pprint_log(dict_sig))
         if dict_sig['id'] == id(self):
             # logger.warning(
             #     f'RX_LOCAL - Stopped infinite loop: "{pprint_log(dict_sig)}"')
@@ -186,8 +184,9 @@ class Input_Fixpoint_Specs(QWidget):
         2. Store fixpoint response in `fb.fx_result` and return to initiating routine
         """
 
-        # logger.warning(
-        #     f"SIG_RX: vis={self.isVisible()}, fx_sim={fb.fil[0]['fx_sim']}\n{pprint_log(dict_sig)}")
+        logger.debug(
+            "SIG_RX: vis = %s, fx_sim = %s\n%s",
+            self.isVisible(), fb.fil[0]['fx_sim'], pprint_log(dict_sig))
 
         if dict_sig['id'] == id(self):
             # logger.warning(f'Stopped infinite loop: "{first_item(dict_sig)}"')
