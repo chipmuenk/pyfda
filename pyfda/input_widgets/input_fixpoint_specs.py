@@ -52,9 +52,7 @@ class Input_Fixpoint_Specs(QWidget):
     from pyfda.libs.pyfda_qt_lib import emit
 
     def __init__(self, parent=None, objectName="input_fixpoint_spec_inst"):
-        super(Input_Fixpoint_Specs, self).__init__(parent)
-    # def __init__(self) -> None:
-    #    super().__init__()
+        super().__init__()
 
         self.setObjectName(objectName)
         self.tab_label = 'Fixpoint'
