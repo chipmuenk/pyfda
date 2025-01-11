@@ -476,7 +476,6 @@ class Input_PZ(QWidget):
         else:
             logger.error("P/Z array 'fb.fil[0]['zpk']' has wrong number of "
                          f"rows = {len(zpk)}")
-            logger.error(zpk)
             return
 
         if len(zpk[0]) != len(zpk[1]):
