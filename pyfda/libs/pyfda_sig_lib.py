@@ -181,7 +181,8 @@ def impz_len(system, zpk: bool = False, level: float = -40) -> int:
 def zeros_with_val(N: int, val: float = 1., pos: int = 0):
     """
     Create a 1D array of `N` zeros where the element at position `pos` has the
-    value `val`.
+    value `val`. Returns `[1. 0, 0, ...] when no argument except the length is
+    given.
 
     Parameters
     ----------
@@ -204,6 +205,20 @@ def zeros_with_val(N: int, val: float = 1., pos: int = 0):
     a = np.zeros(N, dtype=type(val))
     a[pos] = val
     return a
+
+# ------------------------------------------------------------------------------
+def normalize_zpk_gain(zpk, norm: float = 1.0):
+    """
+    Scale the system given in zero, pole, gain form in such a way that the
+    maximum of the magnitude response is `norm`.
+    """
+    b, a = sig.zpk2tf(zpk[0], zpk[1], zpk[2][0])
+    [w, H] = sig.freqz(b, a, whole=True)
+    Hmax = max(abs(H))
+    if not np.isfinite(Hmax) or Hmax > 1e4 or Hmax < 1e-4:
+        Hmax = 1.
+    zpk[2][0] = norm * zpk[2][0] / Hmax  # normalize to `norm`
+    return zpk
 
 # ------------------------------------------------------------------------------
 def zpk2array(zpk):
@@ -231,29 +246,31 @@ def zpk2array(zpk):
         _ = len(zpk)
     except TypeError:
         return f"zpk is a scalar or 'None'!"
-
-    if type(zpk) in {np.ndarray, list, tuple}:
+    if type(zpk) in {np.ndarray, list}: # , tuple}:
         if len(zpk) == 3:  # dimensions are ok, but poles / gain could be empty
             if np.isscalar(zpk[2]) or zpk[2] == []:
-                if zpk[2] == 0:
-                    zpk[2] = 1
+                if zpk[2] == 0 or zpk[2] == []:
+                    zpk[2] = [1]
+                    zpk = normalize_zpk_gain(zpk)
             else:
                 # logger.error(zpk[2])
                 if zpk[2][0] in {0, None}:
                     zpk[2][0] = 1
+                    zpk = normalize_zpk_gain(zpk)
 
         elif len(zpk) == 2:  # only poles and zeros given:
             zpk = list(zpk)
             zpk.append([1])  # set gain = 1
+            zpk = normalize_zpk_gain(zpk)
         elif len(zpk) == 1:  # only zeros given:
             zpk = list(zpk)
             zpk.append([0], [1])  # set pole = 0, gain = 1
+            zpk = normalize_zpk_gain(zpk)
         else:
             logger.error(f"'zpk' has unsuitable shape '{np.shape(zpk)}'")
             return f"'zpk' has unsuitable shape '{np.shape(zpk)}'"
     else:
         return f"'zpk' has an unsuitable type '{type(zpk)}'"
-
     return pyfda_lib.iter2ndarray(zpk)
 
 # ------------------- -----------------------------------------------------------
