@@ -10,8 +10,7 @@
 Widget for plotting impulse and general transient responses
 """
 import time
-from pyfda.libs.compat import (
-    QWidget, pyqtSignal, QTabWidget, QVBoxLayout, QIcon, QSize, QSizePolicy, QFont, QFontMetrics)
+import logging
 
 import numpy as np
 import scipy.signal as sig
@@ -19,6 +18,8 @@ import matplotlib.patches as mpl_patches
 # import matplotlib.lines as lines
 from matplotlib.ticker import AutoMinorLocator
 
+from pyfda.libs.compat import (
+    QWidget, pyqtSignal, QTabWidget, QVBoxLayout, QIcon, QSize, QSizePolicy)
 import pyfda.filterbroker as fb
 from pyfda.filterbroker import get_fil_dict, set_fil_dict
 import pyfda.libs.pyfda_fix_lib as fx
@@ -34,7 +35,6 @@ from pyfda.plot_widgets.tran.plot_tran_stim import Plot_Tran_Stim
 from pyfda.plot_widgets.tran.tran_io import Tran_IO
 from pyfda.plot_widgets.plot_impz_ui import PlotImpz_UI
 
-import logging
 logger = logging.getLogger(__name__)
 
 # TODO: "Home" calls redraw for botb mpl widgets
@@ -427,8 +427,8 @@ class Plot_Impz(QWidget):
                 logger.error('Missing value for key "fx_sim".')
 
             else:
-                logger.error(f'Unknown value "{dict_sig['fx_sim']}" for "fx_sim" key\n'
-                             f'\treceived from "{dict_sig['class']}"')
+                logger.error(f"""Unknown value "{dict_sig['fx_sim']}" for "fx_sim" key\n"""
+                             f"""\treceived from "{dict_sig['class']}" """)
 
         # --- widget is visible, handle all signals except 'fx_sim' -----------
         elif self.isVisible():
