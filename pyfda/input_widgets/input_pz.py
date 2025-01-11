@@ -159,7 +159,7 @@ class Input_PZ(QWidget):
     from pyfda.libs.pyfda_qt_lib import emit
 
     def __init__(self, parent=None):
-        super(Input_PZ, self).__init__(parent)
+        super().__init__()
 
         self.data_changed = True  # initialize flag: filter data has been changed
 
