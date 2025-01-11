@@ -768,7 +768,7 @@ class Input_PZ(QWidget):
             # Matlab workspace (``*.mat``) and a title for the file export dialog
             export_fil_data(self, text, 'zpk', title="Export Poles / Zeros")
     # --------------------------------------------------------------------------
-    def _import(self):
+    def _import(self) -> None:
         """
         Import data from clipboard / file and copy it to `self.zpk` as array of complex
         # TODO: More checks for swapped row <-> col, single values, wrong data type ...
@@ -783,7 +783,7 @@ class Input_PZ(QWidget):
             file_name, file_type = select_file(self, title="Import Poles / Zeros", mode="r",
                                     file_types=('csv', 'mat', 'npy', 'npz'))
             if file_name is None:  # operation cancelled or error
-                return None
+                return
             else:  # file types 'csv', 'mat', 'npy', 'npz'
                 data_str = file2array(
                     file_name, file_type, 'zpk',
