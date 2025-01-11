@@ -10,8 +10,11 @@
 Widget for displaying and modifying filter Poles and Zeros
 """
 import sys
-import re
+import logging
 from pprint import pformat
+
+import numpy as np
+from scipy.signal import freqz, zpk2tf
 
 from pyfda.libs.compat import (
     QtCore, QWidget, QLineEdit, pyqtSignal, QEvent,
@@ -22,20 +25,15 @@ from pyfda.libs.pyfda_qt_lib import qget_cmb_box, qstyle_widget
 from pyfda.libs.pyfda_io_lib import qtable2csv, file2array, export_fil_data, select_file
 from pyfda.libs.pyfda_sig_lib import zeros_with_val, zpk2array
 
-import numpy as np
-from scipy.signal import freqz, zpk2tf
-
 import pyfda.filterbroker as fb  # importing filterbroker initializes all its globals
 import pyfda.libs.pyfda_dirs as dirs
 from pyfda.libs.pyfda_lib import fil_save, safe_eval, frmt2cmplx, pprint_log
 from pyfda.pyfda_rc import params
 from pyfda.input_widgets.input_pz_ui import Input_PZ_UI
 
-import logging
 logger = logging.getLogger(__name__)
 
 classes = {'Input_PZ': 'P/Z'}  #: Dict containing class name : display name
-
 
 class ItemDelegate(QStyledItemDelegate):
     """
@@ -43,11 +41,8 @@ class ItemDelegate(QStyledItemDelegate):
     QTableWidget.
 
     - `displayText()` displays the data stored in the table in various number formats
-
     - `createEditor()` creates a line edit instance for editing table entries
-
     - `setEditorData()` pass data with full precision and in selected format to editor
-
     - `setModelData()` pass edited data back to model (`self.zpk`)
     """
     def __init__(self, parent):
