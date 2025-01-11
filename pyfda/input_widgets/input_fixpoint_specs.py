@@ -13,12 +13,13 @@ Widget for simulating fixpoint filters and generating Verilog Code
 import sys, os, io
 import re
 import importlib
+import logging
+
+import numpy as np
 
 from pyfda.libs.compat import (
     Qt, QWidget, QPushButton, QComboBox, QFileDialog, QLabel, QPixmap,
     QVBoxLayout, QHBoxLayout, pyqtSignal, QFrame, QSizePolicy)
-
-import numpy as np
 
 import pyfda.filterbroker as fb  # importing filterbroker initializes all its globals
 import pyfda.libs.pyfda_dirs as dirs
@@ -35,13 +36,11 @@ try:
 except ImportError:
     HAS_DS = False
 
-import logging
 logger = logging.getLogger(__name__)
 
 # ------------------------------------------------------------------------------
 
 classes = {'Input_Fixpoint_Specs': 'Fixpoint'}  #: Dict with class name : display name
-
 
 class Input_Fixpoint_Specs(QWidget):
     """

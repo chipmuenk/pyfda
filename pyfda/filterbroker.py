@@ -37,12 +37,13 @@ More info on data persistence and storing / accessing global variables:
 
 """
 import logging
-logger = logging.getLogger(__name__)
 
 import copy
-import time
+# import time
 from collections import OrderedDict
 from pyfda.libs.frozendict import freeze_hierarchical
+
+logger = logging.getLogger(__name__)
 
 clipboard = None
 """ Handle to central clipboard instance """
