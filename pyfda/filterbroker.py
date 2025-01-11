@@ -477,6 +477,7 @@ def restore_fil():
         fil[0] = copy.deepcopy(fil_undo[undo_ptr])
         undo_step -= 1
         undo_ptr = (undo_ptr + UNDO_LEN - 1) % UNDO_LEN
+        return 0
 
 def store_fil():
     """
@@ -487,8 +488,7 @@ def store_fil():
 
     # prevent buffer overflow
     undo_step += 1
-    if undo_step > UNDO_LEN:
-        undo_step = UNDO_LEN
+    undo_step = min(undo_step, UNDO_LEN)
     # increase buffer pointer, allowing for circular wrap around
     undo_ptr = (undo_ptr + 1) % UNDO_LEN
     fil_undo[undo_ptr] = copy.deepcopy(fil[0])
@@ -502,10 +502,11 @@ def key_list_to_dict(keys: list) -> dict:
     of the nested dict, use the key for the lowest nesting level on the returned
     dict `d`, i.e. `d[keys[-1]] = arg` resp. `arg = d[keys[-1]]`.
     """
-    global fil
+    # global fil
     if len(keys) == 0:
         raise KeyError("List of keys was empty!")
-    elif len(keys) == 1:
+
+    if len(keys) == 1:
         d = fil[0]
     elif len(keys) == 2:
         d = fil[0][keys[0]]
@@ -551,4 +552,3 @@ def get_fil_dict(keys: list):
 
 # Comparing nested dicts
 # https://stackoverflow.com/questions/27265939/comparing-python-dictionaries-and-nested-dictionaries
-

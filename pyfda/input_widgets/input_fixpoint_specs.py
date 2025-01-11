@@ -711,12 +711,10 @@ class Input_Fixpoint_Specs(QWidget):
 
         - Update UI (fixpoint format, visibility of fixpoint widgets) from combobox
           `self.cmb_qfrmt` to `fb.fil[0]['fx_sim']` and `fb.fil[0]['qfrmt']`.
-
         - Update fixpoint widget settings via `self.dict2ui()`
-
         - Emit {'fx_sim': 'specs_changed'}.
           """
-        fb.fil[0]['fx_sim'] = (qget_cmb_box(self.cmb_qfrmt) != 'float')
+        fb.fil[0]['fx_sim'] = qget_cmb_box(self.cmb_qfrmt) != 'float'
         if fb.fil[0]['fx_sim']:
             fb.fil[0]['qfrmt'] = qget_cmb_box(self.cmb_qfrmt)
 
@@ -745,7 +743,7 @@ class Input_Fixpoint_Specs(QWidget):
         self.wdg_wq_output.setVisible(is_fixp)
         self.frmImg.setVisible(is_fixp)
         if self.fx_wdg_found:
-           self.fx_filt_ui.setVisible(is_fixp)
+            self.fx_filt_ui.setVisible(is_fixp)
 
         if is_fixp:
             # set combobox from dictionary
@@ -829,8 +827,8 @@ class Input_Fixpoint_Specs(QWidget):
             return 0
         else:
         # except (ValueError, AttributeError) as e:
-            logger.error('Fixpoint filter reset or instantiation failed.'
-                         '\nwith "{0} "'.format(e))
+            logger.error(f'Fixpoint filter reset or instantiation failed.'
+                         f'\nwith "{e} "')
         return -1
 
 # ------------------------------------------------------------------------------
@@ -853,7 +851,7 @@ class Input_Fixpoint_Specs(QWidget):
                 logger.error("Fixpoint simulation returned empty results!")
 
         except ValueError as e:
-            logger.error("Simulator error {0}".format(e))
+            logger.error(f"Simulator error {e}")
             fb.fx_results = None
 
         except AssertionError as e:
@@ -864,8 +862,6 @@ class Input_Fixpoint_Specs(QWidget):
                 f'\n\tResponse: Shape {np.shape(fb.fx_results)} of type '
                 f'"{type(fb.fx_results)}"')
             fb.fx_results = None
-
-        return
 
 
 ###############################################################################
