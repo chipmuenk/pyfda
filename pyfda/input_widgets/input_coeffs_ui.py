@@ -113,6 +113,8 @@ class Input_Coeffs_UI(QWidget):
         # UI Elements for controlling the display
         # ---------------------------------------------
 
+
+        lbl_display = QLabel(to_html("Display:", frmt='bi'), self)
         self.cmb_qfrmt = QComboBox(self)
         qcmb_box_populate(self.cmb_qfrmt, self.cmb_q_frmt_items,
                           self.cmb_q_frmt_default)
@@ -159,6 +161,7 @@ class Input_Coeffs_UI(QWidget):
         layH_display = QHBoxLayout()
         layH_display.setContentsMargins(*params['wdg_margins'])
         layH_display.setAlignment(Qt.AlignLeft)
+        layH_display.addWidget(lbl_display)
         layH_display.addWidget(self.cmb_qfrmt)
         layH_display.addWidget(self.spnDigits)
         layH_display.addWidget(self.lblDigits)
@@ -316,10 +319,10 @@ class Input_Coeffs_UI(QWidget):
         layVMain.setContentsMargins(*params['wdg_margins'])
         # the following affects only the first widget (intended here)
         layVMain.setAlignment(Qt.AlignTop)
-        layVMain.addWidget(self.frm_display)
         layVMain.addWidget(self.frm_buttons_coeffs)
         layVMain.addWidget(self.wdg_wq_coeffs_b)
         layVMain.addWidget(self.wdg_wq_coeffs_a)
+        layVMain.addWidget(self.frm_display)
         self.setLayout(layVMain)
         #######################################################################
 
