@@ -10,6 +10,8 @@
 """
 Create the UI for the FilterPZ class
 """
+import logging
+
 from pyfda.libs.compat import (
     pyqtSignal, Qt, QWidget, QLabel, QLineEdit, QComboBox, QPushButton,
     QFrame, QSpinBox, QFont, QIcon, QVBoxLayout, QHBoxLayout)
@@ -20,9 +22,7 @@ from pyfda.libs.pyfda_lib import to_html, first_item
 import pyfda.libs.pyfda_dirs as dirs
 from pyfda.pyfda_rc import params
 
-import logging
 logger = logging.getLogger(__name__)
-
 
 # ------------------------------------------------------------------------------
 class Input_PZ_UI(QWidget):

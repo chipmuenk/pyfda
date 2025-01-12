@@ -9,6 +9,7 @@
 """
 Create the UI for the FilterCoeffs class
 """
+import logging
 
 from pyfda.libs.compat import (
     pyqtSignal, Qt, QtGui, QWidget, QLabel, QLineEdit, QComboBox, QPushButton, QFrame,
@@ -24,7 +25,6 @@ from pyfda.fixpoint_widgets.fx_ui_wq import FX_UI_WQ
 from pyfda.pyfda_rc import params
 import pyfda.filterbroker as fb
 
-import logging
 logger = logging.getLogger(__name__)
 
 
