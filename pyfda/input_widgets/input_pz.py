@@ -23,7 +23,7 @@ from pyfda.libs.compat import (
 
 from pyfda.libs.pyfda_qt_lib import qget_cmb_box, qstyle_widget
 from pyfda.libs.pyfda_io_lib import qtable2csv, file2array, export_fil_data, select_file
-from pyfda.libs.pyfda_sig_lib import zeros_with_val, zpk2array
+from pyfda.libs.pyfda_sig_lib import zeros_with_val, zpk2array, normalize_zpk_gain
 
 import pyfda.filterbroker as fb  # importing filterbroker initializes all its globals
 import pyfda.libs.pyfda_dirs as dirs
@@ -347,17 +347,21 @@ class Input_PZ(QWidget):
             self.zpk[2][0] = np.abs(self.zpk[2][0])
 
         if norm != "None":
-            b, a = zpk2tf(self.zpk[0], self.zpk[1], self.zpk[2][0])
-            [w, H] = freqz(b, a, whole=True)
-            Hmax = max(abs(H))
-            if not np.isfinite(Hmax) or Hmax > 1e4 or Hmax < 1e-4:
-                Hmax = 1.
+            # b, a = zpk2tf(self.zpk[0], self.zpk[1], self.zpk[2][0])
+            # [w, H] = freqz(b, a, whole=True)
+            # Hmax = max(abs(H))
+            # if not np.isfinite(Hmax) or Hmax > 1e4 or Hmax < 1e-4:
+            #     Hmax = 1.
             if norm == "1":
-                self.zpk[2][0] = self.zpk[2][0] / Hmax  # normalize to 1
+                # self.zpk[2][0] = self.zpk[2][0] / Hmax  # normalize to 1
+                self.zpk, _ = normalize_zpk_gain(self.zpk)
             elif norm == "Max":
                 if norm != self.norm_last:  # setting has been changed -> 'Max'
-                    self.Hmax_last = Hmax  # use current design to set Hmax_last
-                self.zpk[2][0] = self.zpk[2][0] / Hmax * self.Hmax_last
+                #     self.Hmax_last = Hmax  # use current design to set Hmax_last
+                # self.zpk[2][0] = self.zpk[2][0] / Hmax * self.Hmax_last
+                    self.zpk, H_max = normalize_zpk_gain(self.zpk, self.Hmax_last)
+                    self.Hmax_last = H_max
+        self.ui.ledGain.setText(str(self.zpk[2][0]))
         self.norm_last = norm  # store current setting of combobox
 
         self._restore_gain()
