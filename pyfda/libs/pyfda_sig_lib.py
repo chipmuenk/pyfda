@@ -218,7 +218,7 @@ def normalize_zpk_gain(zpk, norm: float = 1.0):
     if not np.isfinite(Hmax) or Hmax > 1e4 or Hmax < 1e-4:
         Hmax = 1.
     zpk[2][0] = norm * zpk[2][0] / Hmax  # normalize to `norm`
-    return zpk
+    return zpk, Hmax
 
 # ------------------------------------------------------------------------------
 def zpk2array(zpk):
@@ -246,26 +246,25 @@ def zpk2array(zpk):
         _ = len(zpk)
     except TypeError:
         return f"zpk is a scalar or 'None'!"
-    if type(zpk) in {np.ndarray, list}: # , tuple}:
+    if type(zpk) in {np.ndarray, list}:
         if len(zpk) == 3:  # dimensions are ok, but poles / gain could be empty
             if np.isscalar(zpk[2]) or zpk[2] == []:
                 if zpk[2] == 0 or zpk[2] == []:
                     zpk[2] = [1]
-                    zpk = normalize_zpk_gain(zpk)
+                    zpk, _ = normalize_zpk_gain(zpk)
             else:
-                # logger.error(zpk[2])
                 if zpk[2][0] in {0, None}:
                     zpk[2][0] = 1
-                    zpk = normalize_zpk_gain(zpk)
+                    zpk, _ = normalize_zpk_gain(zpk)
 
         elif len(zpk) == 2:  # only poles and zeros given:
             zpk = list(zpk)
             zpk.append([1])  # set gain = 1
-            zpk = normalize_zpk_gain(zpk)
+            zpk, _ = normalize_zpk_gain(zpk)
         elif len(zpk) == 1:  # only zeros given:
             zpk = list(zpk)
             zpk.append([0], [1])  # set pole = 0, gain = 1
-            zpk = normalize_zpk_gain(zpk)
+            zpk, _ = normalize_zpk_gain(zpk)
         else:
             logger.error(f"'zpk' has unsuitable shape '{np.shape(zpk)}'")
             return f"'zpk' has unsuitable shape '{np.shape(zpk)}'"
