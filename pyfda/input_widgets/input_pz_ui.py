@@ -37,7 +37,7 @@ class Input_PZ_UI(QWidget):
         """
         Pass instance `parent` of parent class (FilterCoeffs)
         """
-        super(Input_PZ_UI, self).__init__(parent)
+        super().__init__()
 #        self.parent = parent # instance of the parent (not the base) class
         self.eps = 1.e-4  # tolerance value for e.g. setting P/Z to zero
 

@@ -37,7 +37,7 @@ class Input_Coeffs_UI(QWidget):
     from pyfda.libs.pyfda_qt_lib import emit
 
     def __init__(self, parent=None):
-        super(Input_Coeffs_UI, self).__init__(parent)
+        super().__init__()
         self.eps = 1.e-6  # initialize tolerance value
 
         self.cmb_q_frmt_items = [
