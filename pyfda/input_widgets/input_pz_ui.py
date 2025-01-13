@@ -35,7 +35,7 @@ class Input_PZ_UI(QWidget):
 
     def __init__(self, parent=None):
         """
-        Pass instance `parent` of parent class (FilterCoeffs)
+        Pass instance `parent` of parent class Input_PZ()
         """
         super().__init__()
 #        self.parent = parent # instance of the parent (not the base) class
@@ -126,44 +126,53 @@ class Input_PZ_UI(QWidget):
             )
         q_icon_size = self.but_format.iconSize()
 
-        layHDisplay = QHBoxLayout()
-        layHDisplay.setContentsMargins(*params['wdg_margins'])
-        layHDisplay.setAlignment(Qt.AlignLeft)
-        layHDisplay.addWidget(lbl_display)
-        layHDisplay.addWidget(self.cmbPZFrmt)
-        layHDisplay.addWidget(self.spnDigits)
-        layHDisplay.addWidget(self.lblDigits)
-        layHDisplay.addWidget(self.but_format)
-        layHDisplay.addStretch()
-        self.frm_display = QFrame(self)
-        self.frm_display.setLayout(layHDisplay)
+        lay_h_display = QHBoxLayout()
+        lay_h_display.setContentsMargins(*params['wdg_margins'])
+        lay_h_display.setAlignment(Qt.AlignLeft)
+        lay_h_display.addWidget(lbl_display)
+        lay_h_display.addWidget(self.cmbPZFrmt)
+        lay_h_display.addWidget(self.spnDigits)
+        lay_h_display.addWidget(self.lblDigits)
+        lay_h_display.addWidget(self.but_format)
+        lay_h_display.addStretch()
+        frm_display = QFrame(self)
+        frm_display.setLayout(lay_h_display)
 
         # ---------------------------------------------
         # UI Elements for setting the gain
         # ---------------------------------------------
         self.lblNorm = QLabel(to_html("Normalize:", frmt='bi'), self)
         self.cmbNorm = QComboBox(self)
-        self.cmbNorm.addItems(["None", "1", "Max"])
+        self.cmbNorm.addItems(["Gain", "H_Max"])
         self.cmbNorm.setToolTip(
             "<span>Set the gain <i>k</i> so that H(f)<sub>max</sub> is "
             "either 1 or the max. of the previous system.</span>")
 
-        self.lblGain = QLabel(to_html("k =", frmt='bi'), self)
+        lbl_gain = QLabel(to_html("k =", frmt='bi'), self)
         self.ledGain = QLineEdit(self, objectName="ledGain")
         self.ledGain.setToolTip(
             "<span>Specify gain factor <i>k</i> "
             "(only possible for Normalize = 'None').</span>")
         self.ledGain.setText(str(1.))
 
-        layHGain = QHBoxLayout()
-        layHGain.setContentsMargins(*params['wdg_margins'])
-        layHGain.addWidget(self.lblNorm)
-        layHGain.addWidget(self.cmbNorm)
-        layHGain.addWidget(self.lblGain)
-        layHGain.addWidget(self.ledGain)
-        layHGain.addStretch()
-        self.frm_gain = QFrame(self)
-        self.frm_gain.setLayout(layHGain)
+        lbl_h_max = QLabel(to_html("|<i>H</i><sub>max</sub>(<i>f</i>)| =", frmt='b'), self)
+        self.led_h_max = QLineEdit(self, objectName="hmax")
+        self.led_h_max.setToolTip(
+            "<span>Specify maximum of magnitude response."
+            "</span>")
+        self.led_h_max.setText(str(1.))
+
+        lay_h_gain = QHBoxLayout()
+        lay_h_gain.setContentsMargins(*params['wdg_margins'])
+        lay_h_gain.addWidget(self.lblNorm)
+        lay_h_gain.addWidget(self.cmbNorm)
+        lay_h_gain.addWidget(lbl_gain)
+        lay_h_gain.addWidget(self.ledGain)
+        lay_h_gain.addWidget(lbl_h_max)
+        lay_h_gain.addWidget(self.led_h_max)
+        lay_h_gain.addStretch()
+        frm_gain = QFrame(self)
+        frm_gain.setLayout(lay_h_gain)
 
         # ---------------------------------------------
         # UI Elements for loading / storing / manipulating cells and rows
@@ -233,17 +242,17 @@ class Input_PZ_UI(QWidget):
         self.load_save_clipboard = not self.load_save_clipboard  # is inverted next step
         self._set_load_save_icons()  # initialize icon / button settings
 
-        layH_buttons_coeffs1 = QHBoxLayout()
-        layH_buttons_coeffs1.addWidget(self.butAddCells)
-        layH_buttons_coeffs1.addWidget(self.butDelCells)
-        layH_buttons_coeffs1.addWidget(self.butClear)
-        layH_buttons_coeffs1.addWidget(self.but_undo)
-        layH_buttons_coeffs1.addWidget(self.but_apply)
-        layH_buttons_coeffs1.addWidget(self.but_file_clipboard)
-        layH_buttons_coeffs1.addWidget(self.but_table_import)
-        layH_buttons_coeffs1.addWidget(self.but_table_export)
-        layH_buttons_coeffs1.addWidget(self.but_csv_options)
-        layH_buttons_coeffs1.addStretch()
+        lay_h_buttons_pz1 = QHBoxLayout()
+        lay_h_buttons_pz1.addWidget(self.butAddCells)
+        lay_h_buttons_pz1.addWidget(self.butDelCells)
+        lay_h_buttons_pz1.addWidget(self.butClear)
+        lay_h_buttons_pz1.addWidget(self.but_undo)
+        lay_h_buttons_pz1.addWidget(self.but_apply)
+        lay_h_buttons_pz1.addWidget(self.but_file_clipboard)
+        lay_h_buttons_pz1.addWidget(self.but_table_import)
+        lay_h_buttons_pz1.addWidget(self.but_table_export)
+        lay_h_buttons_pz1.addWidget(self.but_csv_options)
+        lay_h_buttons_pz1.addStretch()
 
         # -------------------------------------------------------------------
         #   Eps / set zero settings
@@ -255,39 +264,39 @@ class Input_PZ_UI(QWidget):
             "When nothing is selected, test the whole table.</span>")
         self.butSetZero.setIconSize(q_icon_size)
 
-        lblEps = QLabel(self)
-        lblEps.setText("<b><i>for &epsilon;</i> &lt;</b>")
+        lbl_eps = QLabel(self)
+        lbl_eps.setText("<b><i>for &epsilon;</i> &lt;</b>")
 
         self.ledEps = QLineEdit(self)
         self.ledEps.setToolTip("Specify absolute tolerance value.")
 
-        layH_buttons_coeffs2 = QHBoxLayout()
-        layH_buttons_coeffs2.addWidget(self.butSetZero)
-        layH_buttons_coeffs2.addWidget(lblEps)
-        layH_buttons_coeffs2.addWidget(self.ledEps)
-        layH_buttons_coeffs2.addStretch()
+        lay_h_buttons_pz2 = QHBoxLayout()
+        lay_h_buttons_pz2.addWidget(self.butSetZero)
+        lay_h_buttons_pz2.addWidget(lbl_eps)
+        lay_h_buttons_pz2.addWidget(self.ledEps)
+        lay_h_buttons_pz2.addStretch()
 
         # -------------------------------------------------------------------
-        # Now put the _buttons_coeffs HBoxes into frm_buttons_coeffs
+        # Now put the _buttons_pz HBoxes into frm_buttons_pz
         # ---------------------------------------------------------------------
-        layV_buttons_coeffs = QVBoxLayout()
-        layV_buttons_coeffs.addLayout(layH_buttons_coeffs1)
-        layV_buttons_coeffs.addLayout(layH_buttons_coeffs2)
-        layV_buttons_coeffs.setContentsMargins(*params['wdg_margins'])
+        lay_v_buttons_pz = QVBoxLayout()
+        lay_v_buttons_pz.addLayout(lay_h_buttons_pz1)
+        lay_v_buttons_pz.addLayout(lay_h_buttons_pz2)
+        lay_v_buttons_pz.setContentsMargins(*params['wdg_margins'])
 
-        self.frm_buttons_coeffs = QFrame(self)
-        self.frm_buttons_coeffs.setLayout(layV_buttons_coeffs)
+        frm_buttons_pz = QFrame(self)
+        frm_buttons_pz.setLayout(lay_v_buttons_pz)
 
         # ########################  Main UI Layout ############################
 
-        layVMain = QVBoxLayout()
-        layVMain.setContentsMargins(*params['wdg_margins'])
+        lay_v_main = QVBoxLayout()
+        lay_v_main.setContentsMargins(*params['wdg_margins'])
         # the following affects only the first widget (intended here)
-        layVMain.setAlignment(Qt.AlignTop)
-        layVMain.addWidget(self.frm_gain)
-        layVMain.addWidget(self.frm_buttons_coeffs)
-        layVMain.addWidget(self.frm_display)
-        self.setLayout(layVMain)
+        lay_v_main.setAlignment(Qt.AlignTop)
+        lay_v_main.addWidget(frm_gain)
+        lay_v_main.addWidget(frm_buttons_pz)
+        lay_v_main.addWidget(frm_display)
+        self.setLayout(lay_v_main)
 
         # --- set initial values from dict ------------
         self.spnDigits.setValue(params['FMT_pz'])

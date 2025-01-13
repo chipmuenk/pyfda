@@ -30,7 +30,7 @@ logger = logging.getLogger(__name__)
 
 class Input_Coeffs_UI(QWidget):
     """
-    Create the UI for the FilterCoeffs class
+    Create the UI for the Input_Coeffs() class
     """
     sig_rx = pyqtSignal(dict)  # incoming
     sig_tx = pyqtSignal(dict)  # outgoing
@@ -158,27 +158,27 @@ class Input_Coeffs_UI(QWidget):
         # self.frm_q_frmt = QFrame(self)
         # self.frm_q_frmt.setLayout(layH_q_frmt)
 
-        layH_display = QHBoxLayout()
-        layH_display.setContentsMargins(*params['wdg_margins'])
-        layH_display.setAlignment(Qt.AlignLeft)
-        layH_display.addWidget(lbl_display)
-        layH_display.addWidget(self.cmb_qfrmt)
-        layH_display.addWidget(self.spnDigits)
-        layH_display.addWidget(self.lblDigits)
-        layH_display.addWidget(self.cmb_fx_base)
-        layH_display.addWidget(self.but_quant)
-        layH_display.addWidget(self.but_format)
-        layH_display.addStretch()
+        lay_h_display = QHBoxLayout()
+        lay_h_display.setContentsMargins(*params['wdg_margins'])
+        lay_h_display.setAlignment(Qt.AlignLeft)
+        lay_h_display.addWidget(lbl_display)
+        lay_h_display.addWidget(self.cmb_qfrmt)
+        lay_h_display.addWidget(self.spnDigits)
+        lay_h_display.addWidget(self.lblDigits)
+        lay_h_display.addWidget(self.cmb_fx_base)
+        lay_h_display.addWidget(self.but_quant)
+        lay_h_display.addWidget(self.but_format)
+        lay_h_display.addStretch()
 
         self.frm_display = QFrame(self)
-        self.frm_display.setLayout(layH_display)
+        self.frm_display.setLayout(lay_h_display)
 
         #######################################################################
         # frm_buttons_coeffs
         #
         # This frame contains all buttons for manipulating coefficients
         # -----------------------------------------------------------------
-        # layH_buttons_coeffs1
+        # lay_h_buttons_coeffs1
         #
         # UI Elements for loading / storing / manipulating cells and rows
         # -----------------------------------------------------------------
@@ -252,21 +252,21 @@ class Input_Coeffs_UI(QWidget):
         self.load_save_clipboard = not self.load_save_clipboard  # is inverted next step
         self._set_load_save_icons()  # initialize icon / button settings
 
-        layH_buttons_coeffs1 = QHBoxLayout()
-        layH_buttons_coeffs1.addWidget(self.cmbFilterType)
-        layH_buttons_coeffs1.addWidget(self.butAddCells)
-        layH_buttons_coeffs1.addWidget(self.butDelCells)
-        layH_buttons_coeffs1.addWidget(self.butClear)
-        layH_buttons_coeffs1.addWidget(self.but_undo)
-        layH_buttons_coeffs1.addWidget(self.but_apply)
-        layH_buttons_coeffs1.addWidget(self.but_file_clipboard)
-        layH_buttons_coeffs1.addWidget(self.but_table_import)
-        layH_buttons_coeffs1.addWidget(self.but_table_export)
-        layH_buttons_coeffs1.addWidget(self.but_csv_options)
-        layH_buttons_coeffs1.addStretch()
+        lay_h_buttons_coeffs1 = QHBoxLayout()
+        lay_h_buttons_coeffs1.addWidget(self.cmbFilterType)
+        lay_h_buttons_coeffs1.addWidget(self.butAddCells)
+        lay_h_buttons_coeffs1.addWidget(self.butDelCells)
+        lay_h_buttons_coeffs1.addWidget(self.butClear)
+        lay_h_buttons_coeffs1.addWidget(self.but_undo)
+        lay_h_buttons_coeffs1.addWidget(self.but_apply)
+        lay_h_buttons_coeffs1.addWidget(self.but_file_clipboard)
+        lay_h_buttons_coeffs1.addWidget(self.but_table_import)
+        lay_h_buttons_coeffs1.addWidget(self.but_table_export)
+        lay_h_buttons_coeffs1.addWidget(self.but_csv_options)
+        lay_h_buttons_coeffs1.addStretch()
 
         # ----------------------------------------------------------------------
-        # layH_buttons_coeffs2
+        # lay_h_buttons_coeffs2
         #
         # Eps / set zero settings
         # ---------------------------------------------------------------------
@@ -276,28 +276,28 @@ class Input_Coeffs_UI(QWidget):
             "When nothing is selected, test the whole table.</span>")
         self.butSetZero.setIconSize(q_icon_size)
 
-        lblEps = QLabel(self)
-        lblEps.setText("<b><i>for b, a</i> &lt;</b>")
+        lbl_eps = QLabel(self)
+        lbl_eps.setText("<b><i>for b, a</i> &lt;</b>")
 
         self.ledEps = QLineEdit(self)
         self.ledEps.setToolTip("Specify tolerance value.")
 
-        layH_buttons_coeffs2 = QHBoxLayout()
-        layH_buttons_coeffs2.addWidget(self.butSetZero)
-        layH_buttons_coeffs2.addWidget(lblEps)
-        layH_buttons_coeffs2.addWidget(self.ledEps)
-        layH_buttons_coeffs2.addStretch()
+        lay_h_buttons_coeffs2 = QHBoxLayout()
+        lay_h_buttons_coeffs2.addWidget(self.butSetZero)
+        lay_h_buttons_coeffs2.addWidget(lbl_eps)
+        lay_h_buttons_coeffs2.addWidget(self.ledEps)
+        lay_h_buttons_coeffs2.addStretch()
 
         # -------------------------------------------------------------------
         # Now put the _buttons_coeffs HBoxes into frm_buttons_coeffs
         # ---------------------------------------------------------------------
-        layV_buttons_coeffs = QVBoxLayout()
-        layV_buttons_coeffs.addLayout(layH_buttons_coeffs1)
-        layV_buttons_coeffs.addLayout(layH_buttons_coeffs2)
-        layV_buttons_coeffs.setContentsMargins(*params['wdg_margins'])  # 0, 5, 0, 0)
+        lay_v_buttons_coeffs = QVBoxLayout()
+        lay_v_buttons_coeffs.addLayout(lay_h_buttons_coeffs1)
+        lay_v_buttons_coeffs.addLayout(lay_h_buttons_coeffs2)
+        lay_v_buttons_coeffs.setContentsMargins(*params['wdg_margins'])  # 0, 5, 0, 0)
         # This frame encompasses all Quantization Settings
         self.frm_buttons_coeffs = QFrame(self)
-        self.frm_buttons_coeffs.setLayout(layV_buttons_coeffs)
+        self.frm_buttons_coeffs.setLayout(lay_v_buttons_coeffs)
         #######################################################################
 
         # -------------------
@@ -315,15 +315,15 @@ class Input_Coeffs_UI(QWidget):
         # ########################  Main UI Layout ############################
         #######################################################################
 
-        layVMain = QVBoxLayout()
-        layVMain.setContentsMargins(*params['wdg_margins'])
+        lay_v_main = QVBoxLayout()
+        lay_v_main.setContentsMargins(*params['wdg_margins'])
         # the following affects only the first widget (intended here)
-        layVMain.setAlignment(Qt.AlignTop)
-        layVMain.addWidget(self.frm_buttons_coeffs)
-        layVMain.addWidget(self.wdg_wq_coeffs_b)
-        layVMain.addWidget(self.wdg_wq_coeffs_a)
-        layVMain.addWidget(self.frm_display)
-        self.setLayout(layVMain)
+        lay_v_main.setAlignment(Qt.AlignTop)
+        lay_v_main.addWidget(self.frm_buttons_coeffs)
+        lay_v_main.addWidget(self.wdg_wq_coeffs_b)
+        lay_v_main.addWidget(self.wdg_wq_coeffs_a)
+        lay_v_main.addWidget(self.frm_display)
+        self.setLayout(lay_v_main)
         #######################################################################
 
         # --- set initial values from dict ------------
