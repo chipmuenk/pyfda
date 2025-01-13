@@ -1859,7 +1859,8 @@ def fil_convert(fil_dict: dict, format_in) -> None:
 
             # TODO: use mpmath.polyroots() here for higher precision
             # https://mpmath.org/doc/current/calculus/polynomials.html
-            zpk = sig.tf2zpk(fil_dict['ba'][0], fil_dict['ba'][1])  # (b, a)
+            # tf2zpk yields (z,p,k) where z and p are ndarrays
+            zpk = list(sig.tf2zpk(fil_dict['ba'][0], fil_dict['ba'][1]))
             if len(zpk[0]) != len(zpk[1]):
                 logger.warning("Bad coefficients, some values of b are too close to zero,"
                                "\n\tresults may be inaccurate.")

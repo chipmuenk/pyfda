@@ -221,7 +221,7 @@ def normalize_zpk_gain(zpk, h_max_target: float = 1.0):
     return zpk
 
 # ------------------------------------------------------------------------------
-def zpk2array(zpk):
+def zpk2array(zpk: list):
     """
     Test whether Z = zpk[0] and P = zpk[1] have the same length, if not, equalize
     the lengths by adding zeros.
@@ -240,13 +240,14 @@ def zpk2array(zpk):
 
     Returns
     -----
-    zpk as an array or an error string
+    zpk as a numpy array or an error string
     """
     try:
         _ = len(zpk)
     except TypeError:
-        return f"zpk is a scalar or 'None'!"
-    if type(zpk) in {np.ndarray, list}:
+        return "'zpk' is a scalar or 'None'!"
+
+    if type(zpk) is list:
         if len(zpk) == 3:  # dimensions are ok, but poles / gain could be empty
             if np.isscalar(zpk[2]) or zpk[2] == []:
                 if zpk[2] == 0 or zpk[2] == []:
@@ -261,10 +262,12 @@ def zpk2array(zpk):
             zpk = list(zpk)
             zpk.append([1])  # set gain = 1
             zpk = normalize_zpk_gain(zpk)
+
         elif len(zpk) == 1:  # only zeros given:
             zpk = list(zpk)
             zpk.append([0], [1])  # set pole = 0, gain = 1
             zpk = normalize_zpk_gain(zpk)
+
         else:
             logger.error(f"'zpk' has unsuitable shape '{np.shape(zpk)}'")
             return f"'zpk' has unsuitable shape '{np.shape(zpk)}'"
