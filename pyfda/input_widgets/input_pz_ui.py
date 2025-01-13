@@ -147,6 +147,7 @@ class Input_PZ_UI(QWidget):
         self.led_gain.setToolTip(
             "<span>Specify gain factor <i>k</i></span>")
         self.led_gain.setText(str(1.))
+        self.led_gain.setEnabled(self.chk_gain.isChecked())
 
         self.chk_h_max = QRadioButton(self)
         lbl_h_max = QLabel(to_html("|<i>H</i><sub>max</sub>(<i>f</i>)| =", frmt='b'), self)
@@ -154,6 +155,7 @@ class Input_PZ_UI(QWidget):
         self.led_h_max.setToolTip(
             "<span>Specify maximum of magnitude response.</span>")
         self.led_h_max.setText(str(1.))
+        self.led_h_max.setEnabled(self.chk_h_max.isChecked())
 
         lay_h_gain = QHBoxLayout()
         lay_h_gain.setContentsMargins(*params['wdg_margins'])
