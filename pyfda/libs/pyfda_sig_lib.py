@@ -207,18 +207,18 @@ def zeros_with_val(N: int, val: float = 1., pos: int = 0):
     return a
 
 # ------------------------------------------------------------------------------
-def normalize_zpk_gain(zpk, norm: float = 1.0):
+def normalize_zpk_gain(zpk, h_max_target: float = 1.0):
     """
     Scale the system given in zero, pole, gain form in such a way that the
-    maximum of the magnitude response is `norm`.
+    maximum of the magnitude response is `h_max_target`.
     """
     b, a = sig.zpk2tf(zpk[0], zpk[1], zpk[2][0])
     [w, H] = sig.freqz(b, a, whole=True)
-    Hmax = max(abs(H))
-    if not np.isfinite(Hmax) or Hmax > 1e4 or Hmax < 1e-4:
-        Hmax = 1.
-    zpk[2][0] = norm * zpk[2][0] / Hmax  # normalize to `norm`
-    return zpk, Hmax
+    h_max = max(abs(H))
+    if not np.isfinite(h_max) or h_max > 1e4 or h_max < 1e-4:
+        h_max = 1.
+    zpk[2][0] = h_max_target * zpk[2][0] / h_max  # normalize to `h_max_target`
+    return zpk
 
 # ------------------------------------------------------------------------------
 def zpk2array(zpk):
@@ -251,20 +251,20 @@ def zpk2array(zpk):
             if np.isscalar(zpk[2]) or zpk[2] == []:
                 if zpk[2] == 0 or zpk[2] == []:
                     zpk[2] = [1]
-                    zpk, _ = normalize_zpk_gain(zpk)
+                    zpk = normalize_zpk_gain(zpk)
             else:
                 if zpk[2][0] in {0, None}:
                     zpk[2][0] = 1
-                    zpk, _ = normalize_zpk_gain(zpk)
+                    zpk = normalize_zpk_gain(zpk)
 
         elif len(zpk) == 2:  # only poles and zeros given:
             zpk = list(zpk)
             zpk.append([1])  # set gain = 1
-            zpk, _ = normalize_zpk_gain(zpk)
+            zpk = normalize_zpk_gain(zpk)
         elif len(zpk) == 1:  # only zeros given:
             zpk = list(zpk)
             zpk.append([0], [1])  # set pole = 0, gain = 1
-            zpk, _ = normalize_zpk_gain(zpk)
+            zpk = normalize_zpk_gain(zpk)
         else:
             logger.error(f"'zpk' has unsuitable shape '{np.shape(zpk)}'")
             return f"'zpk' has unsuitable shape '{np.shape(zpk)}'"

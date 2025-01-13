@@ -163,7 +163,7 @@ class Input_PZ(QWidget):
 
         self.data_changed = True  # initialize flag: filter data has been changed
 
-        self.Hmax_last = 1  # initial setting for maximum gain
+        self.h_max = 1  # initial setting for maximum gain
         self.angle_char = "\u2220"
         self.pi_char = "pi" # "\u03C0" looks ugly
 
@@ -171,7 +171,6 @@ class Input_PZ(QWidget):
         self.tool_tip = "Display and edit filter poles and zeros."
 
         self.ui = Input_PZ_UI(self)  # create the UI control part
-        self.norm_last = qget_cmb_box(self.ui.cmbNorm, data=False)  # initial setting of cmbNorm
         self._construct_UI()  # construct the rest of the UI
 
 # ------------------------------------------------------------------------------
@@ -245,7 +244,7 @@ class Input_PZ(QWidget):
         self.ui.but_undo.clicked.connect(self.load_dict)
 
         self.ui.but_apply.clicked.connect(self._save_entries)
-        self.ui.cmbNorm.activated.connect(self._normalize_gain)
+        self.ui.chk_gain.toggled.connect(self._normalize_gain)
 
         self.ui.but_del_cells.clicked.connect(self._delete_cells)
         self.ui.but_add_cells.clicked.connect(self._add_rows)
@@ -257,6 +256,7 @@ class Input_PZ(QWidget):
         self.ui.but_set_zero.clicked.connect(self._zero_PZ)
 
         self.ui.led_gain.installEventFilter(self)
+        self.ui.led_h_max.installEventFilter(self)
         self.ui.led_eps.editingFinished.connect(self._set_eps)
 
         # ----------------------------------------------------------------------
@@ -288,93 +288,58 @@ class Input_PZ(QWidget):
         if isinstance(source, QLineEdit):
             if event.type() == QEvent.FocusIn:  # 8
                 self.spec_edited = False
-                self._restore_gain(source)
+                self._reload_entry(source)
                 return True  # event processing stops here
 
             elif event.type() == QEvent.KeyPress:
                 self.spec_edited = True  # entry has been changed
                 key = event.key()  # key press: 6, key release: 7
                 if key in {QtCore.Qt.Key_Return, QtCore.Qt.Key_Enter}:  # store entry
-                    self._store_gain(source)
-                    self._restore_gain(source)  # display in desired format
+                    self._store_entry(source)
+                    self._reload_entry(source)  # display in desired format
                     return True
 
                 elif key == QtCore.Qt.Key_Escape:  # revert changes
                     self.spec_edited = False
-                    self._restore_gain(source)
+                    self._reload_entry(source)
                     return True
 
             elif event.type() == QEvent.FocusOut:  # 9
-                self._store_gain(source)
-                self._restore_gain(source)  # display in desired format
+                self._store_entry(source)
+                self._reload_entry(source)  # display in desired format
                 return True
 
         return super(Input_PZ, self).eventFilter(source, event)
 
     # ------------------------------------------------------------------------------
-    def _store_gain(self, source):
+    def _store_entry(self, source):
         """
         When the textfield of `source` has been edited (flag `self.spec_edited` =  True),
-        store it in the shadow dict. This is triggered by `QEvent.focusOut` or
+        store it in 'target'. This is triggered by `QEvent.focusOut` or
         RETURN key.
         """
         if self.spec_edited:
-            self.zpk[2][0] = safe_eval(source.text(), alt_expr=str(self.zpk[2][0]))
+            logger.error(source.objectName())
+            if source.objectName() == "led_gain":
+                self.zpk[2][0] = safe_eval(source.text(), alt_expr=str(self.zpk[2][0]))
+            else:
+                self.h_max = safe_eval(source.text(), alt_expr=str(self.h_max))
+
             qstyle_widget(self.ui.but_apply, 'changed')
             qstyle_widget(self.ui.but_undo, 'changed')
+
+            self._normalize_gain()
 
             self.spec_edited = False  # reset flag
 
-# ------------------------------------------------------------------------------
-    def _normalize_gain(self):
-        """
-        Normalize the gain factor so that the maximum of |H(f)| stays 1 or a
-        previously stored maximum value of |H(f)|. Do this every time a P or Z
-        has been changed.
-        Called by setModelData() and when cmbNorm is activated
-
-        """
-        norm = qget_cmb_box(self.ui.cmbNorm, data=False)
-        self.ui.led_gain.setEnabled(norm == 'None')
-        if norm != self.norm_last:
-            qstyle_widget(self.ui.but_apply, 'changed')
-            qstyle_widget(self.ui.but_undo, 'changed')
-        if not np.isfinite(self.zpk[2][0]):
-            self.zpk[2][0] = 1.
-        self.zpk[2][0] = np.real_if_close(self.zpk[2][0]).item()
-        if np.iscomplex(self.zpk[2][0]):
-            logger.warning("Casting complex to real for gain k!")
-            self.zpk[2][0] = np.abs(self.zpk[2][0])
-
-        if norm != "None":
-            # b, a = zpk2tf(self.zpk[0], self.zpk[1], self.zpk[2][0])
-            # [w, H] = freqz(b, a, whole=True)
-            # Hmax = max(abs(H))
-            # if not np.isfinite(Hmax) or Hmax > 1e4 or Hmax < 1e-4:
-            #     Hmax = 1.
-            if norm == "1":
-                # self.zpk[2][0] = self.zpk[2][0] / Hmax  # normalize to 1
-                self.zpk, _ = normalize_zpk_gain(self.zpk)
-            elif norm == "Max":
-                if norm != self.norm_last:  # setting has been changed -> 'Max'
-                #     self.Hmax_last = Hmax  # use current design to set Hmax_last
-                # self.zpk[2][0] = self.zpk[2][0] / Hmax * self.Hmax_last
-                    self.zpk, H_max = normalize_zpk_gain(self.zpk, self.Hmax_last)
-                    self.Hmax_last = H_max
-        self.ui.led_gain.setText(str(self.zpk[2][0]))
-        self.norm_last = norm  # store current setting of combobox
-
-        self._restore_gain()
-
     # ------------------------------------------------------------------------------
-    def _restore_gain(self, source=None):
+    def _reload_entry(self, source=None):
         """
-        Update QLineEdit with either full (has focus) or reduced precision (no focus)
+        Reload QLineEdit with either full (has focus) or reduced precision (no focus)
 
         Called by eventFilter, _normalize_gain() and _refresh_table()
         """
 
-        # if self.ui.butEnable.isChecked():
         if len(self.zpk) == 3:  # number of rows
             pass
         elif len(self.zpk) == 2:  # k is missing in zpk:
@@ -383,12 +348,39 @@ class Input_PZ(QWidget):
             logger.error(f"P/Z array 'self.zpk' has wrong number of rows = {len(self.zpk)}")
             logger.error(self.zpk)
 
-        k = safe_eval(self.zpk[2][0], return_type='auto')
+        if source.objectName() == "led_gain":
+            data = safe_eval(self.zpk[2][0], return_type='auto')
+        else:
+            data = self.h_max
+        if not source.hasFocus():  # no focus, round the data
+            source.setText(str(params['FMT'].format(data)))
+        else:  # widget has focus, show data with full precision
+            source.setText(str(data))
 
-        if not self.ui.led_gain.hasFocus():  # no focus, round the gain
-            self.ui.led_gain.setText(str(params['FMT'].format(k)))
-        else:  # widget has focus, show gain with full precision
-            self.ui.led_gain.setText(str(k))
+# ------------------------------------------------------------------------------
+    def _normalize_gain(self):
+        """
+        Normalize the gain factor to either reach the selected maximum of |H(f)| or
+        Do this every time a P or Z has been changed.
+        Called by setModelData() and when gain / h_max radio buttons are toggled
+        """
+        use_gain = self.ui.chk_gain.isChecked()
+        self.ui.led_gain.setEnabled(use_gain)
+        self.ui.led_h_max.setEnabled(not use_gain)
+
+        if not np.isfinite(self.zpk[2][0]):
+            self.zpk[2][0] = 1.
+        self.zpk[2][0] = np.real_if_close(self.zpk[2][0]).item()
+        if np.iscomplex(self.zpk[2][0]):
+            logger.warning("Casting complex to real for gain k!")
+            self.zpk[2][0] = np.abs(self.zpk[2][0])
+
+        if not use_gain:  # calculate necessary gain to achieve H_max
+            self.h_max = safe_eval(self.ui.led_h_max.text(), alt_expr=self.h_max, sign='pos')
+            self.zpk = normalize_zpk_gain(self.zpk, self.h_max)
+
+        self._reload_entry(source=self.ui.led_gain)
+        self._reload_entry(source=self.ui.led_h_max)
 
     # ------------------------------------------------------------------------------
     def _refresh_table_item(self, row, col):
@@ -411,7 +403,6 @@ class Input_PZ(QWidget):
 
         TODO:
         - Update zpk[2][0]?
-        - Remove butEnable part
 
         Called by: load_dict(), _clear_table(), _zero_PZ(), _delete_cells(),
                 add_row(), _import()
@@ -419,30 +410,23 @@ class Input_PZ(QWidget):
 
         params['FMT_pz'] = int(self.ui.spn_digits.text())
 
-        # self.tblPZ.setVisible(self.ui.butEnable.isChecked())
         self.tblPZ.setVisible(True)
 
-        if True: # self.ui.butEnable.isChecked():
+        self.ui.led_gain.setText(
+            str(params['FMT'].format(safe_eval(self.zpk[2][0], return_type='auto'))))
 
-            # self.ui.butEnable.setIcon(QIcon(':/circle-check.svg'))
+        self.tblPZ.setHorizontalHeaderLabels(["Zeros", "Poles"])
+        self.tblPZ.setRowCount(len(self.zpk[0]))
 
-            self._restore_gain()
+        self.tblPZ.blockSignals(True)
+        for col in range(2):
+            for row in range(len(self.zpk[col])):
+                self._refresh_table_item(row, col)
+        self.tblPZ.blockSignals(False)
 
-            self.tblPZ.setHorizontalHeaderLabels(["Zeros", "Poles"])
-            self.tblPZ.setRowCount(len(self.zpk[0]))
-
-            self.tblPZ.blockSignals(True)
-            for col in range(2):
-                for row in range(len(self.zpk[col])):
-                    self._refresh_table_item(row, col)
-            self.tblPZ.blockSignals(False)
-
-            self.tblPZ.resizeColumnsToContents()
-            self.tblPZ.resizeRowsToContents()
-            self.tblPZ.clearSelection()
-
-        # else:  # disable widgets
-        #     self.ui.butEnable.setIcon(QIcon(':/circle-x.svg'))
+        self.tblPZ.resizeColumnsToContents()
+        self.tblPZ.resizeRowsToContents()
+        self.tblPZ.clearSelection()
 
     # ------------------------------------------------------------------------------
     def load_dict(self):
@@ -534,7 +518,7 @@ class Input_PZ(QWidget):
         P = Z = [0; 0], k = 1
         """
         self.zpk = np.array([[0, 0], [0, 0], [1, 0]], dtype=complex)
-        self.Hmax_last = 1.0
+        self.h_max = 1.0
 
         qstyle_widget(self.ui.but_apply, 'changed')
         qstyle_widget(self.ui.but_undo, 'changed')

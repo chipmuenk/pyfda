@@ -13,8 +13,8 @@ Create the UI for the FilterPZ class
 import logging
 
 from pyfda.libs.compat import (
-    pyqtSignal, Qt, QWidget, QLabel, QLineEdit, QComboBox, QPushButton,
-    QFrame, QSpinBox, QFont, QIcon, QVBoxLayout, QHBoxLayout)
+    pyqtSignal, Qt, QWidget, QLabel, QLineEdit, QComboBox, QPushButton, QCheckBox,
+    QRadioButton, QFrame, QSpinBox, QFont, QIcon, QVBoxLayout, QHBoxLayout)
 
 from pyfda.libs.pyfda_qt_lib import qstyle_widget, qcmb_box_populate, PushButton
 from pyfda.libs.csv_option_box import CSV_option_box
@@ -141,33 +141,27 @@ class Input_PZ_UI(QWidget):
         # ---------------------------------------------
         # UI Elements for setting the gain
         # ---------------------------------------------
-        self.lblNorm = QLabel(to_html("Normalize:", frmt='bi'), self)
-        self.cmbNorm = QComboBox(self)
-        self.cmbNorm.addItems(["Gain", "H_Max"])
-        self.cmbNorm.setToolTip(
-            "<span>Set the gain <i>k</i> so that H(f)<sub>max</sub> is "
-            "either 1 or the max. of the previous system.</span>")
-
+        self.chk_gain = QRadioButton(self, checked=True)
         lbl_gain = QLabel(to_html("k =", frmt='bi'), self)
         self.led_gain = QLineEdit(self, objectName="led_gain")
         self.led_gain.setToolTip(
-            "<span>Specify gain factor <i>k</i> "
-            "(only possible for Normalize = 'None').</span>")
+            "<span>Specify gain factor <i>k</i></span>")
         self.led_gain.setText(str(1.))
 
+        self.chk_h_max = QRadioButton(self)
         lbl_h_max = QLabel(to_html("|<i>H</i><sub>max</sub>(<i>f</i>)| =", frmt='b'), self)
-        self.led_h_max = QLineEdit(self, objectName="hmax")
+        self.led_h_max = QLineEdit(self, objectName="led_h_max")
         self.led_h_max.setToolTip(
-            "<span>Specify maximum of magnitude response."
-            "</span>")
+            "<span>Specify maximum of magnitude response.</span>")
         self.led_h_max.setText(str(1.))
 
         lay_h_gain = QHBoxLayout()
         lay_h_gain.setContentsMargins(*params['wdg_margins'])
-        lay_h_gain.addWidget(self.lblNorm)
-        lay_h_gain.addWidget(self.cmbNorm)
+
+        lay_h_gain.addWidget(self.chk_gain)
         lay_h_gain.addWidget(lbl_gain)
         lay_h_gain.addWidget(self.led_gain)
+        lay_h_gain.addWidget(self.chk_h_max)
         lay_h_gain.addWidget(lbl_h_max)
         lay_h_gain.addWidget(self.led_h_max)
         lay_h_gain.addStretch()
