@@ -170,8 +170,8 @@ class Input_Coeffs_UI(QWidget):
         lay_h_display.addWidget(self.but_format)
         lay_h_display.addStretch()
 
-        self.frm_display = QFrame(self)
-        self.frm_display.setLayout(lay_h_display)
+        frm_display = QFrame(self)
+        frm_display.setLayout(lay_h_display)
 
         #######################################################################
         # frm_buttons_coeffs
@@ -322,7 +322,7 @@ class Input_Coeffs_UI(QWidget):
         lay_v_main.addWidget(self.frm_buttons_coeffs)
         lay_v_main.addWidget(self.wdg_wq_coeffs_b)
         lay_v_main.addWidget(self.wdg_wq_coeffs_a)
-        lay_v_main.addWidget(self.frm_display)
+        lay_v_main.addWidget(frm_display)
         self.setLayout(lay_v_main)
         #######################################################################
 
