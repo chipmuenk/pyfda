@@ -69,7 +69,7 @@ class Input_Coeffs_UI(QWidget):
 
         self._construct_UI()
 
-# ------------------------------------------------------------------------------
+    # ------------------------------------------------------------------------------
     def process_sig_rx(self, dict_sig=None):
         """
         Process signals coming from the CSV pop-up window
@@ -88,7 +88,7 @@ class Input_Coeffs_UI(QWidget):
             # signal change of CSV options to other widgets with current id
             self.emit({'ui_global_changed': 'csv'})
 
-# ------------------------------------------------------------------------------
+    # ------------------------------------------------------------------------------
     def _construct_UI(self):
         """
         Intitialize the widget, consisting of:
@@ -103,17 +103,10 @@ class Input_Coeffs_UI(QWidget):
         self.bifont.setItalic(True)
 #        q_icon_size = QSize(20, 20) # optional, size is derived from butEnable
 
-        #######################################################################
-        # frmMain
-        #
-        # This frame contains all the buttons
-        #######################################################################
         # ---------------------------------------------
         #
         # UI Elements for controlling the display
         # ---------------------------------------------
-
-
         lbl_display = QLabel(to_html("Display:", frmt='bi'), self)
         self.cmb_qfrmt = QComboBox(self)
         qcmb_box_populate(self.cmb_qfrmt, self.cmb_q_frmt_items,
@@ -289,7 +282,7 @@ class Input_Coeffs_UI(QWidget):
         lay_h_buttons_coeffs2.addStretch()
 
         # -------------------------------------------------------------------
-        # Now put the _buttons_coeffs HBoxes into frm_buttons_coeffs
+        # Collect lay_h_buttons_coeffs in frm_buttons_coeffs
         # ---------------------------------------------------------------------
         lay_v_buttons_coeffs = QVBoxLayout()
         lay_v_buttons_coeffs.addLayout(lay_h_buttons_coeffs1)
