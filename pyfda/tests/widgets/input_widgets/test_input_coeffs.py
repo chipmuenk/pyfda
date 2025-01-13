@@ -73,13 +73,13 @@ class FilterCoeffsTest(unittest.TestCase):
 
     def initialize_form(self):
         """ utility function for initializing the form """
-        self.ui.spnDigits.setValue(4)
+        self.ui.spn_digits.setValue(4)
         # self.ui.ledScale.setText("1.5")
-        self.set_cmb_box(self.ui.cmbFilterType, 'FIR')
+        self.set_cmb_box(self.ui.cmb_filter_type, 'FIR')
         spy = QSignalSpy(self.form.sig_tx)
         self.set_cmb_box(self.ui.cmb_fx_base, 'Float')
         # Push <Delete Table> Button with the left mouse button
-        QTest.mouseClick(self.ui.butClear, Qt.LeftButton)
+        QTest.mouseClick(self.ui.but_clear, Qt.LeftButton)
 
     def initialize_fixpoint_format(self):
         self.set_cmb_box(self.ui.cmb_fx_base, 'Dec')
@@ -96,11 +96,11 @@ class FilterCoeffsTest(unittest.TestCase):
     def test_defaults(self):
         """Test GUI setting in its default state"""
         self.init()
-        self.assertEqual(self.ui.spnDigits.value(), 4)
-        self.assertEqual(qget_cmb_box(self.ui.cmbFilterType, data=False), "FIR")
+        self.assertEqual(self.ui.spn_digits.value(), 4)
+        self.assertEqual(qget_cmb_box(self.ui.cmb_filter_type, data=False), "FIR")
 
         self.assertEqual(qget_cmb_box(self.ui.cmb_fx_base, data=False).lower(), "float")
-        self.assertEqual(self.ui.butSetZero.text(), "= 0")
+        self.assertEqual(self.ui.but_set_zero.text(), "= 0")
 
         self.assertEqual(self.form.tblCoeff.rowCount(), 3)
         self.assertEqual(self.form.tblCoeff.columnCount(), 1)
@@ -111,22 +111,22 @@ class FilterCoeffsTest(unittest.TestCase):
     def test_cmb_filter_type(self):
         """Test setting <Filter Type> ComboBox and the effect on the table shape"""
         self.init()
-        self.set_cmb_box(self.ui.cmbFilterType, 'IIR')
-        self.assertEqual(qget_cmb_box(self.ui.cmbFilterType, data=False), "IIR")
-        self.ui.cmbFilterType.currentIndexChanged.emit(1)
-        QTest.mouseClick(self.ui.cmbFilterType, Qt.LeftButton)
+        self.set_cmb_box(self.ui.cmb_filter_type, 'IIR')
+        self.assertEqual(qget_cmb_box(self.ui.cmb_filter_type, data=False), "IIR")
+        self.ui.cmb_filter_type.currentIndexChanged.emit(1)
+        QTest.mouseClick(self.ui.cmb_filter_type, Qt.LeftButton)
         QTest.keyClick(QApplication.instance().focusWidget(), Qt.Key_PageDown)
         QTest.qWait(1000)
         QTest.keyClick(QApplication.instance().focusWidget(), Qt.Key_Return)
         QTest.qWait(1000)
-        self.assertEqual(qget_cmb_box(self.ui.cmbFilterType, data=False), "IIR")
+        self.assertEqual(qget_cmb_box(self.ui.cmb_filter_type, data=False), "IIR")
         # https://vicrucann.github.io/tutorials/qttest-signals-qtreewidget/
         self.assertEqual(self.form.tblCoeff.rowCount(), 3)
         self.assertEqual(self.form.tblCoeff.columnCount(), 2)
         item_10 = self.form.tblCoeff.item(0, 1)  # row, col
         self.assertEqual(float(item_10.text()), 1)
 
-        self.set_cmb_box(self.ui.cmbFilterType, 'FIR')
+        self.set_cmb_box(self.ui.cmb_filter_type, 'FIR')
 
         self.assertEqual(self.form.tblCoeff.rowCount(), 3)
         self.assertEqual(self.form.tblCoeff.columnCount(), 1)
@@ -137,8 +137,8 @@ class FilterCoeffsTest(unittest.TestCase):
         """Test fixpoint setting in its default state"""
         self.init()
         self.set_cmb_box(self.ui.cmb_fx_base, 'Dec')
-        self.assertEqual(self.ui.spnDigits.value(), 4)
-        self.assertEqual(qget_cmb_box(self.ui.cmbFilterType, data=False), "FIR")
+        self.assertEqual(self.ui.spn_digits.value(), 4)
+        self.assertEqual(qget_cmb_box(self.ui.cmb_filter_type, data=False), "FIR")
 
         self.assertEqual(self.ui.ledW.text(), "16")
         self.assertEqual(self.ui.ledWF.text(), "15")
@@ -146,7 +146,7 @@ class FilterCoeffsTest(unittest.TestCase):
         self.assertEqual(qget_cmb_box(self.ui.cmb_fx_base, data=False).lower(), "dec")
         self.assertEqual(self.get_cmb_box(self.ui.cmbQOvfl), 'wrap')
         self.assertEqual(self.get_cmb_box(self.ui.cmbQuant), 'floor')
-        self.assertEqual(self.ui.butSetZero.text(), "= 0")
+        self.assertEqual(self.ui.but_set_zero.text(), "= 0")
 
         self.assertEqual(self.form.tblCoeff.rowCount(), 3)
         self.assertEqual(self.form.tblCoeff.columnCount(), 1)
@@ -157,13 +157,13 @@ class FilterCoeffsTest(unittest.TestCase):
     def test_but_clear(self):
         """Test <Clear Table> Button"""
         self.init()
-        self.set_cmb_box(self.ui.cmbFilterType, 'IIR')
+        self.set_cmb_box(self.ui.cmb_filter_type, 'IIR')
 
         item_10 = self.form.tblCoeff.item(1, 0)  # row, col
         self.assertEqual(item_10.text(), "1")
 
         # Push <Delete Table> Button with the left mouse button
-        QTest.mouseClick(self.ui.butClear, Qt.LeftButton)
+        QTest.mouseClick(self.ui.but_clear, Qt.LeftButton)
 
         self.assertEqual(float(self.form.tblCoeff.item(1, 0).text()), 0)
         self.assertEqual(self.form.tblCoeff.rowCount(), 2)

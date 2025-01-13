@@ -124,12 +124,12 @@ class Input_Coeffs_UI(QWidget):
         qcmb_box_populate(self.cmb_fx_base, self.cmb_fx_base_items,
                           self.cmb_fx_base_default)
 
-        self.spnDigits = QSpinBox(self)
-        self.spnDigits.setRange(0, 16)
-        self.spnDigits.setValue(params['FMT_ba'])
-        self.spnDigits.setToolTip("Number of digits to display.")
-        self.lblDigits = QLabel("Digits", self)
-        self.lblDigits.setFont(self.bifont)
+        self.spn_digits = QSpinBox(self)
+        self.spn_digits.setRange(0, 16)
+        self.spn_digits.setValue(params['FMT_ba'])
+        self.spn_digits.setToolTip("Number of digits to display.")
+        self.lbl_digits = QLabel("Digits", self)
+        self.lbl_digits.setFont(self.bifont)
 
         self.but_quant = QPushButton(self)
         self.but_quant.setToolTip(
@@ -163,8 +163,8 @@ class Input_Coeffs_UI(QWidget):
         lay_h_display.setAlignment(Qt.AlignLeft)
         lay_h_display.addWidget(lbl_display)
         lay_h_display.addWidget(self.cmb_qfrmt)
-        lay_h_display.addWidget(self.spnDigits)
-        lay_h_display.addWidget(self.lblDigits)
+        lay_h_display.addWidget(self.spn_digits)
+        lay_h_display.addWidget(self.lbl_digits)
         lay_h_display.addWidget(self.cmb_fx_base)
         lay_h_display.addWidget(self.but_quant)
         lay_h_display.addWidget(self.but_format)
@@ -182,25 +182,25 @@ class Input_Coeffs_UI(QWidget):
         #
         # UI Elements for loading / storing / manipulating cells and rows
         # -----------------------------------------------------------------
-        self.cmbFilterType = QComboBox(self, objectName="comboFilterType")
-        self.cmbFilterType.setToolTip(
+        self.cmb_filter_type = QComboBox(self, objectName="comboFilterType")
+        self.cmb_filter_type.setToolTip(
             "<span>Select between IIR and FIR filter for manual entry. "
             "Changing the type reloads the filter from the filter dict.</span>")
-        self.cmbFilterType.addItems(["FIR", "IIR"])
-        self.cmbFilterType.setSizeAdjustPolicy(QComboBox.AdjustToContents)
+        self.cmb_filter_type.addItems(["FIR", "IIR"])
+        self.cmb_filter_type.setSizeAdjustPolicy(QComboBox.AdjustToContents)
 
-        self.butAddCells = QPushButton(self)
-        self.butAddCells.setIcon(QIcon(':/row_insert_above.svg'))
-        self.butAddCells.setIconSize(q_icon_size)
-        self.butAddCells.setToolTip(
+        self.but_add_cells = QPushButton(self)
+        self.but_add_cells.setIcon(QIcon(':/row_insert_above.svg'))
+        self.but_add_cells.setIconSize(q_icon_size)
+        self.but_add_cells.setToolTip(
             "<span>Insert a row above each selected cell. "
             "Use &lt;SHIFT&gt; or &lt;CTRL&gt; to select multiple cells. "
             "When nothing is selected, append a row to the end.</span>")
 
-        self.butDelCells = QPushButton(self)
-        self.butDelCells.setIcon(QIcon(':/row_delete.svg'))
-        self.butDelCells.setIconSize(q_icon_size)
-        self.butDelCells.setToolTip(
+        self.but_del_cells = QPushButton(self)
+        self.but_del_cells.setIcon(QIcon(':/row_delete.svg'))
+        self.but_del_cells.setIconSize(q_icon_size)
+        self.but_del_cells.setToolTip(
             "<span>Delete selected cell(s) from the table. "
             "Use &lt;SHIFT&gt; or &lt;CTRL&gt; to select multiple cells. "
             "When nothing is selected, delete the last row.</span>")
@@ -216,10 +216,10 @@ class Input_Coeffs_UI(QWidget):
         self.but_undo.setToolTip(
             "<span>Undo: Reload coefficient table from current filter.</span>")
 
-        self.butClear = QPushButton(self)
-        self.butClear.setIcon(QIcon(':/trash.svg'))
-        self.butClear.setIconSize(q_icon_size)
-        self.butClear.setToolTip("Clear all table entries.")
+        self.but_clear = QPushButton(self)
+        self.but_clear.setIcon(QIcon(':/trash.svg'))
+        self.but_clear.setIconSize(q_icon_size)
+        self.but_clear.setToolTip("Clear all table entries.")
 
         self.but_file_clipboard = PushButton(self, icon=QIcon(':/clipboard.svg'), checked=False)
         self.but_file_clipboard.setIconSize(q_icon_size)
@@ -253,10 +253,10 @@ class Input_Coeffs_UI(QWidget):
         self._set_load_save_icons()  # initialize icon / button settings
 
         lay_h_buttons_coeffs1 = QHBoxLayout()
-        lay_h_buttons_coeffs1.addWidget(self.cmbFilterType)
-        lay_h_buttons_coeffs1.addWidget(self.butAddCells)
-        lay_h_buttons_coeffs1.addWidget(self.butDelCells)
-        lay_h_buttons_coeffs1.addWidget(self.butClear)
+        lay_h_buttons_coeffs1.addWidget(self.cmb_filter_type)
+        lay_h_buttons_coeffs1.addWidget(self.but_add_cells)
+        lay_h_buttons_coeffs1.addWidget(self.but_del_cells)
+        lay_h_buttons_coeffs1.addWidget(self.but_clear)
         lay_h_buttons_coeffs1.addWidget(self.but_undo)
         lay_h_buttons_coeffs1.addWidget(self.but_apply)
         lay_h_buttons_coeffs1.addWidget(self.but_file_clipboard)
@@ -270,22 +270,22 @@ class Input_Coeffs_UI(QWidget):
         #
         # Eps / set zero settings
         # ---------------------------------------------------------------------
-        self.butSetZero = QPushButton("= 0", self)
-        self.butSetZero.setToolTip(
+        self.but_set_zero = QPushButton("= 0", self)
+        self.but_set_zero.setToolTip(
             "<span>Set selected coefficients = 0 with a magnitude &lt; &epsilon;. "
             "When nothing is selected, test the whole table.</span>")
-        self.butSetZero.setIconSize(q_icon_size)
+        self.but_set_zero.setIconSize(q_icon_size)
 
         lbl_eps = QLabel(self)
         lbl_eps.setText("<b><i>for b, a</i> &lt;</b>")
 
-        self.ledEps = QLineEdit(self)
-        self.ledEps.setToolTip("Specify tolerance value.")
+        self.led_eps = QLineEdit(self)
+        self.led_eps.setToolTip("Specify tolerance value.")
 
         lay_h_buttons_coeffs2 = QHBoxLayout()
-        lay_h_buttons_coeffs2.addWidget(self.butSetZero)
+        lay_h_buttons_coeffs2.addWidget(self.but_set_zero)
         lay_h_buttons_coeffs2.addWidget(lbl_eps)
-        lay_h_buttons_coeffs2.addWidget(self.ledEps)
+        lay_h_buttons_coeffs2.addWidget(self.led_eps)
         lay_h_buttons_coeffs2.addStretch()
 
         # -------------------------------------------------------------------
@@ -327,8 +327,8 @@ class Input_Coeffs_UI(QWidget):
         #######################################################################
 
         # --- set initial values from dict ------------
-        self.spnDigits.setValue(params['FMT_ba'])
-        self.ledEps.setText(str(self.eps))
+        self.spn_digits.setValue(params['FMT_ba'])
+        self.led_eps.setText(str(self.eps))
 
         # ----------------------------------------------------------------------
         # LOCAL SIGNALS & SLOTs

@@ -240,24 +240,24 @@ class Input_PZ(QWidget):
         # ----------------------------------------------------------------------
         # LOCAL (UI) SIGNALS & SLOTs
         # ----------------------------------------------------------------------
-        self.ui.cmbPZFrmt.activated.connect(self._refresh_table)
-        self.ui.spnDigits.editingFinished.connect(self._refresh_table)
+        self.ui.cmb_pz_frmt.activated.connect(self._refresh_table)
+        self.ui.spn_digits.editingFinished.connect(self._refresh_table)
         self.ui.but_undo.clicked.connect(self.load_dict)
 
         self.ui.but_apply.clicked.connect(self._save_entries)
         self.ui.cmbNorm.activated.connect(self._normalize_gain)
 
-        self.ui.butDelCells.clicked.connect(self._delete_cells)
-        self.ui.butAddCells.clicked.connect(self._add_rows)
-        self.ui.butClear.clicked.connect(self._clear_table)
+        self.ui.but_del_cells.clicked.connect(self._delete_cells)
+        self.ui.but_add_cells.clicked.connect(self._add_rows)
+        self.ui.but_clear.clicked.connect(self._clear_table)
 
         self.ui.but_table_export.clicked.connect(self.export_table)
         self.ui.but_table_import.clicked.connect(self._import)
 
-        self.ui.butSetZero.clicked.connect(self._zero_PZ)
+        self.ui.but_set_zero.clicked.connect(self._zero_PZ)
 
-        self.ui.ledGain.installEventFilter(self)
-        self.ui.ledEps.editingFinished.connect(self._set_eps)
+        self.ui.led_gain.installEventFilter(self)
+        self.ui.led_eps.editingFinished.connect(self._set_eps)
 
         # ----------------------------------------------------------------------
         # self.tblPZ.itemSelectionChanged.connect(self._copy_item)
@@ -335,7 +335,7 @@ class Input_PZ(QWidget):
 
         """
         norm = qget_cmb_box(self.ui.cmbNorm, data=False)
-        self.ui.ledGain.setEnabled(norm == 'None')
+        self.ui.led_gain.setEnabled(norm == 'None')
         if norm != self.norm_last:
             qstyle_widget(self.ui.but_apply, 'changed')
             qstyle_widget(self.ui.but_undo, 'changed')
@@ -361,7 +361,7 @@ class Input_PZ(QWidget):
                 # self.zpk[2][0] = self.zpk[2][0] / Hmax * self.Hmax_last
                     self.zpk, H_max = normalize_zpk_gain(self.zpk, self.Hmax_last)
                     self.Hmax_last = H_max
-        self.ui.ledGain.setText(str(self.zpk[2][0]))
+        self.ui.led_gain.setText(str(self.zpk[2][0]))
         self.norm_last = norm  # store current setting of combobox
 
         self._restore_gain()
@@ -385,10 +385,10 @@ class Input_PZ(QWidget):
 
         k = safe_eval(self.zpk[2][0], return_type='auto')
 
-        if not self.ui.ledGain.hasFocus():  # no focus, round the gain
-            self.ui.ledGain.setText(str(params['FMT'].format(k)))
+        if not self.ui.led_gain.hasFocus():  # no focus, round the gain
+            self.ui.led_gain.setText(str(params['FMT'].format(k)))
         else:  # widget has focus, show gain with full precision
-            self.ui.ledGain.setText(str(k))
+            self.ui.led_gain.setText(str(k))
 
     # ------------------------------------------------------------------------------
     def _refresh_table_item(self, row, col):
@@ -417,7 +417,7 @@ class Input_PZ(QWidget):
                 add_row(), _import()
         """
 
-        params['FMT_pz'] = int(self.ui.spnDigits.text())
+        params['FMT_pz'] = int(self.ui.spn_digits.text())
 
         # self.tblPZ.setVisible(self.ui.butEnable.isChecked())
         self.tblPZ.setVisible(True)
@@ -630,8 +630,8 @@ class Input_PZ(QWidget):
         """
         Set tolerance value
         """
-        self.ui.eps = safe_eval(self.ui.ledEps.text(), alt_expr=self.ui.eps, sign='pos')
-        self.ui.ledEps.setText(str(self.ui.eps))
+        self.ui.eps = safe_eval(self.ui.led_eps.text(), alt_expr=self.ui.eps, sign='pos')
+        self.ui.led_eps.setText(str(self.ui.eps))
 
     # ------------------------------------------------------------------------------
     def _zero_PZ(self):
@@ -708,14 +708,14 @@ class Input_PZ(QWidget):
     def cmplx2frmt(self, text: str, places=-1) -> str:
         """
         Convert number "text" (real or complex or string) to a string with the format
-        defined by cmbPZFrmt.
+        defined by cmb_pz_frmt.
 
         Returns:
             str
         """
         # convert to "normal" string and prettify via safe_eval:
         data = safe_eval(text, return_type='auto')
-        frmt = qget_cmb_box(self.ui.cmbPZFrmt)  # get selected format
+        frmt = qget_cmb_box(self.ui.cmb_pz_frmt)  # get selected format
         # logger.warning(f"{text} -> {data}")
         if places == -1:
             full_prec = True

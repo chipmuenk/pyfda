@@ -99,22 +99,22 @@ class Input_PZ_UI(QWidget):
         self.bifont = QFont()
         self.bifont.setBold(True)
         self.bifont.setItalic(True)
-#        q_icon_size = QSize(20, 20) # optional, size is derived from butAddCells
+#        q_icon_size = QSize(20, 20) # optional, size is derived from but_add_cells
 
         # ---------------------------------------------
         # UI Elements for controlling the display
         # ---------------------------------------------
 
         lbl_display = QLabel(to_html("Display:", frmt='bi'), self)
-        self.cmbPZFrmt = QComboBox(self)
+        self.cmb_pz_frmt = QComboBox(self)
         qcmb_box_populate(
-            self.cmbPZFrmt, self.cmb_pz_frmt_items, self.cmb_pz_frmt_init)
+            self.cmb_pz_frmt, self.cmb_pz_frmt_items, self.cmb_pz_frmt_init)
 
-        self.spnDigits = QSpinBox(self)
-        self.spnDigits.setRange(0, 16)
-        self.spnDigits.setToolTip("Number of digits to display.")
-        self.lblDigits = QLabel("Digits", self)
-        self.lblDigits.setFont(self.bifont)
+        self.spn_digits = QSpinBox(self)
+        self.spn_digits.setRange(0, 16)
+        self.spn_digits.setToolTip("Number of digits to display.")
+        self.lbl_digits = QLabel("Digits", self)
+        self.lbl_digits.setFont(self.bifont)
 
         self.but_format = PushButton(self, icon=QIcon(':/star.svg'), checked=False)
         self.but_format.setToolTip(
@@ -130,9 +130,9 @@ class Input_PZ_UI(QWidget):
         lay_h_display.setContentsMargins(*params['wdg_margins'])
         lay_h_display.setAlignment(Qt.AlignLeft)
         lay_h_display.addWidget(lbl_display)
-        lay_h_display.addWidget(self.cmbPZFrmt)
-        lay_h_display.addWidget(self.spnDigits)
-        lay_h_display.addWidget(self.lblDigits)
+        lay_h_display.addWidget(self.cmb_pz_frmt)
+        lay_h_display.addWidget(self.spn_digits)
+        lay_h_display.addWidget(self.lbl_digits)
         lay_h_display.addWidget(self.but_format)
         lay_h_display.addStretch()
         frm_display = QFrame(self)
@@ -149,11 +149,11 @@ class Input_PZ_UI(QWidget):
             "either 1 or the max. of the previous system.</span>")
 
         lbl_gain = QLabel(to_html("k =", frmt='bi'), self)
-        self.ledGain = QLineEdit(self, objectName="ledGain")
-        self.ledGain.setToolTip(
+        self.led_gain = QLineEdit(self, objectName="led_gain")
+        self.led_gain.setToolTip(
             "<span>Specify gain factor <i>k</i> "
             "(only possible for Normalize = 'None').</span>")
-        self.ledGain.setText(str(1.))
+        self.led_gain.setText(str(1.))
 
         lbl_h_max = QLabel(to_html("|<i>H</i><sub>max</sub>(<i>f</i>)| =", frmt='b'), self)
         self.led_h_max = QLineEdit(self, objectName="hmax")
@@ -167,7 +167,7 @@ class Input_PZ_UI(QWidget):
         lay_h_gain.addWidget(self.lblNorm)
         lay_h_gain.addWidget(self.cmbNorm)
         lay_h_gain.addWidget(lbl_gain)
-        lay_h_gain.addWidget(self.ledGain)
+        lay_h_gain.addWidget(self.led_gain)
         lay_h_gain.addWidget(lbl_h_max)
         lay_h_gain.addWidget(self.led_h_max)
         lay_h_gain.addStretch()
@@ -177,19 +177,19 @@ class Input_PZ_UI(QWidget):
         # ---------------------------------------------
         # UI Elements for loading / storing / manipulating cells and rows
         # ---------------------------------------------
-        self.butAddCells = QPushButton(self)
-        self.butAddCells.setIcon(QIcon(':/row_insert_above.svg'))
-        self.butAddCells.setToolTip(
+        self.but_add_cells = QPushButton(self)
+        self.but_add_cells.setIcon(QIcon(':/row_insert_above.svg'))
+        self.but_add_cells.setToolTip(
             "<span>Select cells to insert a new cell above each selected cell. "
             "Use &lt;SHIFT&gt; or &lt;CTRL&gt; to select multiple cells. "
             "When nothing is selected, add a row at the end.</span>")
-        self.butAddCells.setIconSize(q_icon_size)
-        # q_icon_size = self.butAddCells.iconSize()
+        self.but_add_cells.setIconSize(q_icon_size)
+        # q_icon_size = self.but_add_cells.iconSize()
 
-        self.butDelCells = QPushButton(self)
-        self.butDelCells.setIcon(QIcon(':/row_delete.svg'))
-        self.butDelCells.setIconSize(q_icon_size)
-        self.butDelCells.setToolTip(
+        self.but_del_cells = QPushButton(self)
+        self.but_del_cells.setIcon(QIcon(':/row_delete.svg'))
+        self.but_del_cells.setIconSize(q_icon_size)
+        self.but_del_cells.setToolTip(
             "<span>Delete selected cell(s) from the table. "
             "Use &lt;SHIFT&gt; or &lt;CTRL&gt; to select multiple cells. "
             "When nothing is selected, delete the last row.</span>")
@@ -205,10 +205,10 @@ class Input_PZ_UI(QWidget):
         self.but_undo.setIconSize(q_icon_size)
         self.but_undo.setToolTip("<span>Undo: (Re)Load P/Z table from current filter.</span>")
 
-        self.butClear = QPushButton(self)
-        self.butClear.setIcon(QIcon(':/trash.svg'))
-        self.butClear.setIconSize(q_icon_size)
-        self.butClear.setToolTip("Clear all table entries.")
+        self.but_clear = QPushButton(self)
+        self.but_clear.setIcon(QIcon(':/trash.svg'))
+        self.but_clear.setIconSize(q_icon_size)
+        self.but_clear.setToolTip("Clear all table entries.")
 
         self.but_file_clipboard = PushButton(self, icon=QIcon(':/clipboard.svg'), checked=False)
         self.but_file_clipboard.setIconSize(q_icon_size)
@@ -243,9 +243,9 @@ class Input_PZ_UI(QWidget):
         self._set_load_save_icons()  # initialize icon / button settings
 
         lay_h_buttons_pz1 = QHBoxLayout()
-        lay_h_buttons_pz1.addWidget(self.butAddCells)
-        lay_h_buttons_pz1.addWidget(self.butDelCells)
-        lay_h_buttons_pz1.addWidget(self.butClear)
+        lay_h_buttons_pz1.addWidget(self.but_add_cells)
+        lay_h_buttons_pz1.addWidget(self.but_del_cells)
+        lay_h_buttons_pz1.addWidget(self.but_clear)
         lay_h_buttons_pz1.addWidget(self.but_undo)
         lay_h_buttons_pz1.addWidget(self.but_apply)
         lay_h_buttons_pz1.addWidget(self.but_file_clipboard)
@@ -257,23 +257,23 @@ class Input_PZ_UI(QWidget):
         # -------------------------------------------------------------------
         #   Eps / set zero settings
         # ---------------------------------------------------------------------
-        self.butSetZero = QPushButton("= 0", self)
-        self.butSetZero.setToolTip(
+        self.but_set_zero = QPushButton("= 0", self)
+        self.but_set_zero.setToolTip(
             "<span>Check whether selected poles / zeros are equal or zero with a "
             "tolerance of &lt; &epsilon;. "
             "When nothing is selected, test the whole table.</span>")
-        self.butSetZero.setIconSize(q_icon_size)
+        self.but_set_zero.setIconSize(q_icon_size)
 
         lbl_eps = QLabel(self)
         lbl_eps.setText("<b><i>for &epsilon;</i> &lt;</b>")
 
-        self.ledEps = QLineEdit(self)
-        self.ledEps.setToolTip("Specify absolute tolerance value.")
+        self.led_eps = QLineEdit(self)
+        self.led_eps.setToolTip("Specify absolute tolerance value.")
 
         lay_h_buttons_pz2 = QHBoxLayout()
-        lay_h_buttons_pz2.addWidget(self.butSetZero)
+        lay_h_buttons_pz2.addWidget(self.but_set_zero)
         lay_h_buttons_pz2.addWidget(lbl_eps)
-        lay_h_buttons_pz2.addWidget(self.ledEps)
+        lay_h_buttons_pz2.addWidget(self.led_eps)
         lay_h_buttons_pz2.addStretch()
 
         # -------------------------------------------------------------------
@@ -299,8 +299,8 @@ class Input_PZ_UI(QWidget):
         self.setLayout(lay_v_main)
 
         # --- set initial values from dict ------------
-        self.spnDigits.setValue(params['FMT_pz'])
-        self.ledEps.setText(str(self.eps))
+        self.spn_digits.setValue(params['FMT_pz'])
+        self.led_eps.setText(str(self.eps))
         # ----------------------------------------------------------------------
         # LOCAL SIGNALS & SLOTs
         # ----------------------------------------------------------------------

@@ -381,20 +381,20 @@ class Input_Coeffs(QWidget):
         # wdg.textChanged() is emitted when contents of widget changes
         # wdg.textEdited() is only emitted for user changes
         # wdg.editingFinished() is only emitted for user changes
-        self.ui.spnDigits.editingFinished.connect(self.refresh_table)
+        self.ui.spn_digits.editingFinished.connect(self.refresh_table)
 
         self.ui.but_table_export.clicked.connect(self.export_table)
         self.ui.but_table_import.clicked.connect(self._import)
 
-        self.ui.cmbFilterType.currentIndexChanged.connect(self._filter_type)
+        self.ui.cmb_filter_type.currentIndexChanged.connect(self._filter_type)
 
-        self.ui.butDelCells.clicked.connect(self._delete_cells)
-        self.ui.butAddCells.clicked.connect(self._add_cells)
+        self.ui.but_del_cells.clicked.connect(self._delete_cells)
+        self.ui.but_add_cells.clicked.connect(self._add_cells)
         self.ui.but_undo.clicked.connect(self.load_dict)
         self.ui.but_apply.clicked.connect(self._save_dict)
-        self.ui.butClear.clicked.connect(self.clear_table)
-        self.ui.ledEps.editingFinished.connect(self._set_eps)
-        self.ui.butSetZero.clicked.connect(self._set_coeffs_zero)
+        self.ui.but_clear.clicked.connect(self.clear_table)
+        self.ui.led_eps.editingFinished.connect(self._set_eps)
+        self.ui.but_set_zero.clicked.connect(self._set_coeffs_zero)
 
         # store new settings and refresh table
         self.ui.cmb_fx_base.currentIndexChanged.connect(self.fx_base2dict)
@@ -507,7 +507,7 @@ class Input_Coeffs(QWidget):
     # --------------------------------------------------------------------------
     def _filter_type(self, ftype=None):
         """
-        Get / set 'FIR' and 'IIR' filter from cmbFilterType combobox and set filter
+        Get / set 'FIR' and 'IIR' filter from cmb_filter_type combobox and set filter
             dict and table properties accordingly.
 
         When argument fil_type is not None, set the combobox accordingly.
@@ -515,11 +515,11 @@ class Input_Coeffs(QWidget):
         Reload from filter dict unless ftype is specified [does this make sense?!]
         """
         if ftype in {'FIR', 'IIR'}:
-            ret = qset_cmb_box(self.ui.cmbFilterType, ftype)
+            ret = qset_cmb_box(self.ui.cmb_filter_type, ftype)
             if ret == -1:
                 logger.warning("Unknown filter type {0}".format(ftype))
 
-        if self.ui.cmbFilterType.currentText() == 'IIR':
+        if self.ui.cmb_filter_type.currentText() == 'IIR':
             fb.fil[0]['ft'] = 'IIR'
             self.col = 2
             self.tblCoeff.setColumnCount(2)
@@ -583,7 +583,7 @@ class Input_Coeffs(QWidget):
 
         Called at the end of nearly every method.
         """
-        params['FMT_ba'] = int(self.ui.spnDigits.text())
+        params['FMT_ba'] = int(self.ui.spn_digits.text())
         # update quantized coefficient display and overflow counter
         self.quant_coeffs_view()
         if np.ndim(self.ba) == 1 or fb.fil[0]['ft'] == 'FIR':
@@ -593,8 +593,8 @@ class Input_Coeffs(QWidget):
 
         # When format is 'float', disable all fixpoint options and widgets:
         is_float = (qget_cmb_box(self.ui.cmb_qfrmt) == 'float')
-        self.ui.spnDigits.setVisible(is_float)  # select number of float digits
-        self.ui.lblDigits.setVisible(is_float)
+        self.ui.spn_digits.setVisible(is_float)  # select number of float digits
+        self.ui.lbl_digits.setVisible(is_float)
         self.ui.cmb_fx_base.setVisible(not is_float)  # hide fx base combobosx
         self.ui.but_quant.setVisible(not is_float)  # hide quantization button
 
@@ -606,13 +606,13 @@ class Input_Coeffs(QWidget):
             self.num_cols = 1
             self.tblCoeff.setColumnCount(1)
             self.tblCoeff.setHorizontalHeaderLabels(["b"])
-            qset_cmb_box(self.ui.cmbFilterType, 'FIR')
+            qset_cmb_box(self.ui.cmb_filter_type, 'FIR')
             self.ui.wdg_wq_coeffs_a.setVisible(False)  # always hide a coeffs for FIR
         else:
             self.num_cols = 2
             self.tblCoeff.setColumnCount(2)
             self.tblCoeff.setHorizontalHeaderLabels(["b", "a"])
-            qset_cmb_box(self.ui.cmbFilterType, 'IIR')
+            qset_cmb_box(self.ui.cmb_filter_type, 'IIR')
             # hide all q-settings for float:
             self.ui.wdg_wq_coeffs_a.setVisible(not is_float)
 
@@ -1008,8 +1008,8 @@ class Input_Coeffs(QWidget):
         and refresh QTableWidget
         """
         self.ui.eps = safe_eval(
-            self.ui.ledEps.text(), return_type='float', sign='pos', alt_expr=self.ui.eps)
-        self.ui.ledEps.setText(str(self.ui.eps))
+            self.ui.led_eps.text(), return_type='float', sign='pos', alt_expr=self.ui.eps)
+        self.ui.led_eps.setText(str(self.ui.eps))
 
 # ------------------------------------------------------------------------------
     def _set_coeffs_zero(self):
