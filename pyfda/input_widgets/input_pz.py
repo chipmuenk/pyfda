@@ -319,7 +319,6 @@ class Input_PZ(QWidget):
         RETURN key.
         """
         if self.spec_edited:
-            logger.error(source.objectName())
             if source.objectName() == "led_gain":
                 self.zpk[2][0] = safe_eval(source.text(), alt_expr=str(self.zpk[2][0]))
             else:
