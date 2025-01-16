@@ -8,20 +8,20 @@
 """
 Widget for plotting phase frequency response phi(f)
 """
-
-from pyfda.libs.compat import (
-    QCheckBox, QWidget, QComboBox, QHBoxLayout, QFrame, pyqtSignal)
+import logging
 
 import numpy as np
 import scipy.signal as sig
-from pyfda.filterbroker import get_fil_dict, set_fil_dict
+
+from pyfda.libs.compat import (
+    QWidget, QComboBox, QHBoxLayout, QFrame, pyqtSignal)
+from pyfda.filterbroker import get_fil_dict, set_fil_dict, conf_settings
 from pyfda.pyfda_rc import params
 from pyfda.plot_widgets.mpl_widget import MplWidget
 from matplotlib.ticker import AutoMinorLocator
 from pyfda.libs.pyfda_lib import pprint_log
 from pyfda.libs.pyfda_qt_lib import qget_cmb_box, PushButton
 
-import logging
 logger = logging.getLogger(__name__)
 
 classes = {'Plot_Phi': '\u03C6(f)'}  #: Dict containing class name : display name

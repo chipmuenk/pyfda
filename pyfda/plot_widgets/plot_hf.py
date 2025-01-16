@@ -12,8 +12,8 @@ frequency response \|H(f)\| of the filter either in linear or logarithmic
 scale. Optionally, the magnitude specifications and the phase
 can be overlayed.
 """
-from pyfda.libs.compat import (QCheckBox, QWidget, QComboBox, QLabel, QLineEdit,
-                               QFrame, QHBoxLayout, QGridLayout, pyqtSlot, pyqtSignal)
+import logging
+
 import numpy as np
 import scipy.signal as sig
 from matplotlib.patches import Rectangle
@@ -21,6 +21,8 @@ from matplotlib import rcParams
 import matplotlib.ticker as ticker
 from matplotlib.ticker import AutoMinorLocator
 
+from pyfda.libs.compat import (QCheckBox, QWidget, QComboBox, QLabel, QLineEdit,
+                               QFrame, QHBoxLayout, QGridLayout, pyqtSlot, pyqtSignal)
 import pyfda.filterbroker as fb
 from pyfda.filterbroker import get_fil_dict
 from pyfda.pyfda_rc import params
@@ -28,8 +30,8 @@ from pyfda.plot_widgets.mpl_widget import MplWidget
 from pyfda.libs.pyfda_lib import pprint_log, safe_eval, to_html
 from pyfda.libs.pyfda_qt_lib import PushButton, qtext_width, qcmb_box_populate
 
-import logging
 logger = logging.getLogger(__name__)
+
 classes = {'Plot_Hf': '|H(f)|'}  #: Dict containing class name : display name
 
 

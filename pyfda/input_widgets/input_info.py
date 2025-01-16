@@ -12,6 +12,7 @@ Widget for displaying infos about filter and filter design method and debugging 
 import sys
 import pprint
 import textwrap
+import logging
 
 from pyfda.libs.compat import (
     QtGui, QWidget, QFont, QFrame, QLabel, QTableWidget, QTableWidgetItem,
@@ -29,7 +30,6 @@ from pyfda.libs.pyfda_qt_lib import PushButton
 from pyfda.input_widgets.input_info_about import AboutWindow
 from pyfda.pyfda_rc import params
 
-import logging
 logger = logging.getLogger(__name__)
 
 # TODO: Passband and stopband info should show min / max values for each band

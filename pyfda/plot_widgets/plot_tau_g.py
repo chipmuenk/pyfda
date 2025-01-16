@@ -9,19 +9,20 @@
 """
 Widget for plotting the group delay
 """
+import logging
+
 from matplotlib.ticker import AutoMinorLocator
+import numpy as np
+
 from pyfda.plot_widgets.mpl_widget import MplWidget
 from pyfda.pyfda_rc import params
-from pyfda.filterbroker import get_fil_dict
-import numpy as np
+from pyfda.filterbroker import get_fil_dict, conf_settings
 from pyfda.libs.pyfda_qt_lib import qcmb_box_populate
 from pyfda.libs.pyfda_sig_lib import group_delay
 from pyfda.libs.compat import (QCheckBox, QWidget, QFrame, QComboBox,
                                QHBoxLayout, pyqtSignal)
-import logging
-logger = logging.getLogger(__name__)
 
-# from scipy.signal import group_delay
+logger = logging.getLogger(__name__)
 
 # Dict containing class name : display name
 classes = {'Plot_tau_g': 'tau_g'}
