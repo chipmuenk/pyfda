@@ -246,6 +246,7 @@ qss_dark = """
     QPushButton{background-color: #505050;}
     .QPushButton:disabled, PushButton:disabled{
         background-color: #707070; color: #A0A0A0;}
+
     /* Style the button of QRadioButton */
     QRadioButton::indicator:checked{
         background-color:black; border: 2px solid lightblue;}
@@ -338,10 +339,12 @@ qss_light = """
 
     /* Style the button of QRadioButton */
     QRadioButton::indicator:checked{
-        background-color:lightblue; border-color: red;}
-    QRadioButton::indicator:unchecked{border-color: grey;}
-    QCheckBox::indicator:unchecked{border-color: #808080;}
-    QCheckBox::indicator:checked{background-color: lightblue; border-color: red}
+        background-color:black; border: 2px solid lightblue;}
+    QRadioButton::indicator:unchecked{border: 2px solid black;}
+
+    QCheckBox::indicator:checked{
+        background-color: black; border: 2px solid lightblue;}
+    QCheckBox::indicator:unchecked{border: 2px solid black;}
 
     /* Background color for the spinbox and combobox itself */
     QSpinBox, QComboBox{background-color: #D0D0D0;}
