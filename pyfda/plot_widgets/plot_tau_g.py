@@ -143,18 +143,19 @@ class Plot_tau_g(QWidget):
         aa = get_fil_dict(['ba', 1])
 
         # calculate H_cmplx(W) (complex) for W = 0 ... 2 pi:
-        # scipy: self.W, self.tau_g = group_delay((bb, aa), w=params['N_FFT'],
+        # scipy: self.W, self.tau_g = group_delay((bb, aa), w=fb.conf_settings['N_FFT'],
         #                                           whole = True)
 
         if get_fil_dict(['creator', 0]) == 'sos':  # one of 'sos', 'zpk', 'ba'
-            self.W, self.tau_g = group_delay(get_fil_dict(['sos']), nfft=params['N_FFT'],
-                                             sos=True, whole=True,
-                                             verbose=self.chkWarnings.isChecked(),
-                                             alg=self.cmbAlgorithm.currentData())
+            self.W, self.tau_g = group_delay(
+                get_fil_dict(['sos']), nfft=conf_settings['N_FFT'],
+                sos=True, whole=True, verbose=self.chkWarnings.isChecked(),
+                alg=self.cmbAlgorithm.currentData())
         else:
-            self.W, self.tau_g = group_delay(bb, aa, nfft=params['N_FFT'], whole=True,
-                                             verbose=self.chkWarnings.isChecked(),
-                                             alg=self.cmbAlgorithm.currentData())
+            self.W, self.tau_g = group_delay(
+                bb, aa, nfft=conf_settings['N_FFT'], whole=True,
+                verbose=self.chkWarnings.isChecked(),
+                alg=self.cmbAlgorithm.currentData())
             #                                   self.chkWarnings.isChecked())
 
 # ------------------------------------------------------------------------------
@@ -178,8 +179,8 @@ class Plot_tau_g(QWidget):
             F -= f_max_2
         elif get_fil_dict(['freqSpecsRangeType']) == 'half':
             # only use the first half of H and F
-            tau_g = self.tau_g[0:params['N_FFT']//2]
-            F = F[0:params['N_FFT']//2]
+            tau_g = self.tau_g[0:conf_settings['N_FFT']//2]
+            F = F[0:conf_settings['N_FFT']//2]
         else:  # get_fil_dict(['freqSpecsRangeType']) == 'whole'
             # use H and F as calculated
             tau_g = self.tau_g

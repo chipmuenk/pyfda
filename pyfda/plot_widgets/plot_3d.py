@@ -407,7 +407,7 @@ class Plot_3D(QWidget):
 
         wholeF = fb.fil[0]['freqSpecsRangeType'] != 'half'  # not used
         f_S = fb.fil[0]['f_S']
-        N_FFT = params['N_FFT']
+        N_FFT = fb.conf_settings['N_FFT']
 
         alpha = self.diaAlpha.value()/10.
 

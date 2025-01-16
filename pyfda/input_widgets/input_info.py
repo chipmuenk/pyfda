@@ -133,7 +133,7 @@ class Input_Info(QWidget):
 
         lbl_settings_NFFT = QLabel(to_html("N_FFT =", frmt='bi'), self)
         self.led_settings_NFFT = QLineEdit(self)
-        self.led_settings_NFFT.setText(str(params['N_FFT']))
+        self.led_settings_NFFT.setText(str(fb.conf_settings['N_FFT']))
         self.led_settings_NFFT.setToolTip("<span>Number of FFT points for frequency "
                                           "domain widgets.</span>")
 
@@ -225,9 +225,10 @@ class Input_Info(QWidget):
 
     def _update_settings_nfft(self):
         """ Update value for self.par1 from QLineEdit Widget"""
-        params['N_FFT'] = safe_eval(self.led_settings_NFFT.text(), params['N_FFT'],
-                                    sign='pos', return_type='int')
-        self.led_settings_NFFT.setText(str(params['N_FFT']))
+        fb.conf_settings['N_FFT'] = safe_eval(
+            self.led_settings_NFFT.text(), fb.conf_settings['N_FFT'],
+            sign='pos', return_type='int')
+        self.led_settings_NFFT.setText(str(fb.conf_settings['N_FFT']))
         self.emit({'data_changed': 'n_fft'})
 
 # ------------------------------------------------------------------------------
@@ -303,20 +304,8 @@ class Input_Info(QWidget):
             for the filter defined in the filter dict in a given frequency band
             [f_start, f_stop].
             """
-            w = np.linspace(f_start, f_stop, params['N_FFT'])*2*np.pi
+            w = np.linspace(f_start, f_stop, fb.conf_settings['N_FFT'])*2*np.pi
             [w, H] = sig.freqz(bb, aa, worN=w)
-
-            # add antiCausals if we have them
-            if (antiC):
-               #
-               # Evaluate transfer function of anticausal half on the same freq grid.
-               #
-               wa, ha = sig.freqz(bbA, aaA, worN=w)
-               ha = ha.conjugate()
-               #
-               # Total transfer function is the product
-               #
-               H = H*ha
 
             f = w / (2.0 * pi)  # frequency normalized to f_S
             H_abs = abs(H)

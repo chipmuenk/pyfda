@@ -236,7 +236,9 @@ fil_tree = freeze_hierarchical({
 # ------------------------------------------------------------------------------
 
 conf_settings = {
-    'THEME': 'light'}
+    'THEME': 'light',
+    'N_FFT':  8192  # number of FFT points for most widgets except y[n]
+    }
 
 # -----------------------------------------------------------------------------
 # Dictionary containing current filter type, specifications, design and some

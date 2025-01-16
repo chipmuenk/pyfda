@@ -160,7 +160,7 @@ class Plot_Phi(QWidget):
         """
         # calculate H_cplx(W) (complex) for W = 0 ... 2 pi:
         self.W, self.H_cmplx = sig.freqz(
-            get_fil_dict(['ba', 0]), get_fil_dict(['ba', 1]), worN=params['N_FFT'],
+            get_fil_dict(['ba', 0]), get_fil_dict(['ba', 1]), worN=conf_settings['N_FFT'],
             whole=True, fs=2*np.pi)
         # replace nan and inf by finite values, otherwise np.unwrap yields
         # an array full of nans
@@ -195,8 +195,8 @@ class Plot_Phi(QWidget):
             F -= f_max_2
         elif get_fil_dict(['freqSpecsRangeType']) == 'half':
             # only use the first half of H and F
-            H = self.H_cmplx[0:params['N_FFT']//2]
-            F = F[0:params['N_FFT']//2]
+            H = self.H_cmplx[0:conf_settings['N_FFT']//2]
+            F = F[0:conf_settings['N_FFT']//2]
         else:  # get_fil_dict(['freqSpecsRangeType']) == 'whole'
             # use H and F as calculated
             H = self.H_cmplx

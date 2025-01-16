@@ -1649,7 +1649,7 @@ class Plot_Impz(QWidget):
                 "'<i>k</i>' specifies frequencies w.r.t. " + to_html("f_S", frmt = 'i') +
                 " but plots graphs over the frequency index <i>k</i>.</span>",
                 """
-                # By default, k = params['N_FFT'] which is used for the calculation
+                # By default, k = fb.conf_settings['N_FFT'] which is used for the calculation
                 # of the non-transient tabs and for F_id / H_id here.
                 # Here, the frequency axes must be scaled to fit the number of
                 # frequency points self.ui.N
@@ -1660,7 +1660,7 @@ class Plot_Impz(QWidget):
 
             # freqz-based ideal frequency response:
             F_id, H_id = sig.freqz(get_fil_dict(['ba', 0]), get_fil_dict(['ba', 1]),
-                                   worN=params['N_FFT'], whole=True, fs=f_max)
+                                   worN=fb.conf_settings['N_FFT'], whole=True, fs=f_max)
 
             # frequency vector for FFT-based frequency plots:
             F = np.fft.fftfreq(self.ui.N, d=1. / f_max)
@@ -1752,8 +1752,8 @@ class Plot_Impz(QWidget):
                     X_q = X_q[0:self.ui.N//2]
 
                 F = F[0:self.ui.N//2]
-                F_id = F_id[0:params['N_FFT']//2]
-                H_id = H_id[0:params['N_FFT']//2]
+                F_id = F_id[0:fb.conf_settings['N_FFT']//2]
+                H_id = H_id[0:fb.conf_settings['N_FFT']//2]
 
             else:  # fb.fil[0]['freqSpecsRangeType'] == 'whole'
                 # display 0 ... f_S -> shift frequency axis

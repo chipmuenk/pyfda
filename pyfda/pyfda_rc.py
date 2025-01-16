@@ -33,7 +33,6 @@ logger = logging.getLogger(__name__)
 mpl_ms = 8  # base size for matplotlib markers
 # Various parameters for calculation, plotting and UI
 params = {
-    'N_FFT':  2048,   # number of FFT points for plot commands (freqz etc.)
     'FMT': '{:.3g}',  # format string for QLineEdit fields
     'CSV': {  # format options and parameters for CSV-files and clipboard
             'delimiter': 'auto',  # default delimiter
@@ -247,6 +246,14 @@ qss_dark = """
     QPushButton{background-color: #505050;}
     .QPushButton:disabled, PushButton:disabled{
         background-color: #707070; color: #A0A0A0;}
+    /* Style the button of QRadioButton */
+    QRadioButton::indicator:checked{
+        background-color:black; border: 2px solid lightblue;}
+    QRadioButton::indicator:unchecked{border: 2px solid grey;}
+
+    QCheckBox::indicator:checked{
+        background-color: black; border: 2px solid lightblue;}
+    QCheckBox::indicator:unchecked{border: 2px solid grey;}
 
     /* Background color for the spinbox and combobox itself  */
     QSpinBox, QComboBox{background-color: #505050;}
@@ -328,6 +335,13 @@ qss_light = """
     QPushButton{background-color: #C0C0C0;}
     .QPushButton:disabled, PushButton:disabled{
             background-color: #C0C0C0; color: white}
+
+    /* Style the button of QRadioButton */
+    QRadioButton::indicator:checked{
+        background-color:lightblue; border-color: red;}
+    QRadioButton::indicator:unchecked{border-color: grey;}
+    QCheckBox::indicator:unchecked{border-color: #808080;}
+    QCheckBox::indicator:checked{background-color: lightblue; border-color: red}
 
     /* Background color for the spinbox and combobox itself */
     QSpinBox, QComboBox{background-color: #D0D0D0;}
@@ -535,8 +549,9 @@ qss_common = """
     #fx_filt_ui .QFrame {background-color: lightblue;}
     #fx_filt_ui QFrame {color: black;}
 
-    QCheckBox::indicator{border: 2px solid #808080;}
-    QCheckBox::indicator:checked{background-color: lightblue;}
+    QRadioButton::indicator{
+        background-color: transparent; border-radius:5px;} /*width:8px; height:8px;
+    QCheckBox::indicator{background-color: transparent;}
 
     /* Table Corner Button */
     QTableView QTableCornerButton::section{background-color:lightblue; border-color: green;}
