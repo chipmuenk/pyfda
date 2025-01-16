@@ -263,7 +263,12 @@ class Tree_Builder(object):
                 for k in conf_settings:
                     if k in fb.conf_settings:
                         # TODO: why are the values lists?
-                        fb.conf_settings[k] = conf_settings[k][0]
+                        try:
+                            # try to convert to a numeric type
+                            fb.conf_settings[k] = ast.literal_eval(conf_settings[k][0])
+                        except ValueError:
+                            # unsuccessful, store entry as string
+                            fb.conf_settings[k] = conf_settings[k][0]
                     else:
                         logger.warning(
                             f"Ignoring unknown entry '[{k}]' in configuration file "
