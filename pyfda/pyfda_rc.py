@@ -388,110 +388,6 @@ qss_light = """
         }
     """
 
-# common layout settings for QTabWidget
-qss_tab_bar = """
-    /* The tab _widget_ frame; general and for North / West orientation */
-    QTabWidget {
-        padding: 0;
-        margin:  0;
-        }
-    QTabWidget::pane {
-        padding: 0;
-        margin:  0;
-        }
-
-    QTabWidget::pane::left {border-left: 1px solid #C2C7CB;} /* tabs left (west) */
-    .QTabWidget::pane::top {border-top: 2px solid #C2C7CB;} /* tabs top (north) */
-
-    /* Align the tabs on the left hand side, MacOS styles them in the center */
-    QTabWidget::tab-bar {alignment: left;}
-    /* Style the TAB using the tab sub-control. Note that it reads QTabBar _not_ QTabWidget */
-
-    QTabBar {font-weight: bold; font-size:11pt;}
-
-    QTabBar::tab{
-        color:black;
-        font-size:10pt;
-        font-weight:bold;
-        background: qlineargradient(x1: 0, y1: 0, x2: 1, y2: 1,
-                            stop: 0 white, stop: 0.5 #C0C0C0, stop: 1.0 #C2C7CB);
-        border: 1px solid #C4C4C3;
-        border-top-left-radius: 0.2em;
-    }
-
-    QTabBar::tab:selected, QTabBar::tab:hover {background:lightblue;}
-
-    QTabBar::tab:selected {
-        border-color: #9B9B9B;
-    }
-
-    QTabBar::tab:only-one {
-        margin: 0; /* if there is only one tab, we don't want overlapping margins */
-    }
-
-    QTabBar::tab::top{
-        border-top-right-radius: 0.2em;
-        min-width: 2em;
-        margin-bottom: -0.2em;
-        padding: 0.2em;
-        padding-bottom: 0.4em;
-        }
-
-    QTabBar::tab::left{
-        border-bottom-left-radius: 0.1em;
-        /* width: 26px; */
-        width: 1.5em;
-        margin-right: -0.2em;
-        padding: 0.1em;
-        padding-right: 0.1em;
-    }
-
-    /* separate styling for stimuli / audio widget with icons @ tabs  */
-    QTabWidget#tab_stim_w QTabBar::tab{
-        width: 1.5em;
-        height: 1.5em;
-        margin-right: -0.2em;
-        /*padding: 0;
-        margin: 0;*/
-    }
-
-    /* small gap above vertical mplwidget tabs */
-    QTabWidget#tab_mpl_w QTabBar::tab::left:first{
-        margin-top: 0.1em;
-    }
-
-    QTabBar::tab::top:selected {
-        border-bottom-color: #C2C7CB; /* same as pane color */
-    }
-    QTabBar::tab::left:selected {
-        border-right-color: #C2C7CB; /* same as pane color */
-    }
-
-    /* make non-selected tabs look smaller */
-    QTabBar::tab::top:!selected {
-        margin-top: 0.2em;}
-    QTabBar::tab::left:!selected {
-        margin-left: 0.2em;}
-    """
-
-# Overlap effects for QTabWidget, currently not used
-qss_tab_bar_ovlp = """
-    /* make use of negative margins to produce overlapping selected tabs */
-    QTabBar::tab::top:selected {
-        /* expand/overlap to both sides by 0.2em */
-        margin-left: -0.1em;
-        margin-right: -0.1em;
-    }
-
-    QTabBar::tab::top:first:selected {
-        margin-left: 0; /* the first selected tab has nothing to overlap with on the left */
-    }
-
-    QTabBar::tab::top:last:selected {
-        margin-right: 0; /* the last selected tab has nothing to overlap with on the right */
-    }
-    """
-
 # Common qss settings for all themes
 qss_common = """
     * [state="ok"]{background-color: green; color: white;}
@@ -612,8 +508,112 @@ qss_common = """
         width: 8px;
         image: url(':/ellipses_h.svg');
         }
-
     """
+
+# common layout settings for QTabWidget
+qss_tab_bar = """
+    /* The tab _widget_ frame; general and for North / West orientation */
+    QTabWidget {
+        padding: 0;
+        margin:  0;
+        }
+    QTabWidget::pane {
+        padding: 0;
+        margin:  0;
+        }
+
+    QTabWidget::pane::left {border-left: 1px solid #C2C7CB;} /* tabs left (west) */
+    .QTabWidget::pane::top {border-top: 2px solid #C2C7CB;} /* tabs top (north) */
+
+    /* Align the tabs on the left hand side, MacOS styles them in the center */
+    QTabWidget::tab-bar {alignment: left;}
+    /* Style the TAB using the tab sub-control. Note that it reads QTabBar _not_ QTabWidget */
+
+    QTabBar {font-weight: bold; font-size:11pt;}
+
+    QTabBar::tab{
+        color:black;
+        font-size:10pt;
+        font-weight:bold;
+        background: qlineargradient(x1: 0, y1: 0, x2: 1, y2: 1,
+                            stop: 0 white, stop: 0.5 #C0C0C0, stop: 1.0 #C2C7CB);
+        border: 1px solid #C4C4C3;
+        border-top-left-radius: 0.2em;
+    }
+
+    QTabBar::tab:selected, QTabBar::tab:hover {background:lightblue;}
+
+    QTabBar::tab:selected {
+        border-color: #9B9B9B;
+    }
+
+    QTabBar::tab:only-one {
+        margin: 0; /* if there is only one tab, we don't want overlapping margins */
+    }
+
+    QTabBar::tab::top{
+        border-top-right-radius: 0.2em;
+        min-width: 2em;
+        margin-bottom: -0.2em;
+        padding: 0.2em;
+        padding-bottom: 0.4em;
+        }
+
+    QTabBar::tab::left{
+        border-bottom-left-radius: 0.1em;
+        /* width: 26px; */
+        width: 1.5em;
+        margin-right: -0.2em;
+        padding: 0.1em;
+        padding-right: 0.1em;
+    }
+
+    /* separate styling for stimuli / audio widget with icons @ tabs  */
+    QTabWidget#tab_stim_w QTabBar::tab{
+        width: 1.5em;
+        height: 1.5em;
+        margin-right: -0.2em;
+        /*padding: 0;
+        margin: 0;*/
+    }
+
+    /* small gap above vertical mplwidget tabs */
+    QTabWidget#tab_mpl_w QTabBar::tab::left:first{
+        margin-top: 0.1em;
+    }
+
+    QTabBar::tab::top:selected {
+        border-bottom-color: #C2C7CB; /* same as pane color */
+    }
+    QTabBar::tab::left:selected {
+        border-right-color: #C2C7CB; /* same as pane color */
+    }
+
+    /* make non-selected tabs look smaller */
+    QTabBar::tab::top:!selected {
+        margin-top: 0.2em;}
+    QTabBar::tab::left:!selected {
+        margin-left: 0.2em;}
+    """
+
+# Overlap effects for QTabWidget, currently not used
+qss_tab_bar_ovlp = """
+    /* make use of negative margins to produce overlapping selected tabs */
+    QTabBar::tab::top:selected {
+        /* expand/overlap to both sides by 0.2em */
+        margin-left: -0.1em;
+        margin-right: -0.1em;
+    }
+
+    QTabBar::tab::top:first:selected {
+        margin-left: 0; /* the first selected tab has nothing to overlap with on the left */
+    }
+
+    QTabBar::tab::top:last:selected {
+        margin-right: 0; /* the last selected tab has nothing to overlap with on the right */
+    }
+    """
+
 # Get all available system styles:
 # from PyQt5.QtWidgets import QStyleFactory
 # print(QStyleFactory.keys())
