@@ -7,35 +7,33 @@
 # (see file LICENSE in root directory for details)
 
 """
-Widget template, demonstrating sig_rx / sig_tx mechanism and text output 
+Widget template, demonstrating sig_rx / sig_tx mechanism and text output
 """
 import sys
 import pprint
 import logging
-logger = logging.getLogger(__name__)
 
-from pyfda.compat import (QtGui, QWidget, QFont, QCheckBox, QFrame,
-                      QTableWidget, QTableWidgetItem, QTextBrowser, QTextCursor,
-                      QVBoxLayout, QHBoxLayout, QSplitter, Qt, pyqtSignal)
-
+from pyfda.libs.compat import (QWidget, QFont, QCheckBox, QFrame,
+                      QTextBrowser, QVBoxLayout, QHBoxLayout, pyqtSignal)
 
 import pyfda.filterbroker as fb # importing filterbroker initializes all its globals
 from pyfda.pyfda_rc import params
 
+logger = logging.getLogger(__name__)
 
 class My_Input_Widget(QWidget):
     """
-    Template for user widget
+    Template for user input widget
     """
     sig_rx = pyqtSignal(object) # incoming signals from input_tab_widgets
     sig_tx = pyqtSignal(object) # outgoing signals to input_tab_widgets
 
     def __init__(self, parent):
-        super(My_Input_Widget, self).__init__(parent)
-        
+        super().__init__()
+
         self.tab_label = 'MyWdg'
-        self.tool_tip = ("<span>This is my first pyFDA widget!</span>")       
-        
+        self.tool_tip = "<span>This is my first pyFDA widget!</span>"
+
         self._construct_UI()
         self.load_dict()
 
@@ -56,27 +54,27 @@ class My_Input_Widget(QWidget):
         """
         bfont = QFont()
         bfont.setBold(True)
-        
+
         # ============== UI Layout =====================================
         # widget / subwindow for filter infos
-                                                  
-        self.chkFiltDict = QCheckBox("FiltDict", self)
-        self.chkFiltDict.setToolTip("Show filter dictionary for debugging.")   
 
-        self.layHChkBoxes = QHBoxLayout()
-        self.layHChkBoxes.addWidget(self.chkFiltDict)
-        self.layHChkBoxes.addStretch(1)
-        self.frmMain = QFrame(self)
-        self.frmMain.setLayout(self.layHChkBoxes)
+        self.chk_filt_dict = QCheckBox("FiltDict", self)
+        self.chk_filt_dict.setToolTip("Show filter dictionary for debugging.")
 
-        self.txtFiltDict = QTextBrowser(self)
+        self.lay_h_chk_boxes = QHBoxLayout()
+        self.lay_h_chk_boxes.addWidget(self.chk_filt_dict)
+        self.lay_h_chk_boxes.addStretch(1)
+        self.frm_main = QFrame(self)
+        self.frm_main.setLayout(self.lay_h_chk_boxes)
 
-        layVMain = QVBoxLayout()
-        layVMain.addWidget(self.frmMain)
-        layVMain.addWidget(self.txtFiltDict)
-        layVMain.setContentsMargins(*params['wdg_margins'])
+        self.txt_filt_dict = QTextBrowser(self)
 
-        self.setLayout(layVMain)
+        lay_v_main = QVBoxLayout()
+        lay_v_main.addWidget(self.frm_main)
+        lay_v_main.addWidget(self.txt_filt_dict)
+        lay_v_main.setContentsMargins(*params['wdg_margins'])
+
+        self.setLayout(lay_v_main)
 
         #----------------------------------------------------------------------
         # GLOBAL SIGNALS & SLOTs
@@ -85,7 +83,7 @@ class My_Input_Widget(QWidget):
         #----------------------------------------------------------------------
         # LOCAL SIGNALS & SLOTs
         #----------------------------------------------------------------------
-        self.chkFiltDict.clicked.connect(self._show_filt_dict)
+        self.chk_filt_dict.clicked.connect(self._show_filt_dict)
 
 #------------------------------------------------------------------------------
     def load_dict(self):
@@ -99,13 +97,13 @@ class My_Input_Widget(QWidget):
         """
         Print filter dict for debugging
         """
-        self.txtFiltDict.setVisible(self.chkFiltDict.isChecked())
+        self.txt_filt_dict.setVisible(self.chk_filt_dict.isChecked())
 
         fb_sorted = [str(key) +' : '+ str(fb.fil[0][key]) for key in sorted(fb.fil[0].keys())]
         dictstr = pprint.pformat(fb_sorted)
-        self.txtFiltDict.setText(dictstr)
+        self.txt_filt_dict.setText(dictstr)
 
-        
+
 #------------------------------------------------------------------------------
 
 if __name__ == '__main__':
@@ -114,7 +112,7 @@ if __name__ == '__main__':
     app = QApplication(sys.argv)
     mainw = My_Input_Widget(None)
 
-    app.setActiveWindow(mainw) 
+    app.setActiveWindow(mainw)
     mainw.show()
 
     sys.exit(app.exec_())
