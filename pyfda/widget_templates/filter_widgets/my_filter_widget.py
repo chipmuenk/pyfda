@@ -9,39 +9,42 @@
 """
 Design a simple delay for demonstrating the effect of latency and for debugging
 
-Attention: 
+Attention:
 This class is re-instantiated dynamically every time the filter design method
 is selected, calling the __init__ method.
 
-API version info:   
+API version info:
     1.0: initial working release
 """
 import logging
-logger = logging.getLogger(__name__)
 
-from pyfda.libs.compat import QWidget, QLabel, QLineEdit, pyqtSignal, QVBoxLayout, QHBoxLayout
-
-import scipy.signal as sig
 import numpy as np
 
+from pyfda.libs.compat import QWidget, QLabel, QLineEdit, pyqtSignal, QVBoxLayout, QHBoxLayout
 import pyfda.filterbroker as fb
 from pyfda.libs.pyfda_qt_lib import popup_warning
 from pyfda.libs.pyfda_lib import fil_save, safe_eval
+
+logger = logging.getLogger(__name__)
 
 __version__ = "1.0"
 
 classes = {'AllpPZ':'Allpass (P)'} #: Dict containing class name : display name
 
 class AllpPZ(QWidget):
+    """ 
+    Create a widget for an allpass as an example for how to construct
+    widgets in pyfda.
+    """
 
     FRMT = 'zpk' # output format of delay filter widget
 
-    info ="""
-**Allpass widget**
+    info = """
+    **Allpass widget**
 
-allows entering the two **poles** :math:`p`. **zeros** are calculated from the 
-reciprocal values of the poles. There is no minimum algorithm, only the two 
-poles can be entered manually.
+    allows entering the two **poles** :math:`p`. **zeros** are calculated from the
+    reciprocal values of the poles. There is no minimum algorithm, only the two
+    poles can be entered manually.
 
     """
 
@@ -52,14 +55,14 @@ poles can be entered manually.
         QWidget.__init__(self)
 
         self.p = [0.5, 0.5j]
-        
+
         self.ft = 'IIR'
-        
+
         # the following defines which subwidgets are "a"ctive, "i"nvisible or "d"eactivated
         self.rt_dicts = ('com',)
         self.rt_dict = {
             'COM': {'man': {'fo':('d', 'N'),
-                            'msg':('a', 
+                            'msg':('a',
                                 "<span>Enter poles  <b><i>p</i></b> for allpass function,"
                                 "zeros will be calculated.</span>")
                             },
@@ -74,7 +77,7 @@ poles can be entered manually.
     def construct_UI(self):
         """
         Create additional subwidget(s) needed for filter design:
-        These subwidgets are instantiated dynamically when needed in 
+        These subwidgets are instantiated dynamically when needed in
         select_filter.py using the handle to the filter instance, fb.fil_inst.
         """
         self.lbl_pole1 = QLabel("Pole 1", self)
@@ -83,7 +86,7 @@ poles can be entered manually.
         self.led_pole1.setText(str(self.p[0]))
         self.led_pole1.setObjectName('wdg_led_pole1')
         self.led_pole1.setToolTip("Pole 1 for allpass filter")
-        
+
         self.lbl_pole2 = QLabel("Pole 2", self)
         self.lbl_pole2.setObjectName('wdg_lbl_pole2')
         self.led_pole2 = QLineEdit(self)
@@ -96,7 +99,7 @@ poles can be entered manually.
         self.layHWin.addWidget(self.lbl_pole1)
         self.layHWin.addWidget(self.led_pole1)
         self.layHWin.addWidget(self.lbl_pole2)
-        self.layHWin.addWidget(self.led_pole2)        
+        self.layHWin.addWidget(self.led_pole2)
         self.layHWin.setContentsMargins(0,0,0,0)
         # Widget containing all subwidgets (cmbBoxes, Labels, lineEdits)
         self.wdg_fil = QWidget(self)
@@ -113,11 +116,11 @@ poles can be entered manually.
 
         self.dict2filter_params() # get initial / last setting from dictionary
         self._update_UI()
-        
+
     def _update_UI(self):
         """
         Update UI when line edit field is changed (here, only the text is read
-        and converted to integer) and store parameter settings in filter 
+        and converted to integer) and store parameter settings in filter
         dictionary
         """
         self.p[0] = safe_eval(self.led_pole1.text(), self.p[0], return_type='cmplx')
@@ -128,14 +131,14 @@ poles can be entered manually.
 
         fb.fil[0]['filter_widgets'].update({'allpass':{'p1':self.p[0], 'p2':self.p[1]}
                                     })
-        
-        # sig_tx -> select_filter -> filter_specs   
+
+        # sig_tx -> select_filter -> filter_specs
         self.emit({'filt_changed': 'pole_1_2'})
 
 
     def dict2filter_params(self):
         """
-        Reload parameter(s) from filter dictionary (if they exist) and set 
+        Reload parameter(s) from filter dictionary (if they exist) and set
         corresponding UI elements. dict2filter_params() is called upon initialization
         and when the filter is loaded from disk.
         """
@@ -150,13 +153,13 @@ poles can be entered manually.
 
     def _get_params(self, fil_dict):
         """
-        Get parameters needed for filter design from the passed dictionary and 
+        Get parameters needed for filter design from the passed dictionary and
         translate them to instance parameters, scaling / transforming them if needed.
         """
         #self.p1     = fil_dict['zpk'][1][0]  # get the first and second pole
         #self.p2     = fil_dict['zpk'][1][1]  # from central filter dect
         logger.info(fil_dict['zpk'])
-        
+
     def _test_poles(self):
         """
         Warn the user if one of the poles is outside the unit circle
@@ -176,7 +179,7 @@ poles can be entered manually.
             logger.error("Passed empty filter dict")
         logger.info(arg)
         fil_save(fil_dict, arg, self.FRMT, __name__)
-        
+
         fil_dict['N'] = len(self.p)
 
 
@@ -200,7 +203,7 @@ poles can be entered manually.
             pass
         if self.p[1] != 0:
             self.z[1] = np.conj(1/self.p[1])
-        
+
         k = np.abs(np.polyval(np.poly(self.p),1) / np.polyval(np.poly(self.z),1))
         zpk_list = [self.z,self.p,k]
 
@@ -213,7 +216,7 @@ if __name__ == '__main__':
     from pyfda.libs.compat import QApplication, QFrame
 
     app = QApplication(sys.argv)
-    
+
     # instantiate filter widget
     filt = AllpPZ()
     filt.construct_UI()
@@ -221,13 +224,13 @@ if __name__ == '__main__':
 
     layVDynWdg = QVBoxLayout()
     layVDynWdg.addWidget(wdg_allpass, stretch = 1)
-    
+
     filt.APman(fb.fil[0])  # design an all pass filter with parameters from global dict
     print(fb.fil[0][filt.FRMT]) # return results in default format
 
     frmMain = QFrame()
     frmMain.setFrameStyle(QFrame.StyledPanel|QFrame.Sunken)
-    frmMain.setLayout(layVDynWdg)    
+    frmMain.setLayout(layVDynWdg)
 
     form = frmMain
 

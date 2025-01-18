@@ -9,22 +9,22 @@
 """
 Widget for plotting impulse and general transient responses
 """
-from pyfda.libs.compat import QWidget, pyqtSignal, QVBoxLayout
+import logging
+
 import numpy as np
-from numpy import ndarray, pi
-from pyfda.libs.pyfda_qt_lib import qget_cmb_box, qstyle_widget
+from numpy import pi
 import scipy.signal as sig
 from scipy.special import sinc, diric
 
+from pyfda.libs.compat import QWidget, pyqtSignal, QVBoxLayout
+from pyfda.libs.pyfda_qt_lib import qget_cmb_box, qstyle_widget
 import pyfda.filterbroker as fb
-from pyfda.libs.pyfda_sig_lib import angle_zero
 from pyfda.libs.pyfda_lib import (
     pprint_log, rect_bl, sawtooth_bl, triang_bl, comb_bl, safe_numexpr_eval)
 
 from pyfda.pyfda_rc import params  # FMT string for QLineEdit fields, e.g. '{:.3g}'
 from pyfda.plot_widgets.tran.plot_tran_stim_ui import Plot_Tran_Stim_UI
 
-import logging
 logger = logging.getLogger(__name__)
 
 
@@ -58,9 +58,10 @@ class Plot_Tran_Stim(QWidget):
         - plot_tab_widgets() (global signals)
         """
 
-        logger.warning("SIG_RX - needs_calc: {0} | vis: {1}\n{2}"
-                       .format(self.needs_calc, self.isVisible(), pprint_log(dict_sig)))
+        logger.debug("SIG_RX - needs_calc: %s | vis: %s\n%s",
+                     self.needs_calc, self.isVisible(), pprint_log(dict_sig))
 
+    # ------------------------------------------------------------------------------
     def _construct_UI(self) -> None:
         """
         Instantiate the UI of the widget.
@@ -76,102 +77,102 @@ class Plot_Tran_Stim(QWidget):
         self.setLayout(layVMain)
 
     def init_labels_stim(self):
-            '''intialize title string, y-axis label and some variables'''
-            # use radians for angle internally
-            self.H_str = r'$y[n]$'  # default
-            self.title_str = ""
-            if self.ui.stim == "none":
-                self.title_str = r'Zero Input'
-                self.H_str = r'$h_0[n]$'
-            # ------------------------------------------------------------------
-            elif self.ui.stim == "dirac":
-                self.title_str = r'Impulse Response'
-                self.H_str = r'$h[n]$'
-            elif self.ui.stim == "sinc":
-                self.title_str = r'Sinc Impulse'
-            elif self.ui.stim == "gauss":
-                self.title_str = r'Gaussian Impulse'
-            elif self.ui.stim == "rect":
-                self.title_str = r'Rect Impulse'
-            # ------------------------------------------------------------------
-            elif self.ui.stim == "step":
-                if self.ui.but_step_err.checked:
-                    self.title_str = r'Settling Error $\epsilon$'
-                    self.H_str = r'$h_{\epsilon, \infty} - h_{\epsilon}[n]$'
-                else:
-                    self.title_str = r'Step Response'
-                    self.H_str = r'$h_{\epsilon}[n]$'
-            # ------------------------------------------------------------------
-            elif self.ui.stim == "cos":
-                self.title_str = r'Cosine Stimulus'
-            elif self.ui.stim == "sine":
-                self.title_str = r'Sinusoidal Stimulus'
-            elif self.ui.stim == "exp":
-                self.title_str = r'Complex Exponential Stimulus'
-            elif self.ui.stim == "diric":
-                self.title_str = r'Periodic Sinc Stimulus'
-            # ------------------------------------------------------------------
-            elif self.ui.stim == "chirp":
-                self.title_str = self.ui.chirp_type.capitalize() + ' Chirp Stimulus'
-            # ------------------------------------------------------------------
-            elif self.ui.stim == "triang":
-                if self.ui.but_stim_bl.checked:
-                    self.title_str = r'Bandlim. Triangular Stimulus'
-                else:
-                    self.title_str = r'Triangular Stimulus'
-            elif self.ui.stim == "saw":
-                if self.ui.but_stim_bl.checked:
-                    self.title_str = r'Bandlim. Sawtooth Stimulus'
-                else:
-                    self.title_str = r'Sawtooth Stimulus'
-            elif self.ui.stim == "rect_per":
-                if self.ui.but_stim_bl.checked:
-                    self.title_str = r'Bandlimited Rect. Stimulus'
-                else:
-                    self.title_str = r'Rect. Stimulus'
-            elif self.ui.stim == "comb":
-                self.title_str = r'Bandlim. Comb Stimulus'
-            # ------------------------------------------------------------------
-            elif self.ui.stim == "am":
-                self.title_str = (
-                    r'AM Stimulus: $A_1 \sin(2 \pi n f_1 + \varphi_1)'
-                    r'\cdot A_2 \sin(2 \pi n f_2 + \varphi_2)$')
-            elif self.ui.stim == "pmfm":
-                self.title_str = (
-                    r'PM / FM Stimulus: $A_1 \sin(2 \pi n f_1'
-                    r'+ \varphi_1 + A_2 \sin(2 \pi n f_2 + \varphi_2))$')
-            elif self.ui.stim == "pwm":
-                self.title_str = (
-                    r'PWM Stimulus with Duty Cycle $\frac {1} {2}(1 + A_2\sin(2 \pi n f_2'
-                    r'+ \varphi_2 ))$')
+        '''intialize title string, y-axis label and some variables'''
+        # use radians for angle internally
+        self.H_str = r'$y[n]$'  # default
+        self.title_str = ""
+        if self.ui.stim == "none":
+            self.title_str = r'Zero Input'
+            self.H_str = r'$h_0[n]$'
+        # ------------------------------------------------------------------
+        elif self.ui.stim == "dirac":
+            self.title_str = r'Impulse Response'
+            self.H_str = r'$h[n]$'
+        elif self.ui.stim == "sinc":
+            self.title_str = r'Sinc Impulse'
+        elif self.ui.stim == "gauss":
+            self.title_str = r'Gaussian Impulse'
+        elif self.ui.stim == "rect":
+            self.title_str = r'Rect Impulse'
+        # ------------------------------------------------------------------
+        elif self.ui.stim == "step":
+            if self.ui.but_step_err.checked:
+                self.title_str = r'Settling Error $\epsilon$'
+                self.H_str = r'$h_{\epsilon, \infty} - h_{\epsilon}[n]$'
+            else:
+                self.title_str = r'Step Response'
+                self.H_str = r'$h_{\epsilon}[n]$'
+        # ------------------------------------------------------------------
+        elif self.ui.stim == "cos":
+            self.title_str = r'Cosine Stimulus'
+        elif self.ui.stim == "sine":
+            self.title_str = r'Sinusoidal Stimulus'
+        elif self.ui.stim == "exp":
+            self.title_str = r'Complex Exponential Stimulus'
+        elif self.ui.stim == "diric":
+            self.title_str = r'Periodic Sinc Stimulus'
+        # ------------------------------------------------------------------
+        elif self.ui.stim == "chirp":
+            self.title_str = self.ui.chirp_type.capitalize() + ' Chirp Stimulus'
+        # ------------------------------------------------------------------
+        elif self.ui.stim == "triang":
+            if self.ui.but_stim_bl.checked:
+                self.title_str = r'Bandlim. Triangular Stimulus'
+            else:
+                self.title_str = r'Triangular Stimulus'
+        elif self.ui.stim == "saw":
+            if self.ui.but_stim_bl.checked:
+                self.title_str = r'Bandlim. Sawtooth Stimulus'
+            else:
+                self.title_str = r'Sawtooth Stimulus'
+        elif self.ui.stim == "rect_per":
+            if self.ui.but_stim_bl.checked:
+                self.title_str = r'Bandlimited Rect. Stimulus'
+            else:
+                self.title_str = r'Rect. Stimulus'
+        elif self.ui.stim == "comb":
+            self.title_str = r'Bandlim. Comb Stimulus'
+        # ------------------------------------------------------------------
+        elif self.ui.stim == "am":
+            self.title_str = (
+                r'AM Stimulus: $A_1 \sin(2 \pi n f_1 + \varphi_1)'
+                r'\cdot A_2 \sin(2 \pi n f_2 + \varphi_2)$')
+        elif self.ui.stim == "pmfm":
+            self.title_str = (
+                r'PM / FM Stimulus: $A_1 \sin(2 \pi n f_1'
+                r'+ \varphi_1 + A_2 \sin(2 \pi n f_2 + \varphi_2))$')
+        elif self.ui.stim == "pwm":
+            self.title_str = (
+                r'PWM Stimulus with Duty Cycle $\frac {1} {2}(1 + A_2\sin(2 \pi n f_2'
+                r'+ \varphi_2 ))$')
 
-            # ------------------------------------------------------------------
-            elif self.ui.stim == "formula":
-                self.title_str = r'Formula Defined Stimulus'
-            # ==================================================================
-            if self.ui.noise == "gauss":
-                self.title_str += r' + Gaussian Noise'
-            elif self.ui.noise == "uniform":
-                self.title_str += r' + Uniform Noise'
-            elif self.ui.noise == "randint":
-                self.title_str += r' + Random Int. Sequence'
-            elif self.ui.noise == "mls":
-                self.title_str += r' + Max. Length Sequence'
-            elif self.ui.noise == "brownian":
-                self.title_str += r' + Brownian Noise'
-            # ==================================================================
-            if self.ui.ledDC.isVisible and self.ui.DC != 0:
-                self.title_str += r' + DC'
-            # ==================================================================
-            if self.ui.cmb_file_io.isEnabled():  # File is loaded, data is available
-                if qget_cmb_box(self.ui.cmb_file_io) == "add":
-                    self.title_str += r' + File Data'
-                elif qget_cmb_box(self.ui.cmb_file_io) == "use":
-                    self.title_str = r'File Data'
+        # ------------------------------------------------------------------
+        elif self.ui.stim == "formula":
+            self.title_str = r'Formula Defined Stimulus'
+        # ==================================================================
+        if self.ui.noise == "gauss":
+            self.title_str += r' + Gaussian Noise'
+        elif self.ui.noise == "uniform":
+            self.title_str += r' + Uniform Noise'
+        elif self.ui.noise == "randint":
+            self.title_str += r' + Random Int. Sequence'
+        elif self.ui.noise == "mls":
+            self.title_str += r' + Max. Length Sequence'
+        elif self.ui.noise == "brownian":
+            self.title_str += r' + Brownian Noise'
+        # ==================================================================
+        if self.ui.ledDC.isVisible and self.ui.DC != 0:
+            self.title_str += r' + DC'
+        # ==================================================================
+        if self.ui.cmb_file_io.isEnabled():  # File is loaded, data is available
+            if qget_cmb_box(self.ui.cmb_file_io) == "add":
+                self.title_str += r' + File Data'
+            elif qget_cmb_box(self.ui.cmb_file_io) == "use":
+                self.title_str = r'File Data'
         # ----------------------------------------------------------------------
 
 
-# ------------------------------------------------------------------------------
+    # ------------------------------------------------------------------------------
     def calc_stimulus_frame(self, x: np.ndarray = np.random.randn(10), N_first: int = 0,
                             N_frame: int = 10, N_end: int = 10) -> np.ndarray:
         """
@@ -223,7 +224,7 @@ class Plot_Tran_Stim(QWidget):
                 return stim
             # add_sig is 2D, add it to stimulus as a complex signal
             elif np.ndim(add_sig) == 2:
-                logger.info("add_sig has two channels, casting to complex")
+                logger.info("'add_sig' has two channels, casting to complex")
                 stim = stim.astype(complex) + add_sig[:, 0] + 1j * add_sig[:, 1]
                 return stim
 
@@ -295,7 +296,7 @@ class Plot_Tran_Stim(QWidget):
             f1 = self.ui.f1
             f2 = self.ui.f2
             if (self.ui.A1 != 0 and f1 < 0) or (self.ui.A2 != 0 and f2 < 0):
-                logger.warning(f"Center frequencies f1, f2 need to be >= 0!")
+                logger.warning("Center frequencies f1, f2 need to be >= 0!")
                 return None
             if f1 < 0:
                 f1 = 0.1  # dummy value, A1 == 0
@@ -363,7 +364,7 @@ class Plot_Tran_Stim(QWidget):
         elif self.ui.stim == "triang":
             if self.ui.but_stim_bl.checked:
                 if self.ui.f1 <= 0:
-                    logger.warning(f"Frequency f1 needs to be > 0!")
+                    logger.warning("Frequency f1 needs to be > 0!")
                     return None
                 x[frm_slc] = self.ui.A1 * triang_bl(2*pi * n * self.ui.f1 + self.rad_phi1)
             else:
@@ -373,7 +374,7 @@ class Plot_Tran_Stim(QWidget):
         elif self.ui.stim == "saw":
             if self.ui.but_stim_bl.checked:
                 if self.ui.f1 <= 0:
-                    logger.warning(f"Frequency f1 needs to be > 0!")
+                    logger.warning("Frequency f1 needs to be > 0!")
                     return None
                 x[frm_slc] = self.ui.A1 * sawtooth_bl(2*pi * n * self.ui.f1 + self.rad_phi1)
             else:
@@ -382,7 +383,7 @@ class Plot_Tran_Stim(QWidget):
         elif self.ui.stim == "rect_per":
             if self.ui.but_stim_bl.checked:
                 if self.ui.f1 <= 0:
-                    logger.warning(f"Frequency f1 needs to be > 0!")
+                    logger.warning("Frequency f1 needs to be > 0!")
                     return None
                 x[frm_slc] = self.ui.A1 * rect_bl(
                     2 * pi * n * self.ui.f1 + self.rad_phi1, duty=self.ui.stim_par1)
@@ -392,7 +393,7 @@ class Plot_Tran_Stim(QWidget):
         # ----------------------------------------------------------------------
         elif self.ui.stim == "comb":
             if self.ui.f1 <= 0:
-                logger.warning(f"Frequency f1 needs to be > 0!")
+                logger.warning("Frequency f1 needs to be > 0!")
                 return None
             x[frm_slc] = self.ui.A1 * comb_bl(2 * pi * n * self.ui.f1 + self.rad_phi1)
         # ----------------------------------------------------------------------
@@ -408,7 +409,7 @@ class Plot_Tran_Stim(QWidget):
         elif self.ui.stim == "pwm":
             if self.ui.but_stim_bl.checked:
                 if self.ui.f1 <= 0:
-                    logger.warning(f"Frequency f1 needs to be > 0!")
+                    logger.warning("Frequency f1 needs to be > 0!")
                     return None
                 x[frm_slc] = self.ui.A1 * rect_bl(
                     2 * np.pi * n * self.ui.f1 + self.rad_phi1,
@@ -434,7 +435,7 @@ class Plot_Tran_Stim(QWidget):
             else:
                 qstyle_widget(self.ui.ledStimFormula, 'normal')
         else:
-            logger.error('Unknown stimulus format "{0}"'.format(self.ui.stim))
+            logger.error('Unknown stimulus format "%s"', self.ui.stim)
             return None
         # ----------------------------------------------------------------------
         # Calculate noise
@@ -499,8 +500,7 @@ class Plot_Tran_Stim(QWidget):
             noi += self.noi_last
             self.noi_last = noi[-1]
         else:
-            logger.error('Unknown kind of noise "{}"'.format(self.ui.noise))
-
+            logger.error('Unknown kind of noise "%s"', self.ui.noise)
 
         # #####################################################################
         #
