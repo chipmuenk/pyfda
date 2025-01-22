@@ -160,6 +160,9 @@ class Plot_tau_g(QWidget):
 
 # ------------------------------------------------------------------------------
     def draw(self):
+        """
+        Calculate the group delay and then draw it
+        """
         self.calc_tau_g()
         self.update_view()
 
@@ -197,7 +200,7 @@ class Plot_tau_g(QWidget):
 
         # ---------------------------------------------------------
         self.ax.clear()  # need to clear, doesn't overwrite
-        line_tau_g, = self.ax.plot(F, tau_g, label=r"$\tau_g$")
+        self.ax.plot(F, tau_g, label=r"$\tau_g$")
         # ---------------------------------------------------------
 
         self.ax.xaxis.set_minor_locator(
@@ -225,7 +228,7 @@ class Plot_tau_g(QWidget):
 
 
 if __name__ == "__main__":
-    """ Run widget standalone with `python -m pyfda.plot_widgets.plot_tau_g` """
+    # Run widget standalone with `python -m pyfda.plot_widgets.plot_tau_g`
     import sys
     from pyfda.libs.compat import QApplication
     from pyfda import pyfda_rc as rc

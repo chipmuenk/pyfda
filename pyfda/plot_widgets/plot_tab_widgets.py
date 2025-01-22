@@ -6,25 +6,24 @@
 # Licensed under the terms of the MIT License
 # (see file LICENSE in root directory for details)
 
-"""
-Create a tabbed widget for all plot subwidgets in the list ``fb.plot_widgets_list``.
-This list is compiled at startup in :class:`pyfda.tree_builder.Tree_Builder`, it is
-kept as a module variable in :mod:`pyfda.filterbroker`.
-"""
+import logging
 import importlib
-from pyfda.libs.compat import QTabWidget, QWidget, QVBoxLayout, QEvent, QtCore, pyqtSignal
 
+from pyfda.libs.compat import QTabWidget, QWidget, QVBoxLayout, QEvent, QtCore, pyqtSignal
 from pyfda.libs.pyfda_lib import pprint_log
 from pyfda.pyfda_rc import params
 import pyfda.filterbroker as fb
 
-import logging
 logger = logging.getLogger(__name__)
 
 
 # ------------------------------------------------------------------------------
 class PlotTabWidgets(QWidget):
-
+    """
+    Create a tabbed widget for all plot subwidgets in the list ``fb.plot_classes``.
+    This list is compiled at startup in :class:`pyfda.tree_builder.Tree_Builder`, it is
+    kept as a module variable in :mod:`pyfda.filterbroker`.
+    """
     # incoming, connected to input_tab_widget.sig_tx in pyfdax
     sig_rx = pyqtSignal(object)
     # outgoing: emitted by process_sig_rx
