@@ -352,7 +352,7 @@ if __name__ == '__main__':
     from pyfda import pyfda_rc as rc
 
     app = QApplication(sys.argv)
-    app.setStyleSheet(rc.qss_rc)
+    app.setStyleSheet(rc.QSS_RC)
     mainw = Input_PZ_UI()
     app.setActiveWindow(mainw)
     mainw.show()

@@ -352,7 +352,7 @@ if __name__ == '__main__':
     from pyfda import pyfda_rc as rc
 
     app = QApplication(sys.argv)
-    app.setStyleSheet(rc.qss_rc)
+    app.setStyleSheet(rc.QSS_RC)
     mainw = FIR_DF_nmigen_UI()
     app.setActiveWindow(mainw)
     mainw.show()

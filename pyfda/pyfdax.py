@@ -92,17 +92,17 @@ def main():
     else:
         logger.warning("No Qt attribute 'AA_EnableHighDpiScaling'.")
     # Instantiate QApplication object, passing command line arguments
-    if len(rc.qss_rc) > 20:
+    if len(rc.QSS_RC) > 20:
         app = QApplication(sys.argv)
-        app.setStyleSheet(rc.qss_rc) # this is a proper style sheet
+        app.setStyleSheet(rc.QSS_RC) # this is a proper style sheet
         style = "'pyfda' style sheet"
     else:
-        qstyle = QApplication.setStyle(rc.qss_rc) # this is just a name for a system stylesheet
+        qstyle = QApplication.setStyle(rc.QSS_RC) # this is just a name for a system stylesheet
         app = QApplication(sys.argv)
         if qstyle:
-            style = f"system style sheet '{rc.qss_rc}'"
+            style = f"system style sheet '{rc.QSS_RC}'"
         else:
-            style = f"default style sheet ('{rc.qss_rc}' not found)"
+            style = f"default style sheet ('{rc.QSS_RC}' not found)"
 
     if dirs.OS.lower() == "darwin":  # Mac OS
         ref_dpi = 72

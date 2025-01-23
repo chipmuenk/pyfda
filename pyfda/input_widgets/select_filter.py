@@ -506,7 +506,7 @@ if __name__ == '__main__':
     from pyfda.libs.compat import QApplication
 
     app = QApplication(sys.argv)
-    app.setStyleSheet(rc.qss_rc)
+    app.setStyleSheet(rc.QSS_RC)
     mainw = SelectFilter()
     app.setActiveWindow(mainw)
     mainw.show()

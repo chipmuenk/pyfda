@@ -575,7 +575,7 @@ if __name__ == '__main__':
     from pyfda import pyfda_rc as rc
 
     app = QApplication(sys.argv)
-    app.setStyleSheet(rc.qss_rc)
+    app.setStyleSheet(rc.QSS_RC)
 
     mainw = FX_UI_WQ({}, label='<b>Quantizer</b>', label_2="for the masses")
     app.setActiveWindow(mainw)

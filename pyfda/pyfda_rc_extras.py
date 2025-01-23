@@ -1,6 +1,6 @@
 
 
-qss_common = """
+QSS_COMMON = """
                 /* Background color of popup-list.*/ 
                 QComboBox QListView{
                     background-color:white;

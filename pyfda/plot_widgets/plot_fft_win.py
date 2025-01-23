@@ -839,7 +839,7 @@ if __name__ == '__main__':
     from pyfda import pyfda_rc as rc
 
     app = QApplication(sys.argv)
-    app.setStyleSheet(rc.qss_rc)
+    app.setStyleSheet(rc.QSS_RC)
     fb.clipboard = QApplication.clipboard()  # create clipboard instance
 
     mainw = Plot_FFT_win(app='spec', cur_win_dict=fb.fil[0]['tran_freq_win'],

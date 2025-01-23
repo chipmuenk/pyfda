@@ -878,7 +878,7 @@ if __name__ == '__main__':
     logging.basicConfig()  # setup a basic logger
 
     app = QApplication(sys.argv)
-    app.setStyleSheet(rc.qss_rc)
+    app.setStyleSheet(rc.QSS_RC)
     # change initial settings to FIR
     # fb.fil[0].update({'ft': 'FIR', 'fc': 'Equiripple'})
     # _ = Tree_Builder()  # TODO_ couldn't this be a function?

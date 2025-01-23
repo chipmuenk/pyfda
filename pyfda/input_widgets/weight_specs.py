@@ -295,7 +295,7 @@ if __name__ == '__main__':
     from pyfda import pyfda_rc as rc
 
     app = QApplication(sys.argv)
-    app.setStyleSheet(rc.qss_rc)
+    app.setStyleSheet(rc.QSS_RC)
     mainw = WeightSpecs()
 
     mainw.update_UI(new_labels=['W_SB', 'W_SB2', 'W_PB', 'W_PB2'])

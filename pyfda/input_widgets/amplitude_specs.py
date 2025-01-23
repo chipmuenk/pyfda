@@ -330,7 +330,7 @@ if __name__ == '__main__':
     from pyfda import pyfda_rc as rc
 
     app = QApplication(sys.argv)
-    app.setStyleSheet(rc.qss_rc)
+    app.setStyleSheet(rc.QSS_RC)
     mainw = AmplitudeSpecs()
     mainw.update_UI(new_labels=['a', 'A_SB', 'A_SB2', 'A_PB', 'A_PB2'])
     mainw.update_UI(new_labels=['u', 'A_PB', 'A_SB'])

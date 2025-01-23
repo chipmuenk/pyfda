@@ -206,7 +206,7 @@ if __name__ == "__main__":
     from pyfda import pyfda_rc as rc
 
     app = QApplication(sys.argv)
-    app.setStyleSheet(rc.qss_rc)
+    app.setStyleSheet(rc.QSS_RC)
     mainw = PlotTabWidgets()
     mainw.resize(300, 400)
     app.setActiveWindow(mainw)

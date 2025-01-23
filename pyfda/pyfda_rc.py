@@ -16,21 +16,22 @@ Default parameters, paths etc. are also defined at the end of the file.
 Importing pyfda_rc runs the module once, defining all module variables
 which are global (similar to class variables).
 """
-from pyfda import qrc_resources  # contains all icons
+import logging
 
-from pyfda.libs.pyfda_lib import CRLF
-import pyfda.filterbroker as fb
 from cycler import cycler
 import matplotlib.font_manager
 
-import logging
+from pyfda import qrc_resources  # contains all icons
+from pyfda.libs.pyfda_lib import CRLF
+import pyfda.filterbroker as fb
+
 logger = logging.getLogger(__name__)
 
 # #############################################################################
 # General layout settings
 # #############################################################################
 
-mpl_ms = 8  # base size for matplotlib markers
+MPL_MS = 8  # base size for matplotlib markers
 # Various parameters for calculation, plotting and UI
 params = {
     'FMT': '{:.3g}',  # format string for QLineEdit fields
@@ -47,8 +48,8 @@ params = {
         'height': 720, 'width': 1024}, # height and width in pixels
     'FMT_ba': 4,      # number of digits for coefficient table
     'FMT_pz': 5,      # number of digits for Pole/Zero table
-    'P_Marker': [mpl_ms, 'r'],  # size and color for poles' marker
-    'Z_Marker': [mpl_ms, 'b'],  # size and color for zeros' marker
+    'P_Marker': [MPL_MS, 'r'],  # size and color for poles' marker
+    'Z_Marker': [MPL_MS, 'b'],  # size and color for zeros' marker
     'wdg_margins': (2, 1, 2, 0),  # (R, T, L, B) widget margins
     'wdg_margins_spc': (2, 2, 2, 2),  # widget margins with more vertical spacing
     'wdg_margins_0': (0, 0, 0, 0),  # set margins to zero
@@ -66,7 +67,7 @@ mpl_params_dark = {
 
             'mpl_stimuli': {                       # style for stimulus signals
                           'mfc': 'w', 'mec': 'w',  # marker face + edge color
-                          'ms': mpl_ms,            # marker size
+                          'ms': MPL_MS,            # marker size
                           'alpha': 0.25,           # transparency (marker + stem)
                           'markerfmt': '*',        # marker symbol
                           'lw': '2'}               # stem linewidth
@@ -83,7 +84,7 @@ mpl_params_light = {
 
             'mpl_stimuli': {                       # style for stimulus signals
                           'mfc': 'k', 'mec': 'k',  # marker face + edge color
-                          'ms': mpl_ms,            # marker size
+                          'ms': MPL_MS,            # marker size
                           'alpha': 0.25,           # transparency (marker + stem)
                           'markerfmt': '*',        # marker symbol
                           'lw': '2'}               # stem linewidth
@@ -109,7 +110,7 @@ ft_names = {"IIR": "IIR", "FIR": "FIR"}
 
 # common matplotlib widget settings
 mpl_rc = {'lines.linewidth'           : 1.5,
-          'lines.markersize'          : mpl_ms,         # markersize, in points
+          'lines.markersize'          : MPL_MS,         # markersize, in points
           'font.family'               : 'sans-serif',  # 'serif',
           'font.style'                : 'normal',
           'mathtext.fontset'          : 'stixsans',  # 'stix',
@@ -213,7 +214,7 @@ else:
 # ---------------
 # dark QSS theme
 # ---------------
-qss_dark = """
+QSS_DARK = """
     /* Background color #303030 should be same as matplotlib figure.facecolor */
     QSplitter{background-color: #303030;} /* Top Level background */
     QWidget{color:white;}  /* nearly all widgets are derived from this */
@@ -304,7 +305,7 @@ qss_dark = """
 # ---------------
 # light QSS theme
 # ---------------
-qss_light = """
+QSS_LIGHT = """
     /* Background color #D0D0D0 should be same as matplotlib figure.facecolor */
     QSplitter{background-color: #F0F0F0;} /* Top Level background */
     QWidget{color:black;}  /* nearly all widgets are derived from this */
@@ -392,7 +393,7 @@ qss_light = """
     """
 
 # Common qss settings for all themes
-qss_common = """
+QSS_COMMON = """
     * [state="ok"]{background-color: green; color: white;}
     * [state="changed"]{background-color: yellow; color: black;}
     * [state="running"]{background-color: orange; color: white;}
@@ -514,7 +515,7 @@ qss_common = """
     """
 
 # common layout settings for QTabWidget
-qss_tab_bar = """
+QSS_TAB_BAR = """
     /* The tab _widget_ frame; general and for North / West orientation */
     QTabWidget {
         padding: 0;
@@ -633,21 +634,21 @@ THEME = fb.conf_settings['THEME']
 if THEME == 'dark':
     mpl_rc.update(mpl_rc_dark)
     params.update(mpl_params_dark)
-    qss_rc = qss_common + qss_tab_bar + qss_dark
+    QSS_RC = QSS_COMMON + QSS_TAB_BAR + QSS_DARK
     params['link_color'] = 'lightblue'
 
 elif THEME == 'light':
     mpl_rc.update(mpl_rc_light)
     params.update(mpl_params_light)
-    qss_rc = qss_common + qss_tab_bar + qss_light
+    QSS_RC = QSS_COMMON + QSS_TAB_BAR + QSS_LIGHT
     params['link_color'] = 'blue'
 
 elif THEME == 'none':
     mpl_rc.update(mpl_rc_light)
     params.update(mpl_params_light)
-    qss_rc = qss_common
+    QSS_RC = QSS_COMMON
 
 else:  # use the THEME name as the QStyle name
     mpl_rc.update(mpl_rc_light)
     params.update(mpl_params_light)
-    qss_rc = THEME
+    QSS_RC = THEME

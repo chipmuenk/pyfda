@@ -165,7 +165,7 @@ if __name__ == "__main__":
     from pyfda.libs.compat import QApplication
     from pyfda import pyfda_rc as rc
     app = QApplication(sys.argv)
-    app.setStyleSheet(rc.qss_rc)
+    app.setStyleSheet(rc.QSS_RC)
     # change initial settings to FIR (no IIR fixpoint filters available yet)
     fb.fil[0].update({'ft': 'FIR', 'fc': 'Equiripple'})
 

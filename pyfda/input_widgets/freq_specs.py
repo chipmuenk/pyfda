@@ -428,7 +428,7 @@ if __name__ == '__main__':
     from pyfda import pyfda_rc as rc
 
     app = QApplication(sys.argv)
-    app.setStyleSheet(rc.qss_rc)
+    app.setStyleSheet(rc.QSS_RC)
     mainw = FreqSpecs()
     mainw.update_UI(new_labels=['F_SB', 'F_SB2', 'F_PB', 'F_PB2'])
 #    mainw.update_UI(new_labels = ['F_PB','F_PB2'])
