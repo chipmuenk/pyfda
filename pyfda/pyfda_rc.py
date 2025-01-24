@@ -32,6 +32,12 @@ logger = logging.getLogger(__name__)
 # #############################################################################
 
 MPL_MS = 8  # base size for matplotlib markers
+FONT_SIZE_WIDGETS = 13
+FONT_SIZE_BASE = str(FONT_SIZE_WIDGETS) + "pt"  # base font size of widgets in pt
+FONT_SIZE_MEDIUM = str(FONT_SIZE_WIDGETS * 1.1) + "pt"
+FONT_SIZE_LARGE = str(FONT_SIZE_WIDGETS * 1.2) + "pt"
+FONT_SIZE_XLARGE = str(FONT_SIZE_WIDGETS * 1.4) + "pt"
+
 # Various parameters for calculation, plotting and UI
 params = {
     'FMT': '{:.3g}',  # format string for QLineEdit fields
@@ -130,7 +136,6 @@ mpl_rc = {'lines.linewidth'           : 1.5,
 
           'xtick.direction'           : 'in',
           'ytick.direction'           : 'in',
-          # 'xtick.top'               : False, 2.0 only
           'figure.figsize'            : (5, 4),
           'figure.dpi'                : 100,
           'hatch.color'               : '#808080',
@@ -401,11 +406,10 @@ QSS_COMMON = """
     * [state="error"]{background-color: red; color:white; font-weight:bold;}
     * [state="u_error"]{background-color: pink; color:white; font-weight:bold;}
 
-    QWidget{font-size:10pt; font-family: Tahoma;}
-
-    #medium{font-size: 11pt; font-weight: bold; }
-    #large{font-size: 12pt; font-weight: bold; }
-    #xlarge{font-size: 14pt; font-weight: bold;}
+    QWidget{font-size: %s; font-family: Tahoma;}
+    #medium{font-size: %s; font-weight: bold; }
+    #large{font-size: %s; font-weight: bold; }
+    #xlarge{font-size: %s; font-weight: bold;}
 
     /* Frame with control elements of all plot widgets */
     #frmControls{
@@ -512,7 +516,7 @@ QSS_COMMON = """
         width: 8px;
         image: url(':/ellipses_h.svg');
         }
-    """
+    """ % (FONT_SIZE_BASE, FONT_SIZE_MEDIUM, FONT_SIZE_LARGE, FONT_SIZE_XLARGE)
 
 # common layout settings for QTabWidget
 QSS_TAB_BAR = """
@@ -533,11 +537,11 @@ QSS_TAB_BAR = """
     QTabWidget::tab-bar {alignment: left;}
     /* Style the TAB using the tab sub-control. Note that it reads QTabBar _not_ QTabWidget */
 
-    QTabBar {font-weight: bold; font-size:11pt;}
+    QTabBar {font-weight: bold; font-size: %s;}
 
     QTabBar::tab{
         color:black;
-        font-size:10pt;
+        font-size: %s;
         font-weight:bold;
         background: qlineargradient(x1: 0, y1: 0, x2: 1, y2: 1,
                             stop: 0 white, stop: 0.5 #C0C0C0, stop: 1.0 #C2C7CB);
@@ -598,7 +602,7 @@ QSS_TAB_BAR = """
         margin-top: 0.2em;}
     QTabBar::tab::left:!selected {
         margin-left: 0.2em;}
-    """
+    """ % (FONT_SIZE_MEDIUM, FONT_SIZE_BASE)
 
 # Overlap effects for QTabWidget, currently not used
 qss_tab_bar_ovlp = """
