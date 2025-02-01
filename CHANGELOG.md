@@ -3,7 +3,7 @@
 ## [v0.9.6](https://github.com/chipmuenk/pyfda/tree/v0.9.6) (2025-xx)
 
 ### Bugfixes
-
+- Do not add DC value to real and imaginary part of complex stimuli
 - Add styling for right-mouse context menu
 - Add missing background color for QFileDialog
 - Fix shrinking of input specification subwidgets instead of turning on scroll bars
