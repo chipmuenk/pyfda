@@ -21,31 +21,31 @@ from pyfda.pyfda_rc import params
 
 logger = logging.getLogger(__name__)
 
-class My_Input_Widget(QWidget):
+class MyInputWidget(QWidget):
     """
     Template for user input widget
     """
     sig_rx = pyqtSignal(object) # incoming signals from input_tab_widgets
     sig_tx = pyqtSignal(object) # outgoing signals to input_tab_widgets
 
-    def __init__(self, parent):
+    def __init__(self):
         super().__init__()
 
         self.tab_label = 'MyWdg'
         self.tool_tip = "<span>This is my first pyFDA widget!</span>"
 
-        self._construct_UI()
+        self._construct_ui()
         self.load_dict()
 
     def process_sig_rx(self, dict_sig=None):
         """
         Process signals coming from sig_rx
         """
-        logger.debug("Processing {0}: {1}".format(type(dict_sig).__name__, dict_sig))
+        logger.debug("Processing %s: %s", type(dict_sig).__name__, dict_sig)
         if 'data_changed' in dict_sig or 'view_changed' in dict_sig or 'specs_changed' in dict_sig:
             self.load_dict()
 
-    def _construct_UI(self):
+    def _construct_ui(self):
         """
         Intitialize the widget, consisting of:
         - Checkboxes for selecting the info to be displayed
@@ -110,7 +110,7 @@ if __name__ == '__main__':
 
     from pyfda.libs.compat import QApplication
     app = QApplication(sys.argv)
-    mainw = My_Input_Widget(None)
+    mainw = MyInputWidget(None)
 
     app.setActiveWindow(mainw)
     mainw.show()
