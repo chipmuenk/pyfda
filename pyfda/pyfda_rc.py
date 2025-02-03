@@ -602,7 +602,7 @@ QSS_TAB_BAR = """
         margin-top: 0.2em;}
     QTabBar::tab::left:!selected {
         margin-left: 0.2em;}
-    """ % (FONT_SIZE_MEDIUM, FONT_SIZE_BASE)
+    """ % (FONT_SIZE_MEDIUM, FONT_SIZE_MEDIUM)
 
 # Overlap effects for QTabWidget, currently not used
 qss_tab_bar_ovlp = """
