@@ -204,20 +204,39 @@ class Plot_Tran_Stim(QWidget):
             """
             Add signal `add_sig` to stimulus `stim` (both need to have the same shape)
             and respect all combinations of real and complex-valued signals.
+            `stim` needs to be a one-dimensional array (float or complex).
             If `add_sig` has the shape (N x 2), the two columns are added as real and
             imaginary values.
             """
+            if np.ndim(stim) == 0:
+                # stim needs to be a 1 dimensional array
+                logger.error(
+                    "Stimulus needs to be a 1-dimensional array but is a scalar!")
+                return stim
+            elif np.ndim(stim) > 1:
+                # stim needs to be a 1 dimensional array
+                logger.error(
+                    "Stimulus needs to be a 1-dimensional array but "
+                    f"has the shape ({np.shape(stim)}).")
+                return stim
+
             if np.ndim(add_sig) == 0:
+                # `add_sig` is empty or 0, return `stim`. If `add_sig` is a scalar,
+                #  continue as it can be added to `stim`.
                 if add_sig is None or add_sig == 0:
                     return stim
-                # else add_sig is a scalar, can be added to stim
-            elif np.ndim(stim) != 1 or np.ndim(add_sig) > 2\
-                or np.ndim(add_sig) == 2 and np.shape(add_sig)[1] != 2:
+
+            elif  np.ndim(add_sig) > 2\
+                    or np.ndim(add_sig) == 2 and np.shape(add_sig)[1] != 2:
+                # `add_sig` needs to be an one-dimensional array or a two-dimensional
+                # array with dimensions (N x 2).
                 logger.error(
-                    f"Cannot combine stimulus ({np.shape(stim)}) and additional "
-                    f"signal ({np.shape(add_sig)}) due to unsuitable dimensions!")
+                    f"Cannot add additional signal ({np.shape(add_sig)}) "
+                    "due to unsuitable shape!")
                 return stim
+
             elif len(stim) != np.shape(add_sig)[0]:
+                # `stim` and `add_sig` need to have same length 
                 logger.error(
                     f"Cannot combine stimulus (len = {np.shape(stim)}) and additional "
                     f"signal (len = {np.shape(add_sig)}) due to different lenghts!")
@@ -229,18 +248,11 @@ class Plot_Tran_Stim(QWidget):
                 return stim
 
             # ---
-            # add_sig contains complex items (the array is always complex),
-            # cast stim to complex as well before adding
             if np.any(np.iscomplex(add_sig)):
-                logger.info("add_sig is complex")
-                stim = stim.astype(complex) + add_sig
-            # add_sig is real and stimulus is complex:
-            # -> add add_sig to both real and imaginary part of stimulus
-            elif np.any(np.iscomplex(stim)):
-                logger.info("stim is complex")
-                stim = stim + add_sig + 1j * add_sig
-            else:  # stim and add_sig are real-valued
-                stim = stim + add_sig
+                # `add_sig` contains complex items (the array is always complex),
+                # cast `stim` to complex as well before adding
+                stim = stim.astype(complex)
+            stim = stim + add_sig
             return stim
 
         # ====================================================================
