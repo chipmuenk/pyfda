@@ -33,7 +33,6 @@ API version info:
 
    :2.2: Rename `filter_classes` -> `classes`, remove Py2 compatibility
 """
-import scipy.signal as sig
 from scipy.signal import buttord, butter
 
 from pyfda.libs.pyfda_lib import fil_save, lin2unit
