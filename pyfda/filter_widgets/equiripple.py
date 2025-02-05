@@ -249,17 +249,16 @@ is estimated from frequency and amplitude specifications using Ichige's algorith
 
         self.alg = 'ichige'
 
-    def _test_N(self):
+    def _test_n(self) -> bool:
         """
         Warn the user if the calculated order is too high for a reasonable filter
         design.
         """
         if self.N > 2000:
             return popup_warning(self, self.N, "Equiripple")
-        else:
-            return True
+        return True
 
-    def _save(self, fil_dict, arg):
+    def _save(self, fil_dict, arg) -> None:
         """
         Convert between poles / zeros / gain, filter coefficients (polynomes)
         and second-order sections and store all available formats in the passed
@@ -270,16 +269,17 @@ is estimated from frequency and amplitude specifications using Ichige's algorith
         except Exception as e:
             # catch exception due to malformatted coefficients:
             logger.error("While saving the equiripple filter design, "
-                         "the following error occurred:\n{0}".format(e))
+                         "the following error occurred:\n%s", e)
             return -1
 
         if str(fil_dict['fo']) == 'min':
             fil_dict['N'] = self.N - 1  # yes, update filterbroker
+        return 0
 
 
     def LPman(self, fil_dict):
         self._get_params(fil_dict)
-        if not self._test_N():
+        if not self._test_n():
             return -1
         self._save(fil_dict,
                   sig.remez(self.N,[0, self.F_PB, self.F_SB, 0.5], [1, 0],
@@ -290,7 +290,7 @@ is estimated from frequency and amplitude specifications using Ichige's algorith
         self._get_params(fil_dict)
         (self.N, F, A, W) = remezord([self.F_PB, self.F_SB], [1, 0],
             [self.A_PB, self.A_SB], fs = 1, alg = self.alg)
-        if not self._test_N():
+        if not self._test_n():
             return -1
         fil_dict['W_PB'] = W[0]
         fil_dict['W_SB'] = W[1]
@@ -300,7 +300,7 @@ is estimated from frequency and amplitude specifications using Ichige's algorith
 
     def HPman(self, fil_dict):
         self._get_params(fil_dict)
-        if not self._test_N():
+        if not self._test_n():
             return -1
         if (self.N % 2 == 0): # even order, use odd symmetry (type III)
             self._save(fil_dict,
@@ -317,7 +317,7 @@ is estimated from frequency and amplitude specifications using Ichige's algorith
         self._get_params(fil_dict)
         (self.N, F, A, W) = remezord([self.F_SB, self.F_PB], [0, 1],
             [self.A_SB, self.A_PB], fs = 1, alg = self.alg)
-        if not self._test_N():
+        if not self._test_n():
             return -1
 #        self.N = ceil_odd(N)  # enforce odd order
         fil_dict['W_SB'] = W[0]
@@ -332,7 +332,7 @@ is estimated from frequency and amplitude specifications using Ichige's algorith
     # For BP and BS, F_PB and F_SB have two elements each
     def BPman(self, fil_dict):
         self._get_params(fil_dict)
-        if not self._test_N():
+        if not self._test_n():
             return -1
         self._save(fil_dict,
                  sig.remez(self.N,[0, self.F_SB, self.F_PB,
@@ -345,7 +345,7 @@ is estimated from frequency and amplitude specifications using Ichige's algorith
         (self.N, F, A, W) = remezord([self.F_SB, self.F_PB,
                                 self.F_PB2, self.F_SB2], [0, 1, 0],
             [self.A_SB, self.A_PB, self.A_SB2], fs = 1, alg = self.alg)
-        if not self._test_N():
+        if not self._test_n():
             return -1
         fil_dict['W_SB']  = W[0]
         fil_dict['W_PB']  = W[1]
@@ -355,7 +355,7 @@ is estimated from frequency and amplitude specifications using Ichige's algorith
 
     def BSman(self, fil_dict):
         self._get_params(fil_dict)
-        if not self._test_N():
+        if not self._test_n():
             return -1
         self.N = round_odd(self.N) # enforce odd order
         self._save(fil_dict, sig.remez(self.N,[0, self.F_PB, self.F_SB,
@@ -369,7 +369,7 @@ is estimated from frequency and amplitude specifications using Ichige's algorith
                                 self.F_SB2, self.F_PB2], [1, 0, 1],
             [self.A_PB, self.A_SB, self.A_PB2], fs = 1, alg = self.alg)
         self.N = round_odd(N)  # enforce odd order
-        if not self._test_N():
+        if not self._test_n():
             return -1
         fil_dict['W_PB']  = W[0]
         fil_dict['W_SB']  = W[1]
@@ -379,7 +379,7 @@ is estimated from frequency and amplitude specifications using Ichige's algorith
 
     def HILman(self, fil_dict):
         self._get_params(fil_dict)
-        if not self._test_N():
+        if not self._test_n():
             return -1
         self._save(fil_dict, sig.remez(self.N,[0, self.F_SB, self.F_PB,
                 self.F_PB2, self.F_SB2, 0.5],[0, 1, 0],
@@ -388,7 +388,7 @@ is estimated from frequency and amplitude specifications using Ichige's algorith
 
     def DIFFman(self, fil_dict):
         self._get_params(fil_dict)
-        if not self._test_N():
+        if not self._test_n():
             return -1
         self.N = ceil_even(self.N) # enforce even order
         if self.F_PB < 0.1:
