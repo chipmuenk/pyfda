@@ -53,28 +53,28 @@ class Equiripple(QWidget):
             # currently, only 'ba' is supported for equiripple routines
 
     info = """
-**Equiripple filters**
+    **Equiripple filters**
 
-have the steepest rate of transition between the frequency response’s passband
-and stopband of all FIR filters. This comes at the expense of a constant ripple
-(equiripple) :math:`A_PB` and :math:`A_SB` in both pass and stop band.
+    have the steepest rate of transition between the frequency response’s passband
+    and stopband of all FIR filters. This comes at the expense of a constant ripple
+    (equiripple) :math:`A_PB` and :math:`A_SB` in both pass and stop band.
 
-The filter-coefficients are calculated in such a way that the transfer function
-minimizes the maximum error (**Minimax** design) between the desired gain and the
-realized gain in the specified frequency bands using the **Remez** exchange algorithm.
-The filter design algorithm is known as **Parks-McClellan** algorithm, in
-Matlab (R) it is called ``firpm``.
+    The filter-coefficients are calculated in such a way that the transfer function
+    minimizes the maximum error (**Minimax** design) between the desired gain and the
+    realized gain in the specified frequency bands using the **Remez** exchange algorithm.
+    The filter design algorithm is known as **Parks-McClellan** algorithm, in
+    Matlab (R) it is called ``firpm``.
 
-Manual filter order design requires specifying the frequency bands (:math:`F_PB`,
-:math:`f_SB` etc.), the filter order :math:`N` and weight factors :math:`W_PB`,
-:math:`W_SB` etc.) for individual bands.
+    Manual filter order design requires specifying the frequency bands (:math:`F_PB`,
+    :math:`f_SB` etc.), the filter order :math:`N` and weight factors :math:`W_PB`,
+    :math:`W_SB` etc.) for individual bands.
 
-The minimum order and the weight factors needed to fulfill the target specifications
-is estimated from frequency and amplitude specifications using Ichige's algorithm.
+    The minimum order and the weight factors needed to fulfill the target specifications
+    is estimated from frequency and amplitude specifications using Ichige's algorithm.
 
-**Design routines:**
+    **Design routines:**
 
-``scipy.signal.remez()``, ``pyfda_lib.remezord()``
+    ``scipy.signal.remez()``, ``pyfda_lib.remezord()``
     """
 
     sig_tx = pyqtSignal(object)

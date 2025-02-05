@@ -43,8 +43,8 @@ __version__ = "2.2"
 classes = {'Cheby2': 'Chebyshev 2'} #: Dict containing class name : display name
 class Cheby2():
     """
-    Design Chebychev type 2 filters (LP, HP, BP, BS) with fixed or minimum order,
-    return the filter design in 'sos', 'zpk' or 'ba' format, selected by ``FRMT``.
+    Design digital Chebychev type 2 filters (LP, HP, BP, BS) with fixed or minimum
+    order, return the filter design in 'sos', 'zpk' or 'ba' format, selected by ``FRMT``.
     This is more or less a wrapper around the ``scipy.signal.cheby2()`` and
     ``scipy.signal.cheb2ord()`` routines.
     """

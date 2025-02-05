@@ -44,6 +44,12 @@ __version__ = "2.2"
 classes = {'Butter': 'Butterworth'}
 
 class Butter():
+    """
+    Design digital Butterworth filters (LP, HP, BP, BS) with fixed or minimum order,
+    return the filter design in 'sos', 'zpk' or 'ba' format, selected by ``FRMT``.
+    This is more or less a wrapper around the ``scipy.signal.butter()`` and
+    ``scipy.signal.buttord()`` routines.
+    """
 
     FRMT = 'sos' # output format of filter design routines 'zpk' / 'ba' / 'sos'
 
@@ -262,7 +268,7 @@ class Butter():
         if not self._test_n():
             return -1
         self._save(fil_dict, butter(
-            self.N//2, [self.F_C,self.F_C2], btype='bandpass',
+            self.N//2, [self.F_C, self.F_C2], btype='bandpass',
             analog=self.analog, output=self.FRMT))
         return 0
 

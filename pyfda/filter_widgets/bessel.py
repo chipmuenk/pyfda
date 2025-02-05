@@ -25,14 +25,15 @@ API version info:
     :1.3: new public methods ``destruct_UI`` and ``construct_UI`` (no longer
          called by ``__init__``)
 
-    :1.4: - module attribute ``filter_classes`` contains class name and combo box name instead of class attribute ``name``
+    :1.4: - module attribute ``filter_classes`` contains class name and combo box
+            name instead of class attribute ``name``
 
-          - ``FRMT`` is now a class attribute
+        - ``FRMT`` is now a class attribute
 
     :2.0: Specify the parameters for each subwidget as tuples in a dict where the
-         first element controls whether the widget is visible and / or enabled.
-         This dict is now called ``self.rt_dict``. When present, the dict ``self.rt_dict_add``
-         is read and merged with the first one.
+        first element controls whether the widget is visible and / or enabled.
+        This dict is now called ``self.rt_dict``. When present, the dict
+        ``self.rt_dict_add`` is read and merged with the first one.
 
     :2.1: Remove empty methods ``construct_UI`` and ``destruct_UI`` and attributes
          ``self.wdg`` and ``self.hdl``
@@ -50,8 +51,8 @@ classes = {'Bessel': 'Bessel'} #: Dict containing class name : display name
 
 class Bessel():
     """
-    Design Bessel filters (LP, HP, BP, BS) with fixed or minimum order, return
-    the filter design in 'sos', 'zpk' or 'ba' format, selected by ``FRMT``.
+    Design digital Bessel filters (LP, HP, BP, BS) with fixed or minimum order,
+    return the filter design in 'sos', 'zpk' or 'ba' format, selected by ``FRMT``.
     This is more or less a wrapper around ``scipy.signal.bessel()`` and
     ``scipy.signal.buttord()`` (which is used to approximate the minimum order
     for a Bessel filter).

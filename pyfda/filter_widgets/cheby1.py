@@ -44,8 +44,8 @@ classes = {'Cheby1': 'Chebyshev 1'} #: Dict containing class name : display name
 
 class Cheby1():
     """
-    Design Chebychev type I filters (LP, HP, BP, BS) with fixed or minimum order,
-    return the filter design in 'sos', 'zpk' or 'ba' format, selected by ``FRMT``.
+    Design digital Chebychev type I filters (LP, HP, BP, BS) with fixed or minimum
+    order, return the filter design in 'sos', 'zpk' or 'ba' format, selected by ``FRMT``.
     This is more or less a wrapper around the ``scipy.signal.cheby1()`` and
     ``scipy.signal.chebord()`` routines.
     """
@@ -88,8 +88,8 @@ class Cheby1():
         self.rt_dict_add = {
             'COM':{'man':{'msg':('a',
                 r"Enter the filter order <b><i>N</i></b> and the critical frequency "
-                 "or frequencies <b><i>F<sub>C</sub></i></b>&nbsp; where the gain first drops below "
-                 "the maximum ripple "
+                 "or frequencies <b><i>F<sub>C</sub></i></b>&nbsp; where the gain first "
+                 "drops below the maximum ripple "
                  "<b><i>-A<sub>PB</sub></i></b>&nbsp; allowed below unity gain in the "
                  "passband.")},
                                   },
