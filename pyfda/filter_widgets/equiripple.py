@@ -81,7 +81,7 @@ class Equiripple(QWidget):
     from pyfda.libs.pyfda_qt_lib import emit
 
     def __init__(self, objectName='equiripple_inst'):
-        QWidget.__init__(self)
+        super().__init__()
 
         self.setObjectName(objectName)
         self.grid_density = 16
