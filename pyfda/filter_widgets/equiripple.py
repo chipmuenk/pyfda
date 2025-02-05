@@ -31,17 +31,18 @@ API version info:
    :2.2: Rename `filter_classes` -> `classes`, remove Py2 compatibility
 """
 import logging
-logger = logging.getLogger(__name__)
 
-from pyfda.libs.compat import QWidget, QLabel, QLineEdit, pyqtSignal, QVBoxLayout, QHBoxLayout
-
-import scipy.signal as sig
+from scipy.signal import remez
 import numpy as np
 
+
+from pyfda.libs.compat import QWidget, QLabel, QLineEdit, pyqtSignal, QVBoxLayout, QHBoxLayout
 import pyfda.filterbroker as fb
 from pyfda.libs.pyfda_qt_lib import popup_warning
 from pyfda.libs.pyfda_lib import fil_save, round_odd, ceil_even, safe_eval
 from .common import remezord
+
+logger = logging.getLogger(__name__)
 
 __version__ = "2.2"
 
@@ -49,7 +50,7 @@ classes = {'Equiripple':'Equiripple'} #: Dict containing class name : display na
 
 class Equiripple(QWidget):
 
-    FRMT = 'ba' # output format of filter design routines 'zpk' / 'ba' / 'sos'
+    FRMT = 'ba' # output format of filter design routines ('zpk' / 'ba' / 'sos')
             # currently, only 'ba' is supported for equiripple routines
 
     info = """
@@ -160,7 +161,7 @@ class Equiripple(QWidget):
 
         self.info_doc = []
         self.info_doc.append('remez()\n=======')
-        self.info_doc.append(sig.remez.__doc__)
+        self.info_doc.append(remez.__doc__)
         self.info_doc.append('remezord()\n==========')
         self.info_doc.append(remezord.__doc__)
 
@@ -282,7 +283,7 @@ class Equiripple(QWidget):
         if not self._test_n():
             return -1
         self._save(fil_dict,
-                  sig.remez(self.N,[0, self.F_PB, self.F_SB, 0.5], [1, 0],
+                  remez(self.N,[0, self.F_PB, self.F_SB, 0.5], [1, 0],
                         weight = [fil_dict['W_PB'],fil_dict['W_SB']], fs = 1,
                         grid_density = self.grid_density))
 
@@ -294,7 +295,7 @@ class Equiripple(QWidget):
             return -1
         fil_dict['W_PB'] = W[0]
         fil_dict['W_SB'] = W[1]
-        self._save(fil_dict, sig.remez(self.N, F, [1, 0], weight = W, fs = 1,
+        self._save(fil_dict, remez(self.N, F, [1, 0], weight = W, fs = 1,
                         grid_density = self.grid_density))
 
 
@@ -304,12 +305,12 @@ class Equiripple(QWidget):
             return -1
         if (self.N % 2 == 0): # even order, use odd symmetry (type III)
             self._save(fil_dict,
-                  sig.remez(self.N,[0, self.F_SB, self.F_PB, 0.5], [0, 1],
+                  remez(self.N,[0, self.F_SB, self.F_PB, 0.5], [0, 1],
                         weight = [fil_dict['W_SB'],fil_dict['W_PB']], fs = 1,
                         type = 'hilbert', grid_density = self.grid_density))
         else: # odd order,
             self._save(fil_dict,
-                  sig.remez(self.N,[0, self.F_SB, self.F_PB, 0.5], [0, 1],
+                  remez(self.N,[0, self.F_SB, self.F_PB, 0.5], [0, 1],
                         weight = [fil_dict['W_SB'],fil_dict['W_PB']], fs = 1,
                         type = 'bandpass', grid_density = self.grid_density))
 
@@ -323,10 +324,10 @@ class Equiripple(QWidget):
         fil_dict['W_SB'] = W[0]
         fil_dict['W_PB'] = W[1]
         if (self.N % 2 == 0): # even order
-            self._save(fil_dict, sig.remez(self.N, F,[0, 1], weight = W, fs = 1,
+            self._save(fil_dict, remez(self.N, F,[0, 1], weight = W, fs = 1,
                         type = 'hilbert', grid_density = self.grid_density))
         else:
-            self._save(fil_dict, sig.remez(self.N, F,[0, 1], weight = W, fs = 1,
+            self._save(fil_dict, remez(self.N, F,[0, 1], weight = W, fs = 1,
                         type = 'bandpass', grid_density = self.grid_density))
 
     # For BP and BS, F_PB and F_SB have two elements each
@@ -335,7 +336,7 @@ class Equiripple(QWidget):
         if not self._test_n():
             return -1
         self._save(fil_dict,
-                 sig.remez(self.N,[0, self.F_SB, self.F_PB,
+                 remez(self.N,[0, self.F_SB, self.F_PB,
                 self.F_PB2, self.F_SB2, 0.5],[0, 1, 0],
                 weight = [fil_dict['W_SB'],fil_dict['W_PB'], fil_dict['W_SB2']],
                 fs = 1, grid_density = self.grid_density))
@@ -350,7 +351,7 @@ class Equiripple(QWidget):
         fil_dict['W_SB']  = W[0]
         fil_dict['W_PB']  = W[1]
         fil_dict['W_SB2'] = W[2]
-        self._save(fil_dict, sig.remez(self.N,F,[0, 1, 0], weight = W, fs = 1,
+        self._save(fil_dict, remez(self.N,F,[0, 1, 0], weight = W, fs = 1,
                                       grid_density = self.grid_density))
 
     def BSman(self, fil_dict):
@@ -358,7 +359,7 @@ class Equiripple(QWidget):
         if not self._test_n():
             return -1
         self.N = round_odd(self.N) # enforce odd order
-        self._save(fil_dict, sig.remez(self.N,[0, self.F_PB, self.F_SB,
+        self._save(fil_dict, remez(self.N,[0, self.F_PB, self.F_SB,
             self.F_SB2, self.F_PB2, 0.5],[1, 0, 1],
             weight = [fil_dict['W_PB'],fil_dict['W_SB'], fil_dict['W_PB2']],
             fs = 1, grid_density = self.grid_density))
@@ -374,14 +375,14 @@ class Equiripple(QWidget):
         fil_dict['W_PB']  = W[0]
         fil_dict['W_SB']  = W[1]
         fil_dict['W_PB2'] = W[2]
-        self._save(fil_dict, sig.remez(self.N,F,[1, 0, 1], weight = W, fs = 1,
+        self._save(fil_dict, remez(self.N,F,[1, 0, 1], weight = W, fs = 1,
                                       grid_density = self.grid_density))
 
     def HILman(self, fil_dict):
         self._get_params(fil_dict)
         if not self._test_n():
             return -1
-        self._save(fil_dict, sig.remez(self.N,[0, self.F_SB, self.F_PB,
+        self._save(fil_dict, remez(self.N,[0, self.F_SB, self.F_PB,
                 self.F_PB2, self.F_SB2, 0.5],[0, 1, 0],
                 weight = [fil_dict['W_SB'],fil_dict['W_PB'], fil_dict['W_SB2']],
                 fs = 1, type = 'hilbert', grid_density = self.grid_density))
@@ -399,7 +400,7 @@ class Equiripple(QWidget):
             fil_dict['F_PB'] = self.F_PB
             self.emit({'specs_changed': 'equiripple'})
 
-        self._save(fil_dict, sig.remez(self.N,[0, self.F_PB],[np.pi*fil_dict['W_PB']],
+        self._save(fil_dict, remez(self.N,[0, self.F_PB],[np.pi*fil_dict['W_PB']],
                 fs = 1, type = 'differentiator', grid_density = self.grid_density))
 
 
