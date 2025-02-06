@@ -38,6 +38,8 @@ FONT_SIZE_MEDIUM = str(FONT_SIZE_WIDGETS * 1.1) + "pt"
 FONT_SIZE_LARGE = str(FONT_SIZE_WIDGETS * 1.2) + "pt"
 FONT_SIZE_XLARGE = str(FONT_SIZE_WIDGETS * 1.4) + "pt"
 
+FONT_SIZE_MPL = FONT_SIZE_WIDGETS
+
 # Various parameters for calculation, plotting and UI
 params = {
     'FMT': '{:.3g}',  # format string for QLineEdit fields
@@ -122,7 +124,7 @@ mpl_rc = {'lines.linewidth'           : 1.5,
           'mathtext.fontset'          : 'stixsans',  # 'stix',
           'mathtext.default'          : 'it',
           'mathtext.fallback'         : 'cm',
-          'font.size'                 : 10, # TODO: set this depending on resolution
+          'font.size'                 : FONT_SIZE_MPL, # TODO: set this depending on resolution
           'legend.fontsize'           : 'medium',
           'axes.labelsize'            : 'medium',
           'axes.titlesize'            : 'large',
