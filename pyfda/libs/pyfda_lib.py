@@ -1643,8 +1643,6 @@ def fil_save(fil_dict: dict, arg, format_in: str, sender: str,
         elif isinstance(arg, np.ndarray) and np.ndim(arg) == 2:
             frmt = "nd2" #  two-dimensional numpy array
             # logger.info(f"Format (zpk) is '{frmt}', shape = {np.shape(arg)}")
-        # elif any(isinstance(el, list) for el in arg):
-        #     frmt = "lol"  # list or ndarray or tuple of lists
         elif any(isinstance(el, np.ndarray) for el in arg):
             frmt = "lon"  # list or tuple of ndarrays
             logger.warning(f"Format (zpk) is '{frmt}'.")
@@ -1788,15 +1786,15 @@ def fil_convert(fil_dict: dict, format_in) -> None:
         # check for bad coeffs before converting IIR filt
         # this is the same defn used by scipy (tolerance of 1e-14)
         if (fil_dict['ft'] == 'IIR'):
-            chk = np.asarray(fil_dict['sos'])
-            chk = np.absolute(chk)
-            n_sections = chk.shape[0]
+            sos = np.absolute(np.asarray(fil_dict['sos']))
+            n_sections = sos.shape[0]
             for section in range(n_sections):
-                b1 = chk[section, :3]
-                a1 = chk[section, 3:]
-                if (np.amin(b1) < 1e-14 and np.amin(b1) > 0):
+                b0 = sos[section, 3]  # coeffs of non-recursive section part
+                a = sos[section, 3:]  # coeffs of recursive section part
+                if b0 < 1e-14:
                     raise ValueError(
-                        "\t'fil_convert()': Bad coefficients, required order N is too high or too low!")
+                        "\t'fil_convert()': Bad coefficients, required order N may be too high!\n"
+                        "\tTry relaxing the specifications.")
 
         if 'zpk' not in format_in:
             try:

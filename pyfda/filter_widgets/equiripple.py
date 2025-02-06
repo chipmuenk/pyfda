@@ -31,17 +31,18 @@ API version info:
    :2.2: Rename `filter_classes` -> `classes`, remove Py2 compatibility
 """
 import logging
-logger = logging.getLogger(__name__)
 
-from pyfda.libs.compat import QWidget, QLabel, QLineEdit, pyqtSignal, QVBoxLayout, QHBoxLayout
-
-import scipy.signal as sig
+from scipy.signal import remez
 import numpy as np
 
+
+from pyfda.libs.compat import QWidget, QLabel, QLineEdit, pyqtSignal, QVBoxLayout, QHBoxLayout
 import pyfda.filterbroker as fb
 from pyfda.libs.pyfda_qt_lib import popup_warning
 from pyfda.libs.pyfda_lib import fil_save, round_odd, ceil_even, safe_eval
 from .common import remezord
+
+logger = logging.getLogger(__name__)
 
 __version__ = "2.2"
 
@@ -49,39 +50,39 @@ classes = {'Equiripple':'Equiripple'} #: Dict containing class name : display na
 
 class Equiripple(QWidget):
 
-    FRMT = 'ba' # output format of filter design routines 'zpk' / 'ba' / 'sos'
+    FRMT = 'ba' # output format of filter design routines ('zpk' / 'ba' / 'sos')
             # currently, only 'ba' is supported for equiripple routines
 
     info = """
-**Equiripple filters**
+    **Equiripple filters**
 
-have the steepest rate of transition between the frequency response’s passband
-and stopband of all FIR filters. This comes at the expense of a constant ripple
-(equiripple) :math:`A_PB` and :math:`A_SB` in both pass and stop band.
+    have the steepest rate of transition between the frequency response’s passband
+    and stopband of all FIR filters. This comes at the expense of a constant ripple
+    (equiripple) :math:`A_PB` and :math:`A_SB` in both pass and stop band.
 
-The filter-coefficients are calculated in such a way that the transfer function
-minimizes the maximum error (**Minimax** design) between the desired gain and the
-realized gain in the specified frequency bands using the **Remez** exchange algorithm.
-The filter design algorithm is known as **Parks-McClellan** algorithm, in
-Matlab (R) it is called ``firpm``.
+    The filter-coefficients are calculated in such a way that the transfer function
+    minimizes the maximum error (**Minimax** design) between the desired gain and the
+    realized gain in the specified frequency bands using the **Remez** exchange algorithm.
+    The filter design algorithm is known as **Parks-McClellan** algorithm, in
+    Matlab (R) it is called ``firpm``.
 
-Manual filter order design requires specifying the frequency bands (:math:`F_PB`,
-:math:`f_SB` etc.), the filter order :math:`N` and weight factors :math:`W_PB`,
-:math:`W_SB` etc.) for individual bands.
+    Manual filter order design requires specifying the frequency bands (:math:`F_PB`,
+    :math:`f_SB` etc.), the filter order :math:`N` and weight factors :math:`W_PB`,
+    :math:`W_SB` etc.) for individual bands.
 
-The minimum order and the weight factors needed to fulfill the target specifications
-is estimated from frequency and amplitude specifications using Ichige's algorithm.
+    The minimum order and the weight factors needed to fulfill the target specifications
+    is estimated from frequency and amplitude specifications using Ichige's algorithm.
 
-**Design routines:**
+    **Design routines:**
 
-``scipy.signal.remez()``, ``pyfda_lib.remezord()``
+    ``scipy.signal.remez()``, ``pyfda_lib.remezord()``
     """
 
     sig_tx = pyqtSignal(object)
     from pyfda.libs.pyfda_qt_lib import emit
 
     def __init__(self, objectName='equiripple_inst'):
-        QWidget.__init__(self)
+        super().__init__()
 
         self.setObjectName(objectName)
         self.grid_density = 16
@@ -160,7 +161,7 @@ is estimated from frequency and amplitude specifications using Ichige's algorith
 
         self.info_doc = []
         self.info_doc.append('remez()\n=======')
-        self.info_doc.append(sig.remez.__doc__)
+        self.info_doc.append(remez.__doc__)
         self.info_doc.append('remezord()\n==========')
         self.info_doc.append(remezord.__doc__)
 
@@ -249,17 +250,16 @@ is estimated from frequency and amplitude specifications using Ichige's algorith
 
         self.alg = 'ichige'
 
-    def _test_N(self):
+    def _test_n(self) -> bool:
         """
         Warn the user if the calculated order is too high for a reasonable filter
         design.
         """
         if self.N > 2000:
             return popup_warning(self, self.N, "Equiripple")
-        else:
-            return True
+        return True
 
-    def _save(self, fil_dict, arg):
+    def _save(self, fil_dict, arg) -> None:
         """
         Convert between poles / zeros / gain, filter coefficients (polynomes)
         and second-order sections and store all available formats in the passed
@@ -270,19 +270,20 @@ is estimated from frequency and amplitude specifications using Ichige's algorith
         except Exception as e:
             # catch exception due to malformatted coefficients:
             logger.error("While saving the equiripple filter design, "
-                         "the following error occurred:\n{0}".format(e))
+                         "the following error occurred:\n%s", e)
             return -1
 
         if str(fil_dict['fo']) == 'min':
             fil_dict['N'] = self.N - 1  # yes, update filterbroker
+        return 0
 
 
     def LPman(self, fil_dict):
         self._get_params(fil_dict)
-        if not self._test_N():
+        if not self._test_n():
             return -1
         self._save(fil_dict,
-                  sig.remez(self.N,[0, self.F_PB, self.F_SB, 0.5], [1, 0],
+                  remez(self.N,[0, self.F_PB, self.F_SB, 0.5], [1, 0],
                         weight = [fil_dict['W_PB'],fil_dict['W_SB']], fs = 1,
                         grid_density = self.grid_density))
 
@@ -290,26 +291,26 @@ is estimated from frequency and amplitude specifications using Ichige's algorith
         self._get_params(fil_dict)
         (self.N, F, A, W) = remezord([self.F_PB, self.F_SB], [1, 0],
             [self.A_PB, self.A_SB], fs = 1, alg = self.alg)
-        if not self._test_N():
+        if not self._test_n():
             return -1
         fil_dict['W_PB'] = W[0]
         fil_dict['W_SB'] = W[1]
-        self._save(fil_dict, sig.remez(self.N, F, [1, 0], weight = W, fs = 1,
+        self._save(fil_dict, remez(self.N, F, [1, 0], weight = W, fs = 1,
                         grid_density = self.grid_density))
 
 
     def HPman(self, fil_dict):
         self._get_params(fil_dict)
-        if not self._test_N():
+        if not self._test_n():
             return -1
         if (self.N % 2 == 0): # even order, use odd symmetry (type III)
             self._save(fil_dict,
-                  sig.remez(self.N,[0, self.F_SB, self.F_PB, 0.5], [0, 1],
+                  remez(self.N,[0, self.F_SB, self.F_PB, 0.5], [0, 1],
                         weight = [fil_dict['W_SB'],fil_dict['W_PB']], fs = 1,
                         type = 'hilbert', grid_density = self.grid_density))
         else: # odd order,
             self._save(fil_dict,
-                  sig.remez(self.N,[0, self.F_SB, self.F_PB, 0.5], [0, 1],
+                  remez(self.N,[0, self.F_SB, self.F_PB, 0.5], [0, 1],
                         weight = [fil_dict['W_SB'],fil_dict['W_PB']], fs = 1,
                         type = 'bandpass', grid_density = self.grid_density))
 
@@ -317,25 +318,25 @@ is estimated from frequency and amplitude specifications using Ichige's algorith
         self._get_params(fil_dict)
         (self.N, F, A, W) = remezord([self.F_SB, self.F_PB], [0, 1],
             [self.A_SB, self.A_PB], fs = 1, alg = self.alg)
-        if not self._test_N():
+        if not self._test_n():
             return -1
 #        self.N = ceil_odd(N)  # enforce odd order
         fil_dict['W_SB'] = W[0]
         fil_dict['W_PB'] = W[1]
         if (self.N % 2 == 0): # even order
-            self._save(fil_dict, sig.remez(self.N, F,[0, 1], weight = W, fs = 1,
+            self._save(fil_dict, remez(self.N, F,[0, 1], weight = W, fs = 1,
                         type = 'hilbert', grid_density = self.grid_density))
         else:
-            self._save(fil_dict, sig.remez(self.N, F,[0, 1], weight = W, fs = 1,
+            self._save(fil_dict, remez(self.N, F,[0, 1], weight = W, fs = 1,
                         type = 'bandpass', grid_density = self.grid_density))
 
     # For BP and BS, F_PB and F_SB have two elements each
     def BPman(self, fil_dict):
         self._get_params(fil_dict)
-        if not self._test_N():
+        if not self._test_n():
             return -1
         self._save(fil_dict,
-                 sig.remez(self.N,[0, self.F_SB, self.F_PB,
+                 remez(self.N,[0, self.F_SB, self.F_PB,
                 self.F_PB2, self.F_SB2, 0.5],[0, 1, 0],
                 weight = [fil_dict['W_SB'],fil_dict['W_PB'], fil_dict['W_SB2']],
                 fs = 1, grid_density = self.grid_density))
@@ -345,20 +346,20 @@ is estimated from frequency and amplitude specifications using Ichige's algorith
         (self.N, F, A, W) = remezord([self.F_SB, self.F_PB,
                                 self.F_PB2, self.F_SB2], [0, 1, 0],
             [self.A_SB, self.A_PB, self.A_SB2], fs = 1, alg = self.alg)
-        if not self._test_N():
+        if not self._test_n():
             return -1
         fil_dict['W_SB']  = W[0]
         fil_dict['W_PB']  = W[1]
         fil_dict['W_SB2'] = W[2]
-        self._save(fil_dict, sig.remez(self.N,F,[0, 1, 0], weight = W, fs = 1,
+        self._save(fil_dict, remez(self.N,F,[0, 1, 0], weight = W, fs = 1,
                                       grid_density = self.grid_density))
 
     def BSman(self, fil_dict):
         self._get_params(fil_dict)
-        if not self._test_N():
+        if not self._test_n():
             return -1
         self.N = round_odd(self.N) # enforce odd order
-        self._save(fil_dict, sig.remez(self.N,[0, self.F_PB, self.F_SB,
+        self._save(fil_dict, remez(self.N,[0, self.F_PB, self.F_SB,
             self.F_SB2, self.F_PB2, 0.5],[1, 0, 1],
             weight = [fil_dict['W_PB'],fil_dict['W_SB'], fil_dict['W_PB2']],
             fs = 1, grid_density = self.grid_density))
@@ -369,26 +370,26 @@ is estimated from frequency and amplitude specifications using Ichige's algorith
                                 self.F_SB2, self.F_PB2], [1, 0, 1],
             [self.A_PB, self.A_SB, self.A_PB2], fs = 1, alg = self.alg)
         self.N = round_odd(N)  # enforce odd order
-        if not self._test_N():
+        if not self._test_n():
             return -1
         fil_dict['W_PB']  = W[0]
         fil_dict['W_SB']  = W[1]
         fil_dict['W_PB2'] = W[2]
-        self._save(fil_dict, sig.remez(self.N,F,[1, 0, 1], weight = W, fs = 1,
+        self._save(fil_dict, remez(self.N,F,[1, 0, 1], weight = W, fs = 1,
                                       grid_density = self.grid_density))
 
     def HILman(self, fil_dict):
         self._get_params(fil_dict)
-        if not self._test_N():
+        if not self._test_n():
             return -1
-        self._save(fil_dict, sig.remez(self.N,[0, self.F_SB, self.F_PB,
+        self._save(fil_dict, remez(self.N,[0, self.F_SB, self.F_PB,
                 self.F_PB2, self.F_SB2, 0.5],[0, 1, 0],
                 weight = [fil_dict['W_SB'],fil_dict['W_PB'], fil_dict['W_SB2']],
                 fs = 1, type = 'hilbert', grid_density = self.grid_density))
 
     def DIFFman(self, fil_dict):
         self._get_params(fil_dict)
-        if not self._test_N():
+        if not self._test_n():
             return -1
         self.N = ceil_even(self.N) # enforce even order
         if self.F_PB < 0.1:
@@ -399,7 +400,7 @@ is estimated from frequency and amplitude specifications using Ichige's algorith
             fil_dict['F_PB'] = self.F_PB
             self.emit({'specs_changed': 'equiripple'})
 
-        self._save(fil_dict, sig.remez(self.N,[0, self.F_PB],[np.pi*fil_dict['W_PB']],
+        self._save(fil_dict, remez(self.N,[0, self.F_PB],[np.pi*fil_dict['W_PB']],
                 fs = 1, type = 'differentiator', grid_density = self.grid_density))
 
 

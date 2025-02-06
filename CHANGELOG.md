@@ -3,6 +3,11 @@
 ## [v0.9.6](https://github.com/chipmuenk/pyfda/tree/v0.9.6) (2025-xx)
 
 ### Bugfixes
+
+- Fix buggy check for well-formed sos coefficients, giving wrong error messages
+  about required filter order being too high or too low.
+- Fix bug where IIR bandpass or bandstop have to be specified with half the
+  actual order
 - Do not add DC value to real and imaginary part of complex stimuli
 - Add styling for right-mouse context menu
 - Add missing background color for QFileDialog

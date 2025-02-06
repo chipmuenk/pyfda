@@ -52,7 +52,7 @@ class AllpPZ(QWidget):
     from pyfda.libs.pyfda_qt_lib import emit
 
     def __init__(self):
-        QWidget.__init__(self)
+        super().__init__()
 
         self.p = [0.5, 0.5j]
 
@@ -74,7 +74,7 @@ class AllpPZ(QWidget):
         self.info_doc = []
 
     #--------------------------------------------------------------------------
-    def construct_UI(self):
+    def construct_ui(self):
         """
         Create additional subwidget(s) needed for filter design:
         These subwidgets are instantiated dynamically when needed in
@@ -94,30 +94,30 @@ class AllpPZ(QWidget):
         self.led_pole2.setObjectName('wdg_led_pole2')
         self.led_pole2.setToolTip("Pole 2 for allpass filter")
 
-        self.layHWin = QHBoxLayout()
-        self.layHWin.setObjectName('wdg_layGWin')
-        self.layHWin.addWidget(self.lbl_pole1)
-        self.layHWin.addWidget(self.led_pole1)
-        self.layHWin.addWidget(self.lbl_pole2)
-        self.layHWin.addWidget(self.led_pole2)
-        self.layHWin.setContentsMargins(0,0,0,0)
+        self.lay_h_win = QHBoxLayout()
+        self.lay_h_win.setObjectName('wdg_layGWin')
+        self.lay_h_win.addWidget(self.lbl_pole1)
+        self.lay_h_win.addWidget(self.led_pole1)
+        self.lay_h_win.addWidget(self.lbl_pole2)
+        self.lay_h_win.addWidget(self.led_pole2)
+        self.lay_h_win.setContentsMargins(0,0,0,0)
         # Widget containing all subwidgets (cmbBoxes, Labels, lineEdits)
         self.wdg_fil = QWidget(self)
         self.wdg_fil.setObjectName('wdg_fil')
-        self.wdg_fil.setLayout(self.layHWin)
+        self.wdg_fil.setLayout(self.lay_h_win)
 
         #----------------------------------------------------------------------
         # SIGNALS & SLOTs
         #----------------------------------------------------------------------
-        self.led_pole1.editingFinished.connect(self._update_UI)
-        self.led_pole2.editingFinished.connect(self._update_UI)
+        self.led_pole1.editingFinished.connect(self._update_ui)
+        self.led_pole2.editingFinished.connect(self._update_ui)
         # fires when edited line looses focus or when RETURN is pressed
         #----------------------------------------------------------------------
 
         self.dict2filter_params() # get initial / last setting from dictionary
-        self._update_UI()
+        self._update_ui()
 
-    def _update_UI(self):
+    def _update_ui(self):
         """
         Update UI when line edit field is changed (here, only the text is read
         and converted to integer) and store parameter settings in filter
@@ -219,7 +219,7 @@ if __name__ == '__main__':
 
     # instantiate filter widget
     filt = AllpPZ()
-    filt.construct_UI()
+    filt.construct_ui()
     wdg_allpass = getattr(filt, 'wdg_fil')
 
     layVDynWdg = QVBoxLayout()
@@ -238,4 +238,3 @@ if __name__ == '__main__':
 
     app.exec_()
     #------------------------------------------------------------------------------
-

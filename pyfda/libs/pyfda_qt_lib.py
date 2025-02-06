@@ -492,15 +492,15 @@ def qget_selected(table, select_all=False, reverse=True):
 
 
 # ----------------------------------------------------------------------------
-def popup_warning(self, param1: int = 0, param2: str = "", message: str = "") -> bool:
+def popup_warning(self, N: int = 0, filter: str = "", message: str = "") -> bool:
     """
     Pop-up a warning box and require a user prompt. When `message == ""`, warn of
     very large filter orders, otherwise display the passed message
     """
     if message == "":
         message = (
-            f"<span><b><i>N</i> = {param1}</b> is a rather high order for<br />"
-            f"{param2} filters and may cause large <br />"
+            f"<span><b><i>N</i> = {N}</b> is a rather high order for a<br />"
+            f"{filter} filter and may cause large <br />"
             "numerical errors and compute times.<br />Continue?</span>")
 
     reply = QMessageBox.warning(
