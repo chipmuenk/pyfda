@@ -47,7 +47,7 @@ ignore-paths=['^pyfda/bak/.*$', '^pyfda/tests/.*$']
 # Files or directories matching the regular expression patterns are skipped. The
 # regex matches against base names, not paths. The default value  ["^\\.#"] 
 # ignores Emacs file locks
-ignore-patterns = tests|docs|bak
+# ignore-patterns = tests|docs|bak  use ["tests|docs|bak"]?
 
 # List of module names for which member attributes should not be checked and will
 # not be imported (useful for modules/projects where namespaces are manipulated
