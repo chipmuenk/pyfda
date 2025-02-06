@@ -373,9 +373,9 @@ confidence = ["HIGH", "CONTROL_FLOW", "INFERENCE", "INFERENCE_FAILURE", "UNDEFIN
 # --enable=similarities". If you want to run only the classes checker, but have
 # no Warning level messages displayed, use "--disable=all --enable=classes
 # --disable=W".
-disable = ["raw-checker-failed", "bad-inline-option", "locally-disabled", "file-ignored",\
-	"suppressed-message", "useless-suppression", "deprecated-pragma",\
-	"use-symbolic-message-instead", "use-implicit-booleaness-not-comparison-to-string",\
+disable = ["raw-checker-failed", "bad-inline-option", "locally-disabled", "file-ignored",
+	"suppressed-message", "useless-suppression", "deprecated-pragma",
+	"use-symbolic-message-instead", "use-implicit-booleaness-not-comparison-to-string",
 	"use-implicit-booleaness-not-comparison-to-zero", "bare-except", "invalid-name",
 	"attribute-defined-outside-init"]
 
