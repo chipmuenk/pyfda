@@ -16,7 +16,7 @@ import logging.config
 logger = logging.getLogger(__name__)
 
 from pyfda.libs.tree_builder import Tree_Builder
-# initialize the FilterTreeBuilder class and read config file 
+# initialize the FilterTreeBuilder class and read config file
 tree_builder = Tree_Builder()
 tree_builder.parse_conf_file()
 
@@ -87,7 +87,7 @@ def main():
     # os.environ["QT_SCALE_FACTOR"]             = "1"
     """
     # Enable High DPI display with PyQt5
-    if hasattr(QtCore.Qt, 'AA_EnableHighDpiScaling'):
+    if hasattr(Qt, 'AA_EnableHighDpiScaling'):
         Qt.AA_EnableHighDpiScaling = True
     else:
         logger.warning("No Qt attribute 'AA_EnableHighDpiScaling'.")
@@ -132,7 +132,7 @@ def main():
     # fm = QFontMetrics(font)
     # try to find a good value for matplotlib font size depending on screen resolution
 
-    fontsize = round(9.5 * np.sqrt(pdpiy / ref_dpi) * scaling)
+    fontsize = int(round(9.5 * np.sqrt(pdpiy / ref_dpi) * scaling))
     # fontsize = round(font.pointSizeF() * 1.5 * ldpi / 96)
 
     rc.mpl_rc['font.size'] = fontsize
@@ -144,11 +144,12 @@ def main():
     tree_builder.init_filters()
 
     mainw = pyFDA()
-    logger.info("Logging to {0}".format(dirs.LOG_DIR_FILE))
+    logger.info("Logging to '%s'", dirs.LOG_DIR_FILE)
     logger.info(f"Starting pyfda with screen resolution {width} x {height}, "
                 f"avail: {avail_geometry.width()}x{avail_geometry.height()}")
-    logger.info(f"with {style} and matplotlib fontsize {fontsize}.")
-    logger.info(f"lDPI = {ldpi:.2f}, pDPI = {pdpi:.2f} ({pdpix:.2f} x {pdpiy:.2f}), pix.ratio = {pixel_ratio}")
+    logger.info("with %s and matplotlib fontsize %d.", style, fontsize)
+    logger.info(f"lDPI = {ldpi:.2f}, pDPI = {pdpi:.2f} ({pdpix:.2f} x {pdpiy:.2f}), "
+                f"pix.ratio = {pixel_ratio}\n")
 
     # Available signals:
     # - logicalDotsPerInchChanged(qreal dpi)
@@ -156,7 +157,8 @@ def main():
     # - geometryChanged(const QRect &geometry)
     # - availableGeometryChanged(const QRect &geometry)
 
-    # logger.info(f"size = {font.pointSize()}, {font.pointSizeF()}, {font.pixelSize()},  height = {fm.height()}")
+    # logger.info(f"size = {font.pointSize()}, {font.pointSizeF()}, {font.pixelSize()},  "
+    #             f"height = {fm.height()}")
     if dirs.OS.lower() == "windows":
         # Windows taskbar is not for "Application Windows" but for "Application
         # User Models", grouping several instances of an application under one
@@ -164,7 +166,7 @@ def main():
         # for Pythonw.exe, sometimes the icon is just blank. The following
         # instructions tell Windows that pythonw is merely hosting other applications.
         import ctypes
-        myappid = u'chipmuenk.pyfda.v0.9'
+        myappid = 'chipmuenk.pyfda.v0.9'
         ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID(myappid)
 
     # set taskbar icon
