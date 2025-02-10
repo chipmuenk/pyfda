@@ -45,11 +45,13 @@ def emit(self, dict_sig: dict = {}, sig_name: str = 'sig_tx') -> None:
     - If the sender has passed an objectName, add it with the key "sender_name"
       to the dict.
     """
-
+    logger.warning(sig_name)
     for k in dict_sig:
+        logger.warning(k)
         if k not in DICT_SIG_KEYS:
-            logger.warning(f"Unknown entry '{k}':'{dict_sig[k]}' in 'dict_sig'!")
-            logger.warning(pprint_log(dict_sig))
+            logger.warning(
+                "Unknown entry '%s':'%s' in 'dict_sig'!", k, dict_sig[k])
+            logger.warning("%s", pprint_log(dict_sig))
     # if self.sender() and self.sender().objectName():
     #     logger.info(f"this_sender_name: {self.sender().objectName()}")
     # logger.info(f"objectName = {self.objectName()}")
