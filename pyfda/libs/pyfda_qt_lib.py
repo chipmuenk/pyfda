@@ -9,6 +9,8 @@
 """
 Library with various helper functions for Qt widgets
 """
+import logging
+
 from .pyfda_lib import qstr, pprint_log
 
 from .compat import (
@@ -16,7 +18,6 @@ from .compat import (
     QFont, QSize, QFontMetrics, QSizePolicy, QIcon, QEvent, QHBoxLayout)
 from .pyfda_dirs import OS, OS_VER
 
-import logging
 logger = logging.getLogger(__name__)
 
 DICT_SIG_KEYS = {'id', 'class', 'ttl', 'sender_name', 'object_name',

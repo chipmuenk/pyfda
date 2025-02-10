@@ -9,8 +9,11 @@
 """
 Widget for loading and storing stimulus data from / to transient plotting widget
 """
-from pyfda.libs.compat import Qt, QWidget, pyqtSignal, QVBoxLayout, QDialog, QPushButton
+import logging
+
 import numpy as np
+
+from pyfda.libs.compat import Qt, QWidget, pyqtSignal, QVBoxLayout, QDialog, QPushButton
 
 import pyfda.libs.pyfda_io_lib as io
 import pyfda.filterbroker as fb
@@ -24,7 +27,6 @@ from pyfda.libs.csv_option_box import CSV_option_box
 from pyfda.pyfda_rc import params  # FMT string for QLineEdit fields, e.g. '{:.3g}'
 from pyfda.plot_widgets.tran.tran_io_ui import Tran_IO_UI
 
-import logging
 logger = logging.getLogger(__name__)
 
 class QFileDialogPlus(QDialog):

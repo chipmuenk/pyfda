@@ -9,6 +9,8 @@
 """
 Create the UI for the PlotImz class
 """
+import logging
+
 from pyfda.libs.compat import (
     QCheckBox, QWidget, QComboBox, QLineEdit, QLabel,
     QIcon, QProgressBar, pyqtSignal, QSize, QFrame,
@@ -26,9 +28,7 @@ from pyfda.pyfda_rc import params
 
 from pyfda.plot_widgets.plot_fft_win import Plot_FFT_win
 
-import logging
 logger = logging.getLogger(__name__)
-
 
 class PlotImpz_UI(QWidget):
     """
