@@ -9,11 +9,11 @@
 """
 Design a simple delay for demonstrating the effect of latency and for debugging
 
-Attention: 
+Attention:
 This class is re-instantiated dynamically every time the filter design method
 is selected, calling the __init__ method.
 
-API version info:   
+API version info:
     1.0: initial working release
 """
 from pyfda.libs.compat import QWidget, QLabel, QLineEdit, pyqtSignal, QVBoxLayout, QHBoxLayout
@@ -22,7 +22,7 @@ import scipy.signal as sig
 import numpy as np
 
 import pyfda.filterbroker as fb
-from pyfda.libs.pyfda_qt_lib import popup_warning
+from pyfda.libs.pyfda_qt_lib import popup_warning, emit
 from pyfda.libs.pyfda_lib import fil_save, safe_eval
 
 __version__ = "1.0"
@@ -30,22 +30,24 @@ __version__ = "1.0"
 classes = {'Delay':'Delay'} #: Dict containing class name : display name
 
 class Delay(QWidget):
+    """
+    Create a dummy delay to demonstrate the effect of delays on the phase or to
+    debug fixpoint quantizers.
+    """
 
     FRMT = 'zpk' # output format of delay filter widget
 
     info ="""
-**Delay widget**
+    **Delay widget**
 
-allows entering the number of **delays** :math:`N` :math:`T_S`. It is treated as a FIR filter,
-the number of delays is directly translated to a number of poles (:math:`N > 0`) 
-or zeros (:math:`N < 0`).
+    allows entering the number of **delays** :math:`N` :math:`T_S`. It is treated as a FIR filter,
+    the number of delays is directly translated to a number of poles (:math:`N > 0`)
+    or zeros (:math:`N < 0`).
 
-Obviously, there is no minimum design algorithm or no design algorithm at all :-)
-
+    Obviously, there is no minimum design algorithm or no design algorithm at all :-)
     """
 
     sig_tx = pyqtSignal(object)
-    from pyfda.libs.pyfda_qt_lib import emit
 
     def __init__(self):
         QWidget.__init__(self)
@@ -53,12 +55,12 @@ Obviously, there is no minimum design algorithm or no design algorithm at all :-
         self.N = 5
 
         self.ft = 'FIR'
-        
+
         self.rt_dicts = ('com',)
 
         self.rt_dict = {
             'COM': {'man': {'fo':('a', 'N'),
-                            'msg':('a', 
+                            'msg':('a',
                                 "<span>Enter desired number of delays <b><i>N</i></b>.</span>")
                             },
                 },
@@ -68,11 +70,18 @@ Obviously, there is no minimum design algorithm or no design algorithm at all :-
 
         self.info_doc = []
 
+    # -------------------------------------------------------------------------
+    def emit(self, dict_sig):
+        """
+        Make `emit()` a class attribute, passing `self` with its attributes
+        """
+        emit(self, dict_sig)
+
     #--------------------------------------------------------------------------
     def construct_UI(self):
         """
         Create additional subwidget(s) needed for filter design:
-        These subwidgets are instantiated dynamically when needed in 
+        These subwidgets are instantiated dynamically when needed in
         select_filter.py using the handle to the filter instance, fb.fil_inst.
         """
         pass
@@ -83,7 +92,7 @@ Obviously, there is no minimum design algorithm or no design algorithm at all :-
 #         self.led_delay.setText(str(self.N))
 #         self.led_delay.setObjectName('wdg_led_delay')
 #         self.led_delay.setToolTip("Number of delays, N > 0 produces poles, N < 0 zeros.")
-# 
+#
 #         self.layHWin = QHBoxLayout()
 #         self.layHWin.setObjectName('wdg_layGWin')
 #         self.layHWin.addWidget(self.lbl_delay)
@@ -93,39 +102,39 @@ Obviously, there is no minimum design algorithm or no design algorithm at all :-
 #         self.wdg_fil = QWidget(self)
 #         self.wdg_fil.setObjectName('wdg_fil')
 #         self.wdg_fil.setLayout(self.layHWin)
-# 
+#
 #         #----------------------------------------------------------------------
 #         # SIGNALS & SLOTs
 #         #----------------------------------------------------------------------
 #         self.led_delay.editingFinished.connect(self._update_UI)
 #         # fires when edited line looses focus or when RETURN is pressed
 #         #----------------------------------------------------------------------
-# 
+#
 #         self.dict2filter_params() # get initial / last setting from dictionary
 #         self._update_UI()
 # =============================================================================
-        
+
 # =============================================================================
 #     def _update_UI(self):
 #         """
 #         Update UI when line edit field is changed (here, only the text is read
-#         and converted to integer) and store parameter settings in filter 
+#         and converted to integer) and store parameter settings in filter
 #         dictionary
 #         """
-#         self.N = safe_eval(self.led_delay.text(), self.N, 
+#         self.N = safe_eval(self.led_delay.text(), self.N,
 #                                       sign="poszero", return_type='int')
 #         self.led_delay.setText(str(self.N))
-# 
+#
 #         fb.fil[0].update({'wdg_fil': {'N': self.N}})
-#         
-#         # sig_tx -> select_filter -> filter_specs   
+#
+#         # sig_tx -> select_filter -> filter_specs
 #         self.emit({'filt_changed': 'delay'})
 # =============================================================================
 
 
     def dict2filter_params(self):
         """
-        Reload parameter(s) from filter dictionary (if they exist) and set 
+        Reload parameter(s) from filter dictionary (if they exist) and set
         corresponding UI elements. dict2filter_params() is called upon initialization
         and when the filter is loaded from disk.
         """
@@ -141,18 +150,17 @@ Obviously, there is no minimum design algorithm or no design algorithm at all :-
         Translate parameters from the passed dictionary to instance
         parameters, scaling / transforming them if needed.
         """
-        self.N     = fil_dict['N']  # filter order is translated to numb. of delays
-                                        
-        
-    def _test_N(self):
+        self.N = fil_dict['N']  # filter order is translated to numb. of delays
+
+
+    def _test_n(self):
         """
         Warn the user if the calculated order is too high for a reasonable filter
         design.
         """
         if self.N > 2000:
             return popup_warning(self, self.N, "Delay")
-        else:
-            return True
+        return True
 
     def _save(self, fil_dict, arg=None):
         """
@@ -167,7 +175,7 @@ Obviously, there is no minimum design algorithm or no design algorithm at all :-
 
     def APman(self, fil_dict):
         self._get_params(fil_dict)
-        if not self._test_N():
+        if not self._test_n():
             return -1
         self._save(fil_dict)
 
@@ -178,7 +186,7 @@ if __name__ == '__main__':
     from pyfda.libs.compat import QApplication, QFrame
 
     app = QApplication(sys.argv)
-    
+
     # instantiate filter widget
     filt = Delay()
     filt.construct_UI()
@@ -186,13 +194,13 @@ if __name__ == '__main__':
 
     layVDynWdg = QVBoxLayout()
     layVDynWdg.addWidget(wdg_delay, stretch = 1)
-    
+
     filt.LPman(fb.fil[0])  # design a low-pass with parameters from global dict
     print(fb.fil[0][filt.FRMT]) # return results in default format
 
     frmMain = QFrame()
     frmMain.setFrameStyle(QFrame.StyledPanel|QFrame.Sunken)
-    frmMain.setLayout(layVDynWdg)    
+    frmMain.setLayout(layVDynWdg)
 
     form = frmMain
 
