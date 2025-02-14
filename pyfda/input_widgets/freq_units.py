@@ -10,18 +10,18 @@
 Subwidget for entering frequency units
 """
 import sys
+import logging
+
+import pyfda.filterbroker as fb
 from pyfda.libs.compat import (
     QtCore, QWidget, QLabel, QLineEdit, QComboBox, QFrame, QFont, QSizePolicy,
     QIcon, QVBoxLayout, QHBoxLayout, QGridLayout, pyqtSignal, QEvent)
-
-import pyfda.filterbroker as fb
 from pyfda.libs.pyfda_lib import to_html, safe_eval, pprint_log, first_item
-from pyfda.libs.pyfda_qt_lib import qget_cmb_box, qset_cmb_box, qcmb_box_populate, PushButton
+from pyfda.libs.pyfda_qt_lib import (
+    qget_cmb_box, qset_cmb_box, qcmb_box_populate, PushButton, emit)
 from pyfda.pyfda_rc import params  # FMT string for QLineEdit fields, e.g. '{:.3g}'
 
-import logging
 logger = logging.getLogger(__name__)
-
 
 class FreqUnits(QWidget):
     """
@@ -41,13 +41,11 @@ class FreqUnits(QWidget):
         - `'plt_tLabel'`: label for time axis
 
     """
-
     # class variables (shared between instances if more than one exists)
     # incoming:
     sig_rx = pyqtSignal(object)
     # outgoing: from various and when normalized frequencies have been changed
     sig_tx = pyqtSignal(object)  # outgoing
-    from pyfda.libs.pyfda_qt_lib import emit
 
     def __init__(self, parent=None, title="Frequency Units", objectName=""):
 
@@ -89,7 +87,15 @@ class FreqUnits(QWidget):
 
         self._construct_UI()
 
-# ------------------------------------------------------------------------------
+    # -------------------------------------------------------------------------
+    def emit(self, dict_sig):
+        """
+        Access imported function `emit()` as instance method, passing `self`
+        with its attributes
+        """
+        emit(self, dict_sig)
+
+    # --------------------------------------------------------------------------
     def process_sig_rx(self, dict_sig=None):
         """
         Process signals coming from

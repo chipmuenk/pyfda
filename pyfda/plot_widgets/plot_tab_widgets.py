@@ -5,17 +5,16 @@
 # Copyright © pyFDA Project Contributors
 # Licensed under the terms of the MIT License
 # (see file LICENSE in root directory for details)
-
 import logging
 import importlib
 
+import pyfda.filterbroker as fb
 from pyfda.libs.compat import QTabWidget, QWidget, QVBoxLayout, QEvent, QtCore, pyqtSignal
 from pyfda.libs.pyfda_lib import pprint_log
+from pyfda.libs.pyfda_qt_lib import emit
 from pyfda.pyfda_rc import params
-import pyfda.filterbroker as fb
 
 logger = logging.getLogger(__name__)
-
 
 # ------------------------------------------------------------------------------
 class PlotTabWidgets(QWidget):
@@ -28,14 +27,21 @@ class PlotTabWidgets(QWidget):
     sig_rx = pyqtSignal(object)
     # outgoing: emitted by process_sig_rx
     sig_tx = pyqtSignal(object)
-    from pyfda.libs.pyfda_qt_lib import emit
 
     def __init__(self, parent=None, objectName="plot_tab_widgets_inst"):
         super(PlotTabWidgets, self).__init__(parent)
         self.setObjectName(objectName)
         self._construct_UI()
 
-# ------------------------------------------------------------------------------
+    # -------------------------------------------------------------------------
+    def emit(self, dict_sig):
+        """
+        Access imported function `emit()` as instance method, passing `self`
+        with its attributes
+        """
+        emit(self, dict_sig)
+
+    # ------------------------------------------------------------------------------
     def _construct_UI(self):
         """
         Initialize UI with tabbed subwidgets: Instantiate dynamically each widget

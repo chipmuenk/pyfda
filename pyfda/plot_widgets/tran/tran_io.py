@@ -44,7 +44,8 @@ class QFileDialogPlus(QDialog):
     # -----------------------
     def emit(self, dict_sig):
         """
-        Make `emit()` a class attribute, passing `self` with its attributes
+        Access imported function `emit()` as instance method, passing `self`
+        with its attributes
         """
         emit(self, dict_sig)
 
@@ -122,10 +123,11 @@ class Tran_IO(QWidget):
         elif 'view_changed' in dict_sig and dict_sig['view_changed'] == 'f_S':
             self.set_f_s_wav(fb.fil[0]['f_S'] * fb.fil[0]['f_s_scale'])
 
-    # -----------------------
+    # -----------------------------------------------------------------------------
     def emit(self, dict_sig):
         """
-        Make `emit()` a class attribute, passing `self` with its attributes
+        Access imported function `emit()` as instance method, passing `self`
+        with its attributes
         """
         emit(self, dict_sig)
 

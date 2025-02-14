@@ -9,8 +9,9 @@
 """
 Widget for displaying and modifying filter coefficients
 """
-import sys
 import copy
+import logging
+import sys
 
 from pyfda.libs.compat import (
     Qt, QtCore, QWidget, QLineEdit, QApplication, QIcon, QSize, QTableWidget,
@@ -18,19 +19,19 @@ from pyfda.libs.compat import (
 import numpy as np
 
 import pyfda.filterbroker as fb  # importing filterbroker initializes all its globals
+from .input_coeffs_ui import Input_Coeffs_UI
+from pyfda.libs.csv_option_box import CSV_option_box
+from pyfda.libs.compat import (
+    Qt, QtCore, QWidget, QLineEdit, QApplication, QIcon, QSize, QTableWidget,
+    QTableWidgetItem, QVBoxLayout, pyqtSignal, QStyledItemDelegate, QColor, QBrush)
 import pyfda.libs.pyfda_dirs as dirs
 from pyfda.libs.pyfda_lib import fil_save, safe_eval, pprint_log
-from pyfda.libs.pyfda_sig_lib import zeros_with_val
 from pyfda.libs.pyfda_qt_lib import (
-    qstyle_widget, qset_cmb_box, qget_cmb_box, qget_selected)
+    emit, qstyle_widget, qset_cmb_box, qget_cmb_box, qget_selected)
 from pyfda.libs.pyfda_io_lib import qtable2csv, export_fil_data, select_file, file2array
-from pyfda.libs.csv_option_box import CSV_option_box
-
+from pyfda.libs.pyfda_sig_lib import zeros_with_val
 from pyfda.pyfda_rc import params
 
-from .input_coeffs_ui import Input_Coeffs_UI
-
-import logging
 logger = logging.getLogger(__name__)
 
 # TODO: Fixpoint coefficients do not properly convert complex -> float when saving
@@ -43,7 +44,6 @@ logger = logging.getLogger(__name__)
 #       http://radio.feld.cvut.cz/matlab/toolbox/filterdesign/normalize.html
 #       http://www.ue.eti.pg.gda.pl/~wrona/lab_dsp/cw05/matlab/Help1.pdf
 #       https://stackoverflow.com/questions/68206713/scipy-filter-force-minimal-value-of-sos-coefficient-to-prepare-integer-filter
-
 
 classes = {'Input_Coeffs': 'b,a'}  #: Dict containing class name : display name
 
@@ -277,7 +277,6 @@ class Input_Coeffs(QWidget):
     """
     sig_tx = pyqtSignal(object)  # emitted when filter has been saved
     sig_rx = pyqtSignal(object)  # incoming from input_tab_widgets
-    from pyfda.libs.pyfda_qt_lib import emit
 
     # -------------------------------------------------------------------------
     def __init__(self, parent=None):
@@ -297,6 +296,14 @@ class Input_Coeffs(QWidget):
                      self.ui.wdg_wq_coeffs_a.Q]
 
         self._construct_UI()
+
+    # -------------------------------------------------------------------------
+    def emit(self, dict_sig):
+        """
+        Access imported function `emit()` as instance method, passing `self`
+        with its attributes
+        """
+        emit(self, dict_sig)
 
     # -------------------------------------------------------------------------
     def process_sig_rx(self, dict_sig=None):

@@ -12,16 +12,15 @@ Widget collecting subwidgets for the target filter specifications (currently
 only amplitude and frequency specs.)
 """
 import sys
-
-from pyfda.libs.compat import (
-    QWidget, QLabel, QFont, QFrame, pyqtSignal, Qt, QHBoxLayout, QVBoxLayout)
+import logging
 
 import pyfda.filterbroker as fb
+from pyfda.libs.compat import (
+    QWidget, QLabel, QFont, QFrame, pyqtSignal, Qt, QHBoxLayout, QVBoxLayout)
 from pyfda.libs.pyfda_lib import pprint_log, first_item
 from pyfda.input_widgets import amplitude_specs, freq_specs
 from pyfda.pyfda_rc import params
 
-import logging
 logger = logging.getLogger(__name__)
 
 
@@ -34,7 +33,6 @@ class TargetSpecs(QWidget):
     sig_rx = pyqtSignal(object)  # incoming
     sig_tx = pyqtSignal(object)  # outgoing
     sig_tx_local = pyqtSignal(object)  # outgoing to lower hierarchies
-    from pyfda.libs.pyfda_qt_lib import emit
 
     def __init__(self, parent=None, title="Target Specs", objectName=""):
         super(TargetSpecs, self).__init__(parent)
@@ -44,8 +42,15 @@ class TargetSpecs(QWidget):
 
         self._construct_UI()
 
-# =============================================================================
-#------------------------------------------------------------------------------
+    # -------------------------------------------------------------------------
+    def emit(self, dict_sig, sig_name=""):
+        """
+        Access imported function `emit()` as instance method, passing `self`
+        with its attributes
+        """
+        emit(self, dict_sig, sig_name)
+
+    #--------------------------------------------------------------------------
     def process_sig_rx(self, dict_sig=None):
         """
         Process signals coming in via subwidgets and sig_rx
@@ -62,8 +67,7 @@ class TargetSpecs(QWidget):
         else:
             return
 
-# =============================================================================
-
+    # --------------------------------------------------------------------------
     def _construct_UI(self):
         """
         Construct user interface
@@ -122,7 +126,7 @@ class TargetSpecs(QWidget):
 
         self.update_UI()  # first time initialization
 
-# ------------------------------------------------------------------------------
+    # --------------------------------------------------------------------------
     def update_UI(self, new_labels=()):
         """
         Called when a new filter design algorithm has been selected

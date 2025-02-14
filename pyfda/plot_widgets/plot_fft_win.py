@@ -9,29 +9,26 @@
 """
 Create a popup window with FFT window information
 """
-import copy
+import logging
+
 import numpy as np
 from numpy.fft import fft, fftshift, fftfreq
 from scipy.signal import argrelmin
-
 import matplotlib.patches as mpl_patches
-
-from pyfda.libs.pyfda_lib import safe_eval, to_html, pprint_log
-from pyfda.libs.pyfda_qt_lib import (
-    qwindow_stay_on_top, qtext_width, QVLine, QHLine, PushButton, PushButtonRT)
-from pyfda.libs.fft_windows_cmb_box import QFFTWinCmbBox
-from pyfda.plot_widgets.mpl_widget import MplWidget
 
 # importing filterbroker initializes all its globals:
 import pyfda.filterbroker as fb
-
 from pyfda.libs.compat import (
     Qt, pyqtSignal, QHBoxLayout, QVBoxLayout, QDialog, QLabel, QLineEdit,
     QFrame, QFont, QTextBrowser, QSplitter, QTableWidget, QTableWidgetItem,
     QSizePolicy, QHeaderView)
-import logging
-logger = logging.getLogger(__name__)
+from pyfda.libs.fft_windows_cmb_box import QFFTWinCmbBox
+from pyfda.libs.pyfda_lib import safe_eval, to_html, pprint_log
+from pyfda.libs.pyfda_qt_lib import (
+    qwindow_stay_on_top, qtext_width, QVLine, QHLine, PushButton, PushButtonRT, emit)
+from pyfda.plot_widgets.mpl_widget import MplWidget
 
+logger = logging.getLogger(__name__)
 
 # ------------------------------------------------------------------------------
 class Plot_FFT_win(QDialog):
@@ -81,7 +78,6 @@ class Plot_FFT_win(QDialog):
     """
     sig_rx = pyqtSignal(object)  # incoming
     sig_tx = pyqtSignal(object)  # outgoing
-    from pyfda.libs.pyfda_qt_lib import emit
 
     def __init__(self, cur_win_dict: dict, app: str = 'spec', all_wins_dict: dict = {},
                  sym: bool = False, title: str = 'pyFDA Window Viewer',
@@ -143,7 +139,15 @@ class Plot_FFT_win(QDialog):
         self._construct_UI()
         self.calc_win_draw()
 
-# ------------------------------------------------------------------------------
+    # -------------------------------------------------------------------------
+    def emit(self, dict_sig):
+        """
+        Access imported function `emit()` as instance method, passing `self`
+        with its attributes
+        """
+        emit(self, dict_sig)
+
+    # ------------------------------------------------------------------------------
     def closeEvent(self, event):
         """
         Catch `closeEvent` (user has tried to close the FFT window) and send a

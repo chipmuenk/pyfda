@@ -9,15 +9,10 @@
 """
 Widget for displaying infos about filter and filter design method and debugging infos
 """
-import sys
-import pprint
-import textwrap
 import logging
-
-from pyfda.libs.compat import (
-    QtGui, QWidget, QFont, QFrame, QLabel, QTableWidget, QTableWidgetItem,
-    QTextBrowser, QTextCursor, QLineEdit, QVBoxLayout, QHBoxLayout, QGridLayout,
-    QSplitter, Qt, pyqtSignal)
+import pprint
+import sys
+import textwrap
 
 import numpy as np
 from numpy import pi, log10
@@ -25,9 +20,13 @@ import scipy.signal as sig
 
 import pyfda.filterbroker as fb  # importing filterbroker initializes all its globals
 import pyfda.filter_factory as ff  # importing filterbroker initializes all its globals
-from pyfda.libs.pyfda_lib import lin2unit, mod_version, to_html, safe_eval
-from pyfda.libs.pyfda_qt_lib import PushButton
 from pyfda.input_widgets.input_info_about import AboutWindow
+from pyfda.libs.compat import (
+    QtGui, QWidget, QFont, QFrame, QLabel, QTableWidget, QTableWidgetItem,
+    QTextBrowser, QTextCursor, QLineEdit, QVBoxLayout, QHBoxLayout, QGridLayout,
+    QSplitter, Qt, pyqtSignal)
+from pyfda.libs.pyfda_lib import lin2unit, mod_version, to_html, safe_eval
+from pyfda.libs.pyfda_qt_lib import PushButton, emit
 from pyfda.pyfda_rc import params
 
 logger = logging.getLogger(__name__)
@@ -42,7 +41,6 @@ else:
 
 classes = {'Input_Info': 'Info'}  #: Dict containing class name : display name
 
-
 # ------------------------------------------------------------------------------
 class Input_Info(QWidget):
     """
@@ -50,7 +48,6 @@ class Input_Info(QWidget):
     """
     sig_rx = pyqtSignal(object)  # incoming signals from input_tab_widgets
     sig_tx = pyqtSignal(object)
-    from pyfda.libs.pyfda_qt_lib import emit
 
     def __init__(self, parent=None):
         super(Input_Info, self).__init__(parent)
@@ -63,6 +60,15 @@ class Input_Info(QWidget):
         self._construct_UI()
         self.load_dict()
 
+    # -------------------------------------------------------------------------
+    def emit(self, dict_sig):
+        """
+        Access imported function `emit()` as instance method, passing `self`
+        with its attributes
+        """
+        emit(self, dict_sig)
+
+    # -------------------------------------------------------------------------
     def process_sig_rx(self, dict_sig=None):
         """
         Process signals coming from sig_rx
@@ -72,6 +78,7 @@ class Input_Info(QWidget):
                 or 'specs_changed' in dict_sig:
             self.load_dict()
 
+    # -------------------------------------------------------------------------
     def _construct_UI(self):
         """
         Intitialize the widget, consisting of:
@@ -154,17 +161,17 @@ class Input_Info(QWidget):
         self.frmMain = QFrame(self)
         self.frmMain.setLayout(layVControls)
 
-        self.tblFiltPerf = QTableWidget(self)
-        self.tblFiltPerf.setAlternatingRowColors(True)
-#        self.tblFiltPerf.verticalHeader().setVisible(False)
-        self.tblFiltPerf.horizontalHeader().setHighlightSections(False)
-        self.tblFiltPerf.horizontalHeader().setFont(bfont)
-        self.tblFiltPerf.verticalHeader().setHighlightSections(False)
-        self.tblFiltPerf.verticalHeader().setFont(bfont)
+        self.tbl_filt_perf = QTableWidget(self)
+        self.tbl_filt_perf.setAlternatingRowColors(True)
+#        self.tbl_filt_perf.verticalHeader().setVisible(False)
+        self.tbl_filt_perf.horizontalHeader().setHighlightSections(False)
+        self.tbl_filt_perf.horizontalHeader().setFont(bfont)
+        self.tbl_filt_perf.verticalHeader().setHighlightSections(False)
+        self.tbl_filt_perf.verticalHeader().setFont(bfont)
 
-        self.txtFiltInfoBox = QTextBrowser(self)
-        self.txtFiltDict = QTextBrowser(self)
-        self.txtFiltTree = QTextBrowser(self)
+        self.txt_filt_info_box = QTextBrowser(self)
+        self.txt_filt_dict = QTextBrowser(self)
+        self.txt_filt_tree = QTextBrowser(self)
 
         layVMain = QVBoxLayout()
         layVMain.addWidget(self.frmMain)
@@ -172,10 +179,10 @@ class Input_Info(QWidget):
 #        layVMain.addLayout(self.layHControls)
         splitter = QSplitter(self)
         splitter.setOrientation(Qt.Vertical)
-        splitter.addWidget(self.tblFiltPerf)
-        splitter.addWidget(self.txtFiltInfoBox)
-        splitter.addWidget(self.txtFiltDict)
-        splitter.addWidget(self.txtFiltTree)
+        splitter.addWidget(self.tbl_filt_perf)
+        splitter.addWidget(self.txt_filt_info_box)
+        splitter.addWidget(self.txt_filt_dict)
+        splitter.addWidget(self.txt_filt_tree)
         # setSizes uses absolute pixel values, but can be "misused" by specifying values
         # that are way too large: in this case, the space is distributed according
         # to the _ratio_ of the values:
@@ -204,25 +211,27 @@ class Input_Info(QWidget):
         self.butDocstring.clicked.connect(self._show_doc)
         self.butRichText.clicked.connect(self._show_doc)
 
+    # -------------------------------------------------------------------------
     def _about_window(self):
         self.about_widget = AboutWindow(self)  # important: Handle must be class attribute
         # self.opt_widget.show() # modeless dialog, i.e. non-blocking
         self.about_widget.exec_()  # modal dialog (blocking)
 
-# ------------------------------------------------------------------------------
+    # ------------------------------------------------------------------------
     def _show_debug(self):
         """
         Show / hide debug options depending on the state of the debug button
         """
         self.frmControls2.setVisible(self.butDebug.checked)
 
-# ------------------------------------------------------------------------------
+    # ------------------------------------------------------------------------
     def _show_settings(self):
         """
         Show / hide settings options depending on the state of the settings button
         """
         self.frmSettings.setVisible(self.butSettings.checked)
 
+    # -------------------------------------------------------------------------
     def _update_settings_nfft(self):
         """ Update value for self.par1 from QLineEdit Widget"""
         fb.conf_settings['N_FFT'] = safe_eval(
@@ -231,7 +240,7 @@ class Input_Info(QWidget):
         self.led_settings_NFFT.setText(str(fb.conf_settings['N_FFT']))
         self.emit({'data_changed': 'n_fft'})
 
-# ------------------------------------------------------------------------------
+    # --------------------------------------------------------------------------
     def load_dict(self):
         """
         update docs and filter performance
@@ -241,36 +250,37 @@ class Input_Info(QWidget):
         self._show_filt_dict()
         self._show_filt_tree()
 
-# ------------------------------------------------------------------------------
+    # --------------------------------------------------------------------------
     def _show_doc(self):
         """
         Display info from filter design file and docstring
         """
         if hasattr(ff.fil_inst, 'info'):
             if self.butRichText.checked:
-                self.txtFiltInfoBox.setText(publish_string(
+                self.txt_filt_info_box.setText(publish_string(
                     self._clean_doc(ff.fil_inst.info), writer_name='html',
                     settings_overrides={'output_encoding': 'unicode'}))
             else:
-                self.txtFiltInfoBox.setText(textwrap.dedent(ff.fil_inst.info))
+                self.txt_filt_info_box.setText(textwrap.dedent(ff.fil_inst.info))
         else:
-            self.txtFiltInfoBox.setText("")
+            self.txt_filt_info_box.setText("")
 
         if self.butDocstring.checked and hasattr(ff.fil_inst, 'info_doc'):
             if self.butRichText.checked:
-                self.txtFiltInfoBox.append(
+                self.txt_filt_info_box.append(
                     '<hr /><b>Python module docstring:</b>\n')
                 for doc in ff.fil_inst.info_doc:
-                    self.txtFiltInfoBox.append(publish_string(
+                    self.txt_filt_info_box.append(publish_string(
                      self._clean_doc(doc), writer_name='html',
                      settings_overrides={'output_encoding': 'unicode'}))
             else:
-                self.txtFiltInfoBox.append('\nPython module docstring:\n')
+                self.txt_filt_info_box.append('\nPython module docstring:\n')
                 for doc in ff.fil_inst.info_doc:
-                    self.txtFiltInfoBox.append(self._clean_doc(doc))
+                    self.txt_filt_info_box.append(self._clean_doc(doc))
 
-        self.txtFiltInfoBox.moveCursor(QTextCursor.Start)
+        self.txt_filt_info_box.moveCursor(QTextCursor.Start)
 
+    # -------------------------------------------------------------------------
     def _clean_doc(self, doc: str) -> str:
         """
         Split doc into list of lines, filter out any lines containing '.. versionadded::'
@@ -289,14 +299,12 @@ class Input_Info(QWidget):
 
         return result
 
-# ------------------------------------------------------------------------------
+    # --------------------------------------------------------------------------
     def _show_filt_perf(self):
         """
         Print filter properties in a table at frequencies of interest. When
         specs are violated, colour the table entry in red.
         """
-
-        antiC = False
 
         def _find_min_max(self, f_start, f_stop, unit='dB'):
             """
@@ -319,7 +327,7 @@ class Input_Info(QWidget):
             return F_min, H_min, F_max, H_max
         # ------------------------------------------------------------------
 
-        self.tblFiltPerf.setVisible(self.butFiltPerf.checked)
+        self.tbl_filt_perf.setVisible(self.butFiltPerf.checked)
         if self.butFiltPerf.checked:
 
             bb = fb.fil[0]['ba'][0]
@@ -395,11 +403,6 @@ class Input_Info(QWidget):
 
                 # Calculate frequency response at test frequencies
                 [w_test, a_test] = sig.freqz(bb, aa, 2.0 * pi * f_vals.astype(float))
-                # add antiCausals if we have them
-                if (antiC):
-                   wa, ha = sig.freqz(bbA, aaA, 2.0 * pi * f_vals.astype(float))
-                   ha = ha.conjugate()
-                   a_test = a_test*ha
 
             (F_min, H_min, F_max, H_max) = _find_min_max(self, 0, 1, unit='V')
             # append frequencies and values for min. and max. filter reponse to
@@ -417,7 +420,7 @@ class Input_Info(QWidget):
 
             # get filter type ('IIR', 'FIR') for dB <-> lin conversion
             ft = fb.fil[0]['ft']
-#            unit = fb.fil[0]['amp_specs_unit']
+            # unit = fb.fil[0]['amp_specs_unit']
             unit = 'dB'  # make this fixed for the moment
 
             # build a list with the corresponding target specs:
@@ -443,65 +446,65 @@ class Input_Info(QWidget):
                 "passed: {5}\n".format(a_targs,  a_test,  a_test_dB, f_vals,
                                        a_targs_pass, self.targs_spec_passed))
 
-            self.tblFiltPerf.setRowCount(len(a_test))  # number of table rows
-            self.tblFiltPerf.setColumnCount(5)  # number of table columns
+            self.tbl_filt_perf.setRowCount(len(a_test))  # number of table rows
+            self.tbl_filt_perf.setColumnCount(5)  # number of table columns
 
-            self.tblFiltPerf.setHorizontalHeaderLabels([
+            self.tbl_filt_perf.setHorizontalHeaderLabels([
                 'f/{0:s}'.format(fb.fil[0]['freq_specs_unit']), 'Spec\n(dB)',
                 '|H(f)|\n(dB)', 'Spec', '|H(f)|'])
-            self.tblFiltPerf.setVerticalHeaderLabels(f_lbls)
+            self.tbl_filt_perf.setVerticalHeaderLabels(f_lbls)
             for row in range(len(a_test)):
-                self.tblFiltPerf.setItem(
+                self.tbl_filt_perf.setItem(
                     row, 0, QTableWidgetItem(str('{0:.4g}'.format(f_vals[row]*f_S))))
-                self.tblFiltPerf.setItem(
+                self.tbl_filt_perf.setItem(
                     row, 1, QTableWidgetItem(str('%2.3g'%(-a_targs_dB[row]))))
-                self.tblFiltPerf.setItem(
+                self.tbl_filt_perf.setItem(
                     row, 2, QTableWidgetItem(str('%2.3f'%(-a_test_dB[row]))))
                 if a_targs[row] < 0.01:
-                    self.tblFiltPerf.setItem(
+                    self.tbl_filt_perf.setItem(
                         row, 3, QTableWidgetItem(str('%.3e'%(a_targs[row]))))
                 else:
-                    self.tblFiltPerf.setItem(
+                    self.tbl_filt_perf.setItem(
                         row, 3, QTableWidgetItem(str('%2.4f'%(a_targs[row]))))
                 if a_test[row] < 0.01:
-                    self.tblFiltPerf.setItem(
+                    self.tbl_filt_perf.setItem(
                         row, 4, QTableWidgetItem(str('%.3e'%(abs(a_test[row])))))
                 else:
-                    self.tblFiltPerf.setItem(
+                    self.tbl_filt_perf.setItem(
                         row, 4, QTableWidgetItem(str('%.4f'%(abs(a_test[row])))))
 
                 if not a_targs_pass[row]:
-                    self.tblFiltPerf.item(row, 1).setBackground(QtGui.QColor('red'))
-                    self.tblFiltPerf.item(row, 3).setBackground(QtGui.QColor('red'))
+                    self.tbl_filt_perf.item(row, 1).setBackground(QtGui.QColor('red'))
+                    self.tbl_filt_perf.item(row, 3).setBackground(QtGui.QColor('red'))
 
-            self.tblFiltPerf.resizeColumnsToContents()
-            self.tblFiltPerf.resizeRowsToContents()
+            self.tbl_filt_perf.resizeColumnsToContents()
+            self.tbl_filt_perf.resizeRowsToContents()
 
-# ------------------------------------------------------------------------------
+    # --------------------------------------------------------------------------
     def _show_filt_dict(self):
         """
         Print filter dict for debugging
         """
-        self.txtFiltDict.setVisible(self.butFiltDict.checked)
+        self.txt_filt_dict.setVisible(self.butFiltDict.checked)
 
         fb_sorted = [str(key) + ' : ' + str(fb.fil[0][key])
                      for key in sorted(fb.fil[0].keys())]
         dictstr = pprint.pformat(fb_sorted)
-#        dictstr = pprint.pformat(fb.fil[0])
-        self.txtFiltDict.setText(dictstr)
+        # dictstr = pprint.pformat(fb.fil[0])
+        self.txt_filt_dict.setText(dictstr)
 
-# ------------------------------------------------------------------------------
+    # --------------------------------------------------------------------------
     def _show_filt_tree(self):
         """
         Print filter tree for debugging
         """
-        self.txtFiltTree.setVisible(self.butFiltTree.checked)
+        self.txt_filt_tree.setVisible(self.butFiltTree.checked)
 
         ftree_sorted = ['<b>' + str(key) + ' : ' + '</b>' + str(fb.fil_tree[key])
                         for key in sorted(fb.fil_tree.keys())]
         dictstr = pprint.pformat(ftree_sorted, indent=4)
 #        dictstr = pprint.pformat(fb.fil[0])
-        self.txtFiltTree.setText(dictstr)
+        self.txt_filt_tree.setText(dictstr)
 
 
 # ------------------------------------------------------------------------------

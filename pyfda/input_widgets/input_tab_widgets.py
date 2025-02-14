@@ -9,16 +9,16 @@
 """
 Tabbed container for all input widgets
 """
-import sys
 import importlib
-
-from pyfda.libs.compat import QTabWidget, QWidget, QVBoxLayout, QScrollArea, pyqtSignal
-
-from pyfda.pyfda_rc import params
-import pyfda.filterbroker as fb
-from pyfda.libs.pyfda_lib import pprint_log
-
 import logging
+import sys
+
+import pyfda.filterbroker as fb
+from pyfda.libs.compat import QTabWidget, QWidget, QVBoxLayout, QScrollArea, pyqtSignal
+from pyfda.libs.pyfda_lib import pprint_log
+from pyfda.libs.pyfda_qt_lib import emit
+from pyfda.pyfda_rc import params
+
 logger = logging.getLogger(__name__)
 
 SCROLL = True  # enable scrolling
@@ -34,13 +34,21 @@ class InputTabWidgets(QWidget):
     sig_rx = pyqtSignal(object)
     # outgoing, connected in receiver (pyfdax -> plot_tab_widgets)
     sig_tx = pyqtSignal(object)
-    from pyfda.libs.pyfda_qt_lib import emit
 
     def __init__(self, parent=None, objectName='input_tab_widgets_inst'):
         super(InputTabWidgets, self).__init__(parent)
         self.setObjectName(objectName)
         self._construct_UI()
 
+    # -------------------------------------------------------------------------
+    def emit(self, dict_sig):
+        """
+        Access imported function `emit()` as instance method, passing `self`
+        with its attributes
+        """
+        emit(self, dict_sig)
+
+    # -------------------------------------------------------------------------
     def _construct_UI(self):
         """
         Initialize UI with tabbed subwidgets: Instantiate dynamically each widget
@@ -64,8 +72,8 @@ class InputTabWidgets(QWidget):
            In order to prevent infinite loops, every widget needs to block in-
            coming signals with its own name!
         """
-        tabWidget = QTabWidget(self)
-        # tabWidget.setObjectName("input_tabs")
+        tab_widget = QTabWidget(self)
+        # tab_widget.setObjectName("input_tabs")
 
         n_wdg = 0  # number and ...
         inst_wdg_str = ""  # ... full names of successfully instantiated widgets
@@ -87,11 +95,11 @@ class InputTabWidgets(QWidget):
             if hasattr(inst, "state") and inst.state == "deactivated":
                 continue  # with next widget
             if hasattr(inst, 'tab_label'):
-                tabWidget.addTab(inst, inst.tab_label)
+                tab_widget.addTab(inst, inst.tab_label)
             else:
-                tabWidget.addTab(inst, "not set")
+                tab_widget.addTab(inst, "not set")
             if hasattr(inst, 'tool_tip'):
-                tabWidget.setTabToolTip(n_wdg, inst.tool_tip)
+                tab_widget.setTabToolTip(n_wdg, inst.tool_tip)
             # collect all instance tx signals in self.sig_tx
             if hasattr(inst, 'sig_tx'):
                 inst.sig_tx.connect(self.sig_tx)
@@ -123,28 +131,28 @@ class InputTabWidgets(QWidget):
         self.sig_tx.connect(self.sig_rx)
         # self.sig_rx.connect(self.log_rx) # enable for debugging
         # When user has selected a different tab, trigger a redraw of current tab
-        tabWidget.currentChanged.connect(self.current_tab_changed)
+        tab_widget.currentChanged.connect(self.current_tab_changed)
         # The following does not work: maybe current scope must be left?
-        # tabWidget.currentChanged.connect(tabWidget.currentWidget().redraw)
+        # tab_widget.currentChanged.connect(tab_widget.currentWidget().redraw)
 
-        layVMain = QVBoxLayout()
+        lay_v_main = QVBoxLayout()
 
         # setContentsMargins -> number of pixels between frame window border
-        layVMain.setContentsMargins(*params['wdg_margins'])
+        lay_v_main.setContentsMargins(*params['wdg_margins'])
 
-# --------------------------------------
+        # --------------------------------------
         if SCROLL:
             scroll = QScrollArea(self)
-            scroll.setWidget(tabWidget)
+            scroll.setWidget(tab_widget)
             scroll.setWidgetResizable(True)  # Size of monitored widget is allowed to grow
 
-            layVMain.addWidget(scroll)
+            lay_v_main.addWidget(scroll)
         else:
-            layVMain.addWidget(tabWidget)  # add the tabWidget directly
+            lay_v_main.addWidget(tab_widget)  # add the tab_widget directly
 
-        self.setLayout(layVMain)  # set the main layout of the window
+        self.setLayout(lay_v_main)  # set the main layout of the window
 
-# ------------------------------------------------------------------------------
+    # ------------------------------------------------------------------------------
     def log_rx(self, dict_sig=None):
         """
         Enable `self.sig_rx.connect(self.log_rx)` above for debugging.
@@ -154,7 +162,7 @@ class InputTabWidgets(QWidget):
         else:
             logger.warning("empty dict")
 
-# ------------------------------------------------------------------------------
+    # ------------------------------------------------------------------------------
     def current_tab_changed(self):
         self.emit({'ui_global_changed': 'tab'})
 

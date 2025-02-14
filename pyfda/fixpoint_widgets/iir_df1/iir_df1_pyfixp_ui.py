@@ -11,19 +11,18 @@ Widget for specifying the parameters of a direct-form DF1 IIR filter
 """
 import sys
 import logging
-logger = logging.getLogger(__name__)
 
 import numpy as np
 
 import pyfda.filterbroker as fb
 from pyfda.libs.pyfda_lib import set_dict_defaults, pprint_log, first_item
-from pyfda.libs.pyfda_qt_lib import qget_cmb_box
-
+from pyfda.libs.pyfda_qt_lib import qget_cmb_box, emit
 from pyfda.libs.compat import QWidget, QVBoxLayout, pyqtSignal
-
 from pyfda.fixpoint_widgets.fx_ui_wq import FX_UI_WQ
 
 from .iir_df1_pyfixp import IIR_DF1_pyfixp
+
+logger = logging.getLogger(__name__)
 
 #  Dict containing {widget class name : display name}
 classes = {'IIR_DF1_pyfixp_UI': 'IIR_DF1 (pyfixp)'}  # widget class name : display name
@@ -37,7 +36,6 @@ class IIR_DF1_pyfixp_UI(QWidget):
     """
     sig_rx = pyqtSignal(object)  # incoming
     sig_tx = pyqtSignal(object)  # outcgoing
-    from pyfda.libs.pyfda_qt_lib import emit
 
     def __init__(self):
         super().__init__()

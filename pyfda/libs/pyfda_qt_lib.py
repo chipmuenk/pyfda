@@ -33,7 +33,7 @@ DICT_SIG_KEYS = {'id', 'class', 'ttl', 'sender_name', 'object_name',
                  'mpl_toolbar'     # events triggered by the toolbar
                 }
 # ------------------------------------------------------------------------------
-def emit(self, dict_sig: dict = {}, sig_name: str = 'sig_tx') -> None:
+def emit(self, dict_sig: dict = {}, sig_name: str = '') -> None:
     """
     Emit a signal `self.<sig_name>` (defined as a class attribute) with a
     dict `dict_sig` using Qt's `emit()`.
@@ -45,6 +45,8 @@ def emit(self, dict_sig: dict = {}, sig_name: str = 'sig_tx') -> None:
     - If the sender has passed an objectName, add it with the key "sender_name"
       to the dict.
     """
+    if sig_name == '':
+        sig_name = 'sig_tx'
     logger.warning(sig_name)
     for k in dict_sig:
         logger.warning(k)

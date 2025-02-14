@@ -41,11 +41,12 @@ operations only when the widget is visible and store the need for a redraw in a 
 
 .. code::
 
+    from pyfda.libs.pyfda_qt_lib import emit
+
     class MyWidget(QWidget):
         sig_resize = pyqtSignal()   # emit a local signal upon resize
         sig_rx = pyqtSignal(object) # incoming signal
         sig_tx = pyqtSignal(object) # outgoing signal
-        from pyfda.libs.pyfda_qt_lib import emit
 
         def __init__(self, parent):
             super(MyWidget, self).__init__(parent)
@@ -55,6 +56,15 @@ operations only when the widget is visible and store the need for a redraw in a 
             self.sig_rx.connect(self.process_sig_rx)
             # usually done in method ``_construct_UI()``
 
+        # -------------------------------------------------------------------------
+        def emit(self, dict_sig, sig_name=""):
+            """
+            Access imported function `emit()` as instance method, passing `self`
+            with its attributes
+            """
+            emit(self, dict_sig, sig_name)
+
+        # -------------------------------------------------------------------------
         def process_sig_rx(self, dict_sig=None):
         """
         Process signals coming in via subwidgets and sig_rx

@@ -10,6 +10,7 @@
 Construct a widget consisting of a matplotlib canvas and an improved Navigation
 toolbar.
 """
+import logging
 import sys
 
 # do not import matplotlib.pyplot - pyplot brings its own GUI, event loop etc!!!
@@ -27,17 +28,14 @@ try:
 except ImportError:
     figureoptions = None
 
+import pyfda.filterbroker as fb
 from pyfda.libs.compat import (
     Qt, QtCore, QtGui, QWidget, QLabel, pyqtSignal, QSizePolicy, QIcon, QImage, QVBoxLayout,
     QHBoxLayout, QInputDialog, FigureCanvas, NavigationToolbar, pyqtSlot, QtWidgets, QEvent)
-
-from pyfda.libs.pyfda_qt_lib import EventTypes
-
+from pyfda.libs.pyfda_qt_lib import EventTypes, emit
 from pyfda import pyfda_rc
-import pyfda.filterbroker as fb
 from pyfda import qrc_resources  # contains all icons
 
-import logging
 logger = logging.getLogger(__name__)
 
 # read user settings for linewidth, font size etc. and apply them to matplotlib
@@ -342,7 +340,6 @@ class MplToolbar(NavigationToolbar):
     # def __init__(self, canvas, parent, coordinates=True):
 
     sig_tx = pyqtSignal(object)  # general signal, containing a dict
-    from pyfda.libs.pyfda_qt_lib import emit
 
     def _init_toolbar(self):
         pass  # needed for backward compatibility with mpl < 3.3
@@ -356,9 +353,8 @@ class MplToolbar(NavigationToolbar):
 
         self.mpl_widget = mpl_widget  # create a reference to the parent
 
-    # --------------------------------------------------------------------------
-    # ----  Construct Toolbar using QRC icons -------------------
-
+        # -----------------------------------------------------------
+        # ----  Construct Toolbar using QRC icons -------------------
         # ---------------------------------------------
         # Enable Plot:
         # ---------------------------------------------
@@ -532,10 +528,17 @@ class MplToolbar(NavigationToolbar):
         self.a_he.setToolTip('Open help page from https://pyfda.rtfd.org in browser')
         self.a_he.setDisabled(True)
         self.a_he.setShortcut(self.tr('F1'))
-# ------- end of __init__() ----------------------------------------------------------
-# ====================================================================================
-# ------------------------------------------------------------------------------------
+        # ------- end of __init__() ---------------------------------
+        # ===========================================================
+    # -------------------------------------------------------------------------
+    def emit(self, dict_sig, sig_name=""):
+        """
+        Access imported function `emit()` as instance method, passing `self`
+        with its attributes
+        """
+        emit(self, dict_sig, sig_name)
 
+    # -------------------------------------------------------------------------
     if figureoptions is not None:
         def edit_parameters(self):
             allaxes = self.canvas.figure.get_axes()
@@ -570,7 +573,7 @@ class MplToolbar(NavigationToolbar):
 
             figureoptions.figure_edit(axes, self)
 
-# ------------------------------------------------------------------------------
+    # ---------------------------------------------------------------
     def home(self):
         """
         Reset zoom to default settings (defined by plotting widget).

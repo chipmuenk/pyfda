@@ -97,7 +97,8 @@ class Input_Fixpoint_Specs(QWidget):
     # -----------------------
     def emit(self, dict_sig):
         """
-        Make `emit()` a class attribute, passing `self` with its attributes
+        Access imported function `emit()` as instance method, passing `self`
+        with its attributes
         """
         emit(self, dict_sig)
 

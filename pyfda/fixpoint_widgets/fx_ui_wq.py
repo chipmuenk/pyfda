@@ -9,26 +9,20 @@
 """
 Helper classes and functions for generating and simulating fixpoint filters
 """
+import logging
 import sys
-import inspect
-import copy
-
-# from numpy.lib.function_base import iterable
 
 import pyfda.filterbroker as fb
-from pyfda.libs.tree_builder import merge_dicts_hierarchically
 import pyfda.libs.pyfda_fix_lib as fx
-
 from pyfda.libs.compat import (
     Qt, QWidget, QLabel, QLineEdit, QComboBox, QIcon,
     QVBoxLayout, QHBoxLayout, QGridLayout, QFrame, pyqtSignal)
-
-from pyfda.libs.pyfda_qt_lib import (
-    qcmb_box_populate, qget_cmb_box, qset_cmb_box, qstyle_widget, PushButton)
-from pyfda.pyfda_rc import params
 from pyfda.libs.pyfda_lib import safe_eval, to_html
+from pyfda.libs.pyfda_qt_lib import (
+    qcmb_box_populate, qget_cmb_box, qset_cmb_box, qstyle_widget, PushButton, emit)
+from pyfda.libs.tree_builder import merge_dicts_hierarchically
+from pyfda.pyfda_rc import params
 
-import logging
 logger = logging.getLogger(__name__)
 
 
@@ -104,7 +98,6 @@ class FX_UI_WQ(QWidget):
                                                 #   ['on', 'off', 'auto']
     'MSB_LSB_vis'   : 'off'                     # Are MSB / LSB settings visible?
 
-
     All labels support HTML formatting.
 
     When instantiating the widget, these settings can be modified by setting keyword
@@ -115,12 +108,9 @@ class FX_UI_WQ(QWidget):
             fb.fil[0]['fxq']['QACC'], objectName='wdg_wq_accu_inst',
             label='<b>Accu Quantizer <i>Q<sub>A&nbsp;</sub></i>:</b>')
     ```
-
-
     """
     # sig_rx = pyqtSignal(object)  # incoming
     sig_tx = pyqtSignal(object)  # outcgoing
-    from pyfda.libs.pyfda_qt_lib import emit
 
     def __init__(self, q_dict: dict, objectName: str = 'fx_ui_wq_inst',
                  **kwargs) -> None:
@@ -152,6 +142,14 @@ class FX_UI_WQ(QWidget):
 
     #     if 'fx_sim' in dict_sig and dict_sig['fx_sim'] == 'specs_changed':
     #         self.dict2ui()
+
+    # -------------------------------------------------------------------------
+    def emit(self, dict_sig):
+        """
+        Access imported function `emit()` as instance method, passing `self`
+        with its attributes
+        """
+        emit(self, dict_sig)
 
     # --------------------------------------------------------------------------
     def _construct_UI(self, **kwargs):

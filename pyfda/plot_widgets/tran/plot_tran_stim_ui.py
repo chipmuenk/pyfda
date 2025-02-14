@@ -241,7 +241,8 @@ class Plot_Tran_Stim_UI(QWidget):
     # -----------------------
     def emit(self, dict_sig):
         """
-        Make `emit()` a class attribute, passing `self` with its attributes
+        Access imported function `emit()` as instance method, passing `self`
+        with its attributes
         """
         emit(self, dict_sig)
 
@@ -685,8 +686,8 @@ class Plot_Tran_Stim_UI(QWidget):
                     source.setText(str(params['FMT'].format(var * scale)))
             except KeyError:
                 logger.warning(f"Unknown objectName {source.objectName}!")
-        #------------------------------------------------------------
 
+        #------------------------------------------------------------
         def _store_entry(source):
             """ Store transformed frequency / time values """
             if self.spec_edited:

@@ -10,19 +10,20 @@
 Widget for specifying the parameters of a direct-form FIR filter
 """
 import sys
+import logging
 
 import numpy as np
+
 import pyfda.filterbroker as fb
 from pyfda.libs.pyfda_lib import set_dict_defaults, pprint_log, first_item
-from pyfda.libs.pyfda_qt_lib import qget_cmb_box
-
+from pyfda.libs.pyfda_qt_lib import qget_cmb_box, emit
 from pyfda.libs.compat import QWidget, QVBoxLayout, pyqtSignal
 
 from pyfda.fixpoint_widgets.fx_ui_wq import FX_UI_WQ
 
 from .fir_df_pyfixp import FIR_DF_pyfixp
 
-import logging
+
 logger = logging.getLogger(__name__)
 
 #  Dict containing {widget class name : display name}
@@ -37,7 +38,6 @@ class FIR_DF_pyfixp_UI(QWidget):
     """
     sig_rx = pyqtSignal(object)  # incoming
     sig_tx = pyqtSignal(object)  # outcgoing
-    from pyfda.libs.pyfda_qt_lib import emit
 
     def __init__(self):
         super().__init__()
@@ -62,6 +62,14 @@ class FIR_DF_pyfixp_UI(QWidget):
         # the 'fxq' quantizer dict
         self.fx_filt = FIR_DF_pyfixp(fb.fil[0]['fxq'])
         self.update_ovfl_cnt_all()  # initialize all overflow counters / display
+
+    # -------------------------------------------------------------------------
+    def emit(self, dict_sig):
+        """
+        Access imported function `emit()` as instance method, passing `self`
+        with its attributes
+        """
+        emit(self, dict_sig)
 
     # --------------------------------------------------------------------------
     def _construct_UI(self):

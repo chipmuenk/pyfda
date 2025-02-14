@@ -20,9 +20,9 @@ import logging
 
 import numpy as np
 
-from pyfda.libs.compat import QWidget, QLabel, QLineEdit, pyqtSignal, QVBoxLayout, QHBoxLayout
 import pyfda.filterbroker as fb
-from pyfda.libs.pyfda_qt_lib import popup_warning
+from pyfda.libs.compat import QWidget, QLabel, QLineEdit, pyqtSignal, QVBoxLayout, QHBoxLayout
+from pyfda.libs.pyfda_qt_lib import popup_warning, emit
 from pyfda.libs.pyfda_lib import fil_save, safe_eval
 
 logger = logging.getLogger(__name__)
@@ -47,9 +47,7 @@ class AllpPZ(QWidget):
     poles can be entered manually.
 
     """
-
     sig_tx = pyqtSignal(object)
-    from pyfda.libs.pyfda_qt_lib import emit
 
     def __init__(self):
         super().__init__()
@@ -73,8 +71,16 @@ class AllpPZ(QWidget):
 
         self.info_doc = []
 
+    # -------------------------------------------------------------------------
+    def emit(self, dict_sig):
+        """
+        Access imported function `emit()` as instance method, passing `self`
+        with its attributes
+        """
+        emit(self, dict_sig)
+
     #--------------------------------------------------------------------------
-    def construct_ui(self):
+    def _construct_ui(self):
         """
         Create additional subwidget(s) needed for filter design:
         These subwidgets are instantiated dynamically when needed in
@@ -183,10 +189,10 @@ class AllpPZ(QWidget):
         fil_dict['N'] = len(self.p)
 
 
-#------------------------------------------------------------------------------
-# Filter design routines
-#------------------------------------------------------------------------------
-# The method name MUST be "FilterType"+"MinMan", e.g. LPmin or BPman
+    #--------------------------------------------------------------------------
+    # Filter design routines
+    #--------------------------------------------------------------------------
+    # The method name MUST be "FilterType"+"MinMan", e.g. LPmin or BPman
 
     def APman(self, fil_dict):
         """
@@ -219,7 +225,7 @@ if __name__ == '__main__':
 
     # instantiate filter widget
     filt = AllpPZ()
-    filt.construct_ui()
+    filt._construct_ui()
     wdg_allpass = getattr(filt, 'wdg_fil')
 
     layVDynWdg = QVBoxLayout()
