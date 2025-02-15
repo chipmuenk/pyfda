@@ -17,7 +17,7 @@ import scipy.signal as sig
 from scipy.special import sinc, diric
 
 from pyfda.libs.compat import QWidget, pyqtSignal, QVBoxLayout
-from pyfda.libs.pyfda_qt_lib import qget_cmb_box, qstyle_widget
+from pyfda.libs.pyfda_qt_lib import qget_cmb_box, qstyle_widget, emit
 import pyfda.filterbroker as fb
 from pyfda.libs.pyfda_lib import (
     pprint_log, rect_bl, sawtooth_bl, triang_bl, comb_bl, safe_numexpr_eval)
@@ -34,7 +34,6 @@ class Plot_Tran_Stim(QWidget):
     """
     sig_rx = pyqtSignal(object)  # incoming
     sig_tx = pyqtSignal(object)  # outgoing, e.g. when stimulus has been calculated
-    from pyfda.libs.pyfda_qt_lib import emit
 
     def __init__(self):
         super().__init__()
@@ -49,7 +48,15 @@ class Plot_Tran_Stim(QWidget):
 
         self._construct_UI()
 
-# ------------------------------------------------------------------------------
+    # -------------------------------------------------------------------------
+    def emit(self, dict_sig):
+        """
+        Access imported function `emit()` as instance method, passing `self`
+        with its attributes
+        """
+        emit(self, dict_sig)
+
+    # -------------------------------------------------------------------------
     def process_sig_rx(self, dict_sig=None) -> None:
         """
         Process signals coming from
@@ -67,15 +74,16 @@ class Plot_Tran_Stim(QWidget):
         Instantiate the UI of the widget.
         """
         self.main_wdg = QWidget()
-        layVMain = QVBoxLayout()
-        layVMain.addWidget(self.ui.wdg_stim)
-        layVMain.setContentsMargins(*params['mpl_margins'])
+        lay_v_main = QVBoxLayout()
+        lay_v_main.addWidget(self.ui.wdg_stim)
+        lay_v_main.setContentsMargins(*params['mpl_margins'])
 
         self.ui.sig_tx.connect(self.sig_tx)  # relay UI events further up
         self.sig_rx.connect(self.ui.sig_rx)  # ... and the other way round
 
-        self.setLayout(layVMain)
+        self.setLayout(lay_v_main)
 
+    # ------------------------------------------------------------------------------
     def init_labels_stim(self):
         '''intialize title string, y-axis label and some variables'''
         # use radians for angle internally
@@ -236,7 +244,7 @@ class Plot_Tran_Stim(QWidget):
                 return stim
 
             elif len(stim) != np.shape(add_sig)[0]:
-                # `stim` and `add_sig` need to have same length 
+                # `stim` and `add_sig` need to have same length
                 logger.error(
                     f"Cannot combine stimulus (len = {np.shape(stim)}) and additional "
                     f"signal (len = {np.shape(add_sig)}) due to different lenghts!")

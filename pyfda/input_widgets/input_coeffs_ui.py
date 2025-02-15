@@ -11,19 +11,18 @@ Create the UI for the FilterCoeffs class
 """
 import logging
 
+import pyfda.filterbroker as fb
 from pyfda.libs.compat import (
     pyqtSignal, Qt, QtGui, QWidget, QLabel, QLineEdit, QComboBox, QPushButton, QFrame,
     QSpinBox, QFont, QIcon, QVBoxLayout, QHBoxLayout, QGridLayout, QSizePolicy)
-from pyfda.libs.pyfda_lib import to_html
-
-from pyfda.libs.pyfda_qt_lib import (
-    qset_cmb_box, qstyle_widget, qcmb_box_populate, QHLine, PushButton)
 from pyfda.libs.csv_option_box import CSV_option_box
+from pyfda.libs.pyfda_lib import to_html
+from pyfda.libs.pyfda_qt_lib import (
+    qstyle_widget, qcmb_box_populate, PushButton, emit)
 from pyfda.libs.pyfda_lib import first_item
 import pyfda.libs.pyfda_dirs as dirs
 from pyfda.fixpoint_widgets.fx_ui_wq import FX_UI_WQ
 from pyfda.pyfda_rc import params
-import pyfda.filterbroker as fb
 
 logger = logging.getLogger(__name__)
 
@@ -34,7 +33,6 @@ class Input_Coeffs_UI(QWidget):
     """
     sig_rx = pyqtSignal(dict)  # incoming
     sig_tx = pyqtSignal(dict)  # outgoing
-    from pyfda.libs.pyfda_qt_lib import emit
 
     def __init__(self, parent=None):
         super().__init__()
@@ -68,6 +66,14 @@ class Input_Coeffs_UI(QWidget):
         self.load_save_clipboard = False  # load / save to clipboard or file
 
         self._construct_UI()
+
+    # -------------------------------------------------------------------------
+    def emit(self, dict_sig):
+        """
+        Access imported function `emit()` as instance method, passing `self`
+        with its attributes
+        """
+        emit(self, dict_sig)
 
     # ------------------------------------------------------------------------------
     def process_sig_rx(self, dict_sig=None):

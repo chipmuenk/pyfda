@@ -36,6 +36,8 @@ API version info:
 from pyfda.libs.compat import (QWidget, pyqtSignal, QComboBox, QIcon, QSize,
                                QHBoxLayout, QVBoxLayout)
 import copy
+import logging
+
 import numpy as np
 import scipy.signal as sig
 from scipy.signal import signaltools
@@ -44,13 +46,12 @@ from scipy.special import sinc
 import pyfda.filterbroker as fb  # importing filterbroker initializes all its globals
 import pyfda.libs.pyfda_dirs as dirs
 from pyfda.libs.pyfda_lib import fil_save, round_odd, pprint_log
-from pyfda.libs.pyfda_qt_lib import popup_warning, PushButton
+from pyfda.libs.pyfda_qt_lib import popup_warning, PushButton, emit
 from pyfda.libs.fft_windows_cmb_box import QFFTWinCmbBox
 from pyfda.libs.pyfda_fft_windows_lib import all_wins_dict_ref
 from pyfda.plot_widgets.plot_fft_win import Plot_FFT_win
 from .common import Common, remezord
 
-import logging
 logger = logging.getLogger(__name__)
 
 # TODO: Hilbert, differentiator, multiband are missing
@@ -71,7 +72,6 @@ class Firwin(QWidget):
 
     sig_tx = pyqtSignal(object)  # local signal between FFT widget and FFTWin_Selector
     sig_tx_local = pyqtSignal(object)
-    from pyfda.libs.pyfda_qt_lib import emit
 
     def __init__(self, objectName='firwin_inst'):
         QWidget.__init__(self)
@@ -123,7 +123,15 @@ class Firwin(QWidget):
         # get initial / last setting from dictionary, updating self.all_wins_dict
         self.dict2filter_params()
 
-# ------------------------------------------------------------------------------
+    # -------------------------------------------------------------------------
+    def emit(self, dict_sig, sig_name=""):
+        """
+        Access imported function `emit()` as instance method, passing `self`
+        with its attributes
+        """
+        emit(self, dict_sig, sig_name)
+
+    # ------------------------------------------------------------------------------
     def process_sig_rx(self, dict_sig=None):
         """
         Process local signals from / for
@@ -195,23 +203,23 @@ class Firwin(QWidget):
         self.but_fft_wdg.setChecked(False)
 
 
-        self.layHWin1 = QHBoxLayout()
-        # self.layHWin1.addWidget(self.cmb_firwin_win)
-        # self.layHWin1.addWidget(self.but_fft_wdg)
-        self.layHWin1.addWidget(self.cmb_firwin_alg)
-        self.layHWin2 = QHBoxLayout()
-        self.layHWin2.addWidget(self.but_fft_wdg)
-        self.layHWin2.addWidget(self.qfft_win_select)
+        self.lay_h_win1 = QHBoxLayout()
+        # self.lay_h_win1.addWidget(self.cmb_firwin_win)
+        # self.lay_h_win1.addWidget(self.but_fft_wdg)
+        self.lay_h_win1.addWidget(self.cmb_firwin_alg)
+        self.lay_h_win2 = QHBoxLayout()
+        self.lay_h_win2.addWidget(self.but_fft_wdg)
+        self.lay_h_win2.addWidget(self.qfft_win_select)
 
-        self.layVWin = QVBoxLayout()
-        self.layVWin.addLayout(self.layHWin1)
-        self.layVWin.addLayout(self.layHWin2)
-        self.layVWin.setContentsMargins(0, 0, 0, 0)
+        self.lay_v_win = QVBoxLayout()
+        self.lay_v_win.addLayout(self.lay_h_win1)
+        self.lay_v_win.addLayout(self.lay_h_win2)
+        self.lay_v_win.setContentsMargins(0, 0, 0, 0)
 
         # Widget containing all subwidgets (cmbBoxes, Labels, lineEdits)
         self.wdg_fil = QWidget(self)
         self.wdg_fil.setObjectName('wdg_fil')
-        self.wdg_fil.setLayout(self.layVWin)
+        self.wdg_fil.setLayout(self.lay_v_win)
 
         # ----------------------------------------------------------------------
         # GLOBAL SIGNALS & SLOTs
@@ -316,15 +324,14 @@ class Firwin(QWidget):
 #        self.alg = 'ichige' # algorithm for determining the minimum order
 #        self.alg = self.cmb_firwin_alg.currentText()
 
-    def _test_N(self):
+    def _test_n(self):
         """
         Warn the user if the calculated order is too high for a reasonable filter
         design.
         """
         if self.N > 1000:
             return popup_warning(self, self.N, "FirWin")
-        else:
-            return True
+        return True
 
     def _save(self, fil_dict, arg):
         """
@@ -490,7 +497,7 @@ class Firwin(QWidget):
         self._get_params(fil_dict)
         self.N = self._firwin_ord([self.F_PB, self.F_SB], [1, 0],
                                   [self.A_PB, self.A_SB], alg=self.alg)
-        if not self._test_N():
+        if not self._test_n():
             return -1
 
         fil_dict['F_C'] = (self.F_SB + self.F_PB)/2  # average calculated F_PB and F_SB
@@ -500,7 +507,7 @@ class Firwin(QWidget):
 
     def LPman(self, fil_dict):
         self._get_params(fil_dict)
-        if not self._test_N():
+        if not self._test_n():
             return -1
         self._save(fil_dict,
                    self.firwin(self.N, fil_dict['F_C'], nyq=0.5,
@@ -511,7 +518,7 @@ class Firwin(QWidget):
         N = self._firwin_ord([self.F_SB, self.F_PB], [0, 1],
                              [self.A_SB, self.A_PB], alg=self.alg)
         self.N = round_odd(N)  # enforce odd order
-        if not self._test_N():
+        if not self._test_n():
             return -1
         fil_dict['F_C'] = (self.F_SB + self.F_PB)/2  # average calculated F_PB and F_SB
         self._save(fil_dict,
@@ -521,7 +528,7 @@ class Firwin(QWidget):
     def HPman(self, fil_dict):
         self._get_params(fil_dict)
         self.N = round_odd(self.N)  # enforce odd order
-        if not self._test_N():
+        if not self._test_n():
             return -1
         self._save(fil_dict,
                    self.firwin(self.N, fil_dict['F_C'], pass_zero=False, nyq=0.5,
@@ -532,7 +539,7 @@ class Firwin(QWidget):
         self._get_params(fil_dict)
         self.N = remezord([self.F_SB, self.F_PB, self.F_PB2, self.F_SB2], [0, 1, 0],
                           [self.A_SB, self.A_PB, self.A_SB2], fs=1, alg=self.alg)[0]
-        if not self._test_N():
+        if not self._test_n():
             return -1
 
         fil_dict['F_C'] = (self.F_SB + self.F_PB)/2  # average calculated F_PB and F_SB
@@ -544,7 +551,7 @@ class Firwin(QWidget):
 
     def BPman(self, fil_dict):
         self._get_params(fil_dict)
-        if not self._test_N():
+        if not self._test_n():
             return -1
         self._save(fil_dict,
                    self.firwin(self.N, [fil_dict['F_C'], fil_dict['F_C2']], nyq=0.5,
@@ -556,7 +563,7 @@ class Firwin(QWidget):
         N = remezord([self.F_PB, self.F_SB, self.F_SB2, self.F_PB2], [1, 0, 1],
                      [self.A_PB, self.A_SB, self.A_PB2], fs=1, alg=self.alg)[0]
         self.N = round_odd(N)  # enforce odd order
-        if not self._test_N():
+        if not self._test_n():
             return -1
         fil_dict['F_C'] = (self.F_SB + self.F_PB) / 2  # average calculated F_PB and F_SB
         fil_dict['F_C2'] = (self.F_SB2 + self.F_PB2) / 2
@@ -568,7 +575,7 @@ class Firwin(QWidget):
     def BSman(self, fil_dict):
         self._get_params(fil_dict)
         self.N = round_odd(self.N)  # enforce odd order
-        if not self._test_N():
+        if not self._test_n():
             return -1
         self._save(fil_dict,
                    self.firwin(self.N, [fil_dict['F_C'], fil_dict['F_C2']],

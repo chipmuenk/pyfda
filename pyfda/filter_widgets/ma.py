@@ -32,14 +32,13 @@ API version info:
 
    :2.2: Rename `filter_classes` -> `classes`, remove Py2 compatibility
 """
-from pyfda.libs.compat import (QWidget, QLabel, QLineEdit, pyqtSignal, QCheckBox,
-                      QVBoxLayout, QHBoxLayout)
-
 import numpy as np
 
+from pyfda.libs.compat import (QWidget, QLabel, QLineEdit, pyqtSignal, QCheckBox,
+                      QVBoxLayout, QHBoxLayout)
 import pyfda.filterbroker as fb
 from pyfda.libs.pyfda_lib import fil_save, fil_convert, ceil_odd, safe_eval
-from pyfda.libs.pyfda_qt_lib import popup_warning
+from pyfda.libs.pyfda_qt_lib import popup_warning, emit
 from pyfda.libs.pyfda_sig_lib import zeros_with_val
 
 __version__ = "2.2"
@@ -70,7 +69,6 @@ near ``f_S/2`` (highpass).
 ``ma.calc_ma()``
     """
     sig_tx = pyqtSignal(object)
-    from pyfda.libs.pyfda_qt_lib import emit
 
     def __init__(self, objectName='ma_inst'):
         QWidget.__init__(self)
@@ -138,6 +136,14 @@ near ``f_S/2`` (highpass).
 #        self.info_doc.append(remezord.__doc__)
 
         self.construct_UI()
+
+    # -------------------------------------------------------------------------
+    def emit(self, dict_sig):
+        """
+        Access imported function `emit()` as instance method, passing `self`
+        with its attributes
+        """
+        emit(self, dict_sig)
 
     #--------------------------------------------------------------------------
     def construct_UI(self):

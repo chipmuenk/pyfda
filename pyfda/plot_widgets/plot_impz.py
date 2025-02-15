@@ -27,13 +27,13 @@ from pyfda.libs.pyfda_sig_lib import angle_zero
 from pyfda.libs.pyfda_lib import (
     safe_eval, pprint_log, calc_ssb_spectrum, first_item)
 from pyfda.libs.pyfda_qt_lib import (
-    qget_cmb_box, qset_cmb_box, qstyle_widget, qcmb_box_add_item, qcmb_box_del_item)
-from pyfda.pyfda_rc import params  # FMT string for QLineEdit fields, e.g. '{:.3g}'
+    emit, qget_cmb_box, qset_cmb_box, qstyle_widget, qcmb_box_add_item,
+    qcmb_box_del_item)
 from pyfda.plot_widgets.mpl_widget import MplWidget, stems, scatter
-
 from pyfda.plot_widgets.tran.plot_tran_stim import Plot_Tran_Stim
 from pyfda.plot_widgets.tran.tran_io import Tran_IO
 from pyfda.plot_widgets.plot_impz_ui import PlotImpz_UI
+from pyfda.pyfda_rc import params  # FMT string for QLineEdit fields, e.g. '{:.3g}'
 
 logger = logging.getLogger(__name__)
 
@@ -49,7 +49,6 @@ class Plot_Impz(QWidget):
     """
     sig_rx = pyqtSignal(object)  # incoming
     sig_tx = pyqtSignal(object)  # outgoing, e.g. when stimulus has been calculated
-    from pyfda.libs.pyfda_qt_lib import emit
 
     def __init__(self, objectName='plot_impz_inst'):
         super().__init__()
@@ -105,6 +104,15 @@ class Plot_Impz(QWidget):
 
         self.impz_init()  # initial calculation of stimulus and response and drawing
 
+    # -----------------------------------------------------------------------
+    def emit(self, dict_sig):
+        """
+        Access imported function `emit()` as instance method, passing `self`
+        with its attributes
+        """
+        emit(self, dict_sig)
+
+    # -----------------------------------------------------------------------
     def _construct_UI(self):
         """
         Create the top level UI of the widget, consisting of tabbed matplotlib widgets,
@@ -249,7 +257,7 @@ class Plot_Impz(QWidget):
         self.ui.but_freq_show_info.clicked.connect(self.draw)
         # --- subwidgets
 
-# ------------------------------------------------------------------------------
+    # -----------------------------------------------------------------------
     def toggle_index_k(self):
         """
         Toggle setting of index_k button in filterbroker, update frequency scaling and call `draw()`
@@ -257,7 +265,8 @@ class Plot_Impz(QWidget):
         fb.fil[0]["tab_yn"]["display_index_k"] = self.ui.but_freq_index_k.checked
         self.stim_wdg.ui.normalize_freqs()
         self.draw()
-# ------------------------------------------------------------------------------
+
+    # -----------------------------------------------------------------------
     def toggle_stim_options(self):
         """
         Toggle visibility of stimulus options, depending on the state of the
@@ -270,7 +279,7 @@ class Plot_Impz(QWidget):
         self.ui.wdg_ctrl_time.setVisible(
             qget_cmb_box(self.ui.cmb_ui_select) in {"plot", "plot_stim"})
 
-# ------------------------------------------------------------------------------
+    # -----------------------------------------------------------------------
     def set_ui_level(self, ui_level):
         """
         Sync time and frequency subwidget and set their ui display level
@@ -300,7 +309,7 @@ class Plot_Impz(QWidget):
         else:
             logger.warning("Undefined 'ui_level = %d!", ui_level)
 
-# ------------------------------------------------------------------------------
+    # -----------------------------------------------------------------------
     def resize_stim_tab_widget(self):
         """
         Resize active tab of stimulus Tab widget to fit the height of the contained
@@ -326,7 +335,7 @@ class Plot_Impz(QWidget):
         self.tab_stim_w.setMinimumHeight(max(h, h_min))
 
 
-    # ------------------------------------------------------------------------------
+    # -----------------------------------------------------------------------
     def process_sig_rx_t(self, dict_sig=None):
         """
         Special treatment for signals coming from TIME plot navigation toolbar
@@ -342,7 +351,7 @@ class Plot_Impz(QWidget):
         else:
             self.process_sig_rx(dict_sig)
 
-    # ------------------------------------------------------------------------------
+    # -----------------------------------------------------------------------
     def process_sig_rx_f(self, dict_sig=None):
         """
         Special treatment for signals coming from FREQ plot navigation toolbar
@@ -358,7 +367,7 @@ class Plot_Impz(QWidget):
         else:
             self.process_sig_rx(dict_sig)
 
-    # ------------------------------------------------------------------------------
+    # -----------------------------------------------------------------------
     def process_sig_rx(self, dict_sig=None):
         """
         Process signals coming from
@@ -479,7 +488,7 @@ class Plot_Impz(QWidget):
                 # self.needs_redraw = [True] * 2
                 self.needs_calc = True
 
-    # ------------------------------------------------------------------------------
+    # -----------------------------------------------------------------------
     def set_N_to_file_len(self) -> None:
         """
         Check status of file_io widget:
@@ -496,7 +505,7 @@ class Plot_Impz(QWidget):
             self.ui.but_N_auto.setChecked(False)
             self.ui.led_N_points.setEnabled(True)
 
-    # ------------------------------------------------------------------------------
+    # -----------------------------------------------------------------------
     def file_io(self) -> None:
         """
         Check status of file_io widget:
@@ -523,9 +532,9 @@ class Plot_Impz(QWidget):
             self.stim_wdg.ui.wdg_stim.setEnabled(
                 qget_cmb_box(self.stim_wdg.ui.cmb_file_io) != "use")
 
-    # =========================================================================
+    # =======================================================================
     # Simulation: Calculate stimulus, response and draw them
-    # =========================================================================
+    # =======================================================================
     def calc_auto(self, autorun: bool = None) -> None:
         """
         Triggered when checkbox "Autorun" is clicked or specs have been edited,
@@ -537,7 +546,7 @@ class Plot_Impz(QWidget):
         if self.ui.but_auto_run.checked and self.needs_calc:
             self.impz_init()
 
-    # --------------------------------------------------------------------------
+    # -----------------------------------------------------------------------
     def impz_init(self, arg=None) -> None:
         """
         Initialize transient simulation.
@@ -678,7 +687,7 @@ class Plot_Impz(QWidget):
                 # calculate float impulse response:
                 self.impz()
 
-    # --------------------------------------------------------------------------
+    # -----------------------------------------------------------------------
     def impz(self):
         """
         Calculate floating point / fixpoint response and redraw it
@@ -757,7 +766,7 @@ class Plot_Impz(QWidget):
         # -------------------------------------------------------------
         self.impz_finish()
 
-    # --------------------------------------------------------------------------
+    # -----------------------------------------------------------------------
     def impz_finish(self):
         """
         Do some housekeeping, resetting and drawing when `self.impz()`
@@ -802,7 +811,7 @@ class Plot_Impz(QWidget):
         if fb.fil[0]['fx_sim']:
             self.emit({'fx_sim': 'finish'})
 
-    # --------------------------------------------------------------------------
+    # -----------------------------------------------------------------------
     def update_fx_settings(self, arg=None):
         """
         `arg` can be the following arguments, triggered by:
@@ -871,7 +880,7 @@ class Plot_Impz(QWidget):
 
         self.fx_mode_old = fb.fil[0]['fx_sim']
 
-    # ------------------------------------------------------------------------
+    # -----------------------------------------------------------------------
     def calc_fft(self):
         """
         (Re-)calculate FFTs of stimulus `self.X`, quantized stimulus `self.X_q`
@@ -915,14 +924,14 @@ class Plot_Impz(QWidget):
             self.Y = np.fft.fft(y_win) / self.ui.N
             # self.Y[0] = self.Y[0] * np.sqrt(2) # correct value at DC
 
-#        if self.ui.chk_win_freq.isChecked():
-#            self.Win = np.abs(np.fft.fft(win)) / self.ui.N
+        # if self.ui.chk_win_freq.isChecked():
+        #    self.Win = np.abs(np.fft.fft(win)) / self.ui.N
 
         self.needs_redraw[1] = True   # redraw of frequency widget needed
 
-###############################################################################
-#        PLOTTING
-###############################################################################
+    #########################################################################
+    #        PLOTTING
+    #########################################################################
 
     def draw(self, arg=None):
         """
@@ -986,7 +995,7 @@ class Plot_Impz(QWidget):
                 and self.mplwidget_f.mplToolbar.plot_enabled:
             self.draw_freq()
 
-    # ------------------------------------------------------------------------
+    # ----------------------------------------------------------------------
     def _spgr_ui2params(self):
         """
         Update overlap and nfft parameters for spectrogram from UI
@@ -1010,7 +1019,7 @@ class Plot_Impz(QWidget):
 
         self.draw()
 
-# ----------------------------------------------------------------------------
+# --------------------------------------------------------------------------
     def _spgr_cmb(self):
         """
         Update spectrogram UI when signal selection combobox has been changed
@@ -1020,7 +1029,7 @@ class Plot_Impz(QWidget):
 
         self.draw()
 
-    # ------------------------------------------------------------------------
+    # ----------------------------------------------------------------------
     def _log_mode_time(self):
         """
         Select / deselect log. mode for time domain and update self.ui.bottom_t
@@ -1043,7 +1052,7 @@ class Plot_Impz(QWidget):
         else:
             self.ui.bottom_t = 0
 
-    # ------------------------------------------------------------------------
+    # -----------------------------------------------------------------------
     def _log_mode_freq(self):
         """
         Select / deselect log. mode for frequency domain and update
@@ -1061,7 +1070,7 @@ class Plot_Impz(QWidget):
         else:
             self.ui.bottom_f = 0
 
-    # ------------------------------------------------------------------------
+    # -----------------------------------------------------------------------
     def draw_data(self, plt_style: str, ax: object, x: np.ndarray, y:np.ndarray,
                   bottom: float = 0, label: str = '',
                   plt_fmt: dict = {}, mkr_fmt: dict = {}, **args):

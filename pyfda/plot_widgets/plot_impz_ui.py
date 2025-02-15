@@ -9,26 +9,26 @@
 """
 Create the UI for the PlotImz class
 """
+import logging
+
+import pyfda.filterbroker as fb
 from pyfda.libs.compat import (
     QCheckBox, QWidget, QComboBox, QLineEdit, QLabel,
     QIcon, QProgressBar, pyqtSignal, QSize, QFrame,
     QHBoxLayout, QVBoxLayout, QGridLayout)
-
+import pyfda.libs.pyfda_dirs as dirs
+from pyfda.libs.fft_windows_cmb_box import QFFTWinCmbBox
 from pyfda.libs.pyfda_lib import to_html, safe_eval, pprint_log
 from pyfda.libs.pyfda_sig_lib import impz_len
-import pyfda.filterbroker as fb
-import pyfda.libs.pyfda_dirs as dirs
 from pyfda.libs.pyfda_qt_lib import (
-    qcmb_box_populate, qstyle_widget, qtext_width, QVLine, PushButton, PushButtonRT)
-from pyfda.libs.fft_windows_cmb_box import QFFTWinCmbBox
+    emit, qcmb_box_populate, qstyle_widget, qtext_width, QVLine,
+    PushButton, PushButtonRT)
 # FMT string for QLineEdit fields, e.g. '{:.3g}'
 from pyfda.pyfda_rc import params
 
 from pyfda.plot_widgets.plot_fft_win import Plot_FFT_win
 
-import logging
 logger = logging.getLogger(__name__)
-
 
 class PlotImpz_UI(QWidget):
     """
@@ -42,9 +42,15 @@ class PlotImpz_UI(QWidget):
     # outgoing: to fft related widgets (FFT window widget, qfft_win_select)
     sig_tx_fft = pyqtSignal(object)
 
-    from pyfda.libs.pyfda_qt_lib import emit
+    # -------------------------------------------------------------------------
+    def emit(self, dict_sig, sig_name=""):
+        """
+        Access imported function `emit()` as instance method, passing `self`
+        with its attributes
+        """
+        emit(self, dict_sig, sig_name)
 
-# ------------------------------------------------------------------------------
+    # ------------------------------------------------------------------------
     def process_sig_rx(self, dict_sig=None):
         """
         Process signals coming from
@@ -72,7 +78,7 @@ class PlotImpz_UI(QWidget):
                     # global connection to e.g. plot_impz
                     self.emit(dict_sig)
 
-# ------------------------------------------------------------------------------
+    # ------------------------------------------------------------------------
     def __init__(self):
         super().__init__()
 

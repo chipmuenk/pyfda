@@ -25,7 +25,7 @@ import pyfda.filterbroker as fb  # importing filterbroker initializes all its gl
 import pyfda.libs.pyfda_dirs as dirs
 from pyfda.libs.pyfda_lib import pprint_log, first_item
 from pyfda.libs.pyfda_qt_lib import (
-    qget_cmb_box, qstyle_widget, qcmb_box_populate, qset_cmb_box)
+    qget_cmb_box, qstyle_widget, qcmb_box_populate, qset_cmb_box, emit)
 from pyfda.fixpoint_widgets.fx_ui_wq import FX_UI_WQ
 from pyfda.pyfda_rc import params
 
@@ -49,7 +49,6 @@ class Input_Fixpoint_Specs(QWidget):
     sig_rx_local = pyqtSignal(object)  # incoming from subwidgets -> process_sig_rx_local
     sig_rx = pyqtSignal(object)  # incoming, connected to input_tab_widget.sig_rx
     sig_tx = pyqtSignal(object)  # outcgoing
-    from pyfda.libs.pyfda_qt_lib import emit
 
     def __init__(self, parent=None, objectName="input_fixpoint_spec_inst"):
         super().__init__()
@@ -94,6 +93,14 @@ class Input_Fixpoint_Specs(QWidget):
                          .format(len(inst_wdg_list.split("\n"))-1, inst_wdg_list))
         self._update_fixp_widget()
         self.dict2ui()  # update fixpoint widgets
+
+    # -----------------------
+    def emit(self, dict_sig):
+        """
+        Access imported function `emit()` as instance method, passing `self`
+        with its attributes
+        """
+        emit(self, dict_sig)
 
 # ------------------------------------------------------------------------------
     def process_sig_rx_local(self, dict_sig: dict = None) -> None:
@@ -296,8 +303,7 @@ class Input_Fixpoint_Specs(QWidget):
                 # Reload UI from dict and
                 self.fx_specs_changed = True
 
-
-# ------------------------------------------------------------------------------
+    # -----------------------------------------------------------------------
     def _construct_UI(self) -> None:
         """
         Intitialize the main UI, consisting of:
@@ -308,7 +314,7 @@ class Input_Fixpoint_Specs(QWidget):
         - Simulation and export buttons
         """
         margins = params['wdg_margins']
-# ------------------------------------------------------------------------------
+        # ------------------------------------------------------------------
         # Define frame and layout for the dynamically updated filter widget
         # The actual filter widget is instantiated / deleted in
         # `self._update_fixp_widget()` later on
@@ -322,9 +328,9 @@ class Input_Fixpoint_Specs(QWidget):
         # wdg_fx_dyn.setStyleSheet(".QWidget { background-color:none; }")
         wdg_fx_dyn.setLayout(self.layH_fx_wdg)
 
-# ------------------------------------------------------------------------------
-#       Initialize fixpoint filter combobox, title and description
-# ------------------------------------------------------------------------------
+        # ------------------------------------------------------------------
+        #  Initialize fixpoint filter combobox, title and description
+        # ------------------------------------------------------------------
         self.cmb_fx_wdg = QComboBox(self)
         self.cmb_fx_wdg.setSizeAdjustPolicy(QComboBox.AdjustToContents)
 
@@ -347,12 +353,12 @@ class Input_Fixpoint_Specs(QWidget):
         self.frmTitle.setLayout(layVTitle)
         self.frmTitle.setContentsMargins(*params['wdg_margins'])
 
-# ------------------------------------------------------------------------------
-#       Input and Output Quantizer
-# ------------------------------------------------------------------------------
-#       - instantiate widgets for input and output quantizer
-#       - pass the quantization dictionary to the constructor
-# ------------------------------------------------------------------------------
+        # -----------------------------------------------------------------
+        #       Input and Output Quantizer
+        # -----------------------------------------------------------------
+        #       - instantiate widgets for input and output quantizer
+        #       - pass the quantization dictionary to the constructor
+        # -----------------------------------------------------------------
 
         self.wdg_wq_input = FX_UI_WQ(
             fb.fil[0]['fxq']['QI'], objectName='fx_ui_wq_input',
@@ -371,9 +377,9 @@ class Input_Fixpoint_Specs(QWidget):
             cmb_w_vis='off')
         self.wdg_wq_output.sig_tx.connect(self.sig_rx_local)
 
-# ------------------------------------------------------------------------------
-#       Dynamically updated image of filter topology (label as placeholder)
-# ------------------------------------------------------------------------------
+        # --------------------------------------------------------------------
+        # Dynamically updated image of filter topology (label as placeholder)
+        # --------------------------------------------------------------------
         self.lbl_fixp_img = QLabel("img not set", self)
         # self.lbl_fixp_img.setSizePolicy(QSizePolicy.Minimum, QSizePolicy.Minimum)
 
@@ -387,9 +393,9 @@ class Input_Fixpoint_Specs(QWidget):
         self.frmImg.setLayout(layHImg)
         self.frmImg.setContentsMargins(*params['wdg_margins'])
 
-# ------------------------------------------------------------------------------
-#       Simulation and export Buttons
-# ------------------------------------------------------------------------------
+        # -----------------------------------------------------------------
+        #       Simulation and export Buttons
+        # -----------------------------------------------------------------
         # choose float / fixpoint mode
         self.cmb_qfrmt = QComboBox(self)
         qcmb_box_populate(self.cmb_qfrmt, self.cmb_qfrmt_items,
@@ -410,9 +416,9 @@ class Input_Fixpoint_Specs(QWidget):
         frmHdlBtns.setLayout(layH_fx_btns)
         frmHdlBtns.setContentsMargins(*params['wdg_margins'])
 
-# -------------------------------------------------------------------
-#       Top level layout
-# -------------------------------------------------------------------
+        # -------------------------------------------------------------
+        #       Top level layout
+        # -------------------------------------------------------------
         layVMain = QVBoxLayout()
         layVMain.addWidget(self.frmTitle)
         layVMain.addWidget(frmHdlBtns)
@@ -425,9 +431,9 @@ class Input_Fixpoint_Specs(QWidget):
 
         self.setLayout(layVMain)
 
-        # ----------------------------------------------------------------------
+        # -----------------------------------------------------------------
         # GLOBAL SIGNALS & SLOTs
-        # ----------------------------------------------------------------------
+        # -----------------------------------------------------------------
         self.sig_rx.connect(self.process_sig_rx)
         self.sig_rx_local.connect(self.process_sig_rx_local)
         # dynamic connection in `self._update_fixp_widget()`:
@@ -452,7 +458,7 @@ class Input_Fixpoint_Specs(QWidget):
         # # ... then redraw image when resized
         # self.sig_resize.connect(self.resize_img)
 
-# ------------------------------------------------------------------------------
+    # --------------------------------------------------------------------------
     def load_fx_filter(self) -> None:
         """
         A new filter has been loaded, create fixpoint filter from scratch.
@@ -468,7 +474,7 @@ class Input_Fixpoint_Specs(QWidget):
 
         self.dict2ui()  # update fixpoint widgets
 
-# ------------------------------------------------------------------------------
+    # --------------------------------------------------------------------------
     def _update_filter_cmb(self, fx_wdg: str = "") -> str:
         """
         (Re-)Read list of available fixpoint filters for a given filter class
@@ -545,7 +551,7 @@ class Input_Fixpoint_Specs(QWidget):
 #         # Call base class method to continue normal event processing:
 #         return super(Input_Fixpoint_Specs, self).eventFilter(source, event)
 
-# ------------------------------------------------------------------------------
+    # --------------------------------------------------------------------------
     def embed_fixp_img(self, img_file: str) -> QPixmap:
         """
         Embed `img_file` in png format as `self.img_fixp`
@@ -572,7 +578,7 @@ class Input_Fixpoint_Specs(QWidget):
         self.img_fixp = QPixmap(img_file)
         return self.img_fixp
 
-# ------------------------------------------------------------------------------
+    # --------------------------------------------------------------------------
     def resize_img(self) -> None:
         """
         Triggered when `self` (the widget) is selected or resized. The method resizes
@@ -605,7 +611,7 @@ class Input_Fixpoint_Specs(QWidget):
 
         self.lbl_fixp_img.setPixmap(img_scaled)
 
-# ------------------------------------------------------------------------------
+    # --------------------------------------------------------------------------
     def _update_fixp_widget(self):
         """
         This method is called at the initialization of the widget and when
@@ -703,7 +709,7 @@ class Input_Fixpoint_Specs(QWidget):
 
         self.emit({'fx_sim': 'specs_changed'})
 
-# ------------------------------------------------------------------------------
+    # --------------------------------------------------------------------------
     def qfrmt2ui(self):
         """
         Triggered by by a change of index of the combo box `self.cmb_qfrmt`.
@@ -721,7 +727,7 @@ class Input_Fixpoint_Specs(QWidget):
 
         self.emit({'fx_sim': 'specs_changed'})
 
-# ------------------------------------------------------------------------------
+    # --------------------------------------------------------------------------
     def dict2ui(self):
         """
         Called during `__init__()` and from `process_sig_rx()`.
@@ -763,7 +769,7 @@ class Input_Fixpoint_Specs(QWidget):
         elif not fb.fil[0]['fx_sim']:
             qset_cmb_box(self.cmb_qfrmt, 'float', data=True)
 
-# ------------------------------------------------------------------------------
+    # --------------------------------------------------------------------------
     def exportHDL(self):
         """
         Synthesize HDL description of filter
@@ -830,7 +836,7 @@ class Input_Fixpoint_Specs(QWidget):
                          f'\nwith "{e} "')
         return -1
 
-# ------------------------------------------------------------------------------
+    # --------------------------------------------------------------------------
     def fx_sim_calc_response(self, dict_sig) -> None:
         """
         - Read fixpoint stimulus from `dict_sig` in integer format

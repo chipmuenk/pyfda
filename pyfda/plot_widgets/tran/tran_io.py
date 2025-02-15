@@ -9,8 +9,11 @@
 """
 Widget for loading and storing stimulus data from / to transient plotting widget
 """
-from pyfda.libs.compat import Qt, QWidget, pyqtSignal, QVBoxLayout, QDialog, QPushButton
+import logging
+
 import numpy as np
+
+from pyfda.libs.compat import Qt, QWidget, pyqtSignal, QVBoxLayout, QDialog, QPushButton
 
 import pyfda.libs.pyfda_io_lib as io
 import pyfda.filterbroker as fb
@@ -24,7 +27,6 @@ from pyfda.libs.csv_option_box import CSV_option_box
 from pyfda.pyfda_rc import params  # FMT string for QLineEdit fields, e.g. '{:.3g}'
 from pyfda.plot_widgets.tran.tran_io_ui import Tran_IO_UI
 
-import logging
 logger = logging.getLogger(__name__)
 
 class QFileDialogPlus(QDialog):
@@ -32,13 +34,20 @@ class QFileDialogPlus(QDialog):
     Create a pop-up widget containing QFileDialog and extra widgets
     """
     sig_tx = pyqtSignal(object)  # outgoing
-    from pyfda.libs.pyfda_qt_lib import emit
 
     def __init__(self, parent):
         super(QFileDialogPlus, self).__init__(parent)
 
         self._construct_UI()
         qwindow_stay_on_top(self, True)
+
+    # -----------------------
+    def emit(self, dict_sig):
+        """
+        Access imported function `emit()` as instance method, passing `self`
+        with its attributes
+        """
+        emit(self, dict_sig)
 
 # ------------------------------------------------------------------------------
     def closeEvent(self, event):
@@ -67,13 +76,13 @@ class QFileDialogPlus(QDialog):
         # ============== Signals & Slots ================================
         butClose.clicked.connect(self.close)
 
+# =========================================================================
 class Tran_IO(QWidget):
     """
     Construct a widget for reading data from file
     """
     sig_rx = pyqtSignal(object)  # incoming
     sig_tx = pyqtSignal(object)  # outgoing, e.g. when stimulus has been calculated
-    from pyfda.libs.pyfda_qt_lib import emit
 
     def __init__(self, parent):
         super().__init__()
@@ -113,6 +122,14 @@ class Tran_IO(QWidget):
             self.ui.but_csv_options.setChecked(not dirs.csv_options_handle is None)
         elif 'view_changed' in dict_sig and dict_sig['view_changed'] == 'f_S':
             self.set_f_s_wav(fb.fil[0]['f_S'] * fb.fil[0]['f_s_scale'])
+
+    # -----------------------------------------------------------------------------
+    def emit(self, dict_sig):
+        """
+        Access imported function `emit()` as instance method, passing `self`
+        with its attributes
+        """
+        emit(self, dict_sig)
 
     # ------------------------------------------------------------------------------
     def _construct_UI(self) -> None:

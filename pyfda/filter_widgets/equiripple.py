@@ -35,10 +35,9 @@ import logging
 from scipy.signal import remez
 import numpy as np
 
-
 from pyfda.libs.compat import QWidget, QLabel, QLineEdit, pyqtSignal, QVBoxLayout, QHBoxLayout
 import pyfda.filterbroker as fb
-from pyfda.libs.pyfda_qt_lib import popup_warning
+from pyfda.libs.pyfda_qt_lib import popup_warning, emit
 from pyfda.libs.pyfda_lib import fil_save, round_odd, ceil_even, safe_eval
 from .common import remezord
 
@@ -49,6 +48,12 @@ __version__ = "2.2"
 classes = {'Equiripple':'Equiripple'} #: Dict containing class name : display name
 
 class Equiripple(QWidget):
+    """
+    Design digital FIR Equiripple filters (LP, HP, BP, BS) with fixed or minimum
+    order, return the filter design in 'ba' format.
+    This is more or less a wrapper around the ``scipy.signal.remez()`` and
+    ``libs.pyfda_lib.remezord()`` routines.
+    """
 
     FRMT = 'ba' # output format of filter design routines ('zpk' / 'ba' / 'sos')
             # currently, only 'ba' is supported for equiripple routines
@@ -75,11 +80,10 @@ class Equiripple(QWidget):
 
     **Design routines:**
 
-    ``scipy.signal.remez()``, ``pyfda_lib.remezord()``
+    ``scipy.signal.remez()``, ``libs.pyfda_lib.remezord()``
     """
 
     sig_tx = pyqtSignal(object)
-    from pyfda.libs.pyfda_qt_lib import emit
 
     def __init__(self, objectName='equiripple_inst'):
         super().__init__()
@@ -166,6 +170,14 @@ class Equiripple(QWidget):
         self.info_doc.append(remezord.__doc__)
 
         self.construct_UI()
+
+    # -------------------------------------------------------------------------
+    def emit(self, dict_sig):
+        """
+        Access imported function `emit()` as instance method, passing `self`
+        with its attributes
+        """
+        emit(self, dict_sig)
 
     #--------------------------------------------------------------------------
     def construct_UI(self):

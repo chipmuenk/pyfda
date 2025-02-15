@@ -10,6 +10,7 @@
 Library with classes and functions for file and text IO
 """
 import os, re, io
+import logging
 import copy
 import csv
 import wave
@@ -44,7 +45,6 @@ from pyfda.version import __version__
 
 from .compat import QFileDialog
 
-import logging
 logger = logging.getLogger(__name__)
 
 

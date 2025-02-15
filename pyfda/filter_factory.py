@@ -13,7 +13,6 @@ which have a global scope like class variables and can be imported like
 
 >>> import filter_factory as ff
 >>> myfil = ff.fil_factory
-
 """
 
 import importlib
@@ -30,9 +29,7 @@ Instance of current filter design class (e.g. "cheby1"), globally accessible
 >>> import filter_factory as ff
 >>> ff.fil_factory.create_fil_instance('cheby1') # create instance of dynamic class
 >>> ff.fil_inst.LPmin(fil[0]) # design a filter
-
 """
-#------------------------------------------------------------------------------
 class FilterFactory(object):
     """
     This class implements a filter factory that (re)creates the globally accessible

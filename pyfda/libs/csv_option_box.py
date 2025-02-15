@@ -9,15 +9,15 @@
 """
 Create a popup window with options for CSV import and export
 """
+import logging
 
 from .pyfda_qt_lib import (qget_cmb_box, qset_cmb_box, qcmb_box_populate,
-                           qwindow_stay_on_top)
+                           qwindow_stay_on_top, emit)
 from .pyfda_lib import to_html
 from pyfda.pyfda_rc import params
 from .compat import (QLabel, QComboBox, QDialog, QPushButton,
                      QVBoxLayout, QGridLayout, pyqtSignal)
 
-import logging
 logger = logging.getLogger(__name__)
 
 
@@ -29,7 +29,6 @@ class CSV_option_box(QDialog):
     and zeros.
     """
     sig_tx = pyqtSignal(object)  # outgoing
-    from pyfda.libs.pyfda_qt_lib import emit
 
     def __init__(self, parent):
         super(CSV_option_box, self).__init__(parent)
@@ -42,7 +41,15 @@ class CSV_option_box(QDialog):
         self._construct_UI()
         qwindow_stay_on_top(self, True)
 
-# ------------------------------------------------------------------------------
+    # -------------------------------------------------------------------------
+    def emit(self, dict_sig):
+        """
+        Access imported function `emit()` as instance method, passing `self`
+        with its attributes
+        """
+        emit(self, dict_sig)
+
+    # --------------------------------------------------------------------------
     def closeEvent(self, event):
         """
         Override closeEvent (user has tried to close the window) and send a
@@ -52,7 +59,7 @@ class CSV_option_box(QDialog):
         self.emit({'close_event': ''})
         event.accept()
 
-# ------------------------------------------------------------------------------
+    # --------------------------------------------------------------------------
     def _construct_UI(self):
         """ initialize the User Interface """
         self.setWindowTitle("CSV Options")
@@ -129,12 +136,12 @@ class CSV_option_box(QDialog):
         lay_grid.addWidget(lbl_header, 4, 1)
         lay_grid.addWidget(self.cmb_header, 4, 2)
 
-        layVMain = QVBoxLayout()
+        lay_v_main = QVBoxLayout()
         # layVMain.setAlignment(Qt.AlignTop) # only affects first widget (intended here)
-        layVMain.addLayout(lay_grid)
-        layVMain.addWidget(butClose)
-        layVMain.setContentsMargins(*params['wdg_margins'])
-        self.setLayout(layVMain)
+        lay_v_main.addLayout(lay_grid)
+        lay_v_main.addWidget(butClose)
+        lay_v_main.setContentsMargins(*params['wdg_margins'])
+        self.setLayout(lay_v_main)
 
         self.load_settings()
 
@@ -145,6 +152,7 @@ class CSV_option_box(QDialog):
         self.cmb_terminator.currentIndexChanged.connect(self.store_settings)
         self.cmb_header.currentIndexChanged.connect(self.store_settings)
 
+    # --------------------------------------------------------------------------
     def store_settings(self):
         """
         Store settings of CSV options widget in ``pyfda_rc.params``.
@@ -161,6 +169,7 @@ class CSV_option_box(QDialog):
         except KeyError as e:
             logger.error(e)
 
+    # --------------------------------------------------------------------------
     def load_settings(self):
         """
         Load settings of CSV options widget from ``pyfda_rc.params``.

@@ -6,22 +6,22 @@
 # Licensed under the terms of the MIT License
 # (see file LICENSE in root directory for details)
 
-import importlib
 import copy
+import importlib
+import logging
+
 import numpy as np
 import scipy.signal as sig
 import scipy
 
-import pyfda.filterbroker as fb
-from .pyfda_qt_lib import qcmb_box_populate, qset_cmb_box, qget_cmb_box
-from .pyfda_lib import to_html, safe_eval, pprint_log
-from pyfda.pyfda_rc import params
-from .compat import (QWidget, QLabel, QComboBox, QLineEdit,
-                     QHBoxLayout, pyqtSignal)
-
+# import pyfda.filterbroker as fb
+from pyfda.libs.pyfda_qt_lib import qcmb_box_populate, qset_cmb_box, qget_cmb_box, emit
+from pyfda.libs.pyfda_lib import to_html, safe_eval, pprint_log
 from pyfda.libs.pyfda_fft_windows_lib import all_wins_dict_ref
+from pyfda.pyfda_rc import params
+from .compat import (
+    QWidget, QLabel, QComboBox, QLineEdit, QHBoxLayout, pyqtSignal)
 
-import logging
 logger = logging.getLogger(__name__)
 
 # =============================================================================
@@ -36,8 +36,6 @@ class QFFTWinCmbBox(QWidget):
     """
     sig_rx = pyqtSignal(object)  # incoming
     sig_tx = pyqtSignal(object)  # outgoing
-
-    from pyfda.libs.pyfda_qt_lib import emit
 
     def __init__(self, cur_win_dict: dict, app: str = 'spec', all_wins_dict: dict = {},
                  objectName: str = ""):
@@ -69,6 +67,14 @@ class QFFTWinCmbBox(QWidget):
         self._construct_UI()
         self.set_window_name()  # initialize win_dict
         self.ui2win_dict()
+
+    # -------------------------------------------------------------------------
+    def emit(self, dict_sig):
+        """
+        Access imported function `emit()` as instance method, passing `self`
+        with its attributes
+        """
+        emit(self, dict_sig)
 
     # --------------------------------------------------------------------------
     def process_sig_rx(self, dict_sig=None):
@@ -119,17 +125,17 @@ class QFFTWinCmbBox(QWidget):
         self.led_win_par_1.setText("2")
         self.cmb_win_par_1 = QComboBox(self)
 
-        layH_main = QHBoxLayout(self)
-        layH_main.addWidget(self.cmb_win_fft)
-        layH_main.addWidget(self.cmb_win_fft_variant)
-        layH_main.addWidget(self.lbl_win_par_0)
-        layH_main.addWidget(self.led_win_par_0)
-        layH_main.addWidget(self.cmb_win_par_0)
-        layH_main.addWidget(self.lbl_win_par_1)
-        layH_main.addWidget(self.led_win_par_1)
-        layH_main.addWidget(self.cmb_win_par_1)
+        lay_h_main = QHBoxLayout(self)
+        lay_h_main.addWidget(self.cmb_win_fft)
+        lay_h_main.addWidget(self.cmb_win_fft_variant)
+        lay_h_main.addWidget(self.lbl_win_par_0)
+        lay_h_main.addWidget(self.led_win_par_0)
+        lay_h_main.addWidget(self.cmb_win_par_0)
+        lay_h_main.addWidget(self.lbl_win_par_1)
+        lay_h_main.addWidget(self.led_win_par_1)
+        lay_h_main.addWidget(self.cmb_win_par_1)
 
-        layH_main.setContentsMargins(*params['wdg_margins'])  # (left, top, right, bottom)
+        lay_h_main.setContentsMargins(*params['wdg_margins'])  # (left, top, right, bottom)
 
         # ----------------------------------------------------------------------
         # GLOBAL SIGNALS & SLOTs

@@ -10,17 +10,17 @@ Widget for plotting phase frequency response phi(f)
 """
 import logging
 
+from matplotlib.ticker import AutoMinorLocator
 import numpy as np
 import scipy.signal as sig
 
+from pyfda.filterbroker import get_fil_dict, set_fil_dict, conf_settings
 from pyfda.libs.compat import (
     QWidget, QComboBox, QHBoxLayout, QFrame, pyqtSignal)
-from pyfda.filterbroker import get_fil_dict, set_fil_dict, conf_settings
-from pyfda.pyfda_rc import params
 from pyfda.plot_widgets.mpl_widget import MplWidget
-from matplotlib.ticker import AutoMinorLocator
 from pyfda.libs.pyfda_lib import pprint_log
-from pyfda.libs.pyfda_qt_lib import qget_cmb_box, PushButton
+from pyfda.libs.pyfda_qt_lib import qget_cmb_box, PushButton, emit
+from pyfda.pyfda_rc import params
 
 logger = logging.getLogger(__name__)
 
@@ -32,7 +32,6 @@ class Plot_Phi(QWidget):
     sig_rx = pyqtSignal(object)
     # outgoing, distributed via plot_tab_widget
     sig_tx = pyqtSignal(object)
-    from pyfda.libs.pyfda_qt_lib import emit
 
     def __init__(self):
         super().__init__()
@@ -42,7 +41,15 @@ class Plot_Phi(QWidget):
         self.tab_label = "\u03C6(f)"  # phi(f)
         self._construct_UI()
 
-# ------------------------------------------------------------------------------
+    # -------------------------------------------------------------------------
+    def emit(self, dict_sig):
+        """
+        Access imported function `emit()` as instance method, passing `self`
+        with its attributes
+        """
+        emit(self, dict_sig)
+
+    # ------------------------------------------------------------------------------
     def process_sig_rx(self, dict_sig=None):
         """
         Process signals coming from the navigation toolbar and from sig_rx
@@ -72,7 +79,7 @@ class Plot_Phi(QWidget):
             elif 'view_changed' in dict_sig:
                 self.needs_draw = True
 
-# ------------------------------------------------------------------------------
+    # --------------------------------------------------------------------------
     def _construct_UI(self):
         """
         Intitialize the widget, consisting of:
@@ -134,7 +141,7 @@ class Plot_Phi(QWidget):
         self.cmbUnitsPhi.currentIndexChanged.connect(self.unit_changed)
         self.mplwidget.mplToolbar.sig_tx.connect(self.process_sig_rx)
 
-# ------------------------------------------------------------------------------
+    # --------------------------------------------------------------------------
     def init_axes(self):
         """
         Initialize and clear the axes - this is only called once
@@ -144,7 +151,7 @@ class Plot_Phi(QWidget):
         self.ax.xaxis.tick_bottom()  # remove axis ticks on top
         self.ax.yaxis.tick_left()  # remove axis ticks right
 
-# ------------------------------------------------------------------------------
+    # -------------------------------------------------------------------------
     def unit_changed(self):
         """
         Unit for phase display has been changed, emit a 'view_changed' signal
@@ -153,7 +160,7 @@ class Plot_Phi(QWidget):
         self.emit({'view_changed': 'plot_phi'})
         self.draw()
 
-# ------------------------------------------------------------------------------
+    # --------------------------------------------------------------------------
     def calc_resp(self):
         """
         (Re-)Calculate the complex frequency response H(f)
@@ -166,7 +173,7 @@ class Plot_Phi(QWidget):
         # an array full of nans
         self.H_cmplx = np.nan_to_num(self.H_cmplx)
 
-# ------------------------------------------------------------------------------
+    # --------------------------------------------------------------------------
     def draw(self):
         r"""
         Main entry point:
@@ -175,7 +182,7 @@ class Plot_Phi(QWidget):
         self.calc_resp()
         self.update_view()
 
-# ------------------------------------------------------------------------------
+    # --------------------------------------------------------------------------
     def update_view(self):
         """
         Draw the figure with new limits, scale etc without recalculating H(f)
@@ -233,7 +240,7 @@ class Plot_Phi(QWidget):
 
         self.redraw()
 
-# ------------------------------------------------------------------------------
+    # --------------------------------------------------------------------------
     def redraw(self):
         """
         Redraw the canvas when e.g. the canvas size has changed

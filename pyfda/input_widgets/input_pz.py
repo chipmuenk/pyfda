@@ -9,27 +9,25 @@
 """
 Widget for displaying and modifying filter Poles and Zeros
 """
-import sys
 import logging
 from pprint import pformat
+import sys
 
 import numpy as np
 from scipy.signal import freqz, zpk2tf
 
+import pyfda.filterbroker as fb  # importing filterbroker initializes all its globals
+from pyfda.input_widgets.input_pz_ui import Input_PZ_UI
 from pyfda.libs.compat import (
     QtCore, QWidget, QLineEdit, pyqtSignal, QEvent,
     QBrush, QColor, QSize, QStyledItemDelegate, QApplication,
     QTableWidget, QTableWidgetItem, Qt, QVBoxLayout)
-
-from pyfda.libs.pyfda_qt_lib import qget_cmb_box, qstyle_widget
+from pyfda.libs.pyfda_qt_lib import qget_cmb_box, qstyle_widget, emit
 from pyfda.libs.pyfda_io_lib import qtable2csv, file2array, export_fil_data, select_file
 from pyfda.libs.pyfda_sig_lib import zeros_with_val, zpk2array, normalize_zpk_gain
-
-import pyfda.filterbroker as fb  # importing filterbroker initializes all its globals
 import pyfda.libs.pyfda_dirs as dirs
 from pyfda.libs.pyfda_lib import fil_save, safe_eval, frmt2cmplx, pprint_log
 from pyfda.pyfda_rc import params
-from pyfda.input_widgets.input_pz_ui import Input_PZ_UI
 
 logger = logging.getLogger(__name__)
 
@@ -156,7 +154,6 @@ class Input_PZ(QWidget):
     """
     sig_rx = pyqtSignal(object)  # incoming from input_tab_widgets
     sig_tx = pyqtSignal(object)  # emitted when filter has been saved
-    from pyfda.libs.pyfda_qt_lib import emit
 
     def __init__(self, parent=None):
         super().__init__()
@@ -173,7 +170,15 @@ class Input_PZ(QWidget):
         self.ui = Input_PZ_UI(self)  # create the UI control part
         self._construct_UI()  # construct the rest of the UI
 
-# ------------------------------------------------------------------------------
+    # -------------------------------------------------------------------------
+    def emit(self, dict_sig):
+        """
+        Access imported function `emit()` as instance method, passing `self`
+        with its attributes
+        """
+        emit(self, dict_sig)
+
+    # ------------------------------------------------------------------------------
     def process_sig_rx(self, dict_sig=None):
         """
         Process signals coming from sig_rx
@@ -198,14 +203,14 @@ class Input_PZ(QWidget):
             if 'data_changed' in dict_sig:
                 self.data_changed = True
 
-# ------------------------------------------------------------------------------
+    # ------------------------------------------------------------------------------
     def _construct_UI(self):
         """
         Construct the UI from the table widget and the control part (`self.ui`),
         initialize the widget and setup signal-slot connections and event filters
         """
         self.tblPZ = QTableWidget(self, objectName="tblPZ")
-#        self.tblPZ.setEditTriggers(QTableWidget.AllEditTriggers) # make everything editable
+        # self.tblPZ.setEditTriggers(QTableWidget.AllEditTriggers) # make everything editable
         self.tblPZ.setAlternatingRowColors(True)  # alternating row colors)
 
         # highlight when selected:
@@ -217,15 +222,15 @@ class Input_PZ(QWidget):
         self.tblPZ.setColumnCount(2)
         self.tblPZ.setItemDelegate(ItemDelegate(self))
 
-        layVMain = QVBoxLayout()
+        lay_v_main = QVBoxLayout()
         # the following affects only the first widget (intended here)
-        layVMain.setAlignment(Qt.AlignTop)
-        layVMain.addWidget(self.ui)
-        layVMain.addWidget(self.tblPZ)
+        lay_v_main.setAlignment(Qt.AlignTop)
+        lay_v_main.addWidget(self.ui)
+        lay_v_main.addWidget(self.tblPZ)
 
-        layVMain.setContentsMargins(*params['wdg_margins'])
+        lay_v_main.setContentsMargins(*params['wdg_margins'])
 
-        self.setLayout(layVMain)
+        self.setLayout(lay_v_main)
 
         self.load_dict()  # initialize table from filterbroker
         self._refresh_table()  # initialize table with values

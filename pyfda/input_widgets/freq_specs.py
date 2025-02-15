@@ -11,17 +11,16 @@ Subwidget for entering frequency specifications
 """
 import sys
 import re
-from pyfda.libs.compat import (
-    QtCore, Qt, QWidget, QLabel, QLineEdit, QFrame, QFont, QVBoxLayout, QHBoxLayout,
-    QGridLayout, pyqtSignal, QEvent, QSizePolicy)
-from PyQt5 import QtWidgets
+import logging
 
 import pyfda.filterbroker as fb
+from pyfda.libs.compat import (
+    QtCore, Qt, QWidget, QLabel, QLineEdit, QFrame, QFont, QVBoxLayout, QHBoxLayout,
+    QGridLayout, pyqtSignal, QEvent)
 from pyfda.libs.pyfda_lib import to_html, safe_eval, unique_roots, pprint_log, first_item
-from pyfda.libs.pyfda_qt_lib import qstyle_widget
+from pyfda.libs.pyfda_qt_lib import qstyle_widget, emit
 from pyfda.pyfda_rc import params  # FMT string for QLineEdit fields, e.g. '{:.3g}'
 
-import logging
 logger = logging.getLogger(__name__)
 
 MIN_FREQ_STEP = 1e-4
@@ -34,7 +33,6 @@ class FreqSpecs(QWidget):
     # class variables (shared between instances if more than one exists)
     sig_tx = pyqtSignal(object)  # outgoing
     sig_rx = pyqtSignal(object)  # incoming
-    from pyfda.libs.pyfda_qt_lib import emit
 
     def __init__(self, parent=None, title="Frequency Specs", objectName=""):
 
@@ -49,7 +47,14 @@ class FreqSpecs(QWidget):
 
         self._construct_UI()
 
-# -------------------------------------------------------------
+    # -------------------------------------------------------------------------
+    def emit(self, dict_sig, sig_name=""):
+        """
+        Access imported function `emit()` as instance method, passing `self`
+        with its attributes
+        """
+        emit(self, dict_sig, sig_name)
+    # -------------------------------------------------------------
     def process_sig_rx(self, dict_sig=None):
         """
         Process signals coming in via subwidgets and sig_rx
@@ -65,7 +70,7 @@ class FreqSpecs(QWidget):
             # update frequencies and unit and load_dict.
             self.recalc_freqs()
 
-# -------------------------------------------------------------
+    # -------------------------------------------------------------
     def _construct_UI(self):
         """
         Construct the User Interface
@@ -87,7 +92,6 @@ class FreqSpecs(QWidget):
         # Create a gridLayout consisting of QLabel and QLineEdit fields
         # for the frequency specs:
         self.layGSpecs = QGridLayout()  # sublayout for spec fields
-        # self.layGSpecs.setSizeConstraint(QtWidgets.QLayout.SetMinAndMaxSize)
         # set the title as the first (fixed) entry in grid layout. The other
         # fields are added and hidden dynamically in _show_entries and _hide_entries()
         self.layGSpecs.addLayout(layHTitle, 0, 0, 1, 2)

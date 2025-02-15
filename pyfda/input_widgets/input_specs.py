@@ -10,24 +10,24 @@
 Widget stacking all subwidgets for filter specification and design. The actual
 filter design is started here as well.
 """
-import sys
 import copy
+import logging
+import sys
 
+import pyfda.filterbroker as fb
+import pyfda.filter_factory as ff
+from pyfda.input_widgets import (select_filter, amplitude_specs,
+                                 freq_specs, freq_units,
+                                 weight_specs, target_specs)
 from pyfda.libs.compat import (
     Qt, QWidget, QLabel, QFrame, QPushButton, QComboBox, QLineEdit, pyqtSignal,
     QVBoxLayout, QHBoxLayout, QSizePolicy)
 
-import pyfda.filterbroker as fb
-import pyfda.filter_factory as ff
 from pyfda.libs.pyfda_lib import pprint_log, to_html, first_item
-from pyfda.libs.pyfda_qt_lib import qstyle_widget, qcmb_box_populate, qget_cmb_box, qget_selected
+from pyfda.libs.pyfda_qt_lib import qstyle_widget, qcmb_box_populate, qget_cmb_box, emit
 from pyfda.libs.pyfda_io_lib import load_filter, save_filter, save_all_filters
 from pyfda.pyfda_rc import params
 
-from pyfda.input_widgets import (select_filter, amplitude_specs,
-                                 freq_specs, freq_units,
-                                 weight_specs, target_specs)
-import logging
 logger = logging.getLogger(__name__)
 
 classes = {'Input_Specs': 'Specs'}  #: Dict containing class name : display name
@@ -42,7 +42,6 @@ class Input_Specs(QWidget):
 
     sig_rx = pyqtSignal(object)  # incoming from subwidgets -> process_sig_rx
     sig_tx = pyqtSignal(object)  # from process_sig_rx: propagate local signals
-    from pyfda.libs.pyfda_qt_lib import emit
 
     def __init__(self, parent=None, objectName="input_specs_inst"):
         super(Input_Specs, self).__init__(parent)
@@ -90,6 +89,15 @@ class Input_Specs(QWidget):
 
         self._construct_UI()
 
+    # -------------------------------------------------------------------------
+    def emit(self, dict_sig):
+        """
+        Access imported function `emit()` as instance method, passing `self`
+        with its attributes
+        """
+        emit(self, dict_sig)
+
+    # -------------------------------------------------------------------------
     def process_sig_rx_local(self, dict_sig=None):
         """
         Signals coming in from local subwidgets need to be propagated, so set
@@ -97,6 +105,7 @@ class Input_Specs(QWidget):
         """
         self.process_sig_rx(dict_sig, propagate=True)
 
+    # -------------------------------------------------------------------------
     def process_sig_rx(self, dict_sig, propagate=False):
         """
         Process signals coming in via subwidgets and sig_rx
@@ -139,6 +148,7 @@ class Input_Specs(QWidget):
             dict_sig.update({'class': self.__class__.__name__, 'id': id(self)})
             self.emit(dict_sig)
 
+    # -------------------------------------------------------------------------
     def _construct_UI(self):
         """
         Construct User Interface from all input subwidgets
@@ -277,7 +287,7 @@ class Input_Specs(QWidget):
         self.update_UI()  # first time initialization
         self.start_design_filt()  # design first filter using default values
 
-# ------------------------------------------------------------------------------
+    # --------------------------------------------------------------------------
     def _save_info2dict(self) -> None:
         """
         Update_filter dict and tooltip every time the info field is changed
@@ -288,7 +298,7 @@ class Input_Specs(QWidget):
         self.led_info.home(True)  # move cursor to beginning
         self.led_info.deselect()
 
-# ------------------------------------------------------------------------------
+    # --------------------------------------------------------------------------
     def update_UI(self, dict_sig={}) -> None:
         """
         update_UI is called every time the filter design method or order
@@ -371,7 +381,7 @@ class Input_Specs(QWidget):
         # It is disabled for "Manual_IIR" and "Manual_FIR" filter classes
         self.color_design_button('changed')
 
-# ------------------------------------------------------------------------------
+    # --------------------------------------------------------------------------
     def _load_filter(self):
         """
         Load filter dict `fb.fil[0]` either from file or from memory and update the
@@ -410,9 +420,11 @@ class Input_Specs(QWidget):
         self.cmb_filter_load.setCurrentIndex(0)
         self.emit({'data_changed': 'filter_loaded'})
 
-# ------------------------------------------------------------------------------
+    # --------------------------------------------------------------------------
     def _save_filter(self):
-        """ Save current filter fb.fil[0] either to file or to one of the memories"""
+        """
+        Save current filter fb.fil[0] either to file or to one of the memories
+        """
         # sel contains the data field of the combo box which is either "file" / "file_all"
         # or the number of the memory location (e.g. "2" for "Mem 2"). This is larger by 1
         # than the combobox index
@@ -437,7 +449,7 @@ class Input_Specs(QWidget):
                 int(sel) + 1, f"Load <- Mem {sel}: {self.led_info.text()}", Qt.ToolTipRole)
         self.cmb_filter_save.setCurrentIndex(0)
 
-# ------------------------------------------------------------------------------
+    # --------------------------------------------------------------------------
     def load_dict(self):
         """
         Reload info text from global dict `fb.fil[0]` and reset 'DESIGN' button
@@ -450,7 +462,7 @@ class Input_Specs(QWidget):
                 i + 1, f"Load <- Mem {i}: {str(fb.fil[i]['info'])}", Qt.ToolTipRole)
         self.color_design_button("ok")
 
-# ------------------------------------------------------------------------------
+    # --------------------------------------------------------------------------
     def start_design_filt(self):
         """
         Start the actual filter design process:
@@ -516,7 +528,7 @@ class Input_Specs(QWidget):
         fb.design_filt_state = state
         qstyle_widget(self.butDesignFilt, state)
 
-# ------------------------------------------------------------------------------
+    # --------------------------------------------------------------------------
     def quit_program(self):
         """
         When <QUIT> button is pressed, send 'close_event'

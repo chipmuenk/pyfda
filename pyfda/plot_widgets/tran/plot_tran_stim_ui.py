@@ -18,7 +18,8 @@ from pyfda.libs.compat import (
 from pyfda.libs.pyfda_lib import to_html, safe_eval, pprint_log
 import pyfda.filterbroker as fb
 from pyfda.libs.pyfda_qt_lib import (
-    qcmb_box_populate, qget_cmb_box, qtext_width, qstyle_widget, QVLine, PushButton)
+    qcmb_box_populate, qget_cmb_box, qtext_width, qstyle_widget, QVLine,
+    PushButton, emit)
 # FMT string for QLineEdit fields, e.g. '{:.3g}'
 from pyfda.pyfda_rc import params
 
@@ -36,8 +37,6 @@ class Plot_Tran_Stim_UI(QWidget):
     sig_tx = pyqtSignal(object)
     # outgoing: to fft related widgets (FFT window widget, qfft_win_select)
     sig_tx_fft = pyqtSignal(object)
-
-    from pyfda.libs.pyfda_qt_lib import emit
 
 # ------------------------------------------------------------------------------
     def process_sig_rx(self, dict_sig=None):
@@ -239,6 +238,15 @@ class Plot_Tran_Stim_UI(QWidget):
         self._enable_stim_widgets()
         self._update_noi()
 
+    # -----------------------
+    def emit(self, dict_sig):
+        """
+        Access imported function `emit()` as instance method, passing `self`
+        with its attributes
+        """
+        emit(self, dict_sig)
+
+    # -----------------------
     def _construct_UI(self):
         # =====================================================================
         # Controls for stimuli
@@ -678,8 +686,8 @@ class Plot_Tran_Stim_UI(QWidget):
                     source.setText(str(params['FMT'].format(var * scale)))
             except KeyError:
                 logger.warning(f"Unknown objectName {source.objectName}!")
-        #------------------------------------------------------------
 
+        #------------------------------------------------------------
         def _store_entry(source):
             """ Store transformed frequency / time values """
             if self.spec_edited:

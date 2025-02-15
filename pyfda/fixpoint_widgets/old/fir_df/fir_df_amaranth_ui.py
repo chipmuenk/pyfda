@@ -14,7 +14,7 @@ import sys
 import numpy as np
 import pyfda.filterbroker as fb
 from pyfda.libs.pyfda_lib import set_dict_defaults, pprint_log
-from pyfda.libs.pyfda_qt_lib import qget_cmb_box
+from pyfda.libs.pyfda_qt_lib import qget_cmb_box, emit
 
 from pyfda.libs.compat import QWidget, QVBoxLayout, pyqtSignal
 
@@ -43,7 +43,6 @@ class FIR_DF_amaranth_UI(QWidget):
     """
     sig_rx = pyqtSignal(object)  # incoming
     sig_tx = pyqtSignal(object)  # outcgoing
-    from pyfda.libs.pyfda_qt_lib import emit
 
     def __init__(self):
         super().__init__()
@@ -55,8 +54,16 @@ class FIR_DF_amaranth_UI(QWidget):
         self._construct_UI()
         # Construct an instance of the fixpoint filter using the settings from
         # the 'fxq' quantizer dict
-# ------------------------------------------------------------------------------
 
+    # -------------------------------------------------------------------------
+    def emit(self, dict_sig, sig_name=""):
+        """
+        Access imported function `emit()` as instance method, passing `self`
+        with its attributes
+        """
+        emit(self, dict_sig, sig_name)
+
+    # --------------------------------------------------------------------------
     def _construct_UI(self):
         """
         Intitialize the UI with widgets for coefficient format and input and

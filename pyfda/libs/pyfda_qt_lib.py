@@ -9,6 +9,8 @@
 """
 Library with various helper functions for Qt widgets
 """
+import logging
+
 from .pyfda_lib import qstr, pprint_log
 
 from .compat import (
@@ -16,7 +18,6 @@ from .compat import (
     QFont, QSize, QFontMetrics, QSizePolicy, QIcon, QEvent, QHBoxLayout)
 from .pyfda_dirs import OS, OS_VER
 
-import logging
 logger = logging.getLogger(__name__)
 
 DICT_SIG_KEYS = {'id', 'class', 'ttl', 'sender_name', 'object_name',
@@ -32,7 +33,7 @@ DICT_SIG_KEYS = {'id', 'class', 'ttl', 'sender_name', 'object_name',
                  'mpl_toolbar'     # events triggered by the toolbar
                 }
 # ------------------------------------------------------------------------------
-def emit(self, dict_sig: dict = {}, sig_name: str = 'sig_tx') -> None:
+def emit(self, dict_sig: dict = {}, sig_name: str = '') -> None:
     """
     Emit a signal `self.<sig_name>` (defined as a class attribute) with a
     dict `dict_sig` using Qt's `emit()`.
@@ -44,11 +45,15 @@ def emit(self, dict_sig: dict = {}, sig_name: str = 'sig_tx') -> None:
     - If the sender has passed an objectName, add it with the key "sender_name"
       to the dict.
     """
-
+    if sig_name == '':
+        sig_name = 'sig_tx'
+    logger.warning(sig_name)
     for k in dict_sig:
+        logger.warning(k)
         if k not in DICT_SIG_KEYS:
-            logger.warning(f"Unknown entry '{k}':'{dict_sig[k]}' in 'dict_sig'!")
-            logger.warning(pprint_log(dict_sig))
+            logger.warning(
+                "Unknown entry '%s':'%s' in 'dict_sig'!", k, dict_sig[k])
+            logger.warning("%s", pprint_log(dict_sig))
     # if self.sender() and self.sender().objectName():
     #     logger.info(f"this_sender_name: {self.sender().objectName()}")
     # logger.info(f"objectName = {self.objectName()}")

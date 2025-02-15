@@ -15,8 +15,7 @@ import logging
 from pyfda.libs.compat import (
     pyqtSignal, Qt, QWidget, QLabel, QLineEdit, QComboBox, QPushButton, QCheckBox,
     QRadioButton, QFrame, QSpinBox, QFont, QIcon, QVBoxLayout, QHBoxLayout)
-
-from pyfda.libs.pyfda_qt_lib import qstyle_widget, qcmb_box_populate, PushButton
+from pyfda.libs.pyfda_qt_lib import qstyle_widget, qcmb_box_populate, PushButton, emit
 from pyfda.libs.csv_option_box import CSV_option_box
 from pyfda.libs.pyfda_lib import to_html, first_item
 import pyfda.libs.pyfda_dirs as dirs
@@ -31,7 +30,6 @@ class Input_PZ_UI(QWidget):
     """
     sig_rx = pyqtSignal(object)  # incoming
     sig_tx = pyqtSignal(object)  # outgoing
-    from pyfda.libs.pyfda_qt_lib import emit
 
     def __init__(self, parent=None):
         """
@@ -65,7 +63,15 @@ class Input_PZ_UI(QWidget):
 
         self._construct_UI()
 
-# ------------------------------------------------------------------------------
+    # -------------------------------------------------------------------------
+    def emit(self, dict_sig):
+        """
+        Access imported function `emit()` as instance method, passing `self`
+        with its attributes
+        """
+        emit(self, dict_sig)
+
+    # ------------------------------------------------------------------------------
     def process_sig_rx(self, dict_sig=None):
         """
         Process signals coming from the CSV pop-up window
@@ -85,8 +91,7 @@ class Input_PZ_UI(QWidget):
             # signal change of CSV options to other widgets with current id
             self.emit({'ui_global_changed': 'csv'})
 
-
-# ------------------------------------------------------------------------------
+    # ------------------------------------------------------------------------------
     def _construct_UI(self):
         """
         Intitialize the widget, consisting of:
@@ -99,7 +104,7 @@ class Input_PZ_UI(QWidget):
         self.bifont = QFont()
         self.bifont.setBold(True)
         self.bifont.setItalic(True)
-#        q_icon_size = QSize(20, 20) # optional, size is derived from but_add_cells
+        # q_icon_size = QSize(20, 20) # optional, size is derived from but_add_cells
 
         # ---------------------------------------------
         # UI Elements for controlling the display
