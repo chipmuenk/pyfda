@@ -16,14 +16,12 @@ is selected, calling the __init__ method.
 API version info:
     1.0: initial working release
 """
-from pyfda.libs.compat import QWidget, QLabel, QLineEdit, pyqtSignal, QVBoxLayout, QHBoxLayout
-
-import scipy.signal as sig
 import numpy as np
 
 import pyfda.filterbroker as fb
+from pyfda.libs.compat import QWidget, pyqtSignal, QVBoxLayout
 from pyfda.libs.pyfda_qt_lib import popup_warning, emit
-from pyfda.libs.pyfda_lib import fil_save, safe_eval
+from pyfda.libs.pyfda_lib import fil_save
 
 __version__ = "1.0"
 

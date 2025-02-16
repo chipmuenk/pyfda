@@ -8,5 +8,4 @@
 .. comment automodule:: filter_widgets.butter
 
 .. comment automodule:: filter_widgets.cheby1
-
 """

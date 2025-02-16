@@ -9,31 +9,29 @@
 """
 Fixpoint class for calculating direct-form DF1 FIR filter using pyfixp routines
 """
+# from functools import reduce
+import logging
+# from operator import add
+
 import numpy as np
 from numpy.lib.function_base import iterable
+
+# from amaranth import *
+# from amaranth.back import verilog
+# from amaranth import Signal, signed, Elaboratable, Module
+from amaranth.sim import Simulator, Tick  # , Delay, Settle
+
 import pyfda.filterbroker as fb
 # from pyfda.libs.pyfda_lib import pprint_log
 import pyfda.libs.pyfda_fix_lib as fx
-from pyfda.libs.pyfda_fix_lib import quant_coeffs
-
 from pyfda.libs.pyfda_fix_lib_amaranth import requant
-
-from functools import reduce
-from operator import add
-
-# from amaranth import *
-from amaranth.back import verilog
-from amaranth import Signal, signed, Elaboratable, Module
-from amaranth.sim import Simulator, Tick  # , Delay, Settle
-
 import pyfda.fixpoint_widgets.fir_df.fir_df_amaranth_mod as mod
 
-import logging
 logger = logging.getLogger(__name__)
 
 
 # =============================================================================
-class FIR_DF_amaranth(object):
+class FIR_DF_amaranth():
     """
     A synthesizable nMigen FIR filter in Direct Form.
 
@@ -93,7 +91,7 @@ class FIR_DF_amaranth(object):
         if not fb.fil[0]['fx_sim']:
             return
 
-        b_q = quant_coeffs(fb.fil[0]['ba'][0], self.Q_b, out_frmt="qint")
+        b_q = fx.quant_coeffs(fb.fil[0]['ba'][0], self.Q_b, out_frmt="qint")
         self.L = len(b_q)
 
         self.reset()
@@ -236,7 +234,7 @@ if __name__ == '__main__':
          }
 
     Q_b = fx.Fixed(p['QCB'])  # quantizer for transversal coeffs
-    b_q = quant_coeffs([1, 2, 3, 2, 1], Q_b, out_frmt="qint")
+    b_q = fx.quant_coeffs([1, 2, 3, 2, 1], Q_b, out_frmt="qint")
     Q_I = fx.Fixed(p['QI'])
     Q_O = fx.Fixed(p['QO'])
 

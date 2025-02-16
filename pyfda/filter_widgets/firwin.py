@@ -33,9 +33,6 @@ API version info:
 
    :2.2: Rename `filter_classes` -> `classes`, remove Py2 compatibility
 """
-from pyfda.libs.compat import (QWidget, pyqtSignal, QComboBox, QIcon, QSize,
-                               QHBoxLayout, QVBoxLayout)
-import copy
 import logging
 
 import numpy as np
@@ -45,11 +42,14 @@ from scipy.special import sinc
 
 import pyfda.filterbroker as fb  # importing filterbroker initializes all its globals
 import pyfda.libs.pyfda_dirs as dirs
+from pyfda.libs.compat import (QWidget, pyqtSignal, QComboBox, QIcon, QSize,
+                               QHBoxLayout, QVBoxLayout)
 from pyfda.libs.pyfda_lib import fil_save, round_odd, pprint_log
 from pyfda.libs.pyfda_qt_lib import popup_warning, PushButton, emit
 from pyfda.libs.fft_windows_cmb_box import QFFTWinCmbBox
 from pyfda.libs.pyfda_fft_windows_lib import all_wins_dict_ref
 from pyfda.plot_widgets.plot_fft_win import Plot_FFT_win
+
 from .common import Common, remezord
 
 logger = logging.getLogger(__name__)
