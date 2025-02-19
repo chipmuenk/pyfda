@@ -9,16 +9,17 @@
 """
 Mainwindow for the pyFDA app
 """
-import sys, os
+import os
 import logging
 import logging.config
-logger = logging.getLogger(__name__)
+import sys
 
+import pyfda.filterbroker as fb
+from pyfda.libs.compat import (Qt, QtCore, QMainWindow, QApplication, QSplitter,
+                     QMessageBox, QPlainTextEdit, QMenu, pyqtSignal)
 import pyfda.libs.pyfda_dirs as dirs # initial import constructs file paths
 from pyfda.libs.pyfda_lib import to_html
-from pyfda import pyfda_rc as rc
-import pyfda.filterbroker as fb
-from pyfda import qrc_resources # contains all icons
+from pyfda import pyfda_rc, qrc_resources # contains all icons
 # edit pyfda.qrc, then
 # create with   pyrcc4 pyfda.qrc -o qrc_resources.py -py3
 #   or          pyrcc5 pyfda.qrc -o qrc_resources.py
@@ -27,8 +28,7 @@ from pyfda import qrc_resources # contains all icons
 from pyfda.input_widgets import input_tab_widgets
 from pyfda.plot_widgets import plot_tab_widgets
 
-from pyfda.libs.compat import (Qt, QtCore, QMainWindow, QApplication, QSplitter,
-                     QMessageBox, QPlainTextEdit, QMenu, pyqtSignal)
+logger = logging.getLogger(__name__)
 
 #========================= Setup the loggers ==================================
 class DynFileHandler(logging.FileHandler):
@@ -115,7 +115,7 @@ class pyFDA(QMainWindow):
     # sig_tx = pyqtSignal(object) # outgoing
 
     def __init__(self, parent=None):
-        super(QMainWindow,self).__init__()
+        super().__init__()
         self.setAttribute(QtCore.Qt.WA_DeleteOnClose)
 
         # create clipboard instance that can be accessed from other modules
@@ -161,7 +161,7 @@ class pyFDA(QMainWindow):
         spltHMain.addWidget(inputTabWidgets)
         spltHMain.addWidget(spltVPltLogger)
         spltHMain.setStretchFactor(1, 4)  # relative initial sizes of subwidgets
-        spltHMain.setContentsMargins(*rc.params['wdg_margins'])
+        spltHMain.setContentsMargins(*pyfda_rc.params['wdg_margins'])
         spltHMain.setFocus()
         # make spltHMain occupy the main area of QMainWindow and make QMainWindow its parent !!!
         self.setCentralWidget(spltHMain)
@@ -266,5 +266,3 @@ class pyFDA(QMainWindow):
                 dirs.tran_freq_win_handle.show()
             event.ignore()
 
-
-#==============================================================================
