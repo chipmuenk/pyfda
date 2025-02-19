@@ -13,13 +13,9 @@ import copy
 import logging
 import sys
 
-from pyfda.libs.compat import (
-    Qt, QtCore, QWidget, QLineEdit, QApplication, QIcon, QSize, QTableWidget,
-    QTableWidgetItem, QVBoxLayout, pyqtSignal, QStyledItemDelegate, QColor, QBrush)
 import numpy as np
 
 import pyfda.filterbroker as fb  # importing filterbroker initializes all its globals
-from .input_coeffs_ui import Input_Coeffs_UI
 from pyfda.libs.csv_option_box import CSV_option_box
 from pyfda.libs.compat import (
     Qt, QtCore, QWidget, QLineEdit, QApplication, QIcon, QSize, QTableWidget,
@@ -31,6 +27,8 @@ from pyfda.libs.pyfda_qt_lib import (
 from pyfda.libs.pyfda_io_lib import qtable2csv, export_fil_data, select_file, file2array
 from pyfda.libs.pyfda_sig_lib import zeros_with_val
 from pyfda.pyfda_rc import params
+
+from .input_coeffs_ui import Input_Coeffs_UI
 
 logger = logging.getLogger(__name__)
 
@@ -71,7 +69,7 @@ class ItemDelegate(QStyledItemDelegate):
         """
         Pass instance `parent` of parent class (Input_Coeffs)
         """
-        super(ItemDelegate, self).__init__(parent)
+        super().__init__()
         self.parent = parent  # instance of the parent (not the base) class
         # handles to quantization objects (fx.Fixed() instance) of coefficient widgets
         self.Q = [self.parent.ui.wdg_wq_coeffs_b.Q,

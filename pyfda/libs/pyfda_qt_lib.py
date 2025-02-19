@@ -47,9 +47,7 @@ def emit(self, dict_sig: dict = {}, sig_name: str = '') -> None:
     """
     if sig_name == '':
         sig_name = 'sig_tx'
-    logger.warning(sig_name)
     for k in dict_sig:
-        logger.warning(k)
         if k not in DICT_SIG_KEYS:
             logger.warning(
                 "Unknown entry '%s':'%s' in 'dict_sig'!", k, dict_sig[k])

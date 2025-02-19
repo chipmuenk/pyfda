@@ -6,14 +6,12 @@
 # Licensed under the terms of the MIT License
 # (see file LICENSE in root directory for details)
 
-"""
-Common settings and some helper functions for filter design
-"""
-
 import numpy as np
 
-
-class Common(object):
+class Common():
+    """
+    Common settings and some helper functions for filter design
+    """
 
     def __init__(self):
         self.rt_base_iir = {
@@ -66,17 +64,14 @@ class Common(object):
                 }
             }
 
-# ========================================================
-"""Supplies remezord method according to Scipy Ticket #475
-was: http://projects.scipy.org/scipy/ticket/475
-now: https://github.com/scipy/scipy/issues/1002
-https://github.com/thorstenkranz/eegpy/blob/master/eegpy/filter/remezord.py
-"""
-
-
+# -------------------------------------------------------------------
 def remezord(freqs, amps, rips, fs=1, alg='ichige'):
     """
-    Filter parameter selection for the Remez exchange algorithm.
+    Filter parameter selection for the Remez exchange algorithm. 
+    Supplies remezord method according to Scipy Ticket #475
+        was: http://projects.scipy.org/scipy/ticket/475
+       now: https://github.com/scipy/scipy/issues/1002
+    https://github.com/thorstenkranz/eegpy/blob/master/eegpy/filter/remezord.py
 
     Calculate the parameters required by the Remez exchange algorithm to
     construct a finite impulse response (FIR) filter that approximately
@@ -176,7 +171,7 @@ def remezord(freqs, amps, rips, fs=1, alg='ichige'):
 
     return [L, bands, amps, weight]
 
-
+# -------------------------------------------------------------------
 def remlplen_herrmann(fp, fs, dp, ds):
     """
     Determine the length of the low pass filter with passband frequency
@@ -200,9 +195,8 @@ def remlplen_herrmann(fp, fs, dp, ds):
     N1 = Dinf / dF - f * dF + 1
 
     return int(N1)
-    # ------------------------------------------------------------------------------
-
-
+    
+# -------------------------------------------------------------------
 def remlplen_kaiser(fp, fs, dp, ds):
     """
     Determine the length of the low pass filter with passband frequency
@@ -220,10 +214,9 @@ def remlplen_kaiser(fp, fs, dp, ds):
     N2 = (-20*np.log10(np.sqrt(dp*ds))-13.0)/(14.6*dF)+1.0
 
     return int(N2)
+
 # ------------------------------------------------------------------------------
-
-
-def remlplen_ichige(fp, fs, dp, ds):
+def remlplen_ichige(fp: float, fs: float, dp: float, ds: float) -> int:
     """
     Determine the length of the low pass filter with passband frequency
     fp, stopband frequency fs, passband ripple dp, and stopband ripple ds.
@@ -236,21 +229,32 @@ def remlplen_ichige(fp, fs, dp, ds):
 
     This seems tol give the most accurate results of the three approximations.
     """
-#        dp_lin = (10**(dp/20.0)-1) / (10**(dp/20.0)+1)*2
+    #   dp_lin = (10**(dp/20.0)-1) / (10**(dp/20.0)+1)*2
+    def func_v(dF: float, dp: float) -> float:
+        """ Helper function """
+        return 2.325 * ((-np.log10(dp))**-0.445) * dF ** (-1.39)
+    
+    def func_g(dF: float, fp: float) -> float:
+        """ Helper function """
+        return (2.0 / np.pi) * np.arctan(func_v(dF, dp) * (1.0 / fp - 1.0 / (0.5 - dF)))
+
+    def func_h(dF: float, fp: float, c: float) -> float:
+        """ Helper function """
+        return (2.0/np.pi) * np.arctan((c/dF)*(1.0/fp-1.0/(0.5-dF)))
+
     dF = fs-fp
-    v = lambda dF, dp: 2.325*((-np.log10(dp))**-0.445)*dF**(-1.39)
-    g = lambda fp, dF, d: (2.0/np.pi)*np.arctan(v(dF, dp)*(1.0/fp-1.0/(0.5-dF)))
-    h = lambda fp, dF, c: (2.0/np.pi)*np.arctan((c/dF)*(1.0/fp-1.0/(0.5-dF)))
-    Nc = np.ceil(1.0+(1.101/dF)*(-np.log10(2.0*dp))**1.1)
+    # v = lambda dF, dp: 2.325*((-np.log10(dp))**-0.445)*dF**(-1.39)
+    # g = lambda fp, dF, d: (2.0/np.pi)*np.arctan(v(dF, dp)*(1.0/fp-1.0/(0.5-dF)))
+    # h = lambda fp, dF, c: (2.0/np.pi)*np.arctan((c/dF)*(1.0/fp-1.0/(0.5-dF)))
+    Nc = np.ceil(1.0+(1.101/dF) * (-np.log10(2.0*dp)) ** 1.1)
     Nm = (0.52/dF)*np.log10(dp/ds)*(-np.log10(dp))**0.17
-    N3 = np.ceil(Nc*(g(fp, dF, dp)+g(0.5-dF-fp, dF, dp)+1.0)/3.0)
-    DN = np.ceil(Nm*(h(fp, dF, 1.1)-(h(0.5-dF-fp, dF, 0.29)-1.0)/2.0))
-    N4 = N3+DN
+    N3 = np.ceil(Nc*(func_g(fp, dF) + func_g(0.5-dF-fp, dF) + 1.0) / 3.0)
+    DN = np.ceil(Nm*(func_h(fp, dF, 1.1) - (func_h(0.5-dF-fp, dF, 0.29) - 1.0) / 2.0))
+    N4 = N3 + DN
 
     return int(N4)
 
 
 # ------------------------------------------------------------------------------
-
 if __name__ == '__main__':
     pass

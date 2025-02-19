@@ -33,10 +33,11 @@ API version info:
    :2.2: Rename `filter_classes` -> `classes`, remove Py2 compatibility
 """
 from scipy.signal import cheby2, cheb2ord
-from .common import Common
 
 from pyfda.libs.pyfda_lib import fil_save, lin2unit
 from pyfda.libs.pyfda_qt_lib import popup_warning
+
+from .common import Common
 
 __version__ = "2.2"
 
@@ -139,8 +140,7 @@ class Cheby2():
         """
         if self.N > 25:
             return popup_warning(None, self.N, "Chebyshev 2")
-        else:
-            return True
+        return True
 
     #--------------------------------------------------------------------------
     def _save(self, fil_dict, arg):
