@@ -18,6 +18,7 @@ import pyfda.filterbroker as fb
 from pyfda.libs.compat import (
     QWidget, QLabel, QFont, QFrame, pyqtSignal, Qt, QHBoxLayout, QVBoxLayout)
 from pyfda.libs.pyfda_lib import pprint_log, first_item
+from pyfda.libs.pyfda_qt_lib import emit
 from pyfda.input_widgets import amplitude_specs, freq_specs
 from pyfda.pyfda_rc import params
 
