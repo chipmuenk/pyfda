@@ -9,18 +9,18 @@
 """
 Create the UI for the Tran_IO class
 """
-from PyQt5.QtWidgets import QSizePolicy
-from pyfda.libs.compat import (
-    QWidget, QComboBox, QLineEdit, QLabel, QPushButton, QLineEdit, QFrame,
-    QHBoxLayout, QVBoxLayout, QGridLayout, QIcon)
+import logging
 
+# from PyQt5.QtWidgets import QSizePolicy
+
+from pyfda.libs.compat import (
+    QWidget, QComboBox, QLabel, QPushButton, QLineEdit, QFrame,
+    QHBoxLayout, QVBoxLayout, QGridLayout, QIcon, QSizePolicy)
 from pyfda.libs.pyfda_lib import to_html
 from pyfda.libs.pyfda_qt_lib import (
     QVLine, PushButton, PushButtonRT, qget_cmb_box, qcmb_box_populate,
     qcmb_box_add_items, qcmb_box_del_item, qtext_width)
-from pyfda.pyfda_rc import params  # FMT string for QLineEdit fields, e.g. '{:.3g}'
 
-import logging
 logger = logging.getLogger(__name__)
 
 
@@ -101,7 +101,7 @@ class Tran_IO_UI(QWidget):
 
         self.led_nr_loops_default = 1
 
-        super(Tran_IO_UI, self).__init__(parent)
+        super().__init__()
         self._construct_UI()
 
     # -------------------------------------------------------------------------
