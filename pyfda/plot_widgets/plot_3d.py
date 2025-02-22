@@ -9,26 +9,25 @@
 r"""
 Widget for plotting \|H(z)\| in 3D
 """
-from pyfda.libs.compat import (
-    QWidget, QComboBox, QLabel, QLineEdit, QDial, QGridLayout, QFrame, pyqtSignal)
+import logging
 
+from matplotlib.cm  import ScalarMappable  # Colormap
+from matplotlib import colormaps
+from matplotlib.colors import LightSource
+# from mpl_toolkits.mplot3d import Axes3D  # needed for matplotlib < 3.2
+# Axes3D = Axes3D  # prevent auto-deletion by IDE (Axes3D is never referenced)
 import numpy as np
 from numpy import pi, ones, sin, cos, log10
 import scipy.signal as sig
 
 import pyfda.filterbroker as fb
-from pyfda.pyfda_rc import params
+from pyfda.libs.compat import (
+    QWidget, QComboBox, QLabel, QLineEdit, QDial, QGridLayout, QFrame, pyqtSignal)
 from pyfda.libs.pyfda_lib import H_mag, mod_version, safe_eval, to_html
 from pyfda.libs.pyfda_qt_lib import qget_cmb_box, PushButton
 from pyfda.plot_widgets.mpl_widget import MplWidget
+from pyfda.pyfda_rc import params
 
-from matplotlib.cm  import ScalarMappable  # Colormap
-from matplotlib import colormaps
-from matplotlib.colors import LightSource
-from mpl_toolkits.mplot3d import Axes3D  # needed for matplotlib < 3.2
-Axes3D = Axes3D  # prevent auto-deletion by IDE (Axes3D is never referenced)
-
-import logging
 logger = logging.getLogger(__name__)
 
 classes = {'Plot_3D': '3D'}  #: Dict containing class name : display name
@@ -611,7 +610,7 @@ class Plot_3D(QWidget):
         if self.but_colbar.checked and (self.but_contour_2d.checked or
                                             str(self.cmbMode3D.currentText())
                                             in {'Contour', 'Surf'}):
-            self.colb = self.mplwidget.fig.colorbar(m_cb, ax=self.ax3d, shrink=0.8, 
+            self.colb = self.mplwidget.fig.colorbar(m_cb, ax=self.ax3d, shrink=0.8,
                                                     aspect=20, pad=0.02, fraction=0.08)
 
         # ----------------------------------------------------------------------

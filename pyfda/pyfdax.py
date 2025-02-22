@@ -9,20 +9,11 @@
 """
 Mainwindow for the pyFDA app
 """
-import sys
-
 import logging
 import logging.config
-logger = logging.getLogger(__name__)
+import sys
 
-from pyfda.libs.tree_builder import Tree_Builder
-# initialize the FilterTreeBuilder class and read config file
-tree_builder = Tree_Builder()
-tree_builder.parse_conf_file()
-
-import pyfda.pyfda_rc as rc
-import pyfda.libs.pyfda_dirs as dirs # initial import constructs file paths
-
+import numpy as np
 import matplotlib
 # specify matplotlib backend for systems that have both PyQt4 and PyQt5 installed
 # to avoid
@@ -32,11 +23,29 @@ matplotlib.use("Qt5Agg")
 mpl_logger = logging.getLogger('matplotlib')
 mpl_logger.setLevel(logging.WARNING)
 
-from pyfda.libs.compat import Qt, QtCore, QApplication, QIcon
-
+from pyfda.libs.compat import Qt, QApplication, QIcon
 # from pyfda.libs.pyfda_lib import ANSIcolors as ACol
-import numpy as np
+import pyfda.libs.pyfda_dirs as dirs # initial import constructs file paths
+from pyfda.libs.tree_builder import Tree_Builder
+# initialize the FilterTreeBuilder class and read config file
+tree_builder = Tree_Builder()
+tree_builder.parse_conf_file()
+
+import pyfda.pyfda_rc as rc
+
 from pyfda.pyfda_class import pyFDA
+
+if dirs.OS.lower() == "windows":
+    # Windows taskbar is not for "Application Windows" but for "Application
+    # User Models", grouping several instances of an application under one
+    # common taskbar icon. Python apps are sometimes grouped under the icon
+    # for Pythonw.exe, sometimes the icon is just blank. The following
+    # instructions tell Windows that pythonw is merely hosting other applications.
+    import ctypes
+    myappid = 'chipmuenk.pyfda.v0.9'
+    ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID(myappid)
+
+logger = logging.getLogger(__name__)
 
 def main():
     """
@@ -159,15 +168,6 @@ def main():
 
     # logger.info(f"size = {font.pointSize()}, {font.pointSizeF()}, {font.pixelSize()},  "
     #             f"height = {fm.height()}")
-    if dirs.OS.lower() == "windows":
-        # Windows taskbar is not for "Application Windows" but for "Application
-        # User Models", grouping several instances of an application under one
-        # common taskbar icon. Python apps are sometimes grouped under the icon
-        # for Pythonw.exe, sometimes the icon is just blank. The following
-        # instructions tell Windows that pythonw is merely hosting other applications.
-        import ctypes
-        myappid = 'chipmuenk.pyfda.v0.9'
-        ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID(myappid)
 
     # set taskbar icon
     app.setWindowIcon(QIcon(':/pyfda_icon.svg'))
