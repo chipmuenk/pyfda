@@ -10,55 +10,35 @@
 Library with various general functions and variables needed by the pyfda routines
 """
 import logging
-logger = logging.getLogger(__name__)
-
-import os, re, io
-import sys, time
+import os
+import re
+import sys
 import struct
-from contextlib import redirect_stdout
+import time
+
+# from contextlib import redirect_stdout
+from docutils import __version__ as V_DOC
+# from markdown import __version__ as V_MD
+from matplotlib import __version__ as V_MPL
 import numpy as np
 from numpy import ndarray, pi, log10, sin, cos
 import numexpr
 import markdown
-
+from mplcursors import __version__ as V_CUR
 import scipy.signal as sig
+from scipy import __version__ as V_SCI
 
 import pyfda.filterbroker as fb
 import pyfda.libs.pyfda_dirs as dirs
-import pyfda.libs.pyfda_sig_lib as pyfda_sig_lib
-
-# ###### VERSIONS and related stuff ############################################
-# ================ Required Modules ============================
-# ==
-# == When one of the following imports fails, terminate the program
-from scipy import __version__ as V_SCI
-from matplotlib import __version__ as V_MPL
+from pyfda.libs.pyfda_sig_lib import zeros_with_val, zpk2array
 from .compat import QT_VERSION_STR as V_QT
 from .compat import PYQT_VERSION_STR as V_PYQT
-from markdown import __version__ as V_MD
 
-V_NP = np.__version__
-V_NUM = numexpr.__version__
 V_NUM_MKL = numexpr.get_vml_version()
 if V_NUM_MKL:
     MKL = f" (mkl: {V_NUM_MKL:s})"
 else:
     MKL = " (no mkl)"
-
-# # redirect stdio output of show_config to string
-# f = io.StringIO()
-# with redirect_stdout(f):
-#     np.show_config()
-# INFO_NP = f.getvalue()
-
-
-# if 'mkl_info' in INFO_NP:
-#     MKL = " (mkl)"
-# else:
-#     MKL = ""
-
-# # logger.warning(INFO_NP)
-
 
 __all__ = ['cmp_version', 'mod_version',
            'set_dict_defaults', 'clean_ascii', 'qstr', 'safe_eval',
@@ -67,6 +47,8 @@ __all__ = ['cmp_version', 'mod_version',
            'expand_lim', 'format_ticks', 'fil_save', 'fil_convert', 'sos2zpk',
            'round_odd', 'round_even', 'ceil_odd', 'floor_odd', 'ceil_even', 'floor_even',
            'to_html']
+
+logger = logging.getLogger(__name__)
 
 PY32_64 = struct.calcsize("P") * 8  # yields 32 or 64, depending on 32 or 64 bit Python
 
@@ -77,46 +59,32 @@ MODULES = {'python':       {'V_PY': V_PY},
            'matplotlib':   {'V_MPL': V_MPL},
            'Qt5':          {'V_QT': V_QT},
            'pyqt':         {'V_PYQT': V_PYQT},
-           'numpy':        {'V_NP': V_NP},
-           'numexpr':      {'V_NUM': V_NUM},
+           'numpy':        {'V_NP': np.__version__},
+           'numexpr':      {'V_NUM': numexpr.__version__},
            'scipy':        {'V_SCI': V_SCI + MKL},
-           'markdown':     {'V_MD': V_MD}
+           'markdown':     {'V_MD': markdown.__version__},
+           'docutils':     {'V_DOC': V_DOC},
+           'mplcursors':   {'V_CUR': V_CUR},
            }
 
 # ================ Optional Modules ============================
-try:
-    from docutils import __version__ as V_DOC
-    if V_DOC == '':
-        V_DOC = 'unknown'
-    MODULES.update({'docutils': {'V_DOC': V_DOC}})
-except ImportError:
-    MODULES.update({'docutils': {'V_DOC': 'n.a.'}})
-
-try:
-    from mplcursors import __version__ as V_CUR
-    if V_CUR == '':
-        V_CUR = 'unknown'
-    MODULES.update({'mplcursors': {'V_CUR': V_CUR}})
-except ImportError:
-    MODULES.update({'mplcursors': {'V_CUR': 'n.a.'}})
-
 MODULES.update({'yosys': {'V_YO': dirs.YOSYS_VER}})
 
-try:
-    from xlwt import __version__ as V_XLWT
-    if V_XLWT == '':
-        V_XLWT = 'unknown'
-    MODULES.update({'xlwt': {'V_XLWT': V_XLWT}})
-except ImportError:
-    MODULES.update({'xlwt': {'V_XLWT': 'n.a.'}})
+# try:
+#     from xlwt import __version__ as V_XLWT
+#     if V_XLWT == '':
+#         V_XLWT = 'unknown'
+#     MODULES.update({'xlwt': {'V_XLWT': V_XLWT}})
+# except ImportError:
+#     MODULES.update({'xlwt': {'V_XLWT': 'n.a.'}})
 
-try:
-    from xlsxwriter import __version__ as V_XLSX
-    if V_XLSX == '':
-        V_XLSX = 'unknown'
-    MODULES.update({'xlsx': {'V_XLSX': V_XLSX}})
-except ImportError:
-    MODULES.update({'xlsx': {'V_XLSX': 'n.a.'}})
+# try:
+#     from xlsxwriter import __version__ as V_XLSX
+#     if V_XLSX == '':
+#         V_XLSX = 'unknown'
+#     MODULES.update({'xlsx': {'V_XLSX': V_XLSX}})
+# except ImportError:
+#     MODULES.update({'xlsx': {'V_XLSX': 'n.a.'}})
 
 try:
     from amaranth import __version__ as V_AM
@@ -1659,7 +1627,7 @@ def fil_save(fil_dict: dict, arg, format_in: str, sender: str,
         elif frmt == 'nd1':  # list / array with z only -> FIR
             z = arg
             p = np.zeros(len(z))
-            gain = pyfda_sig_lib.zeros_with_val(len(z))  # create gain vector [1, 0, 0, ...]
+            gain = zeros_with_val(len(z))  # create gain vector [1, 0, 0, ...]
             fil_dict['zpk'] = np.array([z, p, gain])
             fil_dict['ft'] = 'FIR'
 
@@ -1811,7 +1779,7 @@ def fil_convert(fil_dict: dict, format_in) -> None:
                 zpk[0] = np.delete(zpk[0], z_0)
                 zpk[1] = np.delete(zpk[1], p_0)
             fil_dict['zpk'] = np.array(
-                [zpk[0], zpk[1], pyfda_sig_lib.zeros_with_val(len(zpk[0]), zpk[2])],
+                [zpk[0], zpk[1], zeros_with_val(len(zpk[0]), zpk[2])],
                 dtype=complex)
 
         if 'ba' not in format_in:
@@ -1862,7 +1830,7 @@ def fil_convert(fil_dict: dict, format_in) -> None:
             if len(zpk[0]) != len(zpk[1]):
                 logger.warning("Bad coefficients, some values of b are too close to zero,"
                                "\n\tresults may be inaccurate.")
-            zpk_arr = pyfda_sig_lib.zpk2array(zpk)
+            zpk_arr = zpk2array(zpk)
             if not type(zpk_arr) is np.ndarray:  # an error has ocurred, error string is returned
                 logger.error(zpk_arr)
                 return
