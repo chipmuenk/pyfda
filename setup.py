@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
-from setuptools import setup, find_packages, find_namespace_packages
 from os import path
+from setuptools import setup, find_namespace_packages
 
 here = path.abspath(path.dirname(__file__))
 # Get the long description from the README file
@@ -25,13 +25,13 @@ if 'nose' in requirements_list:
 try:
     from PyQt5.QtCore import QT_VERSION_STR
     requirements_list.remove('pyqt5')
-    print("PyQt5 {0} is already installed, skipping it.".format(QT_VERSION_STR))
+    print(f"PyQt5 {QT_VERSION_STR} is already installed, skipping it.")
     # try to prevent installing library twice under conda where lib is listed
     # as "pyqt" for backward compatibility with PyQt4
 except ImportError:
     pass
 
-print("Installing packages\n{0}\n".format(requirements_list))
+print(f"Installing packages\n{requirements_list}\n")
 
 setup(
     name='pyfda',
@@ -41,7 +41,7 @@ setup(
     long_description_content_type='text/markdown',
     # long_description_content_type='text/x-rst',
     long_description=long_description,
-    keywords=["digital", "discrete time", "filter design", "IIR", "FIR", "GUI"],
+    keywords=["digital", "discrete time", "filter design", "DSP", "IIR", "FIR", "GUI"],
     url='https://github.com/chipmuenk/pyFDA',
     author='Christian Muenker',
     author_email='mail07@chipmuenk.de',
@@ -108,7 +108,6 @@ setup(
         ]
     }
 )
-
 
 """
 On non-Windows platforms (using "setup.py install", "setup.py develop",
