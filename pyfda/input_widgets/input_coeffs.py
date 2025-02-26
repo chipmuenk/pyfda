@@ -21,11 +21,11 @@ from pyfda.libs.compat import (
     Qt, QtCore, QWidget, QLineEdit, QApplication, QIcon, QSize, QTableWidget,
     QTableWidgetItem, QVBoxLayout, pyqtSignal, QStyledItemDelegate, QColor, QBrush)
 import pyfda.libs.pyfda_dirs as dirs
-from pyfda.libs.pyfda_lib import fil_save, safe_eval, pprint_log
+from pyfda.libs.pyfda_lib import safe_eval, pprint_log
 from pyfda.libs.pyfda_qt_lib import (
     emit, qstyle_widget, qset_cmb_box, qget_cmb_box, qget_selected)
 from pyfda.libs.pyfda_io_lib import qtable2csv, export_fil_data, select_file, file2array
-from pyfda.libs.pyfda_sig_lib import zeros_with_val
+from pyfda.libs.pyfda_sig_lib import zeros_with_val, fil_save
 from pyfda.pyfda_rc import params
 
 from .input_coeffs_ui import Input_Coeffs_UI

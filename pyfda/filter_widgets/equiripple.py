@@ -38,7 +38,8 @@ import numpy as np
 from pyfda.libs.compat import QWidget, QLabel, QLineEdit, pyqtSignal, QVBoxLayout, QHBoxLayout
 import pyfda.filterbroker as fb
 from pyfda.libs.pyfda_qt_lib import popup_warning, emit
-from pyfda.libs.pyfda_lib import fil_save, round_odd, ceil_even, safe_eval
+from pyfda.libs.pyfda_lib import round_odd, ceil_even, safe_eval
+from pyfda.libs.pyfda_sig_lib import fil_save
 from .common import remezord
 
 logger = logging.getLogger(__name__)

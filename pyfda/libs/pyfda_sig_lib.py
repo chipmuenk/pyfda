@@ -343,6 +343,50 @@ def div_safe(num, den, n_eps: float = 1., i_scale: float = 1., verbose: bool = F
 
 
 # ------------------------------------------------------------------------------
+def sos2zpk(sos):
+    """
+    Taken from scipy/signal/filter_design.py - edit to eliminate first
+    order section
+
+    Return zeros, poles, and gain of a series of second-order sections
+
+    Parameters
+    ----------
+    sos : array_like
+        Array of second-order filter coefficients, must have shape
+        ``(n_sections, 6)``. See `sosfilt` for the SOS filter format
+        specification.
+
+    Returns
+    -------
+    z : ndarray
+        Zeros of the transfer function.
+    p : ndarray
+        Poles of the transfer function.
+    k : float
+        System gain.
+    Notes
+    -----
+    .. versionadded:: 0.16.0
+    """
+    sos = np.asarray(sos)
+    n_sections = sos.shape[0]
+    z = np.empty(n_sections*2, np.complex128)
+    p = np.empty(n_sections*2, np.complex128)
+    k = 1.
+    for section in range(n_sections):
+        logger.info(sos[section])
+        zpk = sig.tf2zpk(sos[section, :3], sos[section, 3:])
+#        if sos[section, 3] == 0: # first order section
+        z[2*section:2*(section+1)] = zpk[0]
+#        if sos[section, -1] == 0: # first order section
+        p[2*section:2*(section+1)] = zpk[1]
+        k *= zpk[2]
+
+    return z, p, k
+
+
+# ------------------------------------------------------------------------------
 def validate_sos(sos):
     """
     Helper to validate a SOS input
@@ -1041,5 +1085,312 @@ def calc_ssb_spectrum(A: np.ndarray, mag: bool=False) -> np.ndarray:
         # A_SSB = np.insert(A[1:N//2] + A[-1:-(N//2):-1].conj(),0, A[0]) # doesn't work
 
     return A_SSB
+
+
+# ------------------------------------------------------------------------------
+def fil_save(fil_dict: dict, arg, format_in: str, sender: str,
+             convert: bool = True) -> None:
+    """
+    Save filter design ``arg`` given in the format specified as ``format_in`` in
+    the dictionary ``fil_dict``. The format can be either poles / zeros / gain,
+    filter coefficients (polynomes) or second-order sections.
+
+    Convert the filter design to the other formats if ``convert`` is True.
+
+    Parameters
+    ----------
+
+    fil_dict : dict
+        The dictionary where the filter design is saved to.
+
+    arg : various formats
+        The actual filter design
+
+    format_in : string
+        Specifies how the filter design in 'arg' is passed:
+
+        :'ba': Coefficient form: Filter coefficients in FIR format
+                 (b, one dimensional) are automatically converted to IIR format (b, a).
+
+        :'zpk': Zero / pole / gain format: When only zeroes are specified,
+                  poles and gain are added automatically.
+
+        :'sos': Second-order sections
+
+    sender : string
+        The name of the method that calculated the filter. This name is stored
+        in ``fil_dict`` together with ``format_in``.
+
+    convert : boolean
+        When ``convert = True``, convert arg to the other formats.
+
+    Returns
+    -------
+    None
+    """
+
+    if format_in == 'sos':
+        fil_dict['sos'] = arg
+        fil_dict['ft'] = 'IIR'
+
+    elif format_in == 'zpk':
+        format_error = False
+        if isinstance(arg, np.ndarray) and np.ndim(arg) == 1:
+            frmt = "nd1" #  one-dimensional numpy array
+            logger.info(f"Format (zpk) is '{frmt}', shape = {np.shape(arg)}")
+        elif isinstance(arg, np.ndarray) and np.ndim(arg) == 2:
+            frmt = "nd2" #  two-dimensional numpy array
+            # logger.info(f"Format (zpk) is '{frmt}', shape = {np.shape(arg)}")
+        elif any(isinstance(el, np.ndarray) for el in arg):
+            frmt = "lon"  # list or tuple of ndarrays
+            logger.warning(f"Format (zpk) is '{frmt}'.")
+        else:
+            format_error = True
+
+        if frmt == "nd2":
+            fil_dict['zpk'] = arg
+            if np.any(arg[1]):  # non-zero poles -> IIR
+                fil_dict['ft'] = 'IIR'
+            else:
+                fil_dict['ft'] = 'FIR'
+
+        elif frmt == 'nd1':  # list / array with z only -> FIR
+            z = arg
+            p = np.zeros(len(z))
+            gain = zeros_with_val(len(z))  # create gain vector [1, 0, 0, ...]
+            fil_dict['zpk'] = np.array([z, p, gain])
+            fil_dict['ft'] = 'FIR'
+
+        elif frmt == 'lon':  # list of  ndarrays
+            if len(arg) == 3:
+                fil_dict['zpk'] = np.array([arg[0], arg[1], arg[2]])
+                if np.any(arg[1]):  # non-zero poles -> IIR
+                    fil_dict['ft'] = 'IIR'
+                else:
+                    fil_dict['ft'] = 'FIR'
+            else:
+                logger.error(f"{len(arg)} rows instead of 3!")
+                format_error = True
+        else:
+            format_error = True
+
+# =============================================================================
+#         if np.ndim(arg) == 1:
+#             if np.ndim(arg[0]) == 0: # list / array with z only -> FIR
+#                 z = arg
+#                 p = np.zeros(len(z))
+#                 k = 1
+#                 fil_dict['zpk'] = [z, p, k]
+#                 fil_dict['ft'] = 'FIR'
+#             elif np.ndim(arg[0]) == 1: # list of lists
+#                 if np.shape(arg)[0] == 3:
+#                     fil_dict['zpk'] = [arg[0], arg[1], arg[2]]
+#                     if np.any(arg[1]): # non-zero poles -> IIR
+#                         fil_dict['ft'] = 'IIR'
+#                     else:
+#                         fil_dict['ft'] = 'FIR'
+#                 else:
+#                     format_error = True
+#             else:
+#                 format_error = True
+#         else:
+#             format_error = True
+#
+# =============================================================================
+        if format_error:
+            raise ValueError("\t'fil_save()': Unknown 'zpk' format {0}".format(arg))
+
+    elif format_in == 'ba':
+        if np.ndim(arg) == 1:  # arg = [b] -> FIR
+            # convert to type array, trim trailing zeros which correspond to
+            # (superfluous) highest order polynomial with coefficient 0 as they
+            # cause trouble when converting to zpk format
+            b = np.trim_zeros(np.asarray(arg))
+            a = np.zeros(len(b))
+        else:  # arg = [b,a]
+            b = arg[0]
+            a = arg[1]
+
+        if len(b) < 2:  # no proper coefficients, initialize with a default
+            b = np.asarray([1, 0])
+        if len(a) < 2:  # no proper coefficients, initialize with a default
+            a = np.asarray([1, 0])
+
+        a[0] = 1  # first coefficient of recursive filter parts always = 1
+
+        # Determine whether it's a FIR or IIR filter and set fil_dict accordingly
+        # Test whether all elements except the first one are zero
+        if not np.any(a[1:]):
+            fil_dict['ft'] = 'FIR'
+        else:
+            fil_dict['ft'] = 'IIR'
+
+        # equalize if b and a subarrays have different lengths:
+        D = len(b) - len(a)
+        if D > 0:  # b is longer than a -> fill up a with zeros
+            a = np.append(a, np.zeros(D))
+        elif D < 0:  # a is longer than b -> fill up b with zeros
+            if fil_dict['ft'] == 'IIR':
+                b = np.append(b, np.zeros(-D))  # make filter causal, fill up b with zeros
+            else:
+                a = a[:D]  # discard last D elements of a (only zeros anyway)
+
+        fil_dict['N'] = len(b) - 1  # correct filter order accordingly
+        fil_dict['ba'] = np.asarray([np.array(b, dtype=complex), np.array(a, dtype=complex)])
+
+    else:
+        raise ValueError("\t'fil_save()':Unknown input format {0:s}".format(format_in))
+
+    fil_dict['creator'] = (format_in, sender)
+    fil_dict['timestamp'] = time.time()
+
+    if convert:
+        fil_convert(fil_dict, format_in)
+
+
+# ------------------------------------------------------------------------------
+def fil_convert(fil_dict: dict, format_in) -> None:
+    """
+    Convert between poles / zeros / gain, filter coefficients (polynomes)
+    and second-order sections and store all formats not generated by the filter
+    design routine in the passed dictionary ``fil_dict``.
+
+    Parameters
+    ----------
+    fil_dict :  dict
+         filter dictionary containing a.o. all formats to be read and written.
+
+    format_in :  string or set of strings
+
+         format(s) generated by the filter design routine. Must be one of
+
+         :'sos': a list of second order sections - all other formats can easily
+                 be derived from this format
+         :'zpk': [z,p,k] where z is the array of zeros, p the array of poles and
+             k is a scalar with the gain - the polynomial form can be derived
+             from this format quite accurately
+         :'ba': [b, a] where b and a are the polynomial coefficients - finding
+                   the roots of the a and b polynomes may fail for higher orders
+
+    Returns
+    -------
+    None
+
+    Exceptions
+    ----------
+    ValueError for Nan / Inf elements or other unsuitable parameters
+    """
+    if 'sos' in format_in:
+        # check for bad coeffs before converting IIR filt
+        # this is the same defn used by scipy (tolerance of 1e-14)
+        if (fil_dict['ft'] == 'IIR'):
+            sos = np.absolute(np.asarray(fil_dict['sos']))
+            n_sections = sos.shape[0]
+            for section in range(n_sections):
+                b0 = sos[section, 3]  # coeffs of non-recursive section part
+                a = sos[section, 3:]  # coeffs of recursive section part
+                if b0 < 1e-14:
+                    raise ValueError(
+                        "\t'fil_convert()': Bad coefficients, required order N may be too high!\n"
+                        "\tTry relaxing the specifications.")
+
+        if 'zpk' not in format_in:
+            try:
+                # returns a tuple (zeros, poles, gain) where gain is scalar:
+                # convert zpk to list to allow for individual editing of z and p
+                zpk = list(sig.sos2zpk(fil_dict['sos']))
+            except Exception as e:
+                raise ValueError(e)
+            # check whether sos conversion has created a additional (superfluous)
+            # pole and zero at the origin and delete them:
+            z_0 = np.where(zpk[0] == 0)[0]
+            p_0 = np.where(zpk[1] == 0)[0]
+            if p_0 and z_0:  # eliminate z = 0 and p = 0 from list:
+                zpk[0] = np.delete(zpk[0], z_0)
+                zpk[1] = np.delete(zpk[1], p_0)
+            fil_dict['zpk'] = np.array(
+                [zpk[0], zpk[1], zeros_with_val(len(zpk[0]), zpk[2])],
+                dtype=complex)
+
+        if 'ba' not in format_in:
+            try:
+                fil_dict['ba'] = sig.sos2tf(fil_dict['sos'])
+            except Exception as e:
+                raise ValueError(e)
+            # check whether sos conversion has created additional (superfluous)
+            # highest order polynomial with coefficient 0 and delete them
+            if fil_dict['ba'][0][-1] == 0 and fil_dict['ba'][1][-1] == 0:
+                # fil_dict['ba'][0] = np.delete(fil_dict['ba'][0], -1)
+                # fil_dict['ba'][1] = np.delete(fil_dict['ba'][1], -1)
+                fil_dict['ba'] = np.delete(fil_dict['ba'], (-1), axis=1)
+
+    elif 'zpk' in format_in:  # z, p, k have been generated,convert to other formats
+        zpk = fil_dict['zpk']
+        if 'ba' not in format_in:
+            try:
+                fil_dict['ba'] = sig.zpk2tf(zpk[0], zpk[1], zpk[2][0])
+            except Exception as e:
+                raise ValueError(e)
+        if 'sos' not in format_in:
+            try:
+               if not np.isscalar(zpk[2]):
+                   k = zpk[2][0]
+               else:
+                   k = zpk[2]
+               fil_dict['sos'] = sig.zpk2sos(zpk[0], zpk[1], k)
+            except ValueError as e:
+               fil_dict['sos'] = []
+               logger.warning(
+                   f"Complex-valued coefficients? Could not convert zpk\n{zpk}\n to SOS.\n{e}")
+
+    elif 'ba' in format_in:  # arg = [b,a]
+        if np.all(np.isfinite(fil_dict['ba'])):
+            if type(fb.fil[0]['ba']) in {list, tuple}:
+                logger.warning(f"fb.fil[0]['ba'] is of type '{type(fb.fil[0]['ba'])}', should be ndarray!")
+
+            if fil_dict['ba'][1][0] != 1:
+                logger.error(
+                    f"The coefficient a[0] = {fil_dict['ba'][1][0]} needs to be 1, "
+                    f"expect the unexpected!")
+
+            # TODO: use mpmath.polyroots() here for higher precision
+            # https://mpmath.org/doc/current/calculus/polynomials.html
+            # tf2zpk yields (z,p,k) where z and p are ndarrays
+            zpk = list(sig.tf2zpk(fil_dict['ba'][0], fil_dict['ba'][1]))
+            if len(zpk[0]) != len(zpk[1]):
+                logger.warning("Bad coefficients, some values of b are too close to zero,"
+                               "\n\tresults may be inaccurate.")
+            zpk_arr = zpk2array(zpk)
+            if not type(zpk_arr) is np.ndarray:  # an error has ocurred, error string is returned
+                logger.error(zpk_arr)
+                return
+            else:
+                fil_dict['zpk'] = zpk_arr
+        else:
+            raise ValueError(
+                "\t'fil_convert()': Cannot convert coefficients with NaN or Inf elements "
+                "to zpk format!")
+        try:
+            fil_dict['sos'] = sig.tf2sos(fil_dict['ba'][0], fil_dict['ba'][1])
+        except ValueError:
+            fil_dict['sos'] = []
+            logger.warning("Complex-valued coefficients, could not convert to SOS.")
+
+    else:
+        raise ValueError(f"\t'fil_convert()': Unknown input format {format_in:s}")
+
+    # eliminate complex coefficients created by numerical inaccuracies
+    # `tol` is specified in multiples of machine eps
+    # for complex coefficients, 'if_close' is False and the array remains unchanged
+    fil_dict['ba'] = np.real_if_close(fil_dict['ba'], tol=100)
+
+    # for poles / zeros the same can happen, only that they *are* usually complex
+    # valued and need to be checked / converted individually. Complex numbers with
+    # very small imaginary parts cannot be displayed by current numexpr versions
+    # TODO:
+    # if any(np.is_complex(fil_dict['zpk'])):
+    #     for c in range[3]:
+    #         for r in range(len(fil_dict[0])):
+    #             fil_dict['zpk'][r][c] = np.real_if_close(fil_dict['zpk'][r][c]).astype(complex)
 
 

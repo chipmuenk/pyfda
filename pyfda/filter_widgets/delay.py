@@ -21,7 +21,7 @@ import numpy as np
 import pyfda.filterbroker as fb
 from pyfda.libs.compat import QWidget, pyqtSignal, QVBoxLayout
 from pyfda.libs.pyfda_qt_lib import popup_warning, emit
-from pyfda.libs.pyfda_lib import fil_save
+from pyfda.libs.pyfda_sig_lib import fil_save
 
 __version__ = "1.0"
 
