@@ -992,3 +992,54 @@ def zorp_group_delayz(zorp, w, fs=1):
     r2 = r**2
     cos = np.cos(W - phi)
     return w, 2 * pi * (r2 - r*cos) / (r2 + 1 - 2*r*cos)
+
+# ------------------------------------------------------------------------------
+def calc_ssb_spectrum(A: np.ndarray, mag: bool=False) -> np.ndarray:
+    """
+    Calculate the single-sideband spectrum from a double-sideband
+    spectrum by doubling the spectrum below f_S/2 (leaving the DC-value
+    untouched). This approach is wrong when the spectrum is not symmetric.
+
+    The alternative approach of  adding the mirrored conjugate complex of the
+    second half of the spectrum to the first doesn't work, spectra of either
+    sine-like or cosine-like signals are cancelled out.
+
+    Hence, the magnitudes of both halves are summed (for `mag=True`), yielding
+    the magnitude spectrum.
+
+    When len(A) is even, A[N//2] represents half the sampling frequency
+    and is discarded (Q: also for the power calculation?).
+
+    Parameters
+    ----------
+    A : array-like
+        double-sided spectrum, usually complex. The sequence is as follows:
+
+            [ A[0], A[1] ... A[4], A[5], A[-4] ...  A[-1] ] for len(A) = 10
+            [ A[0], A[1] ... A[4], A[-4] ...  A[-1] ] for len(A) = 9
+            ->
+            [A[0], A[1] + A[-1] ... A[4] + A[-4], A[5]] for len(A) = 10
+            [A[0], A[1] + A[-1] ... A[4] + A[-4]] for len(A) = 9
+            both cases
+
+    mag : bool
+        calculate the magnitude spectrum when True (default: False) by adding the
+        magnitudes of negative and positive halfband.
+
+    Returns
+    -------
+    A_SSB : array-like
+        single-sided spectrum with half the number of input values
+
+    """
+    N = len(A)
+
+    if mag:
+        A_SSB = np.insert(np.abs(A[1:N//2]) + np.abs(A[-1:(N+1)//2:-1]), 0, A[0])
+    else:
+        A_SSB = np.insert(A[1:N//2] * 2, 0, A[0])
+        # A_SSB = np.insert(A[1:N//2] + A[-1:-(N//2):-1].conj(),0, A[0]) # doesn't work
+
+    return A_SSB
+
+

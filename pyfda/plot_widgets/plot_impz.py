@@ -23,9 +23,8 @@ from pyfda.libs.compat import (
 import pyfda.filterbroker as fb
 from pyfda.filterbroker import get_fil_dict, set_fil_dict
 import pyfda.libs.pyfda_fix_lib as fx
-from pyfda.libs.pyfda_sig_lib import angle_zero
-from pyfda.libs.pyfda_lib import (
-    safe_eval, pprint_log, calc_ssb_spectrum, first_item)
+from pyfda.libs.pyfda_sig_lib import angle_zero, calc_ssb_spectrum
+from pyfda.libs.pyfda_lib import safe_eval, pprint_log, first_item
 from pyfda.libs.pyfda_qt_lib import (
     emit, qget_cmb_box, qset_cmb_box, qstyle_widget, qcmb_box_add_item,
     qcmb_box_del_item)
