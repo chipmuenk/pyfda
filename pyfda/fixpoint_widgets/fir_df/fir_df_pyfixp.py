@@ -9,6 +9,8 @@
 """
 Fixpoint class for calculating direct-form DF1 FIR filter using pyfixp routines
 """
+import logging
+
 import numpy as np
 from numpy.lib.function_base import iterable
 import pyfda.filterbroker as fb
@@ -16,12 +18,11 @@ import pyfda.filterbroker as fb
 import pyfda.libs.pyfda_fix_lib as fx
 from pyfda.libs.pyfda_fix_lib import quant_coeffs
 
-import logging
 logger = logging.getLogger(__name__)
 
 
 # =============================================================================
-class FIR_DF_pyfixp(object):
+class FIR_DF_pyfixp():
     """
     Construct fixed point object with parameter dict `p`
 
@@ -192,10 +193,8 @@ class FIR_DF_pyfixp(object):
 
 # ------------------------------------------------------------------------------
 if __name__ == '__main__':
-    """
-    Run widget standalone with
-    `python -m pyfda.fixpoint_widgets.fir_df.fir_df_pyfixp`
-    """
+    # Run widget standalone with
+    # `python -m pyfda.fixpoint_widgets.fir_df.fir_df_pyfixp`
     fb.fil[0]['fx_sim'] = True  # enable fixpoint mode
 
     fb.fil[0]['ba'] = [[1.1, 2.2, 3.3, 2, 1], []]

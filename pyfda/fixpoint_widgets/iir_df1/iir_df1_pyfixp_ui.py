@@ -20,7 +20,7 @@ from pyfda.libs.pyfda_qt_lib import qget_cmb_box, emit
 from pyfda.libs.compat import QWidget, QVBoxLayout, pyqtSignal
 from pyfda.fixpoint_widgets.fx_ui_wq import FX_UI_WQ
 
-from .iir_df1_pyfixp import IIR_DF1_pyfixp
+from pyfda.fixpoint_widgets.iir_df1.iir_df1_pyfixp import IIR_DF1_pyfixp
 
 logger = logging.getLogger(__name__)
 
@@ -72,6 +72,14 @@ class IIR_DF1_pyfixp_UI(QWidget):
         # the 'fxq' quantizer dict:
         self.fx_filt = IIR_DF1_pyfixp(fb.fil[0]['fxq'])
         self.update_ovfl_cnt_all()  # initialize all overflow counters / display
+
+    # -------------------------------------------------------------------------
+    def emit(self, dict_sig):
+        """
+        Access imported function `emit()` as instance method, passing `self`
+        with its attributes
+        """
+        emit(self, dict_sig)
 
     # --------------------------------------------------------------------------
     def _construct_UI(self):
@@ -156,7 +164,7 @@ class IIR_DF1_pyfixp_UI(QWidget):
         """
         logger.debug("sig_rx:\n%s", pprint_log(dict_sig))
         if dict_sig['id'] == id(self):
-            logger.warning(f'Stopped infinite loop: "%s"', first_item(dict_sig))
+            logger.warning('Stopped infinite loop: "%s"', first_item(dict_sig))
             return
 
         if 'ui_local_changed' in dict_sig:
@@ -354,9 +362,9 @@ class IIR_DF1_pyfixp_UI(QWidget):
 
 # ------------------------------------------------------------------------------
 if __name__ == '__main__':
-    """ Run widget standalone with
-    `python -m pyfda.fixpoint_widgets.iir_df1.iir_df1_pyfixp_ui`
-    """
+    # Run widget standalone with
+    # `python -m pyfda.fixpoint_widgets.iir_df1.iir_df1_pyfixp_ui`
+
     from pyfda.libs.compat import QApplication
     from pyfda import pyfda_rc as rc
 

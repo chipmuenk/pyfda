@@ -9,13 +9,15 @@
 """
 Fixpoint class for calculating direct-form DF1 IIR filter using pyfixp routines
 """
+import logging
+
 import numpy as np
 from numpy.lib.function_base import iterable
+
 import pyfda.filterbroker as fb
 import pyfda.libs.pyfda_fix_lib as fx
 from pyfda.libs.pyfda_fix_lib import quant_coeffs
 
-import logging
 logger = logging.getLogger(__name__)
 
 
@@ -287,10 +289,9 @@ class IIR_DF1_pyfixp(object):
 
 # ------------------------------------------------------------------------------
 if __name__ == '__main__':
-    """
-    Run widget standalone with
-    `python -m pyfda.fixpoint_widgets.iir_df1.iir_df1_pyfixp`
-    """
+    # Run widget standalone with
+    # `python -m pyfda.fixpoint_widgets.iir_df1.iir_df1_pyfixp`
+
     p = {'QCB': {'WI': 0, 'WF': 5, 'w_a_m': 'a',
                 'ovfl': 'wrap', 'quant': 'floor', 'N_over': 0},
         'QCA': {'WI': 1, 'WF': 5, 'w_a_m': 'a',

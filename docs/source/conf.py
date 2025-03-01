@@ -1,10 +1,17 @@
 # -*- coding: utf-8 -*-
 #
-# Configuration file for the Sphinx documentation builder.
+# This file is part of the pyFDA project hosted at https://github.com/chipmuenk/pyfda
 #
-# This file does only contain a selection of the most common options. For a
-# full list see the documentation:
-# http://www.sphinx-doc.org/en/master/config
+# Copyright © pyFDA Project Contributors
+# Licensed under the terms of the MIT License
+# (see file LICENSE in root directory for details)
+"""
+Configuration file for the Sphinx documentation builder.
+
+This file does only contain a selection of the most common options. For a
+full list see the documentation:
+http://www.sphinx-doc.org/en/master/config
+"""
 
 # -- Path setup --------------------------------------------------------------
 
@@ -19,14 +26,10 @@ sys.path.insert(0, os.path.abspath('../'))
 sys.path.insert(0, os.path.abspath('../..'))
 sys.path.insert(0, os.path.abspath('../../pyfda'))
 print(sys.path)
-#import pyfda.filterbroker
-#import pyfda.input_widgets.boing
-
 
 # -- Project information -----------------------------------------------------
-
 project = 'pyfda'
-copyright = '2024, Christian Muenker'
+copyright = '2025, Christian Muenker'
 author = 'Christian Muenker'
 
 # version_nr contains ... well ... the version in the form  __version__ = '0.1b10'
@@ -34,9 +37,8 @@ version_nr = {}
 with open("../../pyfda/version.py") as fp:
     exec(fp.read(), version_nr)
 
-
 # The short X.Y version
-version = version_nr['__version__'] 
+version = version_nr['__version__']
 # The full version, including alpha/beta/rc tags
 release = version
 
@@ -102,7 +104,7 @@ exclude_patterns = []
 # The name of the Pygments (syntax highlighting) style to use.
 pygments_style = 'sphinx'
 
-# Number figures, tables and code-blocks are automatically if they have a caption. 
+# Number figures, tables and code-blocks are automatically if they have a caption.
 # The numref role is enabled. Obeyed so far only by HTML and LaTeX builders. Default is False.
 numfig = True
 numfig_format = {'figure':'Fig. %s',
