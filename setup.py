@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from os import path
 from setuptools import setup, find_namespace_packages
+from pyfda.version import __version__
 
 here = path.abspath(path.dirname(__file__))
 # Get the long description from the README file
@@ -9,9 +10,10 @@ with open(path.join(here, 'README_PYPI.md'), encoding='utf-8') as f:
     long_description = f.read()
 
 # version_nr contains ... well ... the version in the form  __version__ = '0.1b10'
-version_nr = {}
-with open(path.join(here, 'pyfda/version.py'), encoding='utf-8') as f_v:
-    exec(f_v.read(), version_nr)
+# version_nr = {}
+# with open(path.join(here, 'pyfda/version.py'), encoding='utf-8') as f_v:
+#     exec(f_v.read(), version_nr)
+
 
 # --- read requirements.txt, remove comments and unneeded modules
 with open(path.join(here, 'requirements.txt'), encoding='utf-8') as f_r:
@@ -35,7 +37,8 @@ print(f"Installing packages\n{requirements_list}\n")
 
 setup(
     name='pyfda',
-    version=version_nr['__version__'],
+    # version=version_nr['__version__'],
+    version = __version__, 
     description=("Design and analyse discrete time DSP filters with a user-friendly GUI "
                  "tool. Fixpoint filters in time and frequency domain, too."),
     long_description_content_type='text/markdown',
