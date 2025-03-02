@@ -30,7 +30,7 @@ Instance of current filter design class (e.g. "cheby1"), globally accessible
 >>> ff.fil_factory.create_fil_instance('cheby1') # create instance of dynamic class
 >>> ff.fil_inst.LPmin(fil[0]) # design a filter
 """
-class FilterFactory(object):
+class FilterFactory():
     """
     This class implements a filter factory that (re)creates the globally accessible
     filter instance ``fil_inst`` from module path and class name, passed as strings.
@@ -136,10 +136,12 @@ class FilterFactory(object):
                 try:
                     fil_inst = fil_class() # instantiate an object
                     self.err_code = 0 # filter instance has been created / changed successfully
-                    logger.debug("FilterFactory.create_fil_inst(): successfully created {0}".format(fc))
+                    logger.debug(
+                        "FilterFactory.create_fil_inst(): successfully created {0}".format(fc))
                 except Exception as e:
                     self.err_code = 4
-                    logger.warning("Error during instantiation of filter class {0}:\n{1}".format(fc,e))
+                    logger.warning(
+                        "Error during instantiation of filter class {0}:\n{1}".format(fc,e))
                     x = x
         return self.err_code
 
@@ -205,7 +207,8 @@ class FilterFactory(object):
 
         # Error during filter design class instantiation (class fc could not be instantiated)
         if self.err_code > 0:
-            err_string = "Filter design class could not be instantiated, see previous error message."
+            err_string = \
+                "Filter design class could not be instantiated, see previous error message."
 
         # Test whether 'method' is a string (Py3):
         elif not isinstance(method, str):
@@ -241,15 +244,19 @@ class FilterFactory(object):
         if self.err_code is None:
             self.err_code = 0
         elif self.err_code > 0:
-                logger.error(f"ErrCode {self.err_code}: {err_string}")
+            logger.error(f"ErrCode {self.err_code}: {err_string}")
 
         return self.err_code
 
 #------------------------------------------------------------------------------
-fil_factory = FilterFactory() #: Class instance of FilterFactory that can be accessed in other modules
+# Class instance of FilterFactory that can be accessed in other modules
+fil_factory = FilterFactory()
 
 ######################################################################
 if __name__ == '__main__':
+    # Run module standalone with
+    # `python -m pyfda.filter_factory`
+
     print("\nfb.filter_classes\n", fb.filter_classes)
     print("aaa:", fil_factory.create_fil_inst("aaa"),"\n") # class doesn't exist
     print("cheby1:", fil_factory.create_fil_inst("cheby1"),"\n") # first time inst.
@@ -257,14 +264,16 @@ if __name__ == '__main__':
     print("cheby2:", fil_factory.create_fil_inst("cheby2"),"\n") # new class
     print("bbb:", fil_factory.create_fil_inst("bbb"),"\n") # class doesn't exist
 
-    print("LPman, fc = cheby2:", fil_factory.call_fil_method("LPman", fb.fil[0], fc = "cheby2"),"\n")
+    print("LPman, fc = cheby2:",
+          fil_factory.call_fil_method("LPman", fb.fil[0], fc = "cheby2"),"\n")
     print("LPmax:", fil_factory.call_fil_method("LPmax", fb.fil[0]),"\n") # doesn't exist
     print("Int 1:", fil_factory.call_fil_method(1, fb.fil[0]),"\n") # not a string
     print("LPmin:", fil_factory.call_fil_method("LPmin", fb.fil[0]),"\n") # changed method
 
     print("LPmin:", fil_factory.call_fil_method("LPmin", fb.fil[0]),"\n")
     print("LP:", fil_factory.call_fil_method("LP", fb.fil[0]),"\n")
-    print("LPman, fc = cheby1:", fil_factory.call_fil_method("LPman", fb.fil[0], fc = "cheby1"),"\n")
+    print("LPman, fc = cheby1:",
+          fil_factory.call_fil_method("LPman", fb.fil[0], fc = "cheby1"),"\n")
 
-    print("LPman, fc = cheby1:", fil_factory.call_fil_method("LPman", fc = "cheby1"),"\n") # fails
-
+    # print("LPman, fc = cheby1:",
+    #       fil_factory.call_fil_method("LPman", fc = "cheby1"),"\n") # fails
