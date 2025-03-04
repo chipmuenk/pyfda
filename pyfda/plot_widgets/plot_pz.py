@@ -12,23 +12,23 @@
 """
 Widget for plotting poles and zeros
 """
-from pyfda.libs.compat import (
-    QWidget, QLabel, QFrame, QDial, QHBoxLayout, pyqtSignal, QComboBox, QLineEdit)
+import logging
+
+from matplotlib import patches, cm
+from matplotlib.ticker import AutoMinorLocator
 import numpy as np
 import scipy.signal as sig
 
 import pyfda.filterbroker as fb
-from pyfda.pyfda_rc import params
+from pyfda.libs.compat import (
+    QWidget, QLabel, QFrame, QDial, QHBoxLayout, pyqtSignal, QComboBox, QLineEdit)
 from pyfda.libs.pyfda_lib import unique_roots, H_mag, to_html, safe_eval
 from pyfda.libs.pyfda_qt_lib import (
     PushButton, qcmb_box_populate, qget_cmb_box, qtext_width)
+from pyfda.pyfda_rc import params
 
 from pyfda.plot_widgets.mpl_widget import MplWidget
-from matplotlib.ticker import AutoMinorLocator
 
-from matplotlib import patches, cm
-
-import logging
 logger = logging.getLogger(__name__)
 
 classes = {'Plot_PZ': 'P/Z'}  #: Dict containing class name : display name
