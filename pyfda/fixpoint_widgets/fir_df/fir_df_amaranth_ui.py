@@ -9,23 +9,21 @@
 """
 Widget for specifying the parameters of a direct-form FIR filter
 """
+import logging
 import sys
 
+from amaranth.back import verilog
+# from amaranth.sim import Simulator, Tick, Delay, Settle
 import numpy as np
+
 import pyfda.filterbroker as fb
-from pyfda.libs.pyfda_lib import set_dict_defaults, pprint_log, first_item
+from pyfda.libs.compat import QWidget, QVBoxLayout, pyqtSignal
+from pyfda.libs.pyfda_lib import set_dict_defaults, first_item, pprint_log
 from pyfda.libs.pyfda_qt_lib import qget_cmb_box, emit
 
-from pyfda.libs.compat import QWidget, QVBoxLayout, pyqtSignal
-
 from pyfda.fixpoint_widgets.fx_ui_wq import FX_UI_WQ
-
 from .fir_df_amaranth import FIR_DF_amaranth
 
-from amaranth.back import verilog
-from amaranth.sim import Simulator, Tick  # , Delay, Settle
-
-import logging
 logger = logging.getLogger(__name__)
 
 #  Dict containing {widget class name : display name}
@@ -146,7 +144,7 @@ class FIR_DF_amaranth_UI(QWidget):
         self.wdg_wq_accu.sig_tx.connect(self.process_sig_rx)
 
     # --------------------------------------------------------------------------
-    def process_sig_rx(self, dict_sig: dict = None) -> None:
+    def process_sig_rx(self, dict_sig: dict=None) -> None:
         """
         - For locally generated signals (key = 'ui_local_changed'), emit
           `{'fx_sim': 'specs_changed'}` with local id.
@@ -161,9 +159,9 @@ class FIR_DF_amaranth_UI(QWidget):
         the referenced dicts `fb.fil[0]['fxq']['QCB']` and `...['QACC']` have already
         been updated by the corresponding subwidgets `FX_UI_WQ`
         """
-        # logger.warning("sig_rx:\n{0}".format(pprint_log(dict_sig)))
+        logger.debug("sig_rx:\n%s", pprint_log(dict_sig))
         if dict_sig['id'] == id(self):
-            logger.warning(f'Stopped infinite loop: "{first_item(dict_sig)}"')
+            logger.warning('Stopped infinite loop: "%s"', first_item(dict_sig))
             return
 
         if 'ui_local_changed' in dict_sig:
@@ -213,7 +211,7 @@ class FIR_DF_amaranth_UI(QWidget):
                 A_coeff = int(np.ceil(np.log2(np.sum(np.abs(fb.fil[0]['ba'][0])))))
             else:
                 A_coeff = 0
-        except BaseException as e: # Exception as e:
+        except BaseException:
             logger.error("An error occured:", exc_info=True)
             return
 
@@ -274,9 +272,8 @@ class FIR_DF_amaranth_UI(QWidget):
 
 # ------------------------------------------------------------------------------
 if __name__ == '__main__':
-    """ Run widget standalone with
-    `python -m pyfda.fixpoint_widgets.fir_df.fir_df_amaranth_ui`
-    """
+    # Run widget standalone with
+    # `python -m pyfda.fixpoint_widgets.fir_df.fir_df_amaranth_ui`
     from pyfda.libs.compat import QApplication
     from pyfda import pyfda_rc as rc
 

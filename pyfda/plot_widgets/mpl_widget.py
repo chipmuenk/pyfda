@@ -19,19 +19,16 @@ from matplotlib.transforms import Bbox
 from matplotlib import rcParams
 from matplotlib import lines
 from matplotlib.pyplot import setp
-
-import mplcursors
-
-
 try:
-    import matplotlib.backends.qt_editor.figureoptions as figureoptions
+    from matplotlib.backends.qt_editor import figureoptions
 except ImportError:
     figureoptions = None
+import mplcursors
 
 import pyfda.filterbroker as fb
 from pyfda.libs.compat import (
-    Qt, QtCore, QtGui, QWidget, QLabel, pyqtSignal, QSizePolicy, QIcon, QImage, QVBoxLayout,
-    QHBoxLayout, QInputDialog, FigureCanvas, NavigationToolbar, pyqtSlot, QtWidgets, QEvent)
+    Qt, QtCore, QtGui, QWidget, pyqtSignal, QSizePolicy, QIcon, QImage, QVBoxLayout,
+    QHBoxLayout, QInputDialog, FigureCanvas, NavigationToolbar, QtWidgets, QEvent)
 from pyfda.libs.pyfda_qt_lib import EventTypes, emit
 from pyfda import pyfda_rc
 from pyfda import qrc_resources  # contains all icons
@@ -44,12 +41,12 @@ for key in pyfda_rc.mpl_rc:
 
 
 # ------------------------------------------------------------------------------
-def stems(x, y, ax=None, label=None, mkr_fmt=None, **kwargs):
+def stems(x, y, ax=None, mkr_fmt=None, **kwargs):
     """
-    Provide a more flexible stem plot, passing kwargs to the stem plot elements
+    Provide a more flexible stem plot, passing kwargs to the stem plot elements:
+    Create a copy of the kwargs dict without `bottom` key-value pair by popping
+    `bottom` from dict (default = 0) as it is not compatible with vlines
     """
-    # create a copy of the kwargs dict without 'bottom' key-value pair, provide
-    # pop bottom from dict (default = 0), not compatible with vlines
     bottom = kwargs.pop('bottom', 0)
     ax.axhline(bottom, **kwargs)
     ml, sl, bl = ax.stem(x, y, bottom=bottom)
@@ -64,7 +61,7 @@ def stems(x, y, ax=None, label=None, mkr_fmt=None, **kwargs):
     return handle
 
 
-def scatter(x, y, ax=None, label=None, mkr_fmt=None, **kwargs):
+def scatter(x, y, ax=None, label=None, mkr_fmt=None):
     """
     Create a copy of matplolibs scatter that can handle 'ms' and 'markersize' keys
     These keys are removed from the mkr_fmt dictionary and translated to s = ms * ms
@@ -160,10 +157,10 @@ class MplWidget(QWidget):
             # check for "normal" keys, skip x and y (used as mouse modifiers)
             if key < 256 and key != 88 and key != 89:
                 modifiers = event.modifiers()
-                meta = modifiers & Qt.AltModifier == Qt.AltModifier\
-                    or modifiers & Qt.MetaModifier == Qt.MetaModifier
+                # meta = modifiers & Qt.AltModifier == Qt.AltModifier\
+                #     or modifiers & Qt.MetaModifier == Qt.MetaModifier
                 ctrl = modifiers & Qt.ControlModifier == Qt.ControlModifier
-                shift = modifiers & Qt.ShiftModifier == Qt.ShiftModifier
+                # shift = modifiers & Qt.ShiftModifier == Qt.ShiftModifier
 
                 # logger.warning(f"Key = {key}, meta = {meta}, ctrl = {ctrl}, shift = {shift}")
                 if key == 67 and ctrl:  # "ctrl-c"
@@ -303,9 +300,10 @@ class MplToolbar(NavigationToolbar):
     http://pydoc.net/Python/pyQPCR/0.7/pyQPCR.widgets.matplotlibWidget/  !!
     http://matplotlib.org/users/navigation_toolbar.html !!
 
-    see also http://stackoverflow.com/questions/17711099/programmatically-change-matplotlib-toolbar-mode-in-qt4
-             http://matplotlib-users.narkive.com/C8XwIXah/need-help-with-darren-dale-qt-example-of-extending-toolbar
-             https://sukhbinder.wordpress.com/2013/12/16/simple-pyqt-and-matplotlib-example-with-zoompan/
+    see also
+    http://stackoverflow.com/questions/17711099/programmatically-change-matplotlib-toolbar-mode-in-qt4
+    http://matplotlib-users.narkive.com/C8XwIXah/need-help-with-darren-dale-qt-example-of-extending-toolbar
+    https://sukhbinder.wordpress.com/2013/12/16/simple-pyqt-and-matplotlib-example-with-zoompan/
 
     Changing the info:
     http://stackoverflow.com/questions/15876011/add-information-to-matplotlib-navigation-toolbar-status-bar
@@ -513,7 +511,7 @@ class MplToolbar(NavigationToolbar):
         # --------------------------------------
 
         # --------------------------------------
-        # SETTINGS:
+        # FIGURE OPTIONS:
         # --------------------------------------
         if figureoptions is not None:
             self.a_op = self.addAction(
@@ -541,6 +539,9 @@ class MplToolbar(NavigationToolbar):
     # -------------------------------------------------------------------------
     if figureoptions is not None:
         def edit_parameters(self):
+            """
+            Setup a widget for editing figure options like labels, plot color etc
+            """
             allaxes = self.canvas.figure.get_axes()
             if len(allaxes) == 1:
                 axes = allaxes[0]
@@ -562,8 +563,8 @@ class MplToolbar(NavigationToolbar):
                     else:
                         fmt = "%(axes_repr)s"
                     titles.append(
-                        fmt % dict(title=title, ylabel=ylabel, label=label,
-                                   axes_repr=repr(axes)))
+                        fmt % {"title": title, "ylabel": ylabel, "label": label,
+                               "axes_repr": repr(axes)})
                 item, ok = QInputDialog.getItem(
                     self, 'Customize', 'Select axes:', titles, 0, False)
                 if ok:

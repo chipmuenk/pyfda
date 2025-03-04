@@ -16,16 +16,16 @@ import sys
 import numpy as np
 
 import pyfda.filterbroker as fb  # importing filterbroker initializes all its globals
-from pyfda.libs.csv_option_box import CSV_option_box
+# from pyfda.libs.csv_option_box import CSV_option_box
 from pyfda.libs.compat import (
-    Qt, QtCore, QWidget, QLineEdit, QApplication, QIcon, QSize, QTableWidget,
+    Qt, QtCore, QWidget, QLineEdit, QApplication, QSize, QTableWidget,
     QTableWidgetItem, QVBoxLayout, pyqtSignal, QStyledItemDelegate, QColor, QBrush)
 import pyfda.libs.pyfda_dirs as dirs
-from pyfda.libs.pyfda_lib import fil_save, safe_eval, pprint_log
+from pyfda.libs.pyfda_lib import safe_eval, pprint_log
 from pyfda.libs.pyfda_qt_lib import (
     emit, qstyle_widget, qset_cmb_box, qget_cmb_box, qget_selected)
 from pyfda.libs.pyfda_io_lib import qtable2csv, export_fil_data, select_file, file2array
-from pyfda.libs.pyfda_sig_lib import zeros_with_val
+from pyfda.libs.pyfda_sig_lib import zeros_with_val, fil_save
 from pyfda.pyfda_rc import params
 
 from .input_coeffs_ui import Input_Coeffs_UI
@@ -308,7 +308,7 @@ class Input_Coeffs(QWidget):
         """
         Process signals coming from sig_rx
         """
-        # logger.warning(f"SIG_RX: vis={self.isVisible()}\n{pprint_log(dict_sig)}")
+        logger.debug("SIG_RX: vis=%s\n%s", self.isVisible(), pprint_log(dict_sig))
 
         if dict_sig['id'] == id(self):
             # logger.warning(f'Stopped infinite loop: "{first_item(dict_sig)}"')
@@ -1063,7 +1063,7 @@ class Input_Coeffs(QWidget):
 
 # ------------------------------------------------------------------------------
 if __name__ == '__main__':
-    """ Run widget standalone with `python -m pyfda.input_widgets.input_coeffs` """
+    # Run widget standalone with `python -m pyfda.input_widgets.input_coeffs`
     from pyfda import pyfda_rc as rc
 
     app = QApplication(sys.argv)

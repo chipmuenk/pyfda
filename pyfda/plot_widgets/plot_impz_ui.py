@@ -764,7 +764,7 @@ def main():
 
 
 if __name__ == "__main__":
-    """ Run widget standalone with `python -m pyfda.plot_widgets.plot_impz_ui` """
+    # Run widget standalone with `python -m pyfda.plot_widgets.plot_impz_ui`
     import sys
     from pyfda.libs.compat import QApplication
     from pyfda import pyfda_rc as rc

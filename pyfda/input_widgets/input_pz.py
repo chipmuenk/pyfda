@@ -24,9 +24,9 @@ from pyfda.libs.compat import (
     QTableWidget, QTableWidgetItem, Qt, QVBoxLayout)
 from pyfda.libs.pyfda_qt_lib import qget_cmb_box, qstyle_widget, emit
 from pyfda.libs.pyfda_io_lib import qtable2csv, file2array, export_fil_data, select_file
-from pyfda.libs.pyfda_sig_lib import zeros_with_val, zpk2array, normalize_zpk_gain
+from pyfda.libs.pyfda_sig_lib import zeros_with_val, zpk2array, normalize_zpk_gain, fil_save
 import pyfda.libs.pyfda_dirs as dirs
-from pyfda.libs.pyfda_lib import fil_save, safe_eval, frmt2cmplx, pprint_log
+from pyfda.libs.pyfda_lib import safe_eval, frmt2cmplx, pprint_log
 from pyfda.pyfda_rc import params
 
 logger = logging.getLogger(__name__)

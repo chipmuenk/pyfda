@@ -5,14 +5,14 @@
 # Copyright © pyFDA Project Contributors
 # Licensed under the terms of the MIT License
 # (see file LICENSE in root directory for details)
+""" Common settings and some helper functions for filter design """
 
 import numpy as np
 
 class Common():
     """
-    Common settings and some helper functions for filter design
+    Provide common settings for basic filter types
     """
-
     def __init__(self):
         self.rt_base_iir = {
             'COM': {'man': {'fo': ('a', 'N')},
@@ -67,7 +67,7 @@ class Common():
 # -------------------------------------------------------------------
 def remezord(freqs, amps, rips, fs=1, alg='ichige'):
     """
-    Filter parameter selection for the Remez exchange algorithm. 
+    Filter parameter selection for the Remez exchange algorithm.
     Supplies remezord method according to Scipy Ticket #475
         was: http://projects.scipy.org/scipy/ticket/475
        now: https://github.com/scipy/scipy/issues/1002
@@ -195,7 +195,7 @@ def remlplen_herrmann(fp, fs, dp, ds):
     N1 = Dinf / dF - f * dF + 1
 
     return int(N1)
-    
+
 # -------------------------------------------------------------------
 def remlplen_kaiser(fp, fs, dp, ds):
     """
@@ -227,13 +227,13 @@ def remlplen_ichige(fp: float, fs: float, dp: float, ds: float) -> int:
     Filter Length for Optimum FIR Digital Filters, IEEE Transactions on
     Circuits and Systems, 47(10):1008-1017, October 2000.
 
-    This seems tol give the most accurate results of the three approximations.
+    This seems to give the most accurate results of the three approximations.
     """
     #   dp_lin = (10**(dp/20.0)-1) / (10**(dp/20.0)+1)*2
     def func_v(dF: float, dp: float) -> float:
         """ Helper function """
         return 2.325 * ((-np.log10(dp))**-0.445) * dF ** (-1.39)
-    
+
     def func_g(dF: float, fp: float) -> float:
         """ Helper function """
         return (2.0 / np.pi) * np.arctan(func_v(dF, dp) * (1.0 / fp - 1.0 / (0.5 - dF)))
@@ -248,12 +248,11 @@ def remlplen_ichige(fp: float, fs: float, dp: float, ds: float) -> int:
     # h = lambda fp, dF, c: (2.0/np.pi)*np.arctan((c/dF)*(1.0/fp-1.0/(0.5-dF)))
     Nc = np.ceil(1.0+(1.101/dF) * (-np.log10(2.0*dp)) ** 1.1)
     Nm = (0.52/dF)*np.log10(dp/ds)*(-np.log10(dp))**0.17
-    N3 = np.ceil(Nc*(func_g(fp, dF) + func_g(0.5-dF-fp, dF) + 1.0) / 3.0)
-    DN = np.ceil(Nm*(func_h(fp, dF, 1.1) - (func_h(0.5-dF-fp, dF, 0.29) - 1.0) / 2.0))
+    N3 = np.ceil(Nc*(func_g(dF, fp) + func_g(dF, 0.5-dF-fp) + 1.0) / 3.0)
+    DN = np.ceil(Nm*(func_h(dF, fp, 1.1) - (func_h(dF, 0.5-dF-fp, 0.29) - 1.0) / 2.0))
     N4 = N3 + DN
 
     return int(N4)
-
 
 # ------------------------------------------------------------------------------
 if __name__ == '__main__':
