@@ -1,3 +1,6 @@
+# Good example for a useful ruleset
+# https://github.com/openedx/edx-lint/blob/master/pylintrc
+
 [tool.pylint.main]
 # Analyse import fallback blocks. This can be used to support both Python 2 and 3
 # compatible code, which means that the block might have code that exists only in
