@@ -19,18 +19,16 @@ from matplotlib.transforms import Bbox
 from matplotlib import rcParams
 from matplotlib import lines
 from matplotlib.pyplot import setp
-
-import mplcursors
-
 try:
     from matplotlib.backends.qt_editor import figureoptions
 except ImportError:
     figureoptions = None
+import mplcursors
 
 import pyfda.filterbroker as fb
 from pyfda.libs.compat import (
-    Qt, QtCore, QtGui, QWidget, QLabel, pyqtSignal, QSizePolicy, QIcon, QImage, QVBoxLayout,
-    QHBoxLayout, QInputDialog, FigureCanvas, NavigationToolbar, pyqtSlot, QtWidgets, QEvent)
+    Qt, QtCore, QtGui, QWidget, pyqtSignal, QSizePolicy, QIcon, QImage, QVBoxLayout,
+    QHBoxLayout, QInputDialog, FigureCanvas, NavigationToolbar, QtWidgets, QEvent)
 from pyfda.libs.pyfda_qt_lib import EventTypes, emit
 from pyfda import pyfda_rc
 from pyfda import qrc_resources  # contains all icons
