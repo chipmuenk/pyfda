@@ -35,6 +35,7 @@ classes = {'Plot_PZ': 'P/Z'}  #: Dict containing class name : display name
 
 
 class Plot_PZ(QWidget):
+    """ Widget for plotting poles and zeros """
     # incoming, connected in sender widget (locally connected to self.process_sig_rx() )
     sig_rx = pyqtSignal(object)
 
@@ -238,7 +239,7 @@ class Plot_PZ(QWidget):
         """
         self.mplwidget.fig.clf()  # needed to get rid of colorbar
         if len(self.mplwidget.fig.get_axes()) == 0:  # empty figure, no axes
-            self.ax = self.mplwidget.fig.subplots()  # .add_subplot(111)
+            self.ax = self.mplwidget.fig.subplots()  # initialize axes
         else:
             self.ax = self.mplwidget.fig.get_axes()[0]
         self.ax.xaxis.tick_bottom()  # remove axis ticks on top

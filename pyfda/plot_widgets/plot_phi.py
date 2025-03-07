@@ -54,11 +54,11 @@ class Plot_Phi(QWidget):
         """
         Process signals coming from the navigation toolbar and from sig_rx
         """
-        # logger.debug("Processing {0} | needs_calc = {1}, visible = {2}"
-        #              .format(dict_sig, self.needs_calc, self.isVisible()))
+        logger.debug("PROCESS_SIG_RX:\n%s \n\tneeds_calc = %s, visible = %s",
+                     pprint_log(dict_sig), self.needs_calc, self.isVisible())
 
         if dict_sig['id'] == id(self):
-            logger.warning("Stopped infinite loop:\n{0}".format(pprint_log(dict_sig)))
+            logger.warning("Stopped infinite loop:\n%s", pprint_log(dict_sig))
             return
 
         if self.isVisible():
@@ -146,8 +146,7 @@ class Plot_Phi(QWidget):
         """
         Initialize and clear the axes - this is only called once
         """
-        if len(self.mplwidget.fig.get_axes()) == 0:  # empty figure, no axes
-            self.ax = self.mplwidget.fig.subplots()
+        self.ax = self.mplwidget.fig.subplots()
         self.ax.xaxis.tick_bottom()  # remove axis ticks on top
         self.ax.yaxis.tick_left()  # remove axis ticks right
 
@@ -228,7 +227,7 @@ class Plot_Phi(QWidget):
 
         # ---------------------------------------------------------
         self.ax.clear()  # need to clear, doesn't overwrite
-        line_phi = self.ax.plot(F, phi_plt, label=r'$\phi(F)$')
+        self.ax.plot(F, phi_plt, label=r'$\phi(F)$')
         # ---------------------------------------------------------
 
         self.ax.xaxis.set_minor_locator(AutoMinorLocator())  # enable minor ticks
@@ -249,7 +248,7 @@ class Plot_Phi(QWidget):
 
 # ------------------------------------------------------------------------------
 if __name__ == "__main__":
-    """ Run widget standalone with `python -m pyfda.plot_widgets.plot_phi` """
+    # Run widget standalone with `python -m pyfda.plot_widgets.plot_phi`
     import sys
     from pyfda.libs.compat import QApplication
     from pyfda import pyfda_rc as rc

@@ -10,9 +10,10 @@
 Create the UI for the Plot_Tran_Impz class
 """
 import collections
+import logging
 
 from pyfda.libs.compat import (
-    QWidget, QComboBox, QLineEdit, QLabel, QPushButton,
+    QWidget, QComboBox, QLineEdit, QLabel,
     pyqtSignal, QEvent, Qt, QHBoxLayout, QVBoxLayout, QGridLayout)
 
 from pyfda.libs.pyfda_lib import to_html, safe_eval, pprint_log
@@ -23,7 +24,6 @@ from pyfda.libs.pyfda_qt_lib import (
 # FMT string for QLineEdit fields, e.g. '{:.3g}'
 from pyfda.pyfda_rc import params
 
-import logging
 logger = logging.getLogger(__name__)
 
 
@@ -58,15 +58,15 @@ class Plot_Tran_Stim_UI(QWidget):
                 self.normalize_freqs()
 
 # ------------------------------------------------------------------------------
-    def __init__(self, objectName='plot_tran_stim_ui_inst'):
-        super().__init__()
-
+    def __init__(self, objectName: str = 'plot_tran_stim_ui_inst') -> None:
         """
         Intitialize the widget, consisting of:
         - top chkbox row
         - coefficient table
         - two bottom rows with action buttons
         """
+        super().__init__()
+
         # initial settings
         self.setObjectName(objectName)
         self.N_FFT = 0  # TODO: FFT value needs to be passed here somehow?
@@ -1072,8 +1072,8 @@ def main():
 
 
 if __name__ == "__main__":
-    """ Run widget standalone with
-        `python -m pyfda.plot_widgets.tran.plot_tran_stim_ui` """
+    # Run widget standalone with
+    # `python -m pyfda.plot_widgets.tran.plot_tran_stim_ui`
     import sys
     from pyfda.libs.compat import QApplication
     from pyfda import pyfda_rc as rc

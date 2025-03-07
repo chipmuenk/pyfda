@@ -404,8 +404,8 @@ class Plot_3D(QWidget):
         zz = np.array(fb.fil[0]['zpk'][0])
         pp = np.array(fb.fil[0]['zpk'][1])
 
-        wholeF = fb.fil[0]['freqSpecsRangeType'] != 'half'  # not used
-        f_S = fb.fil[0]['f_S']
+        # wholeF = fb.fil[0]['freqSpecsRangeType'] != 'half'  # not used
+        # f_S = fb.fil[0]['f_S']
         N_FFT = fb.conf_settings['N_FFT']
 
         alpha = self.diaAlpha.value()/10.
@@ -438,7 +438,7 @@ class Plot_3D(QWidget):
         H = np.nan_to_num(H)  # replace nans and inf by finite numbers
 
         H_abs = abs(H)
-        H_max = max(H_abs)
+        # H_max = max(H_abs)
         H_min = min(H_abs)
         # f = w / (2 * pi) * f_S                  # translate w to absolute frequencies
         # F_min = f[np.argmin(H_abs)]
@@ -623,8 +623,8 @@ class Plot_3D(QWidget):
         else:
             self._restore_axes()
 
-        self.ax3d.set_xlabel('Re')  # (fb.fil[0]['plt_fLabel'])
-        self.ax3d.set_ylabel('Im')  # (r'$ \tau_g(\mathrm{e}^{\mathrm{j} \Omega}) / T_S \; \rightarrow $')
+        self.ax3d.set_xlabel('Re')
+        self.ax3d.set_ylabel('Im')
 #        self.ax3d.set_zlabel(r'$|H(z)|\; \rightarrow $')
         self.ax3d.set_title(r'3D-Plot of $|H(\mathrm{e}^{\mathrm{j} \Omega})|$ and $|H(z)|$')
 
@@ -640,7 +640,7 @@ class Plot_3D(QWidget):
 
 # ------------------------------------------------------------------------------
 if __name__ == "__main__":
-    """ Run widget standalone with `python -m pyfda.plot_widgets.plot_3d` """
+    # Run widget standalone with `python -m pyfda.plot_widgets.plot_3d`
     import sys
     from pyfda.libs.compat import QApplication
     from pyfda import pyfda_rc as rc
