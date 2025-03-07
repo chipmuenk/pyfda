@@ -104,6 +104,11 @@ If you're working with Anaconda's packet manager conda, there is a recipe for py
 
 You should install pyfda into a new environment to avoid unwanted interaction with other installations.
 
+If you run into problems that conda brings a different Qt version than PyQt5, you will get an error message "PyQt not found". According to issue [#267](https://github.com/chipmuenk/pyfda/issues/267) you should then create the conda pyfda environment from a terminal and start installation from there:
+
+    > conda create --name pyfda
+    > conda install --channel=conda-forge pyfda
+
 ### git
 
 If you want to contribute to pyfda (great idea!), fork the latest version from [https://github.com/chipmuenk/pyfda.git](https://github.com/chipmuenk/pyfda.git) and create a local copy using
