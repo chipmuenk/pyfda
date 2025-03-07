@@ -336,20 +336,20 @@ class Plot_Hf(QWidget):
             # upper limits:
             ax.plot(F_lim_upl, A_lim_upl, F_lim_upc, A_lim_upc, F_lim_upr, A_lim_upr,
                     **hatch_borders)
-            if A_lim_upl:
+            if A_lim_upl.any():
                 ax.fill_between(F_lim_upl, max(A_lim_upl), A_lim_upl, **hatch)
-            if A_lim_upc:
+            if A_lim_upc.any():
                 ax.fill_between(F_lim_upc, max(A_lim_upc), A_lim_upc, **hatch)
-            if A_lim_upr:
+            if A_lim_upr.any():
                 ax.fill_between(F_lim_upr, max(A_lim_upr), A_lim_upr, **hatch)
             # lower limits:
             ax.plot(F_lim_lol, A_lim_lol, F_lim_loc, A_lim_loc, F_lim_lor, A_lim_lor,
                     **hatch_borders)
-            if A_lim_lol:
+            if A_lim_lol.any():
                 ax.fill_between(F_lim_lol, min(A_lim_lol), A_lim_lol, **hatch)
-            if A_lim_loc:
+            if A_lim_loc.any():
                 ax.fill_between(F_lim_loc, min(A_lim_loc), A_lim_loc, **hatch)
-            if A_lim_lor:
+            if A_lim_lor.any():
                 ax.fill_between(F_lim_lor, min(A_lim_lor), A_lim_lor, **hatch)
 
         if self.unitA == 'V':
@@ -394,72 +394,71 @@ class Plot_Hf(QWidget):
         F_SB2 = get_fil_dict(['F_SB2']) * self.f_max
         F_PB2 = get_fil_dict(['F_PB2']) * self.f_max
 
-        F_lim_upl = F_lim_lol = []  # left side limits, lower and upper
-        A_lim_upl = A_lim_lol = []
+        F_lim_upl = np.array([])   # left side limits, upper and lower
+        A_lim_upl = np.array([])
+        F_lim_lol = np.array([])
+        A_lim_lol = np.array([])
 
-        F_lim_upc = F_lim_loc = []  # center limits, lower and upper
-        A_lim_upc = A_lim_loc = []
+        F_lim_upc = np.array([])   # center limits, upper and lower
+        A_lim_upc = np.array([])
+        F_lim_loc = np.array([])
+        A_lim_loc = np.array([])
 
-        F_lim_upr = F_lim_lor = []  # right side limits, lower and upper
-        A_lim_upr = A_lim_lor = []
+        F_lim_upr = np.array([])   # right side limits, upper and lower
+        A_lim_upr = np.array([])
+        F_lim_lor = np.array([])
+        A_lim_lor = np.array([])
 
         if get_fil_dict(['rt']) == 'LP':
-            F_lim_upl = [0,        F_PB,     F_PB]
-            A_lim_upl = [A_PB_max, A_PB_max, A_PB_maxx]
+            F_lim_upl = np.array([0,        F_PB,     F_PB])
+            A_lim_upl = np.array([A_PB_max, A_PB_max, A_PB_maxx])
             F_lim_lol = F_lim_upl
-            A_lim_lol = [A_PB_min, A_PB_min, A_PB_minx]
+            A_lim_lol = np.array([A_PB_min, A_PB_min, A_PB_minx])
 
-            F_lim_upr = [F_SB,     F_SB, F_max]
-            A_lim_upr = [A_SB_maxx, A_SB, A_SB]
+            F_lim_upr = np.array([F_SB,     F_SB, F_max])
+            A_lim_upr = np.array([A_SB_maxx, A_SB, A_SB])
 
         if get_fil_dict(['rt']) == 'HP':
-            F_lim_upl = [0,    F_SB, F_SB]
-            A_lim_upl = [A_SB, A_SB, A_SB_maxx]
+            F_lim_upl = np.array([0,    F_SB, F_SB])
+            A_lim_upl = np.array([A_SB, A_SB, A_SB_maxx])
 
-            F_lim_upr = [F_PB,      F_PB,     F_max]
-            A_lim_upr = [A_PB_maxx, A_PB_max, A_PB_max]
+            F_lim_upr = np.array([F_PB,      F_PB,     F_max])
+            A_lim_upr = np.array([A_PB_maxx, A_PB_max, A_PB_max])
             F_lim_lor = F_lim_upr
-            A_lim_lor = [A_PB_minx, A_PB_min, A_PB_min]
+            A_lim_lor = np.array([A_PB_minx, A_PB_min, A_PB_min])
 
         if get_fil_dict(['rt']) == 'BS':
-            F_lim_upl = [0,        F_PB,     F_PB]
-            A_lim_upl = [A_PB_max, A_PB_max, A_PB_maxx]
+            F_lim_upl = np.array([0,        F_PB,     F_PB])
+            A_lim_upl = np.array([A_PB_max, A_PB_max, A_PB_maxx])
             F_lim_lol = F_lim_upl
-            A_lim_lol = [A_PB_min, A_PB_min, A_PB_minx]
+            A_lim_lol = np.array([A_PB_min, A_PB_min, A_PB_minx])
 
-            F_lim_upc = [F_SB, F_SB, F_SB2, F_SB2]
-            A_lim_upc = [A_SB_maxx, A_SB, A_SB,  A_SB_maxx]
+            F_lim_upc = np.array([F_SB, F_SB, F_SB2, F_SB2])
+            A_lim_upc = np.array([A_SB_maxx, A_SB, A_SB,  A_SB_maxx])
 
-            F_lim_upr = [F_PB2, F_PB2, F_max]
-            A_lim_upr = [A_PB_maxx, A_PB2_max, A_PB2_max]
-            F_lim_lor = F_lim_upr
-            A_lim_lor = [A_PB_minx, A_PB2_min, A_PB2_min]
+            F_lim_upr = np.array([F_PB2, F_PB2, F_max])
+            A_lim_upr = np.array([A_PB_maxx, A_PB2_max, A_PB2_max])
+            F_lim_lor = np.array(F_lim_upr)
+            A_lim_lor = np.array([A_PB_minx, A_PB2_min, A_PB2_min])
 
         if get_fil_dict(['rt']) == 'BP':
-            F_lim_upl = [0,    F_SB, F_SB]
-            A_lim_upl = [A_SB, A_SB, A_SB_maxx]
+            F_lim_upl = np.array([0,    F_SB, F_SB])
+            A_lim_upl = np.array([A_SB, A_SB, A_SB_maxx])
 
-            F_lim_upc = [F_PB,      F_PB,     F_PB2,    F_PB2]
-            A_lim_upc = [A_PB_maxx, A_PB_max, A_PB_max, A_PB_maxx]
+            F_lim_upc = np.array([F_PB,      F_PB,     F_PB2,    F_PB2])
+            A_lim_upc = np.array([A_PB_maxx, A_PB_max, A_PB_max, A_PB_maxx])
             F_lim_loc = F_lim_upc
-            A_lim_loc = [A_PB_minx, A_PB_min, A_PB_min, A_PB_minx]
+            A_lim_loc = np.array([A_PB_minx, A_PB_min, A_PB_min, A_PB_minx])
 
-            F_lim_upr = [F_SB2,    F_SB2, F_max]
-            A_lim_upr = [A_SB_maxx, A_SB2, A_SB2]
+            F_lim_upr = np.array([F_SB2,    F_SB2, F_max])
+            A_lim_upr = np.array([A_SB_maxx, A_SB2, A_SB2])
 
         if get_fil_dict(['rt']) == 'HIL':
-            F_lim_upc = [F_PB,      F_PB,     F_PB2,    F_PB2]
-            A_lim_upc = [A_PB_maxx, A_PB_max, A_PB_max, A_PB_maxx]
+            F_lim_upc = np.array([F_PB,      F_PB,     F_PB2,    F_PB2])
+            A_lim_upc = np.array([A_PB_maxx, A_PB_max, A_PB_max, A_PB_maxx])
 
             F_lim_loc = F_lim_upc
-            A_lim_loc = [A_PB_minx, A_PB_min, A_PB_min, A_PB_minx]
-
-        F_lim_upr = np.array(F_lim_upr)
-        F_lim_lor = np.array(F_lim_lor)
-        F_lim_upl = np.array(F_lim_upl)
-        F_lim_lol = np.array(F_lim_lol)
-        F_lim_upc = np.array(F_lim_upc)
-        F_lim_loc = np.array(F_lim_loc)
+            A_lim_loc = np.array([A_PB_minx, A_PB_min, A_PB_min, A_PB_minx])
 
         _plot_specs()  # plot specs in the range 0 ... f_S/2
 
