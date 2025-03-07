@@ -15,6 +15,15 @@ import sys
 
 import numpy as np
 import matplotlib
+
+from pyfda.libs.compat import Qt, QApplication, QIcon
+# from pyfda.libs.pyfda_lib import ANSIcolors as ACol
+import pyfda.libs.pyfda_dirs as dirs # initial import constructs file paths
+from pyfda.libs.tree_builder import Tree_Builder
+import pyfda.pyfda_rc as rc
+
+from pyfda.pyfda_class import pyFDA
+
 # specify matplotlib backend for systems that have both PyQt4 and PyQt5 installed
 # to avoid
 # "RuntimeError: the PyQt4.QtCore and PyQt5.QtCore modules both wrap the QObject class"
@@ -22,18 +31,6 @@ matplotlib.use("Qt5Agg")
 # turn off matplotlib debug messages by elevating the level to "Warning"
 mpl_logger = logging.getLogger('matplotlib')
 mpl_logger.setLevel(logging.WARNING)
-
-from pyfda.libs.compat import Qt, QApplication, QIcon
-# from pyfda.libs.pyfda_lib import ANSIcolors as ACol
-import pyfda.libs.pyfda_dirs as dirs # initial import constructs file paths
-from pyfda.libs.tree_builder import Tree_Builder
-# initialize the FilterTreeBuilder class and read config file
-tree_builder = Tree_Builder()
-tree_builder.parse_conf_file()
-
-import pyfda.pyfda_rc as rc
-
-from pyfda.pyfda_class import pyFDA
 
 if dirs.OS.lower() == "windows":
     # Windows taskbar is not for "Application Windows" but for "Application
@@ -46,6 +43,10 @@ if dirs.OS.lower() == "windows":
     ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID(myappid)
 
 logger = logging.getLogger(__name__)
+
+# initialize the FilterTreeBuilder class and read config file
+tree_builder = Tree_Builder()
+tree_builder.parse_conf_file()
 
 def main():
     """
