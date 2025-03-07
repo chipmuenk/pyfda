@@ -275,53 +275,53 @@ class Plot_Hf(QWidget):
         ax2_lim0 = ax2_yticks[0] - ax2_yoffset
         ax2.set_ybound(ax2_lim0, ax2_lim0 + ax2_ydelta_lim)
 
-# =============================================================================
-#             # https://stackoverflow.com/questions/26752464/how-do-i-align-gridlines-for-two-y-axis-scales-using-matplotlib
-#             # works, but both axes have ugly numbers
-#             nticks = 11
-#             ax.yaxis.set_major_locator(ticker.LinearLocator(nticks))
-#             self.ax_p.yaxis.set_major_locator(ticker.LinearLocator(nticks))
-# # =============================================================================
-# =============================================================================
-#             # https://stackoverflow.com/questions/45037386/trouble-aligning-ticks-for-matplotlib-twinx-axes
-#             # works, but second axis has ugly numbering
-#             l_H = ax.get_ylim()
-#             l_p = self.ax_p.get_ylim()
-#             f = lambda x : l_p[0]+(x-l_H[0])/(l_H[1]-l_H[0])*(l_p[1]-l_p[0])
-#             ticks = f(ax.get_yticks())
-#             self.ax_p.yaxis.set_major_locator(ticker.FixedLocator(ticks))
-#
-# =============================================================================
+    # =============================================================================
+    # https://stackoverflow.com/questions/26752464/how-do-i-align-gridlines-for-two-y-axis-scales-using-matplotlib
+    # works, but both axes have ugly numbers
+    #  nticks = 11
+    #  ax.yaxis.set_major_locator(ticker.LinearLocator(nticks))
+    #  self.ax_p.yaxis.set_major_locator(ticker.LinearLocator(nticks))
+    # # =============================================================================
+    # =============================================================================
+    # https://stackoverflow.com/questions/45037386/trouble-aligning-ticks-for-matplotlib-twinx-axes
+    # works, but second axis has ugly numbering
+    #  l_H = ax.get_ylim()
+    #  l_p = self.ax_p.get_ylim()
+    #  f = lambda x : l_p[0]+(x-l_H[0])/(l_H[1]-l_H[0])*(l_p[1]-l_p[0])
+    #  ticks = f(ax.get_yticks())
+    #  self.ax_p.yaxis.set_major_locator(ticker.FixedLocator(ticks))
+    #
+    # =============================================================================
 
-            # http://stackoverflow.com/questions/28692608/align-grid-lines-on-two-plots
-            # http://stackoverflow.com/questions/3654619/matplotlib-multiple-y-axes-grid-lines-applied-to-both
-            # http://stackoverflow.com/questions/20243683/matplotlib-align-twinx-tick-marks
-            # manual setting:
-            #self.ax_p.set_yticks( np.linspace(self.ax_p.get_ylim()[0],self.ax_p.get_ylim()[1],nbins) )
-            #ax1.set_yticks(np.linspace(ax1.get_ybound()[0], ax1.get_ybound()[1], 5))
-            #ax2.set_yticks(np.linspace(ax2.get_ybound()[0], ax2.get_ybound()[1], 5))
-            #http://stackoverflow.com/questions/3654619/matplotlib-multiple-y-axes-grid-lines-applied-to-both
+    # http://stackoverflow.com/questions/28692608/align-grid-lines-on-two-plots
+    # http://stackoverflow.com/questions/3654619/matplotlib-multiple-y-axes-grid-lines-applied-to-both
+    # http://stackoverflow.com/questions/20243683/matplotlib-align-twinx-tick-marks
+    # manual setting:
+    #self.ax_p.set_yticks( np.linspace(self.ax_p.get_ylim()[0],self.ax_p.get_ylim()[1],nbins) )
+    #ax1.set_yticks(np.linspace(ax1.get_ybound()[0], ax1.get_ybound()[1], 5))
+    #ax2.set_yticks(np.linspace(ax2.get_ybound()[0], ax2.get_ybound()[1], 5))
+    #http://stackoverflow.com/questions/3654619/matplotlib-multiple-y-axes-grid-lines-applied-to-both
 
-            # use helper functions from matplotlib.ticker:
-            #   MaxNLocator: set no more than nbins + 1 ticks
-            #self.ax_p.yaxis.set_major_locator( matplotlib.ticker.MaxNLocator(nbins = nbins) )
-            # further options: integer = False,
-            #                   prune = [‘lower’ | ‘upper’ | ‘both’ | None] Remove edge ticks
-            #   AutoLocator:
-            #self.ax_p.yaxis.set_major_locator( matplotlib.ticker.AutoLocator() )
-            #   LinearLocator:
-            #self.ax_p.yaxis.set_major_locator( matplotlib.ticker.LinearLocator(numticks = nbins -1 ) )
+    # use helper functions from matplotlib.ticker:
+    #   MaxNLocator: set no more than nbins + 1 ticks
+    #self.ax_p.yaxis.set_major_locator( matplotlib.ticker.MaxNLocator(nbins = nbins) )
+    # further options: integer = False,
+    #                   prune = [‘lower’ | ‘upper’ | ‘both’ | None] Remove edge ticks
+    #   AutoLocator:
+    #self.ax_p.yaxis.set_major_locator( matplotlib.ticker.AutoLocator() )
+    #   LinearLocator:
+    #self.ax_p.yaxis.set_major_locator( matplotlib.ticker.LinearLocator(numticks = nbins -1 ) )
 
-#            self.ax_p.locator_params(axis = 'y', nbins = nbins)
-#
-#            self.ax_p.set_yticks(np.linspace(self.ax_p.get_ybound()[0],
-#                                             self.ax_p.get_ybound()[1],
-#                                             len(self.ax.get_yticks())-1))
+    # self.ax_p.locator_params(axis = 'y', nbins = nbins)
+    #
+    # self.ax_p.set_yticks(np.linspace(self.ax_p.get_ybound()[0],
+    #                                  self.ax_p.get_ybound()[1],
+    #                                  len(self.ax.get_yticks())-1))
 
-            #N = source_ax.xaxis.get_major_ticks()
-            #target_ax.xaxis.set_major_locator(LinearLocator(N))
+    # N = source_ax.xaxis.get_major_ticks()
+    # target_ax.xaxis.set_major_locator(LinearLocator(N))
 
-#------------------------------------------------------------------------------
+    #------------------------------------------------------------------------------
     def plot_spec_limits(self, ax):
         """
         Plot the specifications limits (F_SB, A_SB, ...) as hatched areas with borders.
