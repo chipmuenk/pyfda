@@ -68,8 +68,8 @@ class Plot_Hf(QWidget):
         """
         Process signals coming from the navigation toolbar and from sig_rx
         """
-        # logger.debug("SIG_RX - needs_calc = {0}, vis = {1}\n{2}"\
-        #              .format(self.needs_calc, self.isVisible(), pprint_log(dict_sig)))
+        logger.debug("SIG_RX - needs_calc = %s, vis = %s\n%s",
+                     self.needs_calc, self.isVisible(), pprint_log(dict_sig))
 
         if self.isVisible():
             if 'data_changed' in dict_sig or 'specs_changed' in dict_sig\
@@ -263,15 +263,9 @@ class Plot_Hf(QWidget):
         ax2_scale = ax2_ydelta_lim / ax2_ydelta_vis
         # calculate new offset between lower limit and first tick
         ax2_yoffset = ax1_yoffset * ax2_ydelta_lim / ax1_ydelta_lim
-        # logger.warning("ax2: delta_vis: {0}, scale: {1}, offset: {2}"
-        #                .format(ax2_ydelta_vis, ax2_scale, ax2_yoffset))
-        # logger.warning("Ticks: {0} # {1}".format(ax1_nticks, ax2_nticks))
-
         ax2.set_yticks(np.linspace(ax2_yticks[0],
                                    (ax2_yticks[1]-ax2_yticks[0]),
                                    ax1_nticks))
-        # logger.warning("ax2[0]={0} | ax2[1]={1} ax2[-1]={2}".format(ax2_yticks[0],
-        #                            ax2_yticks[1], ax2_yticks[-1]))
         ax2_lim0 = ax2_yticks[0] - ax2_yoffset
         ax2.set_ybound(ax2_lim0, ax2_lim0 + ax2_ydelta_lim)
 
@@ -749,8 +743,6 @@ class Plot_Hf(QWidget):
             #     self.ax_bounds = [self.ax.get_ybound()[0], self.ax.get_ybound()[1]]#, self.ax.get]
             self.ax.set_xlim(f_lim)
             self.ax.set_ylim(A_lim)
-            # logger.warning("set limits")
-
             self.ax.set_xlabel(get_fil_dict(['plt_fLabel']))
             self.ax.set_ylabel(H_str)
 
@@ -793,12 +785,11 @@ class Plot_Hf(QWidget):
             # Align gridlines between H(f) and phi nicely
             self.align_y_axes(self.ax, self.ax_p)
         self.mplwidget.redraw()
-        #logger.warning("redraw")
 
 #------------------------------------------------------------------------------
 
 if __name__ == "__main__":
-    """ Run widget standalone with `python -m pyfda.plot_widgets.plot_hf`"""
+    # Run widget standalone with `python -m pyfda.plot_widgets.plot_hf`
     import sys
     from pyfda.libs.compat import QApplication
     from pyfda import pyfda_rc as rc
