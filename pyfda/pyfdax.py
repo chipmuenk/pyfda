@@ -155,20 +155,17 @@ def main():
 
     mainw = pyFDA()
     logger.info("Logging to '%s'", dirs.LOG_DIR_FILE)
-    logger.info(f"Starting pyfda with screen resolution {width} x {height}, "
-                f"avail: {avail_geometry.width()}x{avail_geometry.height()}")
+    logger.info("Starting pyfda with screen resolution %d x %d, avail: %d x %d",
+                width, height, avail_geometry.width(), avail_geometry.height())
     logger.info("with %s and matplotlib fontsize %d.", style, fontsize)
-    logger.info(f"lDPI = {ldpi:.2f}, pDPI = {pdpi:.2f} ({pdpix:.2f} x {pdpiy:.2f}), "
-                f"pix.ratio = {pixel_ratio}\n")
+    logger.info("lDPI = %.2f, pDPI = %.2f (%.2f x %.2f), pix.ratio = %f",
+                ldpi, pdpi, pdpix, pdpiy, pixel_ratio)
 
     # Available signals:
     # - logicalDotsPerInchChanged(qreal dpi)
     # - physicalDotsPerInchChanged(qreal dpi)
     # - geometryChanged(const QRect &geometry)
     # - availableGeometryChanged(const QRect &geometry)
-
-    # logger.info(f"size = {font.pointSize()}, {font.pointSizeF()}, {font.pixelSize()},  "
-    #             f"height = {fm.height()}")
 
     # set taskbar icon
     app.setWindowIcon(QIcon(':/pyfda_icon.svg'))

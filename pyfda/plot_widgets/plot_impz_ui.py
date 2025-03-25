@@ -58,11 +58,10 @@ class PlotImpz_UI(QWidget):
         - qfft_win_select
         """
 
-        logger.warning(f"PROCESS_SIG_RX - vis: {self.isVisible()}\n{pprint_log(dict_sig)}")
+        logger.warning("PROCESS_SIG_RX - vis: %s\n%s", self.isVisible(), pprint_log(dict_sig))
 
         if 'id' in dict_sig and dict_sig['id'] == id(self):
-            logger.warning("Stopped infinite loop:\n{0}".format(
-                pprint_log(dict_sig)))
+            logger.warning("Stopped infinite loop:\n%s", pprint_log(dict_sig))
             return
 
         # --- signals coming from the FFT window widget or the FFT window selector
