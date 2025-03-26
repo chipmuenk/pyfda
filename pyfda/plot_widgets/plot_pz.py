@@ -526,12 +526,11 @@ class Plot_PZ(QWidget):
         self.ax.apply_aspect()  # normally, the correct aspect is only set when plotting
         xl = self.ax.get_xlim()
         yl = self.ax.get_ylim()
-        # logger.warning(xl)
-        # logger.warning(yl)
+        # logger.warning("limits: {0}, {1}".format(xl, yl))
 
         [x, y] = np.meshgrid(
-            np.arange(xl[0], xl[1], 0.01),
-            np.arange(yl[0], yl[1], 0.01))
+            np.arange(xl[0], xl[1], (xl[1] - xl[0]) / 500),
+            np.arange(yl[0], yl[1], (yl[1] - yl[0]) / 500))
         z = x + 1j*y  # create coordinate grid for complex plane
 
         if self.but_log.checked:
