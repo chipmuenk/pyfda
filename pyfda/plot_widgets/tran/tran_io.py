@@ -13,7 +13,7 @@ import logging
 
 import numpy as np
 
-from pyfda.libs.compat import Qt, QWidget, pyqtSignal, QVBoxLayout, QDialog, QPushButton
+from pyfda.libs.compat import QWidget, pyqtSignal, QVBoxLayout, QDialog, QPushButton
 
 import pyfda.libs.pyfda_io_lib as io
 import pyfda.filterbroker as fb
@@ -21,7 +21,7 @@ import pyfda.libs.pyfda_dirs as dirs
 
 from pyfda.libs.pyfda_lib import safe_eval, pprint_log
 from pyfda.libs.pyfda_qt_lib import (
-    emit, qstyle_widget, qget_cmb_box, qset_cmb_box, qwindow_stay_on_top, PushButton)
+    emit, qstyle_widget, qget_cmb_box, qset_cmb_box, qwindow_stay_on_top)
 from pyfda.libs.csv_option_box import CSV_option_box
 
 from pyfda.pyfda_rc import params  # FMT string for QLineEdit fields, e.g. '{:.3g}'
