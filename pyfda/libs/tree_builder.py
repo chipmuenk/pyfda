@@ -10,11 +10,15 @@
 Create the tree dictionaries containing information about filters,
 filter implementations, widgets etc. in hierarchical form
 """
-import os, sys, re, ast
+import ast
 from collections import OrderedDict
-from pprint import pformat
-import importlib
 import configparser
+import importlib
+import logging
+import os
+from pprint import pformat
+import re
+import sys
 
 import pyfda.filterbroker as fb
 import pyfda.filter_factory as ff
@@ -22,7 +26,6 @@ import pyfda.libs.pyfda_dirs as dirs
 
 from .frozendict import freeze_hierarchical
 
-import logging
 logger = logging.getLogger(__name__)
 
 REQ_VERSION = 4  # required version for config file
