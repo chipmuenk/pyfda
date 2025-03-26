@@ -538,7 +538,7 @@ class Input_Specs(QWidget):
 
 # ------------------------------------------------------------------------------
 if __name__ == '__main__':
-    """ Run widget standalone with `python -m pyfda.input_widgets.input_specs` """
+    # Run widget standalone with `python -m pyfda.input_widgets.input_specs`
     from pyfda.libs.compat import QApplication
     from pyfda import pyfda_rc as rc
 

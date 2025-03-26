@@ -354,9 +354,8 @@ class FIR_DF_amaranth_UI(QWidget):
 
 # ------------------------------------------------------------------------------
 if __name__ == '__main__':
-    """ Run widget standalone with
-        `python -m pyfda.fixpoint_widgets.fir_df.fir_df_amaranth_ui`
-    """
+    # Run widget standalone with `python -m pyfda.fixpoint_widgets.fir_df.fir_df_amaranth_ui`
+
     from pyfda.libs.compat import QApplication
     from pyfda import pyfda_rc as rc
 

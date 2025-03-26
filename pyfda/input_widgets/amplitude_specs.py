@@ -62,11 +62,10 @@ class AmplitudeSpecs(QWidget):
         """
         Process signals coming in via subwidgets and sig_rx
         """
-        # logger.warning(
-        #    f"SIG_RX: {first_item(dict_sig)}")
+        logger.debug("SIG_RX: %s", first_item(dict_sig))
         if dict_sig['id'] == id(self):
             # this should never happen
-            logger.warning("Stopped infinite loop:\n{0}".format(pprint_log(dict_sig)))
+            logger.warning("Stopped infinite loop:\n%s", pprint_log(dict_sig))
             return
         elif 'data_changed' in dict_sig and dict_sig['data_changed'] == 'filter_loaded':
             self.load_dict()
@@ -337,7 +336,7 @@ class AmplitudeSpecs(QWidget):
 
 # ------------------------------------------------------------------------------
 if __name__ == '__main__':
-    """ Run widget standalone with `python -m pyfda.input_widgets.amplitude_specs` """
+    # Run widget standalone with `python -m pyfda.input_widgets.amplitude_specs`
     from pyfda.libs.compat import QApplication
     from pyfda import pyfda_rc as rc
 

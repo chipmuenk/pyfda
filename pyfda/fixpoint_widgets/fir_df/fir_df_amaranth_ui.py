@@ -168,8 +168,7 @@ class FIR_DF_amaranth_UI(QWidget):
             # signal generated locally by modifying coefficient / accu format
             if not dict_sig['sender_name']\
                     in {'fx_ui_wq_fir_df_coeffs_b', 'fx_ui_wq_fir_df_accu'}:
-                logger.error(f"Unknown widget name '{dict_sig['sender_name']}' "
-                             f"in '{__name__}' !")
+                logger.error("Unknown widget name '%s' in '%s'!", dict_sig['sender_name'], __name__)
                 return
 
             elif dict_sig['sender_name'] == 'fx_ui_wq_fir_df_accu':  # accu format updated
@@ -212,7 +211,7 @@ class FIR_DF_amaranth_UI(QWidget):
             else:
                 A_coeff = 0
         except BaseException:
-            logger.error("An error occured:", exc_info=True)
+            logger.error("An error occurred:", exc_info=True)
             return
 
         # calculate required accumulator word format and update filter dict

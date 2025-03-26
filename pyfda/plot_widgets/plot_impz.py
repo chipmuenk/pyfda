@@ -659,8 +659,7 @@ class Plot_Impz(QWidget):
                 self.x_q = np.empty_like(self.x, dtype=np.float64)
                 if np.any(np.iscomplex(x_test)):
                     logger.warning(
-                        "Complex stimulus: Only its real part is used for the "
-                        "fixpoint filter!")
+                        "Complex stimulus: Only its real part is used for the fixpoint filter!")
                 # setup and initialize input quantizer
                 self.q_i = fx.Fixed(get_fil_dict(['fxq', 'QI']))
                 # always use integer decimal format for input quantizer
@@ -796,12 +795,13 @@ class Plot_Impz(QWidget):
         # self.needs_redraw[self.tab_mpl_w.currentIndex()] = False
         self.needs_calc = False
         self.needs_calc_fx = False
-        logger.info(
-            f'Calc / plot '
-            f'({(self.t_resp - self.t_start) * 1000:5.4g} / '
-            f'{(time.process_time() - self.t_resp) * 1000:5.4g} ms) '
-            f'transient {self.fx_str}response')
+        logger.info('Calc / plot (%5.4g / %5.4g ms) transient %sresponse',
+                    (self.t_resp - self.t_start) * 1000,
+                    (time.process_time() - self.t_resp) * 1000,
+                    self.fx_str)
 
+        self.ui.but_run.setIcon(QIcon(":/play.svg"))
+        qstyle_widget(self.ui.but_run, "normal")
         self.ui.but_run.setIcon(QIcon(":/play.svg"))
         qstyle_widget(self.ui.but_run, "normal")
         # update Tran_IO ui, depending on complex and fixpoint status
@@ -893,9 +893,8 @@ class Plot_Impz(QWidget):
             logger.warning("Stimulus is 'None', FFT cannot be calculated.")
         elif len(self.x) < self.ui.N_end:
             self.X = np.zeros(N)  # dummy result
-            logger.warning(
-                "Length of stimulus is {0} < N = {1}, FFT cannot be calculated."
-                .format(len(self.x), self.ui.N_end))
+            logger.warning("Length of stimulus is %d < N = %d, FFT cannot be calculated.",
+                           len(self.x), self.ui.N_end)
         else:
             # multiply the  time signal with window function
             x_win = self.x[self.ui.N_start:self.ui.N_end] * win
@@ -980,8 +979,7 @@ class Plot_Impz(QWidget):
             except AttributeError as e:
                 logger.error("Attribute error: %s", e)
             except TypeError as e:
-                logger.error(
-                    "Type error: 'fxqc_dict'={0},\n{1}".format(get_fil_dict(['fxq']), e))
+                logger.error("Type error: 'fxqc_dict'=%s,\n%s", get_fil_dict(['fxq']), e)
             except ValueError as e:
                 logger.error("Value error: %s", e)
 
@@ -1456,8 +1454,7 @@ class Plot_Impz(QWidget):
                 spgr_pre = r"$\angle$"
 
             else:
-                logger.warning(
-                    f"Unknown spectrogram mode '{mode}', falling back to 'psd'")
+                logger.warning("Unknown spectrogram mode '%s', falling back to 'psd'", mode)
                 mode = "psd"
 
             # ------- lin / log ----------------------
@@ -1688,10 +1685,9 @@ class Plot_Impz(QWidget):
                     * self.stim_wdg.ui.scale_impz
                 if fb.fil[0]['tran_freq_win']['id'] not in\
                         {'boxcar', 'rectangular'}:
-                    logger.warning(
-                        f"Use a Boxcar (Rectangular) window for a correctly scaled\n"
-                        f"\tFFT of an impulse instead of a "
-                        f"{fb.fil[0]['tran_freq_win']['disp_name']} window!")
+                    logger.warning("Use a Boxcar (Rectangular) window for a correctly scaled\n"
+                                   "\tFFT of an impulse instead of a %s window!",
+                                   fb.fil[0]['tran_freq_win']['disp_name'])
             else:
                 freq_resp = False
                 scale_impz = 1.
@@ -2080,7 +2076,7 @@ class Plot_Impz(QWidget):
 # ------------------------------------------------------------------------------
 
 if __name__ == "__main__":
-    """ Run widget standalone with `python -m pyfda.plot_widgets.plot_impz` """
+    # Run widget standalone with `python -m pyfda.plot_widgets.plot_impz`
     import sys
     from pyfda.libs.compat import QApplication
     from pyfda import pyfda_rc as rc

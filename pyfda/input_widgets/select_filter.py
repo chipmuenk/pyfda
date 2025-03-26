@@ -507,7 +507,7 @@ class SelectFilter(QWidget):
 
 # ------------------------------------------------------------------------------
 if __name__ == '__main__':
-    """ Run widget standalone with `python -m pyfda.input_widgets.select_filter` """
+    # Run widget standalone with `python -m pyfda.input_widgets.select_filter`
     from pyfda.libs.compat import QApplication
 
     app = QApplication(sys.argv)

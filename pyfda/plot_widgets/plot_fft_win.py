@@ -170,12 +170,11 @@ class Plot_FFT_win(QDialog):
         - `self.update_view`:
         - `self.draw`: calculate window and FFT and draw both
         """
-        # logger.warning(f"PROCESS_SIG_RX:\n\tvis={self.isVisible()}, "
-        #                f"name={self.objectName()}, needs_calc={self.needs_calc}"
-        #                f"\n{pprint_log(dict_sig)}")
+        logger.debug("PROCESS_SIG_RX:\n\tvis=%s, name=%s, needs_calc=%s\n%s",
+                     self.isVisible(), self.objectName(), self.needs_calc, pprint_log(dict_sig))
 
         if dict_sig['id'] == id(self):
-            logger.warning("Stopped infinite loop:\n{0}".format(pprint_log(dict_sig)))
+            logger.warning("Stopped infinite loop:\n%s", pprint_log(dict_sig))
             return
 
         elif not self.isVisible():
@@ -205,7 +204,7 @@ class Plot_FFT_win(QDialog):
                 # Window and control widget only becomes invisible for minimum detail level
                 self.frm_controls.setVisible(self.mplwidget.mplToolbar.a_ui_level < 2)
         else:
-            logger.error("Cannont process dict_sig: {0}".format(dict_sig))
+            logger.error("Cannot process dict_sig: %s", dict_sig)
 
 # ------------------------------------------------------------------------------
     def _construct_UI(self):
@@ -602,7 +601,7 @@ class Plot_FFT_win(QDialog):
                 self.tbl_sel[num] = False
 
         elif item.column() % 3 == 1:  # clicked on value field
-            logger.info("{0:s} copied to clipboard.".format(item.text()))
+            logger.info("%s copied to clipboard.", item.text())
             fb.clipboard.setText(item.text())
 
         self.update_view()
@@ -837,7 +836,7 @@ class Plot_FFT_win(QDialog):
 
 # ==============================================================================
 if __name__ == '__main__':
-    """ Run widget standalone with `python -m pyfda.plot_widgets.plot_fft_win` """
+    # Run widget standalone with `python -m pyfda.plot_widgets.plot_fft_win`
     import sys
     from pyfda.libs.compat import QApplication
     from pyfda import pyfda_rc as rc

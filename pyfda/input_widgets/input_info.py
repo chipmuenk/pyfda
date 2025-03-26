@@ -509,7 +509,7 @@ class Input_Info(QWidget):
 
 # ------------------------------------------------------------------------------
 if __name__ == '__main__':
-    """ Run widget standalone with `python -m pyfda.input_widgets.input_info` """
+    # Run widget standalone with `python -m pyfda.input_widgets.input_info`
     from pyfda.libs.compat import QApplication
     from pyfda import pyfda_rc as rc
 

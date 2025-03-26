@@ -248,7 +248,7 @@ class Plot_PZ(QWidget):
     # --------------------------------------------------------------------------
     def update_view(self):
         """
-        Draw the figure with new limits, scale etcs without recalculating H(f)
+        Draw the figure with new limits, scale etc without recalculating H(f)
         -- not yet implemented, just use draw() for the moment
         """
         self.draw()
@@ -501,7 +501,26 @@ class Plot_PZ(QWidget):
         return z, p, k
 
     # --------------------------------------------------------------------------
-    def draw_contours(self, overlay):
+    def draw_contours(self, overlay: str) -> None:
+        """
+        Draw contour or filled contour plots for the magnitude response |H(z)|
+        in the complex z-plane.
+
+        Parameters:
+        -----------
+        overlay : str
+            Specifies the type of overlay to draw. Valid options are:
+            - "contour": Draw contour lines for |H(z)|.
+            - "contourf": Draw filled contours for |H(z)|.
+            - Any other value will skip drawing contours.
+
+        Notes:
+        ------
+        - The method uses the current axis limits to create a grid in the z-plane.
+        - The magnitude response is computed using the filter coefficients from
+          `fb.fil[0]['ba']`.
+        - A colorbar is added to the plot to represent the magnitude values.
+        """
         if overlay not in {"contour", "contourf"}:
             return
         self.ax.apply_aspect()  # normally, the correct aspect is only set when plotting
@@ -540,9 +559,17 @@ class Plot_PZ(QWidget):
         self.ax.set_ylim(yl)  # Fixed: Correctly restore the y-axis limits
 
     # --------------------------------------------------------------------------
-    def draw_Hf(self, r=2, Hf_visible=True):
+    def draw_Hf(self, r: float = 2, Hf_visible: bool = True) -> None:
         """
-        Draw the magnitude frequency response around the UC
+        Draw the magnitude frequency response around the unit circle.
+
+        Parameters:
+        -----------
+        r : float
+            Radius for scaling the frequency response.
+
+        Hf_visible : bool
+            Whether to display the frequency response.
         """
         self.diaRad_Hf.setVisible(Hf_visible)
         self.lblRad_Hf.setVisible(Hf_visible)

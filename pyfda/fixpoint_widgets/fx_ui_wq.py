@@ -567,7 +567,7 @@ class FX_UI_WQ(QWidget):
         self.ledWF.setEnabled(self.Q.q_dict['w_a_m'] == 'm')
 # ==============================================================================
 if __name__ == '__main__':
-    """ Run widget standalone with `python -m pyfda.fixpoint_widgets.fx_ui_wq` """
+    # Run widget standalone with `python -m pyfda.fixpoint_widgets.fx_ui_wq`
 
     from pyfda.libs.compat import QApplication
     from pyfda import pyfda_rc as rc

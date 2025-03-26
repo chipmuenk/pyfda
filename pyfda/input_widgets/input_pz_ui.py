@@ -350,7 +350,7 @@ class Input_PZ_UI(QWidget):
 
 # ------------------------------------------------------------------------------
 if __name__ == '__main__':
-    """ Run widget standalone with `python -m pyfda.input_widgets.input_pz_ui` """
+    # Run widget standalone with `python -m pyfda.input_widgets.input_pz_ui`
 
     import sys
     from pyfda.libs.compat import QApplication

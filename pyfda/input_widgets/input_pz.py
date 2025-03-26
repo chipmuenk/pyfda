@@ -831,7 +831,7 @@ class Input_PZ(QWidget):
 
 # ------------------------------------------------------------------------------
 if __name__ == '__main__':
-    """ Run widget standalone with `python -m pyfda.input_widgets.input_pz` """
+    # Run widget standalone with `python -m pyfda.input_widgets.input_pz`
     from pyfda import pyfda_rc as rc
     app = QApplication(sys.argv)
     app.setStyleSheet(rc.QSS_RC)

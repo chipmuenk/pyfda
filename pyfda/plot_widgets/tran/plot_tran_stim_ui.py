@@ -46,12 +46,10 @@ class Plot_Tran_Stim_UI(QWidget):
         - qfft_win_select
         """
 
-        # logger.warning("PROCESS_SIG_RX - vis: {0}\n{1}"
-        #             .format(self.isVisible(), pprint_log(dict_sig)))
+        logger.debug("PROCESS_SIG_RX - vis: %s\n%s", self.isVisible(), pprint_log(dict_sig))
 
         if 'id' in dict_sig and dict_sig['id'] == id(self):
-            logger.warning("Stopped infinite loop:\n{0}".format(
-                pprint_log(dict_sig)))
+            logger.warning("Stopped infinite loop:\n%s", pprint_log(dict_sig))
             return
         elif 'view_changed' in dict_sig:
             if dict_sig['view_changed'] == 'f_S':
@@ -685,7 +683,7 @@ class Plot_Tran_Stim_UI(QWidget):
                 else:
                     source.setText(str(params['FMT'].format(var * scale)))
             except KeyError:
-                logger.warning(f"Unknown objectName {source.objectName}!")
+                logger.warning("Unknown objectName %s!", source.objectName)
 
         #------------------------------------------------------------
         def _store_entry(source):
@@ -778,8 +776,8 @@ class Plot_Tran_Stim_UI(QWidget):
             self.f_scale = fb.fil[0]['f_S']
         self.t_scale = fb.fil[0]['T_S']
 
-        # logger.warning(f"f_S = {fb.fil[0]['f_S']}, prev = {fb.fil[0]['f_S_prev']}\n"
-        #                f"f_scale = {self.f_scale}, f_1 = {self.f1}, f_corr = {f_corr}")
+        # logger.warning("f_S = %s, prev = %s\nf_scale = %s, f_1 = %s, f_corr = %s",
+        #               fb.fil[0]['f_S'], fb.fil[0]['f_S_prev'], self.f_scale, self.f1, f_corr)
 
         # update and round the display
         for w in self.dict_filtered_widgets:
@@ -789,7 +787,7 @@ class Plot_Tran_Stim_UI(QWidget):
             scale = getattr(self, param_name)
             # access lineedit object
             led = getattr(self, w)
-            # logger.warning(f"{w} - {var} - {getattr(self, w).text()}")
+            # logger.warning("%s - %s - %s", w, var, getattr(self, w).text())
             # update the text with the denormalized frequency / time variable
             led.setText(str(params['FMT'].format(var * scale)))
             # self.led_f1.setText(str(params['FMT'].format(self.f1 * self.f_scale)))
@@ -1072,8 +1070,7 @@ def main():
 
 
 if __name__ == "__main__":
-    # Run widget standalone with
-    # `python -m pyfda.plot_widgets.tran.plot_tran_stim_ui`
+    # Run widget standalone with `python -m pyfda.plot_widgets.tran.plot_tran_stim_ui`
     import sys
     from pyfda.libs.compat import QApplication
     from pyfda import pyfda_rc as rc

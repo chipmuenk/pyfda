@@ -241,9 +241,7 @@ class FIR_DF_pyfixp_UI(QWidget):
 
 # ------------------------------------------------------------------------------
 if __name__ == '__main__':
-    """ Run widget standalone with
-    `python -m pyfda.fixpoint_widgets.fir_df.fir_df_pyfixp_ui`
-    """
+    # Run widget standalone with `python -m pyfda.fixpoint_widgets.fir_df.fir_df_pyfixp_ui`
     from pyfda.libs.compat import QApplication
     from pyfda import pyfda_rc as rc
 

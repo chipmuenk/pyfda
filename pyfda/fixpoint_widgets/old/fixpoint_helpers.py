@@ -784,7 +784,7 @@ class UI_WQ(QWidget):
 
 # ==============================================================================
 if __name__ == '__main__':
-    """ Run widget standalone with `python -m pyfda.fixpoint_widgets.fixpoint_helpers` """
+    # Run widget standalone with `python -m pyfda.fixpoint_widgets.fixpoint_helpers`
 
     from pyfda.libs.compat import QApplication
     from pyfda import pyfda_rc as rc

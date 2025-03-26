@@ -345,9 +345,8 @@ class FIR_DF_nmigen_UI(QWidget):
 
 # ------------------------------------------------------------------------------
 if __name__ == '__main__':
-    """ Run widget standalone with
-        `python -m pyfda.fixpoint_widgets.fir_df.fir_df_nmigen_ui`
-    """
+    # Run widget standalone with `python -m pyfda.fixpoint_widgets.fir_df.fir_df_nmigen_ui`
+
     from pyfda.libs.compat import QApplication
     from pyfda import pyfda_rc as rc
 

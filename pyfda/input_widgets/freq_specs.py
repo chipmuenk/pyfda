@@ -59,8 +59,7 @@ class FreqSpecs(QWidget):
         """
         Process signals coming in via subwidgets and sig_rx
         """
-        # logger.warning(
-        #     f"SIG_RX: {first_item(dict_sig)}")
+        logger.debug("SIG_RX: %s", first_item(dict_sig))
         if dict_sig['id'] == id(self):
             # logger.warning("Stopped infinite loop:\n{0}".format(pprint_log(dict_sig)))
             return
@@ -286,12 +285,10 @@ class FreqSpecs(QWidget):
         state = source.property("state")
         err = False
         if fb.fil[0][f_label] <= 0:
-            logger.warning(
-                f"Frequency {str(source.objectName())} has to be >= 0")
+            logger.warning("Frequency %s has to be >= 0", str(source.objectName()))
             err = True
         elif fb.fil[0][f_label] >= 0.5:
-            logger.warning(
-                f"Frequency {str(source.objectName())} has to be < f_S /2.")
+            logger.warning("Frequency %s has to be < f_S /2.", str(source.objectName()))
             err = True
         if not err:
             if state in {'u', 'u_error', 'unused'}:
@@ -301,7 +298,7 @@ class FreqSpecs(QWidget):
             elif state in {'d', 'disabled'}:
                 qstyle_widget(source, 'd')
             else:
-                logger.warning(f"Unsupported state '{state}'!")
+                logger.warning("Unsupported state '%s'!", state)
         else:
             if state in {'u', 'u_error', 'unused'}:
                 qstyle_widget(source, 'u_error')
@@ -310,7 +307,7 @@ class FreqSpecs(QWidget):
             elif state in {'d', 'disabled'}:
                 qstyle_widget(source, 'd')
             else:
-                logger.warning(f"Unsupported state '{state}'!")
+                logger.warning("Unsupported state '%s'!", state)
 
         return
 
@@ -422,12 +419,12 @@ class FreqSpecs(QWidget):
         _, mult = unique_roots(f_specs, tol=MIN_FREQ_STEP)
         ident = [x for x in mult if x > 1]
         if ident:
-            logger.warning("Frequencies must differ by at least {0:.4g}"
-                           .format(MIN_FREQ_STEP * fb.fil[0]['f_S']))
+            logger.warning("Frequencies must differ by at least %.4g",
+                           MIN_FREQ_STEP * fb.fil[0]['f_S'])
         self.load_dict()
 # ------------------------------------------------------------------------------
 if __name__ == '__main__':
-    """ Run widget standalone with `python -m pyfda.input_widgets.freq_specs` """
+    # Run widget standalone with `python -m pyfda.input_widgets.freq_specs`
     from pyfda.libs.compat import QApplication
     from pyfda import pyfda_rc as rc
 

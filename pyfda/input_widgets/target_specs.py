@@ -1,4 +1,3 @@
-
 # -*- coding: utf-8 -*-
 #
 # This file is part of the pyFDA project hosted at https://github.com/chipmuenk/pyfda
@@ -56,7 +55,7 @@ class TargetSpecs(QWidget):
         """
         Process signals coming in via subwidgets and sig_rx
         """
-        # logger.warning(f"SIG_RX: {first_item(dict_sig)}")
+        logger.debug("SIG_RX: %s", first_item(dict_sig))
         if dict_sig['id'] == id(self):
           logger.warning("Stopped infinite loop.")
           return
@@ -156,7 +155,7 @@ class TargetSpecs(QWidget):
 
 # ------------------------------------------------------------------------------
 if __name__ == '__main__':
-    """ Run widget standalone with `python -m pyfda.input_widgets.target_specs` """
+    # Run widget standalone with `python -m pyfda.input_widgets.target_specs`
     from pyfda.libs.compat import QApplication
     from pyfda import pyfda_rc as rc
 

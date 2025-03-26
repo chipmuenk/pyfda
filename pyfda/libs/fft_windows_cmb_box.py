@@ -83,7 +83,7 @@ class QFFTWinCmbBox(QWidget):
         the widgets from the dictionary
 
         """
-        # logger.warning(f"SIG_RX:{id(self)}\n{pprint_log(dict_sig)}")
+        logger.debug("SIG_RX:%s\n%s", id(self), pprint_log(dict_sig))
 
         if dict_sig['id'] == id(self):
             return  # signal has been emitted from same instance
@@ -180,7 +180,7 @@ class QFFTWinCmbBox(QWidget):
 
         elif win_id not in self.all_wins_dict:
             logger.warning(
-                f'Unknown window id "{win_id}", using rectangular window instead.')
+                'Unknown window id "%s", using rectangular window instead.', win_id)
             cur_win_id = "rectangular"
         else:
             cur_win_id = win_id
@@ -198,8 +198,8 @@ class QFFTWinCmbBox(QWidget):
             # only one element, no module name given -> use scipy.signal.windows
             self.win_fnct = getattr(sig.windows, fnct, None)
             if not self.win_fnct:
-                logger.error(f'No window function "{fn_name}" in scipy.signal.windows, '
-                            'using rectangular window instead!')
+                logger.error('No window function "%s" in scipy.signal.windows, '
+                             'using rectangular window instead!', fn_name)
                 win_err = True
         else:
             # extract module name from fully qualified name, starting with first /
@@ -209,12 +209,12 @@ class QFFTWinCmbBox(QWidget):
                 mod = importlib.import_module(mod_name)
                 self.win_fnct = getattr(mod, fnct, None)
             except ImportError:  # no valid module
-                logger.error(f'Found no valid module "{mod_name}", '
-                            'using rectangular window instead!')
+                logger.error('Found no valid module "%s", '
+                             'using rectangular window instead!', mod_name)
                 win_err = True
             except NameError:
-                logger.error(f'Found no valid window function "{fn_name}", '
-                            'using rectangular window instead!')
+                logger.error('Found no valid window function "%s", '
+                             'using rectangular window instead!', fn_name)
                 win_err = True
 
         if win_err:
@@ -288,13 +288,11 @@ class QFFTWinCmbBox(QWidget):
                 w = self.win_fnct(N, self.all_wins_dict[win_id]['par_val'][0],
                              self.all_wins_dict[win_id]['par_val'][1], sym=sym)
             else:
-                logger.error(
-                    "{0:d} parameters are not supported for windows at the moment!"
-                    .format(n_par))
+                logger.error("%d parameters are not supported for windows at the moment!", n_par)
                 w = None
         except Exception as e:
-            logger.error('An error occurred calculating the window function "{0}":\n{1}'
-                         .format(fn_name, e))
+            logger.error('An error occurred calculating the window function "%s":\n%s',
+                         fn_name, e)
             w = None
         if w is None:  # Fall back to rectangular window
             self.err = True
@@ -477,7 +475,7 @@ class QFFTWinCmbBox(QWidget):
 # ------------------------------------------------------------------------------
 
 if __name__ == "__main__":
-    """ Run widget standalone with `python -m pyfda.libs.fft_windows_cmb_box` """
+    # Run widget standalone with `python -m pyfda.libs.fft_windows_cmb_box`
     import sys
     from pyfda.libs.compat import QApplication
     from pyfda import pyfda_rc as rc

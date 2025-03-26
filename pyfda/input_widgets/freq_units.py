@@ -103,7 +103,7 @@ class FreqUnits(QWidget):
         - qfft_win_select
         """
 
-        # logger.warning(f"SIG_RX: {first_item(dict_sig)}")
+        logger.debug("SIG_RX: %s", first_item(dict_sig))
 
         if 'id' in dict_sig and dict_sig['id'] == id(self):
             logger.debug("Stopped infinite loop")
@@ -261,8 +261,9 @@ class FreqUnits(QWidget):
                                caseSensitive=True)
             if idx == -1:
                 logger.warning(
-                    f"Unknown frequency unit {fb.fil[0]['freq_specs_unit']}, "
-                    "using 'f_S'.")
+                    "Unknown frequency unit %s, using 'f_S'.",
+                    fb.fil[0]['freq_specs_unit']
+                )
             # Load Frequency range type (0 ... f_S/2 etc.) from dict
             qset_cmb_box(self.cmb_f_range, fb.fil[0]['freqSpecsRangeType'],
                          data=True, fireSignals=True)
@@ -458,7 +459,7 @@ class FreqUnits(QWidget):
 
 # ------------------------------------------------------------------------------
 if __name__ == '__main__':
-    """ Run widget standalone with `python -m pyfda.input_widgets.freq_units` """
+    # Run widget standalone with `python -m pyfda.input_widgets.freq_units`
     from pyfda.libs.compat import QApplication
     from pyfda import pyfda_rc as rc
 

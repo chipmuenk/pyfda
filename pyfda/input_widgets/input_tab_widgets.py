@@ -169,7 +169,7 @@ class InputTabWidgets(QWidget):
 
 # ------------------------------------------------------------------------
 if __name__ == "__main__":
-    """ Run widget standalone with `python -m pyfda.input_widgets.input_tab_widgets` """
+    # Run widget standalone with `python -m pyfda.input_widgets.input_tab_widgets`
     from pyfda.libs.compat import QApplication
     from pyfda import pyfda_rc as rc
     app = QApplication(sys.argv)
