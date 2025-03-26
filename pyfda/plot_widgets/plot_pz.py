@@ -537,7 +537,7 @@ class Plot_PZ(QWidget):
         # Contour plots and color bar somehow mess up the coordinates:
         # restore to previous settings
         self.ax.set_xlim(xl)
-        self.ax.set_xlim(yl)
+        self.ax.set_ylim(yl)  # Fixed: Correctly restore the y-axis limits
 
     # --------------------------------------------------------------------------
     def draw_Hf(self, r=2, Hf_visible=True):
@@ -581,7 +581,7 @@ class Plot_PZ(QWidget):
 
 # ------------------------------------------------------------------------------
 if __name__ == "__main__":
-    """ Run widget standalone with `python -m pyfda.plot_widgets.plot_pz` """
+    # Run widget standalone with `python -m pyfda.plot_widgets.plot_pz`
     import sys
     from pyfda.libs.compat import QApplication
     from pyfda import pyfda_rc as rc
