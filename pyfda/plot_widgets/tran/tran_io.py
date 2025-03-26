@@ -113,7 +113,7 @@ class Tran_IO(QWidget):
         #                .format(self.isVisible(), pprint_log(dict_sig)))
 
         if 'id' in dict_sig and dict_sig['id'] == id(self):
-            logger.warning("Stopped infinite loop:\n{0}".format(pprint_log(dict_sig)))
+            logger.warning("Stopped infinite loop:\n%s", pprint_log(dict_sig))
         elif 'close_event' in dict_sig:
             self.close_csv_win()
             self.emit({'ui_local_changed': 'csv'})  # propagate one level up
@@ -258,7 +258,7 @@ class Tran_IO(QWidget):
             else:
                 info_str = f" ({io.file2array.info_str})"
         else:
-            logger.error(f"Unknown file format '{self.file_type}'")
+            logger.error("Unknown file format '%s'", self.file_type)
             qstyle_widget(self.ui.but_load, "error")
             return -1
 
@@ -270,7 +270,7 @@ class Tran_IO(QWidget):
         self.ui.lbl_filename.setToolTip(self.file_name)
 
         if err:
-            logger.error(f"Could not load '{self.file_name}'.")
+            logger.error("Could not load '%s'.", self.file_name)
             self.ui.lbl_shape_actual.setText("None")
             qstyle_widget(self.ui.but_load, "error")
             return -1
@@ -283,8 +283,7 @@ class Tran_IO(QWidget):
             self.nchans = np.shape(self.data_raw)[1]
 
         if self.nchans > 2:
-            logger.warning(
-                f"Unsuitable file format with {self.nchans} > 2 channels.")
+            logger.warning("Unsuitable file format with %d > 2 channels.", self.nchans)
             qstyle_widget(self.ui.but_load, "error")
             return -1
 
@@ -354,7 +353,7 @@ class Tran_IO(QWidget):
             elif item == "sum":  # sum channel 1 and 2 as mono signal
                 data = self.data_raw.sum(1)  # sum all channels along dim 1 (columns)
             else:
-                logger.error(f'Unknown item "{item}"')
+                logger.error('Unknown item "%s"', item)
                 self.unload_data()
                 return None
 
@@ -485,11 +484,11 @@ class Tran_IO(QWidget):
             frmt = qget_cmb_box(self.ui.cmb_data_format)
             scale_int = self.ui.but_int_as_float.checked
             if frmt not in {'uint8', 'int16', 'int32', 'float32', 'float64'}:
-                logger.error(f"Unsupported format {frmt} for data export.")
+                logger.error("Unsupported format %s for data export.", frmt)
                 return -1
             elif data.dtype not in {np.dtype('float32'), np.dtype('float64')}:
-                logger.warning(f"Data has format '{data.dtype}', instead of 'float', "
-                            "scaling may yield incorrect results.")
+                logger.warning("Data has format '%s', instead of 'float', scaling may yield incorrect results.",
+                               data.dtype)
             if frmt == 'int16':
                 if scale_int:
                     data = (data * ((1 << 15) - 1)).astype(np.int16)
@@ -517,4 +516,4 @@ class Tran_IO(QWidget):
         try:
             io.save_data_np(self.file_name, self.file_type, data, self.f_s_wav)
         except IOError as e:
-            logger.warning(f"File could not be saved:\n{e}")
+            logger.warning("File could not be saved:\n%s", e)

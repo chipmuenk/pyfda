@@ -117,10 +117,9 @@ def merge_dicts_hierarchically(d1, d2, path=None, mode='keep1'):
                             d1[key] = d1[key] + d2[key]
 
                     else:
-                        logger.warning("Unknown merge mode {0}.".format(mode))
+                        logger.warning("Unknown merge mode %s.", mode)
                 except Exception as e:
-                    logger.warning(
-                        f"Merge conflict at {path + str(key)}: {e}")
+                    logger.warning("Merge conflict at %s: %s", path + str(key), e)
         else:
             d1[key] = d2[key]  # add new entry to dict1
     return d1
@@ -175,8 +174,8 @@ class Tree_Builder(object):
             sect = ""
             for s in self.conf.sections():
                 sect += "\t\t[" + str(s) + "]\n"
-            logger.info("Parsing config file\n\t'{0}' with sections:\n{1}"
-                        .format(dirs.USER_CONF_DIR_FILE, sect))
+            logger.info("Parsing config file\n\t'%s' with sections:\n%s",
+                        dirs.USER_CONF_DIR_FILE, sect)
 
         # -----------------
         def read_conf_version():
@@ -190,17 +189,14 @@ class Tree_Builder(object):
                 conf_ver = int(self.commons['version'][0])
                 if conf_ver != REQ_VERSION:
                     logger.error(
-                        "User config file\n\t'{conf_file:s}'\n\thas the wrong version "
-                        "'{conf_ver}' (required: '{req_version}')."
-                        .format(conf_file=dirs.USER_CONF_DIR_FILE, conf_ver=conf_ver,
-                                req_version=REQ_VERSION))
+                        "User config file\n\t'%s'\n\thas the wrong version '%s' (required: '%s').",
+                        dirs.USER_CONF_DIR_FILE, conf_ver, REQ_VERSION)
                     success = False
             except KeyError:
-                logger.error("No entry 'version' in {0}".format(dirs.USER_CONF_DIR_FILE))
+                logger.error("No entry 'version' in %s", dirs.USER_CONF_DIR_FILE)
                 success = False
             except (IndexError, ValueError, TypeError):
-                logger.error(
-                    f"No suitable value for 'version' in {dirs.USER_CONF_DIR_FILE}")
+                logger.error("No suitable value for 'version' in %s", dirs.USER_CONF_DIR_FILE)
                 success = False
 
             return success
@@ -228,7 +224,7 @@ class Tree_Builder(object):
             # Parsing [Common]
             # ------------------------------------------------------------------
             self.commons = self.parse_conf_section("Common")
-            logger.info("Found {0} entries in [Common]".format(len(self.commons)))
+            logger.info("Found %d entries in [Common]", len(self.commons))
 
             if not read_conf_version():
                 # update configuration files and try again
@@ -250,10 +246,10 @@ class Tree_Builder(object):
                         if d not in sys.path:
                             sys.path.append(d)
                     else:
-                        logger.warning("User directory doesn't exist:\n\t{0}\n".format(d))
+                        logger.warning("User directory doesn't exist:\n\t%s\n", d)
 
             if dirs.USER_DIRS:
-                logger.info("User directory(s):\n\t{0}\n".format(dirs.USER_DIRS))
+                logger.info("User directory(s):\n\t%s\n", dirs.USER_DIRS)
             else:
                 logger.info("No valid user directory specified.")
 
@@ -273,21 +269,19 @@ class Tree_Builder(object):
                             # unsuccessful, store entry as string
                             fb.conf_settings[k] = conf_settings[k][0]
                     else:
-                        logger.warning(
-                            f"Ignoring unknown entry '[{k}]' in configuration file "
-                            "'pyfda.conf'")
+                        logger.warning("Ignoring unknown entry '[%s]' in configuration file 'pyfda.conf'", k)
 
         # ----- Exceptions ----------------------
         except configparser.DuplicateSectionError as e:
-            logger.critical('Duplicate section in config file '
-                            f'"{dirs.USER_CONF_DIR_FILE}":\n{e}.')
+            logger.critical('Duplicate section in config file "%s":\n%s.',
+                            dirs.USER_CONF_DIR_FILE, e)
             sys.exit()
         except configparser.ParsingError as e:
-            logger.critical('Parsing error in config file "{0}:\n{1}".'
-                            .format(dirs.USER_CONF_DIR_FILE, e))
+            logger.critical('Parsing error in config file "%s:\n%s".',
+                            dirs.USER_CONF_DIR_FILE, e)
             sys.exit()
         except configparser.Error as e:
-            logger.critical(f'{e} in config file "{dirs.USER_CONF_DIR_FILE}".')
+            logger.critical('%s in config file "%s".', e, dirs.USER_CONF_DIR_FILE)
             sys.exit()
 
         return
@@ -371,9 +365,8 @@ class Tree_Builder(object):
             if 'fix' in fb.filter_classes[c]:
                 for w in fb.filter_classes[c]['fix']:
                     if w not in fb.fixpoint_classes:
-                        logger.warning(
-                            f'Removing invalid fixpoint module\n\t"{w}" '
-                            f'for filter class "{c}".')
+                        logger.warning('Removing invalid fixpoint module\n\t"%s" for filter class "%s".',
+                                       w, c)
                         fb.filter_classes[c]['fix'].remove(w)
         # merge fb.filter_classes info "filter class":[fx_class1, fx_class2]
         # and fb.fixpoint_classes info "fixpoint class":[fil_class1, fil_class2]
@@ -536,9 +529,8 @@ class Tree_Builder(object):
                 elif isinstance(mod.classes, list):  # list, create a dict with list items
                     mod_dict = {l: l for l in list}  # as both key and value
                 else:
-                    logger.warning(
-                        f"Skipping module '{mod_name}', its attribute 'classes' "
-                        f"has the wrong type '{type(mod.classes).__name__}'.")
+                    logger.warning("Skipping module '%s', its attribute 'classes' has the wrong type '%s'.",
+                                   mod_name, type(mod.classes).__name__)
                     continue  # with next entry in section_conf_dict
                 # logger.info("MOD_DICT: {0}".format(mod_dict))
             else:
@@ -550,9 +542,8 @@ class Tree_Builder(object):
             # Now, check whether class `c` is part of module `mod`
             for c in mod_dict:
                 if not hasattr(mod, c):  # class c doesn't exist in module
-                    logger.warning(
-                        f"Skipping class '{c}', it doesn't exist in "
-                        f"module '{mod_fq_name}'.")
+                    logger.warning("Skipping class '%s', it doesn't exist in module '%s'.",
+                                   c, mod_fq_name)
                     continue  # continue with next entry in classes_dict
                 else:
                     classes_dict.update(
@@ -572,9 +563,8 @@ class Tree_Builder(object):
                         elif type(opt) in {str, list}:  # create dict {'opt':<OPTION>}
                             classes_dict[c].update({"opt": opt})
                         else:
-                            logger.warning(
-                                f'Class "{c}" option data type "{type(opt).__name__}" '
-                                f'not understood:\n "{opt}"')
+                            logger.warning('Class "%s" option data type "%s" not understood:\n "%s"',
+                                           c, type(opt).__name__, opt)
 
                 # logger.info("Opt : {0}".format(classes_dict[c]))
                 num_imports += 1
@@ -583,10 +573,8 @@ class Tree_Builder(object):
         if num_imports < 1:
             logger.warning("No class could be imported.")
         else:
-            logger.info(
-                f"Found {num_imports} classes in [{section}]:\n\t----------"
-                f"\n{imported_classes}"
-                        )
+            logger.info("Found %d classes in [%s]:\n\t----------\n%s",
+                        num_imports, section, imported_classes)
         # logger.debug(classes_dict)
         return classes_dict
 
