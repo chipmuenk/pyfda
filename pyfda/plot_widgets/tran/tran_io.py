@@ -36,8 +36,7 @@ class QFileDialogPlus(QDialog):
     sig_tx = pyqtSignal(object)  # outgoing
 
     def __init__(self, parent):
-        super(QFileDialogPlus, self).__init__(parent)
-
+        super().__init__(parent)  # Updated to Python 3 style
         self._construct_UI()
         qwindow_stay_on_top(self, True)
 
@@ -85,8 +84,7 @@ class Tran_IO(QWidget):
     sig_tx = pyqtSignal(object)  # outgoing, e.g. when stimulus has been calculated
 
     def __init__(self, parent):
-        super().__init__()
-
+        super().__init__()  # Updated to Python 3 style
         # initial settings
         self.file_name = None  # full name of loaded file
         self.file_type = None  # type of loaded file
