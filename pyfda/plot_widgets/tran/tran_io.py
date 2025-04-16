@@ -196,7 +196,7 @@ class Tran_IO(QWidget):
             self.emit({'data_changed': 'file_io'})
 
     # ------------------------------------------------------------------------------
-    def load_data_raw(self):
+    def load_data_raw(self) -> int:
         """
         Select a file in a UI dialog (CSV or WAV) and load it into `self.data_raw`
         Try to find the dimensions and some other infos.
@@ -285,7 +285,7 @@ class Tran_IO(QWidget):
             qstyle_widget(self.ui.but_load, "error")
             return -1
 
-        elif self.nchans == 1:
+        if self.nchans == 1:
             self.ui.line0.setVisible(False)
             self.ui.lbl_chan_import.setVisible(False)
             self.ui.cmb_chan_import.setVisible(False)
@@ -313,7 +313,7 @@ class Tran_IO(QWidget):
             self.select_chan_normalize()
 
     # ------------------------------------------------------------------------------
-    def select_chan_normalize(self):
+    def select_chan_normalize(self) -> None:
         """
         `select_chan_normalize()` is triggered by `file2array()` and by signal-slot
         connections
@@ -334,7 +334,7 @@ class Tran_IO(QWidget):
         """
         if not hasattr(self, 'data_raw') or self.data_raw is None:
             logger.warning("No data loaded yet.")
-            return None
+            return
 
         if self.data_raw.ndim == 1:
             data = self.data_raw
@@ -353,7 +353,7 @@ class Tran_IO(QWidget):
             else:
                 logger.error('Unknown item "%s"', item)
                 self.unload_data()
-                return None
+                return
 
         qstyle_widget(self.ui.but_load, "ok")
         self.ui.but_load.setText("Loaded")
@@ -414,18 +414,25 @@ class Tran_IO(QWidget):
 
     # ------------------------------------------------------------------------------
     def close_csv_win(self):
+        """
+        Close the CSV options window and delete the handle
+        """
         dirs.csv_options_handle = None
         self.ui.but_csv_options.setChecked(False)
 
     # ------------------------------------------------------------------------------
     def save_nr_loops(self):
+        """
+        Read the number of loops for exporting the wav file from the ui, sanitize the
+        value and set the line edit field to the sanitized value.
+        """
         self.nr_loops = safe_eval(
             self.ui.led_nr_loops.text(), alt_expr=self.nr_loops,
             return_type='int', sign='pos')
         self.ui.led_nr_loops.setText(str(self.nr_loops))
 
     # ------------------------------------------------------------------------------
-    def save_data(self) -> None:
+    def save_data(self) -> int:
         """
         Save a file with UI dialog (CSV or WAV), using the data for left and right
         channel, selected in the UI.
@@ -433,7 +440,11 @@ class Tran_IO(QWidget):
         WAV files can be exported in various int formats, the sampling frequency is
         read from the line edit field.
 
-        TODO: uint8 export doesn't work
+        Returns
+        -------
+        int
+            -1: error
+            0: success
         """
         file_type = (qget_cmb_box(self.ui.cmb_file_format),)  # str -> tuple
 
@@ -450,22 +461,22 @@ class Tran_IO(QWidget):
         data = None
         if not sel_l and not sel_r:
             logger.warning("No signal selected for saving.")
-            return
+            return -1
 
         if sel_l:
-            if not '.' in sel_l:
+            if '.' not in sel_l:
                 data = getattr(self.parent, sel_l)
             elif 'im' in sel_l:
-                data = getattr(self.parent, sel_l.split('.')[0]).imag
+                data = getattr(self.parent, sel_l.split('.', maxsplit=1)[0]).imag
             else:
-                data = getattr(self.parent, sel_l.split('.')[0]).real
+                data = getattr(self.parent, sel_l.split('.', maxsplit=1)[0]).real
         if sel_r:
-            if not '.' in sel_r:
+            if '.' not in sel_r:
                 data_r = getattr(self.parent, sel_r)
             elif 'im' in sel_r:
-                data_r = getattr(self.parent, sel_r.split('.')[0]).imag
+                data_r = getattr(self.parent, sel_r.split('.', maxsplit=1)[0]).imag
             else:
-                data_r = getattr(self.parent, sel_r.split('.')[0]).real
+                data_r = getattr(self.parent, sel_r.split('.', maxsplit=1)[0]).real
 
             if data is None:
                 data = data_r
@@ -484,9 +495,12 @@ class Tran_IO(QWidget):
             if frmt not in {'uint8', 'int16', 'int32', 'float32', 'float64'}:
                 logger.error("Unsupported format %s for data export.", frmt)
                 return -1
-            elif data.dtype not in {np.dtype('float32'), np.dtype('float64')}:
-                logger.warning("Data has format '%s', instead of 'float', scaling may yield incorrect results.",
-                               data.dtype)
+
+            if data.dtype not in {np.dtype('float32'), np.dtype('float64')}:
+                logger.warning(
+                    "Data has format '%s', instead of 'float', scaling may yield "
+                    "incorrect results.", data.dtype)
+
             if frmt == 'int16':
                 if scale_int:
                     data = (data * ((1 << 15) - 1)).astype(np.int16)
@@ -500,6 +514,7 @@ class Tran_IO(QWidget):
             elif frmt == 'uint8':
                 if scale_int:
                     data = (data * 127 + 128).astype(np.uint8)
+                    # data = np.clip(data * 127 + 128, 0, 255).astype(np.uint8) # clip to range
                 else:
                     data = data.astype(np.uint8)
             elif frmt == 'float32':
@@ -513,5 +528,7 @@ class Tran_IO(QWidget):
 
         try:
             io.save_data_np(self.file_name, self.file_type, data, self.f_s_wav)
+            return 0
         except IOError as e:
             logger.warning("File could not be saved:\n%s", e)
+            return -1

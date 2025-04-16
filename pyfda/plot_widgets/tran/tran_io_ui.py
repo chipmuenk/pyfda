@@ -28,7 +28,7 @@ class Tran_IO_UI(QWidget):
     """
     Create the UI for the Tran_IO class
     """
-    def __init__(self, parent=None):
+    def __init__(self):
 
         # combobox tooltip + data / text / tooltip for channel import
         self.cmb_chan_import_items = [
@@ -388,8 +388,7 @@ class Tran_IO_UI(QWidget):
 
 # ================================================================================
 if __name__ == "__main__":
-    """ Run widget standalone with
-        `python -m pyfda.plot_widgets.tran.tran_io_ui` """
+    # Run widget standalone with `python -m pyfda.plot_widgets.tran.tran_io_ui`
     import sys
     from pyfda.libs.compat import QApplication
     from pyfda import pyfda_rc as rc
