@@ -1571,9 +1571,21 @@ def export_coe_cmsis_fir(f: TextIO) -> None:
 # ------------------------------------------------------------------------------
 def export_coe_cmsis_sos(f: TextIO, file_type: str) -> None:
     """
-    SOS: Get coefficients in SOS format and export them
-    CMSIS IIR SOS: Get coefficients in SOS format, delete 4th column containing the
-    '1.0' of the recursive parts and export them.
+    Export coefficients in either CMSIS or scipy SOS format.
+
+    Scipy SOS coefficients are specified in the following format:
+    [b_00, b_10, b_20, a_00, a_10, a_20],
+    [b_01, b_11, b_21, a_01, a_11, a_21],
+    ...
+
+    The CMSIS DSP format is used by the ARM Cortex-M DSP library. In the CMSIS IIR SOS
+    format, the 'a_0i = 1.0' coefficients are omitted by deleting the 4th column.
+    The recursive coefficients have the opposite sign compared to the scipy format.
+
+    The CMSIS format is specified as follows:
+    [b_00, b_10, b_20, -a_10, -a_20],
+    [b_01, b_11, b_21, -a_11, -a_21],
+    ...
 
     See https://www.keil.com/pack/doc/CMSIS/DSP/html/group__BiquadCascadeDF1.html
     https://dsp.stackexchange.com/questions/79021/iir-design-scipy-cmsis-dsp-coefficient-format
@@ -1582,25 +1594,27 @@ def export_coe_cmsis_sos(f: TextIO, file_type: str) -> None:
     # TODO: check `scipy.signal.zpk2sos` for details concerning sos pairing
     # TODO: qc = fx.Fixed(fb.fil[0]['fxq']['QCB'])
     """
-    if np.ndim(fb.fil[0]['sos']) < 2 or np.shape(fb.fil[0]['sos'])[1] != 6\
-            or np.shape(fb.fil[0]['sos'])[0] < 1:
-        logger.error(f"SOS coefficients have bad shape '{np.shape(fb.fil[0]['sos'])}'!")
+
+    sos_coeffs = fb.fil[0]['sos']  # fcopy coeffs in scipy SOS format
+    if np.ndim(sos_coeffs) < 2 or np.shape(sos_coeffs)[1] != 6\
+            or np.shape(sos_coeffs)[0] < 1:
+        logger.error(f"SOS coefficients have bad shape '{np.shape(sos_coeffs)}'!")
         return True
+
     if fb.fil[0]['creator'][0] == 'ba':
         logger.warning(f"Second-order sections have been calculated from "
                        f"'ba' format, results may be inaccurate.")
 
     # check whether a_0 coefficients of all sections are == 1
-    if not np.all(np.isclose(fb.fil[0]['sos'][:, 3], 1.0, atol=1e-8)):
+    if not np.all(np.isclose(sos_coeffs[:, 3], 1.0, atol=1e-8)):
         logger.warning(
             "Not all a_0 coefficients are 1.0, results may be wrong!")
+
     if file_type == 'cmsis':
-    # delete a_0 coefficients which always should be 1,
-    # invert the sign of recursive coefficients:
-        sos_coeffs = np.delete(fb.fil[0]['sos'], 3, 1)
+    # delete a_0 coefficients which always should be 1
+    # and invert the sign of recursive coefficients:
+        sos_coeffs = np.delete(sos_coeffs, 3, 1)
         sos_coeffs[:, 3:] = - sos_coeffs[:, 3:]
-    else:
-        sos_coeffs = fb.fil[0]['sos']
 
     delim = params['CSV']['delimiter'].lower()
     if delim == 'auto':  # 'auto' doesn't make sense when exporting
