@@ -36,9 +36,8 @@ from pyfda import qrc_resources  # contains all icons
 logger = logging.getLogger(__name__)
 
 # read user settings for linewidth, font size etc. and apply them to matplotlib
-for key in pyfda_rc.mpl_rc:
-    rcParams[key] = pyfda_rc.mpl_rc[key]
-
+for key, value in pyfda_rc.mpl_rc.items():
+    rcParams[key] = value
 
 # ------------------------------------------------------------------------------
 def stems(x, y, ax=None, mkr_fmt=None, **kwargs):
@@ -91,7 +90,7 @@ class MplWidget(QWidget):
     """
 
     def __init__(self, parent):
-        super(MplWidget, self).__init__(parent)
+        super().__init__(parent)
 
         # initialize dict for translation of events to strings
         self.event_types = EventTypes()
@@ -279,8 +278,7 @@ class MplWidget(QWidget):
             for c in self.cursors:
                 c.remove()
 
-        # see https://stackoverflow.com/questions/59800059/how-to-use-two-mplcursors-simultaneously-for-a-scatter-plot-of-two-sets
-        # https://stackoverflow.com/questions/59800059/how-to-use-two-mplcursors-simultaneously-for-a-scatter-plot-of-two-sets
+    # https://stackoverflow.com/questions/59800059/how-to-use-two-mplcursors-simultaneously-for-a-scatter-plot-of-two-sets
 
 ###############################################################################
 class MplToolbar(NavigationToolbar):
@@ -592,8 +590,9 @@ class MplToolbar(NavigationToolbar):
 
         url = QtCore.QUrl('https://pyfda.readthedocs.io/en/latest/' + self.a_he.info)
         if not url.isValid():
-            logger.warning("Invalid URL\n\t{0}\n\tOpening "
-                           "'https://pyfda.readthedocs.io/en/latest/' instead".format(url.toString()))
+            logger.warning(
+                "Invalid URL\n\t%s\n\tOpening 'https://pyfda.readthedocs.io/en/latest/' instead",
+                url.toString())
             url = QtCore.QUrl('https://pyfda.readthedocs.io/en/latest/')
             # if url.isLocalFile()
         QtGui.QDesktopServices.openUrl(url)

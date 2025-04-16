@@ -221,11 +221,12 @@ class Plot_Tran_Stim(QWidget):
                 logger.error(
                     "Stimulus needs to be a 1-dimensional array but is a scalar!")
                 return stim
-            elif np.ndim(stim) > 1:
+
+            if np.ndim(stim) > 1:
                 # stim needs to be a 1 dimensional array
                 logger.error(
                     "Stimulus needs to be a 1-dimensional array but "
-                    f"has the shape ({np.shape(stim)}).")
+                    "has the shape (%s).", np.shape(stim))
                 return stim
 
             if np.ndim(add_sig) == 0:
@@ -239,16 +240,17 @@ class Plot_Tran_Stim(QWidget):
                 # `add_sig` needs to be an one-dimensional array or a two-dimensional
                 # array with dimensions (N x 2).
                 logger.error(
-                    f"Cannot add additional signal ({np.shape(add_sig)}) "
-                    "due to unsuitable shape!")
+                    "Cannot add additional signal (%s) due to unsuitable shape!",
+                    np.shape(add_sig))
                 return stim
 
             elif len(stim) != np.shape(add_sig)[0]:
                 # `stim` and `add_sig` need to have same length
                 logger.error(
-                    f"Cannot combine stimulus (len = {np.shape(stim)}) and additional "
-                    f"signal (len = {np.shape(add_sig)}) due to different lenghts!")
+                    "Cannot combine stimulus (len = %s) and additional signal (len = %s) "
+                    "due to different lengths!", np.shape(stim), np.shape(add_sig))
                 return stim
+
             # add_sig is 2D, add it to stimulus as a complex signal
             elif np.ndim(add_sig) == 2:
                 logger.info("'add_sig' has two channels, casting to complex")
@@ -549,13 +551,13 @@ class Plot_Tran_Stim(QWidget):
                     (self.x_file[N_first:], np.zeros(N_last - len(self.x_file)))))
             # file data has been consumed, nothing left to be added
             else:
-                return
+                return None
 
 # ------------------------------------------------------------------------------
 
 
 if __name__ == "__main__":
-    """ Run widget standalone with `python -m pyfda.plot_widgets.tran.plot_tran_stim` """
+    # Run widget standalone with `python -m pyfda.plot_widgets.tran.plot_tran_stim`
     import sys
     from pyfda.libs.compat import QApplication
     from pyfda import pyfda_rc as rc
