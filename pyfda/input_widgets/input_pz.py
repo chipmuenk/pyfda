@@ -757,7 +757,8 @@ class Input_PZ(QWidget):
         else:
             # pass csv formatted text, key for accessing data in ``*.npz`` file or
             # Matlab workspace (``*.mat``) and a title for the file export dialog
-            export_fil_data(self, text, 'zpk', title="Export Poles / Zeros")
+            export_fil_data(self, text, 'zpk', title="Export Poles / Zeros",
+                            formatted=self.ui.but_format.checked)
     # --------------------------------------------------------------------------
     def _import(self) -> None:
         """

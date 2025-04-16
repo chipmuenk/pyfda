@@ -682,33 +682,8 @@ class Input_Coeffs(QWidget):
         else:
             # pass csv formatted text, key for accessing data in ``*.npz`` file or
             # Matlab workspace (``*.mat``) and a title for the file export dialog
-            export_fil_data(self, text, 'ba', title="Export Filter Coefficients")
-
-        # elif fb.fil[0]['ft'] != 'IIR':
-        #     logger.warning("CMSIS SOS export is only possible for IIR filters!")
-        # else:
-        #     # Get coefficients in SOS format and delete 4th column containing the
-        #     # '1.0' of the recursive parts:
-        #     sos_coeffs = np.delete(fb.fil[0]['sos'], 3, 1)
-        #     # TODO: check `scipy.signal.zpk2sos` for details concerning sos paring
-
-        #     delim = params['CSV']['delimiter'].lower()
-        #     if delim == 'auto':  # 'auto' doesn't make sense when exporting
-        #         delim = ","
-        #     cr = params['CSV']['lineterminator']
-
-        #     text = ""
-        #     for r in range(np.shape(sos_coeffs)[0]):  # number of rows
-        #         for c in range(5):  # always has 5 columns
-        #             text += str(safe_eval(sos_coeffs[r][c], return_type='auto')) + delim
-        #         text = text.rstrip(delim) + cr
-        #     text = text.rstrip(cr)  # delete last CR
-
-        #     if params['CSV']['clipboard']:
-        #         fb.clipboard.setText(text)
-        #     else:
-        #         export_fil_data(self, text, title="Export in CMSIS DSP SOS format",
-        #                         file_types=('csv',))
+            export_fil_data(self, text, 'ba', title="Export Filter Coefficients",
+                            formatted=self.ui.but_format.checked)
 
     # --------------------------------------------------------------------------
     def _import(self) -> None:

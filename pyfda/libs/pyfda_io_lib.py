@@ -1156,7 +1156,8 @@ def write_wav_frame(parent, file_name, data: np.array, f_S = 1,
 
 # ------------------------------------------------------------------------------
 def export_fil_data(parent: object, data: str, fkey: str = "", title: str = "Export",
-                file_types: Tuple[str, ...] = ('csv', 'mat', 'npy', 'npz')):
+                file_types: Tuple[str, ...] = ('csv', 'mat', 'npy', 'npz'),
+                formatted: bool = True):
     """
     Export filter coefficients or pole/zero data in various formats, file name and type
     are selected via the ui.
@@ -1179,6 +1180,9 @@ def export_fil_data(parent: object, data: str, fkey: str = "", title: str = "Exp
     file_types: tuple of strings
         file extension (e.g. `(csv)` or list of file extensions (e.g. `(csv, txt)`
         which are used to create a file filter.
+
+    formatted: bool
+        export data as displayed in table (fixpoint format, number of digits etc.)
     """
     # logger.debug(
     #     f"export data: type{type(data)}|dim{np.ndim(data)}|"
@@ -1223,9 +1227,9 @@ def export_fil_data(parent: object, data: str, fkey: str = "", title: str = "Exp
                 elif file_type == 'vhd':
                     err = export_coe_vhdl_package(f)
                 elif file_type in {'cmsis', 'sos'} and fb.fil[0]['ft'] == 'IIR':
-                    err = export_coe_cmsis_sos(f, file_type)
+                    err = export_coe_cmsis_sos(f, file_type, formatted)
                 elif file_type == 'cmsis' and fb.fil[0]['ft'] == 'FIR':
-                    err = export_coe_cmsis_fir(f)
+                    err = export_coe_cmsis_fir(f, formatted)
                 else:
                     logger.error(f'Unknown file extension "{file_type}')
                     return None
@@ -1558,7 +1562,7 @@ def export_coe_TI(f: TextIO) -> None:
     pass
 
 
-def export_coe_cmsis_fir(f: TextIO) -> None:
+def export_coe_cmsis_fir(f: TextIO, formatted=False) -> None:
     """
     The CMSIS FIR filter function requires the coefficients to be in time reversed
     order, hence the coefficient array is flipped before exporting.
@@ -1569,7 +1573,7 @@ def export_coe_cmsis_fir(f: TextIO) -> None:
 
 
 # ------------------------------------------------------------------------------
-def export_coe_cmsis_sos(f: TextIO, file_type: str) -> None:
+def export_coe_cmsis_sos(f: TextIO, file_type: str, formatted=False) -> bool:
     """
     Export coefficients in either CMSIS or scipy SOS format.
 
@@ -1615,6 +1619,9 @@ def export_coe_cmsis_sos(f: TextIO, file_type: str) -> None:
     # and invert the sign of recursive coefficients:
         sos_coeffs = np.delete(sos_coeffs, 3, 1)
         sos_coeffs[:, 3:] = - sos_coeffs[:, 3:]
+
+    if formatted:
+        pass
 
     delim = params['CSV']['delimiter'].lower()
     if delim == 'auto':  # 'auto' doesn't make sense when exporting
