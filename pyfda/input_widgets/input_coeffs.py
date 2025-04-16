@@ -446,25 +446,28 @@ class Input_Coeffs(QWidget):
 
         a = np.concatenate(([0.], self.ba[1][1:]))
 
-        # Float format: Set ba_q = ba, overflows are all = 0
+        # Quantize coefficients and store them in `self.ba_q` as a list of arrays
+        # with the following structure:
+        # [b coefficients, a coefficients, b overflows, a overflows]
+        # where overflow items can be -1, 0, +1: 0 = no overflow, -1 = underflow, +1 = overflow
+
+        # Float format: Set ba_q = ba, all overflow items are = 0
         if not fb.fil[0]['fx_sim']:
             self.ba_q = [self.ba[0],
                          self.ba[1],
                          np.zeros(len_b),
                          np.zeros(len_a),
                          ]
-        # Fixpoint decimal format: Print coefficients in numeric format
-        # with a defined number of places
+        # Fixpoint decimal format: Print quantized coefficients in numeric format
+        # with a defined number of `Q[0].places` resp. `Q[1].places``
         elif fb.fil[0]['fx_base'] == 'dec':
             self.ba_q = [
-                ["{0:>{1}}".format(x, self.Q[0].places)
-                    for x in self.Q[0].float2frmt(self.ba[0])],
-                ["{0:>{1}}".format(x, self.Q[1].places)
-                    for x in self.Q[1].float2frmt(a)],
+                [f"{x:>{self.Q[0].places}}" for x in self.Q[0].float2frmt(self.ba[0])],
+                [f"{x:>{self.Q[1].places}}" for x in self.Q[1].float2frmt(a)],
                 self.Q[0].ovr_flag,
                 self.Q[1].ovr_flag
                         ]
-        # Other fixpoint formats: Print coefficients as strings
+        # Other fixpoint formats: Print quantized coefficients as strings
         else:
             self.ba_q = [
                 self.Q[0].float2frmt(self.ba[0]),
@@ -522,7 +525,7 @@ class Input_Coeffs(QWidget):
         if ftype in {'FIR', 'IIR'}:
             ret = qset_cmb_box(self.ui.cmb_filter_type, ftype)
             if ret == -1:
-                logger.warning("Unknown filter type {0}".format(ftype))
+                logger.warning("Unknown filter type %s", ftype)
 
         if self.ui.cmb_filter_type.currentText() == 'IIR':
             fb.fil[0]['ft'] = 'IIR'
@@ -597,7 +600,7 @@ class Input_Coeffs(QWidget):
             self.num_rows = max(len(self.ba[1]), len(self.ba[0]))
 
         # When format is 'float', disable all fixpoint options and widgets:
-        is_float = (qget_cmb_box(self.ui.cmb_qfrmt) == 'float')
+        is_float = qget_cmb_box(self.ui.cmb_qfrmt) == 'float'
         self.ui.spn_digits.setVisible(is_float)  # select number of float digits
         self.ui.lbl_digits.setVisible(is_float)
         self.ui.cmb_fx_base.setVisible(not is_float)  # hide fx base combobosx
@@ -703,8 +706,8 @@ class Input_Coeffs(QWidget):
                 None, None, 'ba', from_clipboard=True,
                 as_str = self.ui.but_format.checked)
         else:  # data from file
-            file_name, file_type = select_file(self, title="Import Filter Coefficients", mode="r",
-                                    file_types=('csv', 'mat', 'npy', 'npz'))
+            file_name, file_type = select_file(self, title="Import Filter Coefficients",
+                                               mode="r", file_types=('csv', 'mat', 'npy', 'npz'))
             if file_name is None:  # operation cancelled or error
                 return None
             else:  # file types 'csv', 'mat', 'npy', 'npz'
@@ -714,23 +717,21 @@ class Input_Coeffs(QWidget):
                     as_str = self.ui.but_format.checked)
 
         if data_str is None:  # file operation has been aborted or some other error
-            logger.info(f"Data was not imported.")
+            logger.info("Data was not imported.")
             return
 
         if np.ndim(data_str) > 1:
             num_cols, num_rows = np.shape(data_str)
             orientation_horiz = num_cols > num_rows  # need to transpose data
             if min(num_cols, num_rows) > 2:
-                logger.error(
-                    f"Data cannot be imported, its shape is {num_cols} x {num_rows}.")
+                logger.error("Data cannot be imported, its shape is %d x %d.", num_cols, num_rows)
                 return
         elif np.ndim(data_str) == 1:
             num_rows = len(data_str)
             num_cols = 1
             orientation_horiz = False
         else:
-            logger.error(
-                "Data cannot be imported, it is a single value or None.")
+            logger.error("Data cannot be imported, it is a single value or None.")
             return
 
         self.ba = [[], []]
@@ -769,15 +770,15 @@ class Input_Coeffs(QWidget):
                 self.ba[1] = zeros_with_val(len(self.ba[0]))
                 self._filter_type(ftype='FIR')
 
-        logger.warning(type(self.ba[0]))
-        logger.warning(self.ba)
+        logger.warning("Type of self.ba[0]: %s", type(self.ba[0]))
+        logger.warning("Contents of self.ba: %s", self.ba)
 
         self.ba[0] = np.asarray(self.ba[0])
         self.ba[1] = np.asarray(self.ba[1])
 
         self._equalize_ba_length()
         self.refresh_table()
-        logger.info(f"Successfully imported data.")
+        logger.info("Successfully imported data.")
         qstyle_widget(self.ui.but_apply, 'changed')
         qstyle_widget(self.ui.but_undo, 'changed')
 
@@ -865,7 +866,7 @@ class Input_Coeffs(QWidget):
         except Exception as e:
             # catch exception due to malformatted coefficients:
             logger.error("While saving the filter coefficients, "
-                         "the following error occurred:\n{0}".format(e))
+                         "the following error occurred:\n%s", e)
 
         if __name__ == '__main__':
             self.load_dict()  # only needed for stand-alone test
