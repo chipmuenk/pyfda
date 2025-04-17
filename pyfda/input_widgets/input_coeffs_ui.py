@@ -245,8 +245,7 @@ class Input_Coeffs_UI(QWidget):
         self.but_csv_options = PushButton(self, icon=QIcon(':/csv_options.svg'))
         # self.but_csv_options.setIconSize(q_icon_size)
         self.but_csv_options.setToolTip(
-            "<span>Select CSV format and whether "
-            "to copy to/from clipboard or file.</span>")
+            "<span>Select CSV format options like separator and linebreaks.</span>")
 
         self.load_save_clipboard = not self.load_save_clipboard  # is inverted next step
         self._set_load_save_icons()  # initialize icon / button settings
@@ -319,9 +318,9 @@ class Input_Coeffs_UI(QWidget):
         # the following affects only the first widget (intended here)
         lay_v_main.setAlignment(Qt.AlignTop)
         lay_v_main.addWidget(self.frm_buttons_coeffs)
+        lay_v_main.addWidget(frm_display)
         lay_v_main.addWidget(self.wdg_wq_coeffs_b)
         lay_v_main.addWidget(self.wdg_wq_coeffs_a)
-        lay_v_main.addWidget(frm_display)
         self.setLayout(lay_v_main)
         #######################################################################
 

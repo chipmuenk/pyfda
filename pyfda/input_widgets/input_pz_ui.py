@@ -237,8 +237,7 @@ class Input_PZ_UI(QWidget):
         # self.but_csv_options.setIcon(QIcon(':/csv_options.svg'))
         self.but_csv_options.setIconSize(q_icon_size)
         self.but_csv_options.setToolTip(
-            "<span>Select CSV format and whether "
-            "to copy to/from clipboard or file.</span>")
+            "<span>Select CSV format like separator and line break.</span>")
 
         self.load_save_clipboard = not self.load_save_clipboard  # is inverted next step
         self._set_load_save_icons()  # initialize icon / button settings
