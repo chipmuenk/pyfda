@@ -127,7 +127,7 @@ class ItemDelegate(QStyledItemDelegate):
             # don't continue with default initStyleOption... display routine ends here
         else:
             # continue with the original `initStyleOption()` and call displayText()
-            super(ItemDelegate, self).initStyleOption(option, index)
+            super().initStyleOption(option, index)
 
     # -------------------------------------------------------------------------
     def text(self, item) -> str:
@@ -822,7 +822,7 @@ class Input_Coeffs(QWidget):
         `{'fx_sim': 'specs_changed'}`.
         """
         qfrmt = qget_cmb_box(self.ui.cmb_qfrmt)
-        fb.fil[0]['fx_sim'] = (qfrmt != 'float')
+        fb.fil[0]['fx_sim'] = qfrmt != 'float'
         if qfrmt != 'float':
             fb.fil[0]['qfrmt'] = qfrmt
 

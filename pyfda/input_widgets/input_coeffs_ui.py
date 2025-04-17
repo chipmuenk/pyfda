@@ -13,8 +13,8 @@ import logging
 
 import pyfda.filterbroker as fb
 from pyfda.libs.compat import (
-    pyqtSignal, Qt, QtGui, QWidget, QLabel, QLineEdit, QComboBox, QPushButton, QFrame,
-    QSpinBox, QFont, QIcon, QVBoxLayout, QHBoxLayout, QGridLayout, QSizePolicy)
+    pyqtSignal, Qt, QWidget, QLabel, QLineEdit, QComboBox, QPushButton, QFrame,
+    QSpinBox, QFont, QIcon, QVBoxLayout, QHBoxLayout, QSizePolicy)
 from pyfda.libs.csv_option_box import CSV_option_box
 from pyfda.libs.pyfda_lib import to_html
 from pyfda.libs.pyfda_qt_lib import (
@@ -34,7 +34,7 @@ class Input_Coeffs_UI(QWidget):
     sig_rx = pyqtSignal(dict)  # incoming
     sig_tx = pyqtSignal(dict)  # outgoing
 
-    def __init__(self, parent=None):
+    def __init__(self):
         super().__init__()
         self.eps = 1.e-6  # initialize tolerance value
 
@@ -76,17 +76,17 @@ class Input_Coeffs_UI(QWidget):
         emit(self, dict_sig)
 
     # ------------------------------------------------------------------------------
-    def process_sig_rx(self, dict_sig=None):
+    def process_sig_rx(self, dict_sig=None) -> None:
         """
         Process signals coming from the CSV pop-up window
         """
         # logger.warning("PROCESS_SIG_RX:\n{0}".format(pprint_log(dict_sig)))
         if dict_sig['id'] == id(self):
             # this should not happen as the rx slot is not connected globally
-            logger.warning(
-                f'Stopped infinite loop: "{first_item(dict_sig)}"')
+            logger.warning('Stopped infinite loop: "%s"', first_item(dict_sig))
             return
-        elif 'close_event' in dict_sig:
+
+        if 'close_event' in dict_sig:
             self._close_csv_win()
             # send signal that pop-up box is closed
             self.emit({'ui_global_changed': 'csv'})
@@ -375,7 +375,7 @@ class Input_Coeffs_UI(QWidget):
 
 # ------------------------------------------------------------------------------
 if __name__ == '__main__':
-    """ Test with python -m pyfda.input_widgets.input_coeffs_ui """
+    # Test with python -m pyfda.input_widgets.input_coeffs_ui
     import sys
     from pyfda.libs.compat import QApplication
     from pyfda import pyfda_rc as rc
