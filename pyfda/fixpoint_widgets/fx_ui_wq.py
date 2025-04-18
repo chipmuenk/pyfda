@@ -192,7 +192,7 @@ class FX_UI_WQ(QWidget):
         # update local `ui_dict` with keyword arguments passed during construction
         for key, val in kwargs.items():
             if key not in ui_dict:
-                logger.warning(f"Unknown key '{key}'")
+                logger.warning("Unknown key '%s'", key)
             else:
                 ui_dict.update({key: val})
         # ui_dict.update(map(kwargs)) # same as above?
@@ -203,15 +203,17 @@ class FX_UI_WQ(QWidget):
         idx = qcmb_box_populate(self.cmbQuant, ui_dict['cmb_q_items'], self.q_dict['quant'])
         if idx == -1:
             logger.warning(
-                f"""Initialization value "{self.q_dict['quant']}" was not found in """
-                f"""'quant' combo box.""")
+                'Initialization value "%s" was not found in "quant" combo box.',
+                self.q_dict['quant']
+            )
 
         self.cmbOvfl = QComboBox(self, objectName='ovfl')
         idx = qcmb_box_populate(self.cmbOvfl, ui_dict['cmb_ov_items'], self.q_dict['ovfl'])
         if idx == -1:
             logger.warning(
-                f"""Initialization value "{self.q_dict['ovfl']}" was not found in """
-                f"""'ovfl' combo box.""")
+                'Initialization value "%s" was not found in "ovfl" combo box.',
+                self.q_dict['ovfl']
+            )
 
         # ComboBox size is adjusted automatically to fit the longest element
         self.cmbQuant.setSizeAdjustPolicy(QComboBox.AdjustToContents)
@@ -221,8 +223,9 @@ class FX_UI_WQ(QWidget):
         idx = qcmb_box_populate(self.cmbW, ui_dict['cmb_w_items'], self.q_dict['w_a_m'])
         if idx == -1:
             logger.warning(
-                f"""Initialization value "{self.q_dict['w_a_m']}" was not found in """
-                f"""'auto/man' combo box.""")
+                'Initialization value "%s" was not found in "auto/man" combo box.',
+                self.q_dict['w_a_m']
+            )
         self.cmbW.setVisible(ui_dict['cmb_w_vis'] == 'on')
 
         self.butLock = PushButton(self, icon=QIcon(':/lock-locked.svg'))
@@ -385,7 +388,7 @@ class FX_UI_WQ(QWidget):
             else:
                 qstyle_widget(self.lbl_ovfl_count, "error")
         else:
-            logger.error(f"Unknown option count_ovfl_vis = '{self.count_ovfl_vis}'")
+            logger.error(f"Unknown option count_ovfl_vis = '{elf.count_ovfl_vis}'")
         return
 
     # --------------------------------------------------------------------------
