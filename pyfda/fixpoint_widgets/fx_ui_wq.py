@@ -20,7 +20,6 @@ from pyfda.libs.compat import (
 from pyfda.libs.pyfda_lib import safe_eval, to_html
 from pyfda.libs.pyfda_qt_lib import (
     qcmb_box_populate, qget_cmb_box, qset_cmb_box, qstyle_widget, PushButton, emit)
-from pyfda.libs.tree_builder import merge_dicts_hierarchically
 from pyfda.pyfda_rc import params
 
 logger = logging.getLogger(__name__)
@@ -138,7 +137,7 @@ class FX_UI_WQ(QWidget):
     #     """ Update the UI when the quantization dictionary has been updated outside
     #         (signal `{'fx_sim': 'specs_changed'}` received)"""
 
-    #     logger.warning("sig_rx:\n{0}".format(dict_sig))
+    #     logger.warning("sig_rx:\n%s", dict_sig)
 
     #     if 'fx_sim' in dict_sig and dict_sig['fx_sim'] == 'specs_changed':
     #         self.dict2ui()
@@ -307,7 +306,7 @@ class FX_UI_WQ(QWidget):
         # ----------------------------------------------------------------------
         WI = int(self.q_dict['WI'])
         WF = int(self.q_dict['WF'])
-        W = WI + WF + 1
+        # W = WI + WF + 1
         self.ledWI.setText(str(WI))
         self.ledWF.setText(str(WF))
 
@@ -356,7 +355,6 @@ class FX_UI_WQ(QWidget):
             self.butLock.setIcon(QIcon(':/lock-locked.svg'))
         else:
             self.butLock.setIcon(QIcon(':/lock-unlocked.svg'))
-        return
 
     # --------------------------------------------------------------------------
     def update_ovfl_cnt(self):
@@ -388,8 +386,7 @@ class FX_UI_WQ(QWidget):
             else:
                 qstyle_widget(self.lbl_ovfl_count, "error")
         else:
-            logger.error(f"Unknown option count_ovfl_vis = '{elf.count_ovfl_vis}'")
-        return
+            logger.error("Unknown option count_ovfl_vis = '%s'", self.count_ovfl_vis)
 
     # --------------------------------------------------------------------------
     def ui2dict(self) -> None:
@@ -410,7 +407,8 @@ class FX_UI_WQ(QWidget):
                            sign='poszero'))
         if fb.fil[0]['qfrmt'] == 'qint':
             if WI <= WF:
-                logger.warning(f"Total word length has to be larger than Fractional scaling WF = {WF}!")
+                logger.warning(
+                    "Total word length has to be larger than Fractional scaling WF = %s!", WF)
                 WI = self.Q.q_dict['WI'] + WF + 1
 
         self.ledWI.setText(str(WI))
@@ -424,7 +422,7 @@ class FX_UI_WQ(QWidget):
         quant = qget_cmb_box(self.cmbQuant)
         w_a_m = qget_cmb_box(self.cmbW)
         if not w_a_m in {'m', 'a', 'f'}:
-            logger.error(f"Unknown option '{w_a_m}' for cmbW combobox!")
+            logger.error("Unknown option '%s' for cmbW combobox!", w_a_m)
 
         # update quantizer dict and derived quantities like W and reset counters
         self.Q.set_qdict(
@@ -435,7 +433,7 @@ class FX_UI_WQ(QWidget):
         self.update_WI_WF()
 
         if self.sender():
-            # logger.error(f"sender = {self.sender().objectName()}")
+            # logger.error("sender = %s", self.sender().objectName())
 #             if self.sender().objectName() == 'cmbW':
 #                self.enable_subwidgets()  # enable / disable WI and WF subwidgets
             dict_sig = {'sender_name': self.objectName(),
@@ -461,27 +459,27 @@ class FX_UI_WQ(QWidget):
         else:
             for k in q_dict:
                 if k not in {'quant', 'ovfl', 'WI', 'WF', 'w_a_m', 'N_over'}:
-                    logger.warning(f"Unknown quantization dict key '{k}'")
+                    logger.warning("Unknown quantization dict key '%s'", k)
 
         # Update all non-numeric instance quantization dict entries from passed `q_dict`
         # Auto-calculation of integer bits etc. needs to performed in parent subwidget!
         if 'w_a_m' in q_dict:
             i = qset_cmb_box(self.cmbW, q_dict['w_a_m'])
             if i < 0:
-                logger.error(f"Unknown value q_dict['w_a_m'] = {q_dict['w_a_m']}")
+                logger.error("Unknown value q_dict['w_a_m'] = %s", q_dict['w_a_m'])
 
         if 'quant' in q_dict:
             qset_cmb_box(self.cmbQuant, q_dict['quant'])
             if i < 0:
-                logger.error(f"Unknown value q_dict['quant'] = {q_dict['quant']}")
+                logger.error("Unknown value q_dict['quant'] = %s", q_dict['quant'])
 
         if 'ovfl' in q_dict:
             qset_cmb_box(self.cmbOvfl, q_dict['ovfl'])
             if i < 0:
-                logger.error(f"Unknown value q_dict['ovfl'] = {q_dict['ovfl']}")
+                logger.error("Unknown value q_dict['ovfl'] = %s", q_dict['ovfl'])
 
         if fb.fil[0]['qfrmt'] not in {'qfrac', 'qint'}:
-            logger.error(f"Unknown quantization format '{fb.fil[0]['qfrmt']}'")
+            logger.error("Unknown quantization format '%s'", fb.fil[0]['qfrmt'])
 
         WI = safe_eval(
             q_dict['WI'], self.Q.q_dict['WI'], return_type="int", sign='poszero')
@@ -528,7 +526,7 @@ class FX_UI_WQ(QWidget):
             LSB = 2 ** -self.Q.q_dict['WF']
             MSB = 2. ** (self.Q.q_dict['WI'] - 1)
         else:
-            logger.error(f"Unknown quantization format '{fb.fil[0]['qfrmt']}'!")
+            logger.error("Unknown quantization format '%s'", fb.fil[0]['qfrmt'])
 
         self.ledWF.setText(str(self.Q.q_dict['WF']))
 
@@ -556,7 +554,7 @@ class FX_UI_WQ(QWidget):
             self.lbl_LSB.setText(
                 f"<b><i>LSB</i><sub>10</sub> = </b>{LSB:.{params['FMT_ba']}g}")
         else:
-            logger.error(f"Unknown option MSB_LSB_vis = '{self.MSB_LSB_vis}'")
+            logger.error("Unknown option MSB_LSB_vis = '%s'", self.MSB_LSB_vis)
 
         self.enable_subwidgets()
 

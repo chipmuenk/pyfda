@@ -42,7 +42,7 @@ class FIR_DF_pyfixp_UI(QWidget):
     def __init__(self):
         super().__init__()
 
-        self.title = ("<b>Direct-Form (DF) FIR Filter</b>")
+        self.title = "<b>Direct-Form (DF) FIR Filter</b>"
         self.description = "Standard FIR topology without pipeling."
         self.img_name = "fir_df.png"
 
@@ -146,11 +146,10 @@ class FIR_DF_pyfixp_UI(QWidget):
             # signal generated locally by modifying coefficient / accu format
             if not dict_sig['sender_name']\
                     in {'fx_ui_wq_fir_df_coeffs_b', 'fx_ui_wq_fir_df_accu'}:
-                logger.error(f"Unknown widget name '{dict_sig['sender_name']}' "
-                             f"in '{__name__}' !")
+                logger.error("Unknown widget name '%s' in '%s' !", dict_sig['sender_name'], __name__)
                 return
 
-            elif dict_sig['sender_name'] == 'fx_ui_wq_fir_df_accu':  # accu format updated
+            if dict_sig['sender_name'] == 'fx_ui_wq_fir_df_accu':  # accu format updated
                 cmbW = qget_cmb_box(self.wdg_wq_accu.cmbW)
                 if cmbW in {'f', 'a'}\
                         or dict_sig['ui_local_changed'] in {'WF', 'WI'}:
@@ -182,16 +181,16 @@ class FIR_DF_pyfixp_UI(QWidget):
         The new values are written to the fixpoint coefficient dict
         `fb.fil[0]['fxq']['QACC']` and the UI is updated.
         """
-        try:
-            if qget_cmb_box(self.wdg_wq_accu.cmbW) == 'f':
-                A_coeff = int(np.ceil(np.log2(len(fb.fil[0]['ba'][0]))))
-            elif qget_cmb_box(self.wdg_wq_accu.cmbW) == 'a':
-                A_coeff = int(np.ceil(np.log2(np.sum(np.abs(fb.fil[0]['ba'][0])))))
-            else:
-                A_coeff = 0
-        except BaseException as e: # Exception as e:
-            logger.error("An error occured:", exc_info=True)
-            return
+        # try:
+        if qget_cmb_box(self.wdg_wq_accu.cmbW) == 'f':
+            A_coeff = int(np.ceil(np.log2(len(fb.fil[0]['ba'][0]))))
+        elif qget_cmb_box(self.wdg_wq_accu.cmbW) == 'a':
+            A_coeff = int(np.ceil(np.log2(np.sum(np.abs(fb.fil[0]['ba'][0])))))
+        else:
+            A_coeff = 0
+        # except BaseException as e: # Exception as e:
+        #     logger.error("An error occured:", exc_info=True)
+        #     return
 
         # calculate required accumulator word format and update filter dict
         if qget_cmb_box(self.wdg_wq_accu.cmbW) in {'f', 'a'}:
