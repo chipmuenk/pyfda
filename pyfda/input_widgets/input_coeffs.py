@@ -16,7 +16,7 @@ import sys
 import numpy as np
 
 import pyfda.filterbroker as fb  # importing filterbroker initializes all its globals
-# from pyfda.libs.csv_option_box import CSV_option_box
+
 from pyfda.libs.compat import (
     Qt, QtCore, QWidget, QLineEdit, QApplication, QSize, QTableWidget,
     QTableWidgetItem, QVBoxLayout, pyqtSignal, QStyledItemDelegate, QColor, QBrush)
@@ -287,7 +287,7 @@ class Input_Coeffs(QWidget):
         self.data_changed = True  # initialize flag: filter data has been changed
         self.fx_specs_changed = True  # fixpoint specs have been changed outside
 
-        self.ui = Input_Coeffs_UI(self)  # create the UI part with buttons etc.
+        self.ui = Input_Coeffs_UI()  # create the UI part with buttons etc.
 
         # handles to quantization objects (`fx.Fixed()` instances) of coefficient widgets
         self.Q = [self.ui.wdg_wq_coeffs_b.Q,
