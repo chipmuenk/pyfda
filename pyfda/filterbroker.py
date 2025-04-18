@@ -321,7 +321,7 @@ fil_ref = {
              "stages": 2,
              "normalize": True}
         },
-
+    "float_frmt": "64",  # float format for display and export {'32', '64'}
     "fo": "man",  # filter order, manual or min
     "freqSpecsRange": [
         0,

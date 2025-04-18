@@ -404,6 +404,7 @@ class Input_Coeffs(QWidget):
         # store new settings and refresh table
         self.ui.cmb_fx_base.currentIndexChanged.connect(self.fx_base2dict)
         self.ui.cmb_qfrmt.currentIndexChanged.connect(self.qfrmt2dict)
+        self.ui.cmb_float_frmt.currentIndexChanged.connect(self.float_frmt2dict)
 
         self.ui.wdg_wq_coeffs_a.sig_tx.connect(self.process_sig_rx)
         self.ui.wdg_wq_coeffs_b.sig_tx.connect(self.process_sig_rx)
@@ -453,11 +454,18 @@ class Input_Coeffs(QWidget):
 
         # Float format: Set ba_q = ba, all overflow items are = 0
         if not fb.fil[0]['fx_sim']:
-            self.ba_q = [self.ba[0],
-                         self.ba[1],
-                         np.zeros(len_b),
-                         np.zeros(len_a),
-                         ]
+            if fb.fil[0]['float_frmt'] == '64':
+                self.ba_q = [self.ba[0],
+                            self.ba[1],
+                            np.zeros(len_b),
+                            np.zeros(len_a),
+                            ]
+            else:
+                self.ba_q = [self.ba[0].astype(np.float32),
+                            self.ba[1].astype(np.float32),
+                            np.zeros(len_b),
+                            np.zeros(len_a),
+                            ]
         # Fixpoint decimal format: Print quantized coefficients in numeric format
         # with a defined number of `Q[0].places` resp. `Q[1].places``
         elif fb.fil[0]['fx_base'] == 'dec':
@@ -600,7 +608,8 @@ class Input_Coeffs(QWidget):
             self.num_rows = max(len(self.ba[1]), len(self.ba[0]))
 
         # When format is 'float', disable all fixpoint options and widgets:
-        is_float = qget_cmb_box(self.ui.cmb_qfrmt) == 'float'
+        is_float = qget_cmb_box(self.ui.cmb_qfrmt) == 'float' # float format 32 or 64 bit
+        self.ui.cmb_float_frmt.setVisible(is_float)  # select float format
         self.ui.spn_digits.setVisible(is_float)  # select number of float digits
         self.ui.lbl_digits.setVisible(is_float)
         self.ui.cmb_fx_base.setVisible(not is_float)  # hide fx base combobosx
@@ -795,21 +804,33 @@ class Input_Coeffs(QWidget):
         - `process_sig_rx()`: self.fx_specs_changed == True or
             dict_sig['fx_sim'] == 'specs_changed'
         - `self.qfrmt2dict()`
+        - `self.float_frmt2dict()`
         - `self.fx_base2dict()`
         """
         # update ui
         if not fb.fil[0]['fx_sim']:  # float mode
             qset_cmb_box(self.ui.cmb_qfrmt, 'float', data=True)
-        else:  # fixpoint mode
+        else:  # fixpoint mode, update quantizer objects and widgets
             qset_cmb_box(self.ui.cmb_qfrmt, fb.fil[0]['qfrmt'], data=True)
-
-        # update quantizer objects and widgets
-        self.ui.wdg_wq_coeffs_a.dict2ui(fb.fil[0]['fxq']['QCA'])
-        self.ui.wdg_wq_coeffs_b.dict2ui(fb.fil[0]['fxq']['QCB'])
+            self.ui.wdg_wq_coeffs_a.dict2ui(fb.fil[0]['fxq']['QCA'])
+            self.ui.wdg_wq_coeffs_b.dict2ui(fb.fil[0]['fxq']['QCB'])
 
         # quantize coefficient view according to new settings and update table
         self.quant_coeffs_view()
         self.refresh_table()
+
+# ------------------------------------------------------------------------------
+    def float_frmt2dict(self):
+        """
+        Read out the UI settings of  `self.ui.cmb_float_frmt` (triggering this method)
+        and store it under the 'float_frmt' key. Update table with the new `float_frmt`
+        settings.
+        """
+
+        fb.fil[0]['float_frmt'] = qget_cmb_box(self.ui.cmb_float_frmt)
+        logger.error("float_frmt: %s", fb.fil[0]['float_frmt'])
+
+        self.dict2ui()
 
 # ------------------------------------------------------------------------------
     def qfrmt2dict(self):
