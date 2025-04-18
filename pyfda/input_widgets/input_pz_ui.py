@@ -121,16 +121,6 @@ class Input_PZ_UI(QWidget):
         self.lbl_digits = QLabel("Digits", self)
         self.lbl_digits.setFont(self.bifont)
 
-        self.but_format = PushButton(self, icon=QIcon(':/star.svg'), checked=False)
-        self.but_format.setToolTip(
-            "<span><b>Formatted Data</b><br><br>"
-            "When <b>inactive</b>: Import / export poles, zeros and gain <i>k</i> "
-            "in float / complex format with full precision.<br><br>"
-            "When <b>active</b>: Import / export in selected display format, e.g. in polar "
-            "coordinates with the selected number of digits etc.</span>"
-            )
-        q_icon_size = self.but_format.iconSize()
-
         lay_h_display = QHBoxLayout()
         lay_h_display.setContentsMargins(*params['wdg_margins'])
         lay_h_display.setAlignment(Qt.AlignLeft)
@@ -138,7 +128,6 @@ class Input_PZ_UI(QWidget):
         lay_h_display.addWidget(self.cmb_pz_frmt)
         lay_h_display.addWidget(self.spn_digits)
         lay_h_display.addWidget(self.lbl_digits)
-        lay_h_display.addWidget(self.but_format)
         lay_h_display.addStretch()
         frm_display = QFrame(self)
         frm_display.setLayout(lay_h_display)
@@ -178,6 +167,16 @@ class Input_PZ_UI(QWidget):
         # ---------------------------------------------
         # UI Elements for loading / storing / manipulating cells and rows
         # ---------------------------------------------
+        self.but_format = PushButton(self, icon=QIcon(':/star.svg'), checked=False)
+        self.but_format.setToolTip(
+            "<span><b>Formatted Data</b><br><br>"
+            "When <b>inactive</b>: Import / export poles, zeros and gain <i>k</i> "
+            "in float / complex format with full precision.<br><br>"
+            "When <b>active</b>: Import / export in selected display format, e.g. in polar "
+            "coordinates with the selected number of digits etc.</span>"
+            )
+        q_icon_size = self.but_format.iconSize()
+
         self.but_add_cells = QPushButton(self)
         self.but_add_cells.setIcon(QIcon(':/row_insert_above.svg'))
         self.but_add_cells.setToolTip(
@@ -251,6 +250,7 @@ class Input_PZ_UI(QWidget):
         lay_h_buttons_pz1.addWidget(self.but_file_clipboard)
         lay_h_buttons_pz1.addWidget(self.but_table_import)
         lay_h_buttons_pz1.addWidget(self.but_table_export)
+        lay_h_buttons_pz1.addWidget(self.but_format)
         lay_h_buttons_pz1.addWidget(self.but_csv_options)
         lay_h_buttons_pz1.addStretch()
 

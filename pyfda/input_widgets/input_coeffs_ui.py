@@ -140,16 +140,6 @@ class Input_Coeffs_UI(QWidget):
         q_icon_size = self.but_quant.iconSize()  # <- comment this for manual sizing
         self.but_quant.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
 
-        self.but_format = PushButton(self, icon=QIcon(':/star.svg'), checked=False)
-        self.but_format.setToolTip(
-            "<span><b>Formatted Data</b><br><br>"
-            "When <b>inactive</b>: Import / export coefficients in float / complex "
-            "format with full precision.<br><br>"
-            "When <b>active</b>: Import / export coefficients in selected display "
-            "format, i.e. with the selected number of digits in Hex, Binary etc.</span>"
-            )
-        self.but_format.setIconSize(q_icon_size)
-
         # layH_q_frmt = QHBoxLayout()
         # layH_q_frmt.addWidget(self.cmb_qfrmt)
         # layH_q_frmt.addWidget(self.but_quant)
@@ -166,7 +156,6 @@ class Input_Coeffs_UI(QWidget):
         lay_h_display.addWidget(self.lbl_digits)
         lay_h_display.addWidget(self.cmb_fx_base)
         lay_h_display.addWidget(self.but_quant)
-        lay_h_display.addWidget(self.but_format)
         lay_h_display.addStretch()
 
         frm_display = QFrame(self)
@@ -247,6 +236,17 @@ class Input_Coeffs_UI(QWidget):
         self.but_csv_options.setToolTip(
             "<span>Select CSV format options like separator and linebreaks.</span>")
 
+        self.but_format = PushButton(self, icon=QIcon(':/star.svg'), checked=False)
+        self.but_format.setToolTip(
+            "<span><b>Formatted Data</b><br><br>"
+            "When <b>inactive</b>: Import / export coefficients in float / complex "
+            "format with full precision.<br><br>"
+            "When <b>active</b>: Import / export coefficients in selected display "
+            "format, i.e. with the selected number of digits in Hex, Binary etc.</span>"
+            )
+        self.but_format.setIconSize(q_icon_size)
+
+
         self.load_save_clipboard = not self.load_save_clipboard  # is inverted next step
         self._set_load_save_icons()  # initialize icon / button settings
 
@@ -260,6 +260,7 @@ class Input_Coeffs_UI(QWidget):
         lay_h_buttons_coeffs1.addWidget(self.but_file_clipboard)
         lay_h_buttons_coeffs1.addWidget(self.but_table_import)
         lay_h_buttons_coeffs1.addWidget(self.but_table_export)
+        lay_h_buttons_coeffs1.addWidget(self.but_format)
         lay_h_buttons_coeffs1.addWidget(self.but_csv_options)
         lay_h_buttons_coeffs1.addStretch()
 
