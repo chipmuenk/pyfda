@@ -2,6 +2,10 @@
 
 ## [v0.9.6](https://github.com/chipmuenk/pyfda/tree/v0.9.6) (2025-xx)
 
+### New features
+
+- Add an option for 32 bit float format
+
 ### Bugfixes
 
 - Fix buggy check for well-formed sos coefficients, giving wrong error messages
