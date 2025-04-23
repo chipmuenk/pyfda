@@ -4,7 +4,8 @@
 
 ### New features
 
-- Add an option for 32 bit float format
+- Float coefficients can be displayed and quanized as 32 bit (single precision) float format
+- Font sizes for UI and matplotlib can now be set in the config file
 
 ### Bugfixes
 
