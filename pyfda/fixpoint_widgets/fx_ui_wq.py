@@ -413,7 +413,7 @@ class FX_UI_WQ(QWidget):
 
         self.ledWI.setText(str(WI))
 
-        # In 'qint' mode, the WI field shows the total word lenghth W. Nevertheless, the value
+        # In 'qint' mode, the WI field shows the total word length W. Nevertheless, the value
         # for 'WI' is stored in the dicts.
         if fb.fil[0]['qfrmt'] == 'qint':
             WI = WI - WF - 1
@@ -478,7 +478,7 @@ class FX_UI_WQ(QWidget):
             if i < 0:
                 logger.error("Unknown value q_dict['ovfl'] = %s", q_dict['ovfl'])
 
-        if fb.fil[0]['qfrmt'] not in {'qfrac', 'qint'}:
+        if fb.fil[0]['fx_sim'] and fb.fil[0]['qfrmt'] not in {'qfrac', 'qint'}:
             logger.error("Unknown quantization format '%s'", fb.fil[0]['qfrmt'])
 
         WI = safe_eval(

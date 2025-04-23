@@ -321,7 +321,6 @@ fil_ref = {
              "stages": 2,
              "normalize": True}
         },
-    "float_frmt": "64",  # float format for display and export {'32', '64'}
     "fo": "man",  # filter order, manual or min
     "freqSpecsRange": [
         0,
@@ -398,7 +397,7 @@ fil_ref = {
     "plt_phiUnit": "rad",
     "plt_tLabel": "$n = t\\, /\\, T_S \\; \\rightarrow$",
     "plt_tUnit": "T_S",
-    "qfrmt": "qfrac",  # global quantization format {'qint', 'qfrac'}
+    "qfrmt": "float",  # global quantization format {'float', 'float32', 'qint', 'qfrac'}
     "rt": "LP",  # filter response type
     # coefficients as second order sections
     "sos": [
