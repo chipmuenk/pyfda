@@ -82,7 +82,7 @@ class Input_Fixpoint_Specs(QWidget):
              "<span>General fractional format with <i>WI</i> + <i>WF</i> + 1 bits "
              "(range -2<sup>WI</sup> ... 2<sup>WI</sup> - 2<sup>WF</sup>).</span>")
             ]
-        self.cmb_qfrmt_default = "float"
+        self.cmb_qfrmt_default = 'float'
 
         self._construct_UI()
         inst_wdg_list = self._update_filter_cmb()

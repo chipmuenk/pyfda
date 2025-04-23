@@ -94,7 +94,7 @@ class PlotImpz_UI(QWidget):
         self.N_frame = 0
 
         # run
-        self.cmb_sim_select_init = "float"
+        self.cmb_sim_select_init = 'float'
         self.cmb_ui_select_init = "plot_stim"
 
         # time
@@ -125,8 +125,8 @@ class PlotImpz_UI(QWidget):
         # combobox fixpoint / floating point simulation
         self.cmb_sim_select_items = [
             "<span>Simulate floating-point or fixpoint response.</span>",
-            ("float", "Float", "floating point simulation"),
-            ("fixpoint", "Fixpoint", "fixpoint simulation")
+            ('float', "Float", "floating point simulation"),
+            ('fixpoint', "Fixpoint", "fixpoint simulation")
         ]
 
         # data / icon / tooltipp (none) for plotting styles

@@ -378,7 +378,7 @@ class Tran_IO(QWidget):
             data = (data - offset_int) / scale_int
 
         if self.ui.but_scale_to.checked:
-            self.norm = safe_eval(self.ui.led_scale_to.text(), self.norm, return_type="float")
+            self.norm = safe_eval(self.ui.led_scale_to.text(), self.norm, return_type='float')
             self.ui.led_scale_to.setText(str(self.norm))
             self.x_file = data * self.norm / np.max(np.abs(data))
         else:

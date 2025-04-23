@@ -48,7 +48,7 @@ class Input_Coeffs_UI(QWidget):
              "<span>General fractional format with <i>WI</i> + <i>WF</i> + 1 bits "
              "(range -2<sup>WI</sup> ... 2<sup>WI</sup> - 2<sup>WF</sup>).</span>")
             ]
-        self.cmb_qfrmt_default = "float"
+        self.cmb_qfrmt_default = 'float'
 
         self.cmb_float_frmt_items = [
             "<span>Floating point wordlength for coefficients.</span>",
@@ -59,8 +59,6 @@ class Input_Coeffs_UI(QWidget):
 
         self.cmb_fx_base_items = [
             "<span>Select the coefficient fixpoint display format.</span>",
-            # ("float", "Float", "<span>Coefficients with full precision in floating "
-            # "point format</span>"),
             ('dec', "Dec", "<span>Fixpoint coefficients in decimal format</span>"),
             ('hex', "Hex", "<span>Fixpoint coefficients in hexadecimal format</span>"),
             ('bin', "Bin", "<span>Fixpoint coefficients in binary format</span>"),

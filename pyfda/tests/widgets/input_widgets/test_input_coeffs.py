@@ -99,7 +99,7 @@ class FilterCoeffsTest(unittest.TestCase):
         self.assertEqual(self.ui.spn_digits.value(), 4)
         self.assertEqual(qget_cmb_box(self.ui.cmb_filter_type, data=False), "FIR")
 
-        self.assertEqual(qget_cmb_box(self.ui.cmb_fx_base, data=False).lower(), "float")
+        self.assertEqual(qget_cmb_box(self.ui.cmb_fx_base, data=False).lower(), 'float')
         self.assertEqual(self.ui.but_set_zero.text(), "= 0")
 
         self.assertEqual(self.form.tblCoeff.rowCount(), 3)
