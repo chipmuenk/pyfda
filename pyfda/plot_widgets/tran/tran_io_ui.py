@@ -55,8 +55,8 @@ class Tran_IO_UI(QWidget):
             ("uint8", "UInt8", "8 Bit Unsigned Integer (0 ... 255)"),
             ("int16", "Int16", "16 Bit signed integer (CD-quality), standard WAV-format"),
             ("int32", "Int32", "32 Bit signed integer for High-Res audio"),
-            ("float32", "Float32", "Floating point single precision"),
-            ("float64", "Float64", "Floating point double precision")
+            ('float32', "Float32", "Floating point single precision"),
+            ('float64', "Float64", "Floating point double precision")
         ]
         self.cmb_data_format_init = "int16"
 

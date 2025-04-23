@@ -795,9 +795,9 @@ def read_wav_info(file):
     # Pos. 20: Audio encoding format, must be 1 for uncompressed PCM
     encoding = str2int(HEADER[20:22])
     if encoding == 1:
-        sample_format = "int"  # Integer PCM
+        sample_format = 'int'  # Integer PCM
     elif encoding == 3:
-        sample_format = "float"  # IEEE Float PCM
+        sample_format = 'float'  # IEEE Float PCM
     else:
         logger.error(f"Invalid audio encoding {encoding}, only uncompressed "
                      "PCM supported!")
@@ -820,7 +820,7 @@ def read_wav_info(file):
     # Pos. 34: Bits per sample, WL = wordlength in bytes
     bits_per_sample = str2int(f.read(2))
 
-    if sample_format == "float":
+    if sample_format == 'float':
         # Format subchunk is 18 bytes long for float samples, hence file pointer
         # has to be advanced by two bytes
         _ = f.read(2)
