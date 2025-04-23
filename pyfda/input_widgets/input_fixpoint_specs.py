@@ -75,7 +75,8 @@ class Input_Fixpoint_Specs(QWidget):
         self.cmb_qfrmt_items = [
             "<span>Quantization format for coefficients (affects only "
             "the display, not the stored values).</span>",
-            ('float', "Float", "<span>Full precision floating point format</span>"),
+            ('float', "Float64", "<span>Full precision floating point format</span>"),
+            ('float32', "Float32", "<span>Single precision floating point format</span>"),
             ('qint', "Integer", "<span>Integer format with <i>WI</i> + 1 bits "
              "(range -2<sup>WI</sup> ... 2<sup>WI</sup> - 1)</span>"),
             ('qfrac', "Fractional",
@@ -719,9 +720,8 @@ class Input_Fixpoint_Specs(QWidget):
         - Update fixpoint widget settings via `self.dict2ui()`
         - Emit {'fx_sim': 'specs_changed'}.
           """
-        fb.fil[0]['fx_sim'] = qget_cmb_box(self.cmb_qfrmt) != 'float'
-        if fb.fil[0]['fx_sim']:
-            fb.fil[0]['qfrmt'] = qget_cmb_box(self.cmb_qfrmt)
+        fb.fil[0]['fx_sim'] = 'float' not in qget_cmb_box(self.cmb_qfrmt)
+        fb.fil[0]['qfrmt'] = qget_cmb_box(self.cmb_qfrmt)
 
         self.dict2ui()
 
@@ -750,9 +750,9 @@ class Input_Fixpoint_Specs(QWidget):
         if self.fx_wdg_found:
             self.fx_filt_ui.setVisible(is_fixp)
 
+        # set combobox from dictionary
+        qset_cmb_box(self.cmb_qfrmt, fb.fil[0]['qfrmt'], data=True)
         if is_fixp:
-            # set combobox from dictionary
-            qset_cmb_box(self.cmb_qfrmt, fb.fil[0]['qfrmt'], data=True)
             # refresh image in case of switching from float to fix
             self.resize_img()
             # update fixpoint widgets from the global filter dict:
@@ -765,9 +765,7 @@ class Input_Fixpoint_Specs(QWidget):
                 # when loading a filter, using the new instance
                 self.fx_filt_ui.dict2ui()
             except AttributeError as e:
-                logger.error(f"Error using FX filter widget 'dict2ui()' method:\n{e}")
-        elif not fb.fil[0]['fx_sim']:
-            qset_cmb_box(self.cmb_qfrmt, 'float', data=True)
+                logger.error("Error using FX filter widget 'dict2ui()' method:\n%s", e)
 
     # --------------------------------------------------------------------------
     def exportHDL(self):

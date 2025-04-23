@@ -41,7 +41,8 @@ class Input_Coeffs_UI(QWidget):
         self.cmb_qfrmt_items = [
             "<span>Quantization format for coefficients (affects only "
             "the display, not the stored values).</span>",
-            ('float', "Float", "<span>Full precision floating point format</span>"),
+            ('float', "Float64", "<span>Full precision floating point format</span>"),
+            ('float32', "Float32", "<span>Single precision floating point format</span>"),
             ('qint', "Integer", "<span>Integer format with <i>WI</i> + 1 bits "
              "(range -2<sup>WI</sup> ... 2<sup>WI</sup> - 1)</span>"),
             ('qfrac', "Fractional",
@@ -49,13 +50,6 @@ class Input_Coeffs_UI(QWidget):
              "(range -2<sup>WI</sup> ... 2<sup>WI</sup> - 2<sup>WF</sup>).</span>")
             ]
         self.cmb_qfrmt_default = 'float'
-
-        self.cmb_float_frmt_items = [
-            "<span>Floating point wordlength for coefficients.</span>",
-            ('64', "64 bit", "<span>Double precision (64 bit) floats</span>"),
-            ('32', "32 bit", "<span>Single precision (32 bit) floats</span>"),
-            ]
-        self.cmb_float_frmt_default = "64b"
 
         self.cmb_fx_base_items = [
             "<span>Select the coefficient fixpoint display format.</span>",
@@ -124,10 +118,6 @@ class Input_Coeffs_UI(QWidget):
                           self.cmb_qfrmt_default)
         self.cmb_qfrmt.setSizeAdjustPolicy(QComboBox.AdjustToContents)
 
-        self.cmb_float_frmt = QComboBox(self)
-        qcmb_box_populate(self.cmb_float_frmt, self.cmb_float_frmt_items,
-                          self.cmb_float_frmt_default)
-
         self.cmb_fx_base = QComboBox(self)
         qcmb_box_populate(self.cmb_fx_base, self.cmb_fx_base_items,
                           self.cmb_fx_base_default)
@@ -161,7 +151,6 @@ class Input_Coeffs_UI(QWidget):
         lay_h_display.setAlignment(Qt.AlignLeft)
         lay_h_display.addWidget(lbl_display)
         lay_h_display.addWidget(self.cmb_qfrmt)
-        lay_h_display.addWidget(self.cmb_float_frmt)
         lay_h_display.addWidget(self.spn_digits)
         lay_h_display.addWidget(self.lbl_digits)
         lay_h_display.addWidget(self.cmb_fx_base)
