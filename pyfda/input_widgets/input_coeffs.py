@@ -153,13 +153,12 @@ class ItemDelegate(QStyledItemDelegate):
 
         if not fb.fil[0]['fx_sim']:
             data = safe_eval(text, return_type='auto')  # convert to float
-            return "{0:.{1}g}".format(data, params['FMT_ba'])
+            return f"{data:#.{params['FMT_ba']}g}"
 
-        elif fb.fil[0]['fx_base'] == 'dec':
-            return "{0:>{1}}".format(text, self.Q[0].places)
+        if fb.fil[0]['fx_base'] == 'dec':
+            return f"{text:>{self.Q[0].places}}"
 
-        else:
-            return text
+        return text
 # see:
 # http://stackoverflow.com/questions/30615090/pyqt-using-qtextedit-as-editor-in-a-qstyleditemdelegate
 
@@ -278,7 +277,7 @@ class Input_Coeffs(QWidget):
 
     # -------------------------------------------------------------------------
     def __init__(self, parent=None):
-        super(Input_Coeffs, self).__init__(parent)
+        super().__init__(parent)
 
         self.opt_widget = None  # handle for pop-up options widget
         self.tool_tip = "Display and edit filter coefficients."
@@ -319,14 +318,14 @@ class Input_Coeffs(QWidget):
             self.ui.but_csv_options.setChecked(not dirs.csv_options_handle is None)
             return
 
-        elif 'ui_local_changed' in dict_sig and 'sender_name' in dict_sig and\
+        if 'ui_local_changed' in dict_sig and 'sender_name' in dict_sig and\
                 dict_sig['sender_name'] in {'fx_ui_wq_coeffs_a', 'fx_ui_wq_coeffs_b'}:
             # local events from UI, trigger requant and refresh table
             self.refresh_table()
             self.emit({'fx_sim': 'specs_changed'})
             return
 
-        elif self.isVisible():
+        if self.isVisible():
             if self.data_changed or 'data_changed' in dict_sig:
                 self.load_dict()
                 self.data_changed = False
@@ -718,12 +717,12 @@ class Input_Coeffs(QWidget):
             file_name, file_type = select_file(self, title="Import Filter Coefficients",
                                                mode="r", file_types=('csv', 'mat', 'npy', 'npz'))
             if file_name is None:  # operation cancelled or error
-                return None
-            else:  # file types 'csv', 'mat', 'npy', 'npz'
-                data_str = file2array(
-                    file_name, file_type, 'ba',
-                    from_clipboard=False,
-                    as_str = self.ui.but_format.checked)
+                return
+            # file types 'csv', 'mat', 'npy', 'npz'
+            data_str = file2array(
+                file_name, file_type, 'ba',
+                from_clipboard=False,
+                as_str = self.ui.but_format.checked)
 
         if data_str is None:  # file operation has been aborted or some other error
             logger.info("Data was not imported.")

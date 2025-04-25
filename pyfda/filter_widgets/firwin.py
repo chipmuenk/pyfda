@@ -48,7 +48,7 @@ from pyfda.libs.pyfda_lib import round_odd, pprint_log
 from pyfda.libs.pyfda_qt_lib import popup_warning, PushButton, emit
 from pyfda.libs.pyfda_sig_lib import fil_save
 from pyfda.libs.fft_windows_cmb_box import QFFTWinCmbBox
-from pyfda.libs.pyfda_fft_windows_lib import all_wins_dict_ref
+# from pyfda.libs.pyfda_fft_windows_lib import all_wins_dict_ref
 from pyfda.plot_widgets.plot_fft_win import Plot_FFT_win
 
 from .common import Common, remezord
@@ -148,17 +148,15 @@ class Firwin(QWidget):
             if 'close_event' in dict_sig:  # hide FFT window windget and return
                 self.hide_fft_wdg()
                 return
-            elif 'view_changed' in dict_sig\
-                    and 'fft_win_type' in dict_sig['view_changed']:
-                    # local connection to FFT window widget and qfft_win_select
-                    # to update the widgets
-                    self.emit(dict_sig, sig_name='sig_tx_local')
-                    self.filter_params2dict()
-                    # global connection to upper hierarchies
-                    # send notification that filter design has changed
-                    self.emit({'filt_changed': 'firwin'})
-            elif 'data_changed' in dict_sig\
-                    and dict_sig['data_changed'] == 'filter_loaded':
+            if 'view_changed' in dict_sig and 'fft_win_type' in dict_sig['view_changed']:
+                # local connection to FFT window widget and qfft_win_select
+                # to update the widgets
+                self.emit(dict_sig, sig_name='sig_tx_local')
+                self.filter_params2dict()
+                # global connection to upper hierarchies
+                # send notification that filter design has changed
+                self.emit({'filt_changed': 'firwin'})
+            elif 'data_changed' in dict_sig and dict_sig['data_changed'] == 'filter_loaded':
                 # update local widgets FFT window widget and qfft_win_select
                 self.emit(dict_sig, sig_name='sig_tx_local')
 
@@ -424,8 +422,8 @@ class Firwin(QWidget):
         if cutoff.size == 0:
             raise ValueError("At least one cutoff frequency must be given.")
         if cutoff.min() <= 0 or cutoff.max() >= 1:
-            raise ValueError("Invalid cutoff frequency {0}: frequencies must be "
-                             "greater than 0 and less than nyq.".format(cutoff))
+            raise ValueError(f"Invalid cutoff frequency {cutoff}: frequencies must be "
+                             "greater than 0 and less than nyq.")
         if np.any(np.diff(cutoff) <= 0):
             raise ValueError("Invalid cutoff frequencies: the frequencies "
                              "must be strictly increasing.")
@@ -634,5 +632,5 @@ def main():
 
 
 if __name__ == "__main__":
-    '''test using "python -m pyfda.filter_widgets.firwin" '''
+    # test using "python -m pyfda.filter_widgets.firwin"
     main()

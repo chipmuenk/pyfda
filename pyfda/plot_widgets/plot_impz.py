@@ -192,13 +192,13 @@ class Plot_Impz(QWidget):
         # ----------------------------------------------------------------------
         # ---------------- GLOBAL LAYOUT ---------------------------------------
         # ----------------------------------------------------------------------
-        layVMain = QVBoxLayout()
-        layVMain.addWidget(self.tab_mpl_w)
-        layVMain.addWidget(self.tab_stim_w)
-        layVMain.addWidget(self.ui.wdg_ctrl_run)
-        layVMain.setContentsMargins(*params['mpl_margins'])
+        lay_v_main = QVBoxLayout()
+        lay_v_main.addWidget(self.tab_mpl_w)
+        lay_v_main.addWidget(self.tab_stim_w)
+        lay_v_main.addWidget(self.ui.wdg_ctrl_run)
+        lay_v_main.setContentsMargins(*params['mpl_margins'])
 
-        self.setLayout(layVMain)
+        self.setLayout(lay_v_main)
         self.updateGeometry()
 
         # ----------------------------------------------------------------------
