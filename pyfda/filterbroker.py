@@ -397,7 +397,7 @@ fil_ref = {
     "plt_phiUnit": "rad",
     "plt_tLabel": "$n = t\\, /\\, T_S \\; \\rightarrow$",
     "plt_tUnit": "T_S",
-    "qfrmt": "float",  # global quantization format {'float', 'float32', 'qint', 'qfrac'}
+    "qfrmt": "float64",  # global quantization format {'float64', 'float32', 'qint', 'qfrac'}
     "rt": "LP",  # filter response type
     # coefficients as second order sections
     "sos": [

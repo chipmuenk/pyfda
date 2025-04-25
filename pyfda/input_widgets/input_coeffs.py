@@ -453,7 +453,7 @@ class Input_Coeffs(QWidget):
 
         # Float format: Set ba_q = ba, all overflow items are = 0
         if not fb.fil[0]['fx_sim']:
-            if fb.fil[0]['qfrmt'] == 'float':
+            if fb.fil[0]['qfrmt'] == 'float64':
                 self.ba_q = [self.ba[0],
                             self.ba[1],
                             np.zeros(len_b),
@@ -606,12 +606,14 @@ class Input_Coeffs(QWidget):
         else:
             self.num_rows = max(len(self.ba[1]), len(self.ba[0]))
 
-        # When format is 'float', disable all fixpoint options and widgets:
+        # When format is 'floatxx', disable all fixpoint options and widgets, only the
+        # quantizer widget is enabled also for 'float32':
         is_float = 'float' in qget_cmb_box(self.ui.cmb_qfrmt) # float format 32 or 64 bit
         self.ui.spn_digits.setVisible(is_float)  # select number of float digits
         self.ui.lbl_digits.setVisible(is_float)
-        self.ui.cmb_fx_base.setVisible(not is_float)  # hide fx base combobosx
-        self.ui.but_quant.setVisible(qget_cmb_box(self.ui.cmb_qfrmt) != 'float')  # hide quantization button
+        self.ui.cmb_fx_base.setVisible(not is_float)  # hide fx base combobox
+        # hide quantization button:
+        self.ui.but_quant.setVisible(qget_cmb_box(self.ui.cmb_qfrmt) != 'float64')
 
         # hide all q-settings for float
         self.ui.wdg_wq_coeffs_b.setVisible(not is_float)
@@ -827,9 +829,6 @@ class Input_Coeffs(QWidget):
         """
         qfrmt = qget_cmb_box(self.ui.cmb_qfrmt)
         fb.fil[0]['fx_sim'] = 'float' not in qfrmt  # True for fixpoint formats
-#        if qfrmt != 'float':
-#            fb.fil[0]['qfrmt'] = qfrmt
-        # if fb.fil[0]['fx_sim']:
         fb.fil[0]['qfrmt'] = qfrmt
 
         # update quant. widgets and table with the new `qfrmt` settings and propagate

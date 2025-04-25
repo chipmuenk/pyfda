@@ -669,11 +669,12 @@ class Fixed(object):
                 "fixp() should only be called for fixpoint number format - returning floats!")
             return y
 
-        if not in_frmt in {'qfrac', 'qint'}:
+        if not in_frmt in {'qfrac', 'qint', 'float32', 'float64'}:
             logger.error(f"Unknown input format {in_frmt}")
-        if not out_frmt in {'qfrac', 'qint'}:
+        if not out_frmt in {'qfrac', 'qint', 'float32', 'float64'}:
             logger.error(f"Unknown output format {out_frmt}")
 
+        # logger.warning(f"in_frmt = '{in_frmt}', out_frmt = '{out_frmt}'")
         # logger.error(f"fixp in: y = {pprint_log(y, N=4)}")
 
         if np.shape(y):

@@ -75,7 +75,7 @@ class Input_Fixpoint_Specs(QWidget):
         self.cmb_qfrmt_items = [
             "<span>Quantization format for coefficients (affects only "
             "the display, not the stored values).</span>",
-            ('float', "Float64", "<span>Full precision floating point format</span>"),
+            ('float64', "Float64", "<span>Full precision floating point format</span>"),
             ('float32', "Float32", "<span>Single precision floating point format</span>"),
             ('qint', "Integer", "<span>Integer format with <i>WI</i> + 1 bits "
              "(range -2<sup>WI</sup> ... 2<sup>WI</sup> - 1)</span>"),
@@ -83,7 +83,7 @@ class Input_Fixpoint_Specs(QWidget):
              "<span>General fractional format with <i>WI</i> + <i>WF</i> + 1 bits "
              "(range -2<sup>WI</sup> ... 2<sup>WI</sup> - 2<sup>WF</sup>).</span>")
             ]
-        self.cmb_qfrmt_default = 'float'
+        self.cmb_qfrmt_default = 'float64'
 
         self._construct_UI()
         inst_wdg_list = self._update_filter_cmb()

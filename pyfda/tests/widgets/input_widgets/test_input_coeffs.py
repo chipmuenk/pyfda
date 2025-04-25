@@ -77,7 +77,7 @@ class FilterCoeffsTest(unittest.TestCase):
         # self.ui.ledScale.setText("1.5")
         self.set_cmb_box(self.ui.cmb_filter_type, 'FIR')
         spy = QSignalSpy(self.form.sig_tx)
-        self.set_cmb_box(self.ui.cmb_fx_base, 'Float')
+        self.set_cmb_box(self.ui.cmb_fx_base, 'float64')
         # Push <Delete Table> Button with the left mouse button
         QTest.mouseClick(self.ui.but_clear, Qt.LeftButton)
 
@@ -99,7 +99,7 @@ class FilterCoeffsTest(unittest.TestCase):
         self.assertEqual(self.ui.spn_digits.value(), 4)
         self.assertEqual(qget_cmb_box(self.ui.cmb_filter_type, data=False), "FIR")
 
-        self.assertEqual(qget_cmb_box(self.ui.cmb_fx_base, data=False).lower(), 'float')
+        self.assertEqual(qget_cmb_box(self.ui.cmb_fx_base, data=False).lower(), 'float64')
         self.assertEqual(self.ui.but_set_zero.text(), "= 0")
 
         self.assertEqual(self.form.tblCoeff.rowCount(), 3)
