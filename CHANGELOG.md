@@ -2,6 +2,11 @@
 
 ## [v0.9.6](https://github.com/chipmuenk/pyfda/tree/v0.9.6) (2025-xx)
 
+### New features
+
+- Float coefficients can be displayed and quanized as 32 bit (single precision) float format
+- Font sizes for UI and matplotlib can now be set in the config file
+
 ### Bugfixes
 
 - Fix buggy check for well-formed sos coefficients, giving wrong error messages
