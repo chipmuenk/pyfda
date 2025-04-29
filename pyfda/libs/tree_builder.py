@@ -545,26 +545,26 @@ class Tree_Builder(object):
                     logger.warning("Skipping class '%s', it doesn't exist in module '%s'.",
                                    c, mod_fq_name)
                     continue  # continue with next entry in classes_dict
-                else:
-                    classes_dict.update(
-                        {c: {'name': mod_dict[c],   # Class name
-                             'mod': mod_fq_name}})  # Fully qualified module name
-                    # when module + class import was successful, add a new entry
-                    # to the dict with the class name as key and a dict containing
-                    # "name":display name and "mod":fully qualified module name as values,
-                    # e.g. 'Butter':{'name':'Butterworth',
-                    #                'mod':'pyfda.filter_design.butter'}
 
-                    # check whether options have been defined in the config file
-                    opt = section_conf_dict[mod_name]
-                    if opt:
-                        if type(opt) == dict:
-                            classes_dict[c].update(opt)
-                        elif type(opt) in {str, list}:  # create dict {'opt':<OPTION>}
-                            classes_dict[c].update({"opt": opt})
-                        else:
-                            logger.warning('Class "%s" option data type "%s" not understood:\n "%s"',
-                                           c, type(opt).__name__, opt)
+                classes_dict.update(
+                    {c: {'name': mod_dict[c],   # Class name
+                            'mod': mod_fq_name}})  # Fully qualified module name
+                # when module + class import was successful, add a new entry
+                # to the dict with the class name as key and a dict containing
+                # "name":display name and "mod":fully qualified module name as values,
+                # e.g. 'Butter':{'name':'Butterworth',
+                #                'mod':'pyfda.filter_design.butter'}
+
+                # check whether options have been defined in the config file
+                opt = section_conf_dict[mod_name]
+                if opt:
+                    if type(opt) == dict:
+                        classes_dict[c].update(opt)
+                    elif type(opt) in {str, list}:  # create dict {'opt':<OPTION>}
+                        classes_dict[c].update({"opt": opt})
+                    else:
+                        logger.warning('Class "%s" option data type "%s" not understood:\n "%s"',
+                                        c, type(opt).__name__, opt)
 
                 # logger.info("Opt : {0}".format(classes_dict[c]))
                 num_imports += 1
