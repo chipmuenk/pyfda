@@ -415,7 +415,7 @@ class Tree_Builder(object):
                         try:
                             val = ast.literal_eval(val)
                         except SyntaxError as e:
-                            logger.warning(f"Syntax Error in config file\n{e}")
+                            logger.warning("Syntax Error in config file\n%s", e)
                             val = ""
                     else:
                         val = re.sub(r'["\'\[\]]','', val)
@@ -426,7 +426,7 @@ class Tree_Builder(object):
                 logger.debug('Found {0:2d} entries in [{1:s}].'
                              .format(len(section_conf_dict), section))
             else:
-                logger.warning('Empty section [{0:s}].'.format(section))
+                logger.warning('Empty section [%s].', section)
 
         except configparser.NoSectionError:
             logger.warning(
@@ -436,12 +436,12 @@ class Tree_Builder(object):
                            )
             # configparser.NoOptionError
         except configparser.DuplicateOptionError as e:
-            logger.warning('{0} in config file "{1}".'.format(e, dirs.USER_CONF_DIR_FILE))
+            logger.warning('%s in config file "%s".', e, dirs.USER_CONF_DIR_FILE)
 
         except configparser.InterpolationMissingOptionError as e:
             # catch unresolvable interpolations like ${wrongSection:wrongOption}
             # Attention: This terminates  current section() without result!
-            logger.warning('{0} in config file "{1}".'.format(e, dirs.USER_CONF_DIR_FILE))
+            logger.warning('%s in config file "%s".', e, dirs.USER_CONF_DIR_FILE)
 
         return section_conf_dict
 
@@ -508,16 +508,16 @@ class Tree_Builder(object):
                     ################################################
                     break  # -> successful import, break out of pckg_names loop
                 except ImportError as e:
-                    logger.debug(f'Import error for "{mod_fq_name}":\n{e}')
+                    logger.debug('Import error for "%s":\n%s', mod_fq_name, e)
                     mod_fq_name = None
                     continue  # module not found, try next package
                 except Exception as e:
-                    logger.warning(f'Error during import of "{mod_fq_name}":\n{e}')
+                    logger.warning('Error during import of "%s":\n%s', mod_fq_name, e)
                     mod_fq_name = None
                     continue  # Some other error ocurred during import, try next package
 
             if not mod_fq_name:
-                logger.warning(f'Module "{mod_name}" could not be imported.')
+                logger.warning('Module "%s" could not be imported.', mod_name)
                 continue
 
             if hasattr(mod, 'classes'):
@@ -529,14 +529,14 @@ class Tree_Builder(object):
                 elif isinstance(mod.classes, list):  # list, create a dict with list items
                     mod_dict = {l: l for l in list}  # as both key and value
                 else:
-                    logger.warning("Skipping module '%s', its attribute 'classes' has the wrong type '%s'.",
-                                   mod_name, type(mod.classes).__name__)
+                    logger.warning("Skipping module '%s', its attribute 'classes' has the "
+                                   "wrong type '%s'.", mod_name, type(mod.classes).__name__)
                     continue  # with next entry in section_conf_dict
                 # logger.info("MOD_DICT: {0}".format(mod_dict))
             else:
                 # no `classes` attribute - skip entry
                 logger.warning(
-                    f'Skipping module "{mod_name}" due to missing attribute "classes".')
+                    'Skipping module "%s" due to missing attribute "classes".', mod_name)
                 continue
 
             # Now, check whether class `c` is part of module `mod`
@@ -600,8 +600,7 @@ class Tree_Builder(object):
             - `fb.fil_tree` :
 
         """
-        logger.info(
-                f"Instantiating filter classes, building filter tree ...\n")
+        logger.info("Instantiating filter classes, building filter tree ...\n")
         fil_tree = {}
 
         for fc in fb.filter_classes:  # iterate over all previously found filter
