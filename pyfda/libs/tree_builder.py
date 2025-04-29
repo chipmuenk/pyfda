@@ -532,7 +532,6 @@ class Tree_Builder(object):
                     logger.warning("Skipping module '%s', its attribute 'classes' has the "
                                    "wrong type '%s'.", mod_name, type(mod.classes).__name__)
                     continue  # with next entry in section_conf_dict
-                # logger.info("MOD_DICT: {0}".format(mod_dict))
             else:
                 # no `classes` attribute - skip entry
                 logger.warning(
@@ -566,7 +565,6 @@ class Tree_Builder(object):
                         logger.warning('Class "%s" option data type "%s" not understood:\n "%s"',
                                         c, type(opt).__name__, opt)
 
-                # logger.info("Opt : {0}".format(classes_dict[c]))
                 num_imports += 1
                 imported_classes += "\t" + mod_fq_name + "." + c + "\n"
 
@@ -610,8 +608,7 @@ class Tree_Builder(object):
             err_code = ff.fil_factory.create_fil_inst(fc)
             if err_code > 0:
                 logger.warning(
-                    'Skipping filter class "{0:s}" due to import error {1:d}'
-                    .format(fc, err_code))
+                    'Skipping filter class "%s" due to import error %d', fc, err_code)
                 continue  # continue with next entry in fb.filter_classes
 
             # add attributes from dict to fil_tree for filter class fc
