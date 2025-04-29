@@ -274,7 +274,6 @@ class IIR_DF1_pyfixp_UI(QWidget):
 
     # --------------------------------------------------------------------------
     def calc_wi_coeffs_b(self):
-        logger.error("calc_wi")
         """
         Calculate required number of integer bits for the largest 'b' coefficient
 

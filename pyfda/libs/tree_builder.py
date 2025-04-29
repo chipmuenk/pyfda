@@ -258,7 +258,7 @@ class Tree_Builder(object):
             # ------------------------------------------------------------------
             conf_settings = self.parse_conf_section("Config Settings")
             if conf_settings:
-                logger.info(conf_settings)
+                # logger.info(conf_settings)
                 for k in conf_settings:
                     if k in fb.conf_settings:
                         # TODO: why are the values lists?

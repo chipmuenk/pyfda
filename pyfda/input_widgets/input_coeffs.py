@@ -491,7 +491,7 @@ class Input_Coeffs(QWidget):
         """
         Triggered by pushing "Quantize button":
 
-        - Store selected / all quantized coefficients in `self.ba`
+        - Store selected / all quantized coefficients in shadow array `self.ba`
         - Refresh table (for the case that anything weird happens during quantization)
         - Reset Overflow flags `self.ba_q[2]` and `self.ba_q[3]`
         - Save quantized `self.ba` to filter dict (in `_save_dict()`). This emits
@@ -502,8 +502,8 @@ class Input_Coeffs(QWidget):
         if not idx:  # nothing selected, quantize all elements
             self.ba[0] = self.Q[0].frmt2float(self.ba_q[0])
             self.ba[1] = self.Q[1].frmt2float(self.ba_q[1])
-            self.ba_q[2] = np.zeros(len(self.ba_q[0]))
-            self.ba_q[3] = np.zeros(len(self.ba_q[1]))
+            self.ba_q[2] = np.zeros(len(self.ba_q[0]))  # reset overflows
+            self.ba_q[3] = np.zeros(len(self.ba_q[1]))  # reset overflows
             # idx = [[j, i] for i in range(self.num_rows) for j in range(self.num_cols)]
         else:
             try:
@@ -512,7 +512,7 @@ class Input_Coeffs(QWidget):
                 pass
             for i in idx:
                 self.ba[i[0]][i[1]] = self.Q[i[0]].frmt2float(self.ba_q[i[0]][i[1]])
-                self.ba_q[i[0] + 2][i[1]] = 0
+                self.ba_q[i[0] + 2][i[1]] = 0  # reset overflows
 
         self.refresh_table()
         qstyle_widget(self.ui.but_apply, 'changed')
