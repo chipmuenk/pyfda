@@ -31,12 +31,11 @@ class Input_PZ_UI(QWidget):
     sig_rx = pyqtSignal(object)  # incoming
     sig_tx = pyqtSignal(object)  # outgoing
 
-    def __init__(self, parent=None):
+    def __init__(self):
         """
         Pass instance `parent` of parent class Input_PZ()
         """
         super().__init__()
-#        self.parent = parent # instance of the parent (not the base) class
         self.eps = 1.e-4  # tolerance value for e.g. setting P/Z to zero
 
         # Items for PZ-format combobox (data, display text, tool tip):
@@ -80,9 +79,10 @@ class Input_PZ_UI(QWidget):
         if dict_sig['id'] == id(self):
             logger.warning(
                 # this should not happen as the rx slot is not connected globally
-                f'Stopped infinite loop: "{first_item(dict_sig)}"')
+                'Stopped infinite loop: "%s"', first_item(dict_sig))
             return
-        elif 'close_event' in dict_sig:
+
+        if 'close_event' in dict_sig:
             self._close_csv_win()
             # send signal that pop-up box is closed
             self.emit({'ui_global_changed': 'csv'})

@@ -129,7 +129,7 @@ class ParseError(Exception):
     pass
 
 
-class Tree_Builder(object):
+class Tree_Builder():
     """
     Read the config file and construct dictionary trees with
 
@@ -269,7 +269,8 @@ class Tree_Builder(object):
                             # unsuccessful, store entry as string
                             fb.conf_settings[k] = conf_settings[k][0]
                     else:
-                        logger.warning("Ignoring unknown entry '[%s]' in configuration file 'pyfda.conf'", k)
+                        logger.warning(
+                            "Ignoring unknown entry '[%s]' in configuration file 'pyfda.conf'", k)
 
         # ----- Exceptions ----------------------
         except configparser.DuplicateSectionError as e:
@@ -283,8 +284,6 @@ class Tree_Builder(object):
         except configparser.Error as e:
             logger.critical('%s in config file "%s".', e, dirs.USER_CONF_DIR_FILE)
             sys.exit()
-
-        return
 
     # --------------------------------------------------------------------------
     def build_widget_tree(self):
@@ -365,8 +364,9 @@ class Tree_Builder(object):
             if 'fix' in fb.filter_classes[c]:
                 for w in fb.filter_classes[c]['fix']:
                     if w not in fb.fixpoint_classes:
-                        logger.warning('Removing invalid fixpoint module\n\t"%s" for filter class "%s".',
-                                       w, c)
+                        logger.warning(
+                            'Removing invalid fixpoint module\n\t"%s" for filter class "%s".',
+                            w, c)
                         fb.filter_classes[c]['fix'].remove(w)
         # merge fb.filter_classes info "filter class":[fx_class1, fx_class2]
         # and fb.fixpoint_classes info "fixpoint class":[fil_class1, fil_class2]
