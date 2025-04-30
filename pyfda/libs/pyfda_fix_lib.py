@@ -664,14 +664,19 @@ class Fixed(object):
         #       Convert input argument into proper floating point scalars /
         #       arrays and initialize flags
         # ======================================================================
-        if not fb.fil[0]['fx_sim']:
+        logger.warning(f"qfrmt = '{fb.fil[0]['qfrmt']}'")
+        if fb.fil[0]['qfrmt'] == 'float64':
             logger.warning(
-                "fixp() should only be called for fixpoint number format - returning floats!")
+                "fixp() should only be called for quantizing - returning unchanged 'float64'!")
             return y
+        elif fb.fil[0]['qfrmt'] == 'float32':
+            logger.warning(
+                "fixp() called for 'float32'!")
+            return y.astype(np.float32)
 
-        if not in_frmt in {'qfrac', 'qint', 'float32', 'float64'}:
+        if not in_frmt in {'qfrac', 'qint'}:
             logger.error(f"Unknown input format {in_frmt}")
-        if not out_frmt in {'qfrac', 'qint', 'float32', 'float64'}:
+        if not out_frmt in {'qfrac', 'qint'}:
             logger.error(f"Unknown output format {out_frmt}")
 
         # logger.warning(f"in_frmt = '{in_frmt}', out_frmt = '{out_frmt}'")
@@ -974,7 +979,7 @@ class Fixed(object):
         Quantized floating point (`dtype=np.float64`) representation of input string
         of same shape as `y`.
         """
-
+        logger.warning(f"fb.fil[0]['qfrmt'] = '{fb.fil[0]['qfrmt']}'")
         if y is None:
             return 0
         elif np.isscalar(y):
@@ -1001,7 +1006,11 @@ class Fixed(object):
                     logger.warning(
                         f'\n\tCannot convert "{y}" of type "{type(y).__name__}" '
                         f'to float or complex, setting to zero.')
-            return y_float
+            if fb.fil[0]['qfrmt'] == 'float32':
+                # convert to float32
+                return y_float.astype(np.float32)
+            return y_float  # return unchanged float
+        # ======================================================================
         # Convert various fixpoint formats to float
         elif np.isscalar(y):
             return self.frmt2float_scalar(y)
