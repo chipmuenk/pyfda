@@ -7,13 +7,20 @@
 # (see file LICENSE in root directory for details)
 
 """
-ItemDelegate for the coefficient table in the Input_Coeffs widget.
-This class is used to display and edit the coefficients of a digital filter
-in a QTableWidget.
+This class controls the view of QTableWidget items in a Model-View-Delegate
+architecture of the `Input_Coeffs()` widget. Coefficients of a digital filter
+can be viewed and edited in various fixpoint and float formats.
 
-Coefficients are stored in a 2D float array `self.parent.ba` where the 
-numerator b is the first and the denominator a the second column.
+Globally, coefficients are stored in the 2D float list `fb.fil[0]['ba']` 
+where the numerator b is the first and the denominator a the second column.
+A local copy is created as `self.parent.ba` of `Input_Coeffs()`where edits are
+stored via `setModelData()`. Changes are only passed back to the original
+`fb.fil[0]['ba']` list by `self.parent._save_dict()` when the user presses
+the `Apply` button in the `Input_Coeffs_UI()`.
 
+Coefficients are displayed and stored in a QTableWidget as string objects
+number of rows. The first column contains the numerator b coefficients, the
+second column the denominator a coefficients. The number of rows is set by
 Quantized data is stored in 2D float array `self.parent.ba_q` where again 
 the numerator b is the first and the denominator a the second column.
 
@@ -26,16 +33,12 @@ in the selected format (int, hex, ...). The quantizer is created in the
 `Input_Coeffs` class and passed to this class via the `parent` parameter as
 `self.Q = [self.parent.ui.wdg_wq_coeffs_b.Q, self.parent.ui.wdg_wq_coeffs_a.Q]`
 """
-import logging
-
 import pyfda.filterbroker as fb  # importing filterbroker initializes all its globals
 
 from pyfda.libs.compat import Qt, QtCore, QLineEdit, QSize, QStyledItemDelegate, QColor, QBrush
 from pyfda.libs.pyfda_lib import safe_eval
 from pyfda.libs.pyfda_qt_lib import qstyle_widget
 from pyfda.pyfda_rc import params
-
-logger = logging.getLogger(__name__)
 
 # TODO: Fixpoint coefficients do not properly convert complex -> float when saving
 #       the filter?
@@ -148,13 +151,17 @@ class ItemDelegateCoeffs(QStyledItemDelegate):
         """
 
         if not fb.fil[0]['fx_sim']:
+            # convert to float and return as string with number of digits defined
+            # in `params['FMT_ba']` (default: 6)
             data = safe_eval(text, return_type='auto')  # convert to float
             return f"{data:#.{params['FMT_ba']}g}"
 
         if fb.fil[0]['fx_base'] == 'dec':
+            # text is decimal format, return with number of decimal places calculated
+            # from the total number of bits
             return f"{text:>{self.Q[0].places}}"
 
-        return text
+        return text  # else: return text as rendered in the table
 # see:
 # http://stackoverflow.com/questions/30615090/pyqt-using-qtextedit-as-editor-in-a-qstyleditemdelegate
 
@@ -242,10 +249,10 @@ class ItemDelegateCoeffs(QStyledItemDelegate):
         if isinstance(data_q, complex):
             # if data_q is complex, convert whole column (b or a array) to complex
             self.parent.ba_q[index.column()] = self.parent.ba_q[index.column()].astype(complex)
-        # store new data in self.ba and ba_q
+        # store new data in `self.parent.ba` and `ba_q``
         self.parent.ba[index.column()][index.row()] = data
         self.parent.ba_q[index.column()][index.row()] = data_q
-        # logger.error(f"fb.fil[0]['ba']: {fb.fil[0]['ba']}")
+
         qstyle_widget(self.parent.ui.but_apply, 'changed')
         qstyle_widget(self.parent.ui.but_undo, 'changed')
         # this is needed to adapt text width to e.g. complex number representation

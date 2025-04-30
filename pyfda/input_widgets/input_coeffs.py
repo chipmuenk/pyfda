@@ -643,7 +643,7 @@ class Input_Coeffs(QWidget):
 # ------------------------------------------------------------------------------
     def _save_dict(self):
         """
-        Save the coefficient register `self.ba` to the filter dict `fb.fil[0]['ba']`.
+        Save the coefficient register `self.ba` to the filter dict as `fb.fil[0]['ba']`.
         """
         fb.fil[0]['N'] = max(len(self.ba[0]), len(self.ba[1])) - 1
 
