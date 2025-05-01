@@ -43,11 +43,13 @@ class ItemDelegatePZ(QStyledItemDelegate):
         """
         # continue with the original `initStyleOption()` and call displayText()
         super().initStyleOption(option, index)
-        # test for poles with magnitude > 1
-        if index.column() == 1 and False:
-            # Color item backgrounds with poles outside the UC red
-            option.backgroundBrush = QBrush(Qt.SolidPattern)
-            option.backgroundBrush.setColor(QColor(100, 0, 0, 80))
+
+        if index.column() == 1:
+            # Color item backgrounds red for poles on or outside the UC
+            data = self.parent.zpk[index.column()][index.row()]
+            if abs(data) >= 1.0:
+                option.backgroundBrush = QBrush(Qt.SolidPattern)
+                option.backgroundBrush.setColor(QColor(100, 0, 0, 80))
 
     # --------------------------------------------------------------------------
     def text(self, item) -> str:
