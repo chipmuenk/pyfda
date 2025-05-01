@@ -338,8 +338,8 @@ class Input_PZ(QWidget):
         Format is: [array[zeros, ...], array[poles, ...], k]
         """
         if not type(fb.fil[0]['zpk']) is np.ndarray:
-            logger.warning(f"fb.fil[0]['zpk'] is of type {type(fb.fil[0]['zpk'])} "
-                           f"with len = {len(fb.fil[0]['zpk'])}")
+            logger.warning("fb.fil[0]['zpk'] is of type %s with len = %s",
+                           type(fb.fil[0]['zpk']), len(fb.fil[0]['zpk']))
 
         zpk = list(fb.fil[0]['zpk']).copy()
 
@@ -356,8 +356,8 @@ class Input_PZ(QWidget):
             return
 
         if len(zpk[0]) != len(zpk[1]):
-            logger.warning("fb.fil[0]['zpk'] has differing row lengths, "
-                           f"{len(fb.fil[0]['zpk'][0])} != {len(fb.fil[0]['zpk'][1])}")
+            logger.warning("fb.fil[0]['zpk'] has differing row lengths, %s != %s",
+                           len(fb.fil[0]['zpk'][0]), len(fb.fil[0]['zpk'][1]))
             return
         # logger.warning(f"New shape (zpk) = {np.shape(zpk)}")
         self.zpk = np.array(zpk)  # this enforces a deep copy and converts back to ndarray
@@ -383,8 +383,8 @@ class Input_PZ(QWidget):
             fil_save(fb.fil[0], self.zpk, 'zpk', __name__)  # save with new gain
         except Exception as e:
             # catch exception due to malformatted P/Zs:
-            logger.error("While saving the poles / zeros, "
-                         "the following error occurred:\n{0}".format(e))
+            logger.error(
+                "While saving the poles / zeros, the following error occurred:\n%s", e)
 
         if __name__ == '__main__':
             self.load_dict()  # only needed for stand-alone test
@@ -597,7 +597,7 @@ class Input_PZ(QWidget):
 
         if frmt == 'cartesian' or not type(data) == complex:
             if full_prec:
-                return "{0}".format(data)
+                return f"{data}"
             else:
                 return "{0:.{plcs}g}".format(data, plcs=places)
 
@@ -605,29 +605,29 @@ class Input_PZ(QWidget):
             r, phi = np.absolute(data), np.angle(data, deg=False)
             if full_prec:
                 return f"{r} {self.angle_char}{phi} rad"
-            else:
-                return "{r:.{plcs}g} {angle_char}{p:.{plcs}g} rad"\
-                    .format(r=r, p=phi, plcs=places, angle_char=self.angle_char)
+
+            return "{r:.{plcs}g} {angle_char}{p:.{plcs}g} rad"\
+                .format(r=r, p=phi, plcs=places, angle_char=self.angle_char)
 
         elif frmt == 'polar_deg':
             r, phi = np.absolute(data), np.angle(data, deg=True)
             if full_prec:
                 return f"{r} {self.angle_char}{phi}°"
-            else:
-                return "{r:.{plcs}g} {angle_char}{p:.{plcs}g}°"\
-                    .format(r=r, p=phi, plcs=places, angle_char=self.angle_char)
+
+            return "{r:.{plcs}g} {angle_char}{p:.{plcs}g}°"\
+                .format(r=r, p=phi, plcs=places, angle_char=self.angle_char)
 
         elif frmt == 'polar_pi':
             r, phi = np.absolute(data), np.angle(data, deg=False) / np.pi
             if full_prec:
                 return f"{r} {self.angle_char}{phi} {self.pi_char}"
-            else:
-                return "{r:.{plcs}g} {angle_char}{p:.{plcs}g} {pi_char}"\
-                    .format(r=r, p=phi, plcs=places, angle_char=self.angle_char,
-                            pi_char=self.pi_char)
+
+            return "{r:.{plcs}g} {angle_char}{p:.{plcs}g} {pi_char}"\
+                .format(r=r, p=phi, plcs=places, angle_char=self.angle_char,
+                        pi_char=self.pi_char)
 
         else:
-            logger.error("Unknown format {0}.".format(frmt))
+            logger.error("Unknown format %s.", frmt)
 
     # --------------------------------------------------------------------------
     def export_table(self):
@@ -661,11 +661,11 @@ class Input_PZ(QWidget):
                                     file_types=('csv', 'mat', 'npy', 'npz'))
             if file_name is None:  # operation cancelled or error
                 return
-            else:  # file types 'csv', 'mat', 'npy', 'npz'
-                data_str = file2array(
-                    file_name, file_type, 'zpk',
-                    from_clipboard=False,
-                    as_str = self.ui.but_format.checked)
+            # file types 'csv', 'mat', 'npy', 'npz'
+            data_str = file2array(
+                file_name, file_type, 'zpk',
+                from_clipboard=False,
+                as_str = self.ui.but_format.checked)
 
         if data_str is None:  # file operation has been aborted
             return
