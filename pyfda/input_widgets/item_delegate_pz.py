@@ -9,9 +9,6 @@
 """
 Widget for displaying and modifying filter Poles and Zeros
 """
-import logging
-from pprint import pformat
-
 from pyfda.libs.compat import (
     QtCore, QLineEdit, QBrush, QColor, QSize, QStyledItemDelegate, Qt)
 from pyfda.libs.pyfda_qt_lib import qstyle_widget

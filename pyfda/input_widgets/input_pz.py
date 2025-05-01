@@ -18,8 +18,7 @@ from scipy.signal import freqz, zpk2tf
 
 import pyfda.filterbroker as fb  # importing filterbroker initializes all its globals
 from pyfda.libs.compat import (
-    QtCore, QWidget, QLineEdit, pyqtSignal, QEvent,
-    QBrush, QColor, QSize, QStyledItemDelegate, QApplication,
+    QtCore, QWidget, QLineEdit, pyqtSignal, QEvent, QApplication,
     QTableWidget, QTableWidgetItem, Qt, QVBoxLayout)
 from pyfda.libs.pyfda_qt_lib import qget_cmb_box, qstyle_widget, emit
 from pyfda.libs.pyfda_io_lib import qtable2csv, file2array, export_fil_data, select_file
@@ -42,7 +41,7 @@ class Input_PZ(QWidget):
     sig_rx = pyqtSignal(object)  # incoming from input_tab_widgets
     sig_tx = pyqtSignal(object)  # emitted when filter has been saved
 
-    def __init__(self, parent=None):
+    def __init__(self):
         super().__init__()
 
         self.data_changed = True  # initialize flag: filter data has been changed
@@ -66,12 +65,12 @@ class Input_PZ(QWidget):
         emit(self, dict_sig)
 
     # ------------------------------------------------------------------------------
-    def process_sig_rx(self, dict_sig=None):
+    def process_sig_rx(self, dict_sig=None) -> None:
         """
         Process signals coming from sig_rx
         """
-        # logger.debug(f"SIG_RX - data_changed = {self.data_changed}, vis = "
-        #              f"{self.isVisible()}\n{pprint_log(dict_sig)}")
+        logger.debug("SIG_RX - data_changed = %s, vis = %s\n%s",
+                     self.data_changed, self.isVisible(), pprint_log(dict_sig))
 
         if dict_sig['id'] == id(self):
             # logger.warning("Stopped infinite loop:\n{0}".format(pprint_log(dict_sig)))
@@ -81,7 +80,7 @@ class Input_PZ(QWidget):
             self.ui.but_csv_options.setChecked(not dirs.csv_options_handle is None)
             return
 
-        elif self.isVisible():
+        if self.isVisible():
             if 'data_changed' in dict_sig or self.data_changed:
                 self.load_dict()
                 self.data_changed = False
@@ -183,7 +182,7 @@ class Input_PZ(QWidget):
                 self._reload_entry(source)
                 return True  # event processing stops here
 
-            elif event.type() == QEvent.KeyPress:
+            if event.type() == QEvent.KeyPress:
                 self.spec_edited = True  # entry has been changed
                 key = event.key()  # key press: 6, key release: 7
                 if key in {QtCore.Qt.Key_Return, QtCore.Qt.Key_Enter}:  # store entry
@@ -191,7 +190,7 @@ class Input_PZ(QWidget):
                     self._reload_entry(source)  # display in desired format
                     return True
 
-                elif key == QtCore.Qt.Key_Escape:  # revert changes
+                if key == QtCore.Qt.Key_Escape:  # revert changes
                     self.spec_edited = False
                     self._reload_entry(source)
                     return True
@@ -201,7 +200,7 @@ class Input_PZ(QWidget):
                 self._reload_entry(source)  # display in desired format
                 return True
 
-        return super(Input_PZ, self).eventFilter(source, event)
+        return super().eventFilter(source, event)
 
     # ------------------------------------------------------------------------------
     def _store_entry(self, source):
@@ -236,7 +235,7 @@ class Input_PZ(QWidget):
         elif len(self.zpk) == 2:  # k is missing in zpk:
             self.zpk.append(zeros_with_val(len(self.zpk[0])))  # add a row with k = 1
         else:
-            logger.error(f"P/Z array 'self.zpk' has wrong number of rows = {len(self.zpk)}")
+            logger.error("P/Z array 'self.zpk' has wrong number of rows = %s", len(self.zpk))
             logger.error(self.zpk)
 
         if source.objectName() == "led_gain":
@@ -353,8 +352,7 @@ class Input_PZ(QWidget):
         elif len(zpk) == 2:  # k is missing in zpk:
             zpk.append(zeros_with_val(len(zpk[0])))  # add a row with k = 1
         else:
-            logger.error("P/Z array 'fb.fil[0]['zpk']' has wrong number of "
-                         f"rows = {len(zpk)}")
+            logger.error("P/Z array 'fb.fil[0]['zpk']' has wrong number of rows = %s", len(zpk))
             return
 
         if len(zpk[0]) != len(zpk[1]):
@@ -597,7 +595,7 @@ class Input_PZ(QWidget):
         else:
             full_prec = False
 
-        if frmt == 'cartesian' or not (type(data) == complex):
+        if frmt == 'cartesian' or not type(data) == complex:
             if full_prec:
                 return "{0}".format(data)
             else:

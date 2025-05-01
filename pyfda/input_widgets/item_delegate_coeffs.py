@@ -42,7 +42,7 @@ from pyfda.pyfda_rc import params
 
 # TODO: Fixpoint coefficients do not properly convert complex -> float when saving
 #       the filter?
-# TODO: This ItemDelegate method displayText is called again and again when an
+# TODO: ItemDelegateCoeffs.displayText() is called again and again when an
 #        item is selected?!
 # TODO: negative values for WI don't work correctly
 
