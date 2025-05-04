@@ -16,6 +16,7 @@ import sys
 import numpy as np
 
 import pyfda.filterbroker as fb  # importing filterbroker initializes all its globals
+from pyfda.filterbroker import fb_get, fb_set, is_fx
 
 from pyfda.libs.compat import (
     Qt, QWidget, QApplication, QTableWidget, QTableWidgetItem, QVBoxLayout, pyqtSignal,
@@ -241,8 +242,8 @@ class Input_Coeffs(QWidget):
         # where overflow items can be -1, 0, +1: 0 = no overflow, -1 = underflow, +1 = overflow
 
         # Float format: Set ba_q = ba, all overflow items are = 0
-        if not fb.fil[0]['fx_sim']:
-            if fb.fil[0]['qfrmt'] == 'float64':
+        if not is_fx():
+            if fb_get('qfrmt') == 'float64':
                 self.ba_q = [self.ba[0],
                             self.ba[1],
                             np.zeros(len_b),
@@ -256,7 +257,7 @@ class Input_Coeffs(QWidget):
                             ]
         # Fixpoint decimal format: Print quantized coefficients in numeric format
         # with a defined number of `Q[0].places` resp. `Q[1].places``
-        elif fb.fil[0]['fx_base'] == 'dec':
+        elif fb_get('fx_base') == 'dec':
             self.ba_q = [
                 [f"{x:>{self.Q[0].places}}" for x in self.Q[0].float2frmt(self.ba[0])],
                 [f"{x:>{self.Q[1].places}}" for x in self.Q[1].float2frmt(a)],
@@ -324,12 +325,12 @@ class Input_Coeffs(QWidget):
                 logger.warning("Unknown filter type %s", ftype)
 
         if self.ui.cmb_filter_type.currentText() == 'IIR':
-            fb.fil[0]['ft'] = 'IIR'
+            fb_set('ft', 'IIR')
             self.col = 2
             self.tblCoeff.setColumnCount(2)
             self.tblCoeff.setHorizontalHeaderLabels(["b", "a"])
         else:
-            fb.fil[0]['ft'] = 'FIR'
+            fb_set('ft', 'FIR')
             self.col = 1
             self.tblCoeff.setColumnCount(1)
             self.tblCoeff.setHorizontalHeaderLabels(["b"])
@@ -390,14 +391,14 @@ class Input_Coeffs(QWidget):
         params['FMT_ba'] = int(self.ui.spn_digits.text())
         # update quantized coefficient display and overflow counter
         self.quant_coeffs_view()
-        if np.ndim(self.ba) == 1 or fb.fil[0]['ft'] == 'FIR':
+        if np.ndim(self.ba) == 1 or fb_get('ft') == 'FIR':
             self.num_rows = len(self.ba[0])
         else:
             self.num_rows = max(len(self.ba[1]), len(self.ba[0]))
 
-        # When format is 'floatxx', disable all fixpoint options and widgets, only the
-        # quantizer widget is enabled also for 'float32':
-        is_float = 'float' in qget_cmb_box(self.ui.cmb_qfrmt) # float format 32 or 64 bit
+        # When format is floating point, disable all fixpoint options and widgets,
+        # only the quantizer widget is enabled also for 'float32':
+        is_float = not is_fx()
         self.ui.spn_digits.setVisible(is_float)  # select number of float digits
         self.ui.lbl_digits.setVisible(is_float)
         self.ui.cmb_fx_base.setVisible(not is_float)  # hide fx base combobox
@@ -408,7 +409,7 @@ class Input_Coeffs(QWidget):
         self.ui.wdg_wq_coeffs_b.setVisible(not is_float)
 
         # check whether filter is FIR and only needs one column
-        if fb.fil[0]['ft'] == 'FIR':
+        if fb_get('ft') == 'FIR':
             self.num_cols = 1
             self.tblCoeff.setColumnCount(1)
             self.tblCoeff.setHorizontalHeaderLabels(["b"])
@@ -437,7 +438,7 @@ class Input_Coeffs(QWidget):
                 self._refresh_table_item(row, col)
 
         # make a[0] selectable but not editable
-        if fb.fil[0]['ft'] == 'IIR':
+        if fb_get('ft') == 'IIR':
             item = self.tblCoeff.item(0, 1)
             item.setFlags(Qt.ItemIsSelectable | Qt.ItemIsEnabled)
             item.setFont(self.ui.bfont)
@@ -460,7 +461,8 @@ class Input_Coeffs(QWidget):
         while the coefficient list `self.ba` is a list of two float ndarrays to allow
         for different lengths of b and a subarrays while adding / deleting items.
         """
-        self.ba = copy.deepcopy(fb.fil[0]['ba'])
+        # TODO: deepcopy can be removed once the setter / getters work properly)
+        self.ba = copy.deepcopy(fb_get('ba'))  # fb.fil[0]['ba'])
 
         # set quantization UI from dictionary, update quantized coeff. display and
         # overflow counter, and refresh table
@@ -596,8 +598,8 @@ class Input_Coeffs(QWidget):
         - `self.fx_base2dict()`
         """
         # update ui
-        qset_cmb_box(self.ui.cmb_qfrmt, fb.fil[0]['qfrmt'], data=True)
-        if fb.fil[0]['fx_sim']:   # fixpoint mode, update quantizer objects and widgets
+        qset_cmb_box(self.ui.cmb_qfrmt, fb_get('qfrmt'), data=True)
+        if is_fx():  # fixpoint mode, update quantizer objects and widgets
             # qset_cmb_box(self.ui.cmb_qfrmt, fb.fil[0]['qfrmt'], data=True)
             self.ui.wdg_wq_coeffs_a.dict2ui(fb.fil[0]['fxq']['QCA'])
             self.ui.wdg_wq_coeffs_b.dict2ui(fb.fil[0]['fxq']['QCB'])
@@ -610,15 +612,12 @@ class Input_Coeffs(QWidget):
     def qfrmt2dict(self):
         """
         Read out the UI settings of  `self.ui.cmb_qfrmt` (triggering this method)
-        and store it under the 'qfrmt' key if it is a fixpoint format. Set the
-        `fb.fil[0]['fx_sim']` flag accordingly.
+        and store it under the 'qfrmt' key if it is a fixpoint format.
 
         Refresh the table and update quantization widgets, finally emit a signal
         `{'fx_sim': 'specs_changed'}`.
         """
-        qfrmt = qget_cmb_box(self.ui.cmb_qfrmt)
-        fb.fil[0]['fx_sim'] = 'float' not in qfrmt  # True for fixpoint formats
-        fb.fil[0]['qfrmt'] = qfrmt
+        fb_set('qfrmt', qget_cmb_box(self.ui.cmb_qfrmt))
 
         # update quant. widgets and table with the new `qfrmt` settings and propagate
         # change in fixpoint settings to other widgets
@@ -635,7 +634,7 @@ class Input_Coeffs(QWidget):
         Refresh the table and update quantization widgets. Don't emit a signal
         because this only influences the view not the data itself.
         """
-        fb.fil[0]['fx_base'] = qget_cmb_box(self.ui.cmb_fx_base)
+        fb_set('fx_base', qget_cmb_box(self.ui.cmb_fx_base))
 
         # update quant. widgets and table with the new `fx_base` settings
         self.dict2ui()
@@ -645,14 +644,14 @@ class Input_Coeffs(QWidget):
         """
         Save the coefficient register `self.ba` to the filter dict as `fb.fil[0]['ba']`.
         """
-        fb.fil[0]['N'] = max(len(self.ba[0]), len(self.ba[1])) - 1
+        fb_set('N', max(len(self.ba[0]), len(self.ba[1])) - 1)
 
         # Switch to manual filter order and 'Manual_IIR' resp. 'Manual_FIR' filter class
-        fb.fil[0]['fo'] = 'man'
-        if fb.fil[0]['ft'] == 'IIR':
-            fb.fil[0]['fc'] = 'Manual_IIR'
+        fb_set('fo', 'man')
+        if fb_get('ft') == 'IIR':
+            fb_set('fc', 'Manual_IIR')
         else:
-            fb.fil[0]['fc'] = 'Manual_FIR'
+            fb_set('fc','Manual_FIR')
 
         # save, check and convert coeffs, check filter type
         try:
@@ -704,7 +703,7 @@ class Input_Coeffs(QWidget):
             self.ba[1] = np.append(self.ba[1], np.zeros(D))
             # self.quant_coeffs_view()
         elif D < 0:  # a is longer than b
-            if fb.fil[0]['ft'] == 'IIR':
+            if fb_get('ft') == 'IIR':
                 self.ba[0] = np.append(self.ba[0], np.zeros(-D))
             else:
                 self.ba[1] = self.ba[1][:D]  # discard last D elements of a
@@ -725,7 +724,7 @@ class Input_Coeffs(QWidget):
 
         if not any(sel) and len(self.ba[0]) > 0:  # nothing selected, delete last row
             self.ba = np.delete(self.ba, -1, axis=1)
-        elif np.all(sel[0] == sel[1]) or fb.fil[0]['ft'] == 'FIR':
+        elif np.all(sel[0] == sel[1]) or fb_get('ft') == 'FIR':
             # only complete rows selected or FIR -> delete row
             self.ba = np.delete(self.ba, sel[0], axis=1)
         else:
@@ -809,7 +808,7 @@ class Input_Coeffs(QWidget):
                 self.ba[0] = np.where(b_close, targ_val, self.ba[0])
                 changed = True
 
-            if fb.fil[0]['ft'] == 'IIR':
+            if fb_get('ft') == 'IIR':
                 a_close = np.logical_and(
                     np.isclose(self.ba[1], test_val, rtol=0, atol=self.ui.eps),
                     (self.ba[1] != targ_val))
