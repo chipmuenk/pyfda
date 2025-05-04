@@ -463,6 +463,43 @@ fil[0] = {}
 for l in range(len(fil)):
     fil[l] = copy.deepcopy(fil_ref)
 
+# -------------------------
+def is_fx()-> bool:
+    """
+    Check if fixpoint mode is active
+    """
+    return fil[0]['qfrmt'] in ['qint', 'qfrac']
+
+# -------------------------
+def fb_get(arg: str) -> str:
+    """
+    Get the value of a key in the   global dict `fil[0]`
+
+    TODO: Keys need to be protected from accidental overwriting by
+    the user. This is done by prepending the keys with an underscore
+    (e.g. `_f_S`). The getter function does the actual renaming.
+    """
+    ret = fil[0][arg]
+    if ret is None:
+        logger.warning(f"Key {arg} not found in filter dict!")
+    return ret
+
+# -------------------------
+def fb_set(arg: str, val) -> None:
+    """
+    Set the value of a key in the global dict `fil[0]`
+    """
+    if arg in fil[0]:
+        fil[0][arg] = val
+    else:
+        logger.warning(f"Key {arg} not found in filter dict!")
+        return -1
+    if arg =='qfrmt':
+        # TODO: remove this later when all `fil[0]['fx_sim']` have been replaced
+        fil[0]['fx_sim'] = is_fx()
+    return 0
+
+# -------------------------
 def restore_fil():
     """
     Restore current global dict `fb.fil[0]` from undo memory `fil_undo`
@@ -480,6 +517,7 @@ def restore_fil():
         undo_ptr = (undo_ptr + UNDO_LEN - 1) % UNDO_LEN
         return 0
 
+# -------------------------
 def store_fil():
     """
     Store current global dict `fb.fil[0]` to undo memory `fil_undo`
@@ -494,6 +532,7 @@ def store_fil():
     undo_ptr = (undo_ptr + 1) % UNDO_LEN
     fil_undo[undo_ptr] = copy.deepcopy(fil[0])
 
+# -------------------------
 def key_list_to_dict(keys: list) -> dict:
     """
     Convert a list of keys (str) to access a nested dict that can be read or written to
@@ -531,6 +570,7 @@ def key_list_to_dict(keys: list) -> dict:
     #         prev_key = key
     # return stack[0]
 
+# -------------------------
 def set_fil_dict(keys: list, arg, backup: bool = True) -> None:
     """
     - Set the value of `fb.fil[0]["key_0"]["key_1"]...["key_n]` to `arg`, nested keys
@@ -543,6 +583,7 @@ def set_fil_dict(keys: list, arg, backup: bool = True) -> None:
         store_fil()
     key_list_to_dict(keys)[keys[-1]] = arg
 
+# -------------------------
 def get_fil_dict(keys: list):
     """
     Get the value of `fb.fil[0]["key_0"]["key_1"]...["key_n]`, nested keys are passed as
