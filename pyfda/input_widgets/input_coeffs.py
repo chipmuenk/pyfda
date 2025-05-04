@@ -155,12 +155,12 @@ class Input_Coeffs(QWidget):
         self.tblCoeff.setItemDelegate(ItemDelegateCoeffs(self))
 
         # ============== Main UI Layout =====================================
-        layVMain = QVBoxLayout()
-        layVMain.setAlignment(Qt.AlignTop)  # only affects the first widget (intended)
-        layVMain.addWidget(self.ui)
-        layVMain.addWidget(self.tblCoeff)
-        layVMain.setContentsMargins(*params['wdg_margins'])
-        self.setLayout(layVMain)
+        lay_v_main = QVBoxLayout()
+        lay_v_main.setAlignment(Qt.AlignTop)  # only affects the first widget (intended)
+        lay_v_main.addWidget(self.ui)
+        lay_v_main.addWidget(self.tblCoeff)
+        lay_v_main.setContentsMargins(*params['wdg_margins'])
+        self.setLayout(lay_v_main)
 
         # initialize, quantize + refresh table with default values from filter dict
         self.load_dict()
