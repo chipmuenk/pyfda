@@ -6,6 +6,7 @@
 
 - Float coefficients can be displayed and quanized as 32 bit (single precision) float format
 - Font sizes for UI and matplotlib can now be set in the config file
+- Highlight poles outside the unit circle in the P/Z input widget
 
 ### Bugfixes
 
