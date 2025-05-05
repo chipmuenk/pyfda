@@ -387,13 +387,13 @@ class Input_Fixpoint_Specs(QWidget):
         # self.lbl_fixp_img.setSizePolicy(QSizePolicy.Minimum, QSizePolicy.Minimum)
 
         self.embed_fixp_img(self.no_fx_filter_img)
-        layHImg = QHBoxLayout()
-        layHImg.setContentsMargins(0, 0, 0, 0)
-        layHImg.addWidget(self.lbl_fixp_img)  # , Qt.AlignCenter)
+        lay_h_img = QHBoxLayout()
+        lay_h_img.setContentsMargins(0, 0, 0, 0)
+        lay_h_img.addWidget(self.lbl_fixp_img)  # , Qt.AlignCenter)
         # embedd image into transparent QFrame
         self.frmImg = QFrame(self)
         self.frmImg.setObjectName("transparent")
-        self.frmImg.setLayout(layHImg)
+        self.frmImg.setLayout(lay_h_img)
         self.frmImg.setContentsMargins(*params['wdg_margins'])
 
         # -----------------------------------------------------------------
@@ -411,28 +411,28 @@ class Input_Fixpoint_Specs(QWidget):
         self.butExportHDL.setText("-> Verilog")
 
         # Wrap qfrmt combobox and HDL buttons sim and convert in one layout
-        layH_fx_btns = QHBoxLayout()
-        layH_fx_btns.addWidget(self.cmb_qfrmt)
-        layH_fx_btns.addWidget(self.butExportHDL)
+        lay_h_fx_btns = QHBoxLayout()
+        lay_h_fx_btns.addWidget(self.cmb_qfrmt)
+        lay_h_fx_btns.addWidget(self.butExportHDL)
 
-        frmHdlBtns = QFrame(self)
-        frmHdlBtns.setLayout(layH_fx_btns)
-        frmHdlBtns.setContentsMargins(*params['wdg_margins'])
+        frm_hdl_btns = QFrame(self)
+        frm_hdl_btns.setLayout(lay_h_fx_btns)
+        frm_hdl_btns.setContentsMargins(*params['wdg_margins'])
 
         # -------------------------------------------------------------
         #       Top level layout
         # -------------------------------------------------------------
-        layVMain = QVBoxLayout()
-        layVMain.addWidget(self.frmTitle)
-        layVMain.addWidget(frmHdlBtns)
-        layVMain.addWidget(self.wdg_wq_input)
-        layVMain.addWidget(wdg_fx_dyn)
-        layVMain.addWidget(self.wdg_wq_output)
-        layVMain.addWidget(self.frmImg)
-        layVMain.addStretch()
-        layVMain.setContentsMargins(*params['wdg_margins'])
+        lay_v_main = QVBoxLayout()
+        lay_v_main.addWidget(self.frmTitle)
+        lay_v_main.addWidget(frm_hdl_btns)
+        lay_v_main.addWidget(self.wdg_wq_input)
+        lay_v_main.addWidget(wdg_fx_dyn)
+        lay_v_main.addWidget(self.wdg_wq_output)
+        lay_v_main.addWidget(self.frmImg)
+        lay_v_main.addStretch()
+        lay_v_main.setContentsMargins(*params['wdg_margins'])
 
-        self.setLayout(layVMain)
+        self.setLayout(lay_v_main)
 
         # -----------------------------------------------------------------
         # GLOBAL SIGNALS & SLOTs
