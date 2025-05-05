@@ -22,6 +22,8 @@ from pyfda.libs.compat import (
     QVBoxLayout, QHBoxLayout, pyqtSignal, QFrame, QSizePolicy)
 
 import pyfda.filterbroker as fb  # importing filterbroker initializes all its globals
+from pyfda.filterbroker import is_fx, fb_get, fb_set
+
 import pyfda.libs.pyfda_dirs as dirs
 from pyfda.libs.pyfda_lib import pprint_log, first_item
 from pyfda.libs.pyfda_qt_lib import (
@@ -194,7 +196,7 @@ class Input_Fixpoint_Specs(QWidget):
 
         logger.debug(
             "SIG_RX: vis = %s, fx_sim = %s\n%s",
-            self.isVisible(), fb.fil[0]['fx_sim'], pprint_log(dict_sig))
+            self.isVisible(), is_fx(), pprint_log(dict_sig))
 
         if dict_sig['id'] == id(self):
             # logger.warning(f'Stopped infinite loop: "{first_item(dict_sig)}"')
@@ -213,7 +215,7 @@ class Input_Fixpoint_Specs(QWidget):
                 # New filter has been designed, update list of available filter topologies
                 self._update_filter_cmb()
 
-        if fb.fil[0]['fx_sim']:  # fixpoint mode active
+        if is_fx():  # fixpoint mode active
             #  =================== UI_CHANGED =======================================
             if 'ui_global_changed' in dict_sig and dict_sig['ui_global_changed']\
                     in {'resized', 'tab'} and self.isVisible():
@@ -471,7 +473,7 @@ class Input_Fixpoint_Specs(QWidget):
         fixpoint implementation combo box `self.cmb_fx_wdg` with successfull
         imports.
         """
-        self._update_filter_cmb(fx_wdg=fb.fil[0]['fx_mod_class_name'])
+        self._update_filter_cmb(fx_wdg=fb_get('fx_mod_class_name'))
 
         self.dict2ui()  # update fixpoint widgets
 
@@ -503,7 +505,7 @@ class Input_Fixpoint_Specs(QWidget):
         # remember last fx widget setting:
         last_fx_wdg = qget_cmb_box(self.cmb_fx_wdg, data=False)
         self.cmb_fx_wdg.clear()  # clear combobox
-        fc = fb.fil[0]['fc']  # get current filter class
+        fc = fb_get('fc')  # get current filter class
 
         if 'fix' in fb.filter_classes[fc]:
             self.cmb_fx_wdg.blockSignals(True)
@@ -696,15 +698,14 @@ class Input_Fixpoint_Specs(QWidget):
                 self.lbl_descr.setVisible(False)
 
             # store fully qualified name of current fixpoint class:
-            fb.fil[0]['fx_mod_class_name'] = fx_mod_class_name[0]
+            fb_set('fx_mod_class_name', fx_mod_class_name[0])
             # Check which methods the fixpoint widget provides and enable
             # corresponding buttons:
             self.butExportHDL.setVisible(hasattr(self.fx_filt_ui, "to_hdl"))
 
         else:  # no fixpoint widget found
-            fb.fil[0]['fx_mod_class_name'] = ""
+            fb_set('fx_mod_class_name', "")
             self.fx_wdg_found = False
-            # fb.fil[0]['fx_sim'] = False
             self.lbl_descr.setVisible(False)
             self.cmb_qfrmt.setEnabled(False)
 
@@ -716,12 +717,11 @@ class Input_Fixpoint_Specs(QWidget):
         Triggered by by a change of index of the combo box `self.cmb_qfrmt`.
 
         - Update UI (fixpoint format, visibility of fixpoint widgets) from combobox
-          `self.cmb_qfrmt` to `fb.fil[0]['fx_sim']` and `fb.fil[0]['qfrmt']`.
+          `self.cmb_qfrmt` to `fb.fil[0]['qfrmt']`.
         - Update fixpoint widget settings via `self.dict2ui()`
         - Emit {'fx_sim': 'specs_changed'}.
           """
-        fb.fil[0]['fx_sim'] = 'float' not in qget_cmb_box(self.cmb_qfrmt)
-        fb.fil[0]['qfrmt'] = qget_cmb_box(self.cmb_qfrmt)
+        fb_set('qfrmt', qget_cmb_box(self.cmb_qfrmt))
 
         self.dict2ui()
 
@@ -732,15 +732,15 @@ class Input_Fixpoint_Specs(QWidget):
         """
         Called during `__init__()` and from `process_sig_rx()`.
 
-        Update UI from `fb.fil[0]['fx_sim']`, `fb.fil[0]['qfrmt']` and the fx filter
+        Update UI from `fb.fil[0]['qfrmt']` and the fx filter
         dict `fb.fil[0]['fxq']`. This affects the visibility and the fx settings of
         input, output and dyn. filter widget via their `dict2ui()` methods.
         The setting of the `self.cmb_qfrmt` combobox influencing float / fixpoint number
         format is updated as well.
         """
-        if not fb.fil[0]['fx_mod_class_name']:  # no fixpoint filter available
-            fb.fil[0]['fx_sim'] = False
-        is_fixp = fb.fil[0]['fx_sim']
+        if not fb_get('fx_mod_class_name'):  # no fixpoint filter available
+            fb_set('qfrmt', 'float64')
+        is_fixp = is_fx()
 
         # fixpoint widgets are only visible in fixpoint mode
         self.frmTitle.setVisible(is_fixp)
@@ -751,7 +751,7 @@ class Input_Fixpoint_Specs(QWidget):
             self.fx_filt_ui.setVisible(is_fixp)
 
         # set combobox from dictionary
-        qset_cmb_box(self.cmb_qfrmt, fb.fil[0]['qfrmt'], data=True)
+        qset_cmb_box(self.cmb_qfrmt, fb_get('qfrmt'), data=True)
         if is_fixp:
             # refresh image in case of switching from float to fix
             self.resize_img()
@@ -825,7 +825,7 @@ class Input_Fixpoint_Specs(QWidget):
         if True:
         # try:
             # initialize fixpoint filter instance with fixpoint quantizer
-            self.fx_filt_ui.fx_filt.init(fb.fil[0]['fxq'])
+            self.fx_filt_ui.fx_filt.init(fb_get('fxq'))
 
             return 0
         else:

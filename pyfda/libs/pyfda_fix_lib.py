@@ -664,7 +664,6 @@ class Fixed(object):
         #       Convert input argument into proper floating point scalars /
         #       arrays and initialize flags
         # ======================================================================
-        logger.warning(f"qfrmt = '{fb.fil[0]['qfrmt']}'")
         if fb.fil[0]['qfrmt'] == 'float64':
             logger.warning(
                 "fixp() should only be called for quantizing - returning unchanged 'float64'!")
