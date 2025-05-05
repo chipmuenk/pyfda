@@ -10,10 +10,12 @@
 Widget for simulating fixpoint filters and generating Verilog Code
 
 """
-import sys, os, io
-import re
 import importlib
+import io
 import logging
+import os
+import re
+import sys
 
 import numpy as np
 
@@ -25,9 +27,9 @@ import pyfda.filterbroker as fb  # importing filterbroker initializes all its gl
 from pyfda.filterbroker import is_fx, fb_get, fb_set
 
 import pyfda.libs.pyfda_dirs as dirs
-from pyfda.libs.pyfda_lib import pprint_log, first_item
+from pyfda.libs.pyfda_lib import pprint_log
 from pyfda.libs.pyfda_qt_lib import (
-    qget_cmb_box, qstyle_widget, qcmb_box_populate, qset_cmb_box, emit)
+    qget_cmb_box, qcmb_box_populate, qset_cmb_box, emit)
 from pyfda.fixpoint_widgets.fx_ui_wq import FX_UI_WQ
 from pyfda.pyfda_rc import params
 
@@ -68,11 +70,11 @@ class Input_Fixpoint_Specs(QWidget):
 
         self.no_fx_filter_img = os.path.join(self.fx_path, "no_fx_filter.png")
         if not os.path.isfile(self.no_fx_filter_img):
-            logger.error("Image {0:s} not found!".format(self.no_fx_filter_img))
+            logger.error("Image %s not found!", self.no_fx_filter_img)
 
         self.default_fx_img = os.path.join(self.fx_path, "default_fx_img.png")
         if not os.path.isfile(self.default_fx_img):
-            logger.error("Image {0:s} not found!".format(self.default_fx_img))
+            logger.error("Image %s not found!", self.default_fx_img)
 
         self.cmb_qfrmt_items = [
             "<span>Quantization format for coefficients (affects only "
@@ -92,8 +94,8 @@ class Input_Fixpoint_Specs(QWidget):
         if len(inst_wdg_list) == 0:
             logger.warning("No fixpoint filter found for this type of filter!")
         else:
-            logger.debug("Imported {0:d} fixpoint filters:\n{1}"
-                         .format(len(inst_wdg_list.split("\n"))-1, inst_wdg_list))
+            logger.debug("Imported %d fixpoint filters:\n%s",
+                         len(inst_wdg_list.split("\n"))-1, inst_wdg_list)
         self._update_fixp_widget()
         self.dict2ui()  # update fixpoint widgets
 
@@ -129,48 +131,46 @@ class Input_Fixpoint_Specs(QWidget):
         # ---- Process input and output quantizer settings ('ui_local_changed') --
         elif 'ui_local_changed' in dict_sig:
             if 'sender_name' not in dict_sig:
-                logger.warning(f"No key 'sender_name' in dict_sig:\n{pprint_log(dict_sig)}")
-                return
-
-            elif dict_sig['ui_local_changed']\
-                    not in {'WI', 'WF', 'ovfl', 'quant', 'cmbW', 'butLock'}:
                 logger.warning(
-                    f"Unknown value '{dict_sig['ui_local_changed']}' "
-                    "for key 'ui_local_changed'")
+                    "No key 'sender_name' in dict_sig:\n%s", pprint_log(dict_sig))
                 return
 
-            elif dict_sig['sender_name'] == 'fx_ui_wq_input':
-                """
-                Input fixpoint format has been changed: Update filter dict with the
-                settings of the input quantizer dict. If I/O lock is active, copy
-                input fixpoint word format to output word format. Do the same
-                if butLock has been activated.
-                """
+            if dict_sig['ui_local_changed']\
+                    not in {'WI', 'WF', 'ovfl', 'quant', 'cmbW', 'butLock'}:
+                logger.warning("Unknown value '%s' for key 'ui_local_changed'",
+                               dict_sig['ui_local_changed'])
+                return
+
+            if dict_sig['sender_name'] == 'fx_ui_wq_input':
+                # Input fixpoint format has been changed: Update filter dict with the
+                # settings of the input quantizer dict. If I/O lock is active, copy
+                # input fixpoint word format to output word format. Do the same
+                # if butLock has been activated.
+                #
                 fb.fil[0]['fxq']['QI'].update(self.wdg_wq_input.Q.q_dict)
                 if dict_sig['ui_local_changed'] == 'butLock'\
                         and not self.wdg_wq_input.butLock.checked:
                     # butLock was deactivitated, don't do anything
                     return
-                elif self.wdg_wq_input.butLock.checked:
+                if self.wdg_wq_input.butLock.checked:
                     # button lock was activated or wordlength settings have been changed
                     # with active lock -> copy input settings to output
                     fb.fil[0]['fxq']['QO']['WI'] = fb.fil[0]['fxq']['QI']['WI']
                     fb.fil[0]['fxq']['QO']['WF'] = fb.fil[0]['fxq']['QI']['WF']
 
             elif dict_sig['sender_name'] == 'fx_ui_wq_output':
-                """
-                Output fixpoint format has been changed: Update filter dict with the
-                settings of the output quantizer dict. When I/O lock is active, copy
-                output fixpoint word format to input word format.
-                """
+                # Output fixpoint format has been changed: Update filter dict with the
+                # settings of the output quantizer dict. When I/O lock is active, copy
+                # output fixpoint word format to input word format.
+                #
                 fb.fil[0]['fxq']['QO'].update(self.wdg_wq_output.Q.q_dict)
 
                 if self.wdg_wq_input.butLock.checked:
                     fb.fil[0]['fxq']['QI']['WI'] = fb.fil[0]['fxq']['QO']['WI']
                     fb.fil[0]['fxq']['QI']['WF'] = fb.fil[0]['fxq']['QO']['WF']
             else:
-                logger.error("Unknown wdg_name / sender_name '{0}' in dict_sig:\n{1}"
-                             .format(dict_sig['sender_name'], pprint_log(dict_sig)))
+                logger.error("Unknown wdg_name / sender_name '%s' in dict_sig:\n%s",
+                             dict_sig['sender_name'], pprint_log(dict_sig))
                 return
 
             self.dict2ui() # update fixpoint widgets
@@ -178,7 +178,7 @@ class Input_Fixpoint_Specs(QWidget):
         # --------------------------------------------------------------------------------
 
         else:
-            logger.error(f"Unknown key/value in 'dict_sig':\n{pprint_log(dict_sig)}")
+            logger.error("Unknown key/value in 'dict_sig':\n%s", pprint_log(dict_sig))
         return
 
 # ------------------------------------------------------------------------------
@@ -268,7 +268,8 @@ class Input_Fixpoint_Specs(QWidget):
                     # number of overflows etc.
                     self.wdg_wq_input.update_ovfl_cnt()
                     self.wdg_wq_output.update_ovfl_cnt()
-                    if hasattr(self, 'fx_filt_ui') and hasattr(self.fx_filt_ui, 'update_ovfl_cnt_all'):
+                    if hasattr(self, 'fx_filt_ui')\
+                            and hasattr(self.fx_filt_ui, 'update_ovfl_cnt_all'):
                         self.fx_filt_ui.update_ovfl_cnt_all()
                     else:
                         logger.warning("No method 'fx_filt_ui.update_ovfl_cnt_all()'")
@@ -280,9 +281,8 @@ class Input_Fixpoint_Specs(QWidget):
                 elif dict_sig['fx_sim'] == 'specs_changed' and not self.isVisible():
                     self.fx_specs_changed = True
                 else:
-                    logger.error('Unknown "fx_sim" command option "{0}"\n'
-                                '\treceived from "{1}".'
-                                .format(dict_sig['fx_sim'], dict_sig['class']))
+                    logger.error('Unknown "fx_sim" command option "%s"\n\treceived from "%s".',
+                                 dict_sig['fx_sim'], dict_sig['class'])
 
             # the next part is reached when fx_sim is active but no fx_sim command
             # has been issued:
@@ -869,12 +869,10 @@ class Input_Fixpoint_Specs(QWidget):
 
 ###############################################################################
 if __name__ == '__main__':
-    """
-    Run widget standalone with `python -m pyfda.input_widgets.input_fixpoint_specs`
-
-    Resizing the image does not work standalone as the {'ui_global_changed': 'resized'}
-    signal is issued from somewhere else
-    """
+    # Run widget standalone with `python -m pyfda.input_widgets.input_fixpoint_specs`
+    #
+    # Resizing the image does not work standalone as the {'ui_global_changed': 'resized'}
+    # signal is issued from somewhere else
     from pyfda.libs.tree_builder import Tree_Builder
     from pyfda.libs.compat import QApplication
     from pyfda import pyfda_rc as rc
