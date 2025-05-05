@@ -41,7 +41,7 @@ class Input_PZ(QWidget):
     sig_rx = pyqtSignal(object)  # incoming from input_tab_widgets
     sig_tx = pyqtSignal(object)  # emitted when filter has been saved
 
-    def __init__(self):
+    def __init__(self, parent=None):
         super().__init__()
 
         self.data_changed = True  # initialize flag: filter data has been changed

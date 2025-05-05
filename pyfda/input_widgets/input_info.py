@@ -50,7 +50,7 @@ class Input_Info(QWidget):
     sig_tx = pyqtSignal(object)
 
     def __init__(self, parent=None):
-        super(Input_Info, self).__init__(parent)
+        super().__init__()
 
         self.tab_label = 'Info'
         self.tool_tip = (

@@ -68,7 +68,7 @@ class Input_Coeffs(QWidget):
 
     # -------------------------------------------------------------------------
     def __init__(self, parent=None):
-        super().__init__(parent)
+        super().__init__()
 
         self.opt_widget = None  # handle for pop-up options widget
         self.tool_tip = "Display and edit filter coefficients."
