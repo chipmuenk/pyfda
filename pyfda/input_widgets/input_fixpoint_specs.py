@@ -796,7 +796,7 @@ class Input_Fixpoint_Specs(QWidget):
             # remove all non-alphanumeric chars:
             vlog_mod_name = re.sub(r'\W+', '', hdl_file_name).lower()
 
-            logger.info('Creating hdl_file "%s"\n\twith top level module "%s"'
+            logger.info('Creating hdl_file "%s"\n\twith top level module "%s"',
                         hdl_full_name, vlog_mod_name)
             try:
                 code = self.fx_filt_ui.to_hdl(name=vlog_mod_name)

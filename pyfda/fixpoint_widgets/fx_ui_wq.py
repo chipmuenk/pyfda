@@ -470,17 +470,14 @@ class FX_UI_WQ(QWidget):
                 logger.error("Unknown value q_dict['w_a_m'] = %s", q_dict['w_a_m'])
 
         if 'quant' in q_dict:
-            qset_cmb_box(self.cmbQuant, q_dict['quant'])
+            i = qset_cmb_box(self.cmbQuant, q_dict['quant'])
             if i < 0:
                 logger.error("Unknown value q_dict['quant'] = %s", q_dict['quant'])
 
         if 'ovfl' in q_dict:
-            qset_cmb_box(self.cmbOvfl, q_dict['ovfl'])
+            i = qset_cmb_box(self.cmbOvfl, q_dict['ovfl'])
             if i < 0:
                 logger.error("Unknown value q_dict['ovfl'] = %s", q_dict['ovfl'])
-
-        if is_fx():
-            logger.error("Unknown quantization format '%s'", fb_get('qfrmt'))
 
         WI = safe_eval(
             q_dict['WI'], self.Q.q_dict['WI'], return_type="int", sign='poszero')
