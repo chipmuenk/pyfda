@@ -11,14 +11,12 @@ Fixpoint library for converting numpy scalars and arrays to quantized
 numpy values and formatting reals in various formats
 """
 # ===========================================================================
-import re
 import inspect
-import copy
+import logging
+import re
 
-import pyfda.filterbroker as fb
 import numpy as np
 from numpy.lib.function_base import iterable
-from pyfda.libs.pyfda_lib import is_numeric, pprint_log
 try:
     import deltasigma as ds
     from deltasigma import simulateDSM, synthesizeNTF
@@ -27,7 +25,10 @@ try:
 except ImportError:
     DS = False
 
-import logging
+import pyfda.filterbroker as fb
+from pyfda.filterbroker import is_fx, fb_get, fb_set
+from pyfda.libs.pyfda_lib import is_numeric, pprint_log
+
 logger = logging.getLogger(__name__)
 
 
@@ -549,7 +550,7 @@ class Fixed(object):
         self.q_dict['WF'] = abs(int(self.q_dict['WF']))
 
         # Calculate min., max., LSB and MSB from word lengths
-        if fb.fil[0]['qfrmt'] == 'qint':
+        if fb_get('qfrmt') == 'qint':
             # LSB = 1, MSB = 2 ** (W - 1)
             self.LSB = 1
             self.MSB = 2 ** (self.q_dict['WI'] + self.q_dict['WF']- 1)
@@ -564,22 +565,23 @@ class Fixed(object):
         # number of bits:
         W = self.q_dict['WI'] + self.q_dict['WF'] + 1
         #
-        if not fb.fil[0]['fx_sim']:  # float format
+        fx_base = fb_get('fx_base')
+        if not is_fx():  # float format
             self.places = 4
-        elif fb.fil[0]['fx_base'] == 'dec':
+        elif fx_base == 'dec':
             self.places = int(
                 np.ceil(np.log10(W) * np.log10(2.))) + 1
-        elif fb.fil[0]['fx_base'] == 'bin':
+        elif fx_base == 'bin':
             self.places = W + 1
-        elif fb.fil[0]['fx_base'] == 'csd':
+        elif fx_base == 'csd':
             self.places = int(np.ceil(W / 1.5)) + 1
-        elif fb.fil[0]['fx_base'] == 'hex':
+        elif fx_base == 'hex':
             self.places = int(np.ceil(W / 4.)) + 1
-        elif fb.fil[0]['fx_base'] == 'oct':
+        elif fx_base == 'oct':
             self.places = int(np.ceil(W / 3.)) + 1
         else:
             raise Exception(
-                u'Unknown number format "{0:s}"!'.format(fb.fil[0]['fx_base']))
+                u'Unknown number format "%s"!', fx_base)
 
 # ------------------------------------------------------------------------------
     def fixp(self, y, in_frmt: str = 'qfrac', out_frmt: str = 'qfrac'):
@@ -664,11 +666,11 @@ class Fixed(object):
         #       Convert input argument into proper floating point scalars /
         #       arrays and initialize flags
         # ======================================================================
-        if fb.fil[0]['qfrmt'] == 'float64':
+        if fb_get('qfrmt') == 'float64':
             logger.warning(
                 "fixp() should only be called for quantizing - returning unchanged 'float64'!")
             return y
-        elif fb.fil[0]['qfrmt'] == 'float32':
+        if fb_get('qfrmt') == 'float32':
             logger.warning(
                 "fixp() called for 'float32'!")
             return y.astype(np.float32)
@@ -941,14 +943,14 @@ class Fixed(object):
         WI_F = QI.q_dict['WF']  # number of fractional bits of input signal
 
         # Convert input signal to fractional format if needed for aligning at fractional point
-        if fb.fil[0]['qfrmt'] == 'qint':
+        if fb_get('qfrmt') == 'qint':
             x_i_frac = x_i / (1 << WI_F)
         else:
             x_i_frac = x_i
 
         # Quantize and saturate / overflow based on fractional output format and return
         # either fractional or integer format, depending on `fb.fil[0]['qfrmt']`.
-        return self.fixp(x_i_frac, out_frmt=fb.fil[0]['qfrmt'])
+        return self.fixp(x_i_frac, out_frmt=fb_get('qfrmt'))
 
     # --------------------------------------------------------------------------
     def frmt2float(self, y):
@@ -978,7 +980,7 @@ class Fixed(object):
         Quantized floating point (`dtype=np.float64`) representation of input string
         of same shape as `y`.
         """
-        logger.warning(f"fb.fil[0]['qfrmt'] = '{fb.fil[0]['qfrmt']}'")
+        logger.warning("fb.fil[0]['qfrmt'] = '%s'", fb_get('qfrmt'))
         if y is None:
             return 0
         elif np.isscalar(y):
@@ -993,7 +995,7 @@ class Fixed(object):
 
         y_float = None
 
-        if not fb.fil[0]['fx_sim']:
+        if not is_fx():
             # this handles floats, np scalars + arrays and strings / string arrays
             try:
                 y_float = np.float64(y)
@@ -1005,7 +1007,7 @@ class Fixed(object):
                     logger.warning(
                         f'\n\tCannot convert "{y}" of type "{type(y).__name__}" '
                         f'to float or complex, setting to zero.')
-            if fb.fil[0]['qfrmt'] == 'float32':
+            if fb_get('qfrmt') == 'float32':
                 # convert to float32
                 return y_float.astype(np.float32)
             return y_float  # return unchanged float
@@ -1090,7 +1092,7 @@ class Fixed(object):
                 return "0", "0"
         # -----------------------------------------
         y = str(y)
-        frmt = fb.fil[0]['fx_base']
+        frmt = fb_get('fx_base')
         # ======================================================================
         # (1) : COMPLEX NUMBERS
         #       Split strings containing 'j' into real and imaginary part,
@@ -1144,7 +1146,7 @@ class Fixed(object):
         if frmt == 'dec':
             # try to convert string -> float directly with decimal point position
             try:
-                y_dec = y_float = self.fixp(val_str, in_frmt=fb.fil[0]['qfrmt'])
+                y_dec = y_float = self.fixp(val_str, in_frmt=fb_get('qfrmt'))
             except Exception as e:
                 logger.warning(e)
                 return 0.0
@@ -1167,7 +1169,7 @@ class Fixed(object):
         # ======================================================================
         elif frmt in {'hex', 'bin', 'oct'}:
             neg_sign = False
-            if fb.fil[0]['qfrmt'] == 'qint':
+            if fb_get('qfrmt') == 'qint':
                 W = self.q_dict['WI'] + self.q_dict['WF'] + 1
             else:
                 W = self.q_dict['WI'] + 1
@@ -1304,7 +1306,7 @@ class Fixed(object):
 
         # ======================================================================
         # logger.warning(f"float2frmt: y = {y}")
-        if not fb.fil[0]['fx_sim']:  # return float input value unchanged (no string)
+        if not is_fx():  # return float input value unchanged (no string)
             logger.error("Not in fixpoint mode, 'float2frmt()' should not be called!")
             return y
 
@@ -1315,7 +1317,7 @@ class Fixed(object):
         elif np.iscomplexobj(y):  # convert complex arguments recursively to format
             y_re = self.float2frmt(np.real(y))
             y_im = self.float2frmt(np.imag(y))
-            if fb.fil[0]['fx_base'] == 'csd':
+            if fb_get('fx_base') == 'csd':
                 logger.error(
                     "Complex CSD coefficients are not supported yet, casting  to real. "
                     "\n\tPlease create an issue if you need this feature.")
@@ -1336,10 +1338,10 @@ class Fixed(object):
                 return "0"
 
         # return a quantized & saturated / wrapped fixpoint (type float) for y (int or frac format)
-        y_fix = self.fixp(y, out_frmt=fb.fil[0]['qfrmt'])
+        y_fix = self.fixp(y, out_frmt=fb_get('qfrmt'))
 
-        if fb.fil[0]['fx_base'] == 'dec':
-            if self.q_dict['WF'] == 0 or fb.fil[0]['qfrmt'] == 'qint':
+        if fb_get('fx_base') == 'dec':
+            if self.q_dict['WF'] == 0 or fb_get('qfrmt') == 'qint':
                 # TODO: need to convert to str?
                 y_str = np.int64(y_fix)  # get rid of trailing zero
                 # y_str = np.char.mod('%d', y_fix)
@@ -1348,33 +1350,33 @@ class Fixed(object):
             else:
                 # y_str = np.char.mod('%f',y_fix)
                 y_str = y_fix
-        elif fb.fil[0]['fx_base'] == 'csd':
-            if fb.fil[0]['qfrmt'] == 'qint':
+        elif fb_get('fx_base') == 'csd':
+            if fb_get('qfrmt') == 'qint':
                 # integer case, convert with 0 fractional bits
                 y_str = dec2csd_vec(y_fix, 0)
             else:
                 # fractional case, convert with WF fractional bits
                 y_str = dec2csd_vec(y_fix, self.q_dict['WF'])
 
-        elif fb.fil[0]['fx_base'] in {'bin', 'oct', 'hex'}:
+        elif fb_get('fx_base') in {'bin', 'oct', 'hex'}:
             # represent fixpoint number as integer in the range -2**(W-1) ... 2**(W-1)
             y_fix_int = np.int64(np.round(y_fix / self.LSB))
             W = self.q_dict['WI'] + self.q_dict['WF'] + 1
             # convert to (array of) string with 2's complement binary
             y_bin_str = binary_repr(y_fix_int, W)
 
-            if fb.fil[0]['qfrmt'] == 'qint':
+            if fb_get('qfrmt') == 'qint':
                 WI = self.q_dict['WI'] + self.q_dict['WF'] + 1
                 # TODO: Is the "+ 1" correct?
             else:
                 WI = self.q_dict['WI']
-            if fb.fil[0]['fx_base'] == 'hex':
+            if fb_get('fx_base') == 'hex':
                 y_str = bin2hex_vec(y_bin_str, WI)
-            elif fb.fil[0]['fx_base'] == 'oct':
+            elif fb_get('fx_base') == 'oct':
                 y_str = bin2oct_vec(y_bin_str, WI)
             else:  # 'bin'
                 # insert radix point if required
-                if fb.fil[0]['qfrmt'] == 'qint':
+                if fb_get('qfrmt') == 'qint':
                     y_str = y_bin_str
                 else:
                     y_str = insert_binary_point(y_bin_str, WI)
@@ -1395,8 +1397,7 @@ def quant_coeffs(coeffs: iterable, Q, recursive: bool = False, out_frmt: str = "
     """
     Quantize the coefficients, scale and convert them to a list of integers,
     using the quantization settings of `Fixed()` instance `Q` and global setting
-    `fb.fil[0]['qfrmt']` (`'qfrac'` or `'qint'`) and `fb.fil[0]['fx_sim']` (`True`
-    or `False`)
+    `fb.fil[0]['qfrmt']` (`'qfrac'` or `'qint'`) and `is_fx()`
 
     Parameters
     ----------
@@ -1420,14 +1421,14 @@ def quant_coeffs(coeffs: iterable, Q, recursive: bool = False, out_frmt: str = "
     settings of the quantization object dict or None in case of an error
 
     """
-    disp_frmt_tmp = fb.fil[0]['fx_base']  # temporarily store fx display format and
+    disp_frmt_tmp = fb_get('fx_base')  # temporarily store fx display format and
     # always use decimal display format for coefficient quantization
-    fb.fil[0]['fx_base'] = 'dec'
+    fb_set('fx_base', 'dec')
     if out_frmt == "":
-        out_frmt=fb.fil[0]['qfrmt']
+        out_frmt = fb_get('qfrmt')
     elif out_frmt not in {"qint", "qfrac"}:
-        logger.error(f"Unknown quantization format '{out_frmt}', using default.")
-        out_frmt=fb.fil[0]['qfrmt']
+        logger.error("Unknown quantization format '%s', using default.", out_frmt)
+        out_frmt = fb_get('qfrmt')
 
     Q.resetN()  # reset all overflow counters
 
@@ -1447,7 +1448,7 @@ def quant_coeffs(coeffs: iterable, Q, recursive: bool = False, out_frmt: str = "
 
     # self.update_ovfl_cnt()  # update display of overflow counter and MSB / LSB
 
-    fb.fil[0]['fx_base'] = disp_frmt_tmp  # restore previous display setting
+    fb_set('fx_base', disp_frmt_tmp)  # restore previous display setting
     return coeff_q
 
 
