@@ -13,6 +13,7 @@ import logging
 import sys
 
 import pyfda.filterbroker as fb
+from pyfda.filterbroker import is_fx, fb_get
 import pyfda.libs.pyfda_fix_lib as fx
 from pyfda.libs.compat import (
     Qt, QWidget, QLabel, QLineEdit, QComboBox, QIcon,
@@ -405,7 +406,7 @@ class FX_UI_WQ(QWidget):
 
         WI = int(safe_eval(self.ledWI.text(), self.Q.q_dict['WI'] + WF + 1, return_type="int",
                            sign='poszero'))
-        if fb.fil[0]['qfrmt'] == 'qint':
+        if fb_get('qfrmt') == 'qint':
             if WI <= WF:
                 logger.warning(
                     "Total word length has to be larger than Fractional scaling WF = %s!", WF)
@@ -415,7 +416,7 @@ class FX_UI_WQ(QWidget):
 
         # In 'qint' mode, the WI field shows the total word length W. Nevertheless, the value
         # for 'WI' is stored in the dicts.
-        if fb.fil[0]['qfrmt'] == 'qint':
+        if fb_get('qfrmt') == 'qint':
             WI = WI - WF - 1
 
         ovfl = qget_cmb_box(self.cmbOvfl)
@@ -478,8 +479,8 @@ class FX_UI_WQ(QWidget):
             if i < 0:
                 logger.error("Unknown value q_dict['ovfl'] = %s", q_dict['ovfl'])
 
-        if fb.fil[0]['fx_sim'] and fb.fil[0]['qfrmt'] not in {'qfrac', 'qint'}:
-            logger.error("Unknown quantization format '%s'", fb.fil[0]['qfrmt'])
+        if is_fx():
+            logger.error("Unknown quantization format '%s'", fb_get('qfrmt'))
 
         WI = safe_eval(
             q_dict['WI'], self.Q.q_dict['WI'], return_type="int", sign='poszero')
@@ -498,16 +499,16 @@ class FX_UI_WQ(QWidget):
     def update_WI_WF(self):
         """
         Update display, visibility / writability of integer and fractional part of the
-        quantization format. depending on `fb.fil[0]['fx_sim']` ...['qfrmt'] and
+        quantization format. depending on `is_fx()` ...['qfrmt'] and
         ...['w_a_m'] settings
         """
-        self.ledWI.setVisible(fb.fil[0]['fx_sim'])
-        self.ledWF.setVisible(fb.fil[0]['fx_sim'])
+        self.ledWI.setVisible(is_fx())
+        self.ledWF.setVisible(is_fx())
 
-        if not fb.fil[0]['fx_sim']:
+        if not is_fx():  # float modes
             self.lbl_sep1.setText(to_html("---", frmt='b'))
             self.lbl_sep2.setVisible(False)
-        elif fb.fil[0]['qfrmt'] == 'qint':
+        elif fb_get('qfrmt') == 'qint':
             self.lbl_sep1.setText(to_html("(", frmt='b'))
             self.ledWF.setToolTip("Scale factor 2<sup>-WF</sup>")
             self.ledWI.setText(str(self.Q.q_dict['WI'] + self.Q.q_dict['WF'] + 1))
@@ -516,7 +517,7 @@ class FX_UI_WQ(QWidget):
 
             LSB = 1.
             MSB = 2. ** (self.Q.q_dict['WI'] + self.Q.q_dict['WF'] - 1)
-        elif fb.fil[0]['qfrmt'] == "qfrac":
+        elif fb_get('qfrmt') == "qfrac":
             self.lbl_sep1.setText(to_html(".", frmt='b'))
             self.ledWF.setToolTip("Number of fractional bits")
             self.ledWI.setText(str(self.Q.q_dict['WI']))
@@ -526,12 +527,12 @@ class FX_UI_WQ(QWidget):
             LSB = 2 ** -self.Q.q_dict['WF']
             MSB = 2. ** (self.Q.q_dict['WI'] - 1)
         else:
-            logger.error("Unknown quantization format '%s'", fb.fil[0]['qfrmt'])
+            logger.error("Unknown quantization format '%s'", fb_get('qfrmt'))
 
         self.ledWF.setText(str(self.Q.q_dict['WF']))
 
 
-        if self.MSB_LSB_vis == 'off' or not fb.fil[0]['fx_sim']:
+        if self.MSB_LSB_vis == 'off' or not is_fx():
             # Don't show any data
             self.lbl_MSB.setVisible(False)
             self.lbl_LSB.setVisible(False)
