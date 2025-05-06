@@ -518,12 +518,11 @@ class Input_Fixpoint_Specs(QWidget):
                     self.cmb_fx_wdg.addItem(disp_name, mod_class_name)
                     inst_wdg_str += '\t' + class_name + ' : ' + mod_class_name + '\n'
                 except AttributeError as e:
-                    logger.warning('Widget "{0}":\n{1}'.format(class_name, e))
+                    logger.warning('Widget "%s":\n%s', class_name, e)
                     self.embed_fixp_img(self.no_fx_filter_img)
                     continue  # with next `class_name` in for loop
                 except KeyError as e:
-                    logger.warning("No fixpoint filter for filter type {0} available."
-                                   .format(e))
+                    logger.warning("No fixpoint filter for filter type %s available.",e)
                     self.embed_fixp_img(self.no_fx_filter_img)
                     continue  # with next `class_name` in for loop
 
@@ -570,12 +569,12 @@ class Input_Fixpoint_Specs(QWidget):
             pixmap containing the passed img_file
         """
         if not os.path.isfile(img_file):
-            logger.warning("Image file {0} doesn't exist.".format(img_file))
+            logger.warning("Image file '%s' doesn't exist.", img_file)
             img_file = self.default_fx_img
 
         _, file_extension = os.path.splitext(img_file)
         if file_extension != '.png':
-            logger.error('Unknown file extension "{0}"!'.format(file_extension))
+            logger.error('Unknown file extension "%s"!', file_extension)
             img_file = self.default_fx_img
 
         self.img_fixp = QPixmap(img_file)
@@ -638,7 +637,7 @@ class Input_Fixpoint_Specs(QWidget):
                     # delete QWidget when scope has been left
                     self.fx_filt_ui.deleteLater()
                 except AttributeError as e:
-                    logger.error("Destructing UI failed!\n{0}".format(e))
+                    logger.error("Destructing UI failed!\n%s", e)
 
             self.fx_wdg_found = False
             self.butExportHDL.setVisible(False)
@@ -797,8 +796,8 @@ class Input_Fixpoint_Specs(QWidget):
             # remove all non-alphanumeric chars:
             vlog_mod_name = re.sub(r'\W+', '', hdl_file_name).lower()
 
-            logger.info('Creating hdl_file "{0}"\n\twith top level module "{1}"'
-                        .format(hdl_full_name, vlog_mod_name))
+            logger.info('Creating hdl_file "%s"\n\twith top level module "%s"'
+                        hdl_full_name, vlog_mod_name)
             try:
                 code = self.fx_filt_ui.to_hdl(name=vlog_mod_name)
                 # logger.info(str(code)) # print verilog code to console
@@ -854,7 +853,7 @@ class Input_Fixpoint_Specs(QWidget):
                 logger.error("Fixpoint simulation returned empty results!")
 
         except ValueError as e:
-            logger.error(f"Simulator error {e}")
+            logger.error("Simulator error %s", e)
             fb.fx_results = None
 
         except AssertionError as e:
