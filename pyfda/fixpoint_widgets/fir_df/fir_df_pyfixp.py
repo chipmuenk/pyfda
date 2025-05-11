@@ -14,6 +14,7 @@ import logging
 import numpy as np
 from numpy.lib.function_base import iterable
 import pyfda.filterbroker as fb
+from filterbroker import is_fx, fb_get, fb_set
 # from pyfda.libs.pyfda_lib import pprint_log
 import pyfda.libs.pyfda_fix_lib as fx
 from pyfda.libs.pyfda_fix_lib import quant_coeffs
@@ -79,7 +80,7 @@ class FIR_DF_pyfixp():
         None.
         """
         # Do not initialize filter unless fixpoint mode is active
-        if not fb.fil[0]['fx_sim']:
+        if not is_fx():
             return
 
         self.p = p  # parameter dictionary with coefficients etc.
@@ -172,11 +173,10 @@ class FIR_DF_pyfixp():
         for k in range(len(x)):
             # partial products xb_q at time k, quantized with Q_mul:
             xb_q = self.Q_mul.fixp(self.zi[k:k + self.L] * self.b_q,
-                                   in_frmt=fb.fil[0]['qfrmt'],
-                                   out_frmt=fb.fil[0]['qfrmt'])
+                                   in_frmt=fb_get('qfrmt'), out_frmt=fb_get('qfrmt'))
             # accumulate x_bq to get accu[k]
-            y_q[k] = self.Q_acc.fixp(np.sum(xb_q), in_frmt=fb.fil[0]['qfrmt'],
-                                     out_frmt=fb.fil[0]['qfrmt'])
+            y_q[k] = self.Q_acc.fixp(np.sum(xb_q), in_frmt=fb_get('qfrmt'),
+                                     out_frmt=fb_get('qfrmt'))
 
         self.zi = self.zi[-(self.L-1):]  # store last L-1 inputs (i.e. the L-1 registers)
 
@@ -195,7 +195,9 @@ class FIR_DF_pyfixp():
 if __name__ == '__main__':
     # Run widget standalone with
     # `python -m pyfda.fixpoint_widgets.fir_df.fir_df_pyfixp`
-    fb.fil[0]['fx_sim'] = True  # enable fixpoint mode
+
+    # TODO: Is this needed?
+    fb_set('qfrmt', 'qfrmt')  # enable fixpoint mode
 
     fb.fil[0]['ba'] = [[1.1, 2.2, 3.3, 2, 1], []]
     p = {'QCB': {'WI': 2, 'WF': 5, 'w_a_m': 'a',
@@ -206,7 +208,7 @@ if __name__ == '__main__':
          }
     for frmt in ['qint', 'qfrac']:
         print(f"\nFormat = '{frmt}'")
-        fb.fil[0]['qfrmt'] = frmt  # enable fixpoint mode
+        fb_set('qfrmt', frmt)  # enable fixpoint mode
         dut = FIR_DF_pyfixp(p)
         print("Filter fixpoint response / state variables for input = np.ones(7):")
         x = np.ones(7)

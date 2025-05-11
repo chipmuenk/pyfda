@@ -41,6 +41,7 @@ import pyfda.libs.pyfda_fix_lib as fx
 from pyfda.pyfda_rc import params
 import pyfda.libs.pyfda_dirs as dirs
 import pyfda.filterbroker as fb  # importing filterbroker initializes all its globals
+from pyfda.filterbroker import is_fx, fb_get, fb_set
 from pyfda.version import __version__
 
 from .compat import QFileDialog
@@ -1192,7 +1193,7 @@ def export_fil_data(parent: object, data: str, fkey: str = "", title: str = "Exp
     # TODO: Add CMSIS export for FIR filters
     # TODO: Add fixpoint format export for CMSIS / SOS coefficients
     if fkey == 'ba':
-        if fb.fil[0]['ft'] == 'FIR':
+        if fb_get('ft') == 'FIR':
             file_types += ('coe', 'vhd', 'txt', 'cmsis')
         else:
             file_types += ('cmsis', 'sos')
@@ -1226,9 +1227,9 @@ def export_fil_data(parent: object, data: str, fkey: str = "", title: str = "Exp
                     err = export_coe_microsemi(f)
                 elif file_type == 'vhd':
                     err = export_coe_vhdl_package(f)
-                elif file_type in {'cmsis', 'sos'} and fb.fil[0]['ft'] == 'IIR':
+                elif file_type in {'cmsis', 'sos'} and fb_get('ft') == 'IIR':
                     err = export_coe_cmsis_sos(f, file_type, formatted)
-                elif file_type == 'cmsis' and fb.fil[0]['ft'] == 'FIR':
+                elif file_type == 'cmsis' and fb_get('ft') == 'FIR':
                     err = export_coe_cmsis_fir(f, formatted)
                 else:
                     logger.error(f'Unknown file extension "{file_type}')
@@ -1489,16 +1490,13 @@ def export_coe_vhdl_package(f: TextIO) -> bool:
     the number base and the quantized coefficients (decimal or hex integer).
     """
     qc = fx.Fixed(fb.fil[0]['fxq']['QCB'])  # instantiate fixpoint object
-    if not fb.fil[0]['fx_sim'] or fb.fil[0]['qfrmt'] == 'qint'\
-        or fb.fil[0]['qfrmt'] == 'qfrac' and qc.q_dict['WF'] == 0:
-            pass
-    else:
+    if fb_get('qfrmt') == 'qfrac' and qc.q_dict['WF'] != 0:
         logger.error("Fractional numbers are only supported for floats!")
         return True
 
     WO = fb.fil[0]['fxq']['QO']['WI'] + fb.fil[0]['fxq']['QO']['WF'] + 1
 
-    if fb.fil[0]['fx_base'] == 'dec' or not fb.fil[0]['fx_sim']:
+    if fb.fil[0]['fx_base'] == 'dec' or not is_fx():
         pre = ""
         post = ""
     elif fb.fil[0]['fx_base'] == 'hex':
@@ -1521,12 +1519,12 @@ def export_coe_vhdl_package(f: TextIO) -> bool:
         "VHDL FIR filter coefficient package file").replace("\n", "\n-- ")
 
     exp_str += "\nlibrary IEEE;\n"
-    if not fb.fil[0]['fx_sim']:
+    if not is_fx():
         exp_str += "use IEEE.math_real.all;\n"
     exp_str += "USE IEEE.std_logic_1164.all;\n\n"
     exp_str += "package coeff_package is\n"
     exp_str += "constant n_taps: integer := {0:d};\n".format(len(bq)-1)
-    if not fb.fil[0]['fx_sim']:
+    if not is_fx():
         exp_str += "type coeff_type is array(0 to n_taps) of real;\n"
     else:
         exp_str += "type coeff_type is array(0 to n_taps) of integer "
@@ -1950,10 +1948,10 @@ def save_all_filters(self):
             logger.error(f'Failed saving "{file_name}"!\n{e}')
     else:
         err = True
-        logger.error('Unknown file type "{0}"'.format(file_type))
+        logger.error('Unknown file type "%s"', file_type)
 
     if not err:
-        logger.info(f'Filter saved as\n\t"{file_name}"')
+        logger.info('Filter saved as\n\t"%s"', file_name)
         dirs.last_file_name = file_name
         dirs.last_file_dir = os.path.dirname(file_name)  # save new default dir
         dirs.last_file_type = file_type  # save new default file type

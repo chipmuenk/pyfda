@@ -22,6 +22,7 @@ from numpy.lib.function_base import iterable
 from amaranth.sim import Simulator, Tick  # , Delay, Settle
 
 import pyfda.filterbroker as fb
+from filterbroker import is_fx, fb_get, fb_set
 # from pyfda.libs.pyfda_lib import pprint_log
 import pyfda.libs.pyfda_fix_lib as fx
 from pyfda.libs.pyfda_fix_lib_amaranth import requant
@@ -88,7 +89,7 @@ class FIR_DF_amaranth():
         None.
         """
         # Do not initialize filter unless fixpoint mode is active
-        if not fb.fil[0]['fx_sim']:
+        if not is_fx():
             return
 
         b_q = fx.quant_coeffs(fb.fil[0]['ba'][0], self.Q_b, out_frmt="qint")
@@ -199,7 +200,7 @@ class FIR_DF_amaranth():
         # - accumulate the quantized partial products and quantize result, yielding y_q[k]
 
         # convert stimulus to integer
-        if fb.fil[0]['qfrmt'] == 'qfrac':
+        if fb_get('qfrmt') == 'qfrac':
             self.input = x * (1 << self.p['QI']['WF'])
         else:
             self.input = x
@@ -213,7 +214,7 @@ class FIR_DF_amaranth():
         # logger.warning(f"y = {self.Q_O.fixp(self.output, in_frmt='qint', out_frmt=fb.fil[0]['qfrmt'])}")
         # N_ovfl_acc = sum(self.ovfl_acc)
         # logger.error(f"N_ovfl_acc = {self.ovfl_acc}")
-        return self.Q_O.fixp(self.output, in_frmt='qint', out_frmt=fb.fil[0]['qfrmt']), self.zi
+        return self.Q_O.fixp(self.output, in_frmt='qint', out_frmt=fb_get('qfrmt')), self.zi
 
 
 # ------------------------------------------------------------------------------
@@ -223,8 +224,7 @@ if __name__ == '__main__':
     `python -m pyfda.fixpoint_widgets.fir_df.fir_df_amaranth`
     `python -m pyfda.fixpoint_widgets.fir_df.fir_df_amaranth.FIR_DF_amaranth_mod`
     """
-    fb.fil[0]['fx_sim'] = True  # enable fixpoint mode
-    # fb.fil[0]['qfrmt'] = 'qint'
+    fb_set('qfrmt', 'qint')  # set fixpoint mode
 
     p = {'QCB': {'WI': 2, 'WF': 5, 'w_a_m': 'a',
                 'ovfl': 'wrap', 'quant': 'floor', 'N_over': 0},
