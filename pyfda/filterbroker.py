@@ -464,42 +464,6 @@ for l in range(len(fil)):
     fil[l] = copy.deepcopy(fil_ref)
 
 # -------------------------
-def is_fx()-> bool:
-    """
-    Check if fixpoint mode is active
-    """
-    return fil[0]['qfrmt'] in ['qint', 'qfrac']
-
-# -------------------------
-def fb_get(arg: str) -> str:
-    """
-    Get the value of a key in the   global dict `fil[0]`
-
-    TODO: Keys need to be protected from accidental overwriting by
-    the user. This is done by prepending the keys with an underscore
-    (e.g. `_f_S`). The getter function does the actual renaming.
-    """
-    ret = fil[0][arg]
-    if ret is None:
-        logger.warning(f"Key {arg} not found in filter dict!")
-    return ret
-
-# -------------------------
-def fb_set(arg: str, val) -> None:
-    """
-    Set the value of a key in the global dict `fil[0]`
-    """
-    if arg in fil[0]:
-        fil[0][arg] = val
-    else:
-        logger.warning(f"Key {arg} not found in filter dict!")
-        return -1
-    if arg =='qfrmt':
-        # TODO: remove this later when all `fil[0]['fx_sim']` have been replaced
-        fil[0]['fx_sim'] = is_fx()
-    return 0
-
-# -------------------------
 def restore_fil():
     """
     Restore current global dict `fb.fil[0]` from undo memory `fil_undo`
@@ -569,6 +533,41 @@ def key_list_to_dict(keys: list) -> dict:
     #         current_dict = new_dict
     #         prev_key = key
     # return stack[0]
+# -------------------------
+def is_fx()-> bool:
+    """
+    Check if fixpoint mode is active
+    """
+    return fil[0]['qfrmt'] in ['qint', 'qfrac']
+
+# -------------------------
+def fb_get(arg: str) -> str:
+    """
+    Get the value of a key in the   global dict `fil[0]`
+
+    TODO: Keys need to be protected from accidental overwriting by
+    the user. This is done by prepending the keys with an underscore
+    (e.g. `_f_S`). The getter function does the actual renaming.
+    """
+    ret = fil[0][arg]
+    if ret is None:
+        logger.warning(f"Key {arg} not found in filter dict!")
+    return ret
+
+# -------------------------
+def fb_set(arg: str, val) -> None:
+    """
+    Set the value of a key in the global dict `fil[0]`
+    """
+    if arg in fil[0]:
+        fil[0][arg] = val
+    else:
+        logger.warning(f"Key {arg} not found in filter dict!")
+        return -1
+    if arg =='qfrmt':
+        # TODO: remove this later when all `fil[0]['fx_sim']` have been replaced
+        fil[0]['fx_sim'] = is_fx()
+    return 0
 
 # -------------------------
 def set_fil_dict(keys: list, arg, backup: bool = True) -> None:
