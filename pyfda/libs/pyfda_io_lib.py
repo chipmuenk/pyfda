@@ -1333,8 +1333,8 @@ def coe_header(title: str) -> str:
     unit = 'dB'  # fix this for the moment
     # construct pairs of corner frequency and corresponding amplitude
     # labels in ascending frequency for each response type
-    if fb.fil[0]['rt'] in {'LP', 'HP', 'BP', 'BS', 'HIL'}:
-        if fb.fil[0]['rt'] == 'LP':
+    if fb_get('rt') in {'LP', 'HP', 'BP', 'BS', 'HIL'}:
+        if fb_get('rt') == 'LP':
             f_lbls = ['F_PB', 'F_SB']
             a_lbls = ['A_PB', 'A_SB']
         elif fb.fil[0]['rt'] == 'HP':

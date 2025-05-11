@@ -15,6 +15,7 @@ import logging
 import numpy as np
 
 import pyfda.filterbroker as fb
+from pyfda.filterbroker import is_fx, fb_get, fb_set
 from pyfda.libs.pyfda_lib import set_dict_defaults, pprint_log, first_item
 from pyfda.libs.pyfda_qt_lib import qget_cmb_box, emit
 from pyfda.libs.compat import QWidget, QVBoxLayout, pyqtSignal
@@ -70,7 +71,7 @@ class IIR_DF1_pyfixp_UI(QWidget):
         self._construct_UI()
         # Construct an instance of the fixpoint filter using the settings from
         # the 'fxq' quantizer dict:
-        self.fx_filt = IIR_DF1_pyfixp(fb.fil[0]['fxq'])
+        self.fx_filt = IIR_DF1_pyfixp(fb_get('fxq'))
         self.update_ovfl_cnt_all()  # initialize all overflow counters / display
 
     # -------------------------------------------------------------------------
@@ -88,7 +89,7 @@ class IIR_DF1_pyfixp_UI(QWidget):
         output quantization
         """
         # widget for quantization of coefficients 'b'
-        if 'QCB' not in fb.fil[0]['fxq']:
+        if 'QCB' not in fb_get('fxq'):
             fb.fil[0]['fxq'].update({'QCB': {}})  # no coefficient settings in dict yet
             logger.warning("Empty dict / missing key 'fb.fil{0]['fxq']['QCB']'!")
         self.wdg_wq_coeffs_b = FX_UI_WQ(
@@ -99,7 +100,7 @@ class IIR_DF1_pyfixp_UI(QWidget):
         layV_wq_coeffs_b.addWidget(self.wdg_wq_coeffs_b)
 
         # widget for quantization of coefficients 'a'
-        if 'QCA' not in fb.fil[0]['fxq']:
+        if 'QCA' not in fb_get('fxq'):
             fb.fil[0]['fxq'].update({'QCA': {}})  # no coefficient settings in dict yet
             logger.warning("Empty dict / missing key 'fb.fil{0]['fxq']['QCA']'!")
         self.wdg_wq_coeffs_a = FX_UI_WQ(
@@ -369,7 +370,7 @@ if __name__ == '__main__':
 
     app = QApplication(sys.argv)
     app.setStyleSheet(rc.QSS_RC)
-    fb.fil[0]['fx_sim'] = True  # enable fixpoint mode
+    fb_set('qfrmt', 'qint')  # enable fixpoint mode
 
     mainw = IIR_DF1_pyfixp_UI()
     app.setActiveWindow(mainw)
