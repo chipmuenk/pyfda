@@ -14,7 +14,7 @@ from matplotlib.ticker import AutoMinorLocator
 import numpy as np
 import scipy.signal as sig
 
-from pyfda.filterbroker import get_fil_dict, set_fil_dict, conf_settings
+from pyfda.filterbroker import fb_get, fb_set, conf_settings
 from pyfda.libs.compat import (
     QWidget, QComboBox, QHBoxLayout, QFrame, pyqtSignal)
 from pyfda.plot_widgets.mpl_widget import MplWidget
@@ -166,7 +166,7 @@ class Plot_Phi(QWidget):
         """
         # calculate H_cplx(W) (complex) for W = 0 ... 2 pi:
         self.W, self.H_cmplx = sig.freqz(
-            get_fil_dict(['ba', 0]), get_fil_dict(['ba', 1]), worN=conf_settings['N_FFT'],
+            fb_get('ba', 0), fb_get('ba', 1), worN=conf_settings['N_FFT'],
             whole=True, fs=2*np.pi)
         # replace nan and inf by finite values, otherwise np.unwrap yields
         # an array full of nans
@@ -189,21 +189,21 @@ class Plot_Phi(QWidget):
 
         self.unitPhi = qget_cmb_box(self.cmbUnitsPhi, data=False)
 
-        f_max_2 = get_fil_dict(['f_max']) / 2.
+        f_max_2 = fb_get('f_max') / 2.
 
         # ========= select frequency range to be displayed =====================
         # === shift, scale and select: W -> F, H_cplx -> H_c
         F = self.W * f_max_2 / np.pi
 
-        if get_fil_dict(['freqSpecsRangeType']) == 'sym':
+        if fb_get('freqSpecsRangeType') == 'sym':
             # shift H and F by f_S/2
             H = np.fft.fftshift(self.H_cmplx)
             F -= f_max_2
-        elif get_fil_dict(['freqSpecsRangeType']) == 'half':
+        elif fb_get('freqSpecsRangeType') == 'half':
             # only use the first half of H and F
             H = self.H_cmplx[0:conf_settings['N_FFT']//2]
             F = F[0:conf_settings['N_FFT']//2]
-        else:  # get_fil_dict(['freqSpecsRangeType']) == 'whole'
+        else:  # fb_get('freqSpecsRangeType') == 'whole'
             # use H and F as calculated
             H = self.H_cmplx
 
@@ -217,8 +217,8 @@ class Plot_Phi(QWidget):
         else:
             y_str += 'deg ' + r'$\rightarrow $'
             scale = 180./np.pi
-        set_fil_dict(['plt_phiLabel'], y_str)
-        set_fil_dict(['plt_phiUnit'], self.unitPhi)
+        fb_set('plt_phiLabel', y_str)
+        fb_set('plt_phiUnit', self.unitPhi)
 
         if self.but_wrap.checked:
             phi_plt = np.angle(H) * scale
@@ -233,9 +233,9 @@ class Plot_Phi(QWidget):
         self.ax.xaxis.set_minor_locator(AutoMinorLocator())  # enable minor ticks
         self.ax.yaxis.set_minor_locator(AutoMinorLocator())  # enable minor ticks
         self.ax.set_title(r'Phase Frequency Response')
-        self.ax.set_xlabel(get_fil_dict(['plt_fLabel']))
+        self.ax.set_xlabel(fb_get('plt_fLabel'))
         self.ax.set_ylabel(y_str)
-        self.ax.set_xlim(get_fil_dict(['freqSpecsRange']))
+        self.ax.set_xlim(fb_get('freqSpecsRange'))
 
         self.redraw()
 

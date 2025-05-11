@@ -16,7 +16,7 @@ import numpy as np
 
 from pyfda.plot_widgets.mpl_widget import MplWidget
 from pyfda.pyfda_rc import params
-from pyfda.filterbroker import get_fil_dict, conf_settings
+from pyfda.filterbroker import fb_get, conf_settings
 from pyfda.libs.pyfda_qt_lib import qcmb_box_populate
 from pyfda.libs.pyfda_sig_lib import group_delay
 from pyfda.libs.compat import (QCheckBox, QWidget, QFrame, QComboBox,
@@ -139,16 +139,16 @@ class Plot_tau_g(QWidget):
         """
         (Re-)Calculate the complex frequency response H(f)
         """
-        bb = get_fil_dict(['ba', 0])
-        aa = get_fil_dict(['ba', 1])
+        bb = fb_get('ba', 0)
+        aa = fb_get('ba', 1)
 
         # calculate H_cmplx(W) (complex) for W = 0 ... 2 pi:
         # scipy: self.W, self.tau_g = group_delay((bb, aa), w=fb.conf_settings['N_FFT'],
         #                                           whole = True)
 
-        if get_fil_dict(['creator', 0]) == 'sos':  # one of 'sos', 'zpk', 'ba'
+        if fb_get('creator', 0) == 'sos':  # one of 'sos', 'zpk', 'ba'
             self.W, self.tau_g = group_delay(
-                get_fil_dict(['sos']), nfft=conf_settings['N_FFT'],
+                fb_get('sos'), nfft=conf_settings['N_FFT'],
                 sos=True, whole=True, verbose=self.chkWarnings.isChecked(),
                 alg=self.cmbAlgorithm.currentData())
         else:
@@ -173,30 +173,30 @@ class Plot_tau_g(QWidget):
         """
         # ========= select frequency range to be displayed =====================
         # === shift, scale and select: W -> F, H_cplx -> H_c
-        f_max_2 = get_fil_dict(['f_max']) / 2.
+        f_max_2 = fb_get('f_max') / 2.
         F = self.W * f_max_2 / np.pi
 
-        if get_fil_dict(['freqSpecsRangeType']) == 'sym':
+        if fb_get('freqSpecsRangeType') == 'sym':
             # shift tau_g and F by f_S/2
             tau_g = np.fft.fftshift(self.tau_g)
             F -= f_max_2
-        elif get_fil_dict(['freqSpecsRangeType']) == 'half':
+        elif fb_get('freqSpecsRangeType') == 'half':
             # only use the first half of H and F
             tau_g = self.tau_g[0:conf_settings['N_FFT']//2]
             F = F[0:conf_settings['N_FFT']//2]
-        else:  # get_fil_dict(['freqSpecsRangeType']) == 'whole'
+        else:  # fb_get('freqSpecsRangeType') == 'whole'
             # use H and F as calculated
             tau_g = self.tau_g
 
         # ================ Main Plotting Routine =========================
         # ===  clear the axes and (re)draw the plot
 
-        if get_fil_dict(['freq_specs_unit']) in {'f_S', 'f_Ny'}:
+        if fb_get('freq_specs_unit') in {'f_S', 'f_Ny'}:
             tau_str = r'$ \tau_g(\mathrm{e}^{\mathrm{j} \Omega}) / T_S \; \rightarrow $'
         else:
             tau_str = r'$ \tau_g(\mathrm{e}^{\mathrm{j} \Omega})$'\
-                + ' in ' + get_fil_dict(['plt_tUnit']) + r' $ \rightarrow $'
-            tau_g = tau_g / get_fil_dict(['f_S'])
+                + ' in ' + fb_get('plt_tUnit') + r' $ \rightarrow $'
+            tau_g = tau_g / fb_get('f_S')
 
         # ---------------------------------------------------------
         self.ax.clear()  # need to clear, doesn't overwrite
@@ -208,12 +208,12 @@ class Plot_tau_g(QWidget):
         self.ax.yaxis.set_minor_locator(
             AutoMinorLocator())  # enable minor ticks
         self.ax.set_title(r'Group Delay $ \tau_g$')
-        self.ax.set_xlabel(get_fil_dict(['plt_fLabel']))
+        self.ax.set_xlabel(fb_get('plt_fLabel'))
         self.ax.set_ylabel(tau_str)
         # widen y-limits to suppress numerical inaccuracies when tau_g = constant
         self.ax.set_ylim(
             [max(np.nanmin(tau_g)-0.5, 0), np.nanmax(tau_g) + 0.5])
-        self.ax.set_xlim(get_fil_dict(['freqSpecsRange']))
+        self.ax.set_xlim(fb_get('freqSpecsRange'))
 
         self.redraw()
 

@@ -398,6 +398,8 @@ fil_ref = {
     "plt_tLabel": "$n = t\\, /\\, T_S \\; \\rightarrow$",
     "plt_tUnit": "T_S",
     "qfrmt": "float64",  # global quantization format {'float64', 'float32', 'qint', 'qfrac'}
+    'qfrmt_float_last': 'float64',  # last used float format
+    'qfrmt_fx_last': 'qfrac',  # last used fixpoint format
     "rt": "LP",  # filter response type
     # coefficients as second order sections
     "sos": [
@@ -499,8 +501,8 @@ def store_fil():
 # -------------------------
 def key_list_to_dict(keys: list) -> dict:
     """
-    Convert a list of keys (str) to access a nested dict that can be read or written to
-    and return that dict.
+    Convert a list or tuple of keys (str) to access a nested dict that can be
+    read or written to and return that dict.
 
     The nested dict is always based on `fb.fil[0]`. In order to set or get the value
     of the nested dict, use the key for the lowest nesting level on the returned
@@ -521,18 +523,6 @@ def key_list_to_dict(keys: list) -> dict:
             "Creating dicts nested more than 3 keys deep is not supported yet!")
     return d
 
-    # stack = []
-    # current_dict = {}
-    # for key in keys:
-    #     if len(stack) == len(keys) - 1:
-    #         stack[-1][prev_key] = key
-    #     else:
-    #         new_dict = {}
-    #         current_dict[key] = new_dict
-    #         stack.append(current_dict)
-    #         current_dict = new_dict
-    #         prev_key = key
-    # return stack[0]
 # -------------------------
 def is_fx()-> bool:
     """
@@ -541,32 +531,73 @@ def is_fx()-> bool:
     return fil[0]['qfrmt'] in ['qint', 'qfrac']
 
 # -------------------------
-def fb_get(arg: str) -> str:
+def fb_get(*args) -> str:
     """
-    Get the value of a key in the   global dict `fil[0]`
+    Get the value of a key in the global dict `fil[0]`. Multiple arguments
+    access nested dicts:
+    fb_get('qfrmt') == fb.fil[0]['qfrmt']
+    fb_get('ba', 0) == fb.fil[0]['ba'][0]
 
     TODO: Keys need to be protected from accidental overwriting by
-    the user. This is done by prepending the keys with an underscore
-    (e.g. `_f_S`). The getter function does the actual renaming.
+    the user. This will be done by prepending the keys with an underscore
+    (e.g. `_f_S`) once all direct accesses have been changed.
     """
-    ret = fil[0][arg]
+    if len(args) == 0:
+        raise KeyError("'fb_get()' called without argument")
+
+    if len(args) == 1:
+        ret = fil[0][args[0]]
+        # ret = fil[0]['_' + args[0]]
+    elif len(args) == 2:
+        ret = fil[0][args[0]][args[1]]
+    elif len(args) == 3:
+        ret = fil[0][args[0]][args[1]][args[2]]
+    else:
+        raise KeyError(
+            "Accessing dicts nested more than 3 keys deep is not supported yet!")
+
     if ret is None:
-        logger.warning(f"Key {arg} not found in filter dict!")
+        logger.warning("Key '%s' not found in filter dict!", args[-1])
     return ret
 
 # -------------------------
-def fb_set(arg: str, val) -> None:
+def fb_set(*args, backup: bool = True) -> None:
     """
     Set the value of a key in the global dict `fil[0]`
     """
-    if arg in fil[0]:
-        fil[0][arg] = val
-    else:
-        logger.warning(f"Key {arg} not found in filter dict!")
+    if type(args) != tuple or len(args) < 2:
+        logger.error("No dictionary can be built from '%s'", args)
         return -1
-    if arg =='qfrmt':
-        # TODO: remove this later when all `fil[0]['fx_sim']` have been replaced
-        fil[0]['fx_sim'] = is_fx()
+
+    val = args[-1]  # last element is the value to be set
+
+    try:
+        d = key_list_to_dict(args[:-1])  # create nested dict from the other arguments
+        _ =  d[args[-2]]  # try accessing dictionary
+        if backup:
+            store_fil()  # backup old setting
+
+        if args[-2] =='qfrmt' and len(args) == 2:
+            # keep current fixpoint / float format
+            if is_fx():
+                fil[0]['qfrmt_fx_last'] = fil[0]['qfrmt']
+            else:
+                fil[0]['qfrmt_float_last'] = fil[0]['qfrmt']
+            # TODO: remove this later when all `fil[0]['fx_sim']` have been replaced
+            fil[0]['qfrmt'] = val
+            fil[0]['fx_sim'] = is_fx()
+        else:
+            d[args[-2]] = val  # store new value if valid
+    except KeyError:
+        dict_str = 'fb.fil[0]'  # create a string for the failed dict
+        if len(args) < 3:  # only one level dictionary, args[-1] is already the key
+            dict_str += '[' + args[-2] + ']'
+        else:
+            for i, s in enumerate(args[:-1]):
+                dict_str += '[' + s[i] + ']'
+        logger.error(f"Dict '%s' does not exist!", dict_str)
+        return -1
+
     return 0
 
 # -------------------------
@@ -582,14 +613,6 @@ def set_fil_dict(keys: list, arg, backup: bool = True) -> None:
         store_fil()
     key_list_to_dict(keys)[keys[-1]] = arg
 
-# -------------------------
-def get_fil_dict(keys: list):
-    """
-    Get the value of `fb.fil[0]["key_0"]["key_1"]...["key_n]`, nested keys are passed as
-    a list of strings `keys`, e.g. `keys=['fxq', 'QACC']` accesses
-    `fb.fil[0]['fxq']['QACC']`.
-    """
-    return key_list_to_dict(keys)[keys[-1]]
 
 # Comparing nested dicts
 # https://stackoverflow.com/questions/27265939/comparing-python-dictionaries-and-nested-dictionaries

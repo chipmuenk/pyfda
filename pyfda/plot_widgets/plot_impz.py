@@ -21,7 +21,7 @@ from matplotlib.ticker import AutoMinorLocator
 from pyfda.libs.compat import (
     QWidget, pyqtSignal, QTabWidget, QVBoxLayout, QIcon, QSize, QSizePolicy)
 import pyfda.filterbroker as fb
-from pyfda.filterbroker import get_fil_dict, set_fil_dict, is_fx, fb_get, fb_set
+from pyfda.filterbroker import is_fx, fb_get, fb_set
 import pyfda.libs.pyfda_fix_lib as fx
 from pyfda.libs.pyfda_sig_lib import angle_zero, calc_ssb_spectrum
 from pyfda.libs.pyfda_lib import safe_eval, pprint_log, first_item
@@ -66,8 +66,8 @@ class Plot_Impz(QWidget):
         self.needs_redraw = [True] * 2  # flags which plots need to be redrawn
         self.error = False
 
-        set_fil_dict(['fx_sim'], False, backup=False)  # disable fixpoint mode initially
-        self.fx_mode_old = False  # previous setting of fixpoint mode
+        fb_set('qfrmt', 'float64')  # disable fixpoint mode initially
+        self.is_fx_old = is_fx()   # previous setting of fixpoint mode
 
         self.tool_tip = "Impulse / transient response and their spectra"
         self.tab_label = "y[n]"
@@ -98,7 +98,7 @@ class Plot_Impz(QWidget):
         self._construct_UI()
 
         # --------------------------------------------
-        # initialize UI and `get_fil_dict(['fx_sim'])` for fixpoint or float simulation
+        # initialize UI for fixpoint or float simulation
         self.update_fx_settings()
 
         self.impz_init()  # initial calculation of stimulus and response and drawing
@@ -400,7 +400,7 @@ class Plot_Impz(QWidget):
                 self.error = False      # reset error flag
                 # set cmb box for fixpoint / float simulation and update ui:
                 self.update_fx_settings()
-                if fb.fil[0]['fx_sim']:
+                if is_fx():
                     self.needs_calc_fx = True   # fx sim needs recalculation
 
                 qstyle_widget(self.ui.but_run, 'changed')
@@ -441,7 +441,7 @@ class Plot_Impz(QWidget):
         # --- widget is visible, handle all signals except 'fx_sim' -----------
         elif self.isVisible():
             if 'data_changed' in dict_sig or self.needs_calc\
-                    or (get_fil_dict(['fx_sim']) and self.needs_calc_fx):
+                    or (is_fx() and self.needs_calc_fx):
                 # a file has been loaded or unloaded:
                 if 'data_changed' in dict_sig and dict_sig['data_changed'] == 'file_io':
                     # make file data available to stimulus widget and modify number of
@@ -595,7 +595,7 @@ class Plot_Impz(QWidget):
         self.error = False
         self.needs_redraw = [True] * 2
 
-        # check for fixpoint setting `get_fil_dict(['fx_sim'])` and update UI if needed
+        # check for fixpoint setting `is_fx()` and update UI if needed
         self.update_fx_settings()
 
         if type(arg) == bool:
@@ -650,7 +650,7 @@ class Plot_Impz(QWidget):
 
             self.t_start = time.process_time()  # store starting time
 
-            if get_fil_dict(['fx_sim']):
+            if is_fx():
                 # - update plot title string
                 # - setup input quantizer self.q_i
                 # - emit {'fx_sim': 'init'} to listening widgets (input_fixpoint_specs)
@@ -661,29 +661,29 @@ class Plot_Impz(QWidget):
                     logger.warning(
                         "Complex stimulus: Only its real part is used for the fixpoint filter!")
                 # setup and initialize input quantizer
-                self.q_i = fx.Fixed(get_fil_dict(['fxq', 'QI']))
+                self.q_i = fx.Fixed(fb_get('fxq', 'QI'))
                 # always use integer decimal format for input quantizer
                 # self.q_i.set_qdict({'fx_base': 'dec'})
 
                 # initialize FX filter and get a handle for `fxfilter()` function
                 self.emit({'fx_sim': 'init'})
                 return  # process_sig_rx() directly calls impz() in next step
+
+            # Initialize filter memory with zeros, for either cascaded structure (sos)
+            # or direct form
+            self.sos = np.asarray(fb_get('sos'))
+            if len(self.sos) > 0:  # has second order sections
+                self.zi = np.zeros((self.sos.shape[0], 2))
             else:
-                # Initialize filter memory with zeros, for either cascaded structure (sos)
-                # or direct form
-                self.sos = np.asarray(get_fil_dict(['sos']))
-                if len(self.sos) > 0:  # has second order sections
-                    self.zi = np.zeros((self.sos.shape[0], 2))
-                else:
-                    self.bb = np.asarray(get_fil_dict(['ba', 0]))
-                    self.aa = np.asarray(get_fil_dict(['ba', 1]))
-                    if min(len(self.aa), len(self.bb)) < 2:
-                        logger.error(
-                            'No proper filter coefficients: len(a), len(b) < 2 !')
-                        return
-                    self.zi = np.zeros(max(len(self.aa), len(self.bb)) - 1)
-                # calculate float impulse response:
-                self.impz()
+                self.bb = np.asarray(fb_get('ba', 0))
+                self.aa = np.asarray(fb_get('ba', 1))
+                if min(len(self.aa), len(self.bb)) < 2:
+                    logger.error(
+                        'No proper filter coefficients: len(a), len(b) < 2 !')
+                    return
+                self.zi = np.zeros(max(len(self.aa), len(self.bb)) - 1)
+            # calculate float impulse response:
+            self.impz()
 
     # -----------------------------------------------------------------------
     def impz(self):
@@ -715,10 +715,10 @@ class Plot_Impz(QWidget):
             # ------------------------------------------------------------------
             # ---- calculate fixpoint or floating point response for current frame
             # ------------------------------------------------------------------
-            if get_fil_dict(['fx_sim']):  # fixpoint filter
+            if is_fx():  # fixpoint filter
                 # Quantize stimulus:
                 self.x_q[frame] = self.q_i.fixp(self.x[frame].real,
-                                                out_frmt=get_fil_dict(['qfrmt']))
+                                                out_frmt=fb_get('qfrmt'))
                 # --------------------------------------------------------------
                 # ---- Get fixpoint response for current frame -----------------
                 # --------------------------------------------------------------
@@ -805,9 +805,9 @@ class Plot_Impz(QWidget):
         self.ui.but_run.setIcon(QIcon(":/play.svg"))
         qstyle_widget(self.ui.but_run, "normal")
         # update Tran_IO ui, depending on complex and fixpoint status
-        self.tran_io_wdg.ui.update_ui(cmplx=self.cmplx, fx=fb.fil[0]['fx_sim'])
+        self.tran_io_wdg.ui.update_ui(cmplx=self.cmplx, fx=is_fx())
 
-        if fb.fil[0]['fx_sim']:
+        if is_fx():
             self.emit({'fx_sim': 'finish'})
 
     # -----------------------------------------------------------------------
@@ -821,29 +821,34 @@ class Plot_Impz(QWidget):
             - arg int 0 or 1 from `self.ui.cmb_sim_select` when index was changed
               (signal-slot-connection), update `fb.fil[0]['fx_sim']` correspondingly,
               fire signal {'fx_sim': 'specs_changed'} and start simulation
-            - arg 'fixpoint' or 'float' from a direct call with (not used currently),
+            - arg 'fixpoint' or 'float' from a direct call (not used currently),
               update ui and combobox `self.ui.cmb_sim_select` correspondingly
 
         When fixpoint simulation is selected, all corresponding widgets are made
-        visible and `fb.fil[0]['fx_sim']` is set to True.
+        visible and `is_fx()` becomes True.
 
-        If `fb.fil[0]['fx_sim']` has been changed since last time, `self.needs_calc`
-        is set to True and the run button is set to 'changed'.
+        If `is_fx()` has changed since last time, `self.needs_calc`
+        is set to `True` and the run button is set to 'changed'.
         """
         # Function call with argument: Set UI and fb.fil[0]['fx_sim'] accord. to `arg`
         # if arg in {'float', 'fixpoint'}:
         #     qset_cmb_box(self.ui.cmb_sim_select, arg, data=True)
         #     fb.fil[0]['fx_sim'] = (arg == "fixpoint")
 
-        # Direct call with no argument, set combobox according to fb.fil[0]['fx_sim']
+        # Direct call with no argument, set combobox according to `is_fx()``
         if arg is None:
-            if fb.fil[0]['fx_sim']:
+            if is_fx():
                 qset_cmb_box(self.ui.cmb_sim_select, 'fixpoint', data=True)
             else:
                 qset_cmb_box(self.ui.cmb_sim_select, 'float', data=True)
         # Combobox modified, set fb.fil[0]['fx_sim'] according to combobox and start sim
         elif type(arg) == int:
-            fb.fil[0]['fx_sim'] = qget_cmb_box(self.ui.cmb_sim_select) == 'fixpoint'
+            # fb.fil[0]['fx_sim'] = qget_cmb_box(self.ui.cmb_sim_select) == 'fixpoint'
+            # TODO: store old fixpoint / float setting
+            if qget_cmb_box(self.ui.cmb_sim_select) == 'fixpoint':
+                fb_set('qfrmt', 'qint')
+            else:
+                fb_set('qfrmt', 'float64')
             self.emit({'fx_sim': 'specs_changed'})
             self.needs_calc = True
             self.calc_auto()  # run simulation if autostart has been selected
@@ -851,33 +856,33 @@ class Plot_Impz(QWidget):
             logger.error("Unknown argument '%s'!", arg)
             return
 
-        fx_mode = fb.fil[0]['fx_sim']
-        # enable plot widgets for quantized stimulus signal
-        self.ui.cmb_plt_freq_stmq.setVisible(fx_mode)  # cmb box freq. domain
-        self.ui.lbl_plt_freq_stmq.setVisible(fx_mode)  # label freq. domain
-        self.ui.cmb_plt_time_stmq.setVisible(fx_mode)  # cmb box time domain
-        self.ui.lbl_plt_time_stmq.setVisible(fx_mode)  # cmb box time domain
-        self.ui.lbl_fx_range.setVisible(fx_mode)  # display fx range limits
-        self.ui.chk_fx_range_x.setVisible(fx_mode)  # display fx range limits
-        self.ui.chk_fx_range_y.setVisible(fx_mode)  # display fx range limits
+        _is_fx = is_fx()
+        # enable fixpoint plot widgets only in fixpoint mode
+        self.ui.cmb_plt_freq_stmq.setVisible(_is_fx)  # cmb box freq. domain
+        self.ui.lbl_plt_freq_stmq.setVisible(_is_fx)  # label freq. domain
+        self.ui.cmb_plt_time_stmq.setVisible(_is_fx)  # cmb box time domain
+        self.ui.lbl_plt_time_stmq.setVisible(_is_fx)  # cmb box time domain
+        self.ui.lbl_fx_range.setVisible(_is_fx)  # display fx range limits
+        self.ui.chk_fx_range_x.setVisible(_is_fx)  # display fx range limits
+        self.ui.chk_fx_range_y.setVisible(_is_fx)  # display fx range limits
 
         # add / delete fixpoint entry to / from spectrogram combo box and set
         # `fx_str = "fixpoint"`` or `""``
-        if fx_mode:
+        if _is_fx:
             qcmb_box_add_item(self.ui.cmb_plt_time_spgr, ["xqn", "x_q[n]", ""])
             self.fx_str = "fixpoint "
         else:
             qcmb_box_del_item(self.ui.cmb_plt_time_spgr, "x_q[n]")
             self.fx_str = ""
 
-        if fx_mode != self.fx_mode_old:
+        if _is_fx != self.is_fx_old:
             self.ui.but_run.setIcon(QIcon(":/play.svg"))
             qstyle_widget(self.ui.but_run, 'changed')
             # force recalculation of stimulus and response when switching
             # between float and fixpoint
             self.needs_calc = True
 
-        self.fx_mode_old = fb.fil[0]['fx_sim']
+        self.is_fx_old = is_fx()
 
     # -----------------------------------------------------------------------
     def calc_fft(self):
@@ -902,7 +907,7 @@ class Plot_Impz(QWidget):
             self.X = np.fft.fft(x_win) / self.ui.N
             # self.X[0] = self.X[0] * np.sqrt(2) # correct value at DC
 
-            if fb.fil[0]['fx_sim'] and hasattr(self, "q_i"):
+            if is_fx() and hasattr(self, "q_i"):
                 # same for fixpoint simulation
                 x_q_win = self.q_i.fixp(self.x[self.ui.N_start:self.ui.N_end])\
                     * win
@@ -948,10 +953,9 @@ class Plot_Impz(QWidget):
         self.scale_i = self.scale_iq = self.scale_o = 1
         self.fx_min_x = self.fx_min_y = -1.
         self.fx_max_x = self.fx_max_y = 1.
-        if get_fil_dict(['fx_sim']):
-            # fixpoint simulation enabled -> scale stimulus and response
+        if is_fx():  # fixpoint simulation enabled -> scale stimulus and response
             try:
-                if get_fil_dict(['qfrmt']) == 'qint':
+                if fb_get('qfrmt') == 'qint':
                     # display stimulus and response as integer values
                     # in the range +/- 2 ** (WI + WF)
                     self.scale_i = 1 << fb.fil[0]['fxq']['QI']['WF']
@@ -964,7 +968,7 @@ class Plot_Impz(QWidget):
                     self.fx_min_y = - (1 << (fb.fil[0]['fxq']['QO']['WI']
                                      + fb.fil[0]['fxq']['QO']['WF']))
                     self.fx_max_y = -self.fx_min_y - 1
-                elif get_fil_dict(['qfrmt']) == 'qfrac':
+                elif fb_get('qfrmt') == 'qfrac':
                     # display values scaled as "real world (float) values"
                     self.scale_i = self.scale_iq = self.scale_o = 1
                     self.fx_min_x = -(1 << fb.fil[0]['fxq']['QI']['WI'])
@@ -974,12 +978,12 @@ class Plot_Impz(QWidget):
                     self.fx_max_y = -self.fx_min_y -\
                         1. / (1 << fb.fil[0]['fxq']['QO']['WF'])
                 else:
-                    logger.error("Undefined qfrmt = '%s'!", get_fil_dict(['qfrmt']))
+                    logger.error("Undefined qfrmt = '%s'!", fb_get('qfrmt'))
 
             except AttributeError as e:
                 logger.error("Attribute error: %s", e)
             except TypeError as e:
-                logger.error("Type error: 'fxqc_dict'=%s,\n%s", get_fil_dict(['fxq']), e)
+                logger.error("Type error: 'fxqc_dict'=%s,\n\t%s", fb_get('fxq'), e)
             except ValueError as e:
                 logger.error("Value error: %s", e)
 
@@ -1141,8 +1145,7 @@ class Plot_Impz(QWidget):
         self.spgr = self.plt_time_spgr != "none"
 
         self.plt_time_enabled = self.plt_time_resp != "none"\
-            or self.plt_time_stim != "none"\
-            or (self.plt_time_stmq != "none" and fb.fil[0]['fx_sim'])
+            or self.plt_time_stim != "none" or (self.plt_time_stmq != "none" and is_fx())
 
         self.mplwidget_t.fig.clf()  # clear figure with axes
 
@@ -1192,7 +1195,7 @@ class Plot_Impz(QWidget):
             H_str = ''
             if qget_cmb_box(self.ui.cmb_plt_time_stim) != "none":
                 H_str += r'$x$, '
-            if qget_cmb_box(self.ui.cmb_plt_time_stmq) != "none" and fb.fil[0]['fx_sim']:
+            if qget_cmb_box(self.ui.cmb_plt_time_stmq) != "none" and is_fx():
                 H_str += r'$x_Q$, '
             if qget_cmb_box(self.ui.cmb_plt_time_resp) != "none":
                 H_str += r'$y$'
@@ -1214,7 +1217,7 @@ class Plot_Impz(QWidget):
             fmt_mkr_resp = {'marker': ''}
 
         # fixpoint simulation enabled -> assign frame to x_q
-        if fb.fil[0]['fx_sim'] and hasattr(self, 'x_q'):
+        if is_fx() and hasattr(self, 'x_q'):
             x_q = self.x_q[self.ui.N_start:N_end]
             if self.ui.but_log_time.checked:
                 x_q = np.maximum(20 * np.log10(abs(x_q)), self.ui.bottom_t)
@@ -1286,10 +1289,10 @@ class Plot_Impz(QWidget):
             else:
                 H_str = H_str + ' in V'
 
-        if self.ui.chk_fx_range_x.isChecked() and fb.fil[0]['fx_sim']:
+        if self.ui.chk_fx_range_x.isChecked() and is_fx():
             self.ax_r.axhline(fx_max_x, 0, 1, linestyle='--')
             self.ax_r.axhline(fx_min_x, 0, 1, linestyle='--')
-        if self.ui.chk_fx_range_y.isChecked() and fb.fil[0]['fx_sim']:
+        if self.ui.chk_fx_range_y.isChecked() and is_fx():
             self.ax_r.axhline(fx_max_y, 0, 1, linestyle='-.')
             self.ax_r.axhline(fx_min_y, 0, 1, linestyle='-.')
 
@@ -1614,7 +1617,7 @@ class Plot_Impz(QWidget):
 
         plt_response = self.plt_freq_resp != "none"
         plt_stimulus = self.plt_freq_stim != "none"
-        plt_stimulus_q = self.plt_freq_stmq != "none" and fb.fil[0]['fx_sim']\
+        plt_stimulus_q = self.plt_freq_stmq != "none" and is_fx()\
             and hasattr(self, "X_q")
 
         if "*" in qget_cmb_box(self.ui.cmb_plt_freq_stim):
@@ -1664,7 +1667,7 @@ class Plot_Impz(QWidget):
                 f_max = fb.fil[0]['f_max']
 
             # freqz-based ideal frequency response:
-            F_id, H_id = sig.freqz(get_fil_dict(['ba', 0]), get_fil_dict(['ba', 1]),
+            F_id, H_id = sig.freqz(fb_get('ba', 0), fb_get('ba', 1),
                                    worN=fb.conf_settings['N_FFT'], whole=True, fs=f_max)
 
             # frequency vector for FFT-based frequency plots:
