@@ -843,12 +843,11 @@ class Plot_Impz(QWidget):
                 qset_cmb_box(self.ui.cmb_sim_select, 'float', data=True)
         # Combobox modified, set fb.fil[0]['fx_sim'] according to combobox and start sim
         elif type(arg) == int:
-            # fb.fil[0]['fx_sim'] = qget_cmb_box(self.ui.cmb_sim_select) == 'fixpoint'
-            # TODO: store old fixpoint / float setting
+            # restore last fixpoint / float mode
             if qget_cmb_box(self.ui.cmb_sim_select) == 'fixpoint':
-                fb_set('qfrmt', 'qint')
+                fb_set('qfrmt', fb_get('qfrmt_fx_last'))
             else:
-                fb_set('qfrmt', 'float64')
+                fb_set('qfrmt',  fb_get('qfrmt_float_last'))
             self.emit({'fx_sim': 'specs_changed'})
             self.needs_calc = True
             self.calc_auto()  # run simulation if autostart has been selected
