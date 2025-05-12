@@ -12,7 +12,8 @@ Test suite for fir_df
 
 import unittest
 import numpy as np
-import pyfda.filterbroker as fb
+
+from pyfda.filterbroker import fb_set
 from pyfda.libs import pyfda_fix_lib as fx
 from pyfda.fixpoint_widgets.fir_df import FIR_DF_wdg
 
@@ -21,7 +22,8 @@ class TestSequenceFunctions(unittest.TestCase):
 
     def setUp(self):
         q_dict = {'WI':0, 'WF':3, 'ovfl':'sat', 'quant':'round'}
-        fb.fil[0].update({'qfrmt': 'qfrac', 'fx_base': 'dec'})  # set to fractional format
+        fb_set('qfrmt', 'qfrac')
+        fb_set('fx_base', 'dec')  # set to fractional format
         self.myQ = fx.Fixed(q_dict) # instantiate fixpoint object with settings above
 
         self.y_list = [-1.1, -1.0, -0.5, 0, 0.5, 0.9, 0.99, 1.0, 1.1]
@@ -50,7 +52,8 @@ class TestSequenceFunctions(unittest.TestCase):
         """
         Check whether parameters are written correctly to the fixpoint instance
         """
-        fb.fil[0].update({'qfrmt': 'qfrac', 'fx_base': 'hex'})  # set to fractional format
+        fb_set('qfrmt','qfrac')
+        fb_set('fx_base', 'hex')  # set to fractional hex format
         q_dict = {'WI':7, 'WF':3, 'ovfl':'none', 'quant':'fix'}
         self.myQ.set_qdict(q_dict)
         # self.assertEqual(q_dict, self.myQ.q_obj)
@@ -64,7 +67,8 @@ class TestSequenceFunctions(unittest.TestCase):
         keyword is not regarded here.
         """
         # return fixpoint numbers as float (no saturation, no quantization)
-        fb.fil[0].update({'qfrmt': 'qfrac', 'fx_base': 'dec'})  # set to fractional format
+        fb_set('qfrmt', 'qfrac')
+        fb_set('fx_base', 'dec')  # set to fractional dec format
         q_dict = {'WI':0, 'WF':3, 'ovfl':'none', 'quant':'none'}
         self.myQ.set_qdict(q_dict)
         # test handling of invalid inputs - scalar inputs
@@ -83,7 +87,7 @@ class TestSequenceFunctions(unittest.TestCase):
         self.assertEqual(yq_list, yq_list_goal)
 
         # test scaling with QI and qint
-        fb.fil[0].update({'qfrmt': 'qint'})  # set to integer format
+        fb_set('qfrmt', 'qint')  # set to integer format
         q_dict = {'WI': 1}
         self.myQ.set_qdict(q_dict)
         yq_list = list(self.myQ.fixp(self.y_list) / 2.)
@@ -101,7 +105,8 @@ class TestSequenceFunctions(unittest.TestCase):
         self.assertEqual(yq_list, yq_list_goal)
 
         # wrap around behaviour with 'fix' quantization; fractional representation
-        fb.fil[0].update({'qfrmt': 'qfrac', 'fx_base': 'dec'})  # set to fractional format
+        fb_set('qfrmt', 'qfrac')
+        fb_set('fx_base', 'dec')  # set to fractional dec. format
         q_dict = {'WI':5, 'WF':2, 'ovfl':'wrap', 'quant':'fix'}
         self.myQ.set_qdict(q_dict)
         yq_list = list(self.myQ.fixp(self.y_list))
@@ -109,7 +114,7 @@ class TestSequenceFunctions(unittest.TestCase):
         self.assertEqual(yq_list, yq_list_goal)
 
         # return fixpoint numbers as integer (rounding), overflow 'none'
-        fb.fil[0].update({'qfrmt': 'qint'})  # set to fractional format
+        fb_set('qfrmt', 'qint')  # set to integer format
         q_dict = {'WI':3, 'WF':0, 'ovfl':'none', 'quant':'round'}
         self.myQ.set_qdict(q_dict)
         yq_list = list(self.myQ.fixp(self.y_list))
@@ -123,7 +128,7 @@ class TestSequenceFunctions(unittest.TestCase):
         self.assertEqual(yq_list, yq_list_goal)
 
         # frmt float
-        fb.fil[0]['fx_sim'] = False
+        fb_set('qfrmt', 'float64')  # disable fixpoint mode
         yq_list = list(self.myQ.fixp(y_string))
         self.assertEqual(yq_list, yq_list_goal)
 
