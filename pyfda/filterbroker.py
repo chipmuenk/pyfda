@@ -397,7 +397,7 @@ fil_ref = {
     "plt_phiUnit": "rad",
     "plt_tLabel": "$n = t\\, /\\, T_S \\; \\rightarrow$",
     "plt_tUnit": "T_S",
-    "qfrmt": "float64",  # global quantization format {'float64', 'float32', 'qint', 'qfrac'}
+    'qfrmt': 'float64',  # global quantization format {'float64', 'float32', 'qint', 'qfrac'}
     'qfrmt_float_last': 'float64',  # last used float format
     'qfrmt_fx_last': 'qfrac',  # last used fixpoint format
     "rt": "LP",  # filter response type
@@ -528,7 +528,18 @@ def is_fx()-> bool:
     """
     Check if fixpoint mode is active
     """
-    return fil[0]['qfrmt'] in ['qint', 'qfrac']
+    return fb_get('qfrmt') in ['qint', 'qfrac']
+
+# -------------------------
+def set_fx(fx: bool)-> None:
+    """
+    Set fixpoint mode by restoring previous fixpoint format
+    when `fx == True`, otherwise restore previous float format.
+    """
+    if fx:
+        fb_set('qfrmt', fb_get('qfrmt_fx_last'))
+    else:
+        fb_set('qfrmt', fb_get('qfrmt_float_last'))
 
 # -------------------------
 def fb_get(*args) -> str:

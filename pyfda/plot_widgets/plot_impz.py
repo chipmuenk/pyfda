@@ -21,7 +21,7 @@ from matplotlib.ticker import AutoMinorLocator
 from pyfda.libs.compat import (
     QWidget, pyqtSignal, QTabWidget, QVBoxLayout, QIcon, QSize, QSizePolicy)
 import pyfda.filterbroker as fb
-from pyfda.filterbroker import is_fx, fb_get, fb_set
+from pyfda.filterbroker import is_fx, set_fx, fb_get, fb_set
 import pyfda.libs.pyfda_fix_lib as fx
 from pyfda.libs.pyfda_sig_lib import angle_zero, calc_ssb_spectrum
 from pyfda.libs.pyfda_lib import safe_eval, pprint_log, first_item
@@ -817,7 +817,7 @@ class Plot_Impz(QWidget):
 
             - arg `None`: from `__init__()`, `impz_init()` or `process_sig_rx()` when
               {dict_sig['fx_sim'] == 'specs_changed'} was received. Read the state of
-              `fb.fil[0]['fx_sim']` and update combobox correspondingly
+              `is_fx()` and update combobox correspondingly
             - arg int 0 or 1 from `self.ui.cmb_sim_select` when index was changed
               (signal-slot-connection), update `fb.fil[0]['fx_sim']` correspondingly,
               fire signal {'fx_sim': 'specs_changed'} and start simulation
@@ -833,7 +833,7 @@ class Plot_Impz(QWidget):
         # Function call with argument: Set UI and fb.fil[0]['fx_sim'] accord. to `arg`
         # if arg in {'float', 'fixpoint'}:
         #     qset_cmb_box(self.ui.cmb_sim_select, arg, data=True)
-        #     fb.fil[0]['fx_sim'] = (arg == "fixpoint")
+        #     set_fx(arg == "fixpoint")
 
         # Direct call with no argument, set combobox according to `is_fx()``
         if arg is None:
@@ -844,10 +844,7 @@ class Plot_Impz(QWidget):
         # Combobox modified, set fb.fil[0]['fx_sim'] according to combobox and start sim
         elif type(arg) == int:
             # restore last fixpoint / float mode
-            if qget_cmb_box(self.ui.cmb_sim_select) == 'fixpoint':
-                fb_set('qfrmt', fb_get('qfrmt_fx_last'))
-            else:
-                fb_set('qfrmt',  fb_get('qfrmt_float_last'))
+            set_fx(qget_cmb_box(self.ui.cmb_sim_select) == 'fixpoint')
             self.emit({'fx_sim': 'specs_changed'})
             self.needs_calc = True
             self.calc_auto()  # run simulation if autostart has been selected
