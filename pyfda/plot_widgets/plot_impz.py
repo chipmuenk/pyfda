@@ -819,7 +819,7 @@ class Plot_Impz(QWidget):
               {dict_sig['fx_sim'] == 'specs_changed'} was received. Read the state of
               `is_fx()` and update combobox correspondingly
             - arg int 0 or 1 from `self.ui.cmb_sim_select` when index was changed
-              (signal-slot-connection), update `fb.fil[0]['fx_sim']` correspondingly,
+              (signal-slot-connection), update `set_fx()` correspondingly,
               fire signal {'fx_sim': 'specs_changed'} and start simulation
             - arg 'fixpoint' or 'float' from a direct call (not used currently),
               update ui and combobox `self.ui.cmb_sim_select` correspondingly
@@ -830,7 +830,7 @@ class Plot_Impz(QWidget):
         If `is_fx()` has changed since last time, `self.needs_calc`
         is set to `True` and the run button is set to 'changed'.
         """
-        # Function call with argument: Set UI and fb.fil[0]['fx_sim'] accord. to `arg`
+        # Function call with argument: Set UI and `set_fx()` accord. to `arg`
         # if arg in {'float', 'fixpoint'}:
         #     qset_cmb_box(self.ui.cmb_sim_select, arg, data=True)
         #     set_fx(arg == "fixpoint")
@@ -841,7 +841,7 @@ class Plot_Impz(QWidget):
                 qset_cmb_box(self.ui.cmb_sim_select, 'fixpoint', data=True)
             else:
                 qset_cmb_box(self.ui.cmb_sim_select, 'float', data=True)
-        # Combobox modified, set fb.fil[0]['fx_sim'] according to combobox and start sim
+        # Combobox modified, `set_fx()` according to combobox and start sim
         elif type(arg) == int:
             # restore last fixpoint / float mode
             set_fx(qget_cmb_box(self.ui.cmb_sim_select) == 'fixpoint')

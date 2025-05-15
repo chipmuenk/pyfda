@@ -17,7 +17,7 @@ from amaranth.back import verilog
 import numpy as np
 
 import pyfda.filterbroker as fb
-from pyfda.filterbroker import set_fx
+from pyfda.filterbroker import set_fx, fb_get
 from pyfda.libs.compat import QWidget, QVBoxLayout, pyqtSignal
 from pyfda.libs.pyfda_lib import set_dict_defaults, first_item, pprint_log
 from pyfda.libs.pyfda_qt_lib import qget_cmb_box, emit
@@ -62,7 +62,7 @@ class FIR_DF_amaranth_UI(QWidget):
         self._construct_UI()
         # Construct an instance of the fixpoint filter using the settings from
         # the 'fxq' quantizer dict
-        self.fx_filt = FIR_DF_amaranth(fb.fil[0]['fxq'])
+        self.fx_filt = FIR_DF_amaranth(fb_get('fxq'))
         self.update_ovfl_cnt_all()  # initialize all overflow counters / display
 
     # -------------------------------------------------------------------------
@@ -206,9 +206,9 @@ class FIR_DF_amaranth_UI(QWidget):
         """
         # try:
         if qget_cmb_box(self.wdg_wq_accu.cmbW) == 'f':
-            A_coeff = int(np.ceil(np.log2(len(fb.fil[0]['ba'][0]))))
+            A_coeff = int(np.ceil(np.log2(len(fb_get('ba', 0)))))
         elif qget_cmb_box(self.wdg_wq_accu.cmbW) == 'a':
-            A_coeff = int(np.ceil(np.log2(np.sum(np.abs(fb.fil[0]['ba'][0])))))
+            A_coeff = int(np.ceil(np.log2(np.sum(np.abs(fb_get('ba', 0))))))
         else:
             A_coeff = 0
         # except BaseException:
