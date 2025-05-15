@@ -17,6 +17,7 @@ from amaranth.back import verilog
 import numpy as np
 
 import pyfda.filterbroker as fb
+from pyfda.filterbroker import set_fx
 from pyfda.libs.compat import QWidget, QVBoxLayout, pyqtSignal
 from pyfda.libs.pyfda_lib import set_dict_defaults, first_item, pprint_log
 from pyfda.libs.pyfda_qt_lib import qget_cmb_box, emit
@@ -278,7 +279,7 @@ if __name__ == '__main__':
 
     app = QApplication(sys.argv)
     app.setStyleSheet(rc.QSS_RC)
-    fb.fil[0]['fx_sim'] = True  # enable fixpoint mode
+    set_fx(True)  # enable fixpoint mode
 
     mainw = FIR_DF_amaranth_UI()
     app.setActiveWindow(mainw)
