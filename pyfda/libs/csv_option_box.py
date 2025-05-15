@@ -11,11 +11,11 @@ Create a popup window with options for CSV import and export
 """
 import logging
 
-from .pyfda_qt_lib import (qget_cmb_box, qset_cmb_box, qcmb_box_populate,
+from pyfda.libs.pyfda_qt_lib import (qget_cmb_box, qset_cmb_box, qcmb_box_populate,
                            qwindow_stay_on_top, emit)
-from .pyfda_lib import to_html
+from pyfda.libs.pyfda_lib import to_html
 from pyfda.pyfda_rc import params
-from .compat import (QLabel, QComboBox, QDialog, QPushButton,
+from pyfda.libs.compat import (QLabel, QComboBox, QDialog, QPushButton,
                      QVBoxLayout, QGridLayout, pyqtSignal)
 
 logger = logging.getLogger(__name__)
@@ -31,7 +31,7 @@ class CSV_option_box(QDialog):
     sig_tx = pyqtSignal(object)  # outgoing
 
     def __init__(self, parent):
-        super(CSV_option_box, self).__init__(parent)
+        super().__init__(parent)
 
         self.cmb_delimiter_default = "auto"
         self.cmb_terminator_default = "auto"
@@ -182,14 +182,14 @@ class CSV_option_box(QDialog):
             qset_cmb_box(self.cmb_header, params['CSV']['header'], data=True)
 
         except KeyError as e:
-            logger.error(f"Unknown key {e}")
+            logger.error("Unknown key '%s'", e)
 
 
 # ==============================================================================
 if __name__ == '__main__':
-    """
-    Run a simple test with python -m pyfda.libs.csv_option_box
-    """
+
+    # Run a simple test with python -m pyfda.libs.csv_option_box
+
     import sys
     from pyfda.libs.compat import QApplication
     from pyfda import pyfda_rc as rc
