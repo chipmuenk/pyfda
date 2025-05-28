@@ -156,7 +156,7 @@ def impz_len(system, zpk: bool = False, level: float = -40) -> int:
     [dsp_stackexchange_2021]_, [dsp_stackexchange_2022]_.
     """
 
-    if fb.fil[0]['ft'] == 'IIR':
+    if fb_get('ft') == 'IIR':
         if zpk:
             p = system[1]
         else:
@@ -739,7 +739,7 @@ Examples
             if verbose:
                 logger.info("Filter in SOS format, using Shpak algorithm for group delay.")
 
-        elif fb.fil[0]['ft'] == 'IIR':
+        elif fb_get('ft') == 'IIR':
             alg = 'jos'  # TODO: use 'shpak' here as well?
             if verbose:
                 logger.info("IIR filter, using J.O. Smith's algorithm for group delay.")
@@ -1137,8 +1137,8 @@ def fil_save(fil_dict: dict, arg, format_in: str, sender: str,
     """
 
     if format_in == 'sos':
-        fil_dict['sos'] = arg
-        fil_dict['ft'] = 'IIR'
+        fb_set('sos', arg)
+        fb_set('ft', 'IIR')
 
     elif format_in == 'zpk':
         format_error = False
@@ -1155,26 +1155,26 @@ def fil_save(fil_dict: dict, arg, format_in: str, sender: str,
             format_error = True
 
         if frmt == "nd2":
-            fil_dict['zpk'] = arg
+            fb_set('zpk', arg)
             if np.any(arg[1]):  # non-zero poles -> IIR
-                fil_dict['ft'] = 'IIR'
+                fb_set('ft', 'IIR')
             else:
-                fil_dict['ft'] = 'FIR'
+                fb_set('ft', 'FIR')
 
         elif frmt == 'nd1':  # list / array with z only -> FIR
             z = arg
             p = np.zeros(len(z))
             gain = zeros_with_val(len(z))  # create gain vector [1, 0, 0, ...]
-            fil_dict['zpk'] = np.array([z, p, gain])
-            fil_dict['ft'] = 'FIR'
+            fb_set('zpk', np.array([z, p, gain]))
+            fb_set('ft', 'FIR')
 
         elif frmt == 'lon':  # list of  ndarrays
             if len(arg) == 3:
-                fil_dict['zpk'] = np.array([arg[0], arg[1], arg[2]])
+                fb_set('zpk', np.array([arg[0], arg[1], arg[2]]))
                 if np.any(arg[1]):  # non-zero poles -> IIR
-                    fil_dict['ft'] = 'IIR'
+                    fb_set('ft', 'IIR')
                 else:
-                    fil_dict['ft'] = 'FIR'
+                    fb_set('ft', 'FIR')
             else:
                 logger.error(f"{len(arg)} rows instead of 3!")
                 format_error = True
@@ -1187,15 +1187,15 @@ def fil_save(fil_dict: dict, arg, format_in: str, sender: str,
 #                 z = arg
 #                 p = np.zeros(len(z))
 #                 k = 1
-#                 fil_dict['zpk'] = [z, p, k]
-#                 fil_dict['ft'] = 'FIR'
+#                 fb_set('zpk', [z, p, k])
+#                 fb_set('ft', 'FIR')
 #             elif np.ndim(arg[0]) == 1: # list of lists
 #                 if np.shape(arg)[0] == 3:
-#                     fil_dict['zpk'] = [arg[0], arg[1], arg[2]]
+#                     fb_set('zpk', [arg[0], arg[1], arg[2]])
 #                     if np.any(arg[1]): # non-zero poles -> IIR
-#                         fil_dict['ft'] = 'IIR'
+#                         fb_set('ft', 'IIR')
 #                     else:
-#                         fil_dict['ft'] = 'FIR'
+#                         fb_set('ft', 'FIR')
 #                 else:
 #                     format_error = True
 #             else:
@@ -1225,31 +1225,31 @@ def fil_save(fil_dict: dict, arg, format_in: str, sender: str,
 
         a[0] = 1  # first coefficient of recursive filter parts always = 1
 
-        # Determine whether it's a FIR or IIR filter and set fil_dict accordingly
+        # Determine whether it's a FIR or IIR filter and store the setting
         # Test whether all elements except the first one are zero
         if not np.any(a[1:]):
-            fil_dict['ft'] = 'FIR'
+            fb_set('ft', 'FIR')
         else:
-            fil_dict['ft'] = 'IIR'
+            fb_set('ft', 'IIR')
 
         # equalize if b and a subarrays have different lengths:
         D = len(b) - len(a)
         if D > 0:  # b is longer than a -> fill up a with zeros
             a = np.append(a, np.zeros(D))
         elif D < 0:  # a is longer than b -> fill up b with zeros
-            if fil_dict['ft'] == 'IIR':
+            if fb_get('ft') == 'IIR':
                 b = np.append(b, np.zeros(-D))  # make filter causal, fill up b with zeros
             else:
                 a = a[:D]  # discard last D elements of a (only zeros anyway)
 
-        fil_dict['N'] = len(b) - 1  # correct filter order accordingly
-        fil_dict['ba'] = np.asarray([np.array(b, dtype=complex), np.array(a, dtype=complex)])
+        fb_set('N', len(b) - 1)  # correct filter order accordingly
+        fb_set('ba', np.asarray([np.array(b, dtype=complex), np.array(a, dtype=complex)]))
 
     else:
         raise ValueError("\t'fil_save()':Unknown input format {0:s}".format(format_in))
 
-    fil_dict['creator'] = (format_in, sender)
-    fil_dict['timestamp'] = time.time()
+    fb_set('creator', (format_in, sender))
+    fb_set('timestamp', time.time())
 
     if convert:
         fil_convert(fil_dict, format_in)
@@ -1290,8 +1290,8 @@ def fil_convert(fil_dict: dict, format_in) -> None:
     if 'sos' in format_in:
         # check for bad coeffs before converting IIR filt
         # this is the same defn used by scipy (tolerance of 1e-14)
-        if (fil_dict['ft'] == 'IIR'):
-            sos = np.absolute(np.asarray(fil_dict['sos']))
+        if fb_get('ft') == 'IIR':
+            sos = np.absolute(np.asarray(fb_get('sos')))
             n_sections = sos.shape[0]
             for section in range(n_sections):
                 b0 = sos[section, 3]  # coeffs of non-recursive section part
@@ -1305,7 +1305,7 @@ def fil_convert(fil_dict: dict, format_in) -> None:
             try:
                 # returns a tuple (zeros, poles, gain) where gain is scalar:
                 # convert zpk to list to allow for individual editing of z and p
-                zpk = list(sig.sos2zpk(fil_dict['sos']))
+                zpk = list(sig.sos2zpk(fb_get('sos')))
             except Exception as e:
                 raise ValueError(e)
             # check whether sos conversion has created a additional (superfluous)
@@ -1315,36 +1315,33 @@ def fil_convert(fil_dict: dict, format_in) -> None:
             if p_0 and z_0:  # eliminate z = 0 and p = 0 from list:
                 zpk[0] = np.delete(zpk[0], z_0)
                 zpk[1] = np.delete(zpk[1], p_0)
-            fil_dict['zpk'] = np.array(
-                [zpk[0], zpk[1], zeros_with_val(len(zpk[0]), zpk[2])],
-                dtype=complex)
+            fb_set('zpk', np.array(
+                [zpk[0], zpk[1], zeros_with_val(len(zpk[0]), zpk[2])], dtype=complex))
 
         if 'ba' not in format_in:
             try:
-                fil_dict['ba'] = sig.sos2tf(fil_dict['sos'])
+                fb_set('ba', sig.sos2tf(fb_get('sos')))
             except Exception as e:
                 raise ValueError(e)
             # check whether sos conversion has created additional (superfluous)
-            # highest order polynomial with coefficient 0 and delete them
-            if fil_dict['ba'][0][-1] == 0 and fil_dict['ba'][1][-1] == 0:
-                # fil_dict['ba'][0] = np.delete(fil_dict['ba'][0], -1)
-                # fil_dict['ba'][1] = np.delete(fil_dict['ba'][1], -1)
-                fil_dict['ba'] = np.delete(fil_dict['ba'], (-1), axis=1)
+            # highest order polynomial with coefficient 0 and delete them (last row)
+            if fb_get('ba')[0][-1] == 0 and fb_get('ba')[1][-1] == 0:
+                fb_set('ba', np.delete(fb_get('ba'), (-1), axis=1))
 
     elif 'zpk' in format_in:  # z, p, k have been generated,convert to other formats
-        zpk = fil_dict['zpk']
+        zpk = fb_get('zpk')
         if 'ba' not in format_in:
             try:
-                fil_dict['ba'] = sig.zpk2tf(zpk[0], zpk[1], zpk[2][0])
+                fb_set('ba', sig.zpk2tf(zpk[0], zpk[1], zpk[2][0]))
             except Exception as e:
                 raise ValueError(e)
         if 'sos' not in format_in:
             try:
-               if not np.isscalar(zpk[2]):
-                   k = zpk[2][0]
-               else:
-                   k = zpk[2]
-               fil_dict['sos'] = sig.zpk2sos(zpk[0], zpk[1], k)
+                if not np.isscalar(zpk[2]):
+                    k = zpk[2][0]
+                else:
+                    k = zpk[2]
+                fb_set('sos', sig.zpk2sos(zpk[0], zpk[1], k))
             except ValueError as e:
                 fb_set('sos', [])
                 logger.warning(
@@ -1352,11 +1349,12 @@ def fil_convert(fil_dict: dict, format_in) -> None:
                     "\n\tto SOS.\n\t%s", zpk, e)
 
     elif 'ba' in format_in:  # arg = [b,a]
-        if np.all(np.isfinite(fil_dict['ba'])):
-            if type(fb.fil[0]['ba']) in {list, tuple}:
-                logger.warning(f"fb.fil[0]['ba'] is of type '{type(fb.fil[0]['ba'])}', should be ndarray!")
+        if np.all(np.isfinite(fb_get('ba'))):
+            if type(fb_get('ba')) in {list, tuple}:
+                logger.warning(
+                    "fb_get('ba') is of type '%s', should be ndarray!", type(fb_get('ba')))
 
-            if fil_dict['ba'][1][0] != 1:
+            if fb_get('ba')[1][0] != 1:
                 logger.error(
                     "The coefficient a[0] = %s needs to be 1, "
                     "expect the unexpected!", fb_get('ba')[1][0])
@@ -1364,7 +1362,7 @@ def fil_convert(fil_dict: dict, format_in) -> None:
             # TODO: use mpmath.polyroots() here for higher precision
             # https://mpmath.org/doc/current/calculus/polynomials.html
             # tf2zpk yields (z,p,k) where z and p are ndarrays
-            zpk = list(sig.tf2zpk(fil_dict['ba'][0], fil_dict['ba'][1]))
+            zpk = list(sig.tf2zpk(fb_get('ba')[0], fb_get('ba')[1]))
             if len(zpk[0]) != len(zpk[1]):
                 logger.warning("Bad coefficients, some values of b are too close to zero,"
                                "\n\tresults may be inaccurate.")
@@ -1372,16 +1370,15 @@ def fil_convert(fil_dict: dict, format_in) -> None:
             if not type(zpk_arr) is np.ndarray:  # an error has ocurred, error string is returned
                 logger.error(zpk_arr)
                 return
-            else:
-                fil_dict['zpk'] = zpk_arr
+            fb_set('zpk', zpk_arr)
         else:
             raise ValueError(
                 "\t'fil_convert()': Cannot convert coefficients with NaN or Inf elements "
                 "to zpk format!")
         try:
-            fil_dict['sos'] = sig.tf2sos(fil_dict['ba'][0], fil_dict['ba'][1])
+            fb_set('sos', sig.tf2sos(fb_get('ba')[0], fb_get('ba')[1]))
         except ValueError:
-            fil_dict['sos'] = []
+            fb_set('sos', [])
             logger.warning("Complex-valued coefficients, could not convert to SOS.")
 
     else:
@@ -1390,15 +1387,13 @@ def fil_convert(fil_dict: dict, format_in) -> None:
     # eliminate complex coefficients created by numerical inaccuracies
     # `tol` is specified in multiples of machine eps
     # for complex coefficients, 'if_close' is False and the array remains unchanged
-    fil_dict['ba'] = np.real_if_close(fil_dict['ba'], tol=100)
+    fb_set('ba', np.real_if_close(fb_get('ba'), tol=100))
 
     # for poles / zeros the same can happen, only that they *are* usually complex
     # valued and need to be checked / converted individually. Complex numbers with
     # very small imaginary parts cannot be displayed by current numexpr versions
     # TODO:
-    # if any(np.is_complex(fil_dict['zpk'])):
+    # if any(np.is_complex(fb_get('zpk'))):
     #     for c in range[3]:
     #         for r in range(len(fil_dict[0])):
-    #             fil_dict['zpk'][r][c] = np.real_if_close(fil_dict['zpk'][r][c]).astype(complex)
-
-
+    #             fb_set('zpk')[r][c], np.real_if_close(fb_get('zpk')[r][c]).astype(complex))
