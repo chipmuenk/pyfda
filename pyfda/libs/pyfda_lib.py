@@ -44,7 +44,7 @@ __all__ = ['cmp_version', 'mod_version',
            'set_dict_defaults', 'clean_ascii', 'qstr', 'safe_eval',
            'dB', 'lin2unit', 'unit2lin',
            'cround', 'H_mag', 'cmplx_sort', 'unique_roots',
-           'expand_lim', 'format_ticks', 'fil_save', 'fil_convert', 'sos2zpk',
+           'expand_lim', 'format_ticks', 'fil_save', 'sos2zpk',
            'round_odd', 'round_even', 'ceil_odd', 'floor_odd', 'ceil_even', 'floor_even',
            'to_html']
 
