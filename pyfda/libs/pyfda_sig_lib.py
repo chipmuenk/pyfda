@@ -6,6 +6,8 @@
 # Licensed under the terms of the MIT License
 # (see file LICENSE in root directory for details)
 
+# TODO: fb.fil\['([\s\S\r]*?)'\] -> fb_get('$1')
+
 """
 Library with various signal processing related functions
 """
@@ -1095,7 +1097,7 @@ def calc_ssb_spectrum(A: np.ndarray, mag: bool=False) -> np.ndarray:
 
 
 # ------------------------------------------------------------------------------
-def fil_save(fil_dict: dict, arg, format_in: str, sender: str,
+def fil_save(fil_dict: dict, arg: np.ndarray, format_in: str, sender: str,
              convert: bool = True) -> None:
     """
     Save filter design ``arg`` given in the format specified as ``format_in`` in
@@ -1108,21 +1110,24 @@ def fil_save(fil_dict: dict, arg, format_in: str, sender: str,
     ----------
 
     fil_dict : dict
-        The dictionary where the filter design is saved to.
+        The dictionary where the filter design is saved to
+        TODO: This is just a placeholder, it should be removed in the future
 
-    arg : various formats
-        The actual filter design
+    arg : ndarray
+        The filter design to be saved / converted. It can be in one of the following formats
+        given by ``format_in``:
 
     format_in : string
         Specifies how the filter design in 'arg' is passed:
 
-        :'ba': Coefficient form: Filter coefficients in FIR format
-                 (b, one dimensional) are automatically converted to IIR format (b, a).
-
-        :'zpk': Zero / pole / gain format: When only zeroes are specified,
-                  poles and gain are added automatically.
-
-        :'sos': Second-order sections
+        :'ba': Coefficient form: Filter coefficients in FIR format (b, one dimensional)
+          are automatically converted to IIR format (b, a).
+        :'zpk': Zero / pole / gain format: When only zeroes are specified, poles and gain
+          are added automatically.
+        :'sos': Second-order sections: The filter design is given as a 2D array with shape
+          (n_sections, 6), where each row corresponds to a second-order section
+          with the first three columns providing the numerator coefficients and
+          the last three providing the denominator coefficients.
 
     sender : string
         The name of the method that calculated the filter. This name is stored
@@ -1135,6 +1140,8 @@ def fil_save(fil_dict: dict, arg, format_in: str, sender: str,
     -------
     None
     """
+    if not isinstance(arg, np.ndarray):
+        logger.warning("'fil_save()': 'ba' format should be a numpy array, is %s!", type(arg))
 
     if format_in == 'sos':
         fb_set('sos', arg)
@@ -1147,10 +1154,9 @@ def fil_save(fil_dict: dict, arg, format_in: str, sender: str,
             logger.info("Format (zpk) is '%s', shape = %s", frmt, np.shape(arg))
         elif isinstance(arg, np.ndarray) and np.ndim(arg) == 2:
             frmt = "nd2" #  two-dimensional numpy array
-            # logger.info(f"Format (zpk) is '{frmt}', shape = {np.shape(arg)}")
         elif any(isinstance(el, np.ndarray) for el in arg):
             frmt = "lon"  # list or tuple of ndarrays
-            logger.warning("Format (zpk) is '%s'.", frmt)
+            logger.error("Format (zpk) is 'list-of-numpy arrays', this is deprecated!")
         else:
             format_error = True
 
@@ -1181,29 +1187,6 @@ def fil_save(fil_dict: dict, arg, format_in: str, sender: str,
         else:
             format_error = True
 
-# =============================================================================
-#         if np.ndim(arg) == 1:
-#             if np.ndim(arg[0]) == 0: # list / array with z only -> FIR
-#                 z = arg
-#                 p = np.zeros(len(z))
-#                 k = 1
-#                 fb_set('zpk', [z, p, k])
-#                 fb_set('ft', 'FIR')
-#             elif np.ndim(arg[0]) == 1: # list of lists
-#                 if np.shape(arg)[0] == 3:
-#                     fb_set('zpk', [arg[0], arg[1], arg[2]])
-#                     if np.any(arg[1]): # non-zero poles -> IIR
-#                         fb_set('ft', 'IIR')
-#                     else:
-#                         fb_set('ft', 'FIR')
-#                 else:
-#                     format_error = True
-#             else:
-#                 format_error = True
-#         else:
-#             format_error = True
-#
-# =============================================================================
         if format_error:
             raise ValueError("\t'fil_save()': Unknown 'zpk' format {0}".format(arg))
 
