@@ -92,7 +92,7 @@ class FIR_DF_amaranth():
         if not is_fx():
             return
 
-        b_q = fx.quant_coeffs(fb.fil[0]['ba'][0], self.Q_b, out_frmt="qint")
+        b_q = fx.quant_coeffs(fb_get('ba', 0), self.Q_b, out_frmt="qint")
         self.L = len(b_q)
 
         self.reset()
@@ -162,7 +162,7 @@ class FIR_DF_amaranth():
         ----------
         x : array of float or float or None
             input value(s) scaled and quantized according to the setting of `p['QI']`
-            and fb.fil[0]['qfrmt']
+            and fb_get('qfrmt')
             - When x is a scalar, calculate impulse response with the
                 amplitude defined by the scalar.
             - When `x == None`, calculate impulse response with amplitude = 1.
@@ -209,9 +209,10 @@ class FIR_DF_amaranth():
         self.sim.run()
 
         # Currently doesn't work, output signal is quantized afterwards, resetting 'N_over'
-        # fb.fil[0]['fxq']['QO']['N_over'] = 13  # doesn't work, output signal is quantized
+        # fb_set('fxq', 'QO', 'N_over', 13)  # doesn't work, output signal is quantized
 
-        # logger.warning(f"y = {self.Q_O.fixp(self.output, in_frmt='qint', out_frmt=fb.fil[0]['qfrmt'])}")
+        # logger.warning("y = %s", self.Q_O.fixp(
+        #                self.output, in_frmt='qint', out_frmt=fb_get('qfrmt')))
         # N_ovfl_acc = sum(self.ovfl_acc)
         # logger.error(f"N_ovfl_acc = {self.ovfl_acc}")
         return self.Q_O.fixp(self.output, in_frmt='qint', out_frmt=fb_get('qfrmt')), self.zi
