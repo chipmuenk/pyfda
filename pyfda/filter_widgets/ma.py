@@ -271,7 +271,7 @@ near ``f_S/2`` (highpass).
         if 'ba' in self.FRMT:
             fil_save(fil_dict, self.b, 'ba', __name__, convert = False)
 
-        fil_convert(fil_dict, self.FRMT)
+        fil_convert(self.FRMT)
 
         # always update filter dict and LineEdit, in case the design algorithm
         # has changed the number of delays:
