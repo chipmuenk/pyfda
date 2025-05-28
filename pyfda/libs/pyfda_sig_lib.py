@@ -200,7 +200,7 @@ def zeros_with_val(N: int, val: float = 1., pos: int = 0):
        Array with zeros except for element at position `pos`
     """
     if pos >= N or -pos > N:
-        raise(IndexError)
+        raise IndexError
 
     a = np.zeros(N, dtype=type(val))
     a[pos] = val
@@ -269,7 +269,7 @@ def zpk2array(zpk: list):
             zpk = normalize_zpk_gain(zpk)
 
         else:
-            logger.error(f"'zpk' has unsuitable shape '{np.shape(zpk)}'")
+            logger.error("'zpk' has unsuitable shape '%s'", np.shape(zpk))
             return f"'zpk' has unsuitable shape '{np.shape(zpk)}'"
     else:
         return f"'zpk' has an unsuitable type '{type(zpk)}'"
@@ -506,8 +506,10 @@ the real part):
 .. math::
 
     \\begin{align}
-    \\Re \\left\\{\\frac{\\partial }{\\partial \\omega} \\ln ( H( \\omega))\\right\\} &= \\frac{H_A'( \\omega)}{H_A( \\omega)} \\\
-    \\Im \\left\\{\\frac{\\partial }{\\partial \\omega} \\ln ( H( \\omega))\\right\\} &= \\phi'(\\omega)
+    \\Re \\left\\{\\frac{\\partial }{\\partial \\omega} \\ln ( H( \\omega))\\right\\}
+           &= \\frac{H_A'( \\omega)}{H_A( \\omega)} \\\\
+    \\Im \\left\\{\\frac{\\partial }{\\partial \\omega} \\ln ( H( \\omega))\\right\\}
+           &= \\phi'(\\omega)
     \\end{align}
 
 and hence
@@ -583,12 +585,14 @@ polynomes with their ramp functions:
 
     \\begin{align}
     \\frac{H'(e^{j \\omega T})}{H(e^{j \\omega T})}
-    &= \\frac{\\left(B(e^{j \\omega T})/A(e^{j \\omega T})\\right)'}{B(e^{j \\omega T})/A(e^{j \\omega T})}
+    &= \\frac{\\left(B(e^{j \\omega T})/A(e^{j \\omega T})\\right)'}
+             {B(e^{j \\omega T})/A(e^{j \\omega T})}
     = \\frac{B'(e^{j \\omega T}) A(e^{j \\omega T}) - A'(e^{j \\omega T})B(e^{j \\omega T})}
     { A(e^{j \\omega T}) B(e^{j \\omega T})}  \\\\
     &= \\frac {B'(e^{j \\omega T})} { B(e^{j \\omega T})}
       - \\frac { A'(e^{j \\omega T})} { A(e^{j \\omega T})}
-    = -j T \\left(\\frac { B_R(e^{j \\omega T})} {B(e^{j \\omega T})} - \\frac { A_R(e^{j \\omega T})} {A(e^{j \\omega T})}\\right)
+    = -j T \\left(\\frac { B_R(e^{j \\omega T})} {B(e^{j \\omega T})}
+                - \\frac { A_R(e^{j \\omega T})} {A(e^{j \\omega T})}\\right)
     \\end{align}
 
 This result is substituted once more into the log. derivative from above:
@@ -676,7 +680,8 @@ where
 .. math::
 
     \\begin{align}
-    \\tilde{A}(z) &=  z^{-N}{A}^{*}(1/z) = {a}^{*}_N + {a}^{*}_{N-1}z^{-1} + \ldots + {a}^{*}_1 z^{-(N-1)}+z^{-N}\\\\
+    \\tilde{A}(z) &=  z^{-N}{A}^{*}(1/z)
+                   = {a}^{*}_N + {a}^{*}_{N-1}z^{-1} + \ldots + {a}^{*}_1 z^{-(N-1)}+z^{-N}\\\\
     \Rightarrow \\tilde{A}(e^{j\omega T}) &=  e^{-jN \omega T}{A}^{*}(e^{-j\omega T}) \\\\
     \\Rightarrow \\angle\\tilde{A}(e^{j\omega T}) &= -\\angle A(e^{j\omega T}) - N\omega T
     \\end{align}
@@ -783,9 +788,9 @@ Examples
         tau_g[singular] = 0
 
         if verbose and np.any(singular):
-            logger.warning('singularity -> setting to 0 at:')
+            logger.warning("singularity -> setting to 0 at:")
             for i in singular:
-                logger.warning('i = {0} '.format(i * fs/nfft))
+                logger.warning("\ti = %s", i * fs/nfft)
 
         if not whole:
             nfft = nfft/2
@@ -829,7 +834,7 @@ Examples
         if verbose and np.any(singular):
             logger.warning('singularity -> setting to 0 at:')
             for i in singular:
-                logger.warning('i = {0} '.format(i * fs/nfft))
+                logger.warning("\ti = %s", i * fs/nfft)
 
         if not whole:
             nfft = nfft/2
@@ -844,14 +849,16 @@ Examples
             w, tau_g = group_delayz(b, a, w, fs=fs)
 
     else:
-        logger.error('Unknown algorithm "{0}"!'.format(alg))
+        logger.error('Unknown algorithm "%s"!', alg)
         tau_g = np.zeros_like(w)
 
     time_1 = int(time.perf_counter() * 1e9)
     delta_t = time_1 - time_0
     if verbose:
         logger.info(
-            "grpdelay calculation ({0}): {1:.3g} ms".format(alg, delta_t/1.e6))
+            "grpdelay calculation (%s): %.3g ms",
+            alg, delta_t / 1.e6
+        )
     return w, tau_g
 
 
@@ -1137,13 +1144,13 @@ def fil_save(fil_dict: dict, arg, format_in: str, sender: str,
         format_error = False
         if isinstance(arg, np.ndarray) and np.ndim(arg) == 1:
             frmt = "nd1" #  one-dimensional numpy array
-            logger.info(f"Format (zpk) is '{frmt}', shape = {np.shape(arg)}")
+            logger.info("Format (zpk) is '%s', shape = %s", frmt, np.shape(arg))
         elif isinstance(arg, np.ndarray) and np.ndim(arg) == 2:
             frmt = "nd2" #  two-dimensional numpy array
             # logger.info(f"Format (zpk) is '{frmt}', shape = {np.shape(arg)}")
         elif any(isinstance(el, np.ndarray) for el in arg):
             frmt = "lon"  # list or tuple of ndarrays
-            logger.warning(f"Format (zpk) is '{frmt}'.")
+            logger.warning("Format (zpk) is '%s'.", frmt)
         else:
             format_error = True
 
@@ -1339,9 +1346,10 @@ def fil_convert(fil_dict: dict, format_in) -> None:
                    k = zpk[2]
                fil_dict['sos'] = sig.zpk2sos(zpk[0], zpk[1], k)
             except ValueError as e:
-               fil_dict['sos'] = []
-               logger.warning(
-                   f"Complex-valued coefficients? Could not convert zpk\n{zpk}\n to SOS.\n{e}")
+                fb_set('sos', [])
+                logger.warning(
+                    "Complex-valued coefficients? Could not convert zpk\n%s"
+                    "\n\tto SOS.\n\t%s", zpk, e)
 
     elif 'ba' in format_in:  # arg = [b,a]
         if np.all(np.isfinite(fil_dict['ba'])):
@@ -1350,8 +1358,8 @@ def fil_convert(fil_dict: dict, format_in) -> None:
 
             if fil_dict['ba'][1][0] != 1:
                 logger.error(
-                    f"The coefficient a[0] = {fil_dict['ba'][1][0]} needs to be 1, "
-                    f"expect the unexpected!")
+                    "The coefficient a[0] = %s needs to be 1, "
+                    "expect the unexpected!", fb_get('ba')[1][0])
 
             # TODO: use mpmath.polyroots() here for higher precision
             # https://mpmath.org/doc/current/calculus/polynomials.html
