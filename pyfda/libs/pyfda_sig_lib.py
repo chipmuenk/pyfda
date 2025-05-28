@@ -10,15 +10,15 @@
 Library with various signal processing related functions
 """
 import logging
-logger = logging.getLogger(__name__)
-
 import time
 import numpy as np
 from numpy import pi
 import scipy.signal as sig
 
-import pyfda.libs.pyfda_lib as pyfda_lib
-import pyfda.filterbroker as fb
+from pyfda.libs import pyfda_lib
+from pyfda.filterbroker import fb_get, fb_set
+
+logger = logging.getLogger(__name__)
 
 
 # ------------------------------------------------------------------------------
