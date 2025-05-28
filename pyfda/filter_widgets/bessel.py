@@ -303,9 +303,9 @@ class Bessel():
 #------------------------------------------------------------------------------
 
 if __name__ == '__main__':
-    import pyfda.filterbroker as fb # importing filterbroker initializes all its globals
+    import pyfda.filterbroker as fb
     filt = Bessel()        # instantiate filter
-    filt.LPman(fb.fil[0])  # design a low-pass with parameters from global dict
-    print(fb.fil[0][filt.FRMT]) # return results in default format
+    filt.LPman()  # design a low-pass with parameters from global dict
+    print(fb_get(filt.FRMT)) # return results in default format (e.g. 'ba')
 
 # test using "python -m pyfda.filter_widgets.bessel"
