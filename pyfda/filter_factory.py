@@ -17,7 +17,7 @@ which have a global scope like class variables and can be imported like
 
 import importlib
 import logging
-from . import filterbroker as fb
+import pyfda.filterbroker as fb
 
 logger = logging.getLogger(__name__)
 
@@ -129,7 +129,7 @@ class FilterFactory():
 
             if fil_class is None: # fc is not a class of fc_module
                 err_string = ("\nERROR in 'FilterFactory.create_fil_inst()':\n"
-                        "Unknown design class '{0}', could not be created.".format(fc))
+                              f"Unknown design class '{fc}', could not be created.")
                 logger.warning(err_string)
                 self.err_code = 3
             else:
@@ -137,11 +137,11 @@ class FilterFactory():
                     fil_inst = fil_class() # instantiate an object
                     self.err_code = 0 # filter instance has been created / changed successfully
                     logger.debug(
-                        "FilterFactory.create_fil_inst(): successfully created {0}".format(fc))
+                        "FilterFactory.create_fil_inst(): successfully created '%s'", fc)
                 except Exception as e:
                     self.err_code = 4
                     logger.warning(
-                        "Error during instantiation of filter class {0}:\n{1}".format(fc,e))
+                        "Error during instantiation of filter class '%s':\n%s", fc, e)
                     x = x
         return self.err_code
 
