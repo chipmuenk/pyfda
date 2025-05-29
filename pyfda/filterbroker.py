@@ -531,7 +531,7 @@ def is_fx()-> bool:
     return fb_get('qfrmt') in ['qint', 'qfrac']
 
 # -------------------------
-def set_fx(fx: bool)-> None:
+def fx_set(fx: bool)-> None:
     """
     Set fixpoint mode by restoring previous fixpoint format
     when `fx == True`, otherwise restore previous float format.

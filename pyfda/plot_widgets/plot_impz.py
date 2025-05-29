@@ -21,7 +21,7 @@ from matplotlib.ticker import AutoMinorLocator
 from pyfda.libs.compat import (
     QWidget, pyqtSignal, QTabWidget, QVBoxLayout, QIcon, QSize, QSizePolicy)
 import pyfda.filterbroker as fb
-from pyfda.filterbroker import is_fx, set_fx, fb_get, fb_set
+from pyfda.filterbroker import is_fx, fx_set, fb_get, fb_set
 import pyfda.libs.pyfda_fix_lib as fx
 from pyfda.libs.pyfda_sig_lib import angle_zero, calc_ssb_spectrum
 from pyfda.libs.pyfda_lib import safe_eval, pprint_log, first_item
@@ -833,7 +833,7 @@ class Plot_Impz(QWidget):
         # Function call with argument: Set UI and fb.fil[0]['fx_sim'] accord. to `arg`
         # if arg in {'float', 'fixpoint'}:
         #     qset_cmb_box(self.ui.cmb_sim_select, arg, data=True)
-        #     set_fx(arg == "fixpoint")
+        #     fx_set(arg == "fixpoint")
 
         # Direct call with no argument, set combobox according to `is_fx()``
         if arg is None:
@@ -844,7 +844,7 @@ class Plot_Impz(QWidget):
         # Combobox modified, set fb.fil[0]['fx_sim'] according to combobox and start sim
         elif type(arg) == int:
             # restore last fixpoint / float mode
-            set_fx(qget_cmb_box(self.ui.cmb_sim_select) == 'fixpoint')
+            fx_set(qget_cmb_box(self.ui.cmb_sim_select) == 'fixpoint')
             self.emit({'fx_sim': 'specs_changed'})
             self.needs_calc = True
             self.calc_auto()  # run simulation if autostart has been selected
