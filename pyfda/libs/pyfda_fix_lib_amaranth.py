@@ -134,8 +134,8 @@ if cmp_version("amaranth", "0.3") >= 0:
                 # add sign bit (sig_i[-1]) as LSB (1 << dWF) before right shift
                 mod.d.comb += sig_i_q.eq((sig_i + (sig_i[-1] << dWF)) >> dWF)
             else:
-                logger.error(f"Unknown output quantization method <{QO['quant']}>,\n"
-                             "\tusing <floor> instead.")
+                logger.error("Unknown output quantization method <%s>,\n"
+                             "\tusing <floor> instead.", {QO['quant']})
                 mod.d.comb += sig_i_q.eq(sig_i >> dWF)
 
         # -----------------------------------------------------------------------
@@ -167,8 +167,8 @@ if cmp_version("amaranth", "0.3") >= 0:
             mod.d.comb += ovfl_o.eq(0)  # TODO: detect overflow from discarded bits
 
             if QO['ovfl'] != 'wrap':
-                logger.error(f"Unknown output overflow method <{QO['ovfl']}>,\n"
-                            "\tusing <wrap> instead.")
+                logger.error("Unknown output overflow method <%s>,\n"
+                            "\tusing <wrap> instead.", {QO['ovfl']})
         # QO['N_over'] = 15  # TODO: this passes the value to the quantizer, but it's a dummy
         return sig_o, ovfl_o
 else:

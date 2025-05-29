@@ -542,7 +542,7 @@ def fx_set(fx: bool)-> None:
         fb_set('qfrmt', fb_get('qfrmt_float_last'))
 
 # -------------------------
-def fb_get(*args) -> str:
+def fb_get(*args, fil_dict=fil[0]) -> str:
     """
     Get the value of a key in the global dict `fil[0]`. Multiple arguments
     access nested dicts:
@@ -557,12 +557,12 @@ def fb_get(*args) -> str:
         raise KeyError("'fb_get()' called without argument")
 
     if len(args) == 1:
-        ret = fil[0][args[0]]
-        # ret = fil[0]['_' + args[0]]
+        ret = fil_dict[args[0]]
+        # ret = fil_dict['_' + args[0]]
     elif len(args) == 2:
-        ret = fil[0][args[0]][args[1]]
+        ret = fil_dict[args[0]][args[1]]
     elif len(args) == 3:
-        ret = fil[0][args[0]][args[1]][args[2]]
+        ret = fil_dict[args[0]][args[1]][args[2]]
     else:
         raise KeyError(
             "Accessing dicts nested more than 3 keys deep is not supported yet!")
@@ -572,7 +572,7 @@ def fb_get(*args) -> str:
     return ret
 
 # -------------------------
-def fb_set(*args, backup: bool = True) -> None:
+def fb_set(*args, backup: bool = True, fil_dict=fil[0]) -> None:
     """
     Set the value of a key in the global dict `fil[0]`
     """
@@ -591,12 +591,12 @@ def fb_set(*args, backup: bool = True) -> None:
         if args[-2] =='qfrmt' and len(args) == 2:
             # keep current fixpoint / float format
             if is_fx():
-                fil[0]['qfrmt_fx_last'] = fil[0]['qfrmt']
+                fil_dict['qfrmt_fx_last'] = fil[0]['qfrmt']
             else:
                 fil[0]['qfrmt_float_last'] = fil[0]['qfrmt']
             # TODO: remove this later when all `fil[0]['fx_sim']` have been replaced
-            fil[0]['qfrmt'] = val
-            fil[0]['fx_sim'] = is_fx()
+            fil_dict['qfrmt'] = val
+            fil_dict['fx_sim'] = is_fx()
         else:
             d[args[-2]] = val  # store new value if valid
     except KeyError:

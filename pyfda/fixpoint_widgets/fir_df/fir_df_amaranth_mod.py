@@ -20,7 +20,7 @@ from numpy.lib.function_base import iterable
 from amaranth import Signal, signed, Elaboratable, Module
 from amaranth.sim import Simulator, Tick  # , Delay, Settle
 
-import pyfda.filterbroker as fb
+from pyfda.filterbroker import set_fx
 # from pyfda.libs.pyfda_lib import pprint_log
 import pyfda.libs.pyfda_fix_lib as fx
 from pyfda.libs.pyfda_fix_lib_amaranth import requant
@@ -173,8 +173,7 @@ if __name__ == '__main__':
     Run widget standalone with
     `python -m pyfda.fixpoint_widgets.fir_df.fir_df_amaranth_mod`
     """
-    fb.fil[0]['fx_sim'] = True  # enable fixpoint mode
-    # fb.fil[0]['qfrmt'] = 'qint'
+    set_fx(True)  # enable fixpoint mode
 
     p = {'QCB': {'WI': 2, 'WF': 5, 'w_a_m': 'a',
                 'ovfl': 'wrap', 'quant': 'floor', 'N_over': 0},

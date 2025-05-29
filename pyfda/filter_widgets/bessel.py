@@ -42,6 +42,7 @@ API version info:
 """
 from scipy.signal import bessel, buttord
 
+from pyfda.filterbroker import fb_get, fb_set
 from pyfda.libs.pyfda_lib import lin2unit
 from pyfda.libs.pyfda_qt_lib import popup_warning
 from pyfda.libs.pyfda_sig_lib import fil_save
@@ -153,30 +154,30 @@ class Bessel():
         self.info_doc.append(buttord.__doc__)
 
     #--------------------------------------------------------------------------
-    def _get_params(self, fil_dict: dict) -> None:
+    def _get_params(self) -> None:
         """
         Translate parameters from the passed dictionary to instance
         parameters, scaling / transforming them if needed.
         """
-        self.N = fil_dict['N']
+        self.N = fb_get('N')
 
-        self.F_PB  = fil_dict['F_PB'] * 2 # Frequencies are normalized to f_Nyq
-        self.F_SB  = fil_dict['F_SB'] * 2
-        self.F_PB2 = fil_dict['F_PB2'] * 2
-        self.F_SB2 = fil_dict['F_SB2'] * 2
+        self.F_PB  = fb_get('F_PB') * 2 # Frequencies are normalized to f_Nyq
+        self.F_SB  = fb_get('F_SB') * 2
+        self.F_PB2 = fb_get('F_PB2') * 2
+        self.F_SB2 = fb_get('F_SB2') * 2
         self.F_PBC = None
-        self.F_C   = fil_dict['F_C'] * 2
-        self.F_C2  = fil_dict['F_C2'] * 2
+        self.F_C   = fb_get('F_C') * 2
+        self.F_C2  = fb_get('F_C2') * 2
 
-        self.A_PB = lin2unit(fil_dict['A_PB'], 'IIR', 'A_PB', unit='dB')
-        self.A_SB = lin2unit(fil_dict['A_SB'], 'IIR', 'A_SB', unit='dB')
+        self.A_PB = lin2unit(fb_get('A_PB'), 'IIR', 'A_PB', unit='dB')
+        self.A_SB = lin2unit(fb_get('A_SB'), 'IIR', 'A_SB', unit='dB')
 
         # bessel filter routines support only one amplitude spec for
         # pass- and stop band each
-        if str(fil_dict['rt']) == 'BS':
-            fil_dict['A_PB2'] = fil_dict['A_PB']
-        elif str(fil_dict['rt']) == 'BP':
-            fil_dict['A_SB2'] = fil_dict['A_SB']
+        if str(fb_get('rt')) == 'BS':
+            fb_set('A_PB2', fb_get('A_PB'))
+        elif str(fb_get('rt')) == 'BP':
+            fb_set('A_SB2', fb_get('A_SB'))
 
     #--------------------------------------------------------------------------
     def _test_n(self) -> bool:
@@ -203,19 +204,19 @@ class Bessel():
         """
         fil_save(fil_dict, arg, self.FRMT, __name__)
 
-        fil_dict['N'] = self.N # always save, might have been limited by _test_n
-        if str(fil_dict['fo']) == 'min':
-            if str(fil_dict['rt']) == 'LP' or str(fil_dict['rt']) == 'HP':
-                fil_dict['F_C'] = self.F_PBC / 2. # HP or LP - single  corner frequency
+        fb_set('N', self.N) # always save, might have been limited by _test_n
+        if str(fb_get('fo')) == 'min':
+            if str(fb_get('rt')) == 'LP' or str(fb_get('rt')) == 'HP':
+                fb_set('F_C', self.F_PBC / 2.) # HP or LP - single  corner frequency
             else: # BP or BS - two corner frequencies; order needs to be doubled
-                fil_dict['F_C'] = self.F_PBC[0] / 2.
-                fil_dict['F_C2'] = self.F_PBC[1] / 2.
-                fil_dict['N'] = self.N * 2
+                fb_set('F_C', self.F_PBC[0] / 2.)
+                fb_set('F_C2', self.F_PBC[1] / 2.)
+                fb_set('N', self.N * 2)
 
     # LP: F_PB < F_SB
     def LPmin(self, fil_dict: dict) -> int:
         """Bessel LP filter, minimum order"""
-        self._get_params(fil_dict)
+        self._get_params()
         self.N, self.F_PBC = buttord(self.F_PB, self.F_SB, self.A_PB, self.A_SB)
         if not self._test_n():
             return -1
@@ -225,7 +226,7 @@ class Bessel():
 
     def LPman(self, fil_dict: dict) -> int:
         """Bessel LP filter, manual order"""
-        self._get_params(fil_dict)
+        self._get_params()
         if not self._test_n():
             return -1
         self._save(fil_dict, bessel(
@@ -235,7 +236,7 @@ class Bessel():
     # HP: F_SB < F_PB
     def HPmin(self, fil_dict: dict) -> int:
         """Bessel HP filter, minimum order"""
-        self._get_params(fil_dict)
+        self._get_params()
         self.N, self.F_PBC = buttord(self.F_PB, self.F_SB, self.A_PB,self.A_SB)
         if not self._test_n():
             return -1
@@ -245,7 +246,7 @@ class Bessel():
 
     def HPman(self, fil_dict: dict) -> int:
         """Bessel HP filter, manual order"""
-        self._get_params(fil_dict)
+        self._get_params()
         if not self._test_n():
             return -1
         self._save(fil_dict, bessel(
@@ -259,7 +260,7 @@ class Bessel():
     # BP: F_SB[0] < F_PB[0], F_SB[1] > F_PB[1]
     def BPmin(self, fil_dict: dict) -> int:
         """Bessel BP filter, minimum order"""
-        self._get_params(fil_dict)
+        self._get_params()
         self.N, self.F_PBC = buttord(
             [self.F_PB, self.F_PB2], [self.F_SB, self.F_SB2], self.A_PB, self.A_SB)
         if not self._test_n():
@@ -270,7 +271,7 @@ class Bessel():
 
     def BPman(self, fil_dict: dict) -> int:
         """Bessel BP filter, manual order"""
-        self._get_params(fil_dict)
+        self._get_params()
         if not self._test_n():
             return -1
         self._save(fil_dict, bessel(
@@ -281,7 +282,7 @@ class Bessel():
     # BS: F_SB[0] > F_PB[0], F_SB[1] < F_PB[1]
     def BSmin(self, fil_dict: dict) -> int:
         """Bessel BS filter, minimum order"""
-        self._get_params(fil_dict)
+        self._get_params()
         self.N, self.F_PBC = buttord(
             [self.F_PB, self.F_PB2], [self.F_SB, self.F_SB2], self.A_PB,self.A_SB)
         if not self._test_n():
@@ -292,7 +293,7 @@ class Bessel():
 
     def BSman(self, fil_dict: dict) -> int:
         """Bessel BS filter, manual order"""
-        self._get_params(fil_dict)
+        self._get_params()
         if not self._test_n():
             return -1
         self._save(fil_dict, bessel(
@@ -302,9 +303,9 @@ class Bessel():
 #------------------------------------------------------------------------------
 
 if __name__ == '__main__':
-    import pyfda.filterbroker as fb # importing filterbroker initializes all its globals
+    import pyfda.filterbroker as fb
     filt = Bessel()        # instantiate filter
-    filt.LPman(fb.fil[0])  # design a low-pass with parameters from global dict
-    print(fb.fil[0][filt.FRMT]) # return results in default format
+    filt.LPman()  # design a low-pass with parameters from global dict
+    print(fb_get(filt.FRMT)) # return results in default format (e.g. 'ba')
 
 # test using "python -m pyfda.filter_widgets.bessel"
