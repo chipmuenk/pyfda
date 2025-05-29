@@ -43,6 +43,7 @@ API version info:
 from scipy.signal import bessel, buttord
 
 from pyfda.filterbroker import fb_get, fb_set
+import pyfda.filterbroker as fb
 from pyfda.libs.pyfda_lib import lin2unit
 from pyfda.libs.pyfda_qt_lib import popup_warning
 from pyfda.libs.pyfda_sig_lib import fil_save
@@ -174,9 +175,9 @@ class Bessel():
 
         # bessel filter routines support only one amplitude spec for
         # pass- and stop band each
-        if str(fb_get('rt')) == 'BS':
+        if fb_get('rt') == 'BS':
             fb_set('A_PB2', fb_get('A_PB'))
-        elif str(fb_get('rt')) == 'BP':
+        elif fb_get('rt') == 'BP':
             fb_set('A_SB2', fb_get('A_SB'))
 
     #--------------------------------------------------------------------------
@@ -190,7 +191,7 @@ class Bessel():
             return popup_warning(None, self.N, "Bessel")
         return True
 
-    def _save(self, fil_dict, arg):
+    def _save(self, arg, fil_dict: dict = fb.fil[0]) -> None:
         """
         Convert results of filter design to all available formats (pz, ba, sos)
         and store them in the global filter dictionary.
@@ -205,8 +206,8 @@ class Bessel():
         fil_save(fil_dict, arg, self.FRMT, __name__)
 
         fb_set('N', self.N) # always save, might have been limited by _test_n
-        if str(fb_get('fo')) == 'min':
-            if str(fb_get('rt')) == 'LP' or str(fb_get('rt')) == 'HP':
+        if fb_get('fo') == 'min':
+            if fb_get('rt') in {'LP', 'HP'}:
                 fb_set('F_C', self.F_PBC / 2.) # HP or LP - single  corner frequency
             else: # BP or BS - two corner frequencies; order needs to be doubled
                 fb_set('F_C', self.F_PBC[0] / 2.)
@@ -220,8 +221,8 @@ class Bessel():
         self.N, self.F_PBC = buttord(self.F_PB, self.F_SB, self.A_PB, self.A_SB)
         if not self._test_n():
             return -1
-        self._save(fil_dict, bessel(
-            self.N, self.F_PBC, btype='low', analog=False, output=self.FRMT))
+        self._save(
+            bessel(self.N, self.F_PBC, btype='low', analog=False, output=self.FRMT))
         return 0
 
     def LPman(self, fil_dict: dict) -> int:
@@ -229,8 +230,8 @@ class Bessel():
         self._get_params()
         if not self._test_n():
             return -1
-        self._save(fil_dict, bessel(
-            self.N, self.F_C, btype='low', analog=False, output=self.FRMT))
+        self._save(
+            bessel(self.N, self.F_C, btype='low', analog=False, output=self.FRMT))
         return 0
 
     # HP: F_SB < F_PB
@@ -240,8 +241,8 @@ class Bessel():
         self.N, self.F_PBC = buttord(self.F_PB, self.F_SB, self.A_PB,self.A_SB)
         if not self._test_n():
             return -1
-        self._save(fil_dict, bessel(
-            self.N, self.F_PBC, btype='highpass', analog=False, output=self.FRMT))
+        self._save(
+            bessel(self.N, self.F_PBC, btype='highpass', analog=False, output=self.FRMT))
         return 0
 
     def HPman(self, fil_dict: dict) -> int:
@@ -249,8 +250,8 @@ class Bessel():
         self._get_params()
         if not self._test_n():
             return -1
-        self._save(fil_dict, bessel(
-            self.N, self.F_C, btype='highpass', analog=False, output=self.FRMT))
+        self._save(
+            bessel(self.N, self.F_C, btype='highpass', analog=False, output=self.FRMT))
         return 0
 
     # For BP and BS, A_PB, F_PB and F_stop have two elements each.
@@ -265,8 +266,8 @@ class Bessel():
             [self.F_PB, self.F_PB2], [self.F_SB, self.F_SB2], self.A_PB, self.A_SB)
         if not self._test_n():
             return -1
-        self._save(fil_dict, bessel(
-            self.N, self.F_PBC, btype='bandpass', analog=False, output=self.FRMT))
+        self._save(
+            bessel(self.N, self.F_PBC, btype='bandpass', analog=False, output=self.FRMT))
         return 0
 
     def BPman(self, fil_dict: dict) -> int:
@@ -274,9 +275,9 @@ class Bessel():
         self._get_params()
         if not self._test_n():
             return -1
-        self._save(fil_dict, bessel(
-            self.N//2, [self.F_C,self. F_C2], btype='bandpass',
-            analog=False, output=self.FRMT))
+        self._save(
+            bessel(self.N//2, [self.F_C,self. F_C2], btype='bandpass',
+                   analog=False, output=self.FRMT))
         return 0
 
     # BS: F_SB[0] > F_PB[0], F_SB[1] < F_PB[1]
@@ -287,8 +288,8 @@ class Bessel():
             [self.F_PB, self.F_PB2], [self.F_SB, self.F_SB2], self.A_PB,self.A_SB)
         if not self._test_n():
             return -1
-        self._save(fil_dict, bessel(
-            self.N, self.F_PBC, btype='bandstop', analog=False, output=self.FRMT))
+        self._save(
+            bessel(self.N, self.F_PBC, btype='bandstop', analog=False, output=self.FRMT))
         return 0
 
     def BSman(self, fil_dict: dict) -> int:
@@ -296,16 +297,14 @@ class Bessel():
         self._get_params()
         if not self._test_n():
             return -1
-        self._save(fil_dict, bessel(
-            self.N//2, [self.F_C, self.F_C2], btype='bandstop',
-            analog=False, output=self.FRMT))
+        self._save(
+            bessel(self.N//2, [self.F_C, self.F_C2], btype='bandstop',
+                   analog=False, output=self.FRMT))
         return 0
 #------------------------------------------------------------------------------
 
 if __name__ == '__main__':
-    import pyfda.filterbroker as fb
+    # Run this module standalone with `python -m pyfda.filter_widgets.bessel`
     filt = Bessel()        # instantiate filter
-    filt.LPman()  # design a low-pass with parameters from global dict
+    filt.LPman(fb.fil[0])  # design a low-pass with parameters from global dict
     print(fb_get(filt.FRMT)) # return results in default format (e.g. 'ba')
-
-# test using "python -m pyfda.filter_widgets.bessel"
