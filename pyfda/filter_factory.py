@@ -212,12 +212,12 @@ class FilterFactory():
 
         # Test whether 'method' is a string (Py3):
         elif not isinstance(method, str):
-            err_string = "Method name '{0}' is not a string.".format(method)
+            err_string = f"Method name '{method}' is not a string."
             self.err_code = 16
 
         # method does not exist in filter class:
         elif not hasattr(fil_inst, method):
-            err_string = "Method '{0}' doesn't exist in class '{1}'.".format(method, fil_inst)
+            err_string = f"Method '{method}' doesn't exist in class '{fil_inst}'."
             self.err_code = 17
 
         else: # everything ok so far, try calling method with the filter dict as argument
@@ -244,7 +244,7 @@ class FilterFactory():
         if self.err_code is None:
             self.err_code = 0
         elif self.err_code > 0:
-            logger.error(f"ErrCode {self.err_code}: {err_string}")
+            logger.error("ErrCode %s: %s", self.err_code, err_string)
 
         return self.err_code
 

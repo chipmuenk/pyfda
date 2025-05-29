@@ -397,7 +397,7 @@ class Input_Specs(QWidget):
             elif ret == -1:
                 return  # aborted or error occurred -> do nothing
             else:
-                logger.error(f'Unknown return code "{ret}"!')
+                logger.error('Unknown return code "%s"!', ret)
                 return
         # 'File (all)' selected, update fil[0] ... fil[9] from file
         elif sel == "file_all":
@@ -408,7 +408,7 @@ class Input_Specs(QWidget):
             elif ret == -1:
                 return  # aborted or error occurred -> do nothing
             else:
-                logger.error(f'Unknown return code "{ret}"!')
+                logger.error('Unknown return code "%s"!', ret)
                 return
         # 'Mem <i>', copy fil[i] to fil[0]
         else:
@@ -477,8 +477,8 @@ class Input_Specs(QWidget):
 
         try:
             logger.info(
-                "Start filter design using method\n\t'{0}.{1}{2}'"
-                .format(str(fb.fil[0]['fc']), str(fb.fil[0]['rt']), str(fb.fil[0]['fo'])))
+                "Start filter design using method\n\t'%s.%s%s'",
+                str(fb.fil[0]['fc']), str(fb.fil[0]['rt']), str(fb.fil[0]['fo']))
 
             # ----------------------------------------------------------------------
             # A globally accessible instance fb.fil_inst of selected filter class fc
@@ -515,9 +515,9 @@ class Input_Specs(QWidget):
 
         except Exception as e:
             if ('__doc__' in str(e)):
-                logger.warning(f"Filter design:\n {e.__doc__}\n{e}\n")
+                logger.warning("Filter design:\n%s\n%s\n", e.__doc__, e)
             else:
-                logger.warning(f"{e}")
+                logger.warning("%s", e)
             self.color_design_button("error")
 
     def color_design_button(self, state):
