@@ -26,7 +26,7 @@ except ImportError:
     DS = False
 
 import pyfda.filterbroker as fb
-from pyfda.filterbroker import is_fx, fb_get, fb_set
+from pyfda.filterbroker import get_fx, fb_get, fb_set
 from pyfda.libs.pyfda_lib import is_numeric, pprint_log
 
 logger = logging.getLogger(__name__)
@@ -564,7 +564,7 @@ class Fixed(object):
         W = self.q_dict['WI'] + self.q_dict['WF'] + 1
         #
         fx_base = fb_get('fx_base')
-        if not is_fx():  # float format
+        if not get_fx():  # float format
             self.places = 4
         elif fx_base == 'dec':
             self.places = int(
@@ -993,7 +993,7 @@ class Fixed(object):
 
         y_float = None
 
-        if not is_fx():
+        if not get_fx():
             # this handles floats, np scalars + arrays and strings / string arrays
             try:
                 y_float = np.float64(y)
@@ -1304,7 +1304,7 @@ class Fixed(object):
 
         # ======================================================================
         # logger.warning(f"float2frmt: y = {y}")
-        if not is_fx():  # return float input value unchanged (no string)
+        if not get_fx():  # return float input value unchanged (no string)
             logger.error("Not in fixpoint mode, 'float2frmt()' should not be called!")
             return y
 
@@ -1395,7 +1395,7 @@ def quant_coeffs(coeffs: iterable, Q, recursive: bool = False, out_frmt: str = "
     """
     Quantize the coefficients, scale and convert them to a list of integers,
     using the quantization settings of `Fixed()` instance `Q` and global setting
-    `fb.fil[0]['qfrmt']` (`'qfrac'` or `'qint'`) and `is_fx()`
+    `fb.fil[0]['qfrmt']` (`'qfrac'` or `'qint'`) and `get_fx()`
 
     Parameters
     ----------

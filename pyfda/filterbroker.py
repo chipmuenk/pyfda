@@ -523,14 +523,14 @@ def key_list_to_dict(keys: list) -> dict:
     return d
 
 # -------------------------
-def is_fx()-> bool:
+def get_fx()-> bool:
     """
     Check if fixpoint mode is active
     """
     return fb_get('qfrmt') in ['qint', 'qfrac']
 
 # -------------------------
-def fx_set(fx: bool)-> None:
+def set_fx(fx: bool)-> None:
     """
     Set fixpoint mode by restoring previous fixpoint format
     when `fx == True`, otherwise restore previous float format.
@@ -589,7 +589,7 @@ def fb_set(*args, backup: bool = True, fil_dict=fil[0]) -> None:
 
         if args[-2] =='qfrmt' and len(args) == 2:
             # remember current fixpoint / float format
-            if is_fx():
+            if get_fx():
                 fil_dict['qfrmt_fx_last'] = fil[0]['qfrmt']
             else:
                 fil[0]['qfrmt_float_last'] = fil[0]['qfrmt']

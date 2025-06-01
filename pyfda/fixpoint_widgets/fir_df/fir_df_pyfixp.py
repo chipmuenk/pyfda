@@ -14,7 +14,7 @@ import logging
 import numpy as np
 from numpy.lib.function_base import iterable
 import pyfda.filterbroker as fb
-from pyfda.filterbroker import is_fx, fb_get, fb_set
+from pyfda.filterbroker import get_fx, fb_get, fb_set
 # from pyfda.libs.pyfda_lib import pprint_log
 import pyfda.libs.pyfda_fix_lib as fx
 from pyfda.libs.pyfda_fix_lib import quant_coeffs
@@ -80,7 +80,7 @@ class FIR_DF_pyfixp():
         None.
         """
         # Do not initialize filter unless fixpoint mode is active
-        if not is_fx():
+        if not get_fx():
             return
 
         self.p = p  # parameter dictionary with coefficients etc.

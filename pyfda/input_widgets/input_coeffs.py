@@ -16,7 +16,7 @@ import sys
 import numpy as np
 
 import pyfda.filterbroker as fb  # importing filterbroker initializes all its globals
-from pyfda.filterbroker import fb_get, fb_set, is_fx
+from pyfda.filterbroker import fb_get, fb_set, get_fx
 
 from pyfda.libs.compat import (
     Qt, QWidget, QApplication, QTableWidget, QTableWidgetItem, QVBoxLayout, pyqtSignal,
@@ -242,7 +242,7 @@ class Input_Coeffs(QWidget):
         # where overflow items can be -1, 0, +1: 0 = no overflow, -1 = underflow, +1 = overflow
 
         # Float format: Set ba_q = ba, all overflow items are = 0
-        if not is_fx():
+        if not get_fx():
             if fb_get('qfrmt') == 'float64':
                 self.ba_q = [self.ba[0],
                             self.ba[1],
@@ -398,7 +398,7 @@ class Input_Coeffs(QWidget):
 
         # When format is floating point, disable all fixpoint options and widgets,
         # only the quantizer widget is enabled also for 'float32':
-        is_float = not is_fx()
+        is_float = not get_fx()
         self.ui.spn_digits.setVisible(is_float)  # select number of float digits
         self.ui.lbl_digits.setVisible(is_float)
         self.ui.cmb_fx_base.setVisible(not is_float)  # hide fx base combobox
@@ -599,7 +599,7 @@ class Input_Coeffs(QWidget):
         """
         # update ui
         qset_cmb_box(self.ui.cmb_qfrmt, fb_get('qfrmt'), data=True)
-        if is_fx():  # fixpoint mode, update quantizer objects and widgets
+        if get_fx():  # fixpoint mode, update quantizer objects and widgets
             # qset_cmb_box(self.ui.cmb_qfrmt, fb.fil[0]['qfrmt'], data=True)
             self.ui.wdg_wq_coeffs_a.dict2ui(fb.fil[0]['fxq']['QCA'])
             self.ui.wdg_wq_coeffs_b.dict2ui(fb.fil[0]['fxq']['QCB'])

@@ -33,7 +33,7 @@ in the selected format (int, hex, ...). The quantizer is created in the
 `Input_Coeffs` class and passed to this class via the `parent` parameter as
 `self.Q = [self.parent.ui.wdg_wq_coeffs_b.Q, self.parent.ui.wdg_wq_coeffs_a.Q]`
 """
-from pyfda.filterbroker import fb_get, is_fx
+from pyfda.filterbroker import fb_get, get_fx
 
 from pyfda.libs.compat import Qt, QtCore, QLineEdit, QSize, QStyledItemDelegate, QColor, QBrush
 from pyfda.libs.pyfda_lib import safe_eval
@@ -150,7 +150,7 @@ class ItemDelegateCoeffs(QStyledItemDelegate):
          positive / negative overflows, else it is 0.
         """
 
-        if not is_fx():
+        if not get_fx():
             # convert to float and return as string with number of digits defined
             # in `params['FMT_ba']` (default: 6)
             data = safe_eval(text, return_type='auto')  # convert to float
@@ -195,7 +195,7 @@ class ItemDelegateCoeffs(QStyledItemDelegate):
         data = safe_eval(self.parent.ba[index.column()][index.row()],
                          return_type="auto")
 
-        if is_fx():
+        if get_fx():
             # fixpoint format with base:
             # pass requantized data with required number of decimal places
             editor.setText(
@@ -209,7 +209,7 @@ class ItemDelegateCoeffs(QStyledItemDelegate):
     def setModelData(self, editor, model, index) -> None:
         """
         When editing has finished, read the updated data from the editor (= QTableWidget),
-        and store it in `self.ba` as float / complex for `is_fx() == False`.
+        and store it in `self.ba` as float / complex for `get_fx() == False`.
 
         For all other formats, convert data back to floating point format via
         `frmt2float()` and store it in `self.ba` as float / complex. Next, use
@@ -232,7 +232,7 @@ class ItemDelegateCoeffs(QStyledItemDelegate):
 #            model.setData(index, editor.currentText())
 #        else:
 #            super(ItemDelegate, self).setModelData(editor, model, index)
-        if not is_fx():
+        if not get_fx():
             data = safe_eval(
                 str(editor.text()), self.parent.ba[index.column()][index.row()],
                 return_type='auto')  # raw float data without fixpoint formatting

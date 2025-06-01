@@ -22,7 +22,7 @@ from numpy.lib.function_base import iterable
 from amaranth.sim import Simulator, Tick  # , Delay, Settle
 
 import pyfda.filterbroker as fb
-from filterbroker import is_fx, fb_get, fb_set
+from filterbroker import get_fx, fb_get, fb_set
 # from pyfda.libs.pyfda_lib import pprint_log
 import pyfda.libs.pyfda_fix_lib as fx
 from pyfda.libs.pyfda_fix_lib_amaranth import requant
@@ -89,7 +89,7 @@ class FIR_DF_amaranth():
         None.
         """
         # Do not initialize filter unless fixpoint mode is active
-        if not is_fx():
+        if not get_fx():
             return
 
         b_q = fx.quant_coeffs(fb_get('ba', 0), self.Q_b, out_frmt="qint")

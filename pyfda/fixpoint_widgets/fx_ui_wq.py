@@ -13,7 +13,7 @@ import logging
 import sys
 
 import pyfda.filterbroker as fb
-from pyfda.filterbroker import is_fx, fb_get
+from pyfda.filterbroker import get_fx, fb_get
 import pyfda.libs.pyfda_fix_lib as fx
 from pyfda.libs.compat import (
     Qt, QWidget, QLabel, QLineEdit, QComboBox, QIcon,
@@ -496,13 +496,13 @@ class FX_UI_WQ(QWidget):
     def update_WI_WF(self):
         """
         Update display, visibility / writability of integer and fractional part of the
-        quantization format. depending on `is_fx()` ...['qfrmt'] and
+        quantization format. depending on `get_fx()` ...['qfrmt'] and
         ...['w_a_m'] settings
         """
-        self.ledWI.setVisible(is_fx())
-        self.ledWF.setVisible(is_fx())
+        self.ledWI.setVisible(get_fx())
+        self.ledWF.setVisible(get_fx())
 
-        if not is_fx():  # float modes
+        if not get_fx():  # float modes
             self.lbl_sep1.setText(to_html("---", frmt='b'))
             self.lbl_sep2.setVisible(False)
         elif fb_get('qfrmt') == 'qint':
@@ -529,7 +529,7 @@ class FX_UI_WQ(QWidget):
         self.ledWF.setText(str(self.Q.q_dict['WF']))
 
 
-        if self.MSB_LSB_vis == 'off' or not is_fx():
+        if self.MSB_LSB_vis == 'off' or not get_fx():
             # Don't show any data
             self.lbl_MSB.setVisible(False)
             self.lbl_LSB.setVisible(False)

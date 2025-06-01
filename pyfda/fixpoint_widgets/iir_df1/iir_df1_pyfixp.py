@@ -15,7 +15,7 @@ import numpy as np
 from numpy.lib.function_base import iterable
 
 import pyfda.filterbroker as fb
-from pyfda.filterbroker import fb_get, fb_set, is_fx
+from pyfda.filterbroker import fb_get, fb_set, get_fx
 import pyfda.libs.pyfda_fix_lib as fx
 from pyfda.libs.pyfda_fix_lib import quant_coeffs
 
@@ -92,7 +92,7 @@ class IIR_DF1_pyfixp(object):
         None.
         """
         # Do not initialize filter unless fixpoint mode is active
-        if not is_fx():
+        if not get_fx():
             return
 
         self.p = p  # update parameter dictionary with coefficients etc.

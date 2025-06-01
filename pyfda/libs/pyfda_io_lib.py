@@ -41,7 +41,7 @@ import pyfda.libs.pyfda_fix_lib as fx
 from pyfda.pyfda_rc import params
 import pyfda.libs.pyfda_dirs as dirs
 import pyfda.filterbroker as fb  # importing filterbroker initializes all its globals
-from pyfda.filterbroker import is_fx, fb_get, fb_set
+from pyfda.filterbroker import get_fx, fb_get, fb_set
 from pyfda.version import __version__
 
 from .compat import QFileDialog
@@ -1496,7 +1496,7 @@ def export_coe_vhdl_package(f: TextIO) -> bool:
 
     WO = fb.fil[0]['fxq']['QO']['WI'] + fb.fil[0]['fxq']['QO']['WF'] + 1
 
-    if fb.fil[0]['fx_base'] == 'dec' or not is_fx():
+    if fb.fil[0]['fx_base'] == 'dec' or not get_fx():
         pre = ""
         post = ""
     elif fb.fil[0]['fx_base'] == 'hex':
@@ -1519,12 +1519,12 @@ def export_coe_vhdl_package(f: TextIO) -> bool:
         "VHDL FIR filter coefficient package file").replace("\n", "\n-- ")
 
     exp_str += "\nlibrary IEEE;\n"
-    if not is_fx():
+    if not get_fx():
         exp_str += "use IEEE.math_real.all;\n"
     exp_str += "USE IEEE.std_logic_1164.all;\n\n"
     exp_str += "package coeff_package is\n"
     exp_str += "constant n_taps: integer := {0:d};\n".format(len(bq)-1)
-    if not is_fx():
+    if not get_fx():
         exp_str += "type coeff_type is array(0 to n_taps) of real;\n"
     else:
         exp_str += "type coeff_type is array(0 to n_taps) of integer "

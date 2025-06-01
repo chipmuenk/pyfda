@@ -24,7 +24,7 @@ from pyfda.libs.compat import (
     QVBoxLayout, QHBoxLayout, pyqtSignal, QFrame, QSizePolicy)
 
 import pyfda.filterbroker as fb  # importing filterbroker initializes all its globals
-from pyfda.filterbroker import is_fx, fb_get, fb_set
+from pyfda.filterbroker import get_fx, fb_get, fb_set
 
 import pyfda.libs.pyfda_dirs as dirs
 from pyfda.libs.pyfda_lib import pprint_log
@@ -196,7 +196,7 @@ class Input_Fixpoint_Specs(QWidget):
 
         logger.debug(
             "SIG_RX: vis = %s, fx_sim = %s\n%s",
-            self.isVisible(), is_fx(), pprint_log(dict_sig))
+            self.isVisible(), get_fx(), pprint_log(dict_sig))
 
         if dict_sig['id'] == id(self):
             # logger.warning(f'Stopped infinite loop: "{first_item(dict_sig)}"')
@@ -215,7 +215,7 @@ class Input_Fixpoint_Specs(QWidget):
                 # New filter has been designed, update list of available filter topologies
                 self._update_filter_cmb()
 
-        if is_fx():  # fixpoint mode active
+        if get_fx():  # fixpoint mode active
             #  =================== UI_CHANGED =======================================
             if 'ui_global_changed' in dict_sig and dict_sig['ui_global_changed']\
                     in {'resized', 'tab'} and self.isVisible():
@@ -739,7 +739,7 @@ class Input_Fixpoint_Specs(QWidget):
         """
         if not fb_get('fx_mod_class_name'):  # no fixpoint filter available
             fb_set('qfrmt', 'float64')
-        is_fixp = is_fx()
+        is_fixp = get_fx()
 
         # fixpoint widgets are only visible in fixpoint mode
         self.frmTitle.setVisible(is_fixp)
