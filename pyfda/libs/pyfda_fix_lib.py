@@ -398,8 +398,6 @@ class Fixed(object):
     Additionally, the following keys from global dict `fb.fil[0]` define the
     number base and quantization/overflow behaviour for fixpoint numbers:
 
-    * **`'fx_sim'`** : Flag for fixpoint mode, default = False (floating point)
-
     * **`'fx_base'`** : Display format for fixpoint number base; default = 'dec'
 
       - 'dec'   : decimal (base = 10)
