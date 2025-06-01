@@ -281,7 +281,7 @@ class Input_Fixpoint_Specs(QWidget):
                 elif dict_sig['fx_sim'] == 'specs_changed' and not self.isVisible():
                     self.fx_specs_changed = True
                 else:
-                    logger.error('Unknown "fx_sim" command option "%s"\n\treceived from "%s".',
+                    logger.error("Unknown 'fx_sim' command option '%s'\n\treceived from '%s'.",
                                  dict_sig['fx_sim'], dict_sig['class'])
 
             # the next part is reached when fx_sim is active but no fx_sim command

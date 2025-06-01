@@ -432,7 +432,7 @@ class Plot_Impz(QWidget):
 
             # ---------------
             elif not dict_sig['fx_sim']:
-                logger.error('Missing value for key "fx_sim".')
+                logger.error("Missing value for key 'fx_sim'.")
 
             else:
                 logger.error(f"""Unknown value "{dict_sig['fx_sim']}" for "fx_sim" key\n"""

@@ -246,32 +246,32 @@ conf_settings = {
 # which can be modified by input widgets and design routines
 # ------------------------------------------------------------------------------
 fil_ref = {
-    "_id": [], # a list with the keyword 'pyfda' and the version, e.g. ['pyfda', 1]
+    '_id': [], # a list with the keyword 'pyfda' and the version, e.g. ['pyfda', 1]
     # amplitude specs (linear units)
-    "A_PB": 0.2056717652757185,
-    "A_PB2": 0.01,
-    "A_SB": 0.001,
-    "A_SB2": 0.0001,
+    'A_PB': 0.2056717652757185,
+    'A_PB2': 0.01,
+    'A_SB': 0.001,
+    'A_SB2': 0.0001,
     # frequency specs (normalized to F_S)
-    "F_C": 0.1,
-    "F_C2": 0.4,
-    "F_N": 0.2,
-    "F_N2": 0.4,
-    "F_PB": 0.1,
-    "F_PB2": 0.3,
-    "F_SB": 0.2,
-    "F_SB2": 0.4,
-    "N": 4,  # filter order
-    "T_S": 1.0,  # sample time
+    'F_C': 0.1,
+    'F_C2': 0.4,
+    'F_N': 0.2,
+    'F_N2': 0.4,
+    'F_PB': 0.1,
+    'F_PB2': 0.3,
+    'F_SB': 0.2,
+    'F_SB2': 0.4,
+    'N': 4,  # filter order
+    'T_S': 1.0,  # sample time
     # weights for pass- and stopbands
-    "W_PB": 1,
-    "W_PB2": 1,
-    "W_SB": 1,
-    "W_SB2": 1,
+    'W_PB': 1,
+    'W_PB2': 1,
+    'W_SB': 1,
+    'W_SB2': 1,
     #
-    "amp_specs_unit": "dB",
+    'amp_specs_unit': 'dB',
     # [b, a] coefficients:
-    "ba": [
+    'ba': [
         [
             0.005009993265049969,
             0.002969044992011087,
@@ -287,53 +287,53 @@ fil_ref = {
             0.639724627220979
         ]
     ],
-    "creator": [
-        "sos",
-        "pyfda.filter_widgets.ellip"
+    'creator': [
+        'sos',
+        'pyfda.filter_widgets.ellip'
     ],
-    "f_S": 1.0,
-    "f_S_prev": 1,  # previous sampling frequency
+    'f_S': 1.0,
+    'f_S_prev': 1,  # previous sampling frequency
     # 'f_s_wav': 16000,  # sampling frequency for wav files
-    "f_max": 1.0,
-    "f_s_scale": 1,
-    "fc": "Ellip",  # filter class
+    'f_max': 1.0,
+    'f_s_scale': 1,
+    'fc': 'Ellip',  # filter class
     # Window parameters for frequency domain analysis of transient signals
-    "tran_freq_win": {
-        "id": "rectangular",  # window id
-        "disp_name": "Rectangular",  # display name
-        "par_val": [],    # list of window parameters
-        "win_len": 32  # window length for window viewer
+    'tran_freq_win': {
+        'id': 'rectangular',  # window id
+        'disp_name': 'Rectangular',  # display name
+        'par_val': [],    # list of window parameters
+        'win_len': 32  # window length for window viewer
     },
     # parameter(s) of dynamically instantiated filter widgets
-    "filter_widgets": {
+    'filter_widgets': {
         # Equiripple FIR filters
-        "equiripple": {"grid_density": 16},
+        'equiripple': {'grid_density': 16},
         # Windowed FIR filters
-        "firwin":
-            {"id": "kaiser", # Window id
-             "disp_name": "Kaiser", # display name
-             "par_val": [10],    # list of window parameters
-             "win_len": 32  # window length for window viewer
+        'firwin':
+            {'id': 'kaiser', # Window id
+             'disp_name': 'Kaiser', # display name
+             'par_val': [10],    # list of window parameters
+             'win_len': 32  # window length for window viewer
             },
         # Moving Average filters
-        "ma":
-            {"delays": 5,
-             "stages": 2,
-             "normalize": True}
+        'ma':
+            {'delays': 5,
+             'stages': 2,
+             'normalize': True}
         },
-    "fo": "man",  # filter order, manual or min
-    "freqSpecsRange": [
+    'fo': 'man',  # filter order, manual or min
+    'freqSpecsRange': [
         0,
         0.5
     ],
-    "freqSpecsRangeType": "half",
-    "freq_locked": False, # don't update absolute frequencies when f_S is changed
-    "freq_specs_sort": True,  # sort freq. specs in ascending order
-    "freq_specs_unit": "f_S",
-    "ft": "IIR",  # filter type
-    "fx_base": "dec", # number format for fx display {'dec', 'hex', 'bin', 'oct', 'csd'}
+    'freqSpecsRangeType': 'half',
+    'freq_locked': False, # don't update absolute frequencies when f_S is changed
+    'freq_specs_sort': True,  # sort freq. specs in ascending order
+    'freq_specs_unit': 'f_S',
+    'ft': 'IIR',  # filter type
+    'fx_base': 'dec', # number format for fx display {'dec', 'hex', 'bin', 'oct', 'csd'}
     # string with current fixpoint module and class
-    "fx_mod_class_name": "pyfda.fixpoint_widgets.iir_df1.iir_df1_pyfixp_ui",
+    'fx_mod_class_name': 'pyfda.fixpoint_widgets.iir_df1.iir_df1_pyfixp_ui',
     # Settings for quantization subwidgets:
     #   'QI':input, 'QO': output, 'QCA': coeffs a, 'QCB': coeffs b, 'QACC': accumulator
     #    (more subwidgets can be added by fixpoint widget if needed)
@@ -344,64 +344,64 @@ fil_ref = {
     #   'N_over': number of overflows during last quantization process
     'fxq':{
         # accumulator quantization
-        "QACC": {
-            "N_over": 0,
-            "WF": 28,
-            "WI": 3,
-            "ovfl": "wrap",
-            "quant": "floor",
-            "w_a_m": "a"
+        'QACC': {
+            'N_over': 0,
+            'WF': 28,
+            'WI': 3,
+            'ovfl': 'wrap',
+            'quant': 'floor',
+            'w_a_m': 'a'
         },
         # 'a' coefficient quantization
-        "QCA": {
-            "N_over": 0,
-            "WF": 12,
-            "WI": 3,
-            "ovfl": "wrap",
-            "quant": "floor",
-            "w_a_m": "a"
+        'QCA': {
+            'N_over': 0,
+            'WF': 12,
+            'WI': 3,
+            'ovfl': 'wrap',
+            'quant': 'floor',
+            'w_a_m': 'a'
         },
         # 'b' coefficient quantization
-        "QCB": {
-            "N_over": 0,
-            "WF": 15,
-            "WI": 0,
-            "ovfl": "wrap",
-            "quant": "floor",
-            "w_a_m": "a"
+        'QCB': {
+            'N_over': 0,
+            'WF': 15,
+            'WI': 0,
+            'ovfl': 'wrap',
+            'quant': 'floor',
+            'w_a_m': 'a'
         },
         # input quantization
-        "QI": {
-            "N_over": 0,
-            "WF": 15,
-            "WI": 0,
-            "ovfl": "sat",
-            "quant": "round",
-            "w_a_m": "m"
+        'QI': {
+            'N_over': 0,
+            'WF': 15,
+            'WI': 0,
+            'ovfl': 'sat',
+            'quant': 'round',
+            'w_a_m': 'm'
         },
         # output quantization
-        "QO": {
-            "N_over": 0,
-            "WF": 15,
-            "WI": 0,
-            "ovfl": "wrap",
-            "quant": "floor",
-            "w_a_m": "m"
+        'QO': {
+            'N_over': 0,
+            'WF': 15,
+            'WI': 0,
+            'ovfl': 'wrap',
+            'quant': 'floor',
+            'w_a_m': 'm'
         }
     },
-    "info": "Ellip. LP (default)",
-    "plt_fLabel": "$F = f\\, /\\, f_S = \\Omega \\, /\\,  2 \\mathrm{\\pi} \\; \\rightarrow$",
-    "plt_fUnit": "f_S",
-    "plt_phiLabel": "$\\angle H(\\mathrm{e}^{\\mathrm{j} \\Omega})$ in rad $\\rightarrow $",
-    "plt_phiUnit": "rad",
-    "plt_tLabel": "$n = t\\, /\\, T_S \\; \\rightarrow$",
-    "plt_tUnit": "T_S",
+    'info': 'Ellip. LP (default)',
+    'plt_fLabel': '$F = f\\, /\\, f_S = \\Omega \\, /\\,  2 \\mathrm{\\pi} \\; \\rightarrow$',
+    'plt_fUnit': 'f_S',
+    'plt_phiLabel': '$\\angle H(\\mathrm{e}^{\\mathrm{j} \\Omega})$ in rad $\\rightarrow $',
+    'plt_phiUnit': 'rad',
+    'plt_tLabel': '$n = t\\, /\\, T_S \\; \\rightarrow$',
+    'plt_tUnit': 'T_S',
     'qfrmt': 'float64',  # global quantization format {'float64', 'float32', 'qint', 'qfrac'}
     'qfrmt_float_last': 'float64',  # last used float format
     'qfrmt_fx_last': 'qfrac',  # last used fixpoint format
-    "rt": "LP",  # filter response type
+    'rt': 'LP',  # filter response type
     # coefficients as second order sections
-    "sos": [
+    'sos': [
         [
             0.005009993265049969,
             0.005370024900373368,
@@ -419,11 +419,11 @@ fil_ref = {
             0.8935430745699543
         ]
     ],
-    "timestamp": 1717151329.1387591,  # time when filter was created
+    'timestamp': 1717151329.1387591,  # time when filter was created
     # 'timestamp': time.time(),
 
     # causal zeros/poles/gain
-    "zpk": [
+    'zpk': [
         [
             -0.5359313492330422+0.8442615642733304j,
             -0.5359313492330422-0.8442615642733304j,
@@ -444,8 +444,8 @@ fil_ref = {
         ]
     ],
     # Tab-specific infos
-    "tab_yn":{
-        "display_index_k": False
+    'tab_yn':{
+        'display_index_k': False
     }
 }
 
