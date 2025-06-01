@@ -334,7 +334,6 @@ fil_ref = {
     "fx_base": "dec", # number format for fx display {'dec', 'hex', 'bin', 'oct', 'csd'}
     # string with current fixpoint module and class
     "fx_mod_class_name": "pyfda.fixpoint_widgets.iir_df1.iir_df1_pyfixp_ui",
-    "fx_sim": False, # fixpoint simulation mode active
     # Settings for quantization subwidgets:
     #   'QI':input, 'QO': output, 'QCA': coeffs a, 'QCB': coeffs b, 'QACC': accumulator
     #    (more subwidgets can be added by fixpoint widget if needed)
@@ -589,14 +588,13 @@ def fb_set(*args, backup: bool = True, fil_dict=fil[0]) -> None:
             store_fil()  # backup old setting
 
         if args[-2] =='qfrmt' and len(args) == 2:
-            # keep current fixpoint / float format
+            # remember current fixpoint / float format
             if is_fx():
                 fil_dict['qfrmt_fx_last'] = fil[0]['qfrmt']
             else:
                 fil[0]['qfrmt_float_last'] = fil[0]['qfrmt']
-            # TODO: remove this later when all `fil[0]['fx_sim']` have been replaced
+            # and set new format
             fil_dict['qfrmt'] = val
-            fil_dict['fx_sim'] = is_fx()
         else:
             d[args[-2]] = val  # store new value if valid
     except KeyError:
