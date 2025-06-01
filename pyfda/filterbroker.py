@@ -611,19 +611,5 @@ def fb_set(*args, backup: bool = True, fil_dict=fil[0]) -> None:
 
     return 0
 
-# -------------------------
-def set_fil_dict(keys: list, arg, backup: bool = True) -> None:
-    """
-    - Set the value of `fb.fil[0]["key_0"]["key_1"]...["key_n]` to `arg`, nested keys
-      are passed as a list of strings, e.g. `keys=['fxq', 'QACC']` accesses
-      `fb.fil[0]['fxq']['QACC']`.
-    - Store the old state of `fb.fil[0]` before making any changes when
-      `backup == True`.
-    """
-    if backup:
-        store_fil()
-    key_list_to_dict(keys)[keys[-1]] = arg
-
-
 # Comparing nested dicts
 # https://stackoverflow.com/questions/27265939/comparing-python-dictionaries-and-nested-dictionaries
