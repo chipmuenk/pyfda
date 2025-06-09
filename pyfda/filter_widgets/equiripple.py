@@ -275,12 +275,15 @@ class Equiripple(QWidget):
             return popup_warning(self, self.N, "Equiripple")
         return True
 
-    def _save(self, arg, fil_dict: dict = fb.fil[0]) -> None:
+    def _save(self, arg, fil_dict: dict = fb.fil[0]) -> int:
         """
         Convert between poles / zeros / gain, filter coefficients (polynomes)
         and second-order sections and store all available formats in the passed
         dictionary 'fil_dict'.
         """
+        # verify whether filter order is low enough
+        if not self._test_n():
+            return -1
         try:
             fil_save(fil_dict, arg, self.FRMT, __name__)
         except Exception as e:
@@ -293,7 +296,7 @@ class Equiripple(QWidget):
             fb_set('N', self.N - 1)  # yes, update filterbroker
         return 0
 
-    def LPman(self, fil_dict):
+    def LPman(self, fil_dict) -> int:
         """
         Design a low-pass FIR filter with given order using the Remez exchange algorithm.
 
@@ -308,8 +311,8 @@ class Equiripple(QWidget):
                     - Other keys required by `_get_params`.
 
         Returns:
-            int: Returns -1 if the filter order (`self.N`) is too high, otherwise
-            the designed filter coefficients are saved in `fil_dict`.
+            int: Returns -1 if the filter order (`self.N`) is too high or another
+            error occurs, otherwise the designed filter coefficients are saved in `fb.fil[0]`.
 
         Notes:
             - The method `_get_params` is used to extract parameters from `fil_dict`.
@@ -319,15 +322,13 @@ class Equiripple(QWidget):
               used in the Remez algorithm.
         """
         self._get_params()
-        if not self._test_n():
-            return -1
-        self._save(
+        ret = self._save(
             remez(self.N,[0, self.F_PB, self.F_SB, 0.5], [1, 0],
                   weight = [fb_get('W_PB'), fb_get('W_SB')], fs = 1,
                   grid_density = self.grid_density))
-        return 0
+        return ret
 
-    def LPmin(self, fil_dict):
+    def LPmin(self, fil_dict) -> int:
         """
         Design a low-pass FIR filter using the Remez exchange algorithm.
 
@@ -350,35 +351,31 @@ class Equiripple(QWidget):
         (self.N, F, A, W) = remezord([self.F_PB, self.F_SB], [1, 0],
                                      [self.A_PB, self.A_SB], fs = 1, alg = self.alg)
         # A is always [1, 0] for LP filters
-        if not self._test_n():
-            return -1
         fb_set('W_PB', W[0])
         fb_set('W_SB', W[1])
-        self._save(
+        ret = self._save(
             remez(self.N, F, A, weight = W, fs = 1, grid_density = self.grid_density))
-        return 0
+        return ret
 
-    def HPman(self, fil_dict):
+    def HPman(self, fil_dict) -> int:
         """
         Design a low-pass FIR filter with given order using the Remez exchange algorithm.
         For more details, see the `LPman` method.
         """
         self._get_params()
-        if not self._test_n():
-            return -1
         if self.N % 2 == 0: # even order, use odd symmetry (type III)
-            self._save(
+            ret = self._save(
                 remez(self.N,[0, self.F_SB, self.F_PB, 0.5], [0, 1],
                       weight = [fb_get('W_SB'), fb_get('W_PB')], fs = 1,
                       type = 'hilbert', grid_density = self.grid_density))
         else: # odd order,
-            self._save(
+            ret = self._save(
                 remez(self.N,[0, self.F_SB, self.F_PB, 0.5], [0, 1],
                       weight = [fb_get('W_SB'), fb_get('W_PB')], fs = 1,
                       type = 'bandpass', grid_density = self.grid_density))
-        return 0
+        return ret
 
-    def HPmin(self, fil_dict):
+    def HPmin(self, fil_dict) -> int:
         """
         Design a high-pass FIR filter with minimum order using the Remez exchange algorithm.
         For more details, see the `LPmin` method.
@@ -388,37 +385,33 @@ class Equiripple(QWidget):
                                      [self.A_SB, self.A_PB], fs = 1, alg = self.alg)
         # A is always [0, 1] for HP filters
 
-        if not self._test_n():
-            return -1
 #        self.N = ceil_odd(N)  # enforce odd order
         fb_set('W_SB', W[0])
         fb_set('W_PB', W[1])
         if self.N % 2 == 0: # even order
-            self._save(
+            ret = self._save(
                 remez(self.N, F, A, weight = W, fs = 1, type = 'hilbert',
                       grid_density = self.grid_density))
         else:
-            self._save(
+            ret = self._save(
                 remez(self.N, F, A, weight = W, fs = 1, type = 'bandpass',
                       grid_density = self.grid_density))
-        return 0
+        return ret
 
     # For BP and BS, F_PB and F_SB have two elements each
-    def BPman(self, fil_dict):
+    def BPman(self, fil_dict) -> int:
         """
         Design a band-pass FIR filter with given order using the Remez exchange algorithm.
         For more details, see the `LPman` method.
         """
         self._get_params()
-        if not self._test_n():
-            return -1
-        self._save(
+        ret = self._save(
             remez(self.N, [0, self.F_SB, self.F_PB, self.F_PB2, self.F_SB2, 0.5], [0, 1, 0],
                   weight = [fb_get('W_SB'), fb_get('W_PB'), fb_get('W_SB2')], fs = 1,
                   grid_density = self.grid_density))
-        return 0
+        return ret
 
-    def BPmin(self, fil_dict):
+    def BPmin(self, fil_dict) -> int:
         """
         Design a band-pass FIR filter with minimum order using the Remez exchange algorithm.
         For more details, see the `LPmin` method.
@@ -427,31 +420,27 @@ class Equiripple(QWidget):
         (self.N, F, A, W) = remezord([self.F_SB, self.F_PB, self.F_PB2, self.F_SB2], [0, 1, 0],
                                      [self.A_SB, self.A_PB, self.A_SB2], fs = 1, alg = self.alg)
         # A is always [0, 1, 0] for BP filters
-        if not self._test_n():
-            return -1
         fb_set('W_SB', W[0])
         fb_set('W_PB', W[1])
         fb_set('W_SB2', W[2])
-        self._save(
+        ret = self._save(
             remez(self.N, F, A, weight = W, fs = 1, grid_density = self.grid_density))
-        return 0
+        return ret
 
-    def BSman(self, fil_dict):
+    def BSman(self, fil_dict) -> int:
         """
         Design a band-stop FIR filter with given order using the Remez exchange algorithm.
         For more details, see the `LPman` method.
         """
         self._get_params()
-        if not self._test_n():
-            return -1
         self.N = round_odd(self.N) # enforce odd order
-        self._save(
+        ret = self._save(
             remez(self.N,[0, self.F_PB, self.F_SB, self.F_SB2, self.F_PB2, 0.5], [1, 0, 1],
                   weight = [fb_get('W_PB'), fb_get('W_SB'), fb_get('W_PB2')], fs = 1,
                   grid_density = self.grid_density))
-        return 0
+        return ret
 
-    def BSmin(self, fil_dict):
+    def BSmin(self, fil_dict) -> int:
         """
         Design a band-stop FIR filter with minimum order using the Remez exchange algorithm.
         For more details, see the `LPmin` method.
@@ -460,38 +449,31 @@ class Equiripple(QWidget):
         (N, F, A, W) = remezord([self.F_PB, self.F_SB, self.F_SB2, self.F_PB2], [1, 0, 1],
                                 [self.A_PB, self.A_SB, self.A_PB2], fs = 1, alg = self.alg)
         # A is always [1, 0, 1] for BS filters
-        self.N = round_odd(N)  # enforce odd order
-        if not self._test_n():
-            return -1
         fb_set('W_PB', W[0])
         fb_set('W_SB', W[1])
         fb_set('W_PB2', W[2])
-        self._save(
+        ret = self._save(
             remez(self.N, F, A, weight = W, fs = 1, grid_density = self.grid_density))
-        return 0
+        return ret
 
-    def HILman(self, fil_dict):
+    def HILman(self, fil_dict) -> int:
         """
         Design a Hilbert FIR filter with given order using the Remez exchange algorithm.
         The Hilbert filter is a special case of the band-pass filter with a wide passband,
         used to shift the phase of the input signal by 90 degrees.
         """
         self._get_params()
-        if not self._test_n():
-            return -1
-        self._save(
+        ret = self._save(
             remez(self.N,[0, self.F_SB, self.F_PB, self.F_PB2, self.F_SB2, 0.5], [0, 1, 0],
                   weight = [fb_get('W_SB'), fb_get('W_PB'), fb_get('W_SB2')], fs = 1,
                   type = 'hilbert', grid_density = self.grid_density))
-        return 0
+        return ret
 
-    def DIFFman(self, fil_dict):
+    def DIFFman(self, fil_dict) -> int:
         """
         Design a FIR differentiator with given order using the Remez exchange algorithm.
         """
         self._get_params()
-        if not self._test_n():
-            return -1
         self.N = ceil_even(self.N) # enforce even order
         if self.F_PB < 0.1:
             logger.warning(
@@ -501,14 +483,15 @@ class Equiripple(QWidget):
             fil_dict['F_PB'] = self.F_PB
             self.emit({'specs_changed': 'equiripple'})
 
-        self._save(
+        ret = self._save(
             remez(self.N, [0, self.F_PB], [np.pi * fb_get('W_PB')], fs = 1,
                   type = 'differentiator', grid_density = self.grid_density))
-        return 0
+        return ret
 
 #------------------------------------------------------------------------------
 
 if __name__ == '__main__':
+    # run module standalone using "python -m pyfda.filter_widgets.equiripple"
     import sys
     from pyfda.libs.compat import QApplication, QFrame
 
@@ -535,4 +518,3 @@ if __name__ == '__main__':
 
     app.exec_()
     #------------------------------------------------------------------------------
-# test using "python -m pyfda.filter_widgets.equiripple"
