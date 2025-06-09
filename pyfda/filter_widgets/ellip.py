@@ -31,6 +31,7 @@ API version info:
          self.wdg and self.hdl
 
    :2.2: Rename `filter_classes` -> `classes`, remove Py2 compatibility
+   TODO: Remove fil_dict from method signatures
 """
 from scipy.signal import ellip, ellipord
 
