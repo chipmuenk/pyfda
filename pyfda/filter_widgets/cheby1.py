@@ -140,7 +140,7 @@ class Cheby1():
             fb_set('A_SB2', fb_get('A_SB'))
 
     #--------------------------------------------------------------------------
-    def _test_n(self):
+    def _test_n(self) -> bool:
         """
         Warn the user if the calculated order is too high for a reasonable filter
         design.
