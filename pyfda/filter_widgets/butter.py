@@ -177,7 +177,7 @@ class Butter():
         return True
 
     #--------------------------------------------------------------------------
-    def _save(self, arg, fil_dict: dict = fb.fil[0]) -> None:
+    def _save(self, arg, fil_dict: dict = fb.fil[0]) -> int:
         """
         Convert results of filter design to all available formats (pz, ba, sos)
         and store them in the global filter dictionary.
@@ -189,6 +189,8 @@ class Butter():
         new values for filter order N (doubled for BP and BS designs)
         and corner frequency(s) F_PBC.
         """
+        if not self._test_n():
+            return -1
         fil_save(fil_dict, arg, self.FRMT, __name__) # save & convert
 
         if fb_get('fo') == 'min':
@@ -201,6 +203,7 @@ class Butter():
                 fil_dict['F_C'] = self.F_PBC[0] / 2.
                 fil_dict['F_C2'] = self.F_PBC[1] / 2.
                 fil_dict['N'] = self.N * 2
+        return 0
 
     #------------------------------------------------------------------------------
     #
@@ -214,20 +217,16 @@ class Butter():
         self._get_params()
         self.N, self.F_PBC = buttord(
             self.F_PB, self.F_SB, self.A_PB, self.A_SB, analog = self.analog)
-        if not self._test_n():
-            return -1
-        self._save(
+        ret = self._save(
             butter(self.N, self.F_PBC, btype='low', analog=self.analog, output=self.FRMT))
-        return 0
+        return ret
 
     def LPman(self, fil_dict: dict) -> int:
         """Butterworth LP filter, fixed order"""
         self._get_params()
-        if not self._test_n():
-            return -1
-        self._save(
+        ret = self._save(
             butter(self.N, self.F_C, btype='low', analog=self.analog, output=self.FRMT))
-        return 0
+        return ret
 
     # HP: F_SB < F_PB -------------------------------------------------------
     def HPmin(self, fil_dict: dict) -> int:
@@ -235,20 +234,16 @@ class Butter():
         self._get_params()
         self.N, self.F_PBC = buttord(
             self.F_PB,self.F_SB, self.A_PB, self.A_SB, analog = self.analog)
-        if not self._test_n():
-            return -1
-        self._save(
+        ret = self._save(
             butter(self.N, self.F_PBC, btype='highpass', analog=self.analog, output=self.FRMT))
-        return 0
+        return ret
 
     def HPman(self, fil_dict: dict) -> int:
         """Butterworth HP filter, fixed order"""
         self._get_params()
-        if not self._test_n():
-            return -1
-        self._save(
+        ret = self._save(
             butter(self.N, self.F_PB, btype='highpass', analog=self.analog, output=self.FRMT))
-        return 0
+        return ret
 
     # For BP and BS, F_xx have two elements each,  A_xx only have one element.
     # The min. filter order and the design algorithms use half the actual filter order,
@@ -261,21 +256,17 @@ class Butter():
         self.N, self.F_PBC = buttord(
             [self.F_PB, self.F_PB2], [self.F_SB, self.F_SB2], self.A_PB, self.A_SB,
             analog = self.analog)
-        if not self._test_n():
-            return -1
-        self._save(
+        ret = self._save(
             butter(self.N, self.F_PBC, btype='bandpass', analog=self.analog, output=self.FRMT))
-        return 0
+        return ret
 
     def BPman(self, fil_dict: dict) -> int:
         """Butterworth BP filter, fixed order"""
         self._get_params()
-        if not self._test_n():
-            return -1
-        self._save(
+        ret = self._save(
             butter(self.N//2, [self.F_C, self.F_C2], btype='bandpass',
                    analog=self.analog, output=self.FRMT))
-        return 0
+        return ret
 
     # BS: F_SB[0] > F_PB[0], F_SB[1] < F_PB[1] --------------------------------
     def BSmin(self, fil_dict: dict) -> int:
@@ -284,21 +275,19 @@ class Butter():
         self.N, self.F_PBC = buttord(
             [self.F_PB, self.F_PB2], [self.F_SB, self.F_SB2], self.A_PB, self.A_SB,
             analog = self.analog)
-        if not self._test_n():
-            return -1
-        self._save(
+        ret = self._save(
             butter(self.N, self.F_PBC, btype='bandstop', analog=self.analog, output=self.FRMT))
-        return 0
+        return ret
 
     def BSman(self, fil_dict: dict) -> int:
         """Butterworth BS filter, fixed order"""
         self._get_params()
         if not self._test_n():
             return -1
-        self._save(
+        ret = self._save(
             butter(self.N//2, [self.F_C, self.F_C2], btype='bandstop',
                    analog=self.analog, output=self.FRMT))
-        return 0
+        return ret
 
 #------------------------------------------------------------------------------
 

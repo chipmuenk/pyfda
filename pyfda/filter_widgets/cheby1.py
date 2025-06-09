@@ -150,7 +150,7 @@ class Cheby1():
         return True
 
     #--------------------------------------------------------------------------
-    def _save(self, arg, fil_dict: dict = fb.fil[0]) -> None:
+    def _save(self, arg, fil_dict: dict = fb.fil[0]) -> int:
         """
         Convert results of filter design to all available formats (pz, ba, sos)
         and store them in the global filter dictionary.
@@ -162,6 +162,8 @@ class Cheby1():
         new values for filter order N (doubled for BP and BS designs)
         and corner frequency(s) F_PBC.
         """
+        if not self._test_n():
+            return -1
         fil_save(fil_dict, arg, self.FRMT, __name__)
 
         if fb_get('fo') == 'min':
@@ -172,6 +174,7 @@ class Cheby1():
                 fb_set('F_C', self.F_PBC[0] / 2.)
                 fb_set('F_C2', self.F_PBC[1] / 2.)
                 fb_set('N', self.N * 2)
+        return 0
 
     #------------------------------------------------------------------------------
     #
@@ -185,22 +188,18 @@ class Cheby1():
         self._get_params()
         self.N, self.F_PBC = cheb1ord(
             self.F_PB, self.F_SB, self.A_PB, self.A_SB, analog=self.analog)
-        if not self._test_n():
-            return -1
-        self._save(
+        ret = self._save(
             cheby1(self.N, self.A_PB, self.F_PBC, btype='low',
                    analog=self.analog, output=self.FRMT))
-        return 0
+        return ret
 
     def LPman(self, fil_dict: dict) -> int:
         """Cheby1 LP filter, manual order"""
         self._get_params()
-        if not self._test_n():
-            return -1
-        self._save(
+        ret = self._save(
             cheby1(self.N, self.A_PB, self.F_C, btype='low',
                    analog=self.analog, output=self.FRMT))
-        return 0
+        return ret
 
     # HP: F_SB < F_PB ---------------------------------------------------------
     def HPmin(self, fil_dict: dict) -> int:
@@ -208,22 +207,18 @@ class Cheby1():
         self._get_params()
         self.N, self.F_PBC = cheb1ord(
             self.F_PB,self.F_SB, self.A_PB, self.A_SB, analog=self.analog)
-        if not self._test_n():
-            return -1
-        self._save(
+        ret = self._save(
             cheby1(self.N, self.A_PB, self.F_PBC, btype='highpass',
                    analog=self.analog, output=self.FRMT))
-        return 0
+        return ret
 
     def HPman(self, fil_dict: dict) -> int:
         """Cheby1 HP filter, manual order"""
         self._get_params()
-        if not self._test_n():
-            return -1
-        self._save(cheby1(
+        ret = self._save(cheby1(
             self.N, self.A_PB, self.F_C, btype='highpass',
             analog=self.analog, output=self.FRMT))
-        return 0
+        return ret
 
     # For BP and BS, A_PB, F_PB and F_stop have two elements each.
     # The min. filter order and the design algorithms use half the actual filter order,
@@ -236,22 +231,18 @@ class Cheby1():
         self.N, self.F_PBC = cheb1ord(
             [self.F_PB, self.F_PB2], [self.F_SB, self.F_SB2], self.A_PB, self.A_SB,
             analog=self.analog)
-        if not self._test_n():
-            return -1
-        self._save(
+        ret = self._save(
             cheby1(self.N, self.A_PB, self.F_PBC, btype='bandpass',
                    analog=self.analog, output=self.FRMT))
-        return 0
+        return ret
 
     def BPman(self, fil_dict: dict) -> int:
         """Cheby1 BP filter, manual order"""
         self._get_params()
-        if not self._test_n():
-            return -1
-        self._save(
+        ret = self._save(
             cheby1(self.N//2, self.A_PB,[self.F_C, self.F_C2], btype='bandpass',
                    analog=self.analog, output=self.FRMT))
-        return 0
+        return ret
 
     # BS: F_SB[0] > F_PB[0], F_SB[1] < F_PB[1] --------------------------------
     def BSmin(self, fil_dict: dict) -> int:
@@ -260,22 +251,18 @@ class Cheby1():
         self.N, self.F_PBC = cheb1ord(
             [self.F_PB, self.F_PB2], [self.F_SB, self.F_SB2], self.A_PB,self.A_SB,
             analog = self.analog)
-        if not self._test_n():
-            return -1
-        self._save(
+        ret = self._save(
             cheby1(self.N, self.A_PB, self.F_PBC, btype='bandstop',
                    analog=self.analog, output=self.FRMT))
-        return 0
+        return ret
 
     def BSman(self, fil_dict: dict) -> int:
         """Cheby1 BS filter, manual order"""
         self._get_params()
-        if not self._test_n():
-            return -1
-        self._save(
+        ret = self._save(
             cheby1(self.N//2, self.A_PB, [self.F_C, self.F_C2], btype='bandstop',
                    analog=self.analog, output=self.FRMT))
-        return 0
+        return ret
 
 #------------------------------------------------------------------------------
 

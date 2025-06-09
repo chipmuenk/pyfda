@@ -7,6 +7,8 @@
 # (see file LICENSE in root directory for details)
 
 """
+# TODO: fb.fil\[0\]\['([\s\S\r]*?)'\] -> fb_get('$1')
+
 Dynamic parameters and settings are exchanged via the dictionaries in this file.
 Importing ``filterbroker.py`` runs the module once, defining all module variables
 which have a global scope like class variables and can be imported like
