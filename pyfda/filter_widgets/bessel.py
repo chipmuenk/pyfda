@@ -191,7 +191,7 @@ class Bessel():
             return popup_warning(None, self.N, "Bessel")
         return True
 
-    def _save(self, arg, fil_dict: dict = fb.fil[0]) -> None:
+    def _save(self, arg, fil_dict: dict = fb.fil[0]) -> int:
         """
         Convert results of filter design to all available formats (pz, ba, sos)
         and store them in the global filter dictionary.
@@ -203,6 +203,8 @@ class Bessel():
         new values for filter order N (doubled for BP and BS designs)
         and corner frequency(s) F_PBC.
         """
+        if not self._test_n():
+            return -1
         fil_save(fil_dict, arg, self.FRMT, __name__)
 
         fb_set('N', self.N) # always save, might have been limited by _test_n
@@ -213,46 +215,39 @@ class Bessel():
                 fb_set('F_C', self.F_PBC[0] / 2.)
                 fb_set('F_C2', self.F_PBC[1] / 2.)
                 fb_set('N', self.N * 2)
+        return 0
 
     # LP: F_PB < F_SB
     def LPmin(self, fil_dict: dict) -> int:
         """Bessel LP filter, minimum order"""
         self._get_params()
         self.N, self.F_PBC = buttord(self.F_PB, self.F_SB, self.A_PB, self.A_SB)
-        if not self._test_n():
-            return -1
-        self._save(
+        ret = self._save(
             bessel(self.N, self.F_PBC, btype='low', analog=False, output=self.FRMT))
-        return 0
+        return ret
 
     def LPman(self, fil_dict: dict) -> int:
         """Bessel LP filter, manual order"""
         self._get_params()
-        if not self._test_n():
-            return -1
-        self._save(
+        ret = self._save(
             bessel(self.N, self.F_C, btype='low', analog=False, output=self.FRMT))
-        return 0
+        return ret
 
     # HP: F_SB < F_PB
     def HPmin(self, fil_dict: dict) -> int:
         """Bessel HP filter, minimum order"""
         self._get_params()
         self.N, self.F_PBC = buttord(self.F_PB, self.F_SB, self.A_PB,self.A_SB)
-        if not self._test_n():
-            return -1
-        self._save(
+        ret = self._save(
             bessel(self.N, self.F_PBC, btype='highpass', analog=False, output=self.FRMT))
-        return 0
+        return ret
 
     def HPman(self, fil_dict: dict) -> int:
         """Bessel HP filter, manual order"""
         self._get_params()
-        if not self._test_n():
-            return -1
-        self._save(
+        ret = self._save(
             bessel(self.N, self.F_C, btype='highpass', analog=False, output=self.FRMT))
-        return 0
+        return ret
 
     # For BP and BS, A_PB, F_PB and F_stop have two elements each.
     # The min. filter order and the design algorithms use half the actual filter order,
@@ -264,21 +259,17 @@ class Bessel():
         self._get_params()
         self.N, self.F_PBC = buttord(
             [self.F_PB, self.F_PB2], [self.F_SB, self.F_SB2], self.A_PB, self.A_SB)
-        if not self._test_n():
-            return -1
-        self._save(
+        ret = self._save(
             bessel(self.N, self.F_PBC, btype='bandpass', analog=False, output=self.FRMT))
-        return 0
+        return ret
 
     def BPman(self, fil_dict: dict) -> int:
         """Bessel BP filter, manual order"""
         self._get_params()
-        if not self._test_n():
-            return -1
-        self._save(
+        ret = self._save(
             bessel(self.N//2, [self.F_C,self. F_C2], btype='bandpass',
                    analog=False, output=self.FRMT))
-        return 0
+        return ret
 
     # BS: F_SB[0] > F_PB[0], F_SB[1] < F_PB[1]
     def BSmin(self, fil_dict: dict) -> int:
@@ -286,21 +277,17 @@ class Bessel():
         self._get_params()
         self.N, self.F_PBC = buttord(
             [self.F_PB, self.F_PB2], [self.F_SB, self.F_SB2], self.A_PB,self.A_SB)
-        if not self._test_n():
-            return -1
-        self._save(
+        ret = self._save(
             bessel(self.N, self.F_PBC, btype='bandstop', analog=False, output=self.FRMT))
-        return 0
+        return ret
 
     def BSman(self, fil_dict: dict) -> int:
         """Bessel BS filter, manual order"""
         self._get_params()
-        if not self._test_n():
-            return -1
-        self._save(
+        ret = self._save(
             bessel(self.N//2, [self.F_C, self.F_C2], btype='bandstop',
                    analog=False, output=self.FRMT))
-        return 0
+        return ret
 #------------------------------------------------------------------------------
 
 if __name__ == '__main__':
