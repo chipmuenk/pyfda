@@ -194,8 +194,9 @@ class Equiripple(QWidget):
         self.led_remez_1 = QLineEdit(self)
         self.led_remez_1.setText(str(self.grid_density))
         self.led_remez_1.setObjectName('wdg_led_remez_1')
-        self.led_remez_1.setToolTip("Number of frequency points for Remez algorithm. Increase the\n"
-                                    "number to reduce frequency overshoot in the transition region.")
+        self.led_remez_1.setToolTip(
+            "Number of frequency points for Remez algorithm. Increase the\n"
+            "number to reduce frequency overshoot in the transition region.")
 
         self.layHWin = QHBoxLayout()
         self.layHWin.setObjectName('wdg_layGWin')
@@ -348,12 +349,13 @@ class Equiripple(QWidget):
         self._get_params()
         (self.N, F, A, W) = remezord([self.F_PB, self.F_SB], [1, 0],
                                      [self.A_PB, self.A_SB], fs = 1, alg = self.alg)
+        # A is always [1, 0] for LP filters
         if not self._test_n():
             return -1
         fb_set('W_PB', W[0])
         fb_set('W_SB', W[1])
         self._save(
-            remez(self.N, F, [1, 0], weight = W, fs = 1, grid_density = self.grid_density))
+            remez(self.N, F, A, weight = W, fs = 1, grid_density = self.grid_density))
         return 0
 
     def HPman(self, fil_dict):
@@ -384,6 +386,8 @@ class Equiripple(QWidget):
         self._get_params()
         (self.N, F, A, W) = remezord([self.F_SB, self.F_PB], [0, 1],
                                      [self.A_SB, self.A_PB], fs = 1, alg = self.alg)
+        # A is always [0, 1] for HP filters
+
         if not self._test_n():
             return -1
 #        self.N = ceil_odd(N)  # enforce odd order
@@ -391,11 +395,11 @@ class Equiripple(QWidget):
         fb_set('W_PB', W[1])
         if self.N % 2 == 0: # even order
             self._save(
-                remez(self.N, F, [0, 1], weight = W, fs = 1, type = 'hilbert',
+                remez(self.N, F, A, weight = W, fs = 1, type = 'hilbert',
                       grid_density = self.grid_density))
         else:
             self._save(
-                remez(self.N, F, [0, 1], weight = W, fs = 1, type = 'bandpass',
+                remez(self.N, F, A, weight = W, fs = 1, type = 'bandpass',
                       grid_density = self.grid_density))
         return 0
 
@@ -422,13 +426,14 @@ class Equiripple(QWidget):
         self._get_params()
         (self.N, F, A, W) = remezord([self.F_SB, self.F_PB, self.F_PB2, self.F_SB2], [0, 1, 0],
                                      [self.A_SB, self.A_PB, self.A_SB2], fs = 1, alg = self.alg)
+        # A is always [0, 1, 0] for BP filters
         if not self._test_n():
             return -1
         fb_set('W_SB', W[0])
         fb_set('W_PB', W[1])
         fb_set('W_SB2', W[2])
         self._save(
-            remez(self.N, F, [0, 1, 0], weight = W, fs = 1, grid_density = self.grid_density))
+            remez(self.N, F, A, weight = W, fs = 1, grid_density = self.grid_density))
         return 0
 
     def BSman(self, fil_dict):
@@ -454,6 +459,7 @@ class Equiripple(QWidget):
         self._get_params()
         (N, F, A, W) = remezord([self.F_PB, self.F_SB, self.F_SB2, self.F_PB2], [1, 0, 1],
                                 [self.A_PB, self.A_SB, self.A_PB2], fs = 1, alg = self.alg)
+        # A is always [1, 0, 1] for BS filters
         self.N = round_odd(N)  # enforce odd order
         if not self._test_n():
             return -1
@@ -461,7 +467,7 @@ class Equiripple(QWidget):
         fb_set('W_SB', W[1])
         fb_set('W_PB2', W[2])
         self._save(
-            remez(self.N, F, [1, 0, 1], weight = W, fs = 1, grid_density = self.grid_density))
+            remez(self.N, F, A, weight = W, fs = 1, grid_density = self.grid_density))
         return 0
 
     def HILman(self, fil_dict):
