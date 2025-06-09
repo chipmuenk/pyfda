@@ -14,6 +14,11 @@ which have a global scope like class variables and can be imported like
 >>> import filterbroker as fb
 >>> myfil = fb.fil[0]
 
+Better:
+
+>>> import pyfda.filterbroker as fb
+
+
 The entries in this file are only used as initial / default entries and to
 demonstrate the structure of the global dicts and lists.
 These initial values are also handy for module-level testing where some useful
@@ -34,6 +39,8 @@ More info on data persistence and storing / accessing global variables:
 * http://pymotw.com/2/articles/data_persistence.html
 * http://stackoverflow.com/questions/9058305/getting-attributes-of-a-class
 * http://stackoverflow.com/questions/2447353/getattr-on-a-module
+
+# TODO: fb.fil\['([\s\S\r]*?)'\] or fil_dict\['([\s\S\r]*?)'\] -> fb_get('$1')
 
 """
 import logging
