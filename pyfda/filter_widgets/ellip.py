@@ -31,13 +31,15 @@ API version info:
          self.wdg and self.hdl
 
    :2.2: Rename `filter_classes` -> `classes`, remove Py2 compatibility
+   TODO: Remove fil_dict from method signatures
 """
 from scipy.signal import ellip, ellipord
 
 from pyfda.libs.pyfda_lib import lin2unit
 from pyfda.libs.pyfda_qt_lib import popup_warning
 from pyfda.libs.pyfda_sig_lib import fil_save
-
+from pyfda.filterbroker import fb_get, fb_set
+import pyfda.filterbroker as fb
 
 from .common import Common
 
@@ -103,34 +105,34 @@ class Ellip():
         self.info_doc.append(ellipord.__doc__)
 
     #--------------------------------------------------------------------------
-    def _get_params(self, fil_dict: dict) -> None:
+    def _get_params(self) -> None:
         """
         Translate parameters from the passed dictionary to instance
         parameters, scaling / transforming them if needed.
         """
         # Frequencies are normalized to f_Nyq = f_S/2, ripple specs are in dB
         self.analog = False # set to True for analog filters
-        self.N     = fil_dict['N']
-        self.F_PB  = fil_dict['F_PB'] * 2
-        self.F_SB  = fil_dict['F_SB'] * 2
-        self.F_C   = fil_dict['F_C']  * 2
-        self.F_C2  = fil_dict['F_C2']  * 2
-        self.F_PB2 = fil_dict['F_PB2'] * 2
-        self.F_SB2 = fil_dict['F_SB2'] * 2
+        self.N     = fb_get('N')
+        self.F_PB  = fb_get('F_PB') * 2
+        self.F_SB  = fb_get('F_SB') * 2
+        self.F_C   = fb_get('F_C')  * 2
+        self.F_C2  = fb_get('F_C2')  * 2
+        self.F_PB2 = fb_get('F_PB2') * 2
+        self.F_SB2 = fb_get('F_SB2') * 2
         self.F_PBC = None
 
-        self.A_PB = lin2unit(fil_dict['A_PB'], 'IIR', 'A_PB', unit='dB')
-        self.A_SB = lin2unit(fil_dict['A_SB'], 'IIR', 'A_SB', unit='dB')
+        self.A_PB = lin2unit(fb_get('A_PB'), 'IIR', 'A_PB', unit='dB')
+        self.A_SB = lin2unit(fb_get('A_SB'), 'IIR', 'A_SB', unit='dB')
 
         # ellip filter routines support only one amplitude spec for
         # pass- and stop band each
-        if str(fil_dict['rt']) == 'BS':
-            fil_dict['A_PB2'] = fil_dict['A_PB']
-        elif str(fil_dict['rt']) == 'BP':
-            fil_dict['A_SB2'] = fil_dict['A_SB']
+        if fb_get('rt') == 'BS':
+            fb_set('A_PB2', fb_get('A_PB'))
+        elif fb_get('rt') == 'BP':
+            fb_set('A_SB2', fb_get('A_SB'))
 
     #--------------------------------------------------------------------------
-    def _test_n(self):
+    def _test_n(self) -> bool:
         """
         Warn the user if the calculated order N is too high for a reasonable filter
         design.
@@ -140,7 +142,7 @@ class Ellip():
         return True
 
     #--------------------------------------------------------------------------
-    def _save(self, fil_dict, arg):
+    def _save(self, arg, fil_dict: dict = fb.fil[0]) -> None:
         """
         Convert results of filter design to all available formats (pz, ba, sos)
         and store them in the global filter dictionary.
@@ -154,19 +156,19 @@ class Ellip():
         """
         fil_save(fil_dict, arg, self.FRMT, __name__)
 
-        if str(fil_dict['fo']) == 'min':
-            if str(fil_dict['rt']) == 'LP' or str(fil_dict['rt']) == 'HP':
+        if fb_get('fo') == 'min':
+            if fb_get('rt') in {'LP', 'HP'}:
                 # HP or LP - single  corner frequency
-                fil_dict['F_PB'] = self.F_PBC / 2.
-                fil_dict['F_C'] = self.F_PBC / 2.
-                fil_dict['N'] = self.N
+                fb_set('F_PB', self.F_PBC / 2.)
+                fb_set('F_C', self.F_PBC / 2.)
+                fb_set('N', self.N)
             else:
                 # BP or BS - two corner frequencies; order needs to be doubled
-                fil_dict['F_PB'] = self.F_PBC[0] / 2.
-                fil_dict['F_C'] = self.F_PBC[0] / 2.
-                fil_dict['F_PB2'] = self.F_PBC[1] / 2.
-                fil_dict['F_C2'] = self.F_PBC[1] / 2.
-                fil_dict['N'] = self.N * 2
+                fb_set('F_PB', self.F_PBC[0] / 2.)
+                fb_set('F_C', self.F_PBC[0] / 2.)
+                fb_set('F_PB2', self.F_PBC[1] / 2.)
+                fb_set('F_C2', self.F_PBC[1] / 2.)
+                fb_set('N', self.N * 2)
 
     #------------------------------------------------------------------------------
     #
@@ -177,47 +179,47 @@ class Ellip():
     # LP: F_PB < F_SB -------------------------------------------------------
     def LPmin(self, fil_dict: dict) -> int:
         """Elliptic LP filter, minimum order"""
-        self._get_params(fil_dict)
+        self._get_params()
         self.N, self.F_PBC = ellipord(
             self.F_PB,self.F_SB, self.A_PB,self.A_SB, analog=self.analog)
         if not self._test_n():
             return -1
-        self._save(fil_dict, ellip(
-            self.N, self.A_PB, self.A_SB, self.F_PBC, btype='low',
-            analog=self.analog, output=self.FRMT))
+        self._save(
+            ellip(self.N, self.A_PB, self.A_SB, self.F_PBC, btype='low',
+                  analog=self.analog, output=self.FRMT))
         return 0
 
     def LPman(self, fil_dict: dict) -> int:
         """Elliptic LP filter, manual order"""
-        self._get_params(fil_dict)
+        self._get_params()
         if not self._test_n():
             return -1
-        self._save(fil_dict, ellip(
-            self.N, self.A_PB, self.A_SB, self.F_C, btype='low',
-            analog=self.analog, output=self.FRMT))
+        self._save(
+            ellip(self.N, self.A_PB, self.A_SB, self.F_C, btype='low',
+                  analog=self.analog, output=self.FRMT))
         return 0
 
     # HP: F_SB < F_PB -------------------------------------------------------
     def HPmin(self, fil_dict: dict) -> int:
         """Elliptic HP filter, minimum order"""
-        self._get_params(fil_dict)
+        self._get_params()
         self.N, self.F_PBC = ellipord(
             self.F_PB,self.F_SB, self.A_PB, self.A_SB, analog=self.analog)
         if not self._test_n():
             return -1
-        self._save(fil_dict, ellip(
-            self.N, self.A_PB, self.A_SB, self.F_PBC, btype='highpass',
-            analog=self.analog, output=self.FRMT))
+        self._save(
+            ellip(self.N, self.A_PB, self.A_SB, self.F_PBC, btype='highpass',
+                  analog=self.analog, output=self.FRMT))
         return 0
 
     def HPman(self, fil_dict: dict) -> int:
         """Elliptic HP filter, manual order"""
-        self._get_params(fil_dict)
+        self._get_params()
         if not self._test_n():
             return -1
-        self._save(fil_dict, ellip(
-            self.N, self.A_PB, self.A_SB, self.F_C, btype='highpass',
-            analog=self.analog, output=self.FRMT))
+        self._save(
+            ellip(self.N, self.A_PB, self.A_SB, self.F_C, btype='highpass',
+                  analog=self.analog, output=self.FRMT))
         return 0
 
     # For BP and BS, F_XX have two elements each, A_XX has only one.
@@ -227,57 +229,56 @@ class Ellip():
     # BP: F_SB[0] < F_PB[0], F_SB[1] > F_PB[1] --------------------------------
     def BPmin(self, fil_dict: dict) -> int:
         """Elliptic BP filter, minimum order"""
-        self._get_params(fil_dict)
+        self._get_params()
         self.N, self.F_PBC = ellipord(
             [self.F_PB, self.F_PB2], [self.F_SB, self.F_SB2], self.A_PB, self.A_SB,
             analog=self.analog)
         if not self._test_n():
             return -1
-        self._save(fil_dict, ellip(
-            self.N, self.A_PB, self.A_SB, self.F_PBC, btype='bandpass',
-            analog=self.analog, output=self.FRMT))
+        self._save(
+            ellip(self.N, self.A_PB, self.A_SB, self.F_PBC, btype='bandpass',
+                  analog=self.analog, output=self.FRMT))
         return 0
 
     def BPman(self, fil_dict: dict) -> int:
         """Elliptic BP filter, manual order"""
-        self._get_params(fil_dict)
+        self._get_params()
         if not self._test_n():
             return -1
-        self._save(fil_dict, ellip(
-            self.N//2, self.A_PB, self.A_SB, [self.F_C,self.F_C2], btype='bandpass',
-            analog=self.analog, output=self.FRMT))
+        self._save(
+            ellip(self.N//2, self.A_PB, self.A_SB, [self.F_C,self.F_C2], btype='bandpass',
+                  analog=self.analog, output=self.FRMT))
         return 0
 
     # BS: F_SB[0] > F_PB[0], F_SB[1] < F_PB[1] --------------------------------
     def BSmin(self, fil_dict: dict) -> int:
         """Elliptic BP filter, minimum order"""
-        self._get_params(fil_dict)
+        self._get_params()
         self.N, self.F_PBC = ellipord(
             [self.F_PB, self.F_PB2], [self.F_SB, self.F_SB2], self.A_PB,self.A_SB,
             analog=self.analog)
         if not self._test_n():
             return -1
-        self._save(fil_dict, ellip(
-            self.N, self.A_PB, self.A_SB, self.F_PBC, btype='bandstop',
-            analog=self.analog, output=self.FRMT))
+        self._save(
+            ellip(self.N, self.A_PB, self.A_SB, self.F_PBC, btype='bandstop',
+                  analog=self.analog, output=self.FRMT))
         return 0
 
     def BSman(self, fil_dict: dict) -> int:
         """Elliptic BS filter, manual order"""
-        self._get_params(fil_dict)
+        self._get_params()
         if not self._test_n():
             return -1
-        self._save(fil_dict, ellip(
-            self.N//2, self.A_PB, self.A_SB, [self.F_C,self.F_C2], btype='bandstop',
-            analog=self.analog, output=self.FRMT))
+        self._save(
+            ellip(self.N//2, self.A_PB, self.A_SB, [self.F_C,self.F_C2], btype='bandstop',
+                  analog=self.analog, output=self.FRMT))
         return 0
 
 #------------------------------------------------------------------------------
 
 if __name__ == '__main__':
-    import pyfda.filterbroker as fb # importing filterbroker initializes all its globals
+    # Run this module standalone with 'python -m pyfda.filter_widgets.ellip'
     filt = Ellip()        # instantiate filter
+    fb_set('fo', 'man')
     filt.LPman(fb.fil[0])  # design a low-pass with parameters from global dict
-    print(fb.fil[0][filt.FRMT]) # return results in default format
-
-# test using "python -m pyfda.filter_widgets.ellip"
+    print(fb_get(filt.FRMT)) # return results in default format

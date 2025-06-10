@@ -6,8 +6,6 @@
 # Licensed under the terms of the MIT License
 # (see file LICENSE in root directory for details)
 
-# TODO: fb.fil\['([\s\S\r]*?)'\] -> fb_get('$1')
-
 """
 Library with various signal processing related functions
 """
