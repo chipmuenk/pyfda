@@ -142,7 +142,7 @@ class Ellip():
         return True
 
     #--------------------------------------------------------------------------
-    def _save(self, arg, fil_dict: dict = fb.fil[0]) -> None:
+    def _save(self, arg, fil_dict: dict = fb.fil[0]) -> int:
         """
         Convert results of filter design to all available formats (pz, ba, sos)
         and store them in the global filter dictionary.

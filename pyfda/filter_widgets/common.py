@@ -65,7 +65,8 @@ class Common():
             }
 
 # -------------------------------------------------------------------
-def remezord(freqs, amps, rips, fs=1, alg='ichige'):
+def remezord(freqs: list, amps: list, rips: list, fs: float = 1.,
+             alg: str = 'ichige') -> list:
     """
     Filter parameter selection for the Remez exchange algorithm.
     Supplies remezord method according to Scipy Ticket #475
@@ -172,7 +173,7 @@ def remezord(freqs, amps, rips, fs=1, alg='ichige'):
     return [L, bands, amps, weight]
 
 # -------------------------------------------------------------------
-def remlplen_herrmann(fp, fs, dp, ds):
+def remlplen_herrmann(fp: float, fs: float, dp: float, ds: float) -> int:
     """
     Determine the length of the low pass filter with passband frequency
     fp, stopband frequency fs, passband ripple dp, and stopband ripple ds.
@@ -197,7 +198,7 @@ def remlplen_herrmann(fp, fs, dp, ds):
     return int(N1)
 
 # -------------------------------------------------------------------
-def remlplen_kaiser(fp, fs, dp, ds):
+def remlplen_kaiser(fp: float, fs: float, dp: float, ds: float) -> int:
     """
     Determine the length of the low pass filter with passband frequency
     fp, stopband frequency fs, passband ripple dp, and stopband ripple ds.

@@ -100,23 +100,23 @@ class Manual_FIR():
 
     #------------------- end of static info for filter tree -------------------
 
-    def _get_params(self, fil_dict):
-        """
-        Translate parameters from the passed dictionary to instance
-        parameters, scaling / transforming them if needed.
-        """
-        self.N     = fil_dict['N']
-        self.F_PB  = fil_dict['F_PB']
-        self.F_SB  = fil_dict['F_SB']
-        self.F_PB2 = fil_dict['F_PB2']
-        self.F_SB2 = fil_dict['F_SB2']
-        self.F_C   = fil_dict['F_C']
-        self.F_C2  = fil_dict['F_C2']
+    # def _get_params(self, fil_dict):
+    #     """
+    #     Translate parameters from the passed dictionary to instance
+    #     parameters, scaling / transforming them if needed.
+    #     """
+    #     self.N     = fil_dict['N']
+    #     self.F_PB  = fil_dict['F_PB']
+    #     self.F_SB  = fil_dict['F_SB']
+    #     self.F_PB2 = fil_dict['F_PB2']
+    #     self.F_SB2 = fil_dict['F_SB2']
+    #     self.F_C   = fil_dict['F_C']
+    #     self.F_C2  = fil_dict['F_C2']
 
-        self.A_PB  = fil_dict['A_PB']
-        self.A_PB2 = fil_dict['A_PB2']
-        self.A_SB  = fil_dict['A_SB']
-        self.A_SB2 = fil_dict['A_SB2']
+    #     self.A_PB  = fil_dict['A_PB']
+    #     self.A_PB2 = fil_dict['A_PB2']
+    #     self.A_SB  = fil_dict['A_SB']
+    #     self.A_SB2 = fil_dict['A_SB2']
 
     def LPman(self, fil_dict):
         """ Dummy method, to display widgets corresponding to filter type in UI """
@@ -184,23 +184,23 @@ class Manual_IIR():
 
         #------------------- end of static info for filter tree ---------------
 
-    def _get_params(self, fil_dict):
-        """
-        Translate parameters from the passed dictionary to instance
-        parameters, scaling / transforming them if needed.
-        """
-        self.N     = fil_dict['N']
-        self.F_PB  = fil_dict['F_PB']
-        self.F_SB  = fil_dict['F_SB']
-        self.F_PB2 = fil_dict['F_PB2']
-        self.F_SB2 = fil_dict['F_SB2']
-        self.F_C   = fil_dict['F_C']
-        self.F_C2  = fil_dict['F_C2']
+    # def _get_params(self, fil_dict):
+    #     """
+    #     Translate parameters from the passed dictionary to instance
+    #     parameters, scaling / transforming them if needed.
+    #     """
+    #     self.N     = fil_dict['N']
+    #     self.F_PB  = fil_dict['F_PB']
+    #     self.F_SB  = fil_dict['F_SB']
+    #     self.F_PB2 = fil_dict['F_PB2']
+    #     self.F_SB2 = fil_dict['F_SB2']
+    #     self.F_C   = fil_dict['F_C']
+    #     self.F_C2  = fil_dict['F_C2']
 
-        self.A_PB  = fil_dict['A_PB']
-        self.A_PB2 = fil_dict['A_PB2']
-        self.A_SB  = fil_dict['A_SB']
-        self.A_SB2 = fil_dict['A_SB2']
+    #     self.A_PB  = fil_dict['A_PB']
+    #     self.A_PB2 = fil_dict['A_PB2']
+    #     self.A_SB  = fil_dict['A_SB']
+    #     self.A_SB2 = fil_dict['A_SB2']
 
 
     def LPman(self, fil_dict):
@@ -231,7 +231,7 @@ class Manual_IIR():
 #------------------------------------------------------------------------------
 
 if __name__ == '__main__':
-    
+    # Run module standalone using "python -m pyfda.filter_widgets.manual"    
     import pyfda.filterbroker as fb # importing filterbroker initializes all its globals
 
     filt = Manual_IIR()    # instantiate filter
@@ -241,6 +241,3 @@ if __name__ == '__main__':
     filt = Manual_FIR()    # instantiate filter
     filt.LPman(fb.fil[0])  # design a low-pass with parameters from global dict
     print(fb.fil[0][FRMT]) # return results in default format
-
-# test using "python -m pyfda.filter_widgets.manual"
-#---------------------------------------------------------------------------
