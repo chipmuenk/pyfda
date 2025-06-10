@@ -154,6 +154,8 @@ class Ellip():
         new values for filter order N (doubled for BP and BS designs)
         and corner frequency(s) F_PBC.
         """
+        if not self._test_n():
+            return -1
         fil_save(fil_dict, arg, self.FRMT, __name__)
 
         if fb_get('fo') == 'min':
@@ -169,6 +171,7 @@ class Ellip():
                 fb_set('F_PB2', self.F_PBC[1] / 2.)
                 fb_set('F_C2', self.F_PBC[1] / 2.)
                 fb_set('N', self.N * 2)
+        return 0
 
     #------------------------------------------------------------------------------
     #
@@ -182,22 +185,18 @@ class Ellip():
         self._get_params()
         self.N, self.F_PBC = ellipord(
             self.F_PB,self.F_SB, self.A_PB,self.A_SB, analog=self.analog)
-        if not self._test_n():
-            return -1
-        self._save(
+        ret = self._save(
             ellip(self.N, self.A_PB, self.A_SB, self.F_PBC, btype='low',
                   analog=self.analog, output=self.FRMT))
-        return 0
+        return ret
 
     def LPman(self, fil_dict: dict) -> int:
         """Elliptic LP filter, manual order"""
         self._get_params()
-        if not self._test_n():
-            return -1
-        self._save(
+        ret = self._save(
             ellip(self.N, self.A_PB, self.A_SB, self.F_C, btype='low',
                   analog=self.analog, output=self.FRMT))
-        return 0
+        return ret
 
     # HP: F_SB < F_PB -------------------------------------------------------
     def HPmin(self, fil_dict: dict) -> int:
@@ -205,22 +204,18 @@ class Ellip():
         self._get_params()
         self.N, self.F_PBC = ellipord(
             self.F_PB,self.F_SB, self.A_PB, self.A_SB, analog=self.analog)
-        if not self._test_n():
-            return -1
-        self._save(
+        ret = self._save(
             ellip(self.N, self.A_PB, self.A_SB, self.F_PBC, btype='highpass',
                   analog=self.analog, output=self.FRMT))
-        return 0
+        return ret
 
     def HPman(self, fil_dict: dict) -> int:
         """Elliptic HP filter, manual order"""
         self._get_params()
-        if not self._test_n():
-            return -1
-        self._save(
+        ret = self._save(
             ellip(self.N, self.A_PB, self.A_SB, self.F_C, btype='highpass',
                   analog=self.analog, output=self.FRMT))
-        return 0
+        return ret
 
     # For BP and BS, F_XX have two elements each, A_XX has only one.
     # The min. filter order and the design algorithms use half the actual filter order,
@@ -233,22 +228,18 @@ class Ellip():
         self.N, self.F_PBC = ellipord(
             [self.F_PB, self.F_PB2], [self.F_SB, self.F_SB2], self.A_PB, self.A_SB,
             analog=self.analog)
-        if not self._test_n():
-            return -1
-        self._save(
+        ret = self._save(
             ellip(self.N, self.A_PB, self.A_SB, self.F_PBC, btype='bandpass',
                   analog=self.analog, output=self.FRMT))
-        return 0
+        return ret
 
     def BPman(self, fil_dict: dict) -> int:
         """Elliptic BP filter, manual order"""
         self._get_params()
-        if not self._test_n():
-            return -1
-        self._save(
+        ret = self._save(
             ellip(self.N//2, self.A_PB, self.A_SB, [self.F_C,self.F_C2], btype='bandpass',
                   analog=self.analog, output=self.FRMT))
-        return 0
+        return ret
 
     # BS: F_SB[0] > F_PB[0], F_SB[1] < F_PB[1] --------------------------------
     def BSmin(self, fil_dict: dict) -> int:
@@ -257,22 +248,18 @@ class Ellip():
         self.N, self.F_PBC = ellipord(
             [self.F_PB, self.F_PB2], [self.F_SB, self.F_SB2], self.A_PB,self.A_SB,
             analog=self.analog)
-        if not self._test_n():
-            return -1
-        self._save(
+        ret = self._save(
             ellip(self.N, self.A_PB, self.A_SB, self.F_PBC, btype='bandstop',
                   analog=self.analog, output=self.FRMT))
-        return 0
+        return ret
 
     def BSman(self, fil_dict: dict) -> int:
         """Elliptic BS filter, manual order"""
         self._get_params()
-        if not self._test_n():
-            return -1
-        self._save(
+        ret = self._save(
             ellip(self.N//2, self.A_PB, self.A_SB, [self.F_C,self.F_C2], btype='bandstop',
                   analog=self.analog, output=self.FRMT))
-        return 0
+        return ret
 
 #------------------------------------------------------------------------------
 
