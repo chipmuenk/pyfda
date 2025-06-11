@@ -507,7 +507,7 @@ def store_fil():
     fil_undo[undo_ptr] = copy.deepcopy(fil[0])
 
 # -------------------------
-def key_list_to_dict(keys: list) -> dict:
+def key_list_to_dict(keys: list, fil_dict: dict) -> dict:
     """
     Convert a list or tuple of keys (str) to access a nested dict that can be
     read or written to and return that dict.
@@ -562,18 +562,26 @@ def fb_get(*args, fil_dict=fil[0]) -> str:
     (e.g. `_f_S`) once all direct accesses have been changed.
     """
     if len(args) == 0:
-        raise KeyError("'fb_get()' called without argument")
+        # called without arguments, return a copy of the whole dict
+        return copy.deepcopy(fil_dict)
 
-    if len(args) == 1:
-        ret = fil_dict[args[0]]
-        # ret = fil_dict['_' + args[0]]
-    elif len(args) == 2:
-        ret = fil_dict[args[0]][args[1]]
-    elif len(args) == 3:
-        ret = fil_dict[args[0]][args[1]][args[2]]
-    else:
-        raise KeyError(
-            "Accessing dicts nested more than 3 keys deep is not supported yet!")
+    ret = fil_dict
+    try:
+        for key in args:
+            ret = ret[key]
+        # if len(args) == 1:
+        #     ret = fil_dict[args[0]]
+        #     # ret = fil_dict['_' + args[0]]
+        # elif len(args) == 2:
+        #     ret = fil_dict[args[0]][args[1]]
+        # elif len(args) == 3:
+        #     ret = fil_dict[args[0]][args[1]][args[2]]
+        # else:
+        #     raise KeyError(
+        #         "Accessing dicts nested more than 3 keys deep is not supported yet!")
+    except (KeyError, IndexError, TypeError):
+        logger.warning("Key path %s not found in filter dict!", args)
+        return None
 
     if ret is None:
         logger.warning("Key '%s' not found in filter dict!", args[-1])
@@ -591,7 +599,7 @@ def fb_set(*args, backup: bool = True, fil_dict=fil[0]) -> None:
     val = args[-1]  # last element is the value to be set
 
     try:
-        d = key_list_to_dict(args[:-1])  # create nested dict from the other arguments
+        d = key_list_to_dict(args[:-1], fil_dict)  # create nested dict from the other arguments
         _ =  d[args[-2]]  # try accessing dictionary
         if backup:
             store_fil()  # backup old setting
@@ -599,9 +607,9 @@ def fb_set(*args, backup: bool = True, fil_dict=fil[0]) -> None:
         if args[-2] =='qfrmt' and len(args) == 2:
             # remember current fixpoint / float format
             if get_fx():
-                fil_dict['qfrmt_fx_last'] = fil[0]['qfrmt']
+                fil_dict['qfrmt_fx_last'] = fil_dict['qfrmt']
             else:
-                fil[0]['qfrmt_float_last'] = fil[0]['qfrmt']
+                fil[0]['qfrmt_float_last'] = fil_dict['qfrmt']
             # and set new format
             fil_dict['qfrmt'] = val
         else:
