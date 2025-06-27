@@ -81,10 +81,10 @@ class FilterFactory():
         Examples
         --------
 
-        >>> create_fil_instance('cheby1')
+        >>> create_fil_instance('Cheby1')
         >>> fil_inst.LPmin(fil[0])
 
-        The example first creates an instance of the filter class 'cheby1' and
+        The example first creates an instance of the filter class 'Cheby1' and
         then performs the actual filter design by calling the method 'LPmin',
         passing the global filter dictionary fil[0] as the parameter.
 
@@ -254,14 +254,13 @@ fil_factory = FilterFactory()
 
 ######################################################################
 if __name__ == '__main__':
-    # Run module standalone with
-    # `python -m pyfda.filter_factory`
+    # Run module standalone with `python -m pyfda.filter_factory`
 
     print("\nfb.filter_classes\n", fb.filter_classes)
     print("aaa:", fil_factory.create_fil_inst("aaa"),"\n") # class doesn't exist
-    print("cheby1:", fil_factory.create_fil_inst("cheby1"),"\n") # first time inst.
-    print("cheby1:", fil_factory.create_fil_inst("cheby1"),"\n") # second time inst.
-    print("cheby2:", fil_factory.create_fil_inst("cheby2"),"\n") # new class
+    print("Cheby1:", fil_factory.create_fil_inst("Cheby1"),"\n") # first time inst.
+    print("Cheby1:", fil_factory.create_fil_inst("Cheby1"),"\n") # second time inst.
+    print("Cheby2:", fil_factory.create_fil_inst("Cheby2"),"\n") # new class
     print("bbb:", fil_factory.create_fil_inst("bbb"),"\n") # class doesn't exist
 
     print("LPman, fc = cheby2:",
