@@ -146,7 +146,7 @@ class FilterFactory():
         return self.err_code
 
 #------------------------------------------------------------------------------
-    def call_fil_method(self, method, fil_dict, fc = None):
+    def call_fil_method(self, method, fil_dict=fb.fil[0], fc = None):
         """
         Instantiate the filter design class passed  as string ``fc`` with the
         globally accessible handle ``fil_inst``. If ``fc = None``, use the previously
@@ -192,11 +192,11 @@ class FilterFactory():
         Examples
         --------
 
-        >>> call_fil_method("LPmin", fil[0], fc="cheby1")
+        >>> call_fil_method("LPmin", fc="cheby1")
 
         The example first creates an instance of the filter class 'cheby1' and
         then performs the actual filter design by calling the method 'LPmin',
-        passing the global filter dictionary ``fil[0]`` as the parameter.
+        using the default global filter dictionary ``fil[0]``.
         """
         if self.err_code >= 16 or self.err_code < 0:
             self.err_code = 0 #  # clear previous method call error
@@ -256,23 +256,23 @@ fil_factory = FilterFactory()
 if __name__ == '__main__':
     # Run module standalone with `python -m pyfda.filter_factory`
 
-    print("\nfb.filter_classes\n", fb.filter_classes)
-    print("aaa:", fil_factory.create_fil_inst("aaa"),"\n") # class doesn't exist
-    print("Cheby1:", fil_factory.create_fil_inst("Cheby1"),"\n") # first time inst.
-    print("Cheby1:", fil_factory.create_fil_inst("Cheby1"),"\n") # second time inst.
-    print("Cheby2:", fil_factory.create_fil_inst("Cheby2"),"\n") # new class
+    print("\nAll fb.filter_classes:\n", fb.filter_classes.keys())
+    print("\nTest 'create_fil_inst:'")
+    print("aaa:", fil_factory.create_fil_inst("aaa")) # class doesn't exist
+    print("Cheby1:", fil_factory.create_fil_inst("Cheby1")) # first time inst.
+    print("Cheby1:", fil_factory.create_fil_inst("Cheby1")) # second time inst.
+    print("Cheby2:", fil_factory.create_fil_inst("Cheby2")) # new class
     print("bbb:", fil_factory.create_fil_inst("bbb"),"\n") # class doesn't exist
 
-    print("LPman, fc = cheby2:",
-          fil_factory.call_fil_method("LPman", fb.fil[0], fc = "cheby2"),"\n")
-    print("LPmax:", fil_factory.call_fil_method("LPmax", fb.fil[0]),"\n") # doesn't exist
-    print("Int 1:", fil_factory.call_fil_method(1, fb.fil[0]),"\n") # not a string
-    print("LPmin:", fil_factory.call_fil_method("LPmin", fb.fil[0]),"\n") # changed method
+    print("\nTest 'call_fil_method:'")
+    print("LPman, fc = Cheby2:",
+          fil_factory.call_fil_method("LPman", fc = "Cheby2"),"\n")
+    print("\tLPmax:", fil_factory.call_fil_method("LPmax", fc = "Cheby2")) # doesn't exist
+    print("Int 1:", fil_factory.call_fil_method(1, fc = "Cheby2"),"\n") # not a string
+    print("LPmin:", fil_factory.call_fil_method("LPmin"),"\n") # changed method
 
-    print("LPmin:", fil_factory.call_fil_method("LPmin", fb.fil[0]),"\n")
-    print("LP:", fil_factory.call_fil_method("LP", fb.fil[0]),"\n")
-    print("LPman, fc = cheby1:",
-          fil_factory.call_fil_method("LPman", fb.fil[0], fc = "cheby1"),"\n")
+    print("LPmin, fc = Cheby2:", fil_factory.call_fil_method("LPmin", fc = "Cheby2"),"\n")
+    print("LPman, fc = Cheby1:", fil_factory.call_fil_method("LPman", fc = "Cheby1"))
 
     # print("LPman, fc = cheby1:",
     #       fil_factory.call_fil_method("LPman", fc = "cheby1"),"\n") # fails

@@ -15,6 +15,7 @@ import logging
 import sys
 
 import pyfda.filterbroker as fb
+from pyfda.filterbroker import fb_get, fb_set
 import pyfda.filter_factory as ff
 from pyfda.input_widgets import (select_filter, amplitude_specs,
                                  freq_specs, freq_units,
@@ -478,7 +479,7 @@ class Input_Specs(QWidget):
         try:
             logger.info(
                 "Start filter design using method\n\t'%s.%s%s'",
-                str(fb.fil[0]['fc']), str(fb.fil[0]['rt']), str(fb.fil[0]['fo']))
+                fb_get('fc'), fb_get('rt'), fb_get('fo'))
 
             # ----------------------------------------------------------------------
             # A globally accessible instance fb.fil_inst of selected filter class fc
@@ -491,8 +492,7 @@ class Input_Specs(QWidget):
             # resulting in e.g. cheby1.LPman(fb.fil[0]) and writing back coefficients,
             # P/Z etc. back to fil[0].
 
-            err = ff.fil_factory.call_fil_method(
-                fb.fil[0]['rt'] + fb.fil[0]['fo'], fb.fil[0])
+            err = ff.fil_factory.call_fil_method(fb_get('rt') + fb_get('fo'), fc=fb_get('fc'))
             # this is the same as e.g.
             # from pyfda.filter_design import ellip
             # inst = ellip.ellip()
