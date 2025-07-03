@@ -40,7 +40,8 @@ import scipy.signal as sig
 from scipy.signal import signaltools
 from scipy.special import sinc
 
-import pyfda.filterbroker as fb  # importing filterbroker initializes all its globals
+import pyfda.filterbroker as fb
+from pyfda.filterbroker import fb_get, fb_set
 import pyfda.libs.pyfda_dirs as dirs
 from pyfda.libs.compat import (QWidget, pyqtSignal, QComboBox, QIcon, QSize,
                                QHBoxLayout, QVBoxLayout)
@@ -176,14 +177,14 @@ class Firwin(QWidget):
         self.cmb_firwin_alg.hide()
 
         # subwidget for selecting window name and entering window parameters (if any)
-        self.qfft_win_select = QFFTWinCmbBox(fb.fil[0]['filter_widgets']['firwin'],
+        self.qfft_win_select = QFFTWinCmbBox(fb_get('filter_widgets', 'firwin'),
                                                app='fir', objectName='fir_win_qfft')
         self.all_wins_dict = self.qfft_win_select.all_wins_dict
         # Minimum size, can be changed in the upper hierarchy levels using layouts:
         # self.qfft_win_select.setSizeAdjustPolicy(QComboBox.AdjustToContents))
 
         # instantiate FFT window with freshly created windows dict
-        self.win_viewer = Plot_FFT_win(fb.fil[0]['filter_widgets']['firwin'],
+        self.win_viewer = Plot_FFT_win(fb_get('filter_widgets', 'firwin'),
             app='fir', all_wins_dict=self.all_wins_dict, sym=True,
             title="pyFDA FIR Window Viewer", object_name="firwin_win_viewer")
         # create handle to window to hide it during the "quit" dialogue,
@@ -260,28 +261,27 @@ class Firwin(QWidget):
              'par_val': [],    # list of window parameters
             }
             """
-        self.N = fb.fil[0]['N']
+        self.N = fb_get('N')
 
         try:
             # Get window id from filter dict fb.fil[0]
-            cur_win_id = fb.fil[0]['filter_widgets']['firwin']['id']
+            cur_win_id = fb_get('filter_widgets', 'firwin', 'id')
 
             # Copy all dynamic parameters from fb.fil[0] to cur_win_dict
-            for p in range(len(fb.fil[0]['filter_widgets']['firwin']['par_val'])):
+            for p in range(len(fb_get('filter_widgets', 'firwin', 'par_val'))):
                 self.all_wins_dict[cur_win_id]['par_val'][p] =\
-                    fb.fil[0]['filter_widgets']['firwin']['par_val'][p]
+                    fb_get('filter_widgets', 'firwin', 'par_val', p)
         except KeyError as e:
-            logger.warning(f"Couldn't load 'firwin' dict!\n{e}")
-            logger.warning(fb.fil[0]['filter_widgets'])
+            logger.warning("Couldn't load 'firwin' dict!\n%s", e)
+            logger.warning(fb_get('filter_widgets'))
             logger.warning("Falling back to 'Rectangular' window.")
 
-            fb.fil[0]['filter_widgets']['firwin']['id'] = 'rectangular'
-            fb.fil[0]['filter_widgets']['firwin']['disp_name'] = 'Rectangular'
-            fb.fil[0]['filter_widgets']['firwin']['par_val'] = []
+            fb_set('filter_widgets', 'firwin', 'id', 'rectangular')
+            fb_set('filter_widgets', 'firwin', 'disp_name', 'Rectangular')
+            fb_set('filter_widgets', 'firwin', 'par_val', [])
             self.filter_params2dict()
 
-        # self.qfft_win_select.set_window_name(
-        #    fb.fil[0]['filter_widgets']['firwin']['id'])
+        # self.qfft_win_select.set_window_name(fb_get('filter_widgets', 'firwin', 'id'))
 
         self.emit({'view_changed': 'fft_win_type'}, sig_name='sig_tx_local')
 
@@ -301,24 +301,24 @@ class Firwin(QWidget):
             )
 
     # --------------------------------------------------------------------------
-    def _get_params(self, fil_dict):
+    def _get_params(self):
         """
         Translate parameters from the passed dictionary to instance
         parameters, scaling / transforming them if needed.
         """
-        self.N     = fil_dict['N']
-        self.F_PB  = fil_dict['F_PB']
-        self.F_SB  = fil_dict['F_SB']
-        self.F_PB2 = fil_dict['F_PB2']
-        self.F_SB2 = fil_dict['F_SB2']
-        self.F_C   = fil_dict['F_C']
-        self.F_C2  = fil_dict['F_C2']
+        self.N     = fb_get('N')
+        self.F_PB  = fb_get('F_PB')
+        self.F_SB  = fb_get('F_SB')
+        self.F_PB2 = fb_get('F_PB2')
+        self.F_SB2 = fb_get('F_SB2')
+        self.F_C   = fb_get('F_C')
+        self.F_C2  = fb_get('F_C2')
 
         # firwin amplitude specs are linear (not in dBs)
-        self.A_PB  = fil_dict['A_PB']
-        self.A_PB2 = fil_dict['A_PB2']
-        self.A_SB  = fil_dict['A_SB']
-        self.A_SB2 = fil_dict['A_SB2']
+        self.A_PB  = fb_get('A_PB')
+        self.A_PB2 = fb_get('A_PB2')
+        self.A_SB  = fb_get('A_SB')
+        self.A_SB2 = fb_get('A_SB2')
 
 #        self.alg = 'ichige' # algorithm for determining the minimum order
 #        self.alg = self.cmb_firwin_alg.currentText()
@@ -332,16 +332,16 @@ class Firwin(QWidget):
             return popup_warning(self, self.N, "FirWin")
         return True
 
-    def _save(self, fil_dict, arg):
+    def _save(self, arg):
         """
         Convert between poles / zeros / gain, filter coefficients (polynomes)
         and second-order sections and store all available formats in the passed
         dictionary 'fil_dict'.
         """
-        fil_save(fil_dict, arg, self.FRMT, __name__)
+        fil_save(arg, self.FRMT, __name__)
 
         try:  # has the order been calculated by a "min" filter design?
-            fil_dict['N'] = self.N  # yes, update filterbroker
+            fb_set('N', self.N)  # yes, update filterbroker
         except AttributeError:
             pass
         self.filter_params2dict()
@@ -482,7 +482,7 @@ class Firwin(QWidget):
         delta_f = abs(F[1] - F[0]) * 2  # referred to f_Ny
         # delta_A = np.sqrt(A[0] * A[1])
         if fb.fil[0]['filter_widgets']['firwin']['id'] == "kaiser":
-            N, beta = sig.kaiserord(20 * np.log10(np.abs(fb.fil[0]['A_SB'])), delta_f)
+            N, beta = sig.kaiserord(20 * np.log10(np.abs(fb_get('A_SB'))), delta_f)
             self.all_wins_dict["kaiser"]["par"][0]["val"] = beta
             self.qfft_win_select.led_win_par_0.setText(str(beta))
             self.qfft_win_select.ui2dict_params()  # pass changed parameter to other widgets
@@ -492,92 +492,84 @@ class Firwin(QWidget):
         self.emit({'view_changed': 'fft_win_type'}, sig_name='sig_tx_local')
         return N
 
-    def LPmin(self, fil_dict):
-        self._get_params(fil_dict)
+    def LPmin(self):
+        self._get_params()
         self.N = self._firwin_ord([self.F_PB, self.F_SB], [1, 0],
                                   [self.A_PB, self.A_SB], alg=self.alg)
         if not self._test_n():
             return -1
 
-        fil_dict['F_C'] = (self.F_SB + self.F_PB)/2  # average calculated F_PB and F_SB
-        self._save(fil_dict,
-                   self.firwin(self.N, fil_dict['F_C'], nyq=0.5,
+        fb_set('F_C', (self.F_SB + self.F_PB)/2)  # average calculated F_PB and F_SB
+        self._save(self.firwin(self.N, fb_get('F_C'), nyq=0.5,
                                window=self.qfft_win_select.calc_window(self.N, sym=True)))
 
-    def LPman(self, fil_dict):
-        self._get_params(fil_dict)
+    def LPman(self):
+        self._get_params()
         if not self._test_n():
             return -1
-        self._save(fil_dict,
-                   self.firwin(self.N, fil_dict['F_C'], nyq=0.5,
+        self._save(self.firwin(self.N, fb_get('F_C'), nyq=0.5,
                                window=self.qfft_win_select.calc_window(self.N, sym=True)))
 
-    def HPmin(self, fil_dict):
-        self._get_params(fil_dict)
+    def HPmin(self):
+        self._get_params()
         N = self._firwin_ord([self.F_SB, self.F_PB], [0, 1],
                              [self.A_SB, self.A_PB], alg=self.alg)
         self.N = round_odd(N)  # enforce odd order
         if not self._test_n():
             return -1
-        fil_dict['F_C'] = (self.F_SB + self.F_PB)/2  # average calculated F_PB and F_SB
-        self._save(fil_dict,
-                   self.firwin(self.N, fil_dict['F_C'], pass_zero=False, nyq=0.5,
+        fb_set('F_C', (self.F_SB + self.F_PB)/2)  # average calculated F_PB and F_SB
+        self._save(self.firwin(self.N, fb_get('F_C'), pass_zero=False, nyq=0.5,
                                window=self.qfft_win_select.calc_window(self.N, sym=True)))
 
-    def HPman(self, fil_dict):
-        self._get_params(fil_dict)
+    def HPman(self):
+        self._get_params()
         self.N = round_odd(self.N)  # enforce odd order
         if not self._test_n():
             return -1
-        self._save(fil_dict,
-                   self.firwin(self.N, fil_dict['F_C'], pass_zero=False, nyq=0.5,
+        self._save(self.firwin(self.N, fb_get('F_C'), pass_zero=False, nyq=0.5,
                                window=self.qfft_win_select.calc_window(self.N, sym=True)))
 
     # For BP and BS, F_PB and F_SB have two elements each
-    def BPmin(self, fil_dict):
-        self._get_params(fil_dict)
+    def BPmin(self):
+        self._get_params()
         self.N = remezord([self.F_SB, self.F_PB, self.F_PB2, self.F_SB2], [0, 1, 0],
                           [self.A_SB, self.A_PB, self.A_SB2], fs=1, alg=self.alg)[0]
         if not self._test_n():
             return -1
 
-        fil_dict['F_C'] = (self.F_SB + self.F_PB)/2  # average calculated F_PB and F_SB
-        fil_dict['F_C2'] = (self.F_SB2 + self.F_PB2)/2
-        self._save(fil_dict,
-                   self.firwin(self.N, [fil_dict['F_C'], fil_dict['F_C2']], nyq=0.5,
+        fb_set('F_C', (self.F_SB + self.F_PB)/2)  # average calculated F_PB and F_SB
+        fb_set('F_C2', (self.F_SB2 + self.F_PB2)/2)
+        self._save(self.firwin(self.N, [fb_get('F_C'), fb_get('F_C2')], nyq=0.5,
                                pass_zero=False,
                                window=self.qfft_win_select.calc_window(self.N, sym=True)))
 
-    def BPman(self, fil_dict):
-        self._get_params(fil_dict)
+    def BPman(self):
+        self._get_params()
         if not self._test_n():
             return -1
-        self._save(fil_dict,
-                   self.firwin(self.N, [fil_dict['F_C'], fil_dict['F_C2']], nyq=0.5,
+        self._save(self.firwin(self.N, [fb_get('F_C'), fb_get('F_C2')], nyq=0.5,
                                pass_zero=False,
                                window=self.qfft_win_select.calc_window(self.N, sym=True)))
 
-    def BSmin(self, fil_dict):
-        self._get_params(fil_dict)
+    def BSmin(self):
+        self._get_params()
         N = remezord([self.F_PB, self.F_SB, self.F_SB2, self.F_PB2], [1, 0, 1],
                      [self.A_PB, self.A_SB, self.A_PB2], fs=1, alg=self.alg)[0]
         self.N = round_odd(N)  # enforce odd order
         if not self._test_n():
             return -1
-        fil_dict['F_C'] = (self.F_SB + self.F_PB) / 2  # average calculated F_PB and F_SB
-        fil_dict['F_C2'] = (self.F_SB2 + self.F_PB2) / 2
-        self._save(fil_dict,
-                   self.firwin(self.N, [fil_dict['F_C'], fil_dict['F_C2']],
+        fb_set('F_C', (self.F_SB + self.F_PB) / 2)  # average calculated F_PB and F_SB
+        fb_set('F_C2', (self.F_SB2 + self.F_PB2) / 2)
+        self._save(self.firwin(self.N, [fb_get('F_C'), fb_get('F_C2')],
                                window=self.qfft_win_select.calc_window(self.N, sym=True),
                                pass_zero=True, nyq=0.5))
 
-    def BSman(self, fil_dict):
-        self._get_params(fil_dict)
+    def BSman(self):
+        self._get_params()
         self.N = round_odd(self.N)  # enforce odd order
         if not self._test_n():
             return -1
-        self._save(fil_dict,
-                   self.firwin(self.N, [fil_dict['F_C'], fil_dict['F_C2']],
+        self._save(self.firwin(self.N, [fb_get('F_C'), fb_get('F_C2')],
                                window=self.qfft_win_select.calc_window(self.N, sym=True),
                                pass_zero=True, nyq=0.5))
 
