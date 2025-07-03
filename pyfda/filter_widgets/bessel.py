@@ -192,7 +192,7 @@ class Bessel():
             return popup_warning(None, self.N, "Bessel")
         return True
 
-    def _save(self, arg, fil_dict: dict = fb.fil[0]) -> int:
+    def _save(self, arg) -> int:
         """
         Convert results of filter design to all available formats (pz, ba, sos)
         and store them in the global filter dictionary.
@@ -206,7 +206,7 @@ class Bessel():
         """
         if not self._test_n():
             return -1
-        fil_save(fil_dict, arg, self.FRMT, __name__)
+        fil_save(arg, self.FRMT, __name__)
 
         fb_set('N', self.N) # always save, might have been limited by _test_n
         if fb_get('fo') == 'min':
@@ -219,7 +219,7 @@ class Bessel():
         return 0
 
     # LP: F_PB < F_SB
-    def LPmin(self, fil_dict: dict) -> int:
+    def LPmin(self) -> int:
         """Bessel LP filter, minimum order"""
         self._get_params()
         self.N, self.F_PBC = buttord(self.F_PB, self.F_SB, self.A_PB, self.A_SB)
@@ -227,7 +227,7 @@ class Bessel():
             bessel(self.N, self.F_PBC, btype='low', analog=False, output=self.FRMT))
         return ret
 
-    def LPman(self, fil_dict: dict) -> int:
+    def LPman(self) -> int:
         """Bessel LP filter, manual order"""
         self._get_params()
         ret = self._save(
@@ -235,7 +235,7 @@ class Bessel():
         return ret
 
     # HP: F_SB < F_PB
-    def HPmin(self, fil_dict: dict) -> int:
+    def HPmin(self) -> int:
         """Bessel HP filter, minimum order"""
         self._get_params()
         self.N, self.F_PBC = buttord(self.F_PB, self.F_SB, self.A_PB,self.A_SB)
@@ -243,7 +243,7 @@ class Bessel():
             bessel(self.N, self.F_PBC, btype='highpass', analog=False, output=self.FRMT))
         return ret
 
-    def HPman(self, fil_dict: dict) -> int:
+    def HPman(self) -> int:
         """Bessel HP filter, manual order"""
         self._get_params()
         ret = self._save(
@@ -255,7 +255,7 @@ class Bessel():
     # hence the filter order needs to be doubled / halved before (re-)storing
 
     # BP: F_SB[0] < F_PB[0], F_SB[1] > F_PB[1]
-    def BPmin(self, fil_dict: dict) -> int:
+    def BPmin(self) -> int:
         """Bessel BP filter, minimum order"""
         self._get_params()
         self.N, self.F_PBC = buttord(
@@ -264,7 +264,7 @@ class Bessel():
             bessel(self.N, self.F_PBC, btype='bandpass', analog=False, output=self.FRMT))
         return ret
 
-    def BPman(self, fil_dict: dict) -> int:
+    def BPman(self) -> int:
         """Bessel BP filter, manual order"""
         self._get_params()
         ret = self._save(
@@ -273,7 +273,7 @@ class Bessel():
         return ret
 
     # BS: F_SB[0] > F_PB[0], F_SB[1] < F_PB[1]
-    def BSmin(self, fil_dict: dict) -> int:
+    def BSmin(self) -> int:
         """Bessel BS filter, minimum order"""
         self._get_params()
         self.N, self.F_PBC = buttord(
@@ -282,7 +282,7 @@ class Bessel():
             bessel(self.N, self.F_PBC, btype='bandstop', analog=False, output=self.FRMT))
         return ret
 
-    def BSman(self, fil_dict: dict) -> int:
+    def BSman(self) -> int:
         """Bessel BS filter, manual order"""
         self._get_params()
         ret = self._save(

@@ -31,7 +31,6 @@ API version info:
          self.wdg and self.hdl
 
    :2.2: Rename `filter_classes` -> `classes`, remove Py2 compatibility
-   TODO: Remove fil_dict from method signatures
 """
 from scipy.signal import ellip, ellipord
 
@@ -142,7 +141,7 @@ class Ellip():
         return True
 
     #--------------------------------------------------------------------------
-    def _save(self, arg, fil_dict: dict = fb.fil[0]) -> None:
+    def _save(self, arg) -> None:
         """
         Convert results of filter design to all available formats (pz, ba, sos)
         and store them in the global filter dictionary.
@@ -154,7 +153,7 @@ class Ellip():
         new values for filter order N (doubled for BP and BS designs)
         and corner frequency(s) F_PBC.
         """
-        fil_save(fil_dict, arg, self.FRMT, __name__)
+        fil_save(arg, self.FRMT, __name__)
 
         if fb_get('fo') == 'min':
             if fb_get('rt') in {'LP', 'HP'}:
@@ -177,7 +176,7 @@ class Ellip():
     #------------------------------------------------------------------------------
 
     # LP: F_PB < F_SB -------------------------------------------------------
-    def LPmin(self, fil_dict: dict) -> int:
+    def LPmin(self) -> int:
         """Elliptic LP filter, minimum order"""
         self._get_params()
         self.N, self.F_PBC = ellipord(
@@ -189,7 +188,7 @@ class Ellip():
                   analog=self.analog, output=self.FRMT))
         return 0
 
-    def LPman(self, fil_dict: dict) -> int:
+    def LPman(self) -> int:
         """Elliptic LP filter, manual order"""
         self._get_params()
         if not self._test_n():
@@ -200,7 +199,7 @@ class Ellip():
         return 0
 
     # HP: F_SB < F_PB -------------------------------------------------------
-    def HPmin(self, fil_dict: dict) -> int:
+    def HPmin(self) -> int:
         """Elliptic HP filter, minimum order"""
         self._get_params()
         self.N, self.F_PBC = ellipord(
@@ -212,7 +211,7 @@ class Ellip():
                   analog=self.analog, output=self.FRMT))
         return 0
 
-    def HPman(self, fil_dict: dict) -> int:
+    def HPman(self) -> int:
         """Elliptic HP filter, manual order"""
         self._get_params()
         if not self._test_n():
@@ -227,7 +226,7 @@ class Ellip():
     # hence the filter order needs to be doubled / halved before (re-)storing
 
     # BP: F_SB[0] < F_PB[0], F_SB[1] > F_PB[1] --------------------------------
-    def BPmin(self, fil_dict: dict) -> int:
+    def BPmin(self) -> int:
         """Elliptic BP filter, minimum order"""
         self._get_params()
         self.N, self.F_PBC = ellipord(
@@ -240,7 +239,7 @@ class Ellip():
                   analog=self.analog, output=self.FRMT))
         return 0
 
-    def BPman(self, fil_dict: dict) -> int:
+    def BPman(self) -> int:
         """Elliptic BP filter, manual order"""
         self._get_params()
         if not self._test_n():
@@ -251,7 +250,7 @@ class Ellip():
         return 0
 
     # BS: F_SB[0] > F_PB[0], F_SB[1] < F_PB[1] --------------------------------
-    def BSmin(self, fil_dict: dict) -> int:
+    def BSmin(self) -> int:
         """Elliptic BP filter, minimum order"""
         self._get_params()
         self.N, self.F_PBC = ellipord(
@@ -264,7 +263,7 @@ class Ellip():
                   analog=self.analog, output=self.FRMT))
         return 0
 
-    def BSman(self, fil_dict: dict) -> int:
+    def BSman(self) -> int:
         """Elliptic BS filter, manual order"""
         self._get_params()
         if not self._test_n():

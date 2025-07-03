@@ -146,7 +146,7 @@ class FilterFactory():
         return self.err_code
 
 #------------------------------------------------------------------------------
-    def call_fil_method(self, method, fil_dict=fb.fil[0], fc = None):
+    def call_fil_method(self, method, fc = None):
         """
         Instantiate the filter design class passed  as string ``fc`` with the
         globally accessible handle ``fil_inst``. If ``fc = None``, use the previously
@@ -160,11 +160,6 @@ class FilterFactory():
 
         method : string
             The name of the design method to be called (e.g. 'LPmin')
-
-        fil_dict : dictionary
-            A dictionary with all the filter specs that is passed to the actual
-            filter design routine. This is usually a copy of ``fb.fil[0]``
-            The results of the filter design routine are written back to the same dict.
 
         fc : string (optional, default: None)
             The name of the filter design class to be instantiated. When nothing
@@ -195,8 +190,8 @@ class FilterFactory():
         >>> call_fil_method("LPmin", fc="cheby1")
 
         The example first creates an instance of the filter class 'cheby1' and
-        then performs the actual filter design by calling the method 'LPmin',
-        using the default global filter dictionary ``fil[0]``.
+        then performs the actual filter design by calling the method 'LPmin'. This
+        method reads and stores parameters from / to the filter dictionary.
         """
         if self.err_code >= 16 or self.err_code < 0:
             self.err_code = 0 #  # clear previous method call error
@@ -224,7 +219,7 @@ class FilterFactory():
               # err_code = -1 means "operation cancelled"
             try:
                 #------------------------------------------------------------------
-                self.err_code = getattr(fil_inst, method)(fil_dict)
+                self.err_code = getattr(fil_inst, method)()
                 #------------------------------------------------------------------
             except Exception as e:
                 err_string =\

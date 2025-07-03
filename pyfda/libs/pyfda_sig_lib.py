@@ -1095,8 +1095,7 @@ def calc_ssb_spectrum(A: np.ndarray, mag: bool=False) -> np.ndarray:
 
 
 # ------------------------------------------------------------------------------
-def fil_save(fil_dict: dict, arg: np.ndarray, format_in: str, sender: str,
-             convert: bool = True) -> None:
+def fil_save(arg: np.ndarray, format_in: str, sender: str, convert: bool = True) -> None:
     """
     Save filter design ``arg`` given in the format specified as ``format_in`` in
     the dictionary ``fil_dict``. The format can be either poles / zeros / gain,
@@ -1106,10 +1105,6 @@ def fil_save(fil_dict: dict, arg: np.ndarray, format_in: str, sender: str,
 
     Parameters
     ----------
-
-    fil_dict : dict
-        The dictionary where the filter design is saved to
-        TODO: This is just a placeholder, it should be removed in the future
 
     arg : ndarray
         The filter design to be saved / converted. It can be in one of the following formats

@@ -31,7 +31,6 @@ API version info:
          self.wdg and self.hdl
 
    :2.2: Rename `filter_classes` -> `classes`, remove Py2 compatibility
-    TODO: Remove fil_dict from method signatures
 """
 from scipy.signal import cheby1, cheb1ord
 
@@ -150,7 +149,7 @@ class Cheby1():
         return True
 
     #--------------------------------------------------------------------------
-    def _save(self, arg, fil_dict: dict = fb.fil[0]) -> int:
+    def _save(self, arg) -> int:
         """
         Convert results of filter design to all available formats (pz, ba, sos)
         and store them in the global filter dictionary.
@@ -164,7 +163,7 @@ class Cheby1():
         """
         if not self._test_n():
             return -1
-        fil_save(fil_dict, arg, self.FRMT, __name__)
+        fil_save(arg, self.FRMT, __name__)
 
         if fb_get('fo') == 'min':
             if fb_get('rt') in {'LP', 'HP'}:
@@ -183,7 +182,7 @@ class Cheby1():
     #------------------------------------------------------------------------------
 
     # LP: F_PB < F_SB ---------------------------------------------------------
-    def LPmin(self, fil_dict: dict) -> int:
+    def LPmin(self) -> int:
         """Cheby1 LP filter, minimum order"""
         self._get_params()
         self.N, self.F_PBC = cheb1ord(
@@ -193,7 +192,7 @@ class Cheby1():
                    analog=self.analog, output=self.FRMT))
         return ret
 
-    def LPman(self, fil_dict: dict) -> int:
+    def LPman(self) -> int:
         """Cheby1 LP filter, manual order"""
         self._get_params()
         ret = self._save(
@@ -202,7 +201,7 @@ class Cheby1():
         return ret
 
     # HP: F_SB < F_PB ---------------------------------------------------------
-    def HPmin(self, fil_dict: dict) -> int:
+    def HPmin(self) -> int:
         """Cheby1 HP filter, minimum order"""
         self._get_params()
         self.N, self.F_PBC = cheb1ord(
@@ -212,7 +211,7 @@ class Cheby1():
                    analog=self.analog, output=self.FRMT))
         return ret
 
-    def HPman(self, fil_dict: dict) -> int:
+    def HPman(self) -> int:
         """Cheby1 HP filter, manual order"""
         self._get_params()
         ret = self._save(cheby1(
@@ -225,7 +224,7 @@ class Cheby1():
     # hence the filter order needs to be doubled / halved before (re-)storing
 
     # BP: F_SB[0] < F_PB[0], F_SB[1] > F_PB[1] --------------------------------
-    def BPmin(self, fil_dict: dict) -> int:
+    def BPmin(self) -> int:
         """Cheby1 BP filter, minimum order"""
         self._get_params()
         self.N, self.F_PBC = cheb1ord(
@@ -236,7 +235,7 @@ class Cheby1():
                    analog=self.analog, output=self.FRMT))
         return ret
 
-    def BPman(self, fil_dict: dict) -> int:
+    def BPman(self) -> int:
         """Cheby1 BP filter, manual order"""
         self._get_params()
         ret = self._save(
@@ -245,7 +244,7 @@ class Cheby1():
         return ret
 
     # BS: F_SB[0] > F_PB[0], F_SB[1] < F_PB[1] --------------------------------
-    def BSmin(self, fil_dict: dict) -> int:
+    def BSmin(self) -> int:
         """Cheby1 BS filter, minimum order"""
         self._get_params()
         self.N, self.F_PBC = cheb1ord(
@@ -256,7 +255,7 @@ class Cheby1():
                    analog=self.analog, output=self.FRMT))
         return ret
 
-    def BSman(self, fil_dict: dict) -> int:
+    def BSman(self) -> int:
         """Cheby1 BS filter, manual order"""
         self._get_params()
         ret = self._save(
