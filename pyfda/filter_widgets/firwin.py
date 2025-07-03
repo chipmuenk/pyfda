@@ -60,7 +60,7 @@ logger = logging.getLogger(__name__)
 # TODO: Improve calculation of F_C and F_C2 using the weights
 # TODO: Automatic setting of density factor for remez calculation?
 #       Automatic switching to Kaiser / Hermann?
-# TODO: Parameters for windows are not stored in fil_dict?
+# TODO: Parameters for windows are not stored in the filter dictionary
 
 __version__ = "2.2"
 
@@ -335,8 +335,8 @@ class Firwin(QWidget):
     def _save(self, arg):
         """
         Convert between poles / zeros / gain, filter coefficients (polynomes)
-        and second-order sections and store all available formats in the passed
-        dictionary 'fil_dict'.
+        and second-order sections and store all available formats in the
+        filter dictionary.
         """
         fil_save(arg, self.FRMT, __name__)
 

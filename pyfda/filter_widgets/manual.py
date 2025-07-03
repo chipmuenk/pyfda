@@ -118,27 +118,27 @@ class Manual_FIR():
     #     self.A_SB  = fil_dict['A_SB']
     #     self.A_SB2 = fil_dict['A_SB2']
 
-    def LPman(self, fil_dict):
+    def LPman(self):
         """ Dummy method, to display widgets corresponding to filter type in UI """
         pass
 
-    def HPman(self, fil_dict):
+    def HPman(self):
         """ Dummy method, to display widgets corresponding to filter type in UI """
         pass
 
-    def BPman(self, fil_dict):
+    def BPman(self):
         """ Dummy method, to display widgets corresponding to filter type in UI """
         pass
 
-    def BSman(self, fil_dict):
+    def BSman(self):
         """ Dummy method, to display widgets corresponding to filter type in UI """
         pass
 
-    def HILman(self, fil_dict):
+    def HILman(self):
         """ Dummy method, to display widgets corresponding to filter type in UI """
         pass
 
-    def DIFFman(self, fil_dict):
+    def DIFFman(self):
         """ Dummy method, to display widgets corresponding to filter type in UI """
         pass
 
@@ -203,27 +203,27 @@ class Manual_IIR():
     #     self.A_SB2 = fil_dict['A_SB2']
 
 
-    def LPman(self, fil_dict):
+    def LPman(self):
         """ Dummy method, to display widgets corresponding to filter type in UI """
         pass
 
-    def HPman(self, fil_dict):
+    def HPman(self):
         """ Dummy method, to display widgets corresponding to filter type in UI """
         pass
 
-    def BPman(self, fil_dict):
+    def BPman(self):
         """ Dummy method, to display widgets corresponding to filter type in UI """
         pass
 
-    def BSman(self, fil_dict):
+    def BSman(self):
         """ Dummy method, to display widgets corresponding to filter type in UI """
         pass
 
-    def HILman(self, fil_dict):
+    def HILman(self):
         """ Dummy method, to display widgets corresponding to filter type in UI """
         pass
 
-    def DIFFman(self, fil_dict):
+    def DIFFman(self):
         """ Dummy method, to display widgets corresponding to filter type in UI """
         pass
 
