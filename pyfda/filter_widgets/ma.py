@@ -37,6 +37,7 @@ import numpy as np
 from pyfda.libs.compat import (QWidget, QLabel, QLineEdit, pyqtSignal, QCheckBox,
                       QVBoxLayout, QHBoxLayout)
 import pyfda.filterbroker as fb
+from pyfda.filterbroker import fb_get, fb_set
 from pyfda.libs.pyfda_lib import ceil_odd, safe_eval
 from pyfda.libs.pyfda_qt_lib import popup_warning, emit
 from pyfda.libs.pyfda_sig_lib import zeros_with_val, fil_save, fil_convert
@@ -157,7 +158,7 @@ near ``f_S/2`` (highpass).
         self.lbl_delays.setObjectName('wdg_lbl_ma_0')
         self.led_delays = QLineEdit(self)
         try:
-            self.led_delays.setText(str(fb.fil[0]['N']))
+            self.led_delays.setText(str(fb_get('N')))
         except KeyError:
             self.led_delays.setText(str(self.delays))
         self.led_delays.setObjectName('wdg_led_ma_0')
@@ -210,8 +211,8 @@ near ``f_S/2`` (highpass).
         corresponding UI elements. load_dict() is called upon initialization
         and when the filter is loaded from disk.
         """
-        if 'filter_widgets' in fb.fil[0] and 'ma' in fb.fil[0]['filter_widgets']:
-            wdg_fil_par = fb.fil[0]['filter_widgets']['ma']
+        if 'filter_widgets' in fb.fil[0] and 'ma' in fb_get('filter_widgets'):
+            wdg_fil_par = fb_get('filter_widgets', 'ma')
             if 'delays' in wdg_fil_par:
                 self.delays = wdg_fil_par['delays']
                 self.led_delays.setText(str(self.delays))
@@ -249,39 +250,39 @@ near ``f_S/2`` (highpass).
         self.emit({'filt_changed': 'ma'})
 
 
-    def _get_params(self, fil_dict):
+    def _get_params(self):
         """
         Translate parameters from the passed dictionary to instance
         parameters, scaling / transforming them if needed.
         """
         # N is total order, L is number of taps per stage
-        self.F_SB  = fil_dict['F_SB']
-        self.A_SB  = fil_dict['A_SB']
+        self.F_SB  = fb_get('F_SB')
+        self.A_SB  = fb_get('A_SB')
 
 
-    def _save(self, fil_dict):
+    def _save(self):
         """
         Save MA-filters both in 'zpk' and 'ba' format; no conversion has to be
         performed except maybe deleting an 'sos' entry from an earlier
         filter design.
         """
         if 'zpk' in self.FRMT:
-            fil_save(fil_dict, self.zpk, 'zpk', __name__, convert = False)
+            fil_save(self.zpk, 'zpk', __name__, convert = False)
 
         if 'ba' in self.FRMT:
-            fil_save(fil_dict, self.b, 'ba', __name__, convert = False)
+            fil_save(self.b, 'ba', __name__, convert = False)
 
         fil_convert(self.FRMT)
 
         # always update filter dict and LineEdit, in case the design algorithm
         # has changed the number of delays:
-        fil_dict['N'] = self.delays * self.stages # updated filter order
+        fb_set('N', self.delays * self.stages) # updated filter order
         self.led_delays.setText(str(self.delays)) # updated number of delays
 
         self._store_entries()
 
 
-    def calc_ma(self, fil_dict, rt='LP'):
+    def calc_ma(self, rt):
         """
         Calculate coefficients and P/Z for moving average filter based on
         filter length L = N + 1 and number of cascaded stages and save the
@@ -355,38 +356,38 @@ near ``f_S/2`` (highpass).
         # store in class attributes for the _save method
         self.zpk = np.array([z,p,gain])
         self.b = b
-        self._save(fil_dict)
+        self._save()
 
 
-    def LPman(self, fil_dict):
-        self._get_params(fil_dict)
-        self.calc_ma(fil_dict, rt = 'LP')
+    def LPman(self):
+        self._get_params()
+        self.calc_ma('LP')
 
-    def LPmin(self, fil_dict):
-        self._get_params(fil_dict)
+    def LPmin(self):
+        self._get_params()
         self.delays = int(np.ceil(1 / (self.A_SB **(1/self.stages) *
                                                      np.sin(self.F_SB * np.pi))))
-        self.calc_ma(fil_dict, rt = 'LP')
+        self.calc_ma('LP')
 
-    def HPman(self, fil_dict):
-        self._get_params(fil_dict)
-        self.calc_ma(fil_dict, rt = 'HP')
+    def HPman(self):
+        self._get_params()
+        self.calc_ma('HP')
 
-    def HPmin(self, fil_dict):
-        self._get_params(fil_dict)
+    def HPmin(self):
+        self._get_params()
         self.delays = int(np.ceil(1 / (self.A_SB **(1/self.stages) *
                                               np.sin((0.5 - self.F_SB) * np.pi))))
-        self.calc_ma(fil_dict, rt = 'HP')
+        self.calc_ma('HP')
 
-    def BSman(self, fil_dict):
-        self._get_params(fil_dict)
+    def BSman(self):
+        self._get_params()
         self.delays = ceil_odd(self.delays)  # enforce odd order
-        self.calc_ma(fil_dict, rt = 'BS')
+        self.calc_ma('BS')
 
-    def BPman(self, fil_dict):
-        self._get_params(fil_dict)
+    def BPman(self):
+        self._get_params()
         self.delays = ceil_odd(self.delays)  # enforce odd order
-        self.calc_ma(fil_dict, rt = 'BP')
+        self.calc_ma('BP')
 
 #------------------------------------------------------------------------------
 
@@ -405,7 +406,7 @@ if __name__ == '__main__':
     layVDynWdg.addWidget(wdg_ma, stretch = 1)
 
     filt.LPman(fb.fil[0])  # design a low-pass with parameters from global dict
-    print(fb.fil[0]['zpk']) # return results in default format
+    print(fb_get('zpk')) # return results in default format
 
     form = QFrame()
     form.setFrameStyle(QFrame.StyledPanel|QFrame.Sunken)
