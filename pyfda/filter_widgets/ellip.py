@@ -155,7 +155,7 @@ class Ellip():
         """
         if not self._test_n():
             return -1
-        fil_save(fil_dict, arg, self.FRMT, __name__)
+        fil_save(arg, self.FRMT, __name__)
 
         if fb_get('fo') == 'min':
             if fb_get('rt') in {'LP', 'HP'}:
