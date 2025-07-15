@@ -507,34 +507,52 @@ def store_fil():
     fil_undo[undo_ptr] = copy.deepcopy(fil[0])
 
 # -------------------------
-def key_list_to_dict(keys: list, fil_dict: dict) -> dict:
+def key_list_to_dict(keys_tuple: list, fil_dict: dict) -> dict:
     """
-    Convert a list or tuple of keys (str) to access a nested dict that can be
-    read or written to and return that dict.
+    Use a list or tuple of strings `keys_tuple` to access a nested dict `fil_dict` that
+    can be written to and return that dict.
 
-    The nested dict is always based on `fb.fil[0]`. In order to set or get the value
-    of the nested dict, use the key for the lowest nesting level on the returned
-    dict `d`, i.e. `d[keys[-1]] = arg` resp. `arg = d[keys[-1]]`.
+    In order to set the value of the returned nested dict, use the key for the lowest
+    nesting level on the returned dict `d`, i.e. `d[keys_tuple[-1]] = arg` .
+
+    Parameters
+    ----------
+    keys_tuple : list
+        List of keys to traverse the nested dictionary.
+    fil_dict : dict
+        The dictionary to traverse.
+
+    Returns
+    -------
+    dict
+        The nested dictionary at the specified level.
+
+    Raises
+    ------
+    KeyError
+        If the keys do not exist in the dictionary.
     """
-    # global fil
-    if len(keys) == 0:
+    if not keys_tuple:
         raise KeyError("List of keys was empty!")
 
-    if len(keys) == 1:
-        d = fil[0]
-    elif len(keys) == 2:
-        d = fil[0][keys[0]]
-    elif len(keys) == 3:
-        d = fil[0][keys[0]][keys[1]]
-    else:
-        raise KeyError(
-            "Creating dicts nested more than 3 keys deep is not supported yet!")
+    d = fil_dict
+    for key in keys_tuple[:-1]:  # Traverse all keys except the last one
+        if key not in d or not isinstance(d[key], dict):
+            raise KeyError(f"Key '{key}' not found or is not a dictionary!")
+        d = d[key]
+
     return d
 
 # -------------------------
 def get_fx()-> bool:
     """
-    Check if fixpoint mode is active
+    Check if a fixpoint mode is active
+
+    Returns
+    -------
+    bool
+        True if qfrmt is one of the fixpoint formats 'qint' or 'qfrac'
+
     """
     return fb_get('qfrmt') in ['qint', 'qfrac']
 
@@ -550,7 +568,7 @@ def set_fx(fx: bool)-> None:
         fb_set('qfrmt', fb_get('qfrmt_float_last'))
 
 # -------------------------
-def fb_get(*args, fil_dict=fil[0]) -> str:
+def fb_get(*keys_tuple, fil_dict=fil[0]) -> str:
     """
     Get the value of a key in the global dict `fil[0]`. Multiple arguments
     access nested dicts:
@@ -559,67 +577,101 @@ def fb_get(*args, fil_dict=fil[0]) -> str:
 
     TODO: Keys need to be protected from accidental overwriting by
     the user. This will be done by prepending the keys with an underscore
-    (e.g. `_f_S`) once all direct accesses have been changed.
+    (e.g. `_f_S`) once all direct accesses have been removed.
     """
-    if len(args) == 0:
+    if len(keys_tuple) == 0:
         # called without arguments, return a copy of the whole dict
         return copy.deepcopy(fil_dict)
 
     ret = fil_dict
     try:
-        for key in args:
+        for key in keys_tuple:
             ret = ret[key]
-        # if len(args) == 1:
-        #     ret = fil_dict[args[0]]
-        #     # ret = fil_dict['_' + args[0]]
-        # elif len(args) == 2:
-        #     ret = fil_dict[args[0]][args[1]]
-        # elif len(args) == 3:
-        #     ret = fil_dict[args[0]][args[1]][args[2]]
-        # else:
-        #     raise KeyError(
-        #         "Accessing dicts nested more than 3 keys deep is not supported yet!")
+            # ret = fil_dict[keys_tuple[0]][keys_tuple[1]][keys_tuple[2]] ...
     except (KeyError, IndexError, TypeError):
-        logger.warning("Key path %s not found in filter dict!", args)
-        return None
+        # create a meaningful error message with a string of the failed dict
+        dict_str = fil_dict
+        if len(keys_tuple) < 3:  # only one level dictionary, keys_tuple[-1] is already the key
+            dict_str += '[' + keys_tuple[-2] + ']'
+        else:
+            for i, s in enumerate(keys_tuple[:-1]):
+                dict_str += '[' + s[i] + ']'
+        logger.error(f"Dict '%s' does not exist!", dict_str)
+        return -1
+
+        # logger.warning("Key path %s not found in filter dict!", keys_tuple)
+        # return None
 
     if ret is None:
-        logger.warning("Key '%s' not found in filter dict!", args[-1])
+        logger.warning("Key '%s' not found in filter dict!", keys_tuple[-1])
     return ret
 
 # -------------------------
-def fb_set(*args, backup: bool = True, fil_dict=fil[0]) -> None:
+def fb_set(*keys_tuple, backup: bool = True, fil_dict=fil[0]) -> None:
     """
-    Set the value of a key in the global dict `fil[0]`
-    """
-    if type(args) != tuple or len(args) < 2:
-        logger.error("No dictionary can be built from '%s'", args)
-        return -1
+    Use the items of `keys_tuple` to access a nested dict `fil_dict`
+    (default: `fil[0]`) and write the last item in `keys_tuple` to the dict.
 
-    val = args[-1]  # last element is the value to be set
+    In order to set the value of the returned nested dict, use the key for the lowest
+    nesting level on the returned dict `d`, i.e. `d[keys_tuple[-1]] = arg` .
+
+    Parameters
+    ----------
+    keys_tuple : tuple
+        Tuple of keys for traversing the nested dictionary, the last element is the value
+        to be set.
+    backup : bool
+        Whether the previous state of the filter dict should be backed up
+    fil_dict : dict
+        The dictionary to traverse.
+
+    Returns
+    -------
+    int
+        The error code; 0 for successful operation, -1 for an error
+
+    Raises
+    ------
+    KeyError
+        If a key does not exist in the dictionary or the tuple of keys is empty
+    TypeError
+        If `keys_tuple` is not of type Tuple or if the tuple contains less than two items
+    """
+
+    if not keys_tuple:
+        raise KeyError("Tuple of keys is empty!")
+    if type(keys_tuple) != tuple:
+        raise TypeError("Keys container needs to be a Tuple, not a '%s'!", type(keys_tuple))
+        # logger.error("Wrong type of arguments collection '%s'", type(keys_tuple))
+        # return -1
+    if len(keys_tuple) < 2:
+        raise TypeError("Not enough arguments for setting a dictionary value!")
+
+    val = keys_tuple[-1]  # last element is not a key but the value to be set
 
     try:
-        d = key_list_to_dict(args[:-1], fil_dict)  # create nested dict from the other arguments
-        _ =  d[args[-2]]  # try accessing dictionary
+        d = key_list_to_dict(keys_tuple[:-1], fil_dict)  # create nested dict from the other arguments
+        _ =  d[keys_tuple[-2]]  # test accessing the dictionary
         if backup:
             store_fil()  # backup old setting
 
-        if args[-2] =='qfrmt' and len(args) == 2:
+        if keys_tuple[-2] =='qfrmt' and len(keys_tuple) == 2:
             # remember current fixpoint / float format
-            if get_fx():
+            if get_fx():  # store old fixpoint format
                 fil_dict['qfrmt_fx_last'] = fil_dict['qfrmt']
-            else:
+            else:  # store old float format
                 fil[0]['qfrmt_float_last'] = fil_dict['qfrmt']
             # and set new format
             fil_dict['qfrmt'] = val
         else:
-            d[args[-2]] = val  # store new value if valid
+            d[keys_tuple[-2]] = val  # store new value if valid
     except KeyError:
-        dict_str = 'fb.fil[0]'  # create a string for the failed dict
-        if len(args) < 3:  # only one level dictionary, args[-1] is already the key
-            dict_str += '[' + args[-2] + ']'
+        # create a meaningful error message with a string of the failed dict
+        dict_str = 'fb.fil[0]'
+        if len(keys_tuple) < 3:  # only one level dictionary, keys_tuple[-1] is already the key
+            dict_str += '[' + keys_tuple[-2] + ']'
         else:
-            for i, s in enumerate(args[:-1]):
+            for i, s in enumerate(keys_tuple[:-1]):
                 dict_str += '[' + s[i] + ']'
         logger.error(f"Dict '%s' does not exist!", dict_str)
         return -1
