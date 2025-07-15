@@ -293,5 +293,5 @@ class Bessel():
 if __name__ == '__main__':
     # Run this module standalone with `python -m pyfda.filter_widgets.bessel`
     filt = Bessel()        # instantiate filter
-    filt.LPman(fb.fil[0])  # design a low-pass with parameters from global dict
+    filt.LPman()  # design a low-pass with parameters from global dict
     print(fb_get(filt.FRMT)) # return results in default format (e.g. 'ba')

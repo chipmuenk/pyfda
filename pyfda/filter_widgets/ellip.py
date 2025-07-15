@@ -266,5 +266,5 @@ if __name__ == '__main__':
     # Run this module standalone with 'python -m pyfda.filter_widgets.ellip'
     filt = Ellip()        # instantiate filter
     fb_set('fo', 'man')
-    filt.LPman(fb.fil[0])  # design a low-pass with parameters from global dict
+    filt.LPman()  # design a low-pass with parameters from global dict
     print(fb_get(filt.FRMT)) # return results in default format

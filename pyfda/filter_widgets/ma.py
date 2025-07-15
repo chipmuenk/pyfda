@@ -405,7 +405,7 @@ if __name__ == '__main__':
     layVDynWdg = QVBoxLayout()
     layVDynWdg.addWidget(wdg_ma, stretch = 1)
 
-    filt.LPman(fb.fil[0])  # design a low-pass with parameters from global dict
+    filt.LPman()  # design a low-pass with parameters from global dict
     print(fb_get('zpk')) # return results in default format
 
     form = QFrame()

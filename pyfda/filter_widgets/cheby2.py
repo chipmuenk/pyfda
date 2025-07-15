@@ -266,7 +266,7 @@ class Cheby2():
 if __name__ == '__main__':
     import pyfda.filterbroker as fb # importing filterbroker initializes all its globals
     filt = Cheby2()        # instantiate filter
-    filt.LPman(fb.fil[0])  # design a low-pass with parameters from global dict
+    filt.LPman()  # design a low-pass with parameters from global dict
     print(fb.fil[0][filt.FRMT]) # return results in default format
 
 # test using "python -m pyfda.filter_widgets.cheby2"

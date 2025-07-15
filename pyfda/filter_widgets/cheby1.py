@@ -269,7 +269,7 @@ if __name__ == '__main__':
     # Run this module standalone with 'python -m pyfda.filter_widgets.cheby1'
     filt = Cheby1()        # instantiate filter
     fb_set('fo', 'min')
-    filt.LPmin(fb.fil[0])  # design a low-pass with parameters from global dict
+    filt.LPmin()  # design a low-pass with parameters from global dict
     print(fb_get(filt.FRMT)) # return results in default format
 
 
