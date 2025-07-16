@@ -102,21 +102,21 @@ class Manual_FIR():
 
     # def _get_params(self, fil_dict):
     #     """
-    #     Translate parameters from the passed dictionary to instance
+    #     Translate parameters from the filter dictionary to instance
     #     parameters, scaling / transforming them if needed.
     #     """
-    #     self.N     = fil_dict['N']
-    #     self.F_PB  = fil_dict['F_PB']
-    #     self.F_SB  = fil_dict['F_SB']
-    #     self.F_PB2 = fil_dict['F_PB2']
-    #     self.F_SB2 = fil_dict['F_SB2']
-    #     self.F_C   = fil_dict['F_C']
-    #     self.F_C2  = fil_dict['F_C2']
+    #     self.N     = fb_get('N')
+    #     self.F_PB  = fb_get('F_PB')
+    #     self.F_SB  = fb_get('F_SB')
+    #     self.F_PB2 = fb_get('F_PB2')
+    #     self.F_SB2 = fb_get('F_SB2')
+    #     self.F_C   = fb_get('F_C')
+    #     self.F_C2  = fb_get('F_C2')
 
-    #     self.A_PB  = fil_dict['A_PB']
-    #     self.A_PB2 = fil_dict['A_PB2']
-    #     self.A_SB  = fil_dict['A_SB']
-    #     self.A_SB2 = fil_dict['A_SB2']
+    #     self.A_PB  = fb_get('A_PB')
+    #     self.A_PB2 = fb_get('A_PB2')
+    #     self.A_SB  = fb_get('A_SB')
+    #     self.A_SB2 = fb_get('A_SB2')
 
     def LPman(self):
         """ Dummy method, to display widgets corresponding to filter type in UI """
@@ -184,23 +184,23 @@ class Manual_IIR():
 
         #------------------- end of static info for filter tree ---------------
 
-    # def _get_params(self, fil_dict):
+    # def _get_params(self):
     #     """
     #     Translate parameters from the passed dictionary to instance
     #     parameters, scaling / transforming them if needed.
     #     """
-    #     self.N     = fil_dict['N']
-    #     self.F_PB  = fil_dict['F_PB']
-    #     self.F_SB  = fil_dict['F_SB']
-    #     self.F_PB2 = fil_dict['F_PB2']
-    #     self.F_SB2 = fil_dict['F_SB2']
-    #     self.F_C   = fil_dict['F_C']
-    #     self.F_C2  = fil_dict['F_C2']
+    #     self.N     = fb_get('N')
+    #     self.F_PB  = fb_get('F_PB')
+    #     self.F_SB  = fb_get('F_SB')
+    #     self.F_PB2 = fb_get('F_PB2')
+    #     self.F_SB2 = fb_get('F_SB2')
+    #     self.F_C   = fb_get('F_C')
+    #     self.F_C2  = fb_get('F_C2')
 
-    #     self.A_PB  = fil_dict['A_PB']
-    #     self.A_PB2 = fil_dict['A_PB2']
-    #     self.A_SB  = fil_dict['A_SB']
-    #     self.A_SB2 = fil_dict['A_SB2']
+    #     self.A_PB  = fb_get('A_PB')
+    #     self.A_PB2 = fb_get('A_PB2')
+    #     self.A_SB  = fb_get('A_SB')
+    #     self.A_SB2 = fb_get('A_SB2')
 
 
     def LPman(self):
