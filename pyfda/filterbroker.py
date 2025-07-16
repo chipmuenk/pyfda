@@ -42,6 +42,7 @@ More info on data persistence and storing / accessing global variables:
 * http://stackoverflow.com/questions/9058305/getting-attributes-of-a-class
 * http://stackoverflow.com/questions/2447353/getattr-on-a-module
 
+# Replace fb.fil[0]['some_key'] with fb_get('some_key')
 # TODO: fb.fil\['([\s\S\r]*?)'\] or fil_dict\['([\s\S\r]*?)'\] -> fb_get('$1')
 
 """
@@ -568,12 +569,22 @@ def set_fx(fx: bool)-> None:
         fb_set('qfrmt', fb_get('qfrmt_float_last'))
 
 # -------------------------
-def fb_get(*keys_tuple, fil_dict=fil[0]) -> str:
+def fb_get(*keys_tuple, fil_dict=fil[0], verbose=True) -> str:
     """
     Get the value of a key in the global dict `fil[0]`. Multiple arguments
     access nested dicts:
     fb_get('qfrmt') == fb.fil[0]['qfrmt']
     fb_get('ba', 0) == fb.fil[0]['ba'][0]
+
+    Parameters
+    ----------
+    keys_tuple : tuple
+        Tuple of keys for traversing the nested dictionary.
+    fil_dict : dict
+        The dictionary to traverse, the default is the global `fil[0]`.
+    verbose : bool
+        Whether to log errors and warnings, default is True. Setting this to False
+        can be used to detect silently whether a key exists in the dictionary
 
     TODO: Keys need to be protected from accidental overwriting by
     the user. This will be done by prepending the keys with an underscore
@@ -590,19 +601,17 @@ def fb_get(*keys_tuple, fil_dict=fil[0]) -> str:
             # ret = fil_dict[keys_tuple[0]][keys_tuple[1]][keys_tuple[2]] ...
     except (KeyError, IndexError, TypeError):
         # create a meaningful error message with a string of the failed dict
-        dict_str = fil_dict
-        if len(keys_tuple) < 3:  # only one level dictionary, keys_tuple[-1] is already the key
-            dict_str += '[' + keys_tuple[-2] + ']'
-        else:
-            for i, s in enumerate(keys_tuple[:-1]):
-                dict_str += '[' + s[i] + ']'
-        logger.error(f"Dict '%s' does not exist!", dict_str)
-        return -1
+        if verbose:
+            dict_str = fil_dict
+            if len(keys_tuple) < 3:  # only one level dictionary, keys_tuple[-1] is already the key
+                dict_str += '[' + keys_tuple[-2] + ']'
+            else:
+                for i, s in enumerate(keys_tuple[:-1]):
+                    dict_str += '[' + s[i] + ']'
+            logger.error("Dict '%s' does not exist!", dict_str)
+        return None
 
-        # logger.warning("Key path %s not found in filter dict!", keys_tuple)
-        # return None
-
-    if ret is None:
+    if ret is None and verbose:
         logger.warning("Key '%s' not found in filter dict!", keys_tuple[-1])
     return ret
 
