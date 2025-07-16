@@ -604,10 +604,11 @@ def fb_get(*keys_tuple, fil_dict=fil[0], verbose=True) -> str:
         if verbose:
             dict_str = fil_dict
             if len(keys_tuple) < 3:  # only one level dictionary, keys_tuple[-1] is already the key
+                logger.warning(keys_tuple)
                 dict_str += '[' + keys_tuple[-2] + ']'
             else:
-                for i, s in enumerate(keys_tuple[:-1]):
-                    dict_str += '[' + s[i] + ']'
+                for k in enumerate(keys_tuple[:-1]):
+                    dict_str += '[' + k + ']'
             logger.error("Dict '%s' does not exist!", dict_str)
         return None
 
@@ -680,8 +681,8 @@ def fb_set(*keys_tuple, backup: bool = True, fil_dict=fil[0]) -> None:
         if len(keys_tuple) < 3:  # only one level dictionary, keys_tuple[-1] is already the key
             dict_str += '[' + keys_tuple[-2] + ']'
         else:
-            for i, s in enumerate(keys_tuple[:-1]):
-                dict_str += '[' + s[i] + ']'
+            for k in keys_tuple[:-1]:
+                dict_str += '[' + k + ']'
         logger.error(f"Dict '%s' does not exist!", dict_str)
         return -1
 
