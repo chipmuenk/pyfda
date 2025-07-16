@@ -19,7 +19,9 @@ API version info:
 import numpy as np
 
 import pyfda.filterbroker as fb
-from pyfda.libs.compat import QWidget, pyqtSignal, QVBoxLayout
+from pyfda.filterbroker import fb_get, fb_set
+from pyfda.libs.pyfda_lib import safe_eval
+from pyfda.libs.compat import QWidget, QLabel, QLineEdit, pyqtSignal, QVBoxLayout, QHBoxLayout
 from pyfda.libs.pyfda_qt_lib import popup_warning, emit
 from pyfda.libs.pyfda_sig_lib import fil_save
 
@@ -83,53 +85,49 @@ class Delay(QWidget):
         These subwidgets are instantiated dynamically when needed in
         select_filter.py using the handle to the filter instance, fb.fil_inst.
         """
-        pass
-# =============================================================================
-#         self.lbl_delay = QLabel("Delays", self)
-#         self.lbl_delay.setObjectName('wdg_lbl_delays')
-#         self.led_delay = QLineEdit(self)
-#         self.led_delay.setText(str(self.N))
-#         self.led_delay.setObjectName('wdg_led_delay')
-#         self.led_delay.setToolTip("Number of delays, N > 0 produces poles, N < 0 zeros.")
-#
-#         self.layHWin = QHBoxLayout()
-#         self.layHWin.setObjectName('wdg_layGWin')
-#         self.layHWin.addWidget(self.lbl_delay)
-#         self.layHWin.addWidget(self.led_delay)
-#         self.layHWin.setContentsMargins(0,0,0,0)
-#         # Widget containing all subwidgets (cmbBoxes, Labels, lineEdits)
-#         self.wdg_fil = QWidget(self)
-#         self.wdg_fil.setObjectName('wdg_fil')
-#         self.wdg_fil.setLayout(self.layHWin)
-#
-#         #----------------------------------------------------------------------
-#         # SIGNALS & SLOTs
-#         #----------------------------------------------------------------------
-#         self.led_delay.editingFinished.connect(self._update_UI)
-#         # fires when edited line looses focus or when RETURN is pressed
-#         #----------------------------------------------------------------------
-#
-#         self.dict2filter_params() # get initial / last setting from dictionary
-#         self._update_UI()
-# =============================================================================
 
-# =============================================================================
-#     def _update_UI(self):
-#         """
-#         Update UI when line edit field is changed (here, only the text is read
-#         and converted to integer) and store parameter settings in filter
-#         dictionary
-#         """
-#         self.N = safe_eval(self.led_delay.text(), self.N,
-#                                       sign="poszero", return_type='int')
-#         self.led_delay.setText(str(self.N))
-#
-#         fb.fil[0].update({'wdg_fil': {'N': self.N}})
-#
-#         # sig_tx -> select_filter -> filter_specs
-#         self.emit({'filt_changed': 'delay'})
-# =============================================================================
+        self.lbl_delay = QLabel("Delays", self)
+        self.lbl_delay.setObjectName('wdg_lbl_delays')
+        self.led_delay = QLineEdit(self)
+        self.led_delay.setText(str(self.N))
+        self.led_delay.setObjectName('wdg_led_delay')
+        self.led_delay.setToolTip("Number of delays, N > 0 produces poles, N < 0 zeros.")
 
+        self.layHWin = QHBoxLayout()
+        self.layHWin.setObjectName('wdg_layGWin')
+        self.layHWin.addWidget(self.lbl_delay)
+        self.layHWin.addWidget(self.led_delay)
+        self.layHWin.setContentsMargins(0,0,0,0)
+        # Widget containing all subwidgets (cmbBoxes, Labels, lineEdits)
+        self.wdg_fil = QWidget(self)
+        self.wdg_fil.setObjectName('wdg_fil')
+        self.wdg_fil.setLayout(self.layHWin)
+
+        #----------------------------------------------------------------------
+        # SIGNALS & SLOTs
+        #----------------------------------------------------------------------
+        self.led_delay.editingFinished.connect(self._update_UI)
+        # fires when edited line looses focus or when RETURN is pressed
+        #----------------------------------------------------------------------
+
+        self.dict2filter_params() # get initial / last setting from dictionary
+        self._update_UI()
+
+    def _update_UI(self):
+        """
+        Update UI when line edit field is changed (here, only the text is read
+        and converted to integer) and store parameter settings in filter
+        dictionary
+        """
+        self.N = safe_eval(self.led_delay.text(), self.N,
+                                      sign="poszero", return_type='int')
+        self.led_delay.setText(str(self.N))
+
+        fb_set('wdg_fil', 'N', self.N)  # store in filter dictionary
+        # fb_set('filter_widgets', 'delay', {'N': self.N})  # store in filter widgets dict
+
+        # sig_tx -> select_filter -> filter_specs
+        self.emit({'filt_changed': 'delay'})
 
     def dict2filter_params(self):
         """
@@ -137,20 +135,17 @@ class Delay(QWidget):
         corresponding UI elements. dict2filter_params() is called upon initialization
         and when the filter is loaded from disk.
         """
-        if 'filter_widgets' in fb.fil[0] and 'delay' in fb.fil[0]['filter_widgets']:
-            wdg_fil_par = fb.fil[0]['filter_widgets']['delay']
-            if 'N' in wdg_fil_par:
-                self.N = wdg_fil_par['N']
-                self.led_delay.setText(str(self.N))
+        wdg_fil_par = fb_get('filter_widgets', 'delay', verbose=False)
+        if wdg_fil_par and 'N' in wdg_fil_par:
+            self.N = wdg_fil_par['N']
+            self.led_delay.setText(str(self.N))
 
-
-    def _get_params(self, fil_dict):
+    def _get_params(self):
         """
         Translate parameters from the passed dictionary to instance
         parameters, scaling / transforming them if needed.
         """
-        self.N = fil_dict['N']  # filter order is translated to numb. of delays
-
+        self.N = fb_get('N')  # filter order is translated to numb. of delays
 
     def _test_n(self):
         """
@@ -161,26 +156,27 @@ class Delay(QWidget):
             return popup_warning(self, self.N, "Delay")
         return True
 
-    def _save(self, fil_dict, arg=None):
+    def _save(self, arg=None):
         """
         Convert between poles / zeros / gain, filter coefficients (polynomes)
-        and second-order sections and store all available formats in the passed
-        dictionary 'fil_dict'.
+        and second-order sections and store all available formats in the global
+        filter dictionary.
         """
         if arg is None:
             arg = np.zeros(self.N)
             #arg =[[0], np.zeros(self.N), 1] # crashes coeff tab
-        fil_save(fil_dict, arg, self.FRMT, __name__)
+        fil_save(arg, self.FRMT, __name__)
 
-    def APman(self, fil_dict):
-        self._get_params(fil_dict)
+    def APman(self):
+        self._get_params()
         if not self._test_n():
             return -1
-        self._save(fil_dict)
+        self._save()
 
 #------------------------------------------------------------------------------
 
 if __name__ == '__main__':
+    # Run this module standalone with 'python -m pyfda.filter_widgets.delay'
     import sys
     from pyfda.libs.compat import QApplication, QFrame
 
@@ -194,8 +190,8 @@ if __name__ == '__main__':
     layVDynWdg = QVBoxLayout()
     layVDynWdg.addWidget(wdg_delay, stretch = 1)
 
-    filt.LPman(fb.fil[0])  # design a low-pass with parameters from global dict
-    print(fb.fil[0][filt.FRMT]) # return results in default format
+    filt.APman()  # design a low-pass with parameters from global dict
+    print(fb_get(filt.FRMT)) # return results in default format
 
     frmMain = QFrame()
     frmMain.setFrameStyle(QFrame.StyledPanel|QFrame.Sunken)
