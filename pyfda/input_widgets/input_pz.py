@@ -36,7 +36,8 @@ classes = {'Input_PZ': 'P/Z'}  #: Dict containing class name : display name
 
 class Input_PZ(QWidget):
     """
-    Create the window for entering exporting / importing and saving / loading data
+    Widget for entering, exporting / importing and saving / loading filter data
+    in pole / zero format (P/Z) with gain.
     """
     sig_rx = pyqtSignal(object)  # incoming from input_tab_widgets
     sig_tx = pyqtSignal(object)  # emitted when filter has been saved

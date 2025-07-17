@@ -49,9 +49,8 @@ classes = {'Input_Coeffs': 'b,a'}  #: Dict containing class name : display name
 
 class Input_Coeffs(QWidget):
     """
-    Create widget with a (sort of) model-view architecture for viewing /
-    editing / entering data contained in `self.ba` which is a list of two numpy
-    arrays:
+    Widget with a (sort of) model-view architecture for viewing / editing /
+    entering data contained in `self.ba` which is a list of two numpy arrays:
 
     - `self.ba[0]` contains the numerator coefficients ("b")
     - `self.ba[1]` contains the denominator coefficients ("a")
