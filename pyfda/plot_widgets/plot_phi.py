@@ -28,6 +28,7 @@ classes = {'Plot_Phi': '\u03C6(f)'}  #: Dict containing class name : display nam
 
 
 class Plot_Phi(QWidget):
+    """ Widget for plotting the phase frequency response phi(f) """
     # incoming, connected in sender widget (locally connected to self.process_sig_rx() )
     sig_rx = pyqtSignal(object)
     # outgoing, distributed via plot_tab_widget
