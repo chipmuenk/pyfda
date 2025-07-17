@@ -294,7 +294,7 @@ class Plot_PZ(QWidget):
         overlay = qget_cmb_box(self.cmb_overlay)
         self.but_log.setVisible(overlay != "none")
 
-        self.draw_Hf(r=self.diaRad_Hf.value(), Hf_visible=(overlay == "h(f)"))
+        self.draw_Hf(r=self.diaRad_Hf.value(), Hf_visible=overlay == "h(f)")
 
         self.draw_contours(overlay)
 
@@ -463,20 +463,20 @@ class Plot_PZ(QWidget):
         plt_ax.scatter(z.real, z.imag, s=mzs*mzs, zorder=2, marker='o',
                        facecolor='none', edgecolor=mzc, lw=lw, label=zlabel)
         # and print their multiplicity
-        for i in range(len(z)):
-            logger.debug('z: {0} | {1} | {2}'.format(i, z[i], num_z[i]))
+        for i, z_i in enumerate(z):
+            logger.debug("z: %d | %s | %d", i, z_i, num_z[i])
             if num_z[i] > 1:
-                plt_ax.text(np.real(z[i]), np.imag(z[i]), '  (' + str(num_z[i]) + ')',
+                plt_ax.text(np.real(z_i), np.imag(z_i), '  (' + str(num_z[i]) + ')',
                             va='top', color=mzc)
         if plt_poles:
             # Plot the poles
             plt_ax.scatter(p.real, p.imag, s=mps*mps, zorder=2, marker='x',
                            color=mpc, lw=lw, label=plabel)
             # and print their multiplicity
-            for i in range(len(p)):
-                logger.debug('p:{0} | {1} | {2}'.format(i, p[i], num_p[i]))
+            for i, p_i in enumerate(p):
+                logger.debug("p: %d | %s | %d", i, p_i, num_p[i])
                 if num_p[i] > 1:
-                    plt_ax.text(np.real(p[i]), np.imag(p[i]), '  (' + str(num_p[i]) + ')',
+                    plt_ax.text(np.real(p_i), np.imag(p_i), '  (' + str(num_p[i]) + ')',
                                 va='bottom', color=mpc)
 
 # =============================================================================
