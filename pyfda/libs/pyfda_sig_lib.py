@@ -1133,7 +1133,9 @@ def fil_save(arg: np.ndarray, format_in: str, sender: str, convert: bool = True)
     None
     """
     if not isinstance(arg, np.ndarray):
-        logger.warning("'fil_save()': 'ba' format should be a numpy array, is %s!", type(arg))
+        logger.warning(
+            "'fil_save()': data in '%s' format should be a numpy array but is '%s'!",
+            format_in, type(arg))
 
     if format_in == 'sos':
         fb_set('sos', arg)
