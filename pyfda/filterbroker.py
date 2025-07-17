@@ -604,7 +604,7 @@ def fb_get(*keys_tuple, fil_dict=fil[0], verbose=True) -> str:
                 logger.warning(keys_tuple)
                 dict_str += '[' + keys_tuple[-2] + ']'
             else:
-                for k in enumerate(keys_tuple[:-1]):
+                for k in keys_tuple[:-1]:
                     dict_str += '[' + k + ']'
             logger.error("Dict '%s' does not exist!", dict_str)
         return None
