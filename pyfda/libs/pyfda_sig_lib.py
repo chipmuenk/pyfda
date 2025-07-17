@@ -100,7 +100,7 @@ def impz(b, a=1, FS=1, N=0, step=False):
 
 # ------------------------------------------------------------------------------
 def impz_len(system, zpk: bool = False, level: float = -40) -> int:
-    """
+    r"""
     Calculate length of impulse response for FIR and IIR filters.
 
     Parameters
@@ -137,7 +137,7 @@ def impz_len(system, zpk: bool = False, level: float = -40) -> int:
 
     .. math::
 
-        \\tau\\approx \\frac{T_S}{1-\\abs{p}_{max}}
+        \tau\approx \frac{T_S}{1-\abs{p}_{max}}
 
     When calculating the number of samples instead of an absolute time, `T_S = 1`.
 
@@ -145,7 +145,7 @@ def impz_len(system, zpk: bool = False, level: float = -40) -> int:
 
     .. math::
 
-        N \\approx -level/20 * \\ln(10) \\tau
+        N \approx -level/20 * \ln(10) \tau
 
     When poles are specified (`zpk == True`), it is of course easy to find the
     dominant pole. When coefficients of the system are specified, poles can be
@@ -407,322 +407,321 @@ def validate_sos(sos):
 # ------------------------------------------------------------------------------
 def group_delay(b, a=1, nfft=512, whole=False, analog=False, verbose=True,
                 fs=2.*pi, sos=False, alg="scipy", n_eps=100):
-    """
-Calculate group delay of a discrete time filter, specified by
-numerator coefficients `b` and denominator coefficients `a` of the system
-function `H` ( `z`).
+    r"""Calculate group delay of a discrete time filter, specified by
+    numerator coefficients `b` and denominator coefficients `a` of the system
+    function `H` ( `z`).
 
-When only `b` is given, the group delay of the transversal (FIR)
-filter specified by `b` is calculated.
+    When only `b` is given, the group delay of the transversal (FIR)
+    filter specified by `b` is calculated.
 
-Parameters
-----------
-b :  array_like
-     Numerator coefficients (transversal part of filter)
+    Parameters
+    ----------
+    b :  array_like
+        Numerator coefficients (transversal part of filter)
 
-a :  array_like (optional, default = 1 for FIR-filter)
-     Denominator coefficients (recursive part of filter)
+    a :  array_like (optional, default = 1 for FIR-filter)
+        Denominator coefficients (recursive part of filter)
 
-whole : boolean (optional, default : False)
-     Only when True calculate group delay around
-     the complete unit circle (0 ... 2 pi)
+    whole : boolean (optional, default : False)
+        Only when True calculate group delay around
+        the complete unit circle (0 ... 2 pi)
 
-verbose : boolean (optional, default : True)
-    Print warnings about frequency points with undefined group delay (amplitude = 0)
-    and the time used for calculating the group delay
+    verbose : boolean (optional, default : True)
+        Print warnings about frequency points with undefined group delay (amplitude = 0)
+        and the time used for calculating the group delay
 
-nfft :  integer (optional, default: 512)
-     Number of FFT-points
+    nfft :  integer (optional, default: 512)
+        Number of FFT-points
 
-fs : float (optional, default: fs = 2*pi)
-     Sampling frequency.
+    fs : float (optional, default: fs = 2*pi)
+        Sampling frequency.
 
-alg : str (default: "scipy")
-      The algorithm for calculating the group delay:
-          - "scipy" The algorithm used by scipy's grpdelay,
-          - "jos": The original J.O.Smith algorithm; same as in "scipy" except that
-            the frequency response is calculated with the FFT instead of polyval
-          - "diff": Group delay is calculated by differentiating the phase
-          - "Shpakh": Group delay is calculated from second-order sections
+    alg : str (default: "scipy")
+        The algorithm for calculating the group delay:
+            - "scipy" The algorithm used by scipy's grpdelay,
+            - "jos": The original J.O.Smith algorithm; same as in "scipy" except that
+                the frequency response is calculated with the FFT instead of polyval
+            - "diff": Group delay is calculated by differentiating the phase
+            - "Shpakh": Group delay is calculated from second-order sections
 
-n_eps : integer (optional, default : 100)
-        Minimum value in the calculation of intermediate values before tau_g is set
-        to zero.
+    n_eps : integer (optional, default : 100)
+            Minimum value in the calculation of intermediate values before tau_g is set
+            to zero.
 
-Returns
--------
-tau_g : ndarray
-        group delay
+    Returns
+    -------
+    tau_g : ndarray
+            group delay
 
-w : ndarray
-    angular frequency points where group delay was computed
+    w : ndarray
+        angular frequency points where group delay was computed
 
-Notes
-=======
+    Notes
+    =======
 
-The following explanations follow [JOS]_.
+    The following explanations follow [JOS]_.
 
-**Definition and direct calculation ('diff')**
+    **Definition and direct calculation ('diff')**
 
-The group delay :math:`\\tau_g(\\omega)` of discrete time (DT) and continuous time
-(CT) systems is the rate of change of phase with respect to angular frequency.
-In the following, derivative is always meant w.r.t. :math:`\\omega`:
+    The group delay :math:`\tau_g(\omega)` of discrete time (DT) and continuous time
+    (CT) systems is the rate of change of phase with respect to angular frequency.
+    In the following, derivative is always meant w.r.t. :math:`\omega`:
 
-.. math::
+    .. math::
 
-    \\tau_g(\\omega)
-        = -\\frac{\\partial }{\\partial \\omega}\\angle H( \\omega)
-        = -\\frac{\\partial \\phi(\\omega)}{\\partial \\omega}
-        = -  \\phi'(\\omega)
+        \tau_g(\omega)
+            = -\frac{\partial }{\partial \omega}\angle H( \omega)
+            = -\frac{\partial \phi(\omega)}{\partial \omega}
+            = -  \phi'(\omega)
 
-With numpy / scipy, the group delay can be calculated directly with
+    With numpy / scipy, the group delay can be calculated directly with
 
-.. code-block:: python
+    .. code-block:: python
 
-    w, H = sig.freqz(b, a, worN=nfft, whole=whole)
-    tau_g = -np.diff(np.unwrap(np.angle(H)))/np.diff(w)
+        w, H = sig.freqz(b, a, worN=nfft, whole=whole)
+        tau_g = -np.diff(np.unwrap(np.angle(H)))/np.diff(w)
 
-The derivative can create numerical problems for e.g. phase jumps at zeros of
-frequency response or when the complex frequency response becomes very small e.g.
-in the stop band.
+    The derivative can create numerical problems for e.g. phase jumps at zeros of
+    frequency response or when the complex frequency response becomes very small e.g.
+    in the stop band.
 
-This can be avoided by calculating the group delay from the derivative of the
-*logarithmic* frequency response in polar form (amplitude response and phase):
+    This can be avoided by calculating the group delay from the derivative of the
+    *logarithmic* frequency response in polar form (amplitude response and phase):
 
-.. math::
+    .. math::
 
-    \\ln ( H( \\omega))
-      = \\ln \\left({H_A( \\omega)} e^{j \\phi(\\omega)} \\right)
-      = \\ln \\left({H_A( \\omega)} \\right) + j \\phi(\\omega)
+        \ln ( H( \omega))
+        = \ln \left({H_A( \omega)} e^{j \phi(\omega)} \right)
+        = \ln \left({H_A( \omega)} \right) + j \phi(\omega)
 
-      \\Rightarrow \\; \\frac{\\partial }{\\partial \\omega} \\ln ( H( \\omega))
-      = \\frac{H_A'( \\omega)}{H_A( \\omega)} +  j \\phi'(\\omega)
+        \Rightarrow \; \frac{\partial }{\partial \omega} \ln ( H( \omega))
+        = \frac{H_A'( \omega)}{H_A( \omega)} +  j \phi'(\omega)
 
-where :math:`H_A(\\omega)` is the amplitude response. :math:`H_A(\\omega)` and
-its derivative :math:`H_A'(\\omega)` are real-valued, therefore, the group
-delay can be calculated by separating real and imginary components (and discarding
-the real part):
+    where :math:`H_A(\omega)` is the amplitude response. :math:`H_A(\omega)` and
+    its derivative :math:`H_A'(\omega)` are real-valued, therefore, the group
+    delay can be calculated by separating real and imginary components (and discarding
+    the real part):
 
-.. math::
+    .. math::
 
-    \\begin{align}
-    \\Re \\left\\{\\frac{\\partial }{\\partial \\omega} \\ln ( H( \\omega))\\right\\}
-           &= \\frac{H_A'( \\omega)}{H_A( \\omega)} \\\\
-    \\Im \\left\\{\\frac{\\partial }{\\partial \\omega} \\ln ( H( \\omega))\\right\\}
-           &= \\phi'(\\omega)
-    \\end{align}
+        \begin{align}
+        \Re \left\{\frac{\partial }{\partial \omega} \ln ( H( \omega))\right\}
+            &= \frac{H_A'( \omega)}{H_A( \omega)} \\
+        \Im \left\{\frac{\partial }{\partial \omega} \ln ( H( \omega))\right\}
+            &= \phi'(\omega)
+        \end{align}
 
-and hence
+    and hence
 
-.. math::
+    .. math::
 
-      \\tau_g(\\omega) = -\\phi'(\\omega) =
-      -\\Im \\left\\{ \\frac{\\partial }{\\partial \\omega}
-      \\ln ( H( \\omega)) \\right\\}
-      =-\\Im \\left\\{ \\frac{H'(\\omega)}{H(\\omega)} \\right\\}
+        \tau_g(\omega) = -\phi'(\omega) =
+        -\Im \left\{ \frac{\partial }{\partial \omega}
+        \ln ( H( \omega)) \right\}
+        =-\Im \left\{ \frac{H'(\omega)}{H(\omega)} \right\}
 
-Note: The last term contains the complex response :math:`H(\omega)`, not the
-amplitude response :math:`H_A(\omega)`!
+    Note: The last term contains the complex response :math:`H(\omega)`, not the
+    amplitude response :math:`H_A(\omega)`!
 
-In the following, it will be shown that the derivative of birational functions
-(like DT and CT filters) can be calculated very efficiently and from this the group
-delay.
+    In the following, it will be shown that the derivative of birational functions
+    (like DT and CT filters) can be calculated very efficiently and from this the group
+    delay.
 
 
-**J.O. Smith's basic algorithm for FIR filters ('scipy')**
+    **J.O. Smith's basic algorithm for FIR filters ('scipy')**
 
-An efficient form of calculating the group delay of FIR filters based on the
-derivative of the logarithmic frequency response has been described in [JOS]_
-and [Lyons08]_ for discrete time systems.
+    An efficient form of calculating the group delay of FIR filters based on the
+    derivative of the logarithmic frequency response has been described in [JOS]_
+    and [Lyons08]_ for discrete time systems.
 
-A FIR filter is defined via its polyome :math:`H(z) = \\sum_k b_k z^{-k}` and has
-the following derivative:
+    A FIR filter is defined via its polyome :math:`H(z) = \sum_k b_k z^{-k}` and has
+    the following derivative:
 
-.. math::
+    .. math::
 
-    \\frac{\\partial }{\\partial \\omega} H(z = e^{j \\omega T})
-    = \\frac{\\partial }{\\partial \\omega} \\sum_{k = 0}^N b_k e^{-j k \\omega T}
-    =  -jT \\sum_{k = 0}^{N} k b_{k} e^{-j k \\omega T}
-    =  -jT H_R(e^{j \\omega T})
+        \frac{\partial }{\partial \omega} H(z = e^{j \omega T})
+        = \frac{\partial }{\partial \omega} \sum_{k = 0}^N b_k e^{-j k \omega T}
+        =  -jT \sum_{k = 0}^{N} k b_{k} e^{-j k \omega T}
+        =  -jT H_R(e^{j \omega T})
 
-where :math:`H_R` is the "ramped" polynome, i.e. polynome :math:`H` multiplied
-with a ramp :math:`k`, yielding
+    where :math:`H_R` is the "ramped" polynome, i.e. polynome :math:`H` multiplied
+    with a ramp :math:`k`, yielding
 
-.. math::
+    .. math::
 
-    \\tau_g(e^{j \\omega T}) = -\\Im \\left\\{ \\frac{H'(e^{j \\omega T})}
-                    {H(e^{j \\omega T})} \\right\\}
-                    = -\\Im \\left\\{ -j T \\frac{H_R(e^{j \\omega T})}
-                    {H(e^{j \\omega T})} \\right\\}
-                    = T \\, \\Re \\left\\{\\frac{H_R(e^{j \\omega T})}
-                    {H(e^{j \\omega T})} \\right\\}
+        \tau_g(e^{j \omega T}) = -\Im \left\{ \frac{H'(e^{j \omega T})}
+                        {H(e^{j \omega T})} \right\}
+                        = -\Im \left\{ -j T \frac{H_R(e^{j \omega T})}
+                        {H(e^{j \omega T})} \right\}
+                        = T \, \Re \left\{\frac{H_R(e^{j \omega T})}
+                        {H(e^{j \omega T})} \right\}
 
-scipy's grpdelay directly calculates the complex frequency response
-:math:`H(e^{j\\omega T})` and its ramped function at the frequency points using
-the polyval function.
+    scipy's grpdelay directly calculates the complex frequency response
+    :math:`H(e^{j\omega T})` and its ramped function at the frequency points using
+    the polyval function.
 
-When zeros of the frequency response are on or near the data points of the DFT, this
-algorithm runs into numerical problems. Hence, it is neccessary to check whether
-the magnitude of the denominator is less than e.g. 100 times the machine eps.
-In this case, :math:`\\tau_g` is set to zero.
+    When zeros of the frequency response are on or near the data points of the DFT, this
+    algorithm runs into numerical problems. Hence, it is neccessary to check whether
+    the magnitude of the denominator is less than e.g. 100 times the machine eps.
+    In this case, :math:`\tau_g` is set to zero.
 
-**J.O. Smith's basic algorithm for IIR filters ('scipy')**
+    **J.O. Smith's basic algorithm for IIR filters ('scipy')**
 
-IIR filters are defined by
+    IIR filters are defined by
 
-.. math::
+    .. math::
 
-        H(z) = \\frac {B(z)}{A(z)} = \\frac {\\sum b_k z^k}{\\sum a_k z^k},
+            H(z) = \frac {B(z)}{A(z)} = \frac {\sum b_k z^k}{\sum a_k z^k},
 
-their group delay can be calculated numerically via the logarithmic frequency
-response as well.
+    their group delay can be calculated numerically via the logarithmic frequency
+    response as well.
 
-The derivative  of :math:`H(z)` w.r.t. :math:`\\omega` is calculated using the
-quotient rule and by replacing the derivatives of numerator and denominator
-polynomes with their ramp functions:
+    The derivative  of :math:`H(z)` w.r.t. :math:`\omega` is calculated using the
+    quotient rule and by replacing the derivatives of numerator and denominator
+    polynomes with their ramp functions:
 
-.. math::
+    .. math::
 
-    \\begin{align}
-    \\frac{H'(e^{j \\omega T})}{H(e^{j \\omega T})}
-    &= \\frac{\\left(B(e^{j \\omega T})/A(e^{j \\omega T})\\right)'}
-             {B(e^{j \\omega T})/A(e^{j \\omega T})}
-    = \\frac{B'(e^{j \\omega T}) A(e^{j \\omega T}) - A'(e^{j \\omega T})B(e^{j \\omega T})}
-    { A(e^{j \\omega T}) B(e^{j \\omega T})}  \\\\
-    &= \\frac {B'(e^{j \\omega T})} { B(e^{j \\omega T})}
-      - \\frac { A'(e^{j \\omega T})} { A(e^{j \\omega T})}
-    = -j T \\left(\\frac { B_R(e^{j \\omega T})} {B(e^{j \\omega T})}
-                - \\frac { A_R(e^{j \\omega T})} {A(e^{j \\omega T})}\\right)
-    \\end{align}
+        \begin{align}
+        \frac{H'(e^{j \omega T})}{H(e^{j \omega T})}
+        &= \frac{\left(B(e^{j \omega T})/A(e^{j \omega T})\right)'}
+                {B(e^{j \omega T})/A(e^{j \omega T})}
+        = \frac{B'(e^{j \omega T}) A(e^{j \omega T}) - A'(e^{j \omega T})B(e^{j \omega T})}
+        { A(e^{j \omega T}) B(e^{j \omega T})}  \\
+        &= \frac {B'(e^{j \omega T})} { B(e^{j \omega T})}
+        - \frac { A'(e^{j \omega T})} { A(e^{j \omega T})}
+        = -j T \left(\frac { B_R(e^{j \omega T})} {B(e^{j \omega T})}
+                    - \frac { A_R(e^{j \omega T})} {A(e^{j \omega T})}\right)
+        \end{align}
 
-This result is substituted once more into the log. derivative from above:
+    This result is substituted once more into the log. derivative from above:
 
-.. math::
+    .. math::
 
-    \\begin{align}
-    \\tau_g(e^{j \\omega T})
-    =-\\Im \\left\\{ \\frac{H'(e^{j \\omega T})}{H(e^{j \\omega T})} \\right\\}
-    &=-\\Im \\left\\{
-        -j T \\left(\\frac { B_R(e^{j \\omega T})} {B(e^{j \\omega T})}
-                    - \\frac { A_R(e^{j \\omega T})} {A(e^{j \\omega T})}\\right)
-                     \\right\\} \\\\
-        &= T \\Re \\left\\{\\frac { B_R(e^{j \\omega T})} {B(e^{j \\omega T})}
-                    - \\frac { A_R(e^{j \\omega T})} {A(e^{j \\omega T})}
-         \\right\\}
-    \\end{align}
+        \begin{align}
+        \tau_g(e^{j \omega T})
+        =-\Im \left\{ \frac{H'(e^{j \omega T})}{H(e^{j \omega T})} \right\}
+        &=-\Im \left\{
+            -j T \left(\frac { B_R(e^{j \omega T})} {B(e^{j \omega T})}
+                        - \frac { A_R(e^{j \omega T})} {A(e^{j \omega T})}\right)
+                        \right\} \\
+            &= T \Re \left\{\frac { B_R(e^{j \omega T})} {B(e^{j \omega T})}
+                        - \frac { A_R(e^{j \omega T})} {A(e^{j \omega T})}
+            \right\}
+        \end{align}
 
 
-If the denominator of the computation becomes too small, the group delay
-is set to zero.  (The group delay approaches infinity when
-there are poles or zeros very close to the unit circle in the z plane.)
+    If the denominator of the computation becomes too small, the group delay
+    is set to zero.  (The group delay approaches infinity when
+    there are poles or zeros very close to the unit circle in the z plane.)
 
-**J.O. Smith's algorithm for CT filters**
+    **J.O. Smith's algorithm for CT filters**
 
-The same process can be applied for CT systems as well: The derivative of a CT
-polynome :math:`P(s)` w.r.t. :math:`\\omega` is calculated by:
+    The same process can be applied for CT systems as well: The derivative of a CT
+    polynome :math:`P(s)` w.r.t. :math:`\omega` is calculated by:
 
-.. math::
+    .. math::
 
-    \\frac{\\partial }{\\partial \\omega} P(s = j \\omega)
-    = \\frac{\\partial }{\\partial \\omega} \\sum_{k = 0}^N c_k (j \\omega)^k
-    =  j \\sum_{k = 0}^{N-1} (k+1) c_{k+1} (j \\omega)^{k}
-    =  j P_R(s = j \\omega)
+        \frac{\partial }{\partial \omega} P(s = j \omega)
+        = \frac{\partial }{\partial \omega} \sum_{k = 0}^N c_k (j \omega)^k
+        =  j \sum_{k = 0}^{N-1} (k+1) c_{k+1} (j \omega)^{k}
+        =  j P_R(s = j \omega)
 
-where :math:`P_R` is the "ramped" polynome, i.e. its `k` th coefficient is
-multiplied by the ramp `k` + 1, yielding the same form as for DT systems (but
-the ramped polynome has to be calculated differently).
+    where :math:`P_R` is the "ramped" polynome, i.e. its `k` th coefficient is
+    multiplied by the ramp `k` + 1, yielding the same form as for DT systems (but
+    the ramped polynome has to be calculated differently).
 
-.. math::
+    .. math::
 
-    \\tau_g(\\omega) = -\\Im \\left\\{ \\frac{H'(\\omega)}{H(\\omega)} \\right\\}
-                     = -\\Im \\left\\{j \\frac{H_R(\\omega)}{H(\\omega)} \\right\\}
-                     = -\\Re \\left\\{\\frac{H_R(\\omega)}{H(\\omega)} \\right\\}
+        \tau_g(\omega) = -\Im \left\{ \frac{H'(\omega)}{H(\omega)} \right\}
+                        = -\Im \left\{j \frac{H_R(\omega)}{H(\omega)} \right\}
+                        = -\Re \left\{\frac{H_R(\omega)}{H(\omega)} \right\}
 
 
-**J.O. Smith's improved algorithm for IIR filters ('jos')**
+    **J.O. Smith's improved algorithm for IIR filters ('jos')**
 
-J.O. Smith gives the following speed and accuracy optimizations for the basic
-algorithm:
+    J.O. Smith gives the following speed and accuracy optimizations for the basic
+    algorithm:
 
-    - convert the filter to a FIR filter with identical phase and group delay
-      (but with different magnitude response)
+        - convert the filter to a FIR filter with identical phase and group delay
+        (but with different magnitude response)
 
-    - use FFT instead of polyval to calculate the frequency response
+        - use FFT instead of polyval to calculate the frequency response
 
-The group delay of an IIR filter :math:`H(z) = B(z)/A(z)` can also
-be calculated from an equivalent FIR filter :math:`C(z)` with the same phase
-response (and hence group delay) as the original filter. This filter is obtained
-by the following steps:
+    The group delay of an IIR filter :math:`H(z) = B(z)/A(z)` can also
+    be calculated from an equivalent FIR filter :math:`C(z)` with the same phase
+    response (and hence group delay) as the original filter. This filter is obtained
+    by the following steps:
 
-- The zeros of :math:`A(z)` are the poles of :math:`1/A(z)`, its phase response is
-  :math:`\\angle A(z) = - \\angle 1/A(z)`.
+    - The zeros of :math:`A(z)` are the poles of :math:`1/A(z)`, its phase response is
+    :math:`\angle A(z) = - \angle 1/A(z)`.
 
-- Transforming :math:`z \\rightarrow 1/z` mirrors the zeros at the unit circle,
-  correcting the negative phase response. This can be performed numerically by "flipping"
-  the order of the coefficients and multiplying by :math:`z^{-N}` where :math:`N`
-  is the order of :math:`A(z)`. This operation also conjugates the coefficients (?)
-  which mirrors the zeros at the real axis. This effect has to be compensated,
-  yielding the polynome :math:`\\tilde{A}(z)`. It is the "flip-conjugate" or
-  "Hermitian conjugate" of :math:`A(z)`.
+    - Transforming :math:`z \rightarrow 1/z` mirrors the zeros at the unit circle,
+    correcting the negative phase response. This can be performed numerically by "flipping"
+    the order of the coefficients and multiplying by :math:`z^{-N}` where :math:`N`
+    is the order of :math:`A(z)`. This operation also conjugates the coefficients (?)
+    which mirrors the zeros at the real axis. This effect has to be compensated,
+    yielding the polynome :math:`\tilde{A}(z)`. It is the "flip-conjugate" or
+    "Hermitian conjugate" of :math:`A(z)`.
 
-  Frequently (e.g. in the scipy and until recently in the Matlab implementation)
-  the conjugate operation is omitted which gives wrong results for complex
-  coefficients.
+    Frequently (e.g. in the scipy and until recently in the Matlab implementation)
+    the conjugate operation is omitted which gives wrong results for complex
+    coefficients.
 
-- Finally, :math:`C(z) = B(z) \\tilde{A}(z)`:
+    - Finally, :math:`C(z) = B(z) \tilde{A}(z)`:
 
-.. math::
+    .. math::
 
-    C(z) = B(z)\\left[ z^{-N}{A}^{*}(1/z)\\right] = B(z)\\tilde{A}(z)
+        C(z) = B(z)\left[ z^{-N}{A}^{*}(1/z)\right] = B(z)\tilde{A}(z)
 
-where
+    where
 
-.. math::
+    .. math::
 
-    \\begin{align}
-    \\tilde{A}(z) &=  z^{-N}{A}^{*}(1/z)
-                   = {a}^{*}_N + {a}^{*}_{N-1}z^{-1} + \ldots + {a}^{*}_1 z^{-(N-1)}+z^{-N}\\\\
-    \Rightarrow \\tilde{A}(e^{j\omega T}) &=  e^{-jN \omega T}{A}^{*}(e^{-j\omega T}) \\\\
-    \\Rightarrow \\angle\\tilde{A}(e^{j\omega T}) &= -\\angle A(e^{j\omega T}) - N\omega T
-    \\end{align}
+        \begin{align}
+        \tilde{A}(z) &=  z^{-N}{A}^{*}(1/z)
+                    = {a}^{*}_N + {a}^{*}_{N-1}z^{-1} + \ldots + {a}^{*}_1 z^{-(N-1)}+z^{-N}\\
+        \Rightarrow \tilde{A}(e^{j\omega T}) &=  e^{-jN \omega T}{A}^{*}(e^{-j\omega T}) \\
+        \Rightarrow \angle\tilde{A}(e^{j\omega T}) &= -\angle A(e^{j\omega T}) - N\omega T
+        \end{align}
 
 
-In Python, the coefficients of :math:`C(z)` are calculated efficiently by
-convolving the coefficients of :math:`B(z)` and  :math:`\\tilde{A}(z)`:
+    In Python, the coefficients of :math:`C(z)` are calculated efficiently by
+    convolving the coefficients of :math:`B(z)` and  :math:`\tilde{A}(z)`:
 
-.. code-block:: python
+    .. code-block:: python
 
-    c = np.convolve(b, np.conj(a[::-1]))
+        c = np.convolve(b, np.conj(a[::-1]))
 
-where :math:`b` and :math:`a` are the coefficient vectors of the original
-numerator and denominator polynomes. The actual group delay is then calculated
-from the equivalent FIR filter as described above.
+    where :math:`b` and :math:`a` are the coefficient vectors of the original
+    numerator and denominator polynomes. The actual group delay is then calculated
+    from the equivalent FIR filter as described above.
 
-Calculating the frequency response with the `np.polyval(p,z)` function at the
-`NFFT` frequency points along the unit circle, :math:`z = \\exp(-j \\omega)`,
-seems to be numerically less robust than using the FFT for the same task, it
-is also much slower.
+    Calculating the frequency response with the `np.polyval(p,z)` function at the
+    `NFFT` frequency points along the unit circle, :math:`z = \exp(-j \omega)`,
+    seems to be numerically less robust than using the FFT for the same task, it
+    is also much slower.
 
-This measure fixes already most of the problems described for narrowband IIR
-filters in scipy issues [Scipy_9310]_ and [Scipy_1175]_. In my experience, these problems
-occur for all narrowband IIR response types.
+    This measure fixes already most of the problems described for narrowband IIR
+    filters in scipy issues [Scipy_9310]_ and [Scipy_1175]_. In my experience, these problems
+    occur for all narrowband IIR response types.
 
-**Shpak algorithm for IIR filters**
+    **Shpak algorithm for IIR filters**
 
-The algorithm described above is numerically efficient but not robust for
-narrowband IIR filters. Especially for filters defined by second-order sections,
-it is recommended to calculate the group delay using the D. J. Shpak's algorithm.
+    The algorithm described above is numerically efficient but not robust for
+    narrowband IIR filters. Especially for filters defined by second-order sections,
+    it is recommended to calculate the group delay using the D. J. Shpak's algorithm.
 
-Code is available at [Endolith_5828333]_ (GPL licensed) or at [SPA]_ (MIT licensed).
+    Code is available at [Endolith_5828333]_ (GPL licensed) or at [SPA]_ (MIT licensed).
 
-This algorithm sums the group delays of the individual sections which is much
-more robust as only second-order functions are involved. However, converting `(b,a)`
-coefficients to SOS coefficients introduces inaccuracies.
+    This algorithm sums the group delays of the individual sections which is much
+    more robust as only second-order functions are involved. However, converting `(b,a)`
+    coefficients to SOS coefficients introduces inaccuracies.
 
-Examples
---------
->>> b = [1,2,3] # Coefficients of H(z) = 1 + 2 z^2 + 3 z^3
->>> tau_g, td = pyfda_lib.grpdelay(b)
+    Examples
+    --------
+    >>> b = [1,2,3] # Coefficients of H(z) = 1 + 2 z^2 + 3 z^3
+    >>> tau_g, td = pyfda_lib.grpdelay(b)
 """
 
     if not whole:

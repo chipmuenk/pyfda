@@ -6,9 +6,10 @@
 # Licensed under the terms of the MIT License
 # (see file LICENSE in root directory for details)
 
-"""
-# TODO: fb.fil\[0\]\['([\s\S\r]*?)'\] -> fb_get('$1')
+# Replace fb.fil[0]['some_key'] with fb_get('some_key') with the regular expression
+#   fb.fil\[0\]\['([\s\S\r]*?)'\] -> fb_get('$1')
 
+"""
 Dynamic parameters and settings are exchanged via the dictionaries in this file.
 Importing ``filterbroker.py`` runs the module once, defining all module variables
 which have a global scope like class variables and can be imported like
@@ -41,10 +42,6 @@ More info on data persistence and storing / accessing global variables:
 * http://pymotw.com/2/articles/data_persistence.html
 * http://stackoverflow.com/questions/9058305/getting-attributes-of-a-class
 * http://stackoverflow.com/questions/2447353/getattr-on-a-module
-
-# Replace fb.fil[0]['some_key'] with fb_get('some_key')
-# TODO: fb.fil\['([\s\S\r]*?)'\] or fil_dict\['([\s\S\r]*?)'\] -> fb_get('$1')
-
 """
 import logging
 
