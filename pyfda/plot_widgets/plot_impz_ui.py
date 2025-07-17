@@ -69,24 +69,22 @@ class PlotImpz_UI(QWidget):
             if 'close_event' in dict_sig:   # hide FFT window widget and return
                 self.hide_fft_wdg()
                 return
-            else:
-                # check for value 'fft_win*':
-                if 'view_changed' in dict_sig and 'fft_win' in dict_sig['view_changed']:
-                    # local connection to FFT window widget and qfft_win_select
-                    self.emit(dict_sig, sig_name='sig_tx_fft')
-                    # global connection to e.g. plot_impz
-                    self.emit(dict_sig)
+
+            # check for value 'fft_win*':
+            if 'view_changed' in dict_sig and 'fft_win' in dict_sig['view_changed']:
+                # local connection to FFT window widget and qfft_win_select
+                self.emit(dict_sig, sig_name='sig_tx_fft')
+                # global connection to e.g. plot_impz
+                self.emit(dict_sig)
 
     # ------------------------------------------------------------------------
     def __init__(self):
         super().__init__()
+        # Intitialize the widget, consisting of:
+        # - top chkbox row
+        # - coefficient table
+        # - two bottom rows with action buttons
 
-        """
-        Intitialize the widget, consisting of:
-        - top chkbox row
-        - coefficient table
-        - two bottom rows with action buttons
-        """
         # initial settings
         self.N_start = 0
         self.N = 100
@@ -634,14 +632,17 @@ class PlotImpz_UI(QWidget):
 
     # -------------------------------------------------------------------------
     def update_N_auto(self):
+        """
+        Update the number of data points to be plotted when the "N_auto" button is clicked.
+        """
         if not self.but_N_auto.checked:
             # manual entry of number of data points, enable data entry and return
             self.led_N_points.setEnabled(True)
             return
-        else:
-            # automatic calculation of number of data points, disable data entry
-            self.led_N_points.setEnabled(False)
-            self.update_N()
+
+        # automatic calculation of number of data points, disable data entry
+        self.led_N_points.setEnabled(False)
+        self.update_N()
 
     # -------------------------------------------------------------------------
     def update_N(self, emit=True, N_end=0):
@@ -669,7 +670,7 @@ class PlotImpz_UI(QWidget):
                 been changed (`emit==True`)
         """
         if not isinstance(emit, bool):
-            logger.error(f"update N: wrong data type emit={emit}")
+            logger.error("update N: wrong data type emit: '%s'", emit)
 
         # Read value for first data point to be plotted from UI
         self.N_start = safe_eval(self.led_N_start.text(), self.N_start,
@@ -682,8 +683,8 @@ class PlotImpz_UI(QWidget):
         if N_end > 0: # specified max. number of data points, e.g. by file io
             if N_end <= self.N_start:
                 logger.warning(
-                    f"Total number of data points must be {N_end} > "
-                    f"N_start = {self.N_start}, setting N_start = 0.")
+                    "Total number of data points N = %d must be > "
+                    "N_start = %d, setting N_start = 0.", N_end, self.N_start)
                 self.N_start = 0
                 self.led_N_start.setText("0")  # update widget
 
