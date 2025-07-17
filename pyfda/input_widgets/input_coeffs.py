@@ -654,8 +654,8 @@ class Input_Coeffs(QWidget):
 
         # save, check and convert coeffs, check filter type
         try:
-            fil_save(fb.fil[0], self.ba, 'ba', __name__)
-        except Exception as e:
+            fil_save(self.ba, 'ba', __name__)
+        except (ValueError, TypeError) as e:
             # catch exception due to malformatted coefficients:
             logger.error("While saving the filter coefficients, "
                          "the following error occurred:\n%s", e)

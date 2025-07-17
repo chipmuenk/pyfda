@@ -381,8 +381,8 @@ class Input_PZ(QWidget):
             fb.fil[0]['fc'] = 'Manual_FIR'
 
         try:
-            fil_save(fb.fil[0], self.zpk, 'zpk', __name__)  # save with new gain
-        except Exception as e:
+            fil_save(self.zpk, 'zpk', __name__)  # save with new gain
+        except (ValueError, TypeError)as e:
             # catch exception due to malformatted P/Zs:
             logger.error(
                 "While saving the poles / zeros, the following error occurred:\n%s", e)
