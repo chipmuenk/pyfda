@@ -517,6 +517,7 @@ def key_list_to_dict(keys_tuple: list, fil_dict: dict) -> dict:
     ----------
     keys_tuple : list
         List of keys to traverse the nested dictionary.
+
     fil_dict : dict
         The dictionary to traverse.
 

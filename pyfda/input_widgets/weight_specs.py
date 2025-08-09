@@ -104,10 +104,9 @@ class WeightSpecs(QWidget):
 
         self.setLayout(self.layVMain)
 
-        # - Build a list from all entries in the fil_dict dictionary starting
+        # - Build a list from all entries in the filter dictionary starting
         #   with "W" (= weight specifications of the current filter)
         # - Pass the list to setEntries which recreates the widget
-        # ATTENTION: Entries need to be converted from QString to str for Py 2
         self.n_cur_labels = 0  # number of currently visible labels / qlineedits
         new_labels = [str(lbl) for lbl in fb.fil[0] if lbl[0] == 'W']
         self.update_UI(new_labels=new_labels)
