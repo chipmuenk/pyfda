@@ -96,8 +96,8 @@ class IIR_DF1_pyfixp_UI(QWidget):
             fb.fil[0]['fxq']['QCB'], objectName='fx_ui_wq_iir_df1_coeffs_b',
             label='<b>Coeff. Quantization <i>b<sub>I.F&nbsp;</sub></i>:</b>',
             MSB_LSB_vis='max', cmb_w_vis='on', cmb_w_items=self.cmb_wq_coeffs_b_items)
-        layV_wq_coeffs_b = QVBoxLayout()
-        layV_wq_coeffs_b.addWidget(self.wdg_wq_coeffs_b)
+        lay_v_wq_coeffs_b = QVBoxLayout()
+        lay_v_wq_coeffs_b.addWidget(self.wdg_wq_coeffs_b)
 
         # widget for quantization of coefficients 'a'
         if 'QCA' not in fb_get('fxq'):
@@ -107,8 +107,8 @@ class IIR_DF1_pyfixp_UI(QWidget):
             fb.fil[0]['fxq']['QCA'], objectName='fx_ui_wq_iir_df1_coeffs_a',
             label='<b>Coeff. Quantization <i>a<sub>I.F&nbsp;</sub></i>:</b>',
             MSB_LSB_vis='max', cmb_w_vis='on', cmb_w_items=self.cmb_wq_coeffs_a_items)
-        layV_wq_coeffs_a = QVBoxLayout()
-        layV_wq_coeffs_a.addWidget(self.wdg_wq_coeffs_a)
+        lay_v_wq_coeffs_a = QVBoxLayout()
+        lay_v_wq_coeffs_a.addWidget(self.wdg_wq_coeffs_a)
         # calculate wordlength needed for coefficients if required
         if qget_cmb_box(self.wdg_wq_coeffs_a.cmbW) == 'a':
             self.calc_wi_coeffs_a()
@@ -126,17 +126,17 @@ class IIR_DF1_pyfixp_UI(QWidget):
             fb.fil[0]['fxq']['QACC'], objectName='fx_ui_wq_iir_df1_accu',
             label='<b>Accu Quantizer <i>Q<sub>ACC&nbsp;</sub></i>:</b>',
             cmb_w_vis='on', cmb_w_items=self.cmb_wq_accu_items)
-        layV_wq_accu = QVBoxLayout()
-        layV_wq_accu.addWidget(self.wdg_wq_accu)
+        lay_v_wq_accu = QVBoxLayout()
+        lay_v_wq_accu.addWidget(self.wdg_wq_accu)
 
         # ----------------------------------------------------------------------
-        layVWdg = QVBoxLayout()
+        lay_v_wdg = QVBoxLayout()
         # margins are created in input_fixpoint_specs widget
-        layVWdg.setContentsMargins(0, 0, 0, 0)
-        layVWdg.addLayout(layV_wq_coeffs_b)
-        layVWdg.addLayout(layV_wq_coeffs_a)
-        layVWdg.addLayout(layV_wq_accu)
-        self.setLayout(layVWdg)
+        lay_v_wdg.setContentsMargins(0, 0, 0, 0)
+        lay_v_wdg.addLayout(lay_v_wq_coeffs_b)
+        lay_v_wdg.addLayout(lay_v_wq_coeffs_a)
+        lay_v_wdg.addLayout(lay_v_wq_accu)
+        self.setLayout(lay_v_wdg)
 
         # ----------------------------------------------------------------------
         # GLOBAL SIGNALS

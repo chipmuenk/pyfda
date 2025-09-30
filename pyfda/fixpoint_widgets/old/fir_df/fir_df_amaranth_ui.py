@@ -108,17 +108,17 @@ class FIR_DF_amaranth_UI(QWidget):
         self.wdg_q_accu.sig_tx.connect(self.process_sig_rx)
 # ------------------------------------------------------------------------------
 
-        layVWdg = QVBoxLayout()
-        layVWdg.setContentsMargins(0, 0, 0, 0)
+        lay_v_wdg = QVBoxLayout()
+        lay_v_wdg.setContentsMargins(0, 0, 0, 0)
 
-        layVWdg.addWidget(self.wdg_w_coeffs)
-#        layVWdg.addWidget(self.wdg_q_coeffs)
-        layVWdg.addWidget(self.wdg_q_accu)
-        layVWdg.addWidget(self.wdg_w_accu)
+        lay_v_wdg.addWidget(self.wdg_w_coeffs)
+#        lay_v_wdg.addWidget(self.wdg_q_coeffs)
+        lay_v_wdg.addWidget(self.wdg_q_accu)
+        lay_v_wdg.addWidget(self.wdg_w_accu)
 
-        layVWdg.addStretch()
+        lay_v_wdg.addStretch()
 
-        self.setLayout(layVWdg)
+        self.setLayout(lay_v_wdg)
 
 # ------------------------------------------------------------------------------
     def process_sig_rx(self, dict_sig=None):

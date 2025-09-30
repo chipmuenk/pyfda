@@ -60,17 +60,17 @@ class Delay_wdg(QWidget):
 #        
 ##------------------------------------------------------------------------------
 #
-#        layVWdg = QVBoxLayout()
-#        layVWdg.setContentsMargins(0,0,0,0)
+#        lay_v_wdg = QVBoxLayout()
+#        lay_v_wdg.setContentsMargins(0,0,0,0)
 #
-#        layVWdg.addLayout(self.layHBtnsMsg)
+#        lay_v_wdg.addLayout(self.layHBtnsMsg)
 #
-#        layVWdg.addWidget(self.wdg_w_input)
-#        layVWdg.addWidget(self.wdg_q_input)
+#        lay_v_wdg.addWidget(self.wdg_w_input)
+#        lay_v_wdg.addWidget(self.wdg_q_input)
 #        
-#        layVWdg.addStretch()
+#        lay_v_wdg.addStretch()
 #
-#        self.setLayout(layVWdg)
+#        self.setLayout(lay_v_wdg)
 #------------------------------------------------------------------------------
     def construct_fixp_filter(self):
         """
