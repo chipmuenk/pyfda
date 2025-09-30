@@ -87,8 +87,8 @@ class FIR_DF_pyfixp_UI(QWidget):
             fb.fil[0]['fxq']['QCB'], objectName='fx_ui_wq_fir_df_coeffs_b',
             label='<b>Coeff. Quantization <i>b<sub>I.F&nbsp;</sub></i>:</b>',
             MSB_LSB_vis='max')
-        layV_wq_coeffs = QVBoxLayout()
-        layV_wq_coeffs.addWidget(self.wdg_wq_coeffs)
+        lay_v_wq_coeffs = QVBoxLayout()
+        lay_v_wq_coeffs.addWidget(self.wdg_wq_coeffs)
 
         # widget for accumulator quantization
         # Attention: fb.fil[0]['fxq']['QACC'] == self.wdg_wq_accu.q_dict
@@ -101,16 +101,16 @@ class FIR_DF_pyfixp_UI(QWidget):
             fb.fil[0]['fxq']['QACC'], objectName='fx_ui_wq_fir_df_accu',
             cmb_w_vis='on', cmb_w_items=self.cmb_wq_accu_items,
             label='<b>Accu Format <i>Q<sub>ACC&nbsp;</sub></i>:</b>')
-        layV_wq_accu = QVBoxLayout()
-        layV_wq_accu.addWidget(self.wdg_wq_accu)
+        lay_v_wq_accu = QVBoxLayout()
+        lay_v_wq_accu.addWidget(self.wdg_wq_accu)
 
         # ----------------------------------------------------------------------
-        layVWdg = QVBoxLayout()
+        lay_v_wdg = QVBoxLayout()
         # margins are created in input_fixpoint_specs widget
-        layVWdg.setContentsMargins(0, 0, 0, 0)
-        layVWdg.addLayout(layV_wq_coeffs)
-        layVWdg.addLayout(layV_wq_accu)
-        self.setLayout(layVWdg)
+        lay_v_wdg.setContentsMargins(0, 0, 0, 0)
+        lay_v_wdg.addLayout(lay_v_wq_coeffs)
+        lay_v_wdg.addLayout(lay_v_wq_accu)
+        self.setLayout(lay_v_wdg)
 
         # ----------------------------------------------------------------------
         # GLOBAL SIGNALS

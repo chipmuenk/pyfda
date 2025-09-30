@@ -19,7 +19,8 @@ import numpy as np
 import pyfda.filterbroker as fb
 from pyfda.filterbroker import set_fx, fb_get
 from pyfda.libs.compat import QWidget, QVBoxLayout, pyqtSignal
-from pyfda.libs.pyfda_lib import set_dict_defaults, first_item, pprint_log
+from pyfda.libs.pyfda_lib import (
+    mod_version, set_dict_defaults, first_item, pprint_log, cmp_version)
 from pyfda.libs.pyfda_qt_lib import qget_cmb_box, emit
 
 from pyfda.fixpoint_widgets.fx_ui_wq import FX_UI_WQ
@@ -28,7 +29,7 @@ from .fir_df_amaranth import FIR_DF_amaranth
 logger = logging.getLogger(__name__)
 
 #  Dict containing {widget class name : display name}
-classes = {'FIR_DF_amaranth_UI': 'FIR_DF (Amaranth)'}  # widget class name : display name
+classes = {'FIR_DF_amaranth_UI': 'FIR_DF (Amaranth)'}
 
 
 # =============================================================================
@@ -98,8 +99,8 @@ class FIR_DF_amaranth_UI(QWidget):
                  ("fix", "Fix", "Round towards zero"),
                  ("floor", "Floor", "<span>Round towards negative infinity / "
                   "two's complement truncation.</span>")])
-        layV_wq_coeffs = QVBoxLayout()
-        layV_wq_coeffs.addWidget(self.wdg_wq_coeffs)
+        lay_v_wq_coeffs = QVBoxLayout()
+        lay_v_wq_coeffs.addWidget(self.wdg_wq_coeffs)
 
         # widget for accumulator quantization
         # Attention: fb.fil[0]['fxq']['QACC'] == self.wdg_wq_accu.q_dict
@@ -123,16 +124,16 @@ class FIR_DF_amaranth_UI(QWidget):
                  ("fix", "Fix", "Round towards zero"),
                  ("floor", "Floor", "<span>Round towards negative infinity / "
                   "two's complement truncation.</span>")])
-        layV_wq_accu = QVBoxLayout()
-        layV_wq_accu.addWidget(self.wdg_wq_accu)
+        lay_v_wq_accu = QVBoxLayout()
+        lay_v_wq_accu.addWidget(self.wdg_wq_accu)
 
         # ----------------------------------------------------------------------
-        layVWdg = QVBoxLayout()
+        lay_v_wdg = QVBoxLayout()
         # margins are created in input_fixpoint_specs widget
-        layVWdg.setContentsMargins(0, 0, 0, 0)
-        layVWdg.addLayout(layV_wq_coeffs)
-        layVWdg.addLayout(layV_wq_accu)
-        self.setLayout(layVWdg)
+        lay_v_wdg.setContentsMargins(0, 0, 0, 0)
+        lay_v_wdg.addLayout(lay_v_wq_coeffs)
+        lay_v_wdg.addLayout(lay_v_wq_accu)
+        self.setLayout(lay_v_wdg)
 
         # ----------------------------------------------------------------------
         # GLOBAL SIGNALS
@@ -169,7 +170,8 @@ class FIR_DF_amaranth_UI(QWidget):
             # signal generated locally by modifying coefficient / accu format
             if not dict_sig['sender_name']\
                     in {'fx_ui_wq_fir_df_coeffs_b', 'fx_ui_wq_fir_df_accu'}:
-                logger.error("Unknown widget name '%s' in '%s'!", dict_sig['sender_name'], __name__)
+                logger.error(
+                    "Unknown widget name '%s' in '%s'!", dict_sig['sender_name'], __name__)
                 return
 
             if dict_sig['sender_name'] == 'fx_ui_wq_fir_df_accu':  # accu format updated
