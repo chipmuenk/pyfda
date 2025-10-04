@@ -405,15 +405,15 @@ class Input_Fixpoint_Specs(QWidget):
                           self.cmb_qfrmt_default)
         self.cmb_qfrmt.setSizeAdjustPolicy(QComboBox.AdjustToContents)
 
-        self.butExportHDL = QPushButton(self)
-        self.butExportHDL.setToolTip(
-            "Create Verilog or VHDL netlist for fixpoint filter.")
-        self.butExportHDL.setText("-> Verilog")
+        self.but_export_verilog = QPushButton(self)
+        self.but_export_verilog.setToolTip(
+            "Create Verilog netlist for fixpoint filter.")
+        self.but_export_verilog.setText("-> Verilog")
 
         # Wrap qfrmt combobox and HDL buttons sim and convert in one layout
         lay_h_fx_btns = QHBoxLayout()
         lay_h_fx_btns.addWidget(self.cmb_qfrmt)
-        lay_h_fx_btns.addWidget(self.butExportHDL)
+        lay_h_fx_btns.addWidget(self.but_export_verilog)
 
         frm_hdl_btns = QFrame(self)
         frm_hdl_btns.setLayout(lay_h_fx_btns)
@@ -450,7 +450,7 @@ class Input_Fixpoint_Specs(QWidget):
         # LOCAL SIGNALS & SLOTs
         # ----------------------------------------------------------------------
         self.cmb_fx_wdg.currentIndexChanged.connect(self._update_fixp_widget)
-        self.butExportHDL.clicked.connect(self.exportHDL)
+        self.but_export_verilog.clicked.connect(self.exportHDL)
         self.cmb_qfrmt.currentIndexChanged.connect(self.qfrmt2ui)
 
         # ----------------------------------------------------------------------
@@ -640,7 +640,7 @@ class Input_Fixpoint_Specs(QWidget):
                     logger.error("Destructing UI failed!\n%s", e)
 
             self.fx_wdg_found = False
-            self.butExportHDL.setVisible(False)
+            self.but_export_verilog.setVisible(False)
             self.img_fixp = self.embed_fixp_img(self.no_fx_filter_img)
             self.resize_img()
             self.lblTitle.setText("")
@@ -700,7 +700,7 @@ class Input_Fixpoint_Specs(QWidget):
             fb_set('fx_mod_class_name', fx_mod_class_name[0])
             # Check which methods the fixpoint widget provides and enable
             # corresponding buttons:
-            self.butExportHDL.setVisible(hasattr(self.fx_filt_ui, "to_hdl"))
+            self.but_export_verilog.setVisible(hasattr(self.fx_filt_ui.fx_filt, "to_verilog"))
 
         else:  # no fixpoint widget found
             fb_set('fx_mod_class_name', "")
@@ -799,7 +799,7 @@ class Input_Fixpoint_Specs(QWidget):
             logger.info('Creating hdl_file "%s"\n\twith top level module "%s"',
                         hdl_full_name, vlog_mod_name)
             try:
-                code = self.fx_filt_ui.to_hdl(name=vlog_mod_name)
+                code = self.fx_filt_ui.fx_filt.to_verilog(name=vlog_mod_name)
                 # logger.info(str(code)) # print verilog code to console
                 with io.open(hdl_full_name, 'w', encoding="utf8") as f:
                     f.write(str(code))

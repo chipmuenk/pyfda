@@ -12,8 +12,6 @@ Widget for specifying the parameters of a direct-form FIR filter
 import logging
 import sys
 
-from amaranth.back import verilog
-# from amaranth.sim import Simulator, Tick, Delay, Settle
 import numpy as np
 
 import pyfda.filterbroker as fb
@@ -61,10 +59,23 @@ class FIR_DF_amaranth_UI(QWidget):
             ]
 
         self._construct_UI()
-        # Construct an instance of the fixpoint filter using the settings from
-        # the 'fxq' quantizer dict
-        self.fx_filt = FIR_DF_amaranth(fb_get('fxq'))
-        self.update_ovfl_cnt_all()  # initialize all overflow counters / display
+
+        _cmp_ver = cmp_version("amaranth", "0.5")  # test for amaranth version > 0.5
+        if _cmp_ver >= 0:
+            # Construct an instance of the fixpoint filter using the settings from
+            # the 'fxq' quantizer dict
+            self.fx_filt = FIR_DF_amaranth(fb_get('fxq'))
+            self.update_ovfl_cnt_all()  # initialize all overflow counters / display
+        elif _cmp_ver < -1:
+            # Amaranth is not installed or version cannot be determined
+            logger.error("Module amaranth needs to be installed to use the fixpoint filter ",
+            self.__class__.__name__)
+        else:
+            # Version is too old
+            logger.error(
+                "The installed version %s of amaranth is too old for the fixpoint filter '%s'!\n"
+                "Please update to at least version 0.5.0!",
+                mod_version("amaranth"), self.__class__.__name__)
 
     # -------------------------------------------------------------------------
     def emit(self, dict_sig):
@@ -253,14 +264,6 @@ class FIR_DF_amaranth_UI(QWidget):
         self.wdg_wq_coeffs.update_ovfl_cnt()
         self.wdg_wq_accu.update_ovfl_cnt()
 
-# ------------------------------------------------------------------------------
-    def to_hdl(self, **kwargs):
-        """
-        Convert the Amaranth description to Verilog
-        """
-        return verilog.convert(self.fx_filt.mod,
-                               ports=[self.fx_filt.mod.i, self.fx_filt.mod.o],
-                               **kwargs)
 
     # --------------------------------------------------------------------------
     def fxfilter(self, stimulus):

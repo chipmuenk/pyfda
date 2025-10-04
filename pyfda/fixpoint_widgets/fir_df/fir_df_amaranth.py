@@ -7,7 +7,8 @@
 # (see file LICENSE in root directory for details)
 
 """
-Fixpoint class for calculating direct-form DF1 FIR filter using pyfixp routines
+Amaranth fixpoint class for simulating direct-form DF1 FIR filter and generating Verilog
+implementations.
 """
 # from functools import reduce
 import logging
@@ -16,13 +17,11 @@ import logging
 import numpy as np
 from numpy.lib.function_base import iterable
 
-# from amaranth import *
-# from amaranth.back import verilog
+from amaranth.back import verilog
 # from amaranth import Signal, signed, Elaboratable, Module
 from amaranth.sim import Simulator, Tick  # , Delay, Settle
 
-import pyfda.filterbroker as fb
-from filterbroker import get_fx, fb_get, fb_set
+from pyfda.filterbroker import get_fx, fb_get, fb_set
 # from pyfda.libs.pyfda_lib import pprint_log
 import pyfda.libs.pyfda_fix_lib as fx
 from pyfda.libs.pyfda_fix_lib_amaranth import requant
@@ -34,7 +33,7 @@ logger = logging.getLogger(__name__)
 # =============================================================================
 class FIR_DF_amaranth():
     """
-    A synthesizable nMigen FIR filter in Direct Form.
+    A synthesizable direct form FIR filter
 
     Construct fixed point object with parameter dict `p`
 
@@ -55,7 +54,7 @@ class FIR_DF_amaranth():
         - 'q_mul', value: dict with quantizer settings for the partial products
            optional, 'quant' and 'sat' are both set to 'none' if there is none
     """
-    def __init__(self, p):
+    def __init__(self, p: dict):
 
         self.p = p  # parameter dictionary with coefficients etc.
         self.Q_b = fx.Fixed(self.p['QCB'])  # transversal coeffs
@@ -63,10 +62,10 @@ class FIR_DF_amaranth():
         # self.Q_acc = fx.Fixed(self.p['QACC'])  # accumulator
         self.Q_O = fx.Fixed(self.p['QO'])  # output
         self.init(p)
-        logger.info("Instantiated fx filter")
+        logger.info("Instantiated fx filter '%s'", self.__class__.__name__)
 
     # ---------------------------------------------------------
-    def init(self, p, zi: iterable = None) -> None:
+    def init(self, p: dict, zi: iterable = None) -> None:
         """
         Initialize filter with parameter dict `p` by initialising all registers
         and quantizers.
@@ -217,6 +216,14 @@ class FIR_DF_amaranth():
         # logger.error(f"N_ovfl_acc = {self.ovfl_acc}")
         return self.Q_O.fixp(self.output, in_frmt='qint', out_frmt=fb_get('qfrmt')), self.zi
 
+# ------------------------------------------------------------------------------
+    def to_verilog(self, **kwargs):
+        """
+        Convert the Amaranth description to Verilog
+        """
+        return verilog.convert(self.mod,
+                               ports=[self.mod.i, self.mod.o],
+                               **kwargs)
 
 # ------------------------------------------------------------------------------
 if __name__ == '__main__':
