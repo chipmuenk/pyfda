@@ -14,7 +14,7 @@ import logging
 logger = logging.getLogger(__name__)
 
 # ------------------------------------------------------------------------------
-if cmp_version("amaranth", "0.3") >= 0:
+if cmp_version("amaranth", "0.5") >= 0:
     from amaranth import Signal, signed, Cat, Module
 
     def requant(mod: Module, sig_i: Signal, QI: dict, QO: dict) -> Signal:
@@ -142,7 +142,7 @@ if cmp_version("amaranth", "0.3") >= 0:
         # Requantize integer part
         # -----------------------------------------------------------------------
         if dWI < 0:  # WI_I < WO_I, sign extend integer part (prepend copies of sign bit)
-            mod.d.comb += sig_o.eq(Cat(sig_i_q, Repl(sig_i_q[-1], -dWI)))
+            mod.d.comb += sig_o.eq(Cat(sig_i_q, sig_i_q[-1].replicate(-dWI)))
             mod.d.comb += ovfl_o.eq(0)
         elif dWI == 0:  # WI = WO, don't change integer part
             mod.d.comb += sig_o.eq(sig_i_q)
