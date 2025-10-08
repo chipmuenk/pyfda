@@ -405,15 +405,15 @@ class Input_Fixpoint_Specs(QWidget):
                           self.cmb_qfrmt_default)
         self.cmb_qfrmt.setSizeAdjustPolicy(QComboBox.AdjustToContents)
 
-        self.but_export_verilog = QPushButton(self)
-        self.but_export_verilog.setToolTip(
-            "Create Verilog netlist for fixpoint filter.")
-        self.but_export_verilog.setText("-> Verilog")
+        self.but_export_code = QPushButton(self)
+        self.but_export_code.setToolTip(
+            "Create implementable code for fixpoint filter.")
+        self.but_export_code.setText("-> Code")
 
         # Wrap qfrmt combobox and HDL buttons sim and convert in one layout
         lay_h_fx_btns = QHBoxLayout()
         lay_h_fx_btns.addWidget(self.cmb_qfrmt)
-        lay_h_fx_btns.addWidget(self.but_export_verilog)
+        lay_h_fx_btns.addWidget(self.but_export_code)
 
         frm_hdl_btns = QFrame(self)
         frm_hdl_btns.setLayout(lay_h_fx_btns)
@@ -450,7 +450,7 @@ class Input_Fixpoint_Specs(QWidget):
         # LOCAL SIGNALS & SLOTs
         # ----------------------------------------------------------------------
         self.cmb_fx_wdg.currentIndexChanged.connect(self._update_fixp_widget)
-        self.but_export_verilog.clicked.connect(self.exportHDL)
+        self.but_export_code.clicked.connect(self.export_code)
         self.cmb_qfrmt.currentIndexChanged.connect(self.qfrmt2ui)
 
         # ----------------------------------------------------------------------
@@ -640,7 +640,7 @@ class Input_Fixpoint_Specs(QWidget):
                     logger.error("Destructing UI failed!\n%s", e)
 
             self.fx_wdg_found = False
-            self.but_export_verilog.setVisible(False)
+            self.but_export_code.setVisible(False)
             self.img_fixp = self.embed_fixp_img(self.no_fx_filter_img)
             self.resize_img()
             self.lblTitle.setText("")
@@ -700,7 +700,7 @@ class Input_Fixpoint_Specs(QWidget):
             fb_set('fx_mod_class_name', fx_mod_class_name[0])
             # Check which methods the fixpoint widget provides and enable
             # corresponding buttons:
-            self.but_export_verilog.setVisible(hasattr(self.fx_filt_ui.fx_filt, "to_verilog"))
+            self.but_export_code.setVisible(hasattr(self.fx_filt_ui.fx_filt, "to_verilog"))
 
         else:  # no fixpoint widget found
             fb_set('fx_mod_class_name', "")
@@ -767,44 +767,46 @@ class Input_Fixpoint_Specs(QWidget):
                 logger.error("Error using FX filter widget 'dict2ui()' method:\n%s", e)
 
     # --------------------------------------------------------------------------
-    def exportHDL(self):
+    def export_code(self):
         """
-        Synthesize HDL description of filter
+        Generate implementable code for filter
         """
         dlg = QFileDialog(self)  # instantiate file dialog object
 
         file_types = "Verilog (*.v)"
         # needed for overwrite confirmation when name is entered without suffix:
         dlg.setDefaultSuffix('v')
-        dlg.setWindowTitle('Export Verilog')
+        dlg.setWindowTitle('Export Fixpoint Filter Code')
         dlg.setNameFilter(file_types)
         dlg.setDirectory(dirs.last_file_dir)
         # set mode "save file" instead "open file":
         dlg.setAcceptMode(QFileDialog.AcceptSave)
         dlg.setOption(QFileDialog.DontConfirmOverwrite, False)
         if dlg.exec_() == QFileDialog.Accepted:
-            hdl_file = str(dlg.selectedFiles()[0])
+            code_file = str(dlg.selectedFiles()[0])
             # hdl_type = extract_file_ext(qstr(dlg.selectedNameFilter()))
 
-            hdl_dir_name = os.path.dirname(hdl_file)  # extract the directory path
-            if not os.path.isdir(hdl_dir_name):  # create directory if it doesn't exist
-                os.mkdir(hdl_dir_name)
-            hdl_file_name = os.path.splitext(os.path.basename(hdl_file))[0]
-            hdl_full_name = os.path.join(hdl_dir_name, hdl_file_name + ".v")
-            dirs.last_file_name = hdl_full_name
-            dirs.last_file_dir = hdl_dir_name  # make this directory the new default / base dir
-            # remove all non-alphanumeric chars:
-            vlog_mod_name = re.sub(r'\W+', '', hdl_file_name).lower()
+            code_dir = os.path.dirname(code_file)  # extract the directory path
+            if not os.path.isdir(code_dir):  # create directory if it doesn't exist
+                os.mkdir(code_dir)
+            # remove file extension if given and return only base name:
+            code_file = os.path.splitext(os.path.basename(code_file))[0]
+            # remove all non-alphanumeric chars and convert to lower case for "clean name"
+            code_file_clean_name = re.sub(r'\W+', '', code_file).lower()
 
-            logger.info('Creating hdl_file "%s"\n\twith top level module "%s"',
-                        hdl_full_name, vlog_mod_name)
+            code_dir_file = os.path.join(code_dir, code_file + ".v")
+            dirs.last_file_name = code_dir_file
+            dirs.last_file_dir = code_dir  # make this directory the new default / base dir
+
+            logger.info('Creating file "%s"\n\twith top level module "%s"',
+                        code_dir_file, code_file_clean_name)
             try:
-                code = self.fx_filt_ui.fx_filt.to_verilog(name=vlog_mod_name)
-                # logger.info(str(code)) # print verilog code to console
-                with io.open(hdl_full_name, 'w', encoding="utf8") as f:
+                code = self.fx_filt_ui.fx_filt.to_verilog(name=code_file_clean_name)
+                # logger.info(str(code)) # print generated code to console
+                with io.open(code_dir_file, 'w', encoding="utf8") as f:
                     f.write(str(code))
 
-                logger.info("HDL conversion finished!")
+                logger.info("Code generation finished!")
             except (IOError, TypeError) as e:
                 logger.warning(e)
 
