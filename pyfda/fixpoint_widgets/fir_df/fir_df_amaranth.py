@@ -56,6 +56,12 @@ class FIR_DF_amaranth():
     """
     def __init__(self, p: dict):
 
+        self.CODE_EXPORT = {
+            'Verilog':
+                {'method_name': 'to_verilog',
+                 'suffix':'.v',
+                 'tooltip': 'Generate Verilog code for the filter'}
+        }
         self.p = p  # parameter dictionary with coefficients etc.
         self.Q_b = fx.Fixed(self.p['QCB'])  # transversal coeffs
         # self.Q_mul = fx.Fixed(self.p['QACC'].copy())  # partial products
@@ -63,6 +69,7 @@ class FIR_DF_amaranth():
         self.Q_O = fx.Fixed(self.p['QO'])  # output
         self.init(p)
         logger.info("Instantiated fx filter '%s'", self.__class__.__name__)
+
 
     # ---------------------------------------------------------
     def init(self, p: dict, zi: iterable = None) -> None:
