@@ -16,7 +16,7 @@ import logging
 import re
 
 import numpy as np
-from numpy.lib.function_base import iterable
+
 try:
     import deltasigma as ds
     from deltasigma import simulateDSM, synthesizeNTF
@@ -27,7 +27,7 @@ except ImportError:
 
 import pyfda.filterbroker as fb
 from pyfda.filterbroker import get_fx, fb_get, fb_set
-from pyfda.libs.pyfda_lib import is_numeric, pprint_log
+from pyfda.libs.pyfda_lib import is_numeric
 
 logger = logging.getLogger(__name__)
 
@@ -1390,7 +1390,7 @@ class Fixed(object):
 ########################################
 
 # --------------------------------------------------------------------------
-def quant_coeffs(coeffs: iterable, Q, recursive: bool = False, out_frmt: str = ""
+def quant_coeffs(coeffs: np.iterable, Q, recursive: bool = False, out_frmt: str = ""
                  ) -> np.ndarray:
     """
     Quantize the coefficients, scale and convert them to a list of integers,
@@ -1399,7 +1399,7 @@ def quant_coeffs(coeffs: iterable, Q, recursive: bool = False, out_frmt: str = "
 
     Parameters
     ----------
-    coeffs: iterable
+    coeffs: np.iterable
         An iterable of coefficients to be quantized
 
     Q: object
