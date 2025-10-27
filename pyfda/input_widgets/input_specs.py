@@ -476,49 +476,42 @@ class Input_Specs(QWidget):
         - the plots are updated via signal-slot connection
         """
 
-        try:
-            logger.info(
-                "Start filter design using method\n\t'%s.%s%s'",
-                fb_get('fc'), fb_get('rt'), fb_get('fo'))
+        logger.info(
+            "Start filter design using method\n\t'%s.%s%s'",
+            fb_get('fc'), fb_get('rt'), fb_get('fo'))
 
-            # ----------------------------------------------------------------------
-            # A globally accessible instance fb.fil_inst of selected filter class fc
-            # has been instantiated in InputFilter.set_design_method, now
-            # call the method specified in the filter dict fil[0].
+        # ----------------------------------------------------------------------
+        # A globally accessible instance fb.fil_inst of selected filter class fc
+        # has been instantiated in InputFilter.set_design_method, now
+        # call the method specified in the filter dict fil[0].
 
-            # The name of the instance method is constructed from the response
-            # type (e.g. 'LP') and the filter order (e.g. 'man'), giving e.g. 'LPman'.
-            # The filter is designed by passing the specs in fil[0] to the method,
-            # resulting in e.g. cheby1.LPman(fb.fil[0]) and writing back coefficients,
-            # P/Z etc. back to fil[0].
+        # The name of the instance method is constructed from the response
+        # type (e.g. 'LP') and the filter order (e.g. 'man'), giving e.g. 'LPman'.
+        # The filter is designed by passing the specs in fil[0] to the method,
+        # resulting in e.g. cheby1.LPman(fb.fil[0]) and writing back coefficients,
+        # P/Z etc. back to fil[0].
 
-            err = ff.fil_factory.call_fil_method(fb_get('rt') + fb_get('fo'), fc=fb_get('fc'))
-            # this is the same as e.g.
-            # from pyfda.filter_design import ellip
-            # inst = ellip.ellip()
-            # inst.LPmin(fb.fil[0])
-            # -----------------------------------------------------------------------
+        err = ff.fil_factory.call_fil_method(fb_get('rt') + fb_get('fo'), fc=fb_get('fc'))
+        # this is the same as e.g.
+        # from pyfda.filter_design import ellip
+        # inst = ellip.ellip()
+        # inst.LPmin(fb.fil[0])
+        # -----------------------------------------------------------------------
 
-            if err > 0:
-                self.color_design_button("error")
-            elif err == -1:  # filter design cancelled by user
-                return
-            else:
-                # Update filter order in case it has been changed by the
-                # design algorithm and emit {'data_changed': 'filter_designed'}
-                self.sel_fil.load_filter_order()
-                self.color_design_button("ok")
-
-                self.emit({'data_changed': 'filter_designed'})
-                logger.info(
-                    f"Designed filter with order = {str(fb.fil[0]['N'])}")
-
-        except Exception as e:
-            if ('__doc__' in str(e)):
-                logger.warning("Filter design:\n%s\n%s\n", e.__doc__, e)
-            else:
-                logger.warning("%s", e)
+        if err > 0:
             self.color_design_button("error")
+        elif err == -1:  # filter design cancelled by user
+            return
+        else:
+            # Update filter order in case it has been changed by the
+            # design algorithm and emit {'data_changed': 'filter_designed'}
+            self.sel_fil.load_filter_order()
+            self.color_design_button("ok")
+
+            self.emit({'data_changed': 'filter_designed'})
+            logger.info(
+                f"Designed filter with order = {str(fb.fil[0]['N'])}")
+
 
     def color_design_button(self, state):
         man = "manual" in fb.fil[0]['fc'].lower()
