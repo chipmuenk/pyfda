@@ -1278,20 +1278,36 @@ def fil_convert(format_in) -> None:
 
         if 'zpk' not in format_in:
             try:
-                # returns a tuple (zeros, poles, gain) where gain is scalar:
-                # convert zpk to list to allow for individual editing of z and p
-                zpk = list(sig.sos2zpk(fb_get('sos')))
+                # sos2zpk returns a tuple of zeros and poles (ndarrays) and gain (a scalar)
+                zpk = sig.sos2zpk(fb_get('sos'))
+                z = np.asarray(zpk[0])
+                p = np.asarray(zpk[1])
+                k = zpk[2]
+                logger.debug("\nz = %s\n\tp = %s", z, p)
             except Exception as e:
                 raise ValueError(e)
-            # check whether sos conversion has created a additional (superfluous)
-            # pole and zero at the origin and delete them:
-            z_0 = np.where(zpk[0] == 0)[0]
-            p_0 = np.where(zpk[1] == 0)[0]
-            if p_0 and z_0:  # eliminate z = 0 and p = 0 from list:
-                zpk[0] = np.delete(zpk[0], z_0)
-                zpk[1] = np.delete(zpk[1], p_0)
-            fb_set('zpk', np.array(
-                [zpk[0], zpk[1], zeros_with_val(len(zpk[0]), zpk[2])], dtype=complex))
+            # check whether sos conversion has created one or more superfluous
+            # pole / zero pairs at the origin and delete them:
+
+            # get two arrays with the indices pointing to z = 0 and p = 0 items (if any)
+            # z == 0 and p == 0 yield boolean arrays which cannot be used to delete items
+            z_0 = np.where(z == 0)
+            p_0 = np.where(p == 0)
+            logger.debug("\nz_0 = %s\n\tp_0 = %s\n", z_0, p_0)
+
+            # eliminate pole/zero pairs at the origin:
+            num_zp_0 = min(len(z_0), len(p_0))  # number of pole/zero pairs at the origin
+            if num_zp_0 > 0:
+                logger.info("Removed %s pole / zero pair(s).", num_zp_0)
+                z = np.delete(z, z_0[:num_zp_0])
+                p = np.delete(p, p_0[:num_zp_0])
+                logger.debug("\nz = %s\n\tp = %s", z, p)
+
+            # convert to an array (zeros, poles, gain) where gain is a scalar appended
+            # with zeros to the same length as p and z
+            zpk_array = np.array([z, p, zeros_with_val(len(z), k)], dtype=complex)
+            logger.debug("zpk_array = %s", zpk_array)
+            fb_set('zpk', zpk_array)
 
         if 'ba' not in format_in:
             try:
