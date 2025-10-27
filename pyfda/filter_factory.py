@@ -99,6 +99,8 @@ class FilterFactory():
             #------------------------------------------------------------------
 
         except KeyError:
+            if fb.conf_settings['CATCH_ERRORS'] is False:
+                raise
             err_string =("\nKeyError in 'FilterFactory.create_fil_inst()':\n"
                   "Filter design class '%s' is not in dict 'fb.filter_classes',\n"
                   "i.e. it was not found by 'FilterTreeBuilder'."%fc)
@@ -112,6 +114,8 @@ class FilterFactory():
                   "Filter design module '%s' could not be imported."%str(mod))
             self.err_code = 2
             logger.warning(err_string)
+            if fb.conf_settings['CATCH_ERRORS'] is False:
+                raise
             return self.err_code
 
         # Check whether create_fil_inst has been called for the first time .
@@ -140,7 +144,9 @@ class FilterFactory():
                     self.err_code = 4
                     logger.warning(
                         "Error during instantiation of filter class '%s':\n%s", fc, e)
-                    x = x
+                    if fb.conf_settings['CATCH_ERRORS'] is False:
+                        raise
+                    #x = x
         return self.err_code
 
 #------------------------------------------------------------------------------
@@ -198,6 +204,10 @@ class FilterFactory():
         if fc:
             # filter class was part of the argument, (re-)create class instance
             self.err_code = self.create_fil_inst(fc)
+            if self.err_code is None:
+                logger.warning(
+                    "Err_Code is '%s' but should be numeric!", self.err_code)
+                self.err_code = 0
 
         # Error during filter design class instantiation (class fc could not be instantiated)
         if self.err_code > 0:
@@ -233,11 +243,15 @@ class FilterFactory():
                     err_string += "\tTry changing the specifications."
                 else:
                     self.err_code = 99
+                if fb.conf_settings['CATCH_ERRORS'] is False:
+                    logger.error("Err_Code %s: %s", str(self.err_code), err_string)
+                    raise ValueError
 
-        if self.err_code is None:
-            self.err_code = 0
-        elif self.err_code > 0:
+        if self.err_code > 0:
             logger.error("ErrCode %s: %s", self.err_code, err_string)
+            if fb.conf_settings['CATCH_ERRORS'] is False:
+                logger.error("Raising exception as CATCH_ERRORS is False")
+                raise SystemExit("Doh!")
 
         return self.err_code
 
