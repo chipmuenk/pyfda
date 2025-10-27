@@ -41,7 +41,7 @@ else:
     MKL = " (no mkl)"
 
 __all__ = ['cmp_version', 'mod_version',
-           'set_dict_defaults', 'clean_ascii', 'qstr', 'safe_eval',
+           'set_dict_defaults', 'clean_ascii', 'safe_eval',
            'dB', 'lin2unit', 'unit2lin',
            'cround', 'H_mag', 'cmplx_sort', 'unique_roots',
            'expand_lim', 'format_ticks', 'fil_save', 'sos2zpk',

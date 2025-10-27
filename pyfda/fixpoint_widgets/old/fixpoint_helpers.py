@@ -21,7 +21,7 @@ from pyfda.libs.compat import (
 
 from pyfda.libs.pyfda_qt_lib import qcmb_box_populate, qget_cmb_box, qset_cmb_box
 # from pyfda.pyfda_rc import params
-from pyfda.libs.pyfda_lib import qstr, safe_eval, to_html
+from pyfda.libs.pyfda_lib import safe_eval, to_html
 
 import logging
 logger = logging.getLogger(__name__)
@@ -158,8 +158,8 @@ class UI_W(QWidget):
         # ----------------------------------------------------------------------
         # INITIAL SETTINGS
         # ----------------------------------------------------------------------
-        self.ledWI.setText(qstr(dict_ui['WI']))
-        self.ledWF.setText(qstr(dict_ui['WF']))
+        self.ledWI.setText(str(dict_ui['WI']))
+        self.ledWF.setText(str(dict_ui['WF']))
 
         frmMain.setEnabled(dict_ui['enabled'])
         frmMain.setVisible(dict_ui['visible'])
@@ -238,10 +238,10 @@ class UI_W(QWidget):
 
         self.WI = int(safe_eval(self.ledWI.text(), self.WI, return_type="int",
                                 sign='poszero'))
-        self.ledWI.setText(qstr(self.WI))
+        self.ledWI.setText(str(self.WI))
         self.WF = int(safe_eval(self.ledWF.text(), self.WF, return_type="int",
                                 sign='poszero'))
-        self.ledWF.setText(qstr(self.WF))
+        self.ledWF.setText(str(self.WF))
         self.W = int(self.WI + self.WF + 1)
 
         self.q_dict.update({'WI': self.WI, 'WF': self.WF, 'W': self.W})
@@ -267,13 +267,13 @@ class UI_W(QWidget):
 
         if 'WI' in q_dict:
             self.WI = safe_eval(q_dict['WI'], self.WI, return_type="int", sign='poszero')
-            self.ledWI.setText(qstr(self.WI))
+            self.ledWI.setText(str(self.WI))
         else:
             logger.warning("No key 'WI' in dict!")
 
         if 'WF' in q_dict:
             self.WF = safe_eval(q_dict['WF'], self.WF, return_type="int", sign='poszero')
-            self.ledWF.setText(qstr(self.WF))
+            self.ledWF.setText(str(self.WF))
         else:
             logger.warning("No key 'WF' in dict!")
 
@@ -642,8 +642,8 @@ class UI_WQ(QWidget):
         self.WI = int(dict_ui['WI'])
         self.WF = int(dict_ui['WF'])
         self.W = self.WI + self.WF + 1
-        self.ledWI.setText(qstr(self.WI))
-        self.ledWF.setText(qstr(self.WF))
+        self.ledWI.setText(str(self.WI))
+        self.ledWF.setText(str(self.WF))
 
         # initialize button icon
         self.butLock_clicked(self.butLock.isChecked())
@@ -728,10 +728,10 @@ class UI_WQ(QWidget):
         """
         self.WI = int(safe_eval(self.ledWI.text(), self.WI, return_type="int",
                                 sign='poszero'))
-        self.ledWI.setText(qstr(self.WI))
+        self.ledWI.setText(str(self.WI))
         self.WF = int(safe_eval(self.ledWF.text(), self.WF, return_type="int",
                                 sign='poszero'))
-        self.ledWF.setText(qstr(self.WF))
+        self.ledWF.setText(str(self.WF))
         self.W = int(self.WI + self.WF + 1)
 
         self.ovfl = qget_cmb_box(self.cmbOvfl)
@@ -769,13 +769,13 @@ class UI_WQ(QWidget):
 
         if 'WI' in q_dict:
             self.WI = safe_eval(q_dict['WI'], self.WI, return_type="int", sign='poszero')
-            self.ledWI.setText(qstr(self.WI))
+            self.ledWI.setText(str(self.WI))
         else:
             logger.warning("No key 'WI' in dict!")
 
         if 'WF' in q_dict:
             self.WF = safe_eval(q_dict['WF'], self.WF, return_type="int", sign='poszero')
-            self.ledWF.setText(qstr(self.WF))
+            self.ledWF.setText(str(self.WF))
         else:
             logger.warning("No key 'WF' in dict!")
 

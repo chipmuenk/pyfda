@@ -37,11 +37,6 @@ logger = logging.getLogger(__name__)
 __version__ = 0.6
 
 
-def qstr(text):
-    """ carefully replace qstr() function - only needed for Py2 compatibility """
-    return str(text)
-
-
 def bin2hex(bin_str: str, WI=0) -> str:
     """
     Convert number `bin_str` in binary format to hex formatted string.

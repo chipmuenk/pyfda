@@ -11,7 +11,7 @@ Library with various helper functions for Qt widgets
 """
 import logging
 
-from .pyfda_lib import qstr, pprint_log
+from .pyfda_lib import pprint_log
 
 from .compat import (
     Qt, QtGui, QtCore, QFrame, QMessageBox, QPushButton, QLabel, QComboBox, QDialog,
@@ -230,9 +230,7 @@ def qget_cmb_box(cmb_box: QComboBox, data: bool = True) -> str:
 
     In Python 3, python Qt objects are automatically converted to QVariant
     when stored as "data" e.g. in a QComboBox and converted back when
-    retrieving. In Python 2, QVariant is returned when itemData is retrieved.
-    This is first converted from the QVariant container format to a
-    QString, next to a "normal" non-unicode string.
+    retrieving.
 
     Returns:
 
@@ -241,11 +239,11 @@ def qget_cmb_box(cmb_box: QComboBox, data: bool = True) -> str:
     if data:
         idx = cmb_box.currentIndex()
         cmb_data = cmb_box.itemData(idx)
-        cmb_str = qstr(cmb_data)  # convert QVariant, QString, string to plain string
+        cmb_str = str(cmb_data)  # convert QVariant, QString, string to plain string
     else:
         cmb_str = cmb_box.currentText()
 
-    cmb_str = str(cmb_str)
+    # cmb_str = str(cmb_str)
 
     return cmb_str
 
