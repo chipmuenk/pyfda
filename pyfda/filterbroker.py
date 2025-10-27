@@ -239,10 +239,11 @@ fil_tree = freeze_hierarchical({
 
 # -----------------------------------------------------------------------------
 # Dictionary containing configuration settings for pyfda which can be modified
-# in the [Config Settings] of `pyfda.conf`
+# in the [Config Settings] of `pyfda.conf` and from the UI
 # ------------------------------------------------------------------------------
 
 conf_settings = {
+    'CATCH_ERRORS': True,
     'THEME': 'light',
     'N_FFT':  8192  # number of FFT points for most widgets except y[n]
     }

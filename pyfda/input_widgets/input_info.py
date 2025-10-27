@@ -124,19 +124,30 @@ class Input_Info(QWidget):
         self.butFiltTree = PushButton(self, "FiltTree", checked=False)
         self.butFiltTree.setToolTip("Show filter tree for debugging.")
 
-        layHControls2 = QHBoxLayout()
-        layHControls2.addWidget(self.butDocstring)
-        # layHControls2.addStretch(1)
-        layHControls2.addWidget(self.butRichText)
-        # layHControls2.addStretch(1)
-        layHControls2.addWidget(self.butFiltDict)
-        # layHControls2.addStretch(1)
-        layHControls2.addWidget(self.butFiltTree)
+        self.but_catch_errors = PushButton(
+            self, "Catch Errors", checked=fb.conf_settings['CATCH_ERRORS'])
+        self.but_catch_errors.setToolTip(
+            "Catch errors in major routines. Disable this to create tracebacks for debugging.")
 
-        self.frmControls2 = QFrame(self)
-        self.frmControls2.setLayout(layHControls2)
-        self.frmControls2.setVisible(self.butDebug.checked)
-        self.frmControls2.setContentsMargins(0, 0, 0, 0)
+        lay_h_debug_1 = QHBoxLayout()
+        lay_h_debug_1.addWidget(self.butDocstring)
+        lay_h_debug_1.addWidget(self.butRichText)
+        lay_h_debug_1.addWidget(self.butFiltDict)
+        lay_h_debug_1.addWidget(self.butFiltTree)
+
+        lay_h_debug_2 = QHBoxLayout()
+        lay_h_debug_2.addWidget(self.but_catch_errors)
+        lay_h_debug_2.addStretch(1)
+
+        lay_v_debug = QVBoxLayout()
+        lay_v_debug.addLayout(lay_h_debug_1)
+        lay_v_debug.addLayout(lay_h_debug_2)
+        lay_v_debug.setContentsMargins(0, 0, 0, 0)
+
+        self.frm_debug = QFrame(self)
+        self.frm_debug.setLayout(lay_v_debug)
+        self.frm_debug.setVisible(self.butDebug.checked)
+        self.frm_debug.setContentsMargins(0, 0, 0, 0)
 
         lbl_settings_NFFT = QLabel(to_html("N_FFT =", frmt='bi'), self)
         self.led_settings_NFFT = QLineEdit(self)
@@ -153,13 +164,13 @@ class Input_Info(QWidget):
         self.frmSettings.setVisible(self.butSettings.checked)
         self.frmSettings.setContentsMargins(0, 0, 0, 0)
 
-        layVControls = QVBoxLayout()
-        layVControls.addLayout(layHControls1)
-        layVControls.addWidget(self.frmControls2)
-        layVControls.addWidget(self.frmSettings)
+        lay_v_controls = QVBoxLayout()
+        lay_v_controls.addLayout(layHControls1)
+        lay_v_controls.addWidget(self.frm_debug)
+        lay_v_controls.addWidget(self.frmSettings)
 
         self.frmMain = QFrame(self)
-        self.frmMain.setLayout(layVControls)
+        self.frmMain.setLayout(lay_v_controls)
 
         self.tbl_filt_perf = QTableWidget(self)
         self.tbl_filt_perf.setAlternatingRowColors(True)
@@ -210,6 +221,7 @@ class Input_Info(QWidget):
         self.butFiltTree.clicked.connect(self._show_filt_tree)
         self.butDocstring.clicked.connect(self._show_doc)
         self.butRichText.clicked.connect(self._show_doc)
+        self.but_catch_errors.clicked.connect(self._disable_error_handling)
 
     # -------------------------------------------------------------------------
     def _about_window(self):
@@ -222,7 +234,7 @@ class Input_Info(QWidget):
         """
         Show / hide debug options depending on the state of the debug button
         """
-        self.frmControls2.setVisible(self.butDebug.checked)
+        self.frm_debug.setVisible(self.butDebug.checked)
 
     # ------------------------------------------------------------------------
     def _show_settings(self):
@@ -506,6 +518,13 @@ class Input_Info(QWidget):
 #        dictstr = pprint.pformat(fb.fil[0])
         self.txt_filt_tree.setText(dictstr)
 
+    # --------------------------------------------------------------------------
+    def _disable_error_handling(self):
+        """
+        Enable / disable major try ... except blocks in pyfda for debugging
+        """
+        fb.conf_settings['CATCH_ERRORS'] = self.but_catch_errors.checked
+        logger.info("Error handling enabled: %s", fb.conf_settings['CATCH_ERRORS'])
 
 # ------------------------------------------------------------------------------
 if __name__ == '__main__':
