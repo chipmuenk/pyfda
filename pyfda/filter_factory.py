@@ -92,7 +92,7 @@ class FilterFactory():
         try:
             # Try to dynamically import the module fc, i.e. do the following
             # import pyfda.<filter_package>.<fc> as fc_module
-            if mod is "":
+            if mod == "":
                 mod = fb.filter_classes[fc]['mod']
             #------------------------------------------------------------------
             fc_module = importlib.import_module(mod)
