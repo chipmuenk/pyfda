@@ -13,6 +13,12 @@ which have a global scope like class variables and can be imported like
 
 >>> import filter_factory as ff
 >>> myfil = ff.fil_factory
+
+A globally accessible instance of a filter design class (e.g. "cheby1") is created with:
+
+>>> import filter_factory as ff
+>>> ff.fil_factory.create_fil_instance('cheby1') # create instance of dynamic class
+>>> ff.fil_inst.LPmin(fil[0]) # design a filter
 """
 
 import importlib
@@ -21,15 +27,8 @@ import pyfda.filterbroker as fb
 
 logger = logging.getLogger(__name__)
 
-
 fil_inst = None
-"""
-Instance of current filter design class (e.g. "cheby1"), globally accessible
 
->>> import filter_factory as ff
->>> ff.fil_factory.create_fil_instance('cheby1') # create instance of dynamic class
->>> ff.fil_inst.LPmin(fil[0]) # design a filter
-"""
 class FilterFactory():
     """
     This class implements a filter factory that (re)creates the globally accessible
@@ -40,9 +39,8 @@ class FilterFactory():
         # return error codes for class instantiation and method
         self.err_code = 0
 
-
-    def create_fil_inst(self, fc, mod = None):
-        # TODO: need to pass both module and class name for more flexibility
+#------------------------------------------------------------------------------
+    def create_fil_inst(self, fc: str, mod: str = "") -> int:
         """
         Create an instance of the filter design class passed as a string ``fc``
         from the module found in ``fb.filter_classes[fc]``.
@@ -57,7 +55,7 @@ class FilterFactory():
         fc : str
             The name of the filter design class to be instantiated (e.g. 'cheby1' or 'equiripple')
 
-        mod : str (optional, default = None)
+        mod : str (optional, default = "")
             Fully qualified name of the filter module. When not specified, it is
             read from the global dict ``fb.filter_classes[fc]['mod']``
 
@@ -94,7 +92,7 @@ class FilterFactory():
         try:
             # Try to dynamically import the module fc, i.e. do the following
             # import pyfda.<filter_package>.<fc> as fc_module
-            if not mod:
+            if mod is "":
                 mod = fb.filter_classes[fc]['mod']
             #------------------------------------------------------------------
             fc_module = importlib.import_module(mod)
@@ -125,11 +123,11 @@ class FilterFactory():
             err_string = ""
             self.err_code = -1
             # get attribute fc from fc_module, here, this returns the class fc
-            fil_class = getattr(fc_module, fc, None) # or None if not in fc_module
+            fil_class = getattr(fc_module, fc, None) # or None if fc not in fc_module
 
             if fil_class is None: # fc is not a class of fc_module
                 err_string = ("\nERROR in 'FilterFactory.create_fil_inst()':\n"
-                              f"Unknown design class '{fc}', could not be created.")
+                              f"Unknown filter class '{fc}', could not be created.")
                 logger.warning(err_string)
                 self.err_code = 3
             else:
@@ -146,7 +144,7 @@ class FilterFactory():
         return self.err_code
 
 #------------------------------------------------------------------------------
-    def call_fil_method(self, method, fc = None):
+    def call_fil_method(self, method: str, fc: str = "") -> int:
         """
         Instantiate the filter design class passed  as string ``fc`` with the
         globally accessible handle ``fil_inst``. If ``fc = None``, use the previously
@@ -197,7 +195,8 @@ class FilterFactory():
             self.err_code = 0 #  # clear previous method call error
             err_string = ""
 
-        if fc: # filter design class was part of the argument, (re-)create class instance
+        if fc:
+            # filter class was part of the argument, (re-)create class instance
             self.err_code = self.create_fil_inst(fc)
 
         # Error during filter design class instantiation (class fc could not be instantiated)
@@ -205,17 +204,17 @@ class FilterFactory():
             err_string = \
                 "Filter design class could not be instantiated, see previous error message."
 
-        # Test whether 'method' is a string (Py3):
+        # Test whether 'method' is a string:
         elif not isinstance(method, str):
             err_string = f"Method name '{method}' is not a string."
             self.err_code = 16
 
-        # method does not exist in filter class:
+        # Test whether filter class contains passed method
         elif not hasattr(fil_inst, method):
             err_string = f"Method '{method}' doesn't exist in class '{fil_inst}'."
             self.err_code = 17
 
-        else: # everything ok so far, try calling method with the filter dict as argument
+        else: # everything ok so far, try calling method
               # err_code = -1 means "operation cancelled"
             try:
                 #------------------------------------------------------------------
@@ -223,8 +222,7 @@ class FilterFactory():
                 #------------------------------------------------------------------
             except Exception as e:
                 err_string =\
-                    f"Method '{method}' of class '{type(fil_inst).__name__}':\n{e}"
-
+                    f"Error in method '{method}' of class '{type(fil_inst).__name__}':\n{e}"
                 if e:
                     err_string += "\n" # add line break to error message
                 if "order n is too high" in str(e).lower():
