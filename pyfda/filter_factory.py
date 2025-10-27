@@ -222,9 +222,9 @@ class FilterFactory():
                 #------------------------------------------------------------------
             except Exception as e:
                 err_string =\
-                    f"Error in method '{method}' of class '{type(fil_inst).__name__}':\n{e}"
+                    f"Error in method '{method}' of class '{type(fil_inst).__name__}':\n\t{e}"
                 if e:
-                    err_string += "\n" # add line break to error message
+                    err_string += "\n" # add line break at the end of error message
                 if "order n is too high" in str(e).lower():
                     self.err_code = 18
                     err_string += "\tTry changing the specifications."
