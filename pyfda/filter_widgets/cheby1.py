@@ -38,7 +38,6 @@ from pyfda.libs.pyfda_lib import lin2unit
 from pyfda.libs.pyfda_qt_lib import popup_warning
 from pyfda.libs.pyfda_sig_lib import fil_save
 from pyfda.filterbroker import fb_get, fb_set
-import pyfda.filterbroker as fb
 
 from .common import Common
 
@@ -270,6 +269,4 @@ if __name__ == '__main__':
     filt = Cheby1()        # instantiate filter
     fb_set('fo', 'min')
     filt.LPmin()  # design a low-pass with parameters from global dict
-    print(fb_get(filt.FRMT)) # return results in default format
-
-
+    print(fb_get(filt.FRMT)) # return results in default format (e.g. 'ba')

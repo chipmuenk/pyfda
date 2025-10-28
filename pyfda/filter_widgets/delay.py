@@ -18,7 +18,6 @@ API version info:
 """
 import numpy as np
 
-import pyfda.filterbroker as fb
 from pyfda.filterbroker import fb_get, fb_set
 from pyfda.libs.pyfda_lib import safe_eval
 from pyfda.libs.compat import QWidget, QLabel, QLineEdit, pyqtSignal, QVBoxLayout, QHBoxLayout

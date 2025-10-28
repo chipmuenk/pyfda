@@ -38,7 +38,6 @@ from pyfda.libs.pyfda_lib import lin2unit
 from pyfda.libs.pyfda_qt_lib import popup_warning
 from pyfda.libs.pyfda_sig_lib import fil_save
 from pyfda.filterbroker import fb_get, fb_set
-import pyfda.filterbroker as fb
 
 from .common import Common
 
@@ -264,9 +263,7 @@ class Cheby2():
 #------------------------------------------------------------------------------
 
 if __name__ == '__main__':
-    import pyfda.filterbroker as fb # importing filterbroker initializes all its globals
+    # Run this module standalone with 'python -m pyfda.filter_widgets.cheby2'
     filt = Cheby2()        # instantiate filter
     filt.LPman()  # design a low-pass with parameters from global dict
-    print(fb.fil[0][filt.FRMT]) # return results in default format
-
-# test using "python -m pyfda.filter_widgets.cheby2"
+    print(fb_get(filt.FRMT)) # return results in default format (e.g. 'ba')

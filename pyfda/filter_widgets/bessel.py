@@ -43,7 +43,6 @@ API version info:
 from scipy.signal import bessel, buttord
 
 from pyfda.filterbroker import fb_get, fb_set
-import pyfda.filterbroker as fb
 from pyfda.libs.pyfda_lib import lin2unit
 from pyfda.libs.pyfda_qt_lib import popup_warning
 from pyfda.libs.pyfda_sig_lib import fil_save

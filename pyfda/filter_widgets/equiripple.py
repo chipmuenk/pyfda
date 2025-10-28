@@ -36,7 +36,6 @@ from scipy.signal import remez
 import numpy as np
 
 from pyfda.libs.compat import QWidget, QLabel, QLineEdit, pyqtSignal, QVBoxLayout, QHBoxLayout
-import pyfda.filterbroker as fb
 from pyfda.filterbroker import fb_get, fb_set
 from pyfda.libs.pyfda_qt_lib import popup_warning, emit
 from pyfda.libs.pyfda_lib import round_odd, ceil_even, safe_eval
