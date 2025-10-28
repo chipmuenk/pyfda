@@ -49,7 +49,7 @@ class Delay(QWidget):
     sig_tx = pyqtSignal(object)
 
     def __init__(self):
-        QWidget.__init__(self)
+        super().__init__()
 
         self.N = 5
 
@@ -70,7 +70,7 @@ class Delay(QWidget):
         self.info_doc = []
 
     # -------------------------------------------------------------------------
-    def emit(self, dict_sig):
+    def emit(self, dict_sig: dict) -> None:
         """
         Access imported function `emit()` as instance method, passing `self`
         with its attributes
@@ -78,7 +78,7 @@ class Delay(QWidget):
         emit(self, dict_sig)
 
     #--------------------------------------------------------------------------
-    def construct_UI(self):
+    def construct_UI(self) -> None:
         """
         Create additional subwidget(s) needed for filter design:
         These subwidgets are instantiated dynamically when needed in
@@ -112,7 +112,7 @@ class Delay(QWidget):
         self.dict2filter_params() # get initial / last setting from dictionary
         self._update_UI()
 
-    def _update_UI(self):
+    def _update_UI(self) -> None:
         """
         Update UI when line edit field is changed (here, only the text is read
         and converted to integer) and store parameter settings in filter
@@ -128,7 +128,7 @@ class Delay(QWidget):
         # sig_tx -> select_filter -> filter_specs
         self.emit({'filt_changed': 'delay'})
 
-    def dict2filter_params(self):
+    def dict2filter_params(self) -> None:
         """
         Reload parameter(s) from filter dictionary (if they exist) and set
         corresponding UI elements. dict2filter_params() is called upon initialization
@@ -139,14 +139,14 @@ class Delay(QWidget):
             self.N = wdg_fil_par['N']
             self.led_delay.setText(str(self.N))
 
-    def _get_params(self):
+    def _get_params(self) -> None:
         """
         Translate parameters from the passed dictionary to instance
         parameters, scaling / transforming them if needed.
         """
         self.N = fb_get('N')  # filter order is translated to numb. of delays
 
-    def _test_n(self):
+    def _test_n(self) -> bool:
         """
         Warn the user if the calculated order is too high for a reasonable filter
         design.
@@ -155,7 +155,7 @@ class Delay(QWidget):
             return popup_warning(self, self.N, "Delay")
         return True
 
-    def _save(self, arg=None):
+    def _save(self, arg=None) -> None:
         """
         Convert between poles / zeros / gain, filter coefficients (polynomes)
         and second-order sections and store all available formats in the global
@@ -166,11 +166,20 @@ class Delay(QWidget):
             #arg =[[0], np.zeros(self.N), 1] # crashes coeff tab
         fil_save(arg, self.FRMT, __name__)
 
-    def APman(self):
+    def APman(self) -> int:
+        """
+        Design an allpass filter with parameters from global dict
+
+        Returns
+        -------
+        int
+            0: success, -1: error
+        """
         self._get_params()
         if not self._test_n():
             return -1
         self._save()
+        return 0
 
 #------------------------------------------------------------------------------
 
@@ -202,4 +211,3 @@ if __name__ == '__main__':
 
     app.exec_()
     #------------------------------------------------------------------------------
-

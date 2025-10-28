@@ -68,6 +68,10 @@ classes = {'Firwin': 'Windowed FIR'}  #: Dict containing class name : display na
 
 
 class Firwin(QWidget):
+    """
+    Create FIR filters  (LP, HP, BP, BS) using the window method with  with fixed or minimum
+    order, return the filter design in 'ba' format.
+    """
 
     FRMT = 'ba'     # output format(s) of filter design routines 'zpk' / 'ba' / 'sos'
                     # currently, only 'ba' is supported for firwin routines
@@ -76,7 +80,7 @@ class Firwin(QWidget):
     sig_tx_local = pyqtSignal(object)
 
     def __init__(self, objectName='firwin_inst'):
-        QWidget.__init__(self)
+        super().__init__()
 
         self.setObjectName(objectName)
         self.ft = 'FIR'
@@ -126,7 +130,7 @@ class Firwin(QWidget):
         self.dict2filter_params()
 
     # -------------------------------------------------------------------------
-    def emit(self, dict_sig, sig_name=""):
+    def emit(self, dict_sig: dict, sig_name: str = "") -> None:
         """
         Access imported function `emit()` as instance method, passing `self`
         with its attributes
@@ -134,7 +138,7 @@ class Firwin(QWidget):
         emit(self, dict_sig, sig_name)
 
     # ------------------------------------------------------------------------------
-    def process_sig_rx(self, dict_sig=None):
+    def process_sig_rx(self, dict_sig: dict = None) -> None:
         """
         Process local signals from / for
         - FFT window widget
@@ -142,7 +146,7 @@ class Firwin(QWidget):
         """
         # logger.warning(pprint_log(dict_sig))
         if dict_sig['id'] == id(self):
-            logger.warning(f"Stopped infinite loop:\n{pprint_log(dict_sig)}")
+            logger.warning("Stopped infinite loop:\n%s", pprint_log(dict_sig))
 
         # --- signals coming from the FFT window widget or the qfft_win_select
         if dict_sig['class'] in {'Plot_FFT_win', 'QFFTWinCmbBox'}:
@@ -162,7 +166,7 @@ class Firwin(QWidget):
                 self.emit(dict_sig, sig_name='sig_tx_local')
 
     # --------------------------------------------------------------------------
-    def construct_UI(self):
+    def construct_UI(self) -> None:
         """
         Create additional subwidget(s) needed for filter design:
         These subwidgets are instantiated dynamically when needed in
@@ -239,7 +243,7 @@ class Firwin(QWidget):
         # ----------------------------------------------------------------------
 
 # ==============================================================================
-    def _update_min_alg(self):
+    def _update_min_alg(self) -> None:
         """
         Update UI when min. calc. algorithm has been changed
         """
@@ -247,7 +251,7 @@ class Firwin(QWidget):
         self.emit({'filt_changed': 'firwin'})
 
     # --------------------------------------------------------------------------
-    def dict2filter_params(self):
+    def dict2filter_params(self) -> None:
         """
         Reload window selection and parameters from filter dictionary
         and set UI elements accordingly. dict2filter_params() is called upon
@@ -286,7 +290,7 @@ class Firwin(QWidget):
         self.emit({'view_changed': 'fft_win_type'}, sig_name='sig_tx_local')
 
     # --------------------------------------------------------------------------
-    def filter_params2dict(self):
+    def filter_params2dict(self) -> None:
         """
         Store window and parameter settings from current window of `self.all_wins_dict`
         to filter dictionary fb.fil[0]['filter_widgets']['firwin'].
@@ -301,7 +305,7 @@ class Firwin(QWidget):
             )
 
     # --------------------------------------------------------------------------
-    def _get_params(self):
+    def _get_params(self) -> None:
         """
         Translate parameters from the passed dictionary to instance
         parameters, scaling / transforming them if needed.
@@ -323,7 +327,7 @@ class Firwin(QWidget):
 #        self.alg = 'ichige' # algorithm for determining the minimum order
 #        self.alg = self.cmb_firwin_alg.currentText()
 
-    def _test_n(self):
+    def _test_n(self) -> bool:
         """
         Warn the user if the calculated order is too high for a reasonable filter
         design.
@@ -332,7 +336,7 @@ class Firwin(QWidget):
             return popup_warning(self, self.N, "FirWin")
         return True
 
-    def _save(self, arg):
+    def _save(self, arg) -> None:
         """
         Convert between poles / zeros / gain, filter coefficients (polynomes)
         and second-order sections and store all available formats in the
@@ -347,8 +351,8 @@ class Firwin(QWidget):
         self.filter_params2dict()
 
 # ------------------------------------------------------------------------------
-    def firwin(self, numtaps, cutoff, window=None, pass_zero=True,
-               scale=True, nyq=1.0, fs=None):
+    def firwin(self, numtaps: int, cutoff, window=None, pass_zero: bool = True,
+               scale: bool = True, nyq: float = 1.0) -> np.ndarray:
 
         """
         FIR filter design using the window method. This is more or less the
@@ -449,11 +453,11 @@ class Firwin(QWidget):
             h += right * sinc(right * m)
             h -= left * sinc(left * m)
 
-        if type(window) == str:
+        if isinstance(window, str):
             # Get and apply the window function.
             # from scipy.signal.signaltools import get_window
             win = signaltools.get_window(window, numtaps, fftbins=False)
-        elif type(window) == np.ndarray:
+        elif isinstance(window, np.ndarray):
             win = window
         else:
             logger.error("The 'window' was neither a string nor a numpy array, "
@@ -477,8 +481,30 @@ class Firwin(QWidget):
             h /= s
         return h
 
-    def _firwin_ord(self, F, W, A, alg):
-        # http://www.mikroe.com/chapters/view/72/chapter-2-fir-filters/
+    def _firwin_ord(self, F: list, W: list, A: list, alg: str) -> int:
+        """
+        Calculate the minimum FIR filter order for given specs using
+        the selected algorithm.
+
+        Parameters
+        ----------
+        F : list
+            List of frequency band edges (normalized to Nyquist rate)
+        W : list
+            List of weights for each band
+        A : list
+            List of maximum amplitudes for each band (linear, not in dB)
+        alg : str
+            Algorithm to be used: 'ichige', 'kaiser', 'herrmann'
+
+        Returns
+        -------
+        N : int
+            Minimum filter order
+
+        See also http://www.mikroe.com/chapters/view/72/chapter-2-fir-filters/
+        """
+
         delta_f = abs(F[1] - F[0]) * 2  # referred to f_Ny
         # delta_A = np.sqrt(A[0] * A[1])
         if fb.fil[0]['filter_widgets']['firwin']['id'] == "kaiser":
@@ -492,7 +518,8 @@ class Firwin(QWidget):
         self.emit({'view_changed': 'fft_win_type'}, sig_name='sig_tx_local')
         return N
 
-    def LPmin(self):
+    def LPmin(self) -> int:
+        """ Design a low-pass FIR filter with minimum order using the window method."""
         self._get_params()
         self.N = self._firwin_ord([self.F_PB, self.F_SB], [1, 0],
                                   [self.A_PB, self.A_SB], alg=self.alg)
@@ -502,15 +529,19 @@ class Firwin(QWidget):
         fb_set('F_C', (self.F_SB + self.F_PB)/2)  # average calculated F_PB and F_SB
         self._save(self.firwin(self.N, fb_get('F_C'), nyq=0.5,
                                window=self.qfft_win_select.calc_window(self.N, sym=True)))
+        return 0
 
-    def LPman(self):
+    def LPman(self) -> int:
+        """ Design a low-pass FIR filter with user-defined order using the window method."""
         self._get_params()
         if not self._test_n():
             return -1
         self._save(self.firwin(self.N, fb_get('F_C'), nyq=0.5,
                                window=self.qfft_win_select.calc_window(self.N, sym=True)))
+        return 0
 
-    def HPmin(self):
+    def HPmin(self) -> int:
+        """ Design a high-pass FIR filter with minimum order using the window method."""
         self._get_params()
         N = self._firwin_ord([self.F_SB, self.F_PB], [0, 1],
                              [self.A_SB, self.A_PB], alg=self.alg)
@@ -520,17 +551,21 @@ class Firwin(QWidget):
         fb_set('F_C', (self.F_SB + self.F_PB)/2)  # average calculated F_PB and F_SB
         self._save(self.firwin(self.N, fb_get('F_C'), pass_zero=False, nyq=0.5,
                                window=self.qfft_win_select.calc_window(self.N, sym=True)))
+        return 0
 
-    def HPman(self):
+    def HPman(self) -> int:
+        """ Design a high-pass FIR filter with user-defined order using the window method."""
         self._get_params()
         self.N = round_odd(self.N)  # enforce odd order
         if not self._test_n():
             return -1
         self._save(self.firwin(self.N, fb_get('F_C'), pass_zero=False, nyq=0.5,
                                window=self.qfft_win_select.calc_window(self.N, sym=True)))
+        return 0
 
     # For BP and BS, F_PB and F_SB have two elements each
-    def BPmin(self):
+    def BPmin(self) -> int:
+        """ Design a band-pass FIR filter with minimum order using the window method."""
         self._get_params()
         self.N = remezord([self.F_SB, self.F_PB, self.F_PB2, self.F_SB2], [0, 1, 0],
                           [self.A_SB, self.A_PB, self.A_SB2], fs=1, alg=self.alg)[0]
@@ -542,16 +577,20 @@ class Firwin(QWidget):
         self._save(self.firwin(self.N, [fb_get('F_C'), fb_get('F_C2')], nyq=0.5,
                                pass_zero=False,
                                window=self.qfft_win_select.calc_window(self.N, sym=True)))
+        return 0
 
-    def BPman(self):
+    def BPman(self) -> int:
+        """ Design a band-pass FIR filter with user-defined order using the window method."""
         self._get_params()
         if not self._test_n():
             return -1
         self._save(self.firwin(self.N, [fb_get('F_C'), fb_get('F_C2')], nyq=0.5,
                                pass_zero=False,
                                window=self.qfft_win_select.calc_window(self.N, sym=True)))
+        return 0
 
-    def BSmin(self):
+    def BSmin(self) -> int:
+        """ Design a band-stop FIR filter with minimum order using the window method."""
         self._get_params()
         N = remezord([self.F_PB, self.F_SB, self.F_SB2, self.F_PB2], [1, 0, 1],
                      [self.A_PB, self.A_SB, self.A_PB2], fs=1, alg=self.alg)[0]
@@ -563,8 +602,10 @@ class Firwin(QWidget):
         self._save(self.firwin(self.N, [fb_get('F_C'), fb_get('F_C2')],
                                window=self.qfft_win_select.calc_window(self.N, sym=True),
                                pass_zero=True, nyq=0.5))
+        return 0
 
-    def BSman(self):
+    def BSman(self) -> int:
+        """ Design a band-stop FIR filter with user-defined order using the window method."""
         self._get_params()
         self.N = round_odd(self.N)  # enforce odd order
         if not self._test_n():
@@ -572,9 +613,10 @@ class Firwin(QWidget):
         self._save(self.firwin(self.N, [fb_get('F_C'), fb_get('F_C2')],
                                window=self.qfft_win_select.calc_window(self.N, sym=True),
                                pass_zero=True, nyq=0.5))
+        return 0
 
     # ------------------------------------------------------------------------------
-    def toggle_fft_wdg(self):
+    def toggle_fft_wdg(self) -> None:
         """
         Show / hide FFT widget depending on the state of the corresponding button
         When widget is shown, trigger an update of the window function.
@@ -586,7 +628,7 @@ class Firwin(QWidget):
             self.win_viewer.hide()
 
     # --------------------------------------------------------------------------
-    def hide_fft_wdg(self):
+    def hide_fft_wdg(self) -> None:
         """
         The closeEvent caused by clicking the "x" in the FFT widget is caught
         there and routed here to only hide the window
@@ -610,8 +652,9 @@ def main():
     layVDynWdg = QVBoxLayout()
     layVDynWdg.addWidget(wdg_firwin, stretch=1)
 
-    filt.LPman(fb.fil[0])  # design a low-pass with parameters from global dict
-    print(fb.fil[0][filt.FRMT])  # return results in default format
+    # fb_set('fo', 'min')
+    filt.LPman()  # design a low-pass with parameters from global dict
+    print(fb_get(filt.FRMT))  # return results in default format
 
     frmMain = QFrame()
     frmMain.setFrameStyle(QFrame.StyledPanel | QFrame.Sunken)
@@ -624,5 +667,5 @@ def main():
 
 
 if __name__ == "__main__":
-    # test using "python -m pyfda.filter_widgets.firwin"
+    # Run this module standalone with 'python -m pyfda.filter_widgets.firwin'
     main()
