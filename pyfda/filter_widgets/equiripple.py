@@ -443,7 +443,7 @@ class Equiripple(QWidget):
         For more details, see the `LPmin` method.
         """
         self._get_params()
-        (N, F, A, W) = remezord([self.F_PB, self.F_SB, self.F_SB2, self.F_PB2], [1, 0, 1],
+        (self.N, F, A, W) = remezord([self.F_PB, self.F_SB, self.F_SB2, self.F_PB2], [1, 0, 1],
                                 [self.A_PB, self.A_SB, self.A_PB2], fs = 1, alg = self.alg)
         # A is always [1, 0, 1] for BS filters
         fb_set('W_PB', W[0])
