@@ -521,10 +521,10 @@ def csv2array(f: TextIO):
 
     """
 
-    # throw an error (instead of just issueing a deprecation warning) when trying to
+    # throw an error (instead of just issuing a deprecation warning) when trying to
     # create a numpy array from nested ragged sequences. This error can then be
     # caught easily.
-    warnings.filterwarnings('error', category=np.VisibleDeprecationWarning)
+    warnings.filterwarnings('error', category=np.exceptions.VisibleDeprecationWarning)
     # ------------------------------------------------------------------------------
     # Get CSV parameter settings
     # ------------------------------------------------------------------------------
@@ -635,7 +635,7 @@ def csv2array(f: TextIO):
     # ------- Convert list to an array of str --------------------
     try:
         data_arr = np.array(data_list)
-    except np.VisibleDeprecationWarning:
+    except np.exception.VisibleDeprecationWarning:
         # prevent creation of numpy arrays from nested ragged sequences
         logger.error("Can't convert to array, columns have different lengths.")
         return None
