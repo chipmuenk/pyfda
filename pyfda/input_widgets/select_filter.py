@@ -21,7 +21,7 @@ from pyfda.libs.compat import (
 
 import pyfda.filterbroker as fb
 import pyfda.filter_factory as ff
-from pyfda.libs.pyfda_lib import safe_eval, first_item, pprint_log
+from pyfda.libs.pyfda_lib import safe_eval
 from pyfda.libs.pyfda_qt_lib import qget_cmb_box, emit
 import pyfda.pyfda_rc as rc
 

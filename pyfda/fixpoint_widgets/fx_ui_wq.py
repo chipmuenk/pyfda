@@ -12,7 +12,6 @@ Helper classes and functions for generating and simulating fixpoint filters
 import logging
 import sys
 
-import pyfda.filterbroker as fb
 from pyfda.filterbroker import get_fx, fb_get
 import pyfda.libs.pyfda_fix_lib as fx
 from pyfda.libs.compat import (

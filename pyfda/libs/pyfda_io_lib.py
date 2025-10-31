@@ -11,7 +11,6 @@ Library with classes and functions for file and text IO
 """
 import os, re, io
 import logging
-import copy
 import csv
 import wave
 import datetime
@@ -41,7 +40,7 @@ import pyfda.libs.pyfda_fix_lib as fx
 from pyfda.pyfda_rc import params
 import pyfda.libs.pyfda_dirs as dirs
 import pyfda.filterbroker as fb  # importing filterbroker initializes all its globals
-from pyfda.filterbroker import get_fx, fb_get, fb_set
+from pyfda.filterbroker import get_fx, fb_get
 from pyfda.version import __version__
 
 from .compat import QFileDialog

@@ -10,8 +10,8 @@
 Was: Compatibility wrapper to obtain same syntax for both Qt4 and 5, PyQt4 has
 been removed
 """
-
-# import PyQt5
+# disable warnings about unused imports, as this is a compatibility module
+# ruff: noqa: F401
 from PyQt5 import QtGui, QtCore, QtTest, QtWidgets
 from PyQt5.QtCore import (Qt, QEvent, QT_VERSION_STR, PYQT_VERSION_STR, QSize, QSysInfo,
                           QObject, QVariant, QPoint, pyqtSignal, pyqtSlot)

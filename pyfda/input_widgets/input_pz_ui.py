@@ -13,7 +13,7 @@ Create the UI for the FilterPZ class
 import logging
 
 from pyfda.libs.compat import (
-    pyqtSignal, Qt, QWidget, QLabel, QLineEdit, QComboBox, QPushButton, QCheckBox,
+    pyqtSignal, Qt, QWidget, QLabel, QLineEdit, QComboBox, QPushButton,
     QRadioButton, QFrame, QSpinBox, QFont, QIcon, QVBoxLayout, QHBoxLayout)
 from pyfda.libs.pyfda_qt_lib import qstyle_widget, qcmb_box_populate, PushButton, emit
 from pyfda.libs.csv_option_box import CSV_option_box

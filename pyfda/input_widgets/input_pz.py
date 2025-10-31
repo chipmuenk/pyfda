@@ -14,7 +14,7 @@ from pprint import pformat
 import sys
 
 import numpy as np
-from scipy.signal import freqz, zpk2tf
+# from scipy.signal import freqz, zpk2tf
 
 import pyfda.filterbroker as fb  # importing filterbroker initializes all its globals
 from pyfda.libs.compat import (

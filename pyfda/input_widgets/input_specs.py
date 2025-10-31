@@ -15,7 +15,7 @@ import logging
 import sys
 
 import pyfda.filterbroker as fb
-from pyfda.filterbroker import fb_get, fb_set
+from pyfda.filterbroker import fb_get
 import pyfda.filter_factory as ff
 from pyfda.input_widgets import (select_filter, amplitude_specs,
                                  freq_specs, freq_units,
@@ -24,7 +24,7 @@ from pyfda.libs.compat import (
     Qt, QWidget, QLabel, QFrame, QPushButton, QComboBox, QLineEdit, pyqtSignal,
     QVBoxLayout, QHBoxLayout, QSizePolicy)
 
-from pyfda.libs.pyfda_lib import pprint_log, to_html, first_item
+from pyfda.libs.pyfda_lib import to_html
 from pyfda.libs.pyfda_qt_lib import qstyle_widget, qcmb_box_populate, qget_cmb_box, emit
 from pyfda.libs.pyfda_io_lib import load_filter, save_filter, save_all_filters
 from pyfda.pyfda_rc import params
