@@ -61,6 +61,7 @@ exclude = [
     ".venv",
     "build",
     "dist",
+    "bak",
     "__pycache__",
     "*.pyc",
     "*.pyo",
@@ -90,10 +91,18 @@ ignore = ["E501", # line too long
 # ignore these tasks
 task-tags = ["TODO", "FIXME"]
 # list of rules that are considered fixable
-fixable = ["W291", "W292", # trailing whitespace, missing newline at end of file
-           "E303",         # too many blank lines
-           "E302", "E305", # expected 2 blank lines, found 1
-           # "I001",         # isort import formatting
+fixable = [
+    "W291",
+    "W292", # trailing whitespace, missing newline at end of file
+    "E303",         # too many blank lines
+    "E302", "E305", # expected 2 blank lines, found 1
+    "E231",         # missing whitespace after ','
+    "E221",         # multiple spaces before operator
+    "E225",         # missing whitespace around operator
+    "E226",         # missing whitespace around arithmetic operator
+    "E222",         # multiple spaces around operator
+    "E714",         # test for object identity should be 'is' or 'is not'
+    # "I001",         # isort import formatting
 ]
 
 [tool.ruff.format]
