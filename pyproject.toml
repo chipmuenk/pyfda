@@ -1,0 +1,105 @@
+[build-system]
+requires = ["setuptools>=75.3.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "pyfda"
+dynamic = ["dependencies", "optional-dependencies", "version"]
+authors = [{name = "Christian Münker", email = "xxx"}]
+keywords=["digital", "discrete time", "filter design", "DSP", "IIR", "FIR", "GUI"]
+   
+readme = {file = "README.md", content-type = "text/markdown"}
+requires-python = ">=3.9"
+classifiers = [
+        # How mature is this project? Common values are
+        #   3 - Alpha
+        #   4 - Beta
+        #   5 - Production/Stable
+        'Development Status :: 4 - Beta',
+
+        # Indicate who your project is intended for
+        'Intended Audience :: Developers',
+        'Intended Audience :: Education',
+        'Topic :: Scientific/Engineering',
+        'Topic :: Education',
+
+        # Pick your license as you wish (should match "license" above)
+        'License :: OSI Approved :: MIT License',
+
+        # Specify the Python versions you support here. In particular, ensure
+        # that you indicate whether you support Python 2, Python 3 or both.
+        'Programming Language :: Python :: 3',
+        'Programming Language :: Python :: 3.9',
+        'Programming Language :: Python :: 3.10',
+        'Programming Language :: Python :: 3.11',
+        'Programming Language :: Python :: 3.12',
+        'Programming Language :: Python :: 3.13',
+    ]
+
+[project.urls]
+Repository = "https://github.com/chipmuenk/pyfda"
+Issues = "https://github.com/chipmuenk/pyfda/issues"
+
+[project.scripts]
+# ssay = "snakesay.__main__:main"
+
+[tool.setuptools.packages.find]
+# Tells the build-system (setuptools) where to find packages in the project
+where = ["."]
+
+[tool.setuptools.dynamic]
+dependencies = { file = ["requirements.txt"] }
+optional-dependencies.dev = { file = ["requirements-dev.txt"] }
+version = {attr = "pyfda.__version__"}
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+exclude = [
+    "widget_templates",
+    "tests",
+    ".venv",
+    "build",
+    "dist",
+    "__pycache__",
+    "*.pyc",
+    "*.pyo",
+    "*.pyd",
+    ".pytest_cache",
+    "*.egg",
+]
+
+[tool.ruff.lint]
+# select rules to enable for linting
+select = [
+    "B",  # flake8-bugbear: find likely bugs and design problems
+    "E",  # pycodestyle errors (like missing whitespace)
+    "W",  # pycodestyle warnings (like trailing whitespace)
+    "F",  # pyflakes
+    "C90",  # max. mccabe complexity of functions
+    "I",    # isort
+    "NPY201"  # numpy 2 style guide
+    ]
+ignore = ["E501", # line too long
+          # "W503", # line break before binary operator
+          # "F403", # 'from module import *' used; unable to detect undefined names
+          # "F401", # module imported but unused
+          # "E203"  # whitespace before ':', conflicts with black
+         ]
+
+# ignore these tasks
+task-tags = ["TODO", "FIXME"]
+# list of rules that are considered fixable
+fixable = ["W291", "W292", # trailing whitespace, missing newline at end of file
+           "E303",         # too many blank lines
+           "E302", "E305", # expected 2 blank lines, found 1
+           # "I001",         # isort import formatting
+]
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "tab"
+
+
+
+
