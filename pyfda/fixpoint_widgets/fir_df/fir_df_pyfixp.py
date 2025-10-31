@@ -12,12 +12,11 @@ Fixpoint class for calculating direct-form DF1 FIR filter using pyfixp routines
 import logging
 
 import numpy as np
-from numpy.lib.function_base import iterable
+
 import pyfda.filterbroker as fb
 from pyfda.filterbroker import get_fx, fb_get, fb_set
 # from pyfda.libs.pyfda_lib import pprint_log
 import pyfda.libs.pyfda_fix_lib as fx
-from pyfda.libs.pyfda_fix_lib import quant_coeffs
 
 logger = logging.getLogger(__name__)
 
@@ -57,7 +56,7 @@ class FIR_DF_pyfixp():
         logger.info("Instantiated fx filter")
 
     # ---------------------------------------------------------
-    def init(self, p, zi: iterable = None) -> None:
+    def init(self, p, zi: np.ndarray = None) -> None:
         """
         Initialize filter with parameter dict `p` by initialising all registers
         and quantizers.
@@ -95,7 +94,7 @@ class FIR_DF_pyfixp():
 
         # Quantize coefficients and store them in local attributes
         # This also resets the overflow counters.
-        self.b_q = quant_coeffs(fb.fil[0]['ba'][0], self.Q_b)
+        self.b_q = fx.quant_coeffs(fb.fil[0]['ba'][0], self.Q_b)
 
         self.L = len(self.b_q)  # filter length = number of taps
 
@@ -124,7 +123,7 @@ class FIR_DF_pyfixp():
         self.zi = np.zeros(self.L - 1)
 
     # ---------------------------------------------------------
-    def fxfilter(self, x: iterable = None, zi: iterable = None) -> np.ndarray:
+    def fxfilter(self, x: np.ndarray = None, zi: np.ndarray = None) -> np.ndarray:
         """
         Calculate FIR filter (direct form) response via difference equation with
         quantization. Registers can be initialized with `zi`.

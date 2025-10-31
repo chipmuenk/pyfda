@@ -12,12 +12,10 @@ Fixpoint class for calculating direct-form DF1 IIR filter using pyfixp routines
 import logging
 
 import numpy as np
-from numpy.lib.function_base import iterable
 
 import pyfda.filterbroker as fb
 from pyfda.filterbroker import fb_get, fb_set, get_fx
 import pyfda.libs.pyfda_fix_lib as fx
-from pyfda.libs.pyfda_fix_lib import quant_coeffs
 
 logger = logging.getLogger(__name__)
 
@@ -61,7 +59,7 @@ class IIR_DF1_pyfixp(object):
         logger.info("Instantiated fx filter")
 
     # ---------------------------------------------------------
-    def init(self, p, zi_b: iterable = None, zi_a: iterable = None) -> None:
+    def init(self, p, zi_b: np.ndarray = None, zi_a: np.ndarray = None) -> None:
         """
         Initialize filter with parameter dict `p` by initialising all registers
         and quantizers.
@@ -119,8 +117,8 @@ class IIR_DF1_pyfixp(object):
 
         # Quantize coefficients and store them in local attributes
         # This also resets the overflow counters.
-        self.a_q = quant_coeffs(fb.fil[0]['ba'][1], self.Q_a, recursive=True)
-        self.b_q = quant_coeffs(fb.fil[0]['ba'][0], self.Q_b)
+        self.a_q = fx.quant_coeffs(fb.fil[0]['ba'][1], self.Q_a, recursive=True)
+        self.b_q = fx.quant_coeffs(fb.fil[0]['ba'][0], self.Q_b)
 
         if np.iscomplexobj(self.a_q):
             self.a_q = self.a_q.real
@@ -167,8 +165,8 @@ class IIR_DF1_pyfixp(object):
         self.zi_b = np.zeros(self.L - 1)
 
     # ---------------------------------------------------------
-    def fxfilter(self, x: iterable = None,
-                 zi_b: iterable = None, zi_a: iterable = None) -> np.ndarray:
+    def fxfilter(self, x: np.ndarray = None,
+                 zi_b: np.ndarray = None, zi_a: np.ndarray = None) -> np.ndarray:
         """
         Calculate quantized IIR filter (direct form 1) response via difference equation
         with quantized coefficient values `self.a_q` and `self.b_q` and quantized
