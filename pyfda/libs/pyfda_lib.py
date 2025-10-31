@@ -14,23 +14,20 @@ import os
 import re
 import sys
 import struct
-import time
 
 # from contextlib import redirect_stdout
 from docutils import __version__ as V_DOC
 # from markdown import __version__ as V_MD
 from matplotlib import __version__ as V_MPL
 import numpy as np
-from numpy import ndarray, pi, log10, sin, cos
+from numpy import pi, log10, sin, cos
 import numexpr
 import markdown
 from mplcursors import __version__ as V_CUR
-import scipy.signal as sig
 from scipy import __version__ as V_SCI
 
-import pyfda.filterbroker as fb
 import pyfda.libs.pyfda_dirs as dirs
-from pyfda.libs.pyfda_sig_lib import zeros_with_val, zpk2array
+
 from .compat import QT_VERSION_STR as V_QT
 from .compat import PYQT_VERSION_STR as V_PYQT
 
@@ -44,7 +41,7 @@ __all__ = ['cmp_version', 'mod_version',
            'set_dict_defaults', 'clean_ascii', 'safe_eval',
            'dB', 'lin2unit', 'unit2lin',
            'cround', 'H_mag', 'cmplx_sort', 'unique_roots',
-           'expand_lim', 'format_ticks', 'fil_save', 'sos2zpk',
+           'expand_lim', 'format_ticks',
            'round_odd', 'round_even', 'ceil_odd', 'floor_odd', 'ceil_even', 'floor_even',
            'to_html']
 
@@ -663,7 +660,7 @@ def frmt2cmplx(string: str, default: float = 0.) -> complex:
 
 # ------------------------------------------------------------------------------
 def safe_numexpr_eval(expr: str, fallback=None,
-                      local_dict: dict = {}) -> ndarray:
+                      local_dict: dict = {}) -> np.ndarray:
     """
     Evaluate `numexpr.evaluate(expr)` and catch various errors.
 
