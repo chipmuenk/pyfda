@@ -117,7 +117,7 @@ class Tran_IO(QWidget):
             self.emit({'ui_local_changed': 'csv'})  # propagate one level up
         elif 'ui_global_changed' in dict_sig and dict_sig['ui_global_changed'] == 'csv':
             # Set CSV options button according to state of CSV popup handle
-            self.ui.but_csv_options.setChecked(not dirs.csv_options_handle is None)
+            self.ui.but_csv_options.setChecked(dirs.csv_options_handle is not None)
         elif 'view_changed' in dict_sig and dict_sig['view_changed'] == 'f_S':
             self.set_f_s_wav(fb.fil[0]['f_S'] * fb.fil[0]['f_s_scale'])
 

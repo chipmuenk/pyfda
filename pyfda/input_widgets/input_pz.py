@@ -78,7 +78,7 @@ class Input_PZ(QWidget):
             return
 
         if 'ui_global_changed' in dict_sig and dict_sig['ui_global_changed'] == 'csv':
-            self.ui.but_csv_options.setChecked(not dirs.csv_options_handle is None)
+            self.ui.but_csv_options.setChecked(dirs.csv_options_handle is not None)
             return
 
         if self.isVisible():
@@ -338,7 +338,7 @@ class Input_PZ(QWidget):
 
         Format is: [array[zeros, ...], array[poles, ...], k]
         """
-        if not type(fb.fil[0]['zpk']) is np.ndarray:
+        if type(fb.fil[0]['zpk']) is not np.ndarray:
             logger.warning("fb.fil[0]['zpk'] is of type %s with len = %s",
                            type(fb.fil[0]['zpk']), len(fb.fil[0]['zpk']))
 
@@ -705,7 +705,7 @@ class Input_PZ(QWidget):
         # sanitize zpk; test and equalize if P and Z lists have different lengths,
         # convert gain to a vector wth same length as zpk[0]
         zpk_arr = zpk2array(zpk)
-        if not type(zpk_arr) is np.ndarray:  # an error has ocurred, error string is returned
+        if type(zpk_arr) is not np.ndarray:  # an error has ocurred, error string is returned
             logger.error(zpk_arr)
             qstyle_widget(self.ui.but_apply, 'error')
             qstyle_widget(self.ui.but_undo, 'changed')  #

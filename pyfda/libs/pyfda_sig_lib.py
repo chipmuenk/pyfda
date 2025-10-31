@@ -1358,7 +1358,7 @@ def fil_convert(format_in) -> None:
                 logger.warning("Bad coefficients, some values of b are too close to zero,"
                                "\n\tresults may be inaccurate.")
             zpk_arr = zpk2array(zpk)
-            if not type(zpk_arr) is np.ndarray:  # an error has ocurred, error string is returned
+            if type(zpk_arr) is not np.ndarray:  # an error has ocurred, error string is returned
                 logger.error(zpk_arr)
                 return
             fb_set('zpk', zpk_arr)

@@ -105,7 +105,7 @@ class Input_Coeffs(QWidget):
 
         if 'ui_global_changed' in dict_sig\
                 and dict_sig['ui_global_changed'] == 'csv':
-            self.ui.but_csv_options.setChecked(not dirs.csv_options_handle is None)
+            self.ui.but_csv_options.setChecked(dirs.csv_options_handle is not None)
             return
 
         if 'ui_local_changed' in dict_sig and 'sender_name' in dict_sig and\

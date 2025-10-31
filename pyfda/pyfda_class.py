@@ -241,12 +241,12 @@ class pyFDA(QMainWindow):
         # pyfda cannot be terminated and freezes
         tran_freq_win_handle_vis = False
         fir_win_handle_vis = False
-        if not dirs.csv_options_handle is None:
+        if dirs.csv_options_handle is not None:
             dirs.csv_options_handle.close()
-        if not dirs.tran_freq_win_handle is None and dirs.tran_freq_win_handle.isVisible():
+        if dirs.tran_freq_win_handle is not None and dirs.tran_freq_win_handle.isVisible():
             tran_freq_win_handle_vis = True
             dirs.tran_freq_win_handle.hide()
-        if not dirs.firwin_handle is None and dirs.firwin_handle.isVisible():
+        if dirs.firwin_handle is not None and dirs.firwin_handle.isVisible():
             fir_win_handle_vis = True
             dirs.firwin_handle.hide()
 
