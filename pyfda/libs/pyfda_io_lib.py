@@ -1687,7 +1687,7 @@ def load_filter(self, all_filters=False) -> int:
         return -1
 
     # --- Test loaded file content for correct type and shape ------------------
-    if type(fb_temp) == list:
+    if isinstance(fb_temp, list):
         if len(fb_temp) != 10:
             logger.error(
                 f"File contains a list with wrong length = {len(fb_temp)} != 10 "
@@ -1773,7 +1773,7 @@ def load_filter(self, all_filters=False) -> int:
     # --- Sanitize *values* in filter dictionary, keys are ok by now
         for k in fb.fil[0]:
             # Bytes need to be decoded for py3 to be used as keys later on
-            if type(fb.fil[0][k]) == bytes:
+            if isinstance(fb.fil[0][k], bytes):
                 fb.fil[0][k] = fb.fil[0][k].decode('utf-8')
             if fb.fil[0][k] is None:
                 logger.warning(f"Entry fb.fil[0][{k}] is empty!")
@@ -1795,7 +1795,7 @@ def load_filter(self, all_filters=False) -> int:
             fb.restore_fil()
             return -1
 
-        if type(fb.fil[0]['ba']) == np.ndarray:
+        if isinstance(fb.fil[0]['ba'], np.ndarray):
             if np.ndim(fb.fil[0]['ba']) != 2:
                 logger.error(
                     f"Unsuitable dimension of 'ba' data, ndim = {np.ndim(fb.fil[0]['ba'])}")
@@ -1807,7 +1807,7 @@ def load_filter(self, all_filters=False) -> int:
         else:
             logger.error(f"Unsuitable 'ba' data type '{type(fb.fil[0]['ba'])}!")
 
-        if type(fb.fil[0]['zpk']) == np.ndarray:
+        if isinstance(fb.fil[0]['zpk'], np.ndarray):
             if np.ndim(fb.fil[0]['zpk']) != 2:
                 logger.error(
                     f"Unsuitable dimension of 'zpk' data, ndim = {np.ndim(fb.fil[0]['zpk'])}")
