@@ -1,20 +1,9 @@
-# Requirements for pip, Travis and ReadTheDocs.org
-#-------------------------------------------------
-# - pip reads this file via 'setup.py', filtering
-#   out comments and 'nose'
-# This file is specified in the project settings 
-# at ReadTheDocs.org and in .travis.yml
-#-------------------------------------------------
 numpy < 2.0
 scipy >= 1.2.0
 matplotlib >= 3.3
 pyqt5
 docutils
-nose
 mplcursors
 numexpr >= 2.8.8
 markdown
 amaranth[builtin-yosys]
-# pytest
-# coverage
-# coveralls
