@@ -682,7 +682,7 @@ def fb_set(*keys_tuple, backup: bool = True, fil_dict=fil[0]) -> None:
         else:
             for k in keys_tuple[:-1]:
                 dict_str += '[' + k + ']'
-        logger.error(f"Dict '%s' does not exist!", dict_str)
+        logger.error("Dict '%s' does not exist!", dict_str)
         return -1
 
     return 0

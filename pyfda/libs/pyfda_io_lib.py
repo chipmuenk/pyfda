@@ -943,22 +943,22 @@ def file2array(file_name: str, file_type: str, fkey: str = "",
         clip_text = fb.clipboard.text()
         if clip_text in {None, ""}:
             # an error has occurred
-            logger.error(f"Clipboard is empty!")
+            logger.error("Clipboard is empty!")
             return None
 
-        logger.info(f"Importing data from clipboard.")
+        logger.info("Importing data from clipboard.")
 
         # convert text from clipboard to a file-like object than can be handled by
         data_arr = csv2array(io.StringIO(clip_text))
 
         if data_arr is None:
             # an error has occurred
-            logger.error(f"Couldn't import data from clipboard.")
+            logger.error("Couldn't import data from clipboard.")
             return None
         elif isinstance(data_arr, str):
             # returned an error message instead of numpy data:
             file2array.info_str = ""
-            logger.error(f"You shouldn't see this message!! \n"
+            logger.error("You shouldn't see this message!! \n"
                             "Error copying from clipboard:\n{data_arr}")
             return None
         else:
@@ -986,7 +986,7 @@ def file2array(file_name: str, file_type: str, fkey: str = "",
                     elif isinstance(data_arr, str):
                         # returned an error message instead of numpy data:
                         file2array.info_str = ""
-                        logger.error(f"You shouldn't see this message!! \n"
+                        logger.error("You shouldn't see this message!! \n"
                                     "Error loading file '{file_name}':\n{data_arr}")
                         return None
 
@@ -1604,8 +1604,8 @@ def export_coe_cmsis_sos(f: TextIO, file_type: str, formatted=False) -> bool:
         return True
 
     if fb.fil[0]['creator'][0] == 'ba':
-        logger.warning(f"Second-order sections have been calculated from "
-                       f"'ba' format, results may be inaccurate.")
+        logger.warning("Second-order sections have been calculated from "
+                       "'ba' format, results may be inaccurate.")
 
     # check whether a_0 coefficients of all sections are == 1
     if not np.all(np.isclose(sos_coeffs[:, 3], 1.0, atol=1e-8)):
