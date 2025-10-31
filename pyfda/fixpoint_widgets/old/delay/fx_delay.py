@@ -50,7 +50,7 @@ class Delay_wdg(QWidget):
         Intitialize the UI and instantiate hdl_filter class
         """
         pass
-        
+
 #        lblHBtnsMsg = QLabel("<b>Fixpoint signal / coeff. formats as WI.WF:</b>", self)
 #        self.layHBtnsMsg = QHBoxLayout()
 #        self.layHBtnsMsg.addWidget(lblHBtnsMsg)
@@ -128,11 +128,11 @@ class Delay_wdg(QWidget):
         """
         inputs = []
         response = []
-        
+
         testbench = self.tb_wdg_stim(stimulus, inputs, response)
-            
+
         run_simulation(self.fixp_filter, testbench)
-        
+
         return response
 ###############################################################################
 
@@ -168,5 +168,5 @@ if __name__ == '__main__':
     mainw.show()
 
     app.exec_()
-    
+
     # test using "python -m pyfda.fixpoint_widgets.fx_delay"
