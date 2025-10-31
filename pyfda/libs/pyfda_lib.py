@@ -139,7 +139,7 @@ def cmp_version(mod: str, version: str) -> int:
         return tuple(map(int, (v.split("."))))
 
     try:  # empty string / module not in list / returned '' as version number
-        if not mod or not mod in MODULES\
+        if not mod or mod not in MODULES\
                 or list(MODULES[mod].values())[0] in {'', 'n.a.'}:
             return -2
         elif dirs.PYINSTALLER:
@@ -480,7 +480,7 @@ def compare_dictionaries(
     # to avoid runtime error "dictionary changed size during iteration" due to new_dict.pop(k)
     for k in list(new_dict):
         path = old_path + f"'{k}'"
-        if not k in ref_dict:
+        if k not in ref_dict:
             key_errs[1].append(path)
             new_dict.pop(k)
 
@@ -766,7 +766,7 @@ def safe_numexpr_eval(expr: str, fallback=None,
 
         np_expr = np.zeros(fallback_shape)
 
-    if not type(np_expr.item(0)) in {float, complex}:
+    if type(np_expr.item(0)) not in {float, complex}:
         np_expr = np_expr.astype(float)
 
     return np_expr
