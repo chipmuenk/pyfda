@@ -292,7 +292,7 @@ class UI_Q(QWidget):
 
     The internal `dict_ui` with widget settings consists of the following keys and their
     default settings which can be overwritten with keyword parameters:
-    
+
     All labels support HTML formatting.
 
     'wdg_name'  : 'ui_q'                            # widget name

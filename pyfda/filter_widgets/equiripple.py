@@ -302,7 +302,7 @@ class Equiripple(QWidget):
         The corner frequencies and the weights for passband and stopband are contained in the
         instance parameters and in the filter dict, they are retrieved using `fb_get()`.
 
-    
+
         - 'W_PB': Weight for the passband.
         - 'W_SB': Weight for the stopband.
         - Other keys required by `_get_params`.
