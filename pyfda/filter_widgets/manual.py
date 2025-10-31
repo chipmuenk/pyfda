@@ -231,7 +231,7 @@ class Manual_IIR():
 #------------------------------------------------------------------------------
 
 if __name__ == '__main__':
-    # Run module standalone using "python -m pyfda.filter_widgets.manual"    
+    # Run module standalone using "python -m pyfda.filter_widgets.manual"
     import pyfda.filterbroker as fb # importing filterbroker initializes all its globals
 
     filt = Manual_IIR()    # instantiate filter

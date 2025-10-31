@@ -38,7 +38,7 @@ print(f"Installing packages\n{requirements_list}\n")
 setup(
     name='pyfda',
     # version=version_nr['__version__'],
-    version = __version__, 
+    version = __version__,
     description=("Design and analyse discrete time DSP filters with a user-friendly GUI "
                  "tool. Fixpoint filters in time and frequency domain, too."),
     long_description_content_type='text/markdown',

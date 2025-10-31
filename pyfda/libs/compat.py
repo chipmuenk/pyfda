@@ -52,9 +52,9 @@ from matplotlib.backends.backend_qt5agg import NavigationToolbar2QT as Navigatio
 #    from PyQt4 import QtGui, QtCore, QtTest
 #    from PyQt4.QtCore import (Qt, QEvent, QT_VERSION_STR, QSize, QSysInfo,
 #                              QObject, QVariant, pyqtSignal, pyqtSlot)
-#    from PyQt4.QtGui import (QAction, QMenu, 
+#    from PyQt4.QtGui import (QAction, QMenu,
 #                             QFont, QFontMetrics, QIcon, QImage, QColor, QBrush, QStyle,
-#                             QPalette, QPixmap, 
+#                             QPalette, QPixmap,
 #                             QMainWindow, QTabWidget, QApplication, QRadioButton,
 #                             QScrollArea, QSplitter, QMessageBox, QDialog,
 #                             QWidget, QComboBox, QLabel, QLineEdit, QFrame,
@@ -66,7 +66,7 @@ from matplotlib.backends.backend_qt5agg import NavigationToolbar2QT as Navigatio
 #                             QStyledItemDelegate)
 #
 #    from matplotlib.backends.backend_qt4agg import FigureCanvasQTAgg as FigureCanvas
-#    from matplotlib.backends.backend_qt4agg import NavigationToolbar2QT as NavigationToolbar  
+#    from matplotlib.backends.backend_qt4agg import NavigationToolbar2QT as NavigationToolbar
 # ==============================================================================
 
 

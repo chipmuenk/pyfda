@@ -13,7 +13,7 @@ low_pass_10_1 = [[[1.0,       -1.04859958, 0.29614036],   # A coefficients, firs
                   [1.0,        2.0,        1.0]]]         # B coefficients, second section
 
 #--------------------------------------------------------------------------------
-# Coefficients for a high-pass Butterworth IIR digital filter with 
+# Coefficients for a high-pass Butterworth IIR digital filter with
 # sampling rate: 10 Hz and corner frequency 1.0 Hz.
 # Filter is order 4, implemented as second-order sections (biquads).
 
@@ -64,7 +64,7 @@ class BiquadFilter:
         # Iterate over the biquads in sequence.  The accum variable transfers
         # the input into the chain, the output of each section into the input of
         # the next, and final output value.
-        accum = input        
+        accum = input
         for s in range(self.sections):
             A = self.coeff[s][0]
             B = self.coeff[s][1]

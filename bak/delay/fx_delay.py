@@ -57,7 +57,7 @@ class Delay_wdg(QWidget):
 #
 #        self.wdg_w_input = UI_W(self, label='Input Format <i>Q<sub>X </sub></i>:')
 #        self.wdg_q_input = UI_Q(self)
-#        
+#
 ##------------------------------------------------------------------------------
 #
 #        lay_v_wdg = QVBoxLayout()
@@ -67,7 +67,7 @@ class Delay_wdg(QWidget):
 #
 #        lay_v_wdg.addWidget(self.wdg_w_input)
 #        lay_v_wdg.addWidget(self.wdg_q_input)
-#        
+#
 #        lay_v_wdg.addStretch()
 #
 #        self.setLayout(lay_v_wdg)
@@ -85,7 +85,7 @@ class Delay_wdg(QWidget):
         """
         return verilog.convert(self.fixp_filter,
                                ios={self.fixp_filter.i, self.fixp_filter.o},
-                               **kwargs) 
+                               **kwargs)
 #------------------------------------------------------------------------------
 
     def tb_wdg_stim(self, stimulus, inputs, outputs):
@@ -119,7 +119,7 @@ class Delay_wdg(QWidget):
             outputs.append((yield self.fixp_filter.o))
             yield
 
-#------------------------------------------------------------------------------           
+#------------------------------------------------------------------------------
     def run_sim(self, stimulus):
         """
         Pass stimuli and run filter simulation, see 
@@ -129,7 +129,7 @@ class Delay_wdg(QWidget):
         inputs = []
         response = []
         
-        testbench = self.tb_wdg_stim(stimulus, inputs, response) 
+        testbench = self.tb_wdg_stim(stimulus, inputs, response)
             
         run_simulation(self.fixp_filter, testbench)
         
@@ -151,7 +151,7 @@ class Delay(Module):
 
         src = self.i
         for c in range(N):
-            sreg = Signal((self.WI, True)) # registers for input signal 
+            sreg = Signal((self.WI, True)) # registers for input signal
             self.sync += sreg.eq(src)
             src = sreg
 
