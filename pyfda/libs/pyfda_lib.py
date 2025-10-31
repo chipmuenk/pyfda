@@ -469,7 +469,7 @@ def compare_dictionaries(
 
     for k in ref_dict:
         path = old_path + f"'{k}'"
-        if not k in new_dict:
+        if k not in new_dict:
             key_errs[0].append(path)
             new_dict.update({k: ref_dict[k]})
         else:
@@ -662,7 +662,11 @@ def frmt2cmplx(string: str, default: float = 0.) -> complex:
 def safe_numexpr_eval(expr: str, fallback=None,
                       local_dict: dict = {}) -> np.ndarray:
     """
-    Evaluate `numexpr.evaluate(expr)` and catch various errors.
+    Evaluate `numexpr.evaluate(expr)` and catch various errors. The input is either
+    a string representing a numeric value or a formula.
+
+    When an error occurs, error code and message are stored in the function attribute
+    `safe_numexpr_eval.err` and `safe_numexpr_eval.err_msg`
 
     Parameters
     ----------
@@ -686,27 +690,33 @@ def safe_numexpr_eval(expr: str, fallback=None,
         `expr` converted to a numpy array or scalar
 
     """
-    safe_numexpr_eval.err = 0  # function attribute, providing some sort of "memory"
+    # define local variables for numexpr
     local_dict.update({'j': 1j, 'None': 0})
+    # function attributes, providing some sort of "memory" for previous errors
+    safe_numexpr_eval.err = 0  # error code
+    safe_numexpr_eval.err_msg = ""  # detailed error message
 
-    if type(expr) != str or expr == "None":
-        logger.warning(f"numexpr: Unsuitable input '{expr}' of type "
-                       f"'{type(expr).__name__}', replacing with zero.")
+    # Replace ',' -> '.' for German-style numbers
+    expr = expr.replace(',', '.')
+    if expr[0] == '.':  # prepend '0' when the number starts with '.'
+        expr = "0" + expr
+
+    # replace non-string or empty inputs by "0.0"
+    if expr in {"", None}:
+        safe_numexpr_eval.err_msg = "numexpr: Replacing empty input with '0.0'."
+        safe_numexpr_eval.err = 9
+        logger.warning(safe_numexpr_eval.err_msg)
+        expr = "0.0"
+    elif type(expr) != str:
+        safe_numexpr_eval.err_msg =(
+            f"numexpr: Replacing non-string input '{expr}' "
+            f"of type '{type(expr).__name__}' with '0.0'.")
         safe_numexpr_eval.err = 10
+        logger.warning(safe_numexpr_eval.err_msg)
         expr = "0.0"
 
-    # Find one or more redundant zeros '0+' at the beginning '^' leading a number [0-9]
-    # Group the number(s) '(...)' and write it '\1' to the resulting string.
-    expr = re.sub(r'^0+([0-9])', r'\1', expr)
-    if len(expr) == 0:
-        expr = "0"
-    else:
-        expr = expr.replace(',', '.')  # ',' -> '.' for German-style numbers
-        if expr[0] == '.':  # prepend '0' when the number starts with '.'
-            expr = "0" + expr
-
     if type(fallback) == tuple:
-        # output is expected to be a numpy array, input is a formula
+        # output is expected to be a numpy array -> input is a formula
         np_expr = np.zeros(fallback)  # fallback defines the shape
         fallback_shape = fallback
     else:
@@ -714,54 +724,70 @@ def safe_numexpr_eval(expr: str, fallback=None,
         # needs to be checked and cleaned more closely
         np_expr = fallback  # fallback is the default numpy return value or None
         fallback_shape = np.shape(fallback)
+
         # expressions like 1e3j are rejected by numexpr, replace them by 1e3*1j
         # numbers like 1e3*1j are converted to 1e3*1*1j which is reduced by numexpr
         if "e" in expr and "j" in expr:
             expr = expr.replace("j", "*1j")
 
+        # check for polar complex expressions containing "<" or "∠"
+        # like 0.3<p/2 or 0.3∠pi/2 or 0.3<π/2 and convert them to cartesian form
         if "<" in expr or "\u2220" in expr:
             return frmt2cmplx(expr)
 
+        # Find one or more redundant zeros '0+' at the beginning '^' of a number '[0-9]'
+        # Group the number(s) '(...)' and write it as '\1' to the resulting string.
+        expr = re.sub(r'^0+([0-9])', r'\1', expr)
+
     try:
         np_expr = numexpr.evaluate(expr.strip(), local_dict=local_dict)
+
     except SyntaxError as e:
-        logger.warning(f"numexpr: Syntax error in '{expr}':\n\t{e}")
+        safe_numexpr_eval.err_msg = f"numexpr: Syntax error in '{expr}':\n\t{e}"
+        logger.warning(safe_numexpr_eval.err_msg)
         safe_numexpr_eval.err = 1
     except AttributeError as e:
-        logger.warning(f"numexpr: Attribute error in '{expr}':\n\t{e}")
+        safe_numexpr_eval.err_msg = f"numexpr: Attribute error in '{expr}':\n\t{e}"
+        logger.warning(safe_numexpr_eval.err_msg)
         safe_numexpr_eval.err = 2
     except KeyError as e:
-        logger.warning(f"numexpr: Unknown variable in '{expr}':\n\t{e}")
+        safe_numexpr_eval.err_msg = f"numexpr: Unknown variable in '{expr}':\n\t{e}"
+        logger.warning(safe_numexpr_eval.err_msg)
         safe_numexpr_eval.err = 3
     except TypeError as e:
-        logger.warning(f"numexpr: Type error in '{expr}':\n\t{e}")
+        safe_numexpr_eval.err_msg = f"numexpr: Type error in '{expr}':\n\t{e}"
+        logger.warning(safe_numexpr_eval.err_msg)
         safe_numexpr_eval.err = 4
     except ValueError as e:
-        logger.warning(f"numexpr: Value error in '{expr}':\n\t{e}")
+        safe_numexpr_eval.err_msg = f"numexpr: Value error in '{expr}':\n\t{e}"
+        logger.warning(safe_numexpr_eval.err_msg)
         safe_numexpr_eval.err = 5
-    except ZeroDivisionError:
-        logger.warning(f"numexpr: Zero division error in '{expr}': \n\t{e}")
+    except ZeroDivisionError as e:
+        safe_numexpr_eval.err_msg = f"numexpr: Zero division error in '{expr}': \n\t{e}"
+        logger.warning(safe_numexpr_eval.err_msg)
         safe_numexpr_eval.err = 6
 
     if np_expr is None:
         return None  # no fallback, no error checking!
 
-    # check if dimensions of converted string agrees with expected dimensions
+    # check if dimensions of converted string agree with expected dimensions
     elif np.ndim(np_expr) != np.ndim(fallback):
         if np.ndim(np_expr) == 0:
             # np_expr is scalar, return array with shape of fallback of constant values
             np_expr = np.ones(fallback_shape) * np_expr
         else:
             # return array of zeros in the shape of the fallback
-            logger.warning(
+            safe_numexpr_eval.err_msg = (
                 f"numexpr: Expression has unexpected number of dimensions {np.ndim(np_expr)}!")
+            logger.warning(safe_numexpr_eval.err_msg)
             safe_numexpr_eval.err = 11
 
             np_expr = np.zeros(fallback_shape)
 
     if np.shape(np_expr) != fallback_shape:
-        logger.warning(
+        safe_numexpr_eval.err_msg = (
             f"numexpr: Expression has unsuitable length {np.shape(np_expr)[0]}!")
+        logger.warning(safe_numexpr_eval.err_msg)
         safe_numexpr_eval.err = 12
 
         np_expr = np.zeros(fallback_shape)
@@ -776,7 +802,11 @@ def safe_numexpr_eval(expr: str, fallback=None,
 def safe_eval(expr, alt_expr=0, return_type: str = 'float', sign: str = None
               ):  # -> complex|float|int: only works with py3.10 upawards
     """
-    Try ... except wrapper around numexpr to catch various errors
+    Try to safely evaluate `expr` using `numexpr.evaluate()` and return the
+    result as float (default), complex or int, depending on `return_type`.
+    The sign of the result can be enforced to be positive or negative using
+    parameter `sign`.
+
     When evaluation fails or returns `None`, try evaluating `alt_expr`.
     When this also fails, return 0 to avoid errors further downstream.
 
@@ -798,7 +828,8 @@ def safe_eval(expr, alt_expr=0, return_type: str = 'float', sign: str = None
 
     Returns
     -------
-    the evaluated result or 0 when both arguments fail: float (default) / complex / int
+    result : float / complex / int
+        the evaluated result or 0 when neither `expr` nor `alt_expr` could be evaluated
 
 
     Function attribute `err` contains number of errors that have occurred during
@@ -818,8 +849,7 @@ def safe_eval(expr, alt_expr=0, return_type: str = 'float', sign: str = None
             logger.warning("Passed an empty string, nothing was changed!")
         else:
             if return_type not in {'float', 'int', 'cmplx', 'auto', ''}:
-                logger.error(
-                    'Unknown return type "{0}", setting result to 0.'.format(return_type))
+                logger.error('Unknown return type "%s", setting result to 0.', return_type)
 
             ex_num = safe_numexpr_eval(ex)
             if ex_num is not None:
