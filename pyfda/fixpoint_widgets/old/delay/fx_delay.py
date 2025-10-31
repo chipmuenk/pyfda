@@ -122,9 +122,9 @@ class Delay_wdg(QWidget):
 #------------------------------------------------------------------------------
     def run_sim(self, stimulus):
         """
-        Pass stimuli and run filter simulation, see 
+        Pass stimuli and run filter simulation, see
         https://reconfig.io/2018/05/hello_world_migen
-        https://github.com/m-labs/migen/blob/master/examples/sim/fir.py        
+        https://github.com/m-labs/migen/blob/master/examples/sim/fir.py
         """
         inputs = []
         response = []

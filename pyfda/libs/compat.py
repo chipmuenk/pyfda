@@ -7,7 +7,7 @@
 # (see file LICENSE in root directory for details)
 
 """
-Was: Compatibility wrapper to obtain same syntax for both Qt4 and 5, PyQt4 has 
+Was: Compatibility wrapper to obtain same syntax for both Qt4 and 5, PyQt4 has
 been removed
 """
 

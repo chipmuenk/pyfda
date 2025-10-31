@@ -647,7 +647,7 @@ class PlotImpz_UI(QWidget):
     # -------------------------------------------------------------------------
     def update_N(self, emit=True, N_end=0):
         """
-        Update values for `self.N`, `self.N_start` and `self.N_end` from the 
+        Update values for `self.N`, `self.N_start` and `self.N_end` from the
         corresponding QLineEditWidgets.
 
         Parameters

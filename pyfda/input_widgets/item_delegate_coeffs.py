@@ -11,7 +11,7 @@ This class controls the view of QTableWidget items in a Model-View-Delegate
 architecture of the `Input_Coeffs()` widget. Coefficients of a digital filter
 can be viewed and edited in various fixpoint and float formats.
 
-Globally, coefficients are stored in the 2D float list `fb.fil[0]['ba']` 
+Globally, coefficients are stored in the 2D float list `fb.fil[0]['ba']`
 where the numerator b is the first and the denominator a the second column.
 A local copy is created as `self.parent.ba` of `Input_Coeffs()`where edits are
 stored via `setModelData()`. Changes are only passed back to the original
@@ -21,15 +21,15 @@ the `Apply` button in the `Input_Coeffs_UI()`.
 Coefficients are displayed and stored in a QTableWidget as string objects
 number of rows. The first column contains the numerator b coefficients, the
 second column the denominator a coefficients. The number of rows is set by
-Quantized data is stored in 2D float array `self.parent.ba_q` where again 
+Quantized data is stored in 2D float array `self.parent.ba_q` where again
 the numerator b is the first and the denominator a the second column.
 
 The coefficients are displayed as floats or in a fixed-point format with
-user-defined number base and number of bits. 
+user-defined number base and number of bits.
 
 The quantizer is an instance of the `fx.Fixed()` class, it is used to
-convert the coefficients to fixed-point format and to display the coefficients 
-in the selected format (int, hex, ...). The quantizer is created in the 
+convert the coefficients to fixed-point format and to display the coefficients
+in the selected format (int, hex, ...). The quantizer is created in the
 `Input_Coeffs` class and passed to this class via the `parent` parameter as
 `self.Q = [self.parent.ui.wdg_wq_coeffs_b.Q, self.parent.ui.wdg_wq_coeffs_a.Q]`
 """
@@ -216,7 +216,7 @@ class ItemDelegateCoeffs(QStyledItemDelegate):
         `float2frmt()` to quantize data and store it in `parent.ba_q`.
         Finally, refresh the whole table - this might be needed to adapt the table
         to a longer number format. Alternatively, one could use `_refresh_table_item()`
-        for a single item. 
+        for a single item.
 
         Parameters
         ----------

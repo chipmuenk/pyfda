@@ -161,7 +161,7 @@ class QFFTWinCmbBox(QWidget):
         `cur_win_dict` dictionary correspondingly.
 
         Additionally, update the handle `self.win_fnct` to the window function and
-        the entries for keys 'par_val' and 'id' of 
+        the entries for keys 'par_val' and 'id' of
             `self.cur_win_dict = fb.fil[0][self.key_fil]`
 
         Parameters
@@ -400,7 +400,7 @@ class QFFTWinCmbBox(QWidget):
         """
         - read FFT window type combo box and update win_dict using `set_window_name()`
         - determine number of parameters and make lineedit or combobox fields visible
-        - set tooltipps and parameter values from `self.all_wins_dict` 
+        - set tooltipps and parameter values from `self.all_wins_dict`
         - update `cur_win_dict` and `all_wins_dict`
         """
         cur_win_id = qget_cmb_box(self.cmb_win_fft, data=True)

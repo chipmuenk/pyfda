@@ -335,12 +335,12 @@ class Equiripple(QWidget):
         coefficients are saved in the provided filter dictionary.
 
         Filter specifications are read from the filter dictionary with `fb_get()`,
-        These are passeband and stopband frequencies (`F_PB`, `F_SB`), 
+        These are passeband and stopband frequencies (`F_PB`, `F_SB`),
         passband and stopband ripple (`A_PB`, `A_SB`), and other parameters.
 
         Returns
         -------
-        err_code: int 
+        err_code: int
             Returns -1 if the computed filter order is invalid, otherwise the
             filter coefficients are saved in the filter dictionary using `fb_set()`.
         """
