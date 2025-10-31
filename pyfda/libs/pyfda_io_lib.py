@@ -342,7 +342,7 @@ def qtable2csv(table: object, data: np.ndarray, zpk: bool = False,
         logger.error(
             f"Unknown key '{params['CSV']['header']}' for params['CSV']['header']")
 
-    if not params['CSV']['orientation'] in {'rows', 'cols', 'auto'}:
+    if params['CSV']['orientation'] not in {'rows', 'cols', 'auto'}:
         logger.error(
             f"Unknown key '{params['CSV']['orientation']}' for "
             "params['CSV']['orientation']")
@@ -540,7 +540,7 @@ def csv2array(f: TextIO):
                 f"Unknown key '{CSV_dict['header']}' for CSV_dict['header'], "
                 f"using {header} instead.")
 
-        if not CSV_dict['orientation'].lower() in {'auto', 'cols', 'rows'}:
+        if CSV_dict['orientation'].lower() not in {'auto', 'cols', 'rows'}:
             logger.error(
                 f"Unknown key '{CSV_dict['orientation']}' for CSV_dict['orientation'], "
                 "using column mode.")
@@ -724,7 +724,7 @@ def read_csv_info_large(filename):
     logger.info(f"Terminator = '{lineterminator}', Delimiter = '{delimiter}', "
                 f"RowCount = {N}, Header={has_header}")
 
-    if not params['CSV']['orientation'] in {'rows', 'cols', 'auto'}:
+    if params['CSV']['orientation'] not in {'rows', 'cols', 'auto'}:
         logger.error(
             f"Unknown key '{params['CSV']['orientation']}' for "
             "params['CSV']['orientation']")
