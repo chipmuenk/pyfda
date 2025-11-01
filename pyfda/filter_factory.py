@@ -108,10 +108,10 @@ class FilterFactory():
             logger.warning(err_string)
             return self.err_code
 
-        except ImportError as e:
+        except ImportError:
             # Filter module mod is in dictionary 'fb.filter_classes', but could not be imported.
             err_string =("\nImportError in 'FilterFactory.create_fil_inst()':\n"
-                  "Filter design module '%s' could not be imported."%str(mod))
+                  "Filter design module '%s' could not be imported.", str(mod))
             self.err_code = 2
             logger.warning(err_string)
             if fb.conf_settings['CATCH_ERRORS'] is False:
