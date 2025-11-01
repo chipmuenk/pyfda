@@ -21,7 +21,6 @@ import logging
 from cycler import cycler
 import matplotlib.font_manager
 
-from pyfda import qrc_resources  # contains all icons
 from pyfda.libs.pyfda_lib import CRLF
 import pyfda.filterbroker as fb
 

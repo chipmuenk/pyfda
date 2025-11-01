@@ -18,13 +18,11 @@ import numpy as np
 from numpy.lib.function_base import iterable
 
 from amaranth.back import verilog
-# from amaranth import Signal, signed, Elaboratable, Module
-from amaranth.sim import Simulator, Tick  # , Delay, Settle
+from amaranth.sim import Simulator, Tick
 
 from pyfda.filterbroker import get_fx, fb_get, fb_set
 # from pyfda.libs.pyfda_lib import pprint_log
 import pyfda.libs.pyfda_fix_lib as fx
-from pyfda.libs.pyfda_fix_lib_amaranth import requant
 import pyfda.fixpoint_widgets.fir_df.fir_df_amaranth_mod as mod
 
 logger = logging.getLogger(__name__)

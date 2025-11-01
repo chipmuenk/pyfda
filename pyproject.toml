@@ -57,6 +57,7 @@ line-length = 100
 target-version = "py312"
 exclude = [
     "widget_templates",
+    "old",
     "tests",
     ".venv",
     "build",

@@ -19,11 +19,10 @@ from pyfda.libs.compat import (Qt, QtCore, QMainWindow, QApplication, QSplitter,
                      QMessageBox, QPlainTextEdit, QMenu, pyqtSignal)
 import pyfda.libs.pyfda_dirs as dirs # initial import constructs file paths
 from pyfda.libs.pyfda_lib import to_html
-from pyfda import pyfda_rc, qrc_resources # contains all icons
+from pyfda import pyfda_rc
 # edit pyfda.qrc, then
-# create with   pyrcc4 pyfda.qrc -o qrc_resources.py -py3
-#   or          pyrcc5 pyfda.qrc -o qrc_resources.py
-# and manually replace "from from PyQt4/5 import QtCore"
+# create with  pyrcc5 pyfda.qrc -o qrc_resources.py
+# and manually replace "from from PyQt5 import QtCore"
 #   by "from pyfda.libs.compat import QtCore" in qrc_resources.py
 from pyfda.input_widgets import input_tab_widgets
 from pyfda.plot_widgets import plot_tab_widgets

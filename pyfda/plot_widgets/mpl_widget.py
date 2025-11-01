@@ -31,7 +31,8 @@ from pyfda.libs.compat import (
     QHBoxLayout, QInputDialog, FigureCanvas, NavigationToolbar, QtWidgets, QEvent)
 from pyfda.libs.pyfda_qt_lib import EventTypes, emit
 from pyfda import pyfda_rc
-from pyfda import qrc_resources  # contains all icons
+# Disallow "unused import" warning - needed to register resources like icons
+from pyfda import qrc_resources  # noqa: F401
 
 logger = logging.getLogger(__name__)
 

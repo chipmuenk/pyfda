@@ -18,7 +18,7 @@ import numpy as np
 import scipy.signal as sig
 from matplotlib.patches import Rectangle
 from matplotlib import rcParams
-import matplotlib.ticker as ticker
+# import matplotlib.ticker as ticker
 from matplotlib.ticker import AutoMinorLocator
 
 from pyfda.libs.compat import (QCheckBox, QWidget, QComboBox, QLabel, QLineEdit,
