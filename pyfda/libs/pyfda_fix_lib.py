@@ -699,7 +699,7 @@ class Fixed(object):
                         y = y.astype(complex)  # try to convert to complex
                         self.N += y.size * 2
                     # try converting elements recursively:
-                    except (TypeError, ValueError) as e:
+                    except (TypeError, ValueError):
                         yq = np.asarray(
                             list(map(lambda y_scalar:\
                                      self.fixp(y_scalar, in_frmt=in_frmt, out_frmt=out_frmt),
@@ -727,7 +727,7 @@ class Fixed(object):
                 except (TypeError, ValueError):
                     try:
                         y = complex(y)
-                    except (TypeError, ValueError) as e:
+                    except (TypeError, ValueError):
                         logger.error(f"'{y}' cannot be converted to a number.")
                         y = 0.0
             over_pos = over_neg = yq = 0

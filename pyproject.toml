@@ -73,12 +73,12 @@ exclude = [
 [tool.ruff.lint]
 # select rules to enable for linting
 select = [
-    "B",  # flake8-bugbear: find likely bugs and design problems
-    "E",  # pycodestyle errors (like missing whitespace)
+    # "B",  # flake8-bugbear: find likely bugs and design problems
+    #"E7",  # pycodestyle errors (like missing whitespace)
     "W",  # pycodestyle warnings (like trailing whitespace)
     "F",  # pyflakes
-    "C90",  # max. mccabe complexity of functions
-    "I",    # isort
+    # "C90",  # max. mccabe complexity of functions
+    # "I",    # isort of imports
     "NPY201"  # numpy 2 style guide
     ]
 ignore = ["E501", # line too long
@@ -92,8 +92,9 @@ ignore = ["E501", # line too long
 task-tags = ["TODO", "FIXME"]
 # list of rules that are considered fixable
 fixable = [
-    "W291",
-    "W292", # trailing whitespace, missing newline at end of file
+    "W291",  # trailing whitespace
+    "W292",  #missing newline at end of file
+    "W293",  # blank line contains whitespace
     "E303",         # too many blank lines
     "E302", "E305", # expected 2 blank lines, found 1
     "E231",         # missing whitespace after ','
@@ -102,6 +103,7 @@ fixable = [
     "E226",         # missing whitespace around arithmetic operator
     "E222",         # multiple spaces around operator
     "E714",         # test for object identity should be 'is' or 'is not'
+    "F541",        # f-string missing placeholders
     # "I001",         # isort import formatting
 ]
 

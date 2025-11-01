@@ -254,13 +254,13 @@ class Plot_Hf(QWidget):
         # calculate scale of Delta Limits / Delta Ticks
         ax1_scale = ax1_ydelta_lim / ax1_ydelta_vis
 
-        ax2_ylims = ax2.get_ybound()
+        # ax2_ylims = ax2.get_ybound()
         ax2_yticks = ax2.get_yticks()
-        ax2_nticks = len(ax2_yticks)
-        #ax2_ydelta_lim = ax2_ylims[1] - ax2_ylims[0]
+        # ax2_nticks = len(ax2_yticks)
+        # ax2_ydelta_lim = ax2_ylims[1] - ax2_ylims[0]
         ax2_ydelta_vis = ax2_yticks[-1] - ax2_yticks[0]
         ax2_ydelta_lim = ax2_ydelta_vis * ax1_scale
-        ax2_scale = ax2_ydelta_lim / ax2_ydelta_vis
+        # ax2_scale = ax2_ydelta_lim / ax2_ydelta_vis
         # calculate new offset between lower limit and first tick
         ax2_yoffset = ax1_yoffset * ax2_ydelta_lim / ax1_ydelta_lim
         ax2.set_yticks(np.linspace(ax2_yticks[0],

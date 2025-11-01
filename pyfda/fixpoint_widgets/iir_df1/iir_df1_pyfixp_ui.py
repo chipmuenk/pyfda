@@ -265,7 +265,7 @@ class IIR_DF1_pyfixp_UI(QWidget):
         """
         try:
             WI_A = int(np.ceil(np.log2((np.abs(np.max(fb.fil[0]['ba'][1]))))))
-        except OverflowError as e:
+        except OverflowError:
             WI_A = 0
             logger.warning("Overflow error in calculation of word length.")
 
@@ -283,7 +283,7 @@ class IIR_DF1_pyfixp_UI(QWidget):
         """
         try:
             WI_B = int(np.ceil(np.log2((np.abs(np.max(fb.fil[0]['ba'][0]))))))
-        except OverflowError as e:
+        except OverflowError:
             WI_B = 0
             logger.warning("Overflow error in calculation of word length.")
         fb.fil[0]['fxq']['QCB']['WI'] = max(WI_B, 0)
