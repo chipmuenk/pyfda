@@ -247,30 +247,27 @@ def zpk2array(zpk: list):
     except TypeError:
         return "'zpk' is a scalar or 'None'!"
 
-    if type(zpk) is list:
-        if len(zpk) == 3:  # dimensions are ok, but poles / gain could be empty
-            if np.isscalar(zpk[2]) or zpk[2] == []:
-                if zpk[2] == 0 or zpk[2] == []:
-                    zpk[2] = [1]
-                    zpk = normalize_zpk_gain(zpk)
-            else:
-                if zpk[2][0] in {0, None}:
-                    zpk[2][0] = 1
-                    zpk = normalize_zpk_gain(zpk)
+    if isinstance(zpk, list):
+        if len(zpk) == 3:  # dimensions are ok, but gain could be empty or zero
+            if zpk[2].size == 0 or zpk[2] in {0, None}:
+                zpk[2] = [1]
+                zpk = normalize_zpk_gain(zpk)
+            elif not np.isscalar(zpk[2]) and zpk[2][0] in {0, None}:
+                zpk[2][0] = 1
+                zpk = normalize_zpk_gain(zpk)
 
         elif len(zpk) == 2:  # only poles and zeros given:
-            zpk = list(zpk)
             zpk.append([1])  # set gain = 1
             zpk = normalize_zpk_gain(zpk)
 
         elif len(zpk) == 1:  # only zeros given:
-            zpk = list(zpk)
             zpk.append([0], [1])  # set pole = 0, gain = 1
             zpk = normalize_zpk_gain(zpk)
 
         else:
-            logger.error("'zpk' has unsuitable shape '%s'", np.shape(zpk))
-            return f"'zpk' has unsuitable shape '{np.shape(zpk)}'"
+            err = ("'zpk' has unsuitable shape '%s'", np.shape(zpk))
+            logger.error(err)
+            return err
     else:
         return f"'zpk' has an unsuitable type '{type(zpk)}'"
     return pyfda_lib.iter2ndarray(zpk)
