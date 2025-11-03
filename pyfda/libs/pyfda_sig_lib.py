@@ -1130,9 +1130,13 @@ def fil_save(arg: np.ndarray, format_in: str, sender: str, convert: bool = True)
     None
     """
     if not isinstance(arg, np.ndarray):
-        logger.warning(
+        logger.error(
             "'fil_save()': data in '%s' format should be a numpy array but is '%s'!",
             format_in, type(arg))
+        return
+    elif arg.size == 0:
+        logger.error("'fil_save()': data in '%s' argument is empty!", format_in)
+        return
 
     if format_in == 'sos':
         fb_set('sos', arg)
@@ -1173,7 +1177,7 @@ def fil_save(arg: np.ndarray, format_in: str, sender: str, convert: bool = True)
                 else:
                     fb_set('ft', 'FIR')
             else:
-                logger.error(f"{len(arg)} rows instead of 3!")
+                logger.error("zpk has %s rows instead of 3!", len(arg))
                 format_error = True
         else:
             format_error = True
@@ -1267,7 +1271,7 @@ def fil_convert(format_in) -> None:
             n_sections = sos.shape[0]
             for section in range(n_sections):
                 b0 = sos[section, 3]  # coeffs of non-recursive section part
-                a = sos[section, 3:]  # coeffs of recursive section part
+                # a = sos[section, 3:]  # coeffs of recursive section part
                 if b0 < 1e-14:
                     raise ValueError(
                         "\t'fil_convert()': Bad coefficients, required order N may be too high!\n"
