@@ -24,6 +24,7 @@ A globally accessible instance of a filter design class (e.g. "cheby1") is creat
 import importlib
 import logging
 import pyfda.filterbroker as fb
+from pyfda.libs.pyfda_lib import debug_exception
 
 logger = logging.getLogger(__name__)
 

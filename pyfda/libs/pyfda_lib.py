@@ -14,6 +14,7 @@ import os
 import re
 import sys
 import struct
+import traceback
 
 # from contextlib import redirect_stdout
 from docutils import __version__ as V_DOC
@@ -26,6 +27,7 @@ import markdown
 from mplcursors import __version__ as V_CUR
 from scipy import __version__ as V_SCI
 
+import pyfda.filterbroker as fb
 import pyfda.libs.pyfda_dirs as dirs
 
 from .compat import QT_VERSION_STR as V_QT
@@ -558,7 +560,7 @@ def pprint_log(d, N: int = 10, tab: str = "\t", debug: bool = False) -> str:
             s = cr + tab + str(d[: min(N-1, len(d))])
             if len(d) > N-1:
                 s += ' ...'
-            s += (cr + tab + f'Type: {type(d).__name__} of {type(d[0]).__name__}, '
+            s += (cr + tab + f'Type: {type(d).__name__} of {type(d[0]).__name__} '
                   f'with shape = ({len(d)},)')
         elif np.ndim(d) == 2:
             rows, cols = np.shape(d)
@@ -762,10 +764,12 @@ def safe_numexpr_eval(expr: str, fallback=None,
         safe_numexpr_eval.err_msg = f"numexpr: Value error in '{expr}':\n\t{e}"
         logger.warning(safe_numexpr_eval.err_msg)
         safe_numexpr_eval.err = 5
-    except ZeroDivisionError as e:
-        safe_numexpr_eval.err_msg = f"numexpr: Zero division error in '{expr}': \n\t{e}"
+        debug_exception(ValueError)
+    except ZeroDivisionError:
+        safe_numexpr_eval.err_msg = f"numexpr: Zero division error in '{expr}'"
         logger.warning(safe_numexpr_eval.err_msg)
         safe_numexpr_eval.err = 6
+        debug_exception()
 
     if np_expr is None:
         return None  # no fallback, no error checking!
@@ -882,6 +886,24 @@ def safe_eval(expr, alt_expr=0, return_type: str = 'float', sign: str = None
     if result is None:
         result = 0
     return result
+
+
+# ------------------------------------------------------------------------------
+def debug_exception(msg: str = "") -> None:
+    """
+    React to an exception depending on the debug level. When debug level is high,
+    use the traceback module for full traceback. Otherwise, keep quiet.
+    """
+    if fb.conf_settings['CATCH_ERRORS'] is False:
+        # get current stack trace as a list of strings. Each string consists of
+        #   "  File '...'\n, line ..., in ...\n"
+        err_list = traceback.format_stack()
+        err_str = msg + "\n\t"
+        # skip the first entries and the last two (it's this function and the caller)
+        for s in err_list[4:-2]:
+            err_str += s.strip(' \t\n').replace("\n", "\n\t\t") + "\n\t" # indent traceback lines
+        logger.error(err_str)
+        logger.error(crash)
 
 
 # ------------------------------------------------------------------------------

@@ -38,7 +38,7 @@ import numpy as np
 from pyfda.libs.compat import QWidget, QLabel, QLineEdit, pyqtSignal, QVBoxLayout, QHBoxLayout
 from pyfda.filterbroker import fb_get, fb_set
 from pyfda.libs.pyfda_qt_lib import popup_warning, emit
-from pyfda.libs.pyfda_lib import round_odd, ceil_even, safe_eval
+from pyfda.libs.pyfda_lib import round_odd, ceil_even, safe_eval, debug_exception
 from pyfda.libs.pyfda_sig_lib import fil_save
 from .common import remezord
 
@@ -289,6 +289,7 @@ class Equiripple(QWidget):
             # catch exception due to malformatted coefficients:
             logger.error("While saving the equiripple filter design, "
                          "the following error occurred:\n%s", e)
+            debug_exception()
             return -1
 
         if fb_get('fo') == 'min':

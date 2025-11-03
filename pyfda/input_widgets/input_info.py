@@ -221,7 +221,8 @@ class Input_Info(QWidget):
         self.butFiltTree.clicked.connect(self._show_filt_tree)
         self.butDocstring.clicked.connect(self._show_doc)
         self.butRichText.clicked.connect(self._show_doc)
-        self.but_catch_errors.clicked.connect(self._disable_error_handling)
+        self.but_catch_errors.clicked.connect(
+            lambda: fb.conf_settings.__setitem__('CATCH_ERRORS', self.but_catch_errors.checked))
 
     # -------------------------------------------------------------------------
     def _about_window(self):
@@ -518,13 +519,6 @@ class Input_Info(QWidget):
 #        dictstr = pprint.pformat(fb.fil[0])
         self.txt_filt_tree.setText(dictstr)
 
-    # --------------------------------------------------------------------------
-    def _disable_error_handling(self):
-        """
-        Enable / disable major try ... except blocks in pyfda for debugging
-        """
-        fb.conf_settings['CATCH_ERRORS'] = self.but_catch_errors.checked
-        logger.info("Error handling enabled: %s", fb.conf_settings['CATCH_ERRORS'])
 
 # ------------------------------------------------------------------------------
 if __name__ == '__main__':
