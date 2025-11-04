@@ -1131,58 +1131,49 @@ def fil_save(arg: np.ndarray, format_in: str, sender: str, convert: bool = True)
     """
     if not isinstance(arg, np.ndarray):
         logger.error(
-            "'fil_save()': data in '%s' format should be a numpy array but is '%s'!",
+            "'fil_save()': data in '%s' format needs to be a numpy array but is '%s'!",
             format_in, type(arg))
         return
     elif arg.size == 0:
-        logger.error("'fil_save()': data in '%s' argument is empty!", format_in)
+        logger.error("'fil_save()': data in '%s' format is empty!", format_in)
+        return
+    elif np.isscalar(arg):
+        logger.error("'fil_save()': data in '%s' format is a scalar!", format_in)
         return
 
     if format_in == 'sos':
+        if np.ndim(arg) != 2 or np.shape(arg)[1] != 6:
+            logger.error(
+                "\t'fil_save()': 'sos' format must be a two-dim. array with six columns "
+                "but has shape '%s'!", np.shape(arg))
+            return
         fb_set('sos', arg)
         fb_set('ft', 'IIR')
 
     elif format_in == 'zpk':
-        format_error = False
-        if isinstance(arg, np.ndarray) and np.ndim(arg) == 1:
-            frmt = "nd1" #  one-dimensional numpy array
-            logger.info("Format (zpk) is '%s', shape = %s", frmt, np.shape(arg))
-        elif isinstance(arg, np.ndarray) and np.ndim(arg) == 2:
-            frmt = "nd2" #  two-dimensional numpy array
-        elif any(isinstance(el, np.ndarray) for el in arg):
-            frmt = "lon"  # list or tuple of ndarrays
-            logger.error("Format (zpk) is 'list-of-numpy arrays', this is deprecated!")
-        else:
-            format_error = True
-
-        if frmt == "nd2":
-            fb_set('zpk', arg)
-            if np.any(arg[1]):  # non-zero poles -> IIR
-                fb_set('ft', 'IIR')
-            else:
-                fb_set('ft', 'FIR')
-
-        elif frmt == 'nd1':  # list / array with z only -> FIR
+        if np.ndim(arg) == 1:
+            # one-dim. numpy array (only z) -> FIR, set gain = 1 and p = [0, 0, ...]
+            logger.debug("zpk is a one-dim. numpy array with shape '%s'", np.shape(arg))
             z = arg
             p = np.zeros(len(z))
             gain = zeros_with_val(len(z))  # create gain vector [1, 0, 0, ...]
             fb_set('zpk', np.array([z, p, gain]))
             fb_set('ft', 'FIR')
 
-        elif frmt == 'lon':  # list of  ndarrays
-            if len(arg) == 3:
-                fb_set('zpk', np.array([arg[0], arg[1], arg[2]]))
-                if np.any(arg[1]):  # non-zero poles -> IIR
-                    fb_set('ft', 'IIR')
-                else:
-                    fb_set('ft', 'FIR')
+        elif np.ndim(arg) == 2:
+            logger.debug("zpk is a two-dim. array with shape '%s'", np.shape(arg))
+            #  two-dim. numpy array, zpk is already given as [z, p, k]
+            if np.shape(arg)[0] != 3:
+                logger.error(
+                    "\t'fil_save()': 'zpk' format must have three rows (z, p, k) but has %s!",
+                    np.shape(arg)[0])
+                return
+            fb_set('zpk', arg)
+            if np.any(arg[1]):  # non-zero poles -> IIR
+                fb_set('ft', 'IIR')
             else:
-                logger.error("zpk has %s rows instead of 3!", len(arg))
-                format_error = True
+                fb_set('ft', 'FIR')
         else:
-            format_error = True
-
-        if format_error:
             raise ValueError("\t'fil_save()': Unknown 'zpk' format {0}".format(arg))
 
     elif format_in == 'ba':
