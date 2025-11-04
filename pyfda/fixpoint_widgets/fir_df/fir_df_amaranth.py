@@ -15,7 +15,6 @@ import logging
 # from operator import add
 
 import numpy as np
-from numpy.lib.function_base import iterable
 
 from amaranth.back import verilog
 from amaranth.sim import Simulator, Tick
@@ -70,7 +69,7 @@ class FIR_DF_amaranth():
 
 
     # ---------------------------------------------------------
-    def init(self, p: dict, zi: iterable = None) -> None:
+    def init(self, p: dict, zi: np.ndarray = None) -> None:
         """
         Initialize filter with parameter dict `p` by initialising all registers
         and quantizers.
@@ -157,7 +156,7 @@ class FIR_DF_amaranth():
         self.zi = np.zeros(self.L - 1)
 
     # ---------------------------------------------------------
-    def fxfilter(self, x: iterable = None, zi: iterable = None) -> np.ndarray:
+    def fxfilter(self, x: np.ndarray = None, zi: np.ndarray = None) -> np.ndarray:
         """
         Calculate FIR filter (direct form) response via difference equation with
         quantization. Registers can be initialized with `zi`.

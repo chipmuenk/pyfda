@@ -14,7 +14,6 @@ import logging
 from operator import add
 
 import numpy as np
-from numpy.lib.function_base import iterable
 
 # from amaranth.back import verilog
 from amaranth import Signal, signed, Elaboratable, Module
@@ -54,7 +53,7 @@ class FIR_DF_amaranth_mod(Elaboratable):
         self.init(p)
 
     # ---------------------------------------------------------
-    def init(self, p, zi: iterable = None) -> None:
+    def init(self, p: dict, zi: np.ndarray = None) -> None:
         """
         Initialize filter with parameter dict `p` by initialising all registers
         and quantizers.
