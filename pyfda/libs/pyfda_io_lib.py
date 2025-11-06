@@ -520,7 +520,7 @@ def csv2array(f: TextIO):
             dialect = csv.Sniffer().sniff(sample, delimiters=['\t', ';', ',', '|', ' '])
         except csv.Error as e:
             logger.warning(
-                'CSV sniffing reported "%s",\ncontinuing with format "excel-tab"', e)
+                'CSV sniffing reported error "%s",\ncontinuing with format "excel-tab"', e)
             dialect = csv.get_dialect('excel-tab')
     else:
         # fall back, alternatives: 'excel', 'unix':
