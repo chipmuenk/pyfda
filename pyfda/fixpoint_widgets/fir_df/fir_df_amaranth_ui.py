@@ -280,10 +280,10 @@ if __name__ == '__main__':
     # Run widget standalone with
     # `python -m pyfda.fixpoint_widgets.fir_df.fir_df_amaranth_ui`
     from pyfda.libs.compat import QApplication
-    from pyfda import pyfda_rc as rc
+    from pyfda import pyfda_rc, qrc_resources  # noqa: F401
 
     app = QApplication(sys.argv)
-    app.setStyleSheet(rc.QSS_RC)
+    app.setStyleSheet(pyfda_rc.QSS_RC)
     set_fx(True)  # enable fixpoint mode
 
     mainw = FIR_DF_amaranth_UI()
