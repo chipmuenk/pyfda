@@ -348,7 +348,7 @@ def qtable2csv(table: object, data: np.ndarray, zpk: bool = False,
             else:
                 return "0" + delim
         else:
-            return str(safe_eval(data[c][r], return_type='auto')) + delim
+            return str(safe_eval(data[c][r], return_type='auto')).strip("()") + delim
 
     text = ""
     if params['CSV']['header'] == 'on':
