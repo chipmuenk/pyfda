@@ -504,7 +504,7 @@ def csv2array(f: TextIO):
         cr = CSV_dict['lineterminator'].lower()
 
     except KeyError as e:
-        logger.error(f"Dict 'params':\n{e}.")
+        logger.error("Dict 'params':\n%s.", e)
         return None
 
     sample = ""
@@ -519,8 +519,8 @@ def csv2array(f: TextIO):
         try:
             dialect = csv.Sniffer().sniff(sample, delimiters=['\t', ';', ',', '|', ' '])
         except csv.Error as e:
-            logger.warning(f'CSV sniffing reported "{e}",\n'
-                        'continuing with format "excel-tab"')
+            logger.warning(
+                'CSV sniffing reported "%s",\ncontinuing with format "excel-tab"', e)
             dialect = csv.get_dialect('excel-tab')
     else:
         # fall back, alternatives: 'excel', 'unix':
@@ -1250,7 +1250,7 @@ def export_fil_data(parent: object, data: str, fkey: str = "", title: str = "Exp
             logger.info('%s data saved as\n\t"%s"', description, file_name)
 
     except IOError as e:
-        logger.error('Failed saving "{0}"!\n{1}\n'.format(file_name, e))
+        logger.error('Failed saving "%s"!\n%s\n', file_name, e)
 
         # Download the Simple ods py module:
         # http://simple-odspy.sourceforge.net/
@@ -1379,8 +1379,9 @@ def export_coe_xilinx(f: TextIO) -> bool:
     if fb.fil[0]['fx_base'] == 'bin':  # select binary format
         coe_radix = 2
     else:
-        logger.warning(f"Coefficients in {fb.fil[0]['fx_base']} format are "
-                       f'not supported in COE files, converting to decimal format.')
+        logger.warning(
+            "Coefficients in %s format are not supported in COE files, converting to "
+            "decimal format.", fb.fil[0]['fx_base'])
         fb.fil[0]['fx_base'] =  'dec'  # select decimal format in all other cases
         coe_radix = 10
 
@@ -1461,8 +1462,9 @@ def export_coe_vhdl_package(f: TextIO) -> bool:
         fb.fil[0]['fx_base'] = 'dec'  # select decimal format in all other cases
         pre = ""
         post = ""
-        logger.warning(f"Coefficients in {fb.fil[0]['fx_base']} format are "
-                       'not supported, converting to decimal format.')
+        logger.warning(
+            "Coefficients in %s format are not supported, converting to decimal format.",
+            fb.fil[0]['fx_base'])
 
     # Quantize coefficients to selected fixpoint format, returning an array of strings
     bq = qc.float2frmt(fb.fil[0]['ba'][0])
@@ -1552,7 +1554,7 @@ def export_coe_cmsis_sos(f: TextIO, file_type: str, formatted=False) -> bool:
     sos_coeffs = fb.fil[0]['sos']  # fcopy coeffs in scipy SOS format
     if np.ndim(sos_coeffs) < 2 or np.shape(sos_coeffs)[1] != 6\
             or np.shape(sos_coeffs)[0] < 1:
-        logger.error(f"SOS coefficients have bad shape '{np.shape(sos_coeffs)}'!")
+        logger.error("SOS coefficients have a bad shape '%s'!", np.shape(sos_coeffs))
         return True
 
     if fb.fil[0]['creator'][0] == 'ba':
