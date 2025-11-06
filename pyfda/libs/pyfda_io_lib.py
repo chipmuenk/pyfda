@@ -187,7 +187,7 @@ def create_file_filters(file_types: tuple, file_filters: str = ""):
         if t in file_filters_dict:
             file_filters += file_filters_dict[t] + f" (*.{t});;"
         else:
-            logger.warning(f"Unknown file extension '.{t}'")
+            logger.warning("Unknown file extension '.%s'", t)
     # remove trailing ';;', otherwise file filter '*' is appended
     file_filters = file_filters.rstrip(';;')
 
@@ -251,7 +251,7 @@ def select_file(parent: object, title: str = "", mode: str = "r",
         dlg.setAcceptMode(QFileDialog.AcceptSave) # set dialog to "file save" mode
         dlg.setFileMode(QFileDialog.AnyFile)
     else:
-        logger.error(f"Unknown mode '{mode}'")
+        logger.error("Unknown mode '%s'", mode)
         return None, None
 
     dlg.setNameFilter(file_filters)  # pass available file filters
@@ -357,12 +357,12 @@ def qtable2csv(table: object, data: np.ndarray, zpk: bool = False,
         use_header = False
     else:
         logger.error(
-            f"Unknown key '{params['CSV']['header']}' for params['CSV']['header']")
+            "Unknown key '%s' for params['CSV']['header']", params['CSV']['header'])
 
     if params['CSV']['orientation'] not in {'rows', 'cols', 'auto'}:
         logger.error(
-            f"Unknown key '{params['CSV']['orientation']}' for "
-            "params['CSV']['orientation']")
+            "Unknown key '%s' for params['CSV']['orientation']",
+            params['CSV']['orientation'])
 
     delim = params['CSV']['delimiter'].lower()
     if delim == 'auto':  # 'auto' doesn't make sense when exporting
@@ -492,13 +492,13 @@ def csv2array(f: TextIO):
         else:
             header = 'auto'
             logger.warning(
-                f"Unknown key '{CSV_dict['header']}' for CSV_dict['header'], "
-                f"using {header} instead.")
+                "Unknown key '%s' for CSV_dict['header'], using %s instead.",
+                CSV_dict['header'], header)
 
         if CSV_dict['orientation'].lower() not in {'auto', 'cols', 'rows'}:
             logger.error(
-                f"Unknown key '{CSV_dict['orientation']}' for CSV_dict['orientation'], "
-                "using column mode.")
+                "Unknown key '%s' for CSV_dict['orientation'], using column mode.",
+                CSV_dict['orientation'])
 
         tab = CSV_dict['delimiter'].lower()
         cr = CSV_dict['lineterminator'].lower()
@@ -544,10 +544,9 @@ def csv2array(f: TextIO):
     if cr != 'auto':
         lineterminator = str(cr)
 
-    logger.info(f"Parsing CSV data with\n"
-                f"\theader = '{use_header}' | "
-                f"Delimiter = {repr(delimiter)} | Lineterm. = {repr(lineterminator)} "
-                f"| quotechar = ' {quotechar} '")
+    logger.info(
+        "Parsing CSV data with\n\theader = '%s' | Delimiter = %r | Lineterm. = %r | "
+        "quotechar = ' %s '", use_header, delimiter, lineterminator, quotechar)
 
     # --------------------------------------------------------------------------
     # finally, create iterator from csv data
@@ -580,7 +579,7 @@ def csv2array(f: TextIO):
             if row:  # only append non-empty rows
                 data_list.append(row)
     except csv.Error as e:
-        logger.error(f"Error during CSV import:\n{e}")
+        logger.error("Error during CSV import:\n%s", e)
         return None
 
     if data_list == [] or data_list ==[""]:
@@ -590,21 +589,21 @@ def csv2array(f: TextIO):
     # ------- Convert list to an array of str --------------------
     try:
         data_arr = np.array(data_list)
-    except np.exception.VisibleDeprecationWarning:
+    except np.exception.VisibleDeprecationWarning as e:
         # prevent creation of numpy arrays from nested ragged sequences
-        logger.error("Can't convert to array, columns have different lengths.")
+        logger.error("numpy deprecation warning treated as error: %s", e)
         return None
     except (TypeError, ValueError) as e:
-        logger.error(f"{e}\nData = {pprint_log(data_list)}")
+        logger.error("%s\nData = %s", e, pprint_log(data_list))
         return None
 
     if np.ndim(data_arr) == 0:
-        logger.error(f"Imported data is a scalar: '{data_arr}'")
+        logger.error("Imported data is a scalar: '%s'", data_arr)
         return None
 
     elif np.ndim(data_arr) == 1:
         if len(data_arr) < 2:
-            logger.error(f"Not enough data: '{data_arr}'")
+            logger.error("Not enough data: '%s'", data_arr)
             return None
         else:
             data = data_arr
@@ -612,30 +611,30 @@ def csv2array(f: TextIO):
     elif np.ndim(data_arr) == 2:
         rows, cols = np.shape(data_arr)
         # The check for max. number of columns has to be handled downstream
-        # logger.info(f"cols = {cols}, rows = {rows}, data_arr = {data_arr}\n")
+        # logger.info("cols = %s, rows = %s, data_arr = %s\n", cols, rows, data_arr)
         # if cols > max_cols and rows > max_cols:
-        #     logger.error(f"Unsuitable data shape {np.shape(data_arr)}")
+        #     logger.error("Unsuitable data shape %s", np.shape(data_arr))
         #     return None
         if params['CSV']['orientation'] == 'rows'\
                 or params['CSV']['orientation'] == 'auto' and cols > rows:
             # returned table is transposed, swap cols and rows
-            logger.info(f"Building transposed table with {cols} row(s) and {rows} columns.")
+            logger.info("Building transposed table with %d row(s) and %d columns.", cols, rows)
             csv2array.info_str = "T:" + csv2array.info_str
             if use_header:
-                logger.info(f"Skipping header {data_arr.T[0]}")
+                logger.info("Skipping header %s", data_arr.T[0])
                 data = data_arr.T[1:]
             else:
                 data = data_arr.T
         else:  # column format
-            logger.info(f"Building table with {cols} column(s) and {rows} rows.")
+            logger.info("Building table with %d column(s) and %d rows.", cols, rows)
             if use_header:
-                logger.info(f"Skipping header {data_arr[0]}")
+                logger.info("Skipping header %s", data_arr[0])
                 data = data_arr[1:]
             else:
                 data = data_arr
     else:
-        logger.error(f"Unsuitable data shape: ndim = {np.ndim(data_arr)}, "
-                     f"shape = { np.shape(data_arr)}")
+        logger.error("Unsuitable data shape: ndim = %d, shape = %s",
+                     np.ndim(data_arr), np.shape(data_arr))
         return None
 
     csv2array.nchans = np.ndim(data)
@@ -652,7 +651,7 @@ def read_csv_info_large(filename):
     https://stackoverflow.com/questions/64744161/best-way-to-find-out-number-of-rows-in-csv-without-loading-the-full-thing
     """
     file_size = os.path.getsize(filename)
-    logger.info(f"File Size is {file_size} bytes")
+    logger.info("File Size is %d bytes", file_size)
 
     sniffer = csv.Sniffer()
 
@@ -676,8 +675,9 @@ def read_csv_info_large(filename):
 
     del f
 
-    logger.info(f"Terminator = '{lineterminator}', Delimiter = '{delimiter}', "
-                f"RowCount = {N}, Header={has_header}")
+    logger.info(
+        "Terminator = '%s', Delimiter = '%s', RowCount = %d, Header=%s",
+        lineterminator, delimiter, N, has_header)
 
     if params['CSV']['orientation'] not in {'rows', 'cols', 'auto'}:
         logger.error(
@@ -693,7 +693,7 @@ def read_csv_info_large(filename):
         transpose = ""
 
     if N < 2:
-        logger.error(f"No suitable CSV file, has only {N} data entries.")
+        logger.error("No suitable CSV file, has only %d data entries.", N)
         return -1
 
     # file is ok, copy local variables to function attributes
@@ -726,7 +726,7 @@ def read_wav_info(file):
     # Get the file size in bytes
     file_size = os.path.getsize(file)
     if file_size < 44:  # minimum length for WAV file due to header
-        logger.error(f"Not a wav file: Filesize is only {file_size} bytes!")
+        logger.error("Not a wav file: Filesize is only %d bytes!", file_size)
         return -1
     HEADER = f.read(44)  # read complete header
 
@@ -739,13 +739,13 @@ def read_wav_info(file):
     # Pos. 12: String 'fmt ' marks beginning of format subchunk
     FMT = HEADER[12:16]  # f.read(4)
     if FMT != "fmt ":  # pos. 12
-        logger.error(f"Invalid format header '{FMT}' instead of 'fmt'!")
+        logger.error("Invalid format header '%s' instead of 'fmt'!", FMT)
         return -1
 
     # Pos. 16: Size of subchunk with format infos in bytes, 16 for Int., 18 for float
     fmt_chnk_size1 = str2int(HEADER[16:20])
     if fmt_chnk_size1 not in {16, 18}:
-        logger.error(f"Invalid size {fmt_chnk_size1} of format subchunk!")
+        logger.error("Invalid size %s of format subchunk!", fmt_chnk_size1)
         return -1
 
     # Pos. 20: Audio encoding format, must be 1 for uncompressed PCM
@@ -755,8 +755,7 @@ def read_wav_info(file):
     elif encoding == 3:
         sample_format = 'float'  # IEEE Float PCM
     else:
-        logger.error(f"Invalid audio encoding {encoding}, only uncompressed "
-                     "PCM supported!")
+        logger.error("Invalid audio encoding %s, only uncompressed PCM supported!", encoding)
         sample_format = ""
         return -1
 
@@ -792,7 +791,7 @@ def read_wav_info(file):
     # String 'data' marks beginning of data subchunk
     DATA = f.read(4)
     if DATA != "data":
-        logger.error(f"Invalid data header '{DATA}' instead of 'data'!")
+        logger.error("Invalid data header '%s' instead of 'data'!", DATA)
         return -1
 
     # -- Function attributes that are accessible from outside
@@ -809,8 +808,8 @@ def read_wav_info(file):
         elif bits_per_sample == 32:
             read_wav_info.sample_format = "int32"
         else:
-            logger.error("Unsupported integer sample format with {bits_per_sample} "
-                         "bits per sample.")
+            logger.error("Unsupported integer sample format with %d "
+                         "bits per sample.", bits_per_sample)
             return -1
     else:
         if bits_per_sample == 32:
@@ -818,8 +817,8 @@ def read_wav_info(file):
         elif bits_per_sample == 64:
             read_wav_info.sample_format = "Float64"
         else:
-            logger.error("Unsupported float sample format with {bits_per_sample} "
-                         "bits per sample.")
+            logger.error("Unsupported float sample format with %d "
+                         "bits per sample.", bits_per_sample)
             return -1
 
     read_wav_info.WL = bits_per_sample // 8  # Wordlength in bytes
@@ -839,7 +838,7 @@ def read_wav_info(file):
 # ------------------------------------------------------------------------------
 def file2array(file_name: str, file_type: str, fkey: str = "",
                from_clipboard: bool = False, as_str: bool = False
-                 )-> np.ndarray:
+                 ) -> np.ndarray:
     r"""
     Import data from a file or from clipboard and convert it to a numpy array.
 
@@ -914,15 +913,14 @@ def file2array(file_name: str, file_type: str, fkey: str = "",
             # returned an error message instead of numpy data:
             file2array.info_str = ""
             logger.error("You shouldn't see this message!! \n"
-                            "Error copying from clipboard:\n{data_arr}")
+                         "Error copying from clipboard:\n%s", data_arr)
             return None
         else:
             file2array.info_str = csv2array.info_str
 
     # ----- Data from file -----------------------------------------------------
     else:
-        logger.info(
-            f"Importing data from file '{file_name}'.")
+        logger.info("Importing data from file '%s'.", file_name)
         try:
             if file_type == 'wav':
                 f_S, data_arr = wavfile.read(file_name, mmap=False)
@@ -936,13 +934,13 @@ def file2array(file_name: str, file_type: str, fkey: str = "",
                     file2array.info_str = csv2array.info_str
                     if data_arr is None:
                         # an error has occurred
-                        logger.error(f"Error loading file '{file_name}'")
+                        logger.error("Error loading file '%s'!", file_name)
                         return None
                     elif isinstance(data_arr, str):
                         # returned an error message instead of numpy data:
                         file2array.info_str = ""
                         logger.error("You shouldn't see this message!! \n"
-                                    "Error loading file '{file_name}':\n{data_arr}")
+                                     "Error loading file '%s':\n%s", file_name, data_arr)
                         return None
 
             else:
@@ -958,16 +956,15 @@ def file2array(file_name: str, file_type: str, fkey: str = "",
                             data_arr = fdict  # pick the whole array
                         elif fkey not in fdict:
                             raise IOError(
-                                f"Key '{fkey}' not in file '{file_name}'.\n"
-                                f"Keys found: {fdict.files}")
+                                "Key '%s' not in file '%s'.\nKeys found: %s", fkey, file_name, fdict.files)
                         else:
                             data_arr = fdict[fkey]  # pick the array `fkey` from the dict
                     else:
-                        logger.error(f'Unknown file type "{file_type}"')
+                        logger.error('Unknown file type "%s"', file_type)
                         return None
 
         except (IOError, KeyError) as e:
-            logger.error("Failed loading {0}!\n{1}".format(file_name, e))
+            logger.error("Failed loading %s!\n%s", file_name, e)
             return None
 
     if data_arr is None:
@@ -981,11 +978,10 @@ def file2array(file_name: str, file_type: str, fkey: str = "",
             try: # try to convert array elements to complex
                 data_arr = data_arr.astype(complex)
             except ValueError:
-                logger.error(f"{e},\n\tconversion to float and complex failed.")
+                logger.error("%s,\n\tconversion to float and complex failed.", e)
                 return None
 
-    logger.info(
-        f'Successfully imported data\n{pprint_log(data_arr, N=5)}')
+    logger.info('Successfully imported data\n%s', pprint_log(data_arr, N=5))
     return data_arr  # returns numpy array of type string or float/complex
 
 # ------------------------------------------------------------------------------
@@ -1024,7 +1020,7 @@ def save_data_np(file_name: str, file_type: str, data: np.ndarray,
     if file_name is None:  # error or operation cancelled
         return -1
     elif np.ndim(data) < 1 or np.ndim(data) > 2:
-        logger.error(f"Unsuitable data format for a wav file, ndim = {np.ndim(data)}.")
+        logger.error("Unsuitable data format for a wav file, ndim = %d.", np.ndim(data))
         logger.error(data)
         return -1
     try:
@@ -1035,7 +1031,7 @@ def save_data_np(file_name: str, file_type: str, data: np.ndarray,
             if f_S != f_S_int:
                 logger.warning(
                     "Only integer sampling frequencies can be used for WAV files,\n"
-                    f"sampling frequency has been changed to f_S = {f_S_int}")
+                    "sampling frequency has been changed to f_S = %d", f_S_int)
 
             # audio = data.T  # transpose data, needed?
             wavfile.write(file_name, f_S_int, data)
@@ -1048,15 +1044,15 @@ def save_data_np(file_name: str, file_type: str, data: np.ndarray,
             np.savetxt(file_name, data, fmt=fmt, delimiter=delimiter)
             # TODO: Integer formats like int16 should be stored as integers
         else:
-            logger.error(f"File type {file_type} not supported!")
+            logger.error("File type %s not supported!", file_type)
             return -1
 
-        logger.info(f'Saved data as\n\t"{file_name}".')
+        logger.info('Saved data as\n\t"%s".', file_name)
         return 0
 
 
     except IOError as e:
-        logger.error(f'Failed saving "{file_name}"!\n{e}\n')
+        logger.error('Failed saving "%s"!\n%s\n', file_name, e)
         return -1
 
 # ------------------------------------------------------------------------------
@@ -1085,10 +1081,10 @@ def write_wav_frame(parent, file_name, data: np.array, f_S = 1,
             audio = data
             n_chan = 1
         elif np.ndim(data) != 2:
-            logger.error(f"Unsuitable data format, ndim = {np.ndim(data)}.")
+            logger.error("Unsuitable data format, ndim = %d.", np.ndim(data))
             return
         elif np.shape(data)[1] != 2:
-            logger.error(f"Unsuitable number of channels = {np.shape(data)[1]}")
+            logger.error("Unsuitable number of channels = %d", np.shape(data)[1])
             return
         else:
             audio = data.T  # transpose data
@@ -1104,10 +1100,10 @@ def write_wav_frame(parent, file_name, data: np.array, f_S = 1,
         with open(file_name, 'w', encoding="utf8", newline='') as f:
                         f.write(data)
 
-        logger.info(f'Filter saved as\n\t"{file_name}"')
+        logger.info('Filter saved as\n\t"%s"', file_name)
 
     except IOError as e:
-        logger.error(f'Failed saving "{file_name}"!\n{e}\n')
+        logger.error('Failed saving "%s"!\n%s\n', file_name, e)
 
 
 # ------------------------------------------------------------------------------
@@ -1187,14 +1183,14 @@ def export_fil_data(parent: object, data: str, fkey: str = "", title: str = "Exp
                 elif file_type == 'cmsis' and fb_get('ft') == 'FIR':
                     err = export_coe_cmsis_fir(f, formatted)
                 else:
-                    logger.error(f'Unknown file extension "{file_type}')
+                    logger.error('Unknown file extension "%s"', file_type)
                     return None
 
         else:  # binary formats, storing numpy arrays
             np_data = csv2array(io.StringIO(data))  # convert csv data to numpy array
             if isinstance(np_data, str):
                 # returned an error message instead of numpy data:
-                logger.error(f"Error converting {description.lower()} data:\n{np_data}")
+                logger.error("Error converting %s data:\n%s", description.lower(), np_data)
                 return None
 
             with open(file_name, 'wb') as f:
@@ -1247,11 +1243,11 @@ def export_fil_data(parent: object, data: str, fkey: str = "", title: str = "Exp
                     workbook.close()
 
                 else:
-                    logger.error(f'Unknown file type "{file_type}"')
+                    logger.error('Unknown file type "%s"', file_type)
                     err = True
 
         if not err:
-            logger.info(f'{description} data saved as\n\t"{file_name}"')
+            logger.info('%s data saved as\n\t"%s"', description, file_name)
 
     except IOError as e:
         logger.error('Failed saving "{0}"!\n{1}\n'.format(file_name, e))
@@ -1392,7 +1388,8 @@ def export_coe_xilinx(f: TextIO) -> bool:
     bq = qc.float2frmt(fb.fil[0]['ba'][0])
 
     exp_str = "; " + coe_header(
-        "XILINX CORE Generator(tm) Distributed Arithmetic FIR filter coefficient (.COE) file").replace("\n", "\n; ")
+        "XILINX CORE Generator(tm) Distributed Arithmetic FIR filter coefficient (.COE) "
+        "file").replace("\n", "\n; ")
 
     exp_str += "\nRadix = {0};\n".format(coe_radix)
       # quantized wordlength
@@ -1612,7 +1609,7 @@ def load_filter(self, all_filters=False) -> int:
                     fb_temp = {}
                     # array containing dict, dtype 'object':
                     arr = np.load(f, allow_pickle=True)
-                    logger.warning(f"Load 'npz', returned type is {type(arr)}.")
+                    logger.warning("Load 'npz', returned type is %s.", type(arr))
 
                     # convert arrays to lists and extract scalar objects
                     for key in sorted(arr):
@@ -1626,7 +1623,7 @@ def load_filter(self, all_filters=False) -> int:
                     fb_temp = pickle.load(f)
 
         except IOError as e:
-            logger.error(f"Failed opening {file_name}!\n{e}")
+            logger.error("Failed opening %s!\n%s", file_name, e)
             return -1
 
     elif file_type == 'json':
@@ -1635,18 +1632,18 @@ def load_filter(self, all_filters=False) -> int:
                 fb_temp = json.load(f)
 
         except IOError as e:
-            logger.error(f"Failed loading {file_name}!\n{e}")
+            logger.error("Failed loading %s!\n%s", file_name, e)
             return -1
     else:
-        logger.error(f'Unknown file type "{file_type}"')
+        logger.error('Unknown file type "%s"', file_type)
         return -1
 
     # --- Test loaded file content for correct type and shape ------------------
     if isinstance(fb_temp, list):
         if len(fb_temp) != 10:
             logger.error(
-                f"File contains a list with wrong length = {len(fb_temp)} != 10 "
-                f"which cannot be loaded!")
+                "File contains a list with wrong length = %d != 10 "
+                "which cannot be loaded!", len(fb_temp))
             return -1
         if all_filters:
             pass  # file content is well-formed for loading all filters
@@ -1673,7 +1670,7 @@ def load_filter(self, all_filters=False) -> int:
 
     else:
         logger.error(
-            f"Wrong data type '{type(fb_temp)}' or shape, cannot load file.")
+            "Wrong data type '%s' or shape, cannot load file.", type(fb_temp))
         return -1
 
     # --- Test for correct id and version number ------------------------------
@@ -1731,7 +1728,7 @@ def load_filter(self, all_filters=False) -> int:
             if isinstance(fb.fil[0][k], bytes):
                 fb.fil[0][k] = fb.fil[0][k].decode('utf-8')
             if fb.fil[0][k] is None:
-                logger.warning(f"Entry fb.fil[0][{k}] is empty!")
+                logger.warning("Entry fb.fil[0][%s] is empty!", k)
         if 'ba' not in fb.fil[0]\
             or type(fb.fil[0]['ba']) not in {list, np.ndarray}\
                 or np.ndim(fb.fil[0]['ba']) != 2\
@@ -1753,36 +1750,36 @@ def load_filter(self, all_filters=False) -> int:
         if isinstance(fb.fil[0]['ba'], np.ndarray):
             if np.ndim(fb.fil[0]['ba']) != 2:
                 logger.error(
-                    f"Unsuitable dimension of 'ba' data, ndim = {np.ndim(fb.fil[0]['ba'])}")
+                    "Unsuitable dimension of 'ba' data, ndim = %d", np.ndim(fb.fil[0]['ba']))
             elif np.shape(fb.fil[0]['ba'])[0] != 2:
                 logger.error(
-                    f"Unsuitable shape {np.shape(fb.fil[0]['ba'])} of 'ba' data ")
+                    "Unsuitable shape %s of 'ba' data ", np.shape(fb.fil[0]['ba']))
         elif type(fb.fil[0]['ba']) in {list, tuple}:
             fb.fil[0]['ba'] = iter2ndarray(fb.fil[0]['ba'])
         else:
-            logger.error(f"Unsuitable 'ba' data type '{type(fb.fil[0]['ba'])}!")
+            logger.error("Unsuitable 'ba' data type '%s'!", type(fb.fil[0]['ba']))
 
         if isinstance(fb.fil[0]['zpk'], np.ndarray):
             if np.ndim(fb.fil[0]['zpk']) != 2:
                 logger.error(
-                    f"Unsuitable dimension of 'zpk' data, ndim = {np.ndim(fb.fil[0]['zpk'])}")
+                    "Unsuitable dimension of 'zpk' data, ndim = %d", np.ndim(fb.fil[0]['zpk']))
             elif np.shape(fb.fil[0]['zpk'])[0] != 3:
                 logger.error(
-                    f"Unsuitable shape {np.shape(fb.fil[0]['zpk'])} of 'zpk' data ")
+                    "Unsuitable shape %s of 'zpk' data ", np.shape(fb.fil[0]['zpk']))
         elif type(fb.fil[0]['zpk']) in {list, tuple}:
             fb.fil[0]['zpk'] = iter2ndarray(fb.fil[0]['zpk'])
         else:
-            logger.error(f"Unsuitable 'zpk' data type '{type(fb.fil[0]['zpk'])}!")
+            logger.error("Unsuitable 'zpk' data type '%s'!", type(fb.fil[0]['zpk']))
 
 
-        logger.info(f'Successfully loaded filter\n\t"{file_name}"')
+        logger.info('Successfully loaded filter\n\t"%s"', file_name)
         dirs.last_file_name = file_name
         dirs.last_file_dir = os.path.dirname(file_name)  # update default working dir
         dirs.last_file_type = file_type  # save new default file type
         return 0
 
     except Exception as e:
-        logger.error(f"Unexpected error:\n{e}")
+        logger.error("Unexpected error:\n%s", e)
         fb.restore_fil()
         return -1
 
@@ -1809,7 +1806,7 @@ def save_filter(self):
         fil_clean = {k:v for k, v in fb.fil[0].items() if k in fb.fil_ref}
         logger.warning(
             "The following keys are ignored because they are not part of the\n"
-            f"\tfilter reference dict:\n\t{keys_unsupported}")
+            "\tfilter reference dict:\n\t%s", keys_unsupported)
     else:
         fil_clean = fb.fil[0]
 
@@ -1823,7 +1820,7 @@ def save_filter(self):
 
         except IOError as e:
             err = True
-            logger.error(f'Failed saving "{file_name}"!\n{e}')
+            logger.error('Failed saving "%s"!\n%s', file_name, e)
 
     elif file_type == 'json':
         try:
@@ -1836,13 +1833,13 @@ def save_filter(self):
 
         except IOError as e:
             err = True
-            logger.error(f'Failed saving "{file_name}"!\n{e}')
+            logger.error('Failed saving "%s"!\n%s', file_name, e)
     else:
         err = True
-        logger.error('Unknown file type "{0}"'.format(file_type))
+        logger.error('Unknown file type "%s"', file_type)
 
     if not err:
-        logger.info(f'Filter saved as\n\t"{file_name}"')
+        logger.info('Filter saved as\n\t"%s"', file_name)
         dirs.last_file_name = file_name
         dirs.last_file_dir = os.path.dirname(file_name)  # save new default dir
         dirs.last_file_type = file_type  # save new default file type
@@ -1872,7 +1869,7 @@ def save_all_filters(self):
             fil_clean[i] = {k:v for k, v in fb.fil[i].items() if k in fb.fil_ref}
             logger.warning(
                 "The following keys are ignored because they are not part of the\n"
-                f"\tfilter reference dict:\n\t{keys_unsupported}")
+                "\tfilter reference dict:\n\t%s", keys_unsupported)
         else:
             fil_clean[i] = fb.fil[i]
 
@@ -1887,7 +1884,7 @@ def save_all_filters(self):
 
         except IOError as e:
             err = True
-            logger.error(f'Failed saving "{file_name}"!\n{e}')
+            logger.error('Failed saving "%s"!\n%s', file_name, e)
 
     elif file_type == 'json':
         try:
@@ -1900,7 +1897,7 @@ def save_all_filters(self):
 
         except IOError as e:
             err = True
-            logger.error(f'Failed saving "{file_name}"!\n{e}')
+            logger.error('Failed saving "%s"!\n%s', file_name, e)
     else:
         err = True
         logger.error('Unknown file type "%s"', file_type)
@@ -1931,14 +1928,14 @@ class NumpyEncoder(json.JSONEncoder):
             else:
                 return str(obj.real) + "+" + str(obj.imag) + "j"
         elif callable(obj):
-            logger.warning(f"Object '{obj}' not JSON serializable as it is a function.")
+            logger.warning("Object '%s' not JSON serializable as it is a function.", obj)
             return ""
         else:
             try:
                 return json.JSONEncoder.default(self, obj)
             except TypeError as e:
                 logger.warning(
-                    f"Object of type '{type(obj)}' is not JSON serializable.\n{e}")
+                    "Object of type '%s' is not JSON serializable.\n%s", type(obj), e)
                 return ""
 
 
