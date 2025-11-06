@@ -91,7 +91,9 @@ ignore = ["E501", # line too long
 
 # ignore these tasks
 task-tags = ["TODO", "FIXME"]
-# list of rules that are considered fixable
+# list of rules that are considered fixable, use
+# ruff check --fix [--unsafe-fixes]
+# to apply them automatically
 fixable = [
     "W291",  # trailing whitespace
     "W292",  #missing newline at end of file
