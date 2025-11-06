@@ -78,6 +78,7 @@ select = [
     #"E7",  # pycodestyle errors (like missing whitespace)
     "W",  # pycodestyle warnings (like trailing whitespace)
     "F",  # pyflakes
+    # "G",  # flake8-logging-format
     # "C90",  # max. mccabe complexity of functions
     # "I",    # isort of imports
     "NPY201"  # numpy 2 style guide
