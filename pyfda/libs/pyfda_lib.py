@@ -748,23 +748,27 @@ def safe_numexpr_eval(expr: str, fallback=None,
         safe_numexpr_eval.err_msg = f"numexpr: Syntax error in '{expr}':\n\t{e}"
         logger.warning(safe_numexpr_eval.err_msg)
         safe_numexpr_eval.err = 1
+        debug_exception()
     except AttributeError as e:
         safe_numexpr_eval.err_msg = f"numexpr: Attribute error in '{expr}':\n\t{e}"
         logger.warning(safe_numexpr_eval.err_msg)
         safe_numexpr_eval.err = 2
+        debug_exception()
     except KeyError as e:
         safe_numexpr_eval.err_msg = f"numexpr: Unknown variable in '{expr}':\n\t{e}"
         logger.warning(safe_numexpr_eval.err_msg)
         safe_numexpr_eval.err = 3
+        debug_exception()
     except TypeError as e:
         safe_numexpr_eval.err_msg = f"numexpr: Type error in '{expr}':\n\t{e}"
         logger.warning(safe_numexpr_eval.err_msg)
         safe_numexpr_eval.err = 4
+        debug_exception()
     except ValueError as e:
         safe_numexpr_eval.err_msg = f"numexpr: Value error in '{expr}':\n\t{e}"
         logger.warning(safe_numexpr_eval.err_msg)
         safe_numexpr_eval.err = 5
-        debug_exception(ValueError)
+        debug_exception()
     except ZeroDivisionError:
         safe_numexpr_eval.err_msg = f"numexpr: Zero division error in '{expr}'"
         logger.warning(safe_numexpr_eval.err_msg)
@@ -803,7 +807,7 @@ def safe_numexpr_eval(expr: str, fallback=None,
 
 
 # ------------------------------------------------------------------------------
-def safe_eval(expr, alt_expr=0, return_type: str = 'float', sign: str = None
+def safe_eval(expr, alt_expr=0, return_type: str = 'float', sign: str = ''
               ):  # -> complex|float|int: only works with py3.10 upawards
     """
     Try to safely evaluate `expr` using `numexpr.evaluate()` and return the
@@ -827,7 +831,7 @@ def safe_eval(expr, alt_expr=0, return_type: str = 'float', sign: str = None
         Type of returned variable ['float' (default) / 'cmplx' / 'int' / '' or 'auto']
 
     sign: str
-        enforce positive / negative sign of result ['pos', 'poszero' / None (default)
+        enforce positive / negative sign of result ['pos', 'poszero' / '' (default)
                                                     'negzero' / 'neg']
 
     Returns
@@ -865,10 +869,14 @@ def safe_eval(expr, alt_expr=0, return_type: str = 'float', sign: str = None
                 else:  # return_type == 'float' or 'int'
                     result = ex_num.real.item()
 
-                if sign in {'pos', 'poszero'}:
+                if sign == '':  # no sign enforcement
+                    pass
+                elif sign in {'pos', 'poszero'}:
                     result = np.abs(result)
                 elif sign in {'neg', 'negzero'}:
                     result = -np.abs(result)
+                else:
+                    logger.error('Unknown sign enforcement "%s".', sign)
 
                 if result == 0 and sign in {'pos', 'neg'}:
                     logger.warning(fallback + 'Argument must not be zero.')
@@ -894,7 +902,8 @@ def debug_exception(msg: str = "") -> None:
     React to an exception depending on the debug level. When debug level is high,
     use the traceback module for full traceback. Otherwise, keep quiet.
     """
-    if fb.conf_settings['CATCH_ERRORS'] is False:
+    if fb.conf_settings['EXCEPTION_LEVEL'] >= 1:
+        logger.info("debug_exception(): Level %s.", fb.conf_settings['EXCEPTION_LEVEL'])
         # get current stack trace as a list of strings. Each string consists of
         #   "  File '...'\n, line ..., in ...\n"
         err_list = traceback.format_stack()
@@ -903,7 +912,8 @@ def debug_exception(msg: str = "") -> None:
         for s in err_list[4:-2]:
             err_str += s.strip(' \t\n').replace("\n", "\n\t\t") + "\n\t" # indent traceback lines
         logger.error(err_str)
-        logger.error(crash)
+    if fb.conf_settings['EXCEPTION_LEVEL'] >= 2:
+        raise SystemExit("from debug_exception!")
 
 
 # ------------------------------------------------------------------------------
