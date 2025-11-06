@@ -1111,8 +1111,10 @@ def fil_save(arg: np.ndarray, format_in: str, sender: str, convert: bool = True)
 
         :'ba': Coefficient form: Filter coefficients in FIR format (b, one dimensional)
           are automatically converted to IIR format (b, a).
-        :'zpk': Zero / pole / gain format: When only zeroes are specified, poles and gain
-          are added automatically.
+        :'zpk': Zero / pole / gain format:
+            - One-dimensional: Only zeroes are specified, poles and gain are created
+              automatically.
+            - Two-dimensional: All three parts (z, p, k) are given in a 2D array
         :'sos': Second-order sections: The filter design is given as a 2D array with shape
           (n_sections, 6), where each row corresponds to a second-order section
           with the first three columns providing the numerator coefficients and
@@ -1128,18 +1130,23 @@ def fil_save(arg: np.ndarray, format_in: str, sender: str, convert: bool = True)
     Returns
     -------
     None
+
+    Raises
+    ------
+    ValueError
+        When ``arg`` is not a numpy array, is empty or a scalar, or when
+        the shape of ``arg`` is not suitable for the specified ``format_in``.
     """
     if not isinstance(arg, np.ndarray):
-        logger.error(
-            "'fil_save()': data in '%s' format needs to be a numpy array but is '%s'!",
+        raise ValueError(
+            "\t'fil_save()': data in '%s' format needs to be a numpy array but is '%s'!",
             format_in, type(arg))
-        return
+
     elif arg.size == 0:
-        logger.error("'fil_save()': data in '%s' format is empty!", format_in)
-        return
+        raise ValueError("'fil_save()': data in '%s' format is empty!", format_in)
+
     elif np.isscalar(arg):
-        logger.error("'fil_save()': data in '%s' format is a scalar!", format_in)
-        return
+        raise ValueError("'fil_save()': data in '%s' format is a scalar!", format_in)
 
     if format_in == 'sos':
         if np.ndim(arg) != 2 or np.shape(arg)[1] != 6:
@@ -1164,10 +1171,10 @@ def fil_save(arg: np.ndarray, format_in: str, sender: str, convert: bool = True)
             logger.debug("zpk is a two-dim. array with shape '%s'", np.shape(arg))
             #  two-dim. numpy array, zpk is already given as [z, p, k]
             if np.shape(arg)[0] != 3:
-                logger.error(
+                raise ValueError(
                     "\t'fil_save()': 'zpk' format must have three rows (z, p, k) but has %s!",
                     np.shape(arg)[0])
-                return
+
             fb_set('zpk', arg)
             if np.any(arg[1]):  # non-zero poles -> IIR
                 fb_set('ft', 'IIR')
@@ -1209,7 +1216,7 @@ def fil_save(arg: np.ndarray, format_in: str, sender: str, convert: bool = True)
             if fb_get('ft') == 'IIR':
                 b = np.append(b, np.zeros(-D))  # make filter causal, fill up b with zeros
             else:
-                a = a[:D]  # discard last D elements of a (only zeros anyway)
+                a = a[:D]  # FIR, discard last D elements of a (only zeros anyway)
 
         fb_set('N', len(b) - 1)  # correct filter order accordingly
         fb_set('ba', np.asarray([np.array(b, dtype=complex), np.array(a, dtype=complex)]))
