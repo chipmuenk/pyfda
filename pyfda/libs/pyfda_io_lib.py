@@ -331,6 +331,24 @@ def qtable2csv(table: object, data: np.ndarray, zpk: bool = False,
     text: str
          text formatted with selected delimiter and linefeed.
     """
+    def item2text(r: int, c: int, formatted: bool) -> str:
+        """
+        Convert table item at coordinate (r, c) to text, return '0' when item is None or empty
+
+        When `formatted` is False, get data from the model (`data`) with full precision,
+        otherwise convert the table item as displayed.
+        """
+        if formatted:
+            if c == 2: # gain column
+                return str(safe_eval(data[c][r], return_type='auto')) + delim
+                # TODO: should use the value from the gain widget instead
+            item = table.item(r, c)
+            if item and item.text() != "":
+                return table.itemDelegate().text(item).lstrip(" ") + delim
+            else:
+                return "0" + delim
+        else:
+            return str(safe_eval(data[c][r], return_type='auto')) + delim
 
     text = ""
     if params['CSV']['header'] == 'on':
@@ -354,106 +372,44 @@ def qtable2csv(table: object, data: np.ndarray, zpk: bool = False,
     num_cols = table.columnCount()  # visible columns of table
     num_rows = table.rowCount()  # visible rows of data
 
-    # TODO: This shouldn't be neccessary anymore
-    # If gain is just a scalar, convert to a list with one item
-    if zpk and np.isscalar(data[2]):
-        data[2] = [data[2]]
-
-    sel = qget_selected(table, reverse=False)['sel']
+    # use this to get a list of lists with selected items per row
+    # sel = qget_selected(table, reverse=False)['sel']
 
     # ==========================================================================
-    # Copy data from the model in float format:
+    # Copy data from the model (formatted = False) or the table (formatted = True)
     # ==========================================================================
-    if not formatted:
-        if params['CSV']['orientation'] == 'rows':  # write table in row format
-            for c in range(num_cols):  # for each column (b,a or z,p) ...
-                if use_header:  # ... start text line with table header and ...
-                    text += table.horizontalHeaderItem(c).text() + delim
-                for r in range(num_rows):  # ... construct text line from data.
-                    text += str(safe_eval(data[c][r], return_type='auto')) + delim
-                text = text.rstrip(delim) + cr  # finish text line, remove last delimiter
-            if zpk:  # add another text line with the gain items
-                if use_header:
-                    text += 'k' + delim
-                for r in range(len(data[2])):
-                    text += str(safe_eval(data[2][r], return_type='auto')) + delim
-                text = text.rstrip(delim) + cr  # finish text line, remove last delimiter
+    if params['CSV']['orientation'] == 'rows':  # write table in row format
+        for c in range(num_cols):  # for each column (b,a or z,p) ...
+            if use_header:  # ... start text line with table header and ...
+                text += table.horizontalHeaderItem(c).text() + delim
+            for r in range(num_rows):  # ... construct text line from data.
+                text += item2text(r, c, formatted)
+            text = text.rstrip(delim) + cr  # finish text line, remove last delimiter
+        if zpk:  # add another text line with the gain items
+            if use_header:
+                text += 'k' + delim
+            for r in range(len(data[2])):
+                text += item2text(r, 2, formatted)  # gain value
+            text = text.rstrip(delim) + cr  # finish text line, remove last delimiter
 
-        else:  # write table in column format
-            if use_header:  # construct a text line with the table header(s)
-                for c in range(num_cols):
-                    text += table.horizontalHeaderItem(c).text() + delim
-                if zpk:
-                    text += 'k' + delim
-                text = text.rstrip(delim) + cr  # finish text line, remove last delimiter
-            for r in range(num_rows):  # for each data row ...
-                # ... construct a text line from the columns (b,a or z,p)
-                for c in range(num_cols):
-                    text += str(safe_eval(data[c][r], return_type='auto')) + delim
-                if zpk and r < len(data[2]):  # add another item with a gain value
-                    text += str(safe_eval(data[2][r], return_type='auto')) + delim
-                text = text.rstrip(delim) + cr  # finish text line, remove last delimiter
-
-    # =======================================================================
-    # Copy table in displayed format:
-    # =======================================================================
-    else:
-        if params['CSV']['orientation'] == 'rows':  # write table in row format
-            for c in range(num_cols):  # for each column (b,a or z,p) ...
-                if use_header:  # ... start text line with table header and ...
-                    text += table.horizontalHeaderItem(c).text() + delim
-                for r in range(num_rows):  # ... construct text line from table column
-                    item = table.item(r, c)
-                    if item and item.text() != "":
-                        text += table.itemDelegate().text(item).lstrip(" ") + delim
-                    else:
-                        text += "0" + delim
-                text = text.rstrip(delim) + cr  # finish text line, remove last delimiter
-            if zpk:  # add another text line with a gain item from the data
-                if use_header:
-                    text += 'k' + delim
-                for r in range(len(data[2])):
-                    text += str(safe_eval(data[2][r], return_type='auto')) + delim
-                text = text.rstrip(delim) + cr  # finish text line, remove last delimiter
-
-        else:  # write table in column format
-            if use_header: # construct a text line with the table header(s)
-                for c in range(num_cols):
-                    text += table.horizontalHeaderItem(c).text() + delim
-                if zpk:
-                    text += 'k' + delim
-                text = text.rstrip(delim) + cr
-            for r in range(num_rows):  # for each table row ...
-                # ... construct a text line from the table columns (b,a or z,p)
-                for c in range(num_cols):
-                    item = table.item(r, c)
-                    if item and item.text() != "":
-                        text += table.itemDelegate().text(item).lstrip(" ") + delim
-                    else:
-                        text += "0" + delim
-                if zpk and r < len(data[2]):  # add another item with a gain value
-                    text += str(safe_eval(data[2][r], return_type='auto')) + delim
-                text = text.rstrip(delim) + cr
+    else:  # write table in column format
+        if use_header:  # construct a text line with the table header(s)
+            for c in range(num_cols):
+                text += table.horizontalHeaderItem(c).text() + delim
+            if zpk:
+                text += 'k' + delim
+            text = text.rstrip(delim) + cr  # finish text line, remove last delimiter
+        for r in range(num_rows):  # for each data row ...
+            # ... construct a text line from the columns (b,a or z,p)
+            for c in range(num_cols):
+                text += item2text(r, c, formatted)
+            if zpk and r < len(data[2]):  # add another item with a gain value
+                text += item2text(r, 2, formatted)  # gain value
+            text = text.rstrip(delim) + cr  # finish text line, remove last delimiter
 
     text = text.rstrip(cr)  # delete CR after last row
     return text
 
-
-# ==============================================================================
-#     # Here 'a' is the name of numpy array and 'file' is the filename to write to.
-#
-#     # If you want to write in column:
-#     for x in np.nditer(a.T, order='C'):
-#             file.write(str(x))
-#             file.write("\n")
-#
-#     # If you want to write in row:
-#     writer= csv.writer(file, delimiter=',')
-#     for x in np.nditer(a.T, order='C'):
-#             row.append(str(x))
-#     writer.writerow(row)
-#
-# ==============================================================================
 
 # ------------------------------------------------------------------------------
 def csv2array(f: TextIO):
