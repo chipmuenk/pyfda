@@ -212,7 +212,9 @@ class Input_PZ(QWidget):
         """
         if self.spec_edited:
             if source.objectName() == "led_gain":
-                self.zpk[2][0] = safe_eval(source.text(), alt_expr=str(self.zpk[2][0]))
+                # enforce gain > 0
+                self.zpk[2][0] = safe_eval(source.text(), sign='pos',
+                                           alt_expr=str(self.zpk[2][0]))
             else:
                 self.h_max = safe_eval(source.text(), alt_expr=str(self.h_max))
 
