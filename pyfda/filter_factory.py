@@ -100,13 +100,12 @@ class FilterFactory():
             #------------------------------------------------------------------
 
         except KeyError:
-            if fb.conf_settings['CATCH_ERRORS'] is False:
-                raise
             err_string =("\nKeyError in 'FilterFactory.create_fil_inst()':\n"
                   "Filter design class '%s' is not in dict 'fb.filter_classes',\n"
                   "i.e. it was not found by 'FilterTreeBuilder'."%fc)
             self.err_code = 1
             logger.warning(err_string)
+            debug_exception()
             return self.err_code
 
         except ImportError:
@@ -115,8 +114,7 @@ class FilterFactory():
                   "Filter design module '%s' could not be imported.", str(mod))
             self.err_code = 2
             logger.warning(err_string)
-            if fb.conf_settings['CATCH_ERRORS'] is False:
-                raise
+            debug_exception()
             return self.err_code
 
         # Check whether create_fil_inst has been called for the first time .
@@ -145,8 +143,7 @@ class FilterFactory():
                     self.err_code = 4
                     logger.warning(
                         "Error during instantiation of filter class '%s':\n%s", fc, e)
-                    if fb.conf_settings['CATCH_ERRORS'] is False:
-                        raise
+                    debug_exception()
                     #x = x
         return self.err_code
 
@@ -244,15 +241,13 @@ class FilterFactory():
                     err_string += "\tTry changing the specifications."
                 else:
                     self.err_code = 99
-                if fb.conf_settings['CATCH_ERRORS'] is False:
-                    logger.error("Err_Code %s: %s", str(self.err_code), err_string)
-                    raise ValueError
+                logger.error("Err_Code %s: %s", str(self.err_code), err_string)
+                debug_exception()
 
         if self.err_code > 0:
             logger.error("ErrCode %s: %s", self.err_code, err_string)
-            if fb.conf_settings['CATCH_ERRORS'] is False:
-                logger.error("Raising exception as CATCH_ERRORS is False")
-                raise SystemExit("Doh!")
+            debug_exception()
+            raise SystemExit("Doh!")
 
         return self.err_code
 

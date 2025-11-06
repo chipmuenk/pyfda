@@ -243,7 +243,7 @@ fil_tree = freeze_hierarchical({
 # ------------------------------------------------------------------------------
 
 conf_settings = {
-    'CATCH_ERRORS': True,
+    'EXCEPTION_LEVEL': 0,  # 0: quiet, 1: print error stack, 2: end pyfda
     'THEME': 'light',
     'N_FFT':  8192  # number of FFT points for most widgets except y[n]
     }

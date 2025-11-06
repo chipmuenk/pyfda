@@ -124,24 +124,14 @@ class Input_Info(QWidget):
         self.butFiltTree = PushButton(self, "FiltTree", checked=False)
         self.butFiltTree.setToolTip("Show filter tree for debugging.")
 
-        self.but_catch_errors = PushButton(
-            self, "Catch Errors", checked=fb.conf_settings['CATCH_ERRORS'])
-        self.but_catch_errors.setToolTip(
-            "Catch errors in major routines. Disable this to create tracebacks for debugging.")
-
         lay_h_debug_1 = QHBoxLayout()
         lay_h_debug_1.addWidget(self.butDocstring)
         lay_h_debug_1.addWidget(self.butRichText)
         lay_h_debug_1.addWidget(self.butFiltDict)
         lay_h_debug_1.addWidget(self.butFiltTree)
 
-        lay_h_debug_2 = QHBoxLayout()
-        lay_h_debug_2.addWidget(self.but_catch_errors)
-        lay_h_debug_2.addStretch(1)
-
         lay_v_debug = QVBoxLayout()
         lay_v_debug.addLayout(lay_h_debug_1)
-        lay_v_debug.addLayout(lay_h_debug_2)
         lay_v_debug.setContentsMargins(0, 0, 0, 0)
 
         self.frm_debug = QFrame(self)
@@ -154,10 +144,18 @@ class Input_Info(QWidget):
         self.led_settings_NFFT.setText(str(fb.conf_settings['N_FFT']))
         self.led_settings_NFFT.setToolTip("<span>Number of FFT points for frequency "
                                           "domain widgets.</span>")
+        lbl_exception_handling = QLabel(to_html("Exception Level =", frmt='b'), self)
+        self.led_exception_handling = QLineEdit(self)
+        self.led_exception_handling.setText(str(fb.conf_settings['EXCEPTION_LEVEL']))
+        self.led_exception_handling.setToolTip(
+            "<span>Set level for handling exceptions: "
+            "0: quiet, 1: print error stack, 2: end pyfda.</span>")
 
         layGSettings = QGridLayout()
         layGSettings.addWidget(lbl_settings_NFFT, 1, 0)
         layGSettings.addWidget(self.led_settings_NFFT, 1, 1)
+        layGSettings.addWidget(lbl_exception_handling, 2, 0)
+        layGSettings.addWidget(self.led_exception_handling, 2, 1)
 
         self.frmSettings = QFrame(self)
         self.frmSettings.setLayout(layGSettings)
@@ -215,14 +213,14 @@ class Input_Info(QWidget):
         self.butAbout.clicked.connect(self._about_window)
         self.butSettings.clicked.connect(self._show_settings)
         self.led_settings_NFFT.editingFinished.connect(self._update_settings_nfft)
+        self.led_exception_handling.editingFinished.connect(self._set_exception_handling)
+
         self.butDebug.clicked.connect(self._show_debug)
 
         self.butFiltDict.clicked.connect(self._show_filt_dict)
         self.butFiltTree.clicked.connect(self._show_filt_tree)
         self.butDocstring.clicked.connect(self._show_doc)
         self.butRichText.clicked.connect(self._show_doc)
-        self.but_catch_errors.clicked.connect(
-            lambda: fb.conf_settings.__setitem__('CATCH_ERRORS', self.but_catch_errors.checked))
 
     # -------------------------------------------------------------------------
     def _about_window(self):
@@ -252,6 +250,14 @@ class Input_Info(QWidget):
             sign='pos', return_type='int')
         self.led_settings_NFFT.setText(str(fb.conf_settings['N_FFT']))
         self.emit({'data_changed': 'n_fft'})
+
+    # -------------------------------------------------------------------------
+    def _set_exception_handling(self):
+        """ Update value for exception handling from QLineEdit Widget"""
+        fb.conf_settings['EXCEPTION_LEVEL'] = safe_eval(
+            self.led_exception_handling.text(), fb.conf_settings['EXCEPTION_LEVEL'],
+            sign='poszero', return_type='int')
+        self.led_exception_handling.setText(str(fb.conf_settings['EXCEPTION_LEVEL']))
 
     # --------------------------------------------------------------------------
     def load_dict(self):
