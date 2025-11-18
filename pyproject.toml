@@ -75,13 +75,16 @@ exclude = [
 # select rules to enable for linting
 select = [
     # "B",  # flake8-bugbear: find likely bugs and design problems
+    "B006", # mutable-argument-default, equivalent to "W0102" dangerous default value as argument
     #"E7",  # pycodestyle errors (like missing whitespace)
-    "W",  # pycodestyle warnings (like trailing whitespace)
     "F",  # pyflakes
     # "G",  # flake8-logging-format
     # "C90",  # max. mccabe complexity of functions
     # "I",    # isort of imports
-    "NPY201"  # numpy 2 style guide
+    "NPY201",  # numpy 2 style guide
+    # "UP008", # use super() instead of super-call-with-parameters
+    "W",  # pycodestyle warnings (like trailing whitespace)
+    "RUF012", # mutable-class-default (RUF012)"W0102"
     ]
 ignore = ["E501", # line too long
           # "W503", # line break before binary operator
