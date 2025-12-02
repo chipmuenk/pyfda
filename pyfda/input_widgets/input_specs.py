@@ -17,14 +17,13 @@ import sys
 import pyfda.filterbroker as fb
 from pyfda.filterbroker import fb_get
 import pyfda.filter_factory as ff
-from pyfda.input_widgets import (select_filter, amplitude_specs,
-                                 freq_specs, freq_units,
-                                 weight_specs, target_specs)
+from pyfda.input_widgets import (
+    select_filter, amplitude_specs, freq_specs, freq_units, weight_specs, target_specs)
 from pyfda.libs.compat import (
     Qt, QWidget, QLabel, QFrame, QPushButton, QComboBox, QLineEdit, pyqtSignal,
     QVBoxLayout, QHBoxLayout, QSizePolicy)
 
-from pyfda.libs.pyfda_lib import to_html
+from pyfda.libs.pyfda_lib import to_html, first_item
 from pyfda.libs.pyfda_qt_lib import qstyle_widget, qcmb_box_populate, qget_cmb_box, emit
 from pyfda.libs.pyfda_io_lib import load_filter, save_filter, save_all_filters
 from pyfda.pyfda_rc import params
@@ -32,6 +31,8 @@ from pyfda.pyfda_rc import params
 logger = logging.getLogger(__name__)
 
 classes = {'Input_Specs': 'Specs'}  #: Dict containing class name : display name
+# This is read by `tree_builder.build_class_dict()` into the dict `filterbroker.input_classes`
+# and used to create the widgets in input_tab_widgets.
 
 
 class Input_Specs(QWidget):
@@ -118,8 +119,8 @@ class Input_Specs(QWidget):
 
         """
         if dict_sig['id'] == id(self):
-            # logger.warning(f"Stopped infinite loop:\n\tPropagate = {propagate}\
-            #               \n{first_item(dict_sig)}")
+            logger.debug("Stopped infinite loop:\n\tPropagate = %s\n",
+                         propagate, first_item(dict_sig))
             return
 
         # logger.warning(f"SIG_RX: {first_item(dict_sig)}")
@@ -308,14 +309,14 @@ class Input_Specs(QWidget):
 
         At this time, the actual filter object instance has been created from
         the name of the design method (e.g. 'cheby1') in select_filter.py.
-        Its handle has been stored in fb.fil_inst.
+        Its handle has been stored in `fb.fil_inst`.
 
         fb.fil[0] (currently selected filter) is read, then general information
         for the selected filter type and order (min/man) is gathered from
         the filter tree [fb.fil_tree], i.e. which parameters are needed, which
         widgets are visible and which message shall be displayed.
 
-        Then, the UIs of all subwidgets are updated using their "update_UI" method.
+        Then, the UIs of all subwidgets are updated using their `update_UI()` methods.
         """
         rt = fb.fil[0]['rt']  # e.g. 'LP'
         ft = fb.fil[0]['ft']  # e.g. 'FIR'
