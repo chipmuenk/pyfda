@@ -134,7 +134,7 @@ class Input_Specs(QWidget):
         elif 'filt_changed' in dict_sig:
             # Changing the filter design requires updating UI because number or
             # kind of input fields changes -> reload filter parameters and update_UI
-            self.update_UI(dict_sig)
+            self.update_UI()
             self.sel_fil.load_dict()
             # Update state of "DESIGN FILTER" button
             # It is disabled for "Manual_IIR" and "Manual_FIR" filter classes
@@ -301,7 +301,7 @@ class Input_Specs(QWidget):
         self.led_info.deselect()
 
     # --------------------------------------------------------------------------
-    def update_UI(self, dict_sig={}) -> None:
+    def update_UI(self) -> None:
         """
         update_UI is called every time the filter design method or order
         (min / man) has been changed as this usually requires a different set of
