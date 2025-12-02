@@ -35,7 +35,7 @@ from pyfda.pyfda_rc import params
 
 # when deltasigma module is present, add a corresponding entry to the combobox
 try:
-    import deltasigma
+    import deltasigma  # noqa: F401
     HAS_DS = True
 except ImportError:
     HAS_DS = False
@@ -823,17 +823,15 @@ class Input_Fixpoint_Specs(QWidget):
         error: int
             0 for sucessful fx widget construction, -1 for error
         """
-        if True:
-        # try:
+        try:
             # initialize fixpoint filter instance with fixpoint quantizer
             self.fx_filt_ui.fx_filt.init(fb_get('fxq'))
 
             return 0
-        else:
-        # except (ValueError, AttributeError) as e:
+        except (ValueError, AttributeError) as e:
             logger.error(f'Fixpoint filter reset or instantiation failed.'
                          f'\nwith "{e} "')
-        return -1
+            return -1
 
     # --------------------------------------------------------------------------
     def fx_sim_calc_response(self, dict_sig) -> None:
