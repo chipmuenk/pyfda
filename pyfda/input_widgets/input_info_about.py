@@ -160,7 +160,7 @@ class AboutWindow(QDialog):
 
         self.info_str = self.style_html_links(
             "<b><a href=https://www.github.com/chipmuenk/pyfda>pyfda</a> "
-            f"Version {version.__version__} (c) 2013 - 2024 Christian Münker</b><br />"
+            f"Version {version.__version__} (c) 2013 - 2025 Christian Münker</b><br />"
             "Design, analyze and synthesize digital filters. Docs @ "
             "<a href=https://pyfda.rtfd.org>pyfda.rtfd.org</a>"
             " (<a href=https://media.readthedocs.org/pdf/pyfda/latest/pyfda.pdf>pdf</a>)"
@@ -185,19 +185,17 @@ class AboutWindow(QDialog):
         dirs_md = ("### Directories ###\n"
                    "| *Function*    | *Path*|\n"  # "|  <!-- -->     |  <!-- -->  |\n"
                    "|:  ----        |:  ----     |\n"
-                   "| **Install Dir**  | `{install_dir}` |\n"
-                   "| **User Module Dir** | `{user_dir}` |\n"
-                   "| **Home Dir**  |   `{home_dir}` |\n"
-                   "| **Temp Dir** | `{temp_dir}` |\n"
+                   f"| **Install Dir**  | `{dirs.INSTALL_DIR}` |\n"
+                   f"| **User Module Dir** &nbsp; | `{user_dirs_str[:-6]}` |\n"
+                   f"| **Home Dir**  |   `{dirs.HOME_DIR}` |\n"
+                   f"| **Temp Dir** | `{dirs.TEMP_DIR}` |\n"
                    "| - - - - - - -  | - - - - - - - - -|\n"
-                   "| **pyFDA Config** | `{pyfda_conf}` |\n"
-                   "| **Log. Config** | `{log_conf}` |\n"
-                   "| **Logfile**  | `{log_file}` |"
-                   .format(home_dir=dirs.HOME_DIR, install_dir=dirs.INSTALL_DIR,
-                           conf_dir=dirs.CONF_DIR, user_dir=user_dirs_str[:-6],
-                           temp_dir=dirs.TEMP_DIR, pyfda_conf=dirs.USER_CONF_DIR_FILE,
-                           log_conf=dirs.USER_LOG_CONF_DIR_FILE,
-                           log_file=dirs.LOG_DIR_FILE))
+                   f"| **pyFDA Config** | `{dirs.USER_CONF_DIR_FILE}` |\n"
+                   f"| **Log. Config** | `{dirs.USER_LOG_CONF_DIR_FILE}` |\n"
+                   f"| **Logfile**  | `{dirs.LOG_DIR_FILE}` |"
+        )
+
+
 
         dirs_str = markdown.markdown(dirs_md, output_format='html5',
                                      extensions=['markdown.extensions.tables'])
