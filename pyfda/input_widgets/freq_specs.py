@@ -34,7 +34,7 @@ class FreqSpecs(QWidget):
     sig_tx = pyqtSignal(object)  # outgoing
     sig_rx = pyqtSignal(object)  # incoming
 
-    def __init__(self, parent=None, title="Frequency Specs", objectName=""):
+    def __init__(self, parent=None, title: str = "Frequency Specs", objectName: str = "") -> None:
 
         super().__init__(parent)
         self.title = title
@@ -48,14 +48,14 @@ class FreqSpecs(QWidget):
         self._construct_UI()
 
     # -------------------------------------------------------------------------
-    def emit(self, dict_sig, sig_name=""):
+    def emit(self, dict_sig: dict, sig_name: str = "") -> None:
         """
         Access imported function `emit()` as instance method, passing `self`
         with its attributes
         """
         emit(self, dict_sig, sig_name)
     # -------------------------------------------------------------
-    def process_sig_rx(self, dict_sig=None):
+    def process_sig_rx(self, dict_sig: dict | None = None) -> None:
         """
         Process signals coming in via subwidgets and sig_rx
         """
@@ -70,7 +70,7 @@ class FreqSpecs(QWidget):
             self.recalc_freqs()
 
     # -------------------------------------------------------------
-    def _construct_UI(self):
+    def _construct_UI(self) -> None:
         """
         Construct the User Interface
         """
@@ -157,7 +157,7 @@ class FreqSpecs(QWidget):
         return super().eventFilter(source, event)
 
     # --------------------------------------------------------------------------
-    def _store_entry(self, event_source):
+    def _store_entry(self, event_source) -> None:
         """
         `_store_entry()` is triggered by `QEvent.focusOut` in the eventFilter:
         When the `event_source` has been edited (`self.spec_edited ==  True`),
@@ -177,7 +177,7 @@ class FreqSpecs(QWidget):
             self.update_f_display(event_source)  # just update / restore display
 
     # --------------------------------------------------------------------------
-    def update_UI(self, new_labels=()):
+    def update_UI(self, new_labels: list[str]) -> None:
         """
         Called by `input_specs.update_UI()` and `target_specs.update_UI()`
         Set labels and get corresponding values from filter dictionary.
@@ -228,7 +228,7 @@ class FreqSpecs(QWidget):
         self.sort_dict_freqs()  # sort frequency entries in dictionary and update display
 
     # --------------------------------------------------------------------------
-    def recalc_freqs(self):
+    def recalc_freqs(self) -> None:
         """
         Update normalized frequencies when absolute frequencies are locked and
         update frequency unit. This is called by via signal {'view_changed': 'f_S'}.
@@ -257,7 +257,7 @@ class FreqSpecs(QWidget):
         self.lblUnit.setText(" in " + to_html(unit, frmt=unit_frmt))
 
 # -------------------------------------------------------------
-    def update_f_display(self, source):
+    def update_f_display(self, source) -> None:
         """
         Update frequency display when frequency or sampling frequency has been
         updated. Depending on whether it has focus or not, the value is displayed
@@ -312,7 +312,7 @@ class FreqSpecs(QWidget):
         return
 
 # -------------------------------------------------------------
-    def load_dict(self):
+    def load_dict(self) -> None:
         """
         Triggered by FocusIn, FocusOut and ESC-Key in LineEdit fields and by
         `sort_dict_freqs():
@@ -347,7 +347,7 @@ class FreqSpecs(QWidget):
             self.qlabels[i].setText(lbl_text)
 
 # ------------------------------------------------------------------------
-    def _show_entries(self, num_new_labels):
+    def _show_entries(self, num_new_labels: int) -> None:
         """
         Called by `update_UI()` when filter has changed
         - check whether subwidgets need to be shown or hidden
@@ -390,7 +390,7 @@ class FreqSpecs(QWidget):
                 self.layGSpecs.addWidget(self.qlineedit[i], i+1, 1)
 
 # ------------------------------------------------------------------------------
-    def sort_dict_freqs(self):
+    def sort_dict_freqs(self) -> None:
         """
         - Sort visible filter dict frequency spec entries with ascending frequency if
              the sort button is activated

@@ -184,7 +184,7 @@ class AmplitudeSpecs(QWidget):
         return super().eventFilter(source, event)
 
     # -------------------------------------------------------------
-    def update_UI(self, new_labels=()):
+    def update_UI(self, new_labels: list[str]) -> None:
         """
         Called from filter_specs.update_UI() and target_specs.update_UI().
         The first entry is the state of the widget, 'a', 'u', 'd'.
@@ -192,10 +192,9 @@ class AmplitudeSpecs(QWidget):
         When number of entries has changed, the layout of subwidget is rebuilt,
         using
 
-        - `self.qlabels`, a list with references to existing QLabel widgets,
         - `new_labels`, a list of strings from the filter_dict for the current
           filter design
-        - 'num_new_labels`, their number
+        - `self.qlabels`, a list with references to existing QLabel widgets,
         - `self.n_cur_labels`, the number of currently visible labels / qlineedit
           fields
         """
@@ -235,7 +234,7 @@ class AmplitudeSpecs(QWidget):
         self.load_dict()  # display rounded filter dict entries in selected unit
 
     # -------------------------------------------------------------------------
-    def load_dict(self):
+    def load_dict(self) -> None:
         """
         Reload and reformat the amplitude textfields from filter dict when a new filter
         design algorithm is selected or when the user has changed the unit  (V / W / dB):
@@ -260,7 +259,7 @@ class AmplitudeSpecs(QWidget):
                 self.qlineedit[i].setText(str(amp_value))
 
     # --------------------------------------------------------------------------
-    def _set_amp_unit(self, source):
+    def _set_amp_unit(self) -> None:
         """
         Store unit for amplitude in filter dictionary, reload amplitude spec
         entries via load_dict and fire a sigUnitChanged signal
@@ -271,7 +270,7 @@ class AmplitudeSpecs(QWidget):
         self.emit({'view_changed': 'a_unit'})
 
     # --------------------------------------------------------------------------
-    def _store_entry(self, source):
+    def _store_entry(self, source) -> None:
         """
         When the textfield of `source` has been edited (flag `self.spec_edited` =  True),
         transform the amplitude spec back to linear unit setting and store it
@@ -292,7 +291,7 @@ class AmplitudeSpecs(QWidget):
         self.load_dict()
 
     # ------------------------------------------------------------------------
-    def _hide_entries(self, num_new_labels):
+    def _hide_entries(self, num_new_labels: int) -> None:
         """
         Hide subwidgets so that only `num_new_labels` subwidgets are visible
         """
@@ -301,7 +300,7 @@ class AmplitudeSpecs(QWidget):
             self.qlineedit[i].hide()
 
     # ------------------------------------------------------------------------
-    def _show_entries(self, num_new_labels):
+    def _show_entries(self, num_new_labels: int) -> None:
         """
         - check whether enough subwidgets (QLabel und QLineEdit) exist for the
           the required number of `num_new_labels`:

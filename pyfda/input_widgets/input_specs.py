@@ -45,7 +45,7 @@ class Input_Specs(QWidget):
     sig_rx = pyqtSignal(object)  # incoming from subwidgets -> process_sig_rx
     sig_tx = pyqtSignal(object)  # from process_sig_rx: propagate local signals
 
-    def __init__(self, parent=None, objectName="input_specs_inst"):
+    def __init__(self, parent=None, objectName: str = "input_specs_inst"):
         super().__init__(parent)
         self.setObjectName(objectName)
         self.tab_label = "Specs"
@@ -92,7 +92,7 @@ class Input_Specs(QWidget):
         self._construct_UI()
 
     # -------------------------------------------------------------------------
-    def emit(self, dict_sig):
+    def emit(self, dict_sig: dict) -> None:
         """
         Access imported function `emit()` as instance method, passing `self`
         with its attributes
@@ -100,7 +100,7 @@ class Input_Specs(QWidget):
         emit(self, dict_sig)
 
     # -------------------------------------------------------------------------
-    def process_sig_rx_local(self, dict_sig=None):
+    def process_sig_rx_local(self, dict_sig: dict | None = None) -> None:
         """
         Signals coming in from local subwidgets need to be propagated, so set
         `propagate=True` and proceed with processing in `process_sig_rx`.
@@ -108,7 +108,7 @@ class Input_Specs(QWidget):
         self.process_sig_rx(dict_sig, propagate=True)
 
     # -------------------------------------------------------------------------
-    def process_sig_rx(self, dict_sig, propagate=False):
+    def process_sig_rx(self, dict_sig: dict, propagate: bool = False) -> None:
         """
         Process signals coming in via subwidgets and sig_rx
 
@@ -151,7 +151,7 @@ class Input_Specs(QWidget):
             self.emit(dict_sig)
 
     # -------------------------------------------------------------------------
-    def _construct_UI(self):
+    def _construct_UI(self) -> None:
         """
         Construct User Interface from all input subwidgets
         """

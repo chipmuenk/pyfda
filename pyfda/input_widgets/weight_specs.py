@@ -30,7 +30,7 @@ class WeightSpecs(QWidget):
     sig_rx = pyqtSignal(object)  # receive signals from higher hierarchies
     sig_tx = pyqtSignal(object)  # outgoing signals
 
-    def __init__(self, parent=None, objectName=""):
+    def __init__(self, parent=None, objectName: str = "") -> None:
         super().__init__(parent)
 
         self.setObjectName(objectName)
@@ -42,7 +42,7 @@ class WeightSpecs(QWidget):
         self._construct_UI()
 
     # -------------------------------------------------------------------------
-    def emit(self, dict_sig):
+    def emit(self, dict_sig: dict) -> None:
         """
         Access imported function `emit()` as instance method, passing `self`
         with its attributes
@@ -50,7 +50,7 @@ class WeightSpecs(QWidget):
         emit(self, dict_sig)
 
     # -------------------------------------------------------------
-    def process_sig_rx(self, dict_sig=None):
+    def process_sig_rx(self, dict_sig: dict = None) -> None:
         """
         Process signals coming in via subwidgets and sig_rx
         """
@@ -62,12 +62,9 @@ class WeightSpecs(QWidget):
         elif 'data_changed' in dict_sig:
             if dict_sig['data_changed'] in {'filter_loaded', 'filter_designed'}:
                 self.load_dict()
-            # elif 'filt_changed' in dict_sig['data_changed'] == 'filter_designed':
-            #    self.update_UI()
-            # This needs to be called directly, passing labels etc.
 
     # ------------------------------------------------------------------------------
-    def _construct_UI(self):
+    def _construct_UI(self) -> None:
         """
         Construct User Interface
         """
@@ -163,7 +160,7 @@ class WeightSpecs(QWidget):
         return super().eventFilter(source, event)
 
     # -------------------------------------------------------------
-    def update_UI(self, new_labels=[]):
+    def update_UI(self, new_labels: list[str]) -> None:
         """
         Called from filter_specs.update_UI()
         Set labels and get corresponding values from filter dictionary.
@@ -204,7 +201,7 @@ class WeightSpecs(QWidget):
         self.load_dict()  # display rounded filter dict entries
 
     # ------------------------------------------------------------------------------
-    def load_dict(self):
+    def load_dict(self) -> None:
         """
         Reload textfields from filter dictionary to update changed settings
         """
@@ -219,7 +216,7 @@ class WeightSpecs(QWidget):
                 self.qlineedit[i].setText(str(weight_value))
 
     # ------------------------------------------------------------------------------
-    def _store_entry(self, widget):
+    def _store_entry(self, widget) -> None:
         """
         When the textfield of `widget` has been edited (`self.spec_edited` =  True),
         store the weight spec in filter dict. This is triggered by `QEvent.focusOut`
@@ -237,7 +234,7 @@ class WeightSpecs(QWidget):
         self.load_dict()
 
     # -------------------------------------------------------------
-    def _hide_entries(self, num_new_labels):
+    def _hide_entries(self, num_new_labels: int) -> None:
         """
         Hide subwidgets so that only `len_new_labels` subwidgets are visible
         """
@@ -246,7 +243,7 @@ class WeightSpecs(QWidget):
             self.qlineedit[i].hide()
 
     # ------------------------------------------------------------------------
-    def _show_entries(self, num_new_labels):
+    def _show_entries(self, num_new_labels: int) -> None:
         """
         - check whether enough subwidgets (QLabel und QLineEdit) exist for the
           the required number of `num_new_labels`:
@@ -279,7 +276,7 @@ class WeightSpecs(QWidget):
                 self.qlineedit[i].show()
 
     # ------------------------------------------------------------------------------
-    def _reset_weights(self):
+    def _reset_weights(self) -> None:
         """
         Reset all entries to "1.0" and store them in the filter dictionary
         """

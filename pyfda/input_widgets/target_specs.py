@@ -34,7 +34,7 @@ class TargetSpecs(QWidget):
     sig_tx = pyqtSignal(object)  # outgoing
     sig_tx_local = pyqtSignal(object)  # outgoing to lower hierarchies
 
-    def __init__(self, parent=None, title="Target Specs", objectName=""):
+    def __init__(self, parent=None, title: str = "Target Specs", objectName: str = "") -> None:
         super().__init__(parent)
 
         self.title = title
@@ -43,7 +43,7 @@ class TargetSpecs(QWidget):
         self._construct_UI()
 
     # -------------------------------------------------------------------------
-    def emit(self, dict_sig, sig_name=""):
+    def emit(self, dict_sig: dict, sig_name: str = ""):
         """
         Access imported function `emit()` as instance method, passing `self`
         with its attributes
@@ -51,7 +51,7 @@ class TargetSpecs(QWidget):
         emit(self, dict_sig, sig_name)
 
     #--------------------------------------------------------------------------
-    def process_sig_rx(self, dict_sig=None):
+    def process_sig_rx(self, dict_sig: dict | None = None) -> None:
         """
         Process signals coming in via subwidgets and sig_rx
         """
@@ -68,7 +68,7 @@ class TargetSpecs(QWidget):
             return
 
     # --------------------------------------------------------------------------
-    def _construct_UI(self):
+    def _construct_UI(self) -> None:
         """
         Construct user interface
         """
@@ -127,7 +127,7 @@ class TargetSpecs(QWidget):
         self.update_UI()  # first time initialization
 
     # --------------------------------------------------------------------------
-    def update_UI(self, new_labels=()):
+    def update_UI(self, new_labels: list[str] | None = None) -> None:
         """
         Called when a new filter design algorithm has been selected
         - Pass new frequency and amplitude labels to the amplitude and frequency
@@ -136,6 +136,10 @@ class TargetSpecs(QWidget):
 
         - The `filt_changed` signal is emitted already by `select_filter.py`
         """
+        if new_labels is None:
+            self.f_specs.hide()
+            self.a_specs.hide()
+            return
 
         if ('frq' in new_labels and len(new_labels['frq']) > 1 and
                 new_labels['frq'][0] != 'i'):
