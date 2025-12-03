@@ -31,7 +31,7 @@ class WeightSpecs(QWidget):
     sig_tx = pyqtSignal(object)  # outgoing signals
 
     def __init__(self, parent=None, objectName=""):
-        super(WeightSpecs, self).__init__(parent)
+        super().__init__(parent)
 
         self.setObjectName(objectName)
         self.qlabels = []  # list with references to QLabel widgets
@@ -160,7 +160,7 @@ class WeightSpecs(QWidget):
             elif event.type() == QEvent.FocusOut:
                 self._store_entry(source)
         # Call base class method to continue normal event processing:
-        return super(WeightSpecs, self).eventFilter(source, event)
+        return super().eventFilter(source, event)
 
     # -------------------------------------------------------------
     def update_UI(self, new_labels=[]):

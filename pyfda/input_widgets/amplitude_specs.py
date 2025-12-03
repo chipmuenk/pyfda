@@ -39,7 +39,7 @@ class AmplitudeSpecs(QWidget):
         """
         Initialize
         """
-        super(AmplitudeSpecs, self).__init__(parent)
+        super().__init__(parent)
         self.title = title
         self.setObjectName(objectName)
 
@@ -181,7 +181,7 @@ class AmplitudeSpecs(QWidget):
             elif event.type() == QEvent.FocusOut:
                 self._store_entry(source)
         # Call base class method to continue normal event processing:
-        return super(AmplitudeSpecs, self).eventFilter(source, event)
+        return super().eventFilter(source, event)
 
     # -------------------------------------------------------------
     def update_UI(self, new_labels=()):

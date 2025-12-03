@@ -35,7 +35,7 @@ class TargetSpecs(QWidget):
     sig_tx_local = pyqtSignal(object)  # outgoing to lower hierarchies
 
     def __init__(self, parent=None, title="Target Specs", objectName=""):
-        super(TargetSpecs, self).__init__(parent)
+        super().__init__(parent)
 
         self.title = title
         self.setObjectName(objectName)

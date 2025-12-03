@@ -46,7 +46,7 @@ class Input_Specs(QWidget):
     sig_tx = pyqtSignal(object)  # from process_sig_rx: propagate local signals
 
     def __init__(self, parent=None, objectName="input_specs_inst"):
-        super(Input_Specs, self).__init__(parent)
+        super().__init__(parent)
         self.setObjectName(objectName)
         self.tab_label = "Specs"
         self.tool_tip = "Enter and view filter specifications."

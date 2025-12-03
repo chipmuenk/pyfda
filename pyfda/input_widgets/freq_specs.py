@@ -36,7 +36,7 @@ class FreqSpecs(QWidget):
 
     def __init__(self, parent=None, title="Frequency Specs", objectName=""):
 
-        super(FreqSpecs, self).__init__(parent)
+        super().__init__(parent)
         self.title = title
 
         self.qlabels = []    # list with references to QLabel widgets
@@ -154,7 +154,7 @@ class FreqSpecs(QWidget):
             elif event.type() == QEvent.FocusOut:
                 self._store_entry(source)
         # Call base class method to continue normal event processing:
-        return super(FreqSpecs, self).eventFilter(source, event)
+        return super().eventFilter(source, event)
 
     # --------------------------------------------------------------------------
     def _store_entry(self, event_source):
