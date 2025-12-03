@@ -26,8 +26,8 @@ SCROLL = True  # enable scrolling
 
 class InputTabWidgets(QWidget):
     """
-    Create a tabbed widget for all input subwidgets in the list ``fb.input_classes``.
-    This list is compiled at startup in :class:`pyfda.libs.tree_builder.Tree_Builder`.
+    Create a tabbed widget for all input subwidgets from the dict ``fb.input_classes``.
+    This list is created at startup in :class:`pyfda.libs.tree_builder.Tree_Builder`.
     """
     # signals as class variables (shared between instances if more than one exists)
     # incoming, connected here to individual senders, passed on to process sigmals
