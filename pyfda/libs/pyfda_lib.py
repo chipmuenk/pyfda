@@ -662,7 +662,7 @@ def frmt2cmplx(string: str, default: float = 0.) -> complex:
 
 # ------------------------------------------------------------------------------
 def safe_numexpr_eval(expr: str, fallback=None,
-                      local_dict: dict = {}) -> np.ndarray:
+                      local_dict: dict | None = None) -> np.ndarray:
     """
     Evaluate `numexpr.evaluate(expr)` and catch various errors. The input is either
     a string representing a numeric value or a formula.
@@ -683,8 +683,8 @@ def safe_numexpr_eval(expr: str, fallback=None,
         the passed shape. Currently, this is only used by the formula stimulus
         in y[n]
 
-    local_dict : dict
-        dict with variables passed to `numexpr.evaluate`
+    local_dict : dict or None
+        optional dict with variables passed to `numexpr.evaluate`
 
     Returns
     -------
@@ -693,7 +693,10 @@ def safe_numexpr_eval(expr: str, fallback=None,
 
     """
     # define local variables for numexpr
-    local_dict.update({'j': 1j, 'None': 0})
+    if local_dict is None:
+        local_dict = {'j': 1j, 'None': 0}
+    else:
+        local_dict.update({'j': 1j, 'None': 0})
     # function attributes, providing some sort of "memory" for previous errors
     safe_numexpr_eval.err = 0  # error code
     safe_numexpr_eval.err_msg = ""  # detailed error message
