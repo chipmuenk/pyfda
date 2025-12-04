@@ -207,7 +207,7 @@ class Tran_IO(QWidget):
         When an error occurred, return -1.
 
         """
-        file_type = (qget_cmb_box(self.ui.cmb_file_format),)  # str -> tuple
+        # file_type = (qget_cmb_box(self.ui.cmb_file_format),)  # str -> tuple
         file_name_prev = self.file_name
         file_type_prev = self.file_type
 
