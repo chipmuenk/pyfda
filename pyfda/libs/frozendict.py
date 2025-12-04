@@ -14,8 +14,24 @@ a shallow copy. Used by filterbroker.py and filter_tree_builder.py
 Taken from http://stackoverflow.com/questions/2703599/what-would-a-frozen-dict-be
 """
 
-def col(i):
-    ''' For binding named attributes to spots inside subclasses of tuple.'''
+def col(i: int):
+    """
+    The `col()` function creates a property that binds a named attribute to a specific index
+    in a tuple / subclass of tuple (here: `Item()`).
+
+    It is used in the Item class to define key and value attributes for accessing the first and
+    second elements of the tuple, respectively.
+
+    This approach improves code readability and makes tuple-like objects more user-friendly by
+    allowing access to elements via named attributes instead of numeric indices.
+
+    Returns:
+        property: A property that retrieves the element at index `i` from the tuple.
+
+    Usage:
+        key = col(0)   # Accesses the first element of the tuple
+        value = col(1) # Accesses the second element of the tuple
+    """
     g = tuple.__getitem__
     @property
     def _col(self):
@@ -23,11 +39,10 @@ def col(i):
     return _col
 
 #--------------------------------------------------------------------------
-def freeze_hierarchical(hier_dict):
+def freeze_hierarchical(hier_dict: dict) -> 'FrozenDict':
     """
-    Return the argumenent as a FrozenDict where all nested dicts have also been
-    converted to FrozenDicts recursively. When the argument is not a dict,
-    return the argument unchanged.
+    Return the argumenent as a FrozenDict where all nested dicts have also been converted to
+    FrozenDicts recursively. When the argument is not a dict, return the argument unchanged.
     """
     if isinstance(hier_dict, dict):
         for k in hier_dict:
@@ -39,20 +54,23 @@ def freeze_hierarchical(hier_dict):
 
 
 class Item(tuple):
-    ''' Designed for storing key-value pairs inside
-        a FrozenDict, which itself is a subclass of frozenset.
-        The __hash__ is overloaded to return the hash of only the key.
-        __eq__ is overloaded so that normally it only checks whether the Item's
-        key is equal to the other object, HOWEVER, if the other object itself
-        is an instance of Item, it checks BOTH the key and value for equality.
+    """
+    Designed for storing key-value pairs inside a FrozenDict, which itself is a subclass
+    of frozenset.
 
-        WARNING: Do not use this class for any purpose other than to contain
-        key value pairs inside FrozenDict!!!!
+    WARNING: Do not use this class for any other purpose!!!!
 
-        The __eq__ operator is overloaded in such a way that it violates a
-        fundamental property of mathematics. That property, which says that
-        a == b and b == c implies a == c, does not hold for this object.
-        Here's a demonstration:
+    The __hash__ is overloaded to return the hash of only the key.
+
+    __eq__ is overloaded so that normally it only checks whether the Item's key is equal
+    to the other object, HOWEVER, if the other object itself is an instance of Item, it
+    checks BOTH the key and value for equality.
+
+    This has the consequence that the __eq__ operator violates a fundamental property of
+    mathematics. That property, which says that a == b and b == c implies a == c, does not
+    hold for this object.
+
+    Here's a demonstration:
 
         >>> x = Item(('a',4))
         >>> y = Item(('a',5))
@@ -68,7 +86,7 @@ class Item(tuple):
         >>> True
         >>> x == y
         >>> False
-    '''
+    """
 
     __slots__ = ()
     key, value = col(0), col(1)
@@ -86,12 +104,12 @@ class Item(tuple):
         return 'Item((%r, %r))' % self
 
 class FrozenDict(frozenset):
-    '''
+    """
     Behaves in most ways like a regular dictionary, except that it's immutable.
-        It differs from other implementations because it doesn't subclass "dict".
-        Instead it subclasses "frozenset" which guarantees immutability.
-        FrozenDict instances are created with the same arguments used to initialize
-        regular dictionaries, and has all the same methods.
+    It differs from other implementations because it doesn't subclass `dict`.
+    Instead it subclasses "frozenset" which guarantees immutability.
+    FrozenDict instances are created with the same arguments used to initialize
+    regular dictionaries and have all the same methods.
 
         >>> f = FrozenDict(x=3,y=4,z=5)
         >>> f['x']
@@ -123,10 +141,12 @@ class FrozenDict(frozenset):
         >>> FrozenDict({'x': 3, 'y': 4, 'z': 5})
         >>> dict(FrozenDict(original))
         >>> {'x': 3, 'y': 4, 'z': 5}
-        '''
+    """
 
     __slots__ = ()
-    def __new__(cls, orig={}, **kw):
+    def __new__(cls, orig: dict | None = None, **kw):
+        if not orig:
+            orig = {}
         if kw:
             d = dict(orig, **kw)
             items = map(Item, d.items())
@@ -140,7 +160,7 @@ class FrozenDict(frozenset):
     def __repr__(self):
         cls = self.__class__.__name__
         items = frozenset.__iter__(self)
-        _repr = ', '.join(map(str,items))
+        _repr = ', '.join(map(str, items))
         return '%s({%s})' % (cls, _repr)
 
     def __getitem__(self, key):
