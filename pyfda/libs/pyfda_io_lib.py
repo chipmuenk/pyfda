@@ -24,17 +24,17 @@ import numpy as np
 from scipy.io import loadmat, savemat, wavfile
 
 try:
-    import xlwt
+    import xlwt  # noqa: F401
 except ImportError:
     xlwt = None
 try:
-    import xlsx
+    import xlsx  # noqa: F401
 except ImportError:
     xlsx = None
 
 from pyfda.libs.pyfda_lib import (
     safe_eval, lin2unit, pprint_log, iter2ndarray, compare_dictionaries)
-from pyfda.libs.pyfda_qt_lib import qget_selected, popup_warning
+from pyfda.libs.pyfda_qt_lib import popup_warning
 
 import pyfda.libs.pyfda_fix_lib as fx
 from pyfda.pyfda_rc import params
@@ -706,7 +706,7 @@ def read_csv_info_large(filename):
     return 0
 
 #-------------------------------------------------------------------------------
-def read_wav_info(file):
+def read_wav_info(file) -> int:
     """
     Get infos about the following properties of a wav file without actually
     loading the whole file into memory by reading the header.
@@ -762,30 +762,33 @@ def read_wav_info(file):
     # Pos. 22: Number of channels
     nchans = str2int(HEADER[22:24])
 
-    f.seek(24)
-    # Pos. 24: Sampling rate f_S
-    f_S = str2int(f.read(4))
+    # Pos. 24: Sampling rate f_S (4 bytes)
+    # f.seek(24)
+    f_S = str2int(HEADER[24:28])
 
-    # Pos. 28: Byte rate = f_S * n_chans * Bytes per sample
-    byte_rate = str2int(f.read(4))
+    # Pos. 28: Byte rate = f_S * n_chans * Bytes per sample (4 bytes)
+    # byte_rate = str2int(HEADER[28:32])
 
-    # Pos. 32: Block align, # of bytes per sample incl. all channels
-    block_align = str2int(f.read(2))
+    # Pos. 32: Block align, # of bytes per sample incl. all channels (2 bytes)
+    # block_align = str2int(HEADER[32:34])
 
-    # Pos. 34: Bits per sample, WL = wordlength in bytes
-    bits_per_sample = str2int(f.read(2))
+    # Pos. 34: Bits per sample, WL = wordlength in bytes (2 bytes)
+    bits_per_sample = str2int(HEADER[34:36])
 
     if sample_format == 'float':
         # Format subchunk is 18 bytes long for float samples, hence file pointer
         # has to be advanced by two bytes
-        _ = f.read(2)
 
         # ###################### FACT Subchunk ###################################
         # The fact chunk indicates how many sample frames are in the file. For
         # integer formats the tag it’s optional; otherwise it’s required. For float
         # PCM, calculation is performed exactly as for integer PCM, hence, it is not
         # evaluated here.
-        FACT = f.read(12)
+        # f.seek(38)
+        # FACT = f.read(12)
+        f.seek(50)
+    else:
+        f.seek(36)
 
     # ###################### DATA Subchunk #######################################
     # String 'data' marks beginning of data subchunk
