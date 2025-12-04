@@ -33,7 +33,7 @@ DICT_SIG_KEYS = {'id', 'class', 'ttl', 'sender_name', 'object_name',
                  'mpl_toolbar'     # events triggered by the toolbar
                 }
 # ------------------------------------------------------------------------------
-def emit(self, dict_sig: dict = {}, sig_name: str = '') -> None:
+def emit(self, dict_sig: dict | None = None, sig_name: str = '') -> None:
     """
     Emit a signal `self.<sig_name>` (defined as a class attribute) with a
     dict `dict_sig` using Qt's `emit()`.
@@ -47,6 +47,8 @@ def emit(self, dict_sig: dict = {}, sig_name: str = '') -> None:
     """
     if sig_name == '':
         sig_name = 'sig_tx'
+    if dict_sig is None:
+        dict_sig = {}
     for k in dict_sig:
         if k not in DICT_SIG_KEYS:
             logger.warning(
@@ -166,7 +168,7 @@ def qcmb_box_populate(cmb_box: QComboBox, items_list: list, item_init: str) -> i
     if type(items_list[0]) is str:  # combo box tool tipp (optional)
         cmb_box.setToolTip(cmb_box.tr(items_list[0]))
     for i in range(1, len(items_list)):
-        if type(items_list[i][1]) == QtGui.QIcon:
+        if isinstance(items_list[i][1], QtGui.QIcon):
             cmb_box.addItem("", items_list[i][0])
             cmb_box.setItemIcon(i-1, items_list[i][1])
         else:
@@ -208,7 +210,7 @@ def qcmb_box_add_items(cmb_box: QComboBox, items_list: list) -> None:
     None
     """
     for i in range(0, len(items_list)):
-        if type(items_list[i][1]) == QtGui.QIcon:
+        if isinstance(items_list[i][1], QtGui.QIcon):
             cmb_box.addItem("", items_list[i][0])
             cmb_box.setItemIcon(i-1, items_list[i][1])
         else:
@@ -640,7 +642,7 @@ class EventTypes:
         self.string_name = {}
         for name in vars(QEvent):
             attribute = getattr(QEvent, name)
-            if type(attribute) == QEvent.Type:
+            if isinstance(attribute, QEvent.Type):
                 self.string_name[attribute] = name
 
     def as_string(self, event: QEvent.Type) -> str:
@@ -675,7 +677,7 @@ class QVLine(QFrame):
     > mylayout.addWidget(myline)
     """
 
-    def __init__(self, width=2):
+    def __init__(self, width: int = 2):
         super(QVLine, self).__init__()
         self.setFrameShape(QFrame.VLine)
         self.setFrameShadow(QFrame.Plain)

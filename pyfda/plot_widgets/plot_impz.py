@@ -596,7 +596,7 @@ class Plot_Impz(QWidget):
         # check for fixpoint setting `get_fx()` and update UI if needed
         self.update_fx_settings()
 
-        if type(arg) == bool:
+        if isinstance(arg, bool):
             self.needs_calc = True  # but_run has been pressed -> force run
         elif not self.ui.but_auto_run.checked:  # "Auto" is not active, return
             return
@@ -616,12 +616,14 @@ class Plot_Impz(QWidget):
             # convert from np.bool to bool to avoid deprecation warning concerning
             # 'np.bool_' scalars to be interpreted as an index.
             self.cmplx = bool(\
-                (self.stim_wdg.ui.ledDC.isVisible and type(self.stim_wdg.ui.DC) == complex)\
-                    or (self.stim_wdg.ui.ledAmp1.isVisible and type(self.stim_wdg.ui.A1) == complex)\
-                or (self.stim_wdg.ui.ledAmp2.isVisible and type(self.stim_wdg.ui.A2) == complex)\
-                    or np.any(np.iscomplex(np.asarray(fb.fil[0]['ba'])))\
-                or self.tran_io_wdg.ui.but_load.property("state") == 'ok'\
-                    and np.iscomplexobj(self.tran_io_wdg.x)\
+                (self.stim_wdg.ui.ledDC.isVisible and isinstance(self.stim_wdg.ui.DC, complex))\
+                or (self.stim_wdg.ui.ledAmp1.isVisible
+                    and isinstance(self.stim_wdg.ui.A1, complex))\
+                or (self.stim_wdg.ui.ledAmp2.isVisible
+                    and isinstance(self.stim_wdg.ui.A2, complex))\
+                or np.any(np.iscomplex(np.asarray(fb.fil[0]['ba'])))\
+                or (self.tran_io_wdg.ui.but_load.property("state") == 'ok'
+                    and np.iscomplexobj(self.tran_io_wdg.x))\
                 or np.any(np.iscomplex(x_test)))
 
             self.ui.lbl_stim_cmplx_warn.setVisible(self.cmplx)
@@ -837,7 +839,7 @@ class Plot_Impz(QWidget):
                 qset_cmb_box(self.ui.cmb_sim_select, 'float', data=True)
 
         # Combobox modified, `set_fx()` according to combobox and start sim
-        elif type(arg) == int:
+        elif isinstance(arg, int):
             # restore last fixpoint / float mode
             set_fx(qget_cmb_box(self.ui.cmb_sim_select) == 'fixpoint')
             self.emit({'fx_sim': 'specs_changed'})

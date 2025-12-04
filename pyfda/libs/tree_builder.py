@@ -349,7 +349,7 @@ class Tree_Builder():
             if 'opt' in fb.filter_classes[c]:
                 fb.filter_classes[c]['fix'] = fb.filter_classes[c].pop('opt')
             if 'fix' in fb.filter_classes[c] and\
-                    type(fb.filter_classes[c]['fix']) == str:
+                    isinstance(fb.filter_classes[c]['fix'], str):
                 fb.filter_classes[c]['fix'] = fb.filter_classes[c]['fix'].split(',')
         # ------------------------------------------------------------------
         # Parsing [Fixpoint Filters]
@@ -557,7 +557,7 @@ class Tree_Builder():
                 # check whether options have been defined in the config file
                 opt = section_conf_dict[mod_name]
                 if opt:
-                    if type(opt) == dict:
+                    if isinstance(opt, dict):
                         classes_dict[c].update(opt)
                     elif type(opt) in {str, list}:  # create dict {'opt':<OPTION>}
                         classes_dict[c].update({"opt": opt})

@@ -649,7 +649,7 @@ def fb_set(*keys_tuple, backup: bool = True, fil_dict=fil[0]) -> None:
 
     if not keys_tuple:
         raise KeyError("Tuple of keys is empty!")
-    if type(keys_tuple) != tuple:
+    if not isinstance(keys_tuple, tuple):
         raise TypeError("Keys container needs to be a Tuple, not a '%s'!", type(keys_tuple))
         # logger.error("Wrong type of arguments collection '%s'", type(keys_tuple))
         # return -1

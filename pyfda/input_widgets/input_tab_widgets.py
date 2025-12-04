@@ -157,7 +157,7 @@ class InputTabWidgets(QWidget):
         """
         Enable `self.sig_rx.connect(self.log_rx)` above for debugging.
         """
-        if type(dict_sig) == dict:
+        if isinstance(dict_sig, dict):
             logger.warning(f"SIG_RX\n{pprint_log(dict_sig)}")
         else:
             logger.warning("empty dict")

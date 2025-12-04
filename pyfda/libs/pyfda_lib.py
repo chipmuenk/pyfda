@@ -400,7 +400,7 @@ def iter2ndarray(iterable, dtype=complex) -> np.ndarray:
     Return ndarray or None
     """
     # try:
-    if type(iterable) == np.ndarray:
+    if isinstance(iterable, np.ndarray):
         # no need to convert argument
         return iterable
     elif type(iterable) in {tuple, list}:
@@ -535,7 +535,7 @@ def pprint_log(d, N: int = 10, tab: str = "\t", debug: bool = False) -> str:
     if debug:
         logger.info(f"Data: {type(d).__name__}[{type(d[0]).__name__}], "
                     f"ndim={np.ndim(d)}")
-    if type(d) == dict:
+    if isinstance(d, dict):
         for k in d:
             if not first:
                 s += cr + tab
@@ -712,7 +712,7 @@ def safe_numexpr_eval(expr: str, fallback=None,
         safe_numexpr_eval.err = 9
         logger.warning(safe_numexpr_eval.err_msg)
         expr = "0.0"
-    elif type(expr) != str:
+    elif not isinstance(expr, str):
         safe_numexpr_eval.err_msg =(
             f"numexpr: Replacing non-string input '{expr}' "
             f"of type '{type(expr).__name__}' with '0.0'.")
@@ -720,7 +720,7 @@ def safe_numexpr_eval(expr: str, fallback=None,
         logger.warning(safe_numexpr_eval.err_msg)
         expr = "0.0"
 
-    if type(fallback) == tuple:
+    if isinstance(fallback, tuple):
         # output is expected to be a numpy array -> input is a formula
         np_expr = np.zeros(fallback)  # fallback defines the shape
         fallback_shape = fallback
