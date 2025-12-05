@@ -77,6 +77,7 @@ select = [
     # "B",  # flake8-bugbear: find likely bugs and design problems
     "B006", # mutable-argument-default, equivalent to "W0102" dangerous default value as argument
     #"E7",  # pycodestyle errors (like missing whitespace)
+    'E721', # Use isinstance() rather than type() for a typecheck. (unidiomatic-typecheck, C0123)
     "F",  # pyflakes
     # "G",  # flake8-logging-format
     # "C90",  # max. mccabe complexity of functions
@@ -84,7 +85,10 @@ select = [
     "NPY201",  # numpy 2 style guide
     # "UP008", # use super() instead of super-call-with-parameters
     "W",  # pycodestyle warnings (like trailing whitespace)
+    # "RET", #flake8-return 505Unnecessary "else"/"elif" after "return", remove the leading "el" from "elif" (no-else-return, R1705)
     "RUF012", # mutable-class-default (RUF012)"W0102"
+    # W1203: Use lazy % formatting in logging functions (logging-fstring-interpolation)
+    # C0209: Formatting a regular string which could be an f-string (consider-using-f-string)
     ]
 ignore = ["E501", # line too long
           # "W503", # line break before binary operator
