@@ -602,32 +602,28 @@ class Input_PZ(QWidget):
             if full_prec:
                 return f"{data}"
             else:
-                return "{0:.{plcs}g}".format(data, plcs=places)
+                return f"{data:.{places}g}"
 
         elif frmt == 'polar_rad':
             r, phi = np.absolute(data), np.angle(data, deg=False)
             if full_prec:
                 return f"{r} {self.angle_char}{phi} rad"
 
-            return "{r:.{plcs}g} {angle_char}{p:.{plcs}g} rad"\
-                .format(r=r, p=phi, plcs=places, angle_char=self.angle_char)
+            return f"{r:.{places}g} {self.angle_char}{phi:.{places}g} rad"
 
         elif frmt == 'polar_deg':
             r, phi = np.absolute(data), np.angle(data, deg=True)
             if full_prec:
                 return f"{r} {self.angle_char}{phi}°"
 
-            return "{r:.{plcs}g} {angle_char}{p:.{plcs}g}°"\
-                .format(r=r, p=phi, plcs=places, angle_char=self.angle_char)
+            return f"{r:.{places}g} {self.angle_char}{phi:.{places}g}°"
 
         elif frmt == 'polar_pi':
             r, phi = np.absolute(data), np.angle(data, deg=False) / np.pi
             if full_prec:
                 return f"{r} {self.angle_char}{phi} {self.pi_char}"
 
-            return "{r:.{plcs}g} {angle_char}{p:.{plcs}g} {pi_char}"\
-                .format(r=r, p=phi, plcs=places, angle_char=self.angle_char,
-                        pi_char=self.pi_char)
+            return f"{r:.{places}g} {self.angle_char}{phi:.{places}g} {self.pi_char}"
 
         else:
             logger.error("Unknown format %s.", frmt)
