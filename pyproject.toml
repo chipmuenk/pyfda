@@ -83,10 +83,10 @@ select = [
     # "C90",  # max. mccabe complexity of functions
     # "I",    # isort of imports
     "NPY201",  # numpy 2 style guide
-    # "UP008", # use super() instead of super-call-with-parameters
+    "UP008", # use super() instead of super-call-with-parameters
     "W",  # pycodestyle warnings (like trailing whitespace)
-    # "RET", #flake8-return 505Unnecessary "else"/"elif" after "return", remove the leading "el" from "elif" (no-else-return, R1705)
-    "RUF012", # mutable-class-default (RUF012)"W0102"
+    "RET", #flake8-return 505Unnecessary "else"/"elif" after "return", remove the leading "el" from "elif" (no-else-return, R1705)
+    "RUF012", # mutable-class-default, equivalent to "W0102"
     # W1203: Use lazy % formatting in logging functions (logging-fstring-interpolation)
     # C0209: Formatting a regular string which could be an f-string (consider-using-f-string)
     ]
