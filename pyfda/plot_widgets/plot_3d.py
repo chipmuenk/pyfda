@@ -38,11 +38,11 @@ if mod_version('mayavi'):
 else:
     MLAB = False
 
-if mod_version('vispy'):
-    from vispy import plot  # (?)
-    HAS_VISPY = True
-else:
-    HAS_VISPY = False
+# if mod_version('vispy'):
+#     from vispy import plot  # (?)
+#     HAS_VISPY = True
+# else:
+#     HAS_VISPY = False
 
 
 class Plot_3D(QWidget):
