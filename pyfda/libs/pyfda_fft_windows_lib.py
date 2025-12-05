@@ -8,7 +8,7 @@
 
 import numpy as np
 import scipy.signal as sig
-import scipy
+# import scipy
 
 # import logging
 # logger = logging.getLogger(__name__)
@@ -391,28 +391,28 @@ all_wins_dict_ref = {
                     'tooltip': '<span>Shape parameter (see window tool tipp)</span>'}],
         'par_val': [0.25]
         },
-    'ultraspherical': {
-        # for some reason, this window crashes pyfda
-        'app': [],
-        'disp_name': 'Ultraspherical',
-        'fn_name': 'pyfda.libs.pyfda_fft_windows_lib.ultraspherical',
-        'id': 'ultraspherical',
-        'info':'''<span>
-            Ultraspherical or Gegenbauer window, <i>&mu;</i> = 1 yields a Gaussian
-            window, <i>&mu;</i> = 0.5 yields the shape of a Laplace distribution.
+    # 'ultraspherical': {
+    #     # for some reason, this window crashes pyfda
+    #     'app': [],
+    #     'disp_name': 'Ultraspherical',
+    #     'fn_name': 'pyfda.libs.pyfda_fft_windows_lib.ultraspherical',
+    #     'id': 'ultraspherical',
+    #     'info':'''<span>
+    #         Ultraspherical or Gegenbauer window, <i>&mu;</i> = 1 yields a Gaussian
+    #         window, <i>&mu;</i> = 0.5 yields the shape of a Laplace distribution.
 
-            This is a three-parameter window (<i>N</i>, &mu;,x_0).
-            </span>''',
-        'par': [{
-            'name': '&mu;', 'name_tex': r'$\mu$', 'min': -0.5, 'max': 10,
-            'tooltip': '<span>Shape parameter &mu; or &alpha;</span>'
-            },
-            {
-            'name': 'x0', 'name_tex': r'$x_0$', 'min': -10, 'max': 10,
-            'tooltip': '<span>Amplitude</span>'}
-             ],
-        'par_val': [0.5, 1]
-        }
+    #         This is a three-parameter window (<i>N</i>, &mu;,x_0).
+    #         </span>''',
+    #     'par': [{
+    #         'name': '&mu;', 'name_tex': r'$\mu$', 'min': -0.5, 'max': 10,
+    #         'tooltip': '<span>Shape parameter &mu; or &alpha;</span>'
+    #         },
+    #         {
+    #         'name': 'x0', 'name_tex': r'$x_0$', 'min': -10, 'max': 10,
+    #         'tooltip': '<span>Amplitude</span>'}
+    #          ],
+    #     'par_val': [0.5, 1]
+    #     }
     }
 
 
@@ -455,7 +455,7 @@ def blackmanharris(N: int, L: str, sym: bool) -> np.ndarray:
 
     return calc_cosine_window(N, sym, a)
 
-
+# -------------------------------------------------------------------------------------
 def calc_cosine_window(N: int, sym: bool, a: list) -> np.ndarray:
     """
     Return window based on cosine functions with amplitudes specified
@@ -471,43 +471,43 @@ def calc_cosine_window(N: int, sym: bool, a: list) -> np.ndarray:
         win += a[k] * np.cos(k*x)
     return win
 
+# # -------------------------------------------------------------------------------------
+# def ultraspherical(N, alpha=0.5, x_0=1, sym=True):
+#     """ The window does not work yet!
+#         More info: https://www.recordingblogs.com/wiki/ultraspherical-window
+#         and https://www.ece.uvic.ca/~andreas/RLectures/UltraSpherWinJASP.pdf
+#     """
 
-def ultraspherical(N, alpha=0.5, x_0=1, sym=True):
-    """ The window does not work yet!
-        More info: https://www.recordingblogs.com/wiki/ultraspherical-window
-        and https://www.ece.uvic.ca/~andreas/RLectures/UltraSpherWinJASP.pdf
-    """
+#     if sym:
+#         L = N-1
+#     else:
+#         L = N
+#     # x = np.arange(N) * np.pi / (N)
 
-    if sym:
-        L = N-1
-    else:
-        L = N
-    # x = np.arange(N) * np.pi / (N)
+#     geg_ev = scipy.special.eval_gegenbauer
+#     w0 = geg_ev(N, alpha, x_0)
+#     w = np.zeros(N)
+#     # a = 2
+#     # for n in range(5 + 1):
+#     #     x = np.linspace(-1.1, 1.1, 5001)
+#     #     y = eval_gegenbauer(n, a, x)
+#     #     plt.plot(x, y, label=r'$C_{%i}^{(2)}$' % n, zorder=-n)
+#     #     plt.ylim((-10,10))
 
-    geg_ev = scipy.special.eval_gegenbauer
-    w0 = geg_ev(N, alpha, x_0)
-    w = np.zeros(N)
-    # a = 2
-    # for n in range(5 + 1):
-    #     x = np.linspace(-1.1, 1.1, 5001)
-    #     y = eval_gegenbauer(n, a, x)
-    #     plt.plot(x, y, label=r'$C_{%i}^{(2)}$' % n, zorder=-n)
-    #     plt.ylim((-10,10))
+#     for n in range(0, N):
+#         w[n] = w0
+#         for k in range(1, N//2+1):
+#             w[n] += geg_ev(N, alpha, x_0 * np.cos(k*np.pi/(N+1)))\
+#                     * np.cos(2*n*np.pi*k/(N+1))
+#     #     rtn +=  np.cos(x*k)
 
-    for n in range(0, N):
-        w[n] = w0
-        for k in range(1, N//2+1):
-            w[n] += geg_ev(N, alpha, x_0 * np.cos(k*np.pi/(N+1)))\
-                    * np.cos(2*n*np.pi*k/(N+1))
-    #     rtn +=  np.cos(x*k)
+#     # w = geg_ev(N-1, alpha, x_0 * np.cos(x))
+#     # logger.error(W[0].dtype, len(W))
+#     # W = np.abs(fft.ifft(w))
+#     # logger.error(type(w[0].dtype), len(w))
+#     return w
 
-    # w = geg_ev(N-1, alpha, x_0 * np.cos(x))
-    # logger.error(W[0].dtype, len(W))
-    # W = np.abs(fft.ifft(w))
-    # logger.error(type(w[0].dtype), len(w))
-    return w
-
-
+# -------------------------------------------------------------------------------------
 class UserWindows(object):
     def __init__(self, parent):
         super().__init__(parent)
