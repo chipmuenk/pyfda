@@ -592,13 +592,13 @@ class Input_PZ(QWidget):
         # convert to numeric value via safe_eval:
         data = safe_eval(text, return_type='auto')
         frmt = qget_cmb_box(self.ui.cmb_pz_frmt)  # get selected format
-        # logger.warning(f"{text} -> {data}")
+
         if places == -1:
             full_prec = True
         else:
             full_prec = False
 
-        if frmt == 'cartesian' or not type(data) == complex:
+        if frmt == 'cartesian' or not isinstance(data, complex):
             if full_prec:
                 return f"{data}"
             else:
