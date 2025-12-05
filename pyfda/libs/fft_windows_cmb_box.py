@@ -37,7 +37,7 @@ class QFFTWinCmbBox(QWidget):
     sig_rx = pyqtSignal(object)  # incoming
     sig_tx = pyqtSignal(object)  # outgoing
 
-    def __init__(self, cur_win_dict: dict, app: str = 'spec', all_wins_dict: dict = {},
+    def __init__(self, cur_win_dict: dict, app: str = 'spec', all_wins_dict: dict | None = None,
                  objectName: str = ""):
         super().__init__()
 
@@ -46,7 +46,7 @@ class QFFTWinCmbBox(QWidget):
         self.cur_win_dict = cur_win_dict
         self.err = False  # error flag for window calculation
 
-        if all_wins_dict == {}:
+        if not all_wins_dict:
             # construct combobox data from all_wins_dict_ref and app type,
             # remove unneeded key:value pairs
             self.all_wins_dict = copy.deepcopy(all_wins_dict_ref)
