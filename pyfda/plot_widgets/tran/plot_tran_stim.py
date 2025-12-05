@@ -49,7 +49,7 @@ class Plot_Tran_Stim(QWidget):
         self._construct_UI()
 
     # -------------------------------------------------------------------------
-    def emit(self, dict_sig):
+    def emit(self, dict_sig: dict) -> None:
         """
         Access imported function `emit()` as instance method, passing `self`
         with its attributes
@@ -84,7 +84,7 @@ class Plot_Tran_Stim(QWidget):
         self.setLayout(lay_v_main)
 
     # ------------------------------------------------------------------------------
-    def init_labels_stim(self):
+    def init_labels_stim(self) -> None:
         '''intialize title string, y-axis label and some variables'''
         # use radians for angle internally
         self.H_str = r'$y[n]$'  # default
@@ -182,7 +182,7 @@ class Plot_Tran_Stim(QWidget):
 
     # ------------------------------------------------------------------------------
     def calc_stimulus_frame(self, x: np.ndarray = np.random.randn(10), N_first: int = 0,
-                            N_frame: int = 10, N_end: int = 10) -> np.ndarray:
+                            N_frame: int = 10, N_end: int = 10) -> None:
         """
         Calculate a data frame of stimulus `x` with a length of `N_frame` samples,
         starting with index `N_first`
@@ -190,7 +190,7 @@ class Plot_Tran_Stim(QWidget):
         Parameters
         ----------
         x: ndarray of float or complex
-            empty array that is filled in place frame by frame
+            empty array, passed by reference, that is filled in place frame by frame
 
         N_first: int
             index of first data point of the current frame
@@ -204,11 +204,11 @@ class Plot_Tran_Stim(QWidget):
         Returns
         -------
         None
-            x is filled with data in place
+            x is filled with data in place (passed by reference)
 
         """
         # -------------------------------------------
-        def add_signal(stim: np.ndarray, add_sig: np.ndarray):
+        def add_signal(stim: np.ndarray, add_sig: np.ndarray) -> np.ndarray:
             """
             Add signal `add_sig` to stimulus `stim` (both need to have the same shape)
             and respect all combinations of real and complex-valued signals.
@@ -254,16 +254,14 @@ class Plot_Tran_Stim(QWidget):
             # add_sig is 2D, add it to stimulus as a complex signal
             elif np.ndim(add_sig) == 2:
                 logger.info("'add_sig' has two channels, casting to complex")
-                stim = stim.astype(complex) + add_sig[:, 0] + 1j * add_sig[:, 1]
-                return stim
+                return stim.astype(complex) + add_sig[:, 0] + 1j * add_sig[:, 1]
 
             # ---
             if np.any(np.iscomplex(add_sig)):
                 # `add_sig` contains complex items (the array is always complex),
                 # cast `stim` to complex as well before adding
                 stim = stim.astype(complex)
-            stim = stim + add_sig
-            return stim
+            return stim + add_sig
 
         # ====================================================================
         # Initialization for all frames
@@ -303,7 +301,7 @@ class Plot_Tran_Stim(QWidget):
                 pass
             return
         # ----------------------------------------------------------------------
-        elif self.ui.stim == "none":
+        if self.ui.stim == "none":
             pass
         # ----------------------------------------------------------------------
         elif self.ui.stim == "dirac":
@@ -319,7 +317,7 @@ class Plot_Tran_Stim(QWidget):
             f2 = self.ui.f2
             if (self.ui.A1 != 0 and f1 < 0) or (self.ui.A2 != 0 and f2 < 0):
                 logger.warning("Center frequencies f1, f2 need to be >= 0!")
-                return None
+                return
             if f1 < 0:
                 f1 = 0.1  # dummy value, A1 == 0
             if f2 < 0:
@@ -370,11 +368,11 @@ class Plot_Tran_Stim(QWidget):
         elif self.ui.stim == "chirp":
             if self.ui.chirp_type == 'hyperbolic' and self.ui.f1 * self.ui.f2 == 0:
                 logger.warning("Frequencies f1 and f2 need to be != 0!")
-                return None
-            elif self.ui.chirp_type == 'logarithmic' and self.ui.f1 * self.ui.f2 <= 0:
+                return
+            if self.ui.chirp_type == 'logarithmic' and self.ui.f1 * self.ui.f2 <= 0:
                 logger.warning(
                     "Frequencies f1 and f2 need to be != 0 and have the same sign!")
-                return None
+                return
             if self.ui.T2 == 0:  # sig.chirp is buggy, T_sim cannot be larger than T_end
                 T_end = N_end  # frequency sweep over complete interval
             else:
@@ -387,7 +385,7 @@ class Plot_Tran_Stim(QWidget):
             if self.ui.but_stim_bl.checked:
                 if self.ui.f1 <= 0:
                     logger.warning("Frequency f1 needs to be > 0!")
-                    return None
+                    return
                 x[frm_slc] = self.ui.A1 * triang_bl(2*pi * n * self.ui.f1 + self.rad_phi1)
             else:
                 x[frm_slc] = self.ui.A1 * sig.sawtooth(
@@ -397,7 +395,7 @@ class Plot_Tran_Stim(QWidget):
             if self.ui.but_stim_bl.checked:
                 if self.ui.f1 <= 0:
                     logger.warning("Frequency f1 needs to be > 0!")
-                    return None
+                    return
                 x[frm_slc] = self.ui.A1 * sawtooth_bl(2*pi * n * self.ui.f1 + self.rad_phi1)
             else:
                 x[frm_slc] = self.ui.A1 * sig.sawtooth(2*pi * n * self.ui.f1 + self.rad_phi1)
@@ -406,7 +404,7 @@ class Plot_Tran_Stim(QWidget):
             if self.ui.but_stim_bl.checked:
                 if self.ui.f1 <= 0:
                     logger.warning("Frequency f1 needs to be > 0!")
-                    return None
+                    return
                 x[frm_slc] = self.ui.A1 * rect_bl(
                     2 * pi * n * self.ui.f1 + self.rad_phi1, duty=self.ui.stim_par1)
             else:
@@ -416,7 +414,7 @@ class Plot_Tran_Stim(QWidget):
         elif self.ui.stim == "comb":
             if self.ui.f1 <= 0:
                 logger.warning("Frequency f1 needs to be > 0!")
-                return None
+                return
             x[frm_slc] = self.ui.A1 * comb_bl(2 * pi * n * self.ui.f1 + self.rad_phi1)
         # ----------------------------------------------------------------------
         elif self.ui.stim == "am":
@@ -432,7 +430,7 @@ class Plot_Tran_Stim(QWidget):
             if self.ui.but_stim_bl.checked:
                 if self.ui.f1 <= 0:
                     logger.warning("Frequency f1 needs to be > 0!")
-                    return None
+                    return
                 x[frm_slc] = self.ui.A1 * rect_bl(
                     2 * np.pi * n * self.ui.f1 + self.rad_phi1,
                     duty=(1/2 + self.ui.A2 / 2 *
@@ -458,7 +456,7 @@ class Plot_Tran_Stim(QWidget):
                 qstyle_widget(self.ui.ledStimFormula, 'normal')
         else:
             logger.error('Unknown stimulus format "%s"', self.ui.stim)
-            return None
+            return
         # ----------------------------------------------------------------------
         # Calculate noise
         # ----------------------------------------------------------------------
@@ -551,7 +549,7 @@ class Plot_Tran_Stim(QWidget):
                     (self.x_file[N_first:], np.zeros(N_last - len(self.x_file)))))
             # file data has been consumed, nothing left to be added
             else:
-                return None
+                return
 
 # ------------------------------------------------------------------------------
 
