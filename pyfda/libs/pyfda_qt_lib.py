@@ -768,7 +768,7 @@ class PushButton(QPushButton):
             self.checked = False
             self.style_button()
 
-    def eventFilter(self, source, event):
+    def eventFilter(self, source: QtCore.QObject, event: QEvent) -> bool:
         if event.type() == QEvent.MouseButtonPress:
             if self.isEnabled() and self._checkable and event.button() == Qt.LeftButton:
                 # signal is passed to base class where "self.toggle()" is performed
@@ -777,7 +777,7 @@ class PushButton(QPushButton):
         # Call base class method to continue normal event processing:
         return super(PushButton, self).eventFilter(source, event)
 
-    def style_button(self):
+    def style_button(self) -> None:
         if self.checked:
             qstyle_widget(self, "highlight")
         else:
@@ -871,7 +871,7 @@ class PushButtonRT(QPushButton):
             self.checked = False
             self.style_button()
 
-    def eventFilter(self, source, event):
+    def eventFilter(self, source: QtCore.QObject, event: QEvent) -> bool:
         if event.type() == QEvent.MouseButtonPress:
             if self.isEnabled() and self._checkable and event.button() == Qt.LeftButton:
                 # signal is passed to base class where "self.toggle()" is performed
