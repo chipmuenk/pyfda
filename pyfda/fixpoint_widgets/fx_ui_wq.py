@@ -117,7 +117,9 @@ class FX_UI_WQ(QWidget):
 
         self.setObjectName(objectName)
         if not q_dict:
-            logger(crash)
+            raise ValueError("FX_UI_WQ: No quantization dictionary passed!")
+
+        # TODO: Is passing q_dict by reference a bug od?
 
         # default settings for q_dict
         # q_dict_default = {'WI': 0, 'WF': 15, 'w_a_m': 'm', 'quant': 'round',
