@@ -69,7 +69,7 @@ class QFFTWinCmbBox(QWidget):
         self.ui2win_dict()
 
     # -------------------------------------------------------------------------
-    def emit(self, dict_sig):
+    def emit(self, dict_sig: dict) -> None:
         """
         Access imported function `emit()` as instance method, passing `self`
         with its attributes
@@ -77,7 +77,7 @@ class QFFTWinCmbBox(QWidget):
         emit(self, dict_sig)
 
     # --------------------------------------------------------------------------
-    def process_sig_rx(self, dict_sig=None):
+    def process_sig_rx(self, dict_sig: dict) -> None:
         """
         Process signals coming from the widget one hierarchy higher to update
         the widgets from the dictionary
@@ -97,7 +97,7 @@ class QFFTWinCmbBox(QWidget):
             self.dict2ui()
 
     # --------------------------------------------------------------------------
-    def _construct_UI(self):
+    def _construct_UI(self) -> None:
         """
         Create the FFT window selection widget, consisting of:
         - combobox for windows
@@ -231,7 +231,7 @@ class QFFTWinCmbBox(QWidget):
         return win_err  # error flag, UI (window combo box) needs to be updated
 
 # ------------------------------------------------------------------------------
-    def calc_window(self, N: int, win_id: str = "", sym: bool = False) -> np.array:
+    def calc_window(self, N: int, win_id: str = "", sym: bool = False) -> np.ndarray:
         # logger.error(f"{self.objectName()}: calc_window({win_id})")
         """
         Calculate the selected window function with `N` points.
@@ -324,7 +324,7 @@ class QFFTWinCmbBox(QWidget):
             self.ui2win_dict()
 
 # ------------------------------------------------------------------------------
-    def dict2ui_params(self):
+    def dict2ui_params(self) -> None:
         """
         Set parameter values from `cur_win_dict`
         """
@@ -344,7 +344,7 @@ class QFFTWinCmbBox(QWidget):
                 self.led_win_par_1.setText(str(self.cur_win_dict['par_val'][1]))
 
 # ------------------------------------------------------------------------------
-    def ui2dict_params(self):
+    def ui2dict_params(self) -> None:
         """
         Read out window parameter widget(s) when editing is finished and
         update `self.cur_win_dict` and `self.all_wins_dict` with the parameter values.
@@ -386,7 +386,7 @@ class QFFTWinCmbBox(QWidget):
         self.emit({'view_changed': 'fft_win_par'})
 
 # ------------------------------------------------------------------------------
-    def ui2win_dict_emit(self, arg=None) -> None:
+    def ui2win_dict_emit(self) -> None:
         """
         Triggered during initialization and by the window type combo box
         - execute `self.ui2win_dict()`

@@ -15,7 +15,7 @@ import csv
 import wave
 import datetime
 import warnings
-from typing import TextIO, Tuple  # replace by built-in tuple from Py 3.9
+from typing import TextIO
 
 import pickle
 import json
@@ -202,7 +202,7 @@ def create_file_filters(file_types: tuple, file_filters: str = ""):
 
 # ------------------------------------------------------------------------------
 def select_file(parent: object, title: str = "", mode: str = "r",
-                file_types: Tuple[str, ...] = ('csv', 'txt')) -> Tuple[str, str]:
+                file_types: tuple[str, ...] = ('csv', 'txt')) -> tuple[str, str]:
     """
     Select a file from a file dialog box for either reading or writing and return
     the selected file name and type.
@@ -1111,7 +1111,7 @@ def write_wav_frame(parent, file_name, data: np.array, f_S = 1,
 
 # ------------------------------------------------------------------------------
 def export_fil_data(parent: object, data: str, fkey: str = "", title: str = "Export",
-                file_types: Tuple[str, ...] = ('csv', 'mat', 'npy', 'npz'),
+                file_types: tuple[str, ...] = ('csv', 'mat', 'npy', 'npz'),
                 formatted: bool = True):
     """
     Export filter coefficients or pole/zero data in various formats, file name and type
@@ -1517,18 +1517,18 @@ def export_coe_TI(f: TextIO) -> None:
     pass
 
 
-def export_coe_cmsis_fir(f: TextIO, formatted=False) -> None:
+def export_coe_cmsis_fir(f: TextIO, formatted: bool = False) -> bool:
     """
     The CMSIS FIR filter function requires the coefficients to be in time reversed
     order, hence the coefficient array is flipped before exporting.
     """
-    logger.error("Not implemented yet!")
-    coeffs = fb.fil[0]['ba'][0][::-1]
+    logger.error("Not implemented yet! (formatted = %s)", formatted)
+    # coeffs = fb.fil[0]['ba'][0][::-1]
     return True
 
 
 # ------------------------------------------------------------------------------
-def export_coe_cmsis_sos(f: TextIO, file_type: str, formatted=False) -> bool:
+def export_coe_cmsis_sos(f: TextIO, file_type: str, formatted: bool = False) -> bool:
     """
     Export coefficients in either CMSIS or scipy SOS format.
 

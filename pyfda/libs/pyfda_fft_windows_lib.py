@@ -417,7 +417,7 @@ all_wins_dict_ref = {
 
 
 # -------------------------------------------------------------------------------------
-def blackmanharris(N, L, sym):
+def blackmanharris(N: int, L: str, sym: bool) -> np.ndarray:
     if L == '4':
         return sig.windows.blackmanharris(N, sym)
 
@@ -450,14 +450,13 @@ def blackmanharris(N, L, sym):
              1.161808358932861e-007]
     else:
         raise Exception(
-            "Undefined parameter '{0}' for order L!"
-            .format(L))
-        return
+            f"Undefined parameter '{L}' for order L!"
+            )
 
     return calc_cosine_window(N, sym, a)
 
 
-def calc_cosine_window(N, sym, a):
+def calc_cosine_window(N: int, sym: bool, a: list) -> np.ndarray:
     """
     Return window based on cosine functions with amplitudes specified
     by the list `a`.
@@ -511,7 +510,7 @@ def ultraspherical(N, alpha=0.5, x_0=1, sym=True):
 
 class UserWindows(object):
     def __init__(self, parent):
-        super(UserWindows, self).__init__(parent)
+        super().__init__(parent)
 
 # =======
 # see also:

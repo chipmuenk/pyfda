@@ -143,7 +143,7 @@ class FX_UI_WQ(QWidget):
     #         self.dict2ui()
 
     # -------------------------------------------------------------------------
-    def emit(self, dict_sig):
+    def emit(self, dict_sig: dict) -> None:
         """
         Access imported function `emit()` as instance method, passing `self`
         with its attributes
@@ -151,7 +151,7 @@ class FX_UI_WQ(QWidget):
         emit(self, dict_sig)
 
     # --------------------------------------------------------------------------
-    def _construct_UI(self, **kwargs):
+    def _construct_UI(self, **kwargs) -> None:
         """ Construct widget """
         cmb_q = ["Select the kind of quantization.",
                  ("round", "Round",
@@ -357,7 +357,7 @@ class FX_UI_WQ(QWidget):
             self.butLock.setIcon(QIcon(':/lock-unlocked.svg'))
 
     # --------------------------------------------------------------------------
-    def update_ovfl_cnt(self):
+    def update_ovfl_cnt(self) -> None:
         """
         Update the overflow counter and MSB / LSB display (if visible)
         """
@@ -443,7 +443,7 @@ class FX_UI_WQ(QWidget):
             logger.error("Sender has no object name!")
 
     # --------------------------------------------------------------------------
-    def dict2ui(self, q_dict: dict = None) -> None:
+    def dict2ui(self, q_dict: dict | None = None) -> None:
         """
         Use the passed quantization dict `q_dict` to update:
 
@@ -492,7 +492,7 @@ class FX_UI_WQ(QWidget):
         self.update_WI_WF()  # set WI / WF widgets visibility depending on 'w_a_m'
 
     # --------------------------------------------------------------------------
-    def update_WI_WF(self):
+    def update_WI_WF(self) -> None:
         """
         Update display, visibility / writability of integer and fractional part of the
         quantization format. depending on `get_fx()` ...['qfrmt'] and
@@ -556,7 +556,7 @@ class FX_UI_WQ(QWidget):
         self.enable_subwidgets()
 
     # --------------------------------------------------------------------------
-    def enable_subwidgets(self):
+    def enable_subwidgets(self) -> None:
         """
         Enable integer and fractional part of the quantization format, depending on
         'w_a_m' settings.
