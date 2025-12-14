@@ -55,7 +55,7 @@ class FreqSpecs(QWidget):
         """
         emit(self, dict_sig, sig_name)
     # -------------------------------------------------------------
-    def process_sig_rx(self, dict_sig: dict | None = None) -> None:
+    def process_sig_rx(self, dict_sig: dict) -> None:
         """
         Process signals coming in via subwidgets and sig_rx
         """
@@ -63,8 +63,8 @@ class FreqSpecs(QWidget):
         if dict_sig['id'] == id(self):
             # logger.warning("Stopped infinite loop:\n{0}".format(pprint_log(dict_sig)))
             return
-        elif ('view_changed' in dict_sig and dict_sig['view_changed'] == 'f_S')\
-                or ('data_changed' in dict_sig
+        if ('view_changed' in dict_sig and dict_sig['view_changed'] == 'f_S')\
+            or ('data_changed' in dict_sig
                 and dict_sig['data_changed'] in {'filter_loaded', 'filter_designed'}):
             # update frequencies and unit and load_dict.
             self.recalc_freqs()

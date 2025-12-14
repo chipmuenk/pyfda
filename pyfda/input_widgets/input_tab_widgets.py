@@ -36,7 +36,7 @@ class InputTabWidgets(QWidget):
     sig_tx = pyqtSignal(object)
 
     def __init__(self, parent=None, objectName='input_tab_widgets_inst'):
-        super(InputTabWidgets, self).__init__(parent)
+        super().__init__(parent)
         self.setObjectName(objectName)
         self._construct_UI()
 

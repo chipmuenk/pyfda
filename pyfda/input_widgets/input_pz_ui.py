@@ -63,7 +63,7 @@ class Input_PZ_UI(QWidget):
         self._construct_UI()
 
     # -------------------------------------------------------------------------
-    def emit(self, dict_sig):
+    def emit(self, dict_sig: dict) -> None:
         """
         Access imported function `emit()` as instance method, passing `self`
         with its attributes
@@ -71,7 +71,7 @@ class Input_PZ_UI(QWidget):
         emit(self, dict_sig)
 
     # ------------------------------------------------------------------------------
-    def process_sig_rx(self, dict_sig=None):
+    def process_sig_rx(self, dict_sig: dict) -> None:
         """
         Process signals coming from the CSV pop-up window
         """
@@ -92,7 +92,7 @@ class Input_PZ_UI(QWidget):
             self.emit({'ui_global_changed': 'csv'})
 
     # ------------------------------------------------------------------------------
-    def _construct_UI(self):
+    def _construct_UI(self) -> None:
         """
         Intitialize the widget, consisting of:
         - top chkbox row
@@ -308,7 +308,7 @@ class Input_PZ_UI(QWidget):
         self.but_file_clipboard.clicked.connect(self._set_load_save_icons)
 
     # ------------------------------------------------------------------------------
-    def _open_csv_win(self):
+    def _open_csv_win(self) -> None:
         """
         Pop-up window for CSV options
         """
@@ -329,13 +329,13 @@ class Input_PZ_UI(QWidget):
             # 'ui_global_changed': 'csv' is emitted by closing pop-up box
 
     # ------------------------------------------------------------------------------
-    def _close_csv_win(self):
+    def _close_csv_win(self) -> None:
         dirs.csv_options_handle = None
         self.but_csv_options.setChecked(False)
         qstyle_widget(self.but_csv_options, "normal")
 
     # ------------------------------------------------------------------------------
-    def _set_load_save_icons(self):
+    def _set_load_save_icons(self) -> None:
         """
         Set icons / tooltipps for loading and saving data to / from file or
         clipboard depending on selected options.

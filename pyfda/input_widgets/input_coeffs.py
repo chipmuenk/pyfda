@@ -85,7 +85,7 @@ class Input_Coeffs(QWidget):
         self._construct_UI()
 
     # -------------------------------------------------------------------------
-    def emit(self, dict_sig):
+    def emit(self, dict_sig: dict) -> None:
         """
         Access imported function `emit()` as instance method, passing `self`
         with its attributes
@@ -93,7 +93,7 @@ class Input_Coeffs(QWidget):
         emit(self, dict_sig)
 
     # -------------------------------------------------------------------------
-    def process_sig_rx(self, dict_sig=None):
+    def process_sig_rx(self, dict_sig: dict) -> None:
         """
         Process signals coming from sig_rx
         """
@@ -133,7 +133,7 @@ class Input_Coeffs(QWidget):
                 self.fx_specs_changed = True
 
 # ------------------------------------------------------------------------------
-    def _construct_UI(self):
+    def _construct_UI(self) -> None:
         """
         Intitialize the widget, consisting of:
         - top chkbox row
@@ -202,7 +202,7 @@ class Input_Coeffs(QWidget):
         self.ui.sig_tx.connect(self.sig_tx)
 
 # ------------------------------------------------------------------------------
-    def quant_coeffs_view(self):
+    def quant_coeffs_view(self) -> None:
         """
         This method only creates a view on the quantized coefficients and stores
         it in `self.ba_q`, the actual coefficients in `self.ba` remain unchanged!
@@ -277,7 +277,7 @@ class Input_Coeffs(QWidget):
         self.ui.wdg_wq_coeffs_a.update_ovfl_cnt()
 
 # ------------------------------------------------------------------------------
-    def quant_coeffs_apply(self):
+    def quant_coeffs_apply(self) -> None:
         """
         Triggered by pushing "Quantize button":
 
@@ -309,7 +309,7 @@ class Input_Coeffs(QWidget):
         qstyle_widget(self.ui.but_undo, 'changed')
 
     # --------------------------------------------------------------------------
-    def _filter_type(self, ftype=None):
+    def _filter_type(self, ftype: set) -> None:
         """
         Get / set 'FIR' and 'IIR' filter from cmb_filter_type combobox and set filter
             dict and table properties accordingly.
@@ -342,7 +342,7 @@ class Input_Coeffs(QWidget):
         qstyle_widget(self.ui.but_undo, 'changed')
 
 # ------------------------------------------------------------------------------
-    def _refresh_table_item(self, row, col):
+    def _refresh_table_item(self, row: int, col: int) -> None:
         """
         Refresh the table item with the index `row, col` from `self.ba_q`
         and color it according to overflow conditions
@@ -370,7 +370,7 @@ class Input_Coeffs(QWidget):
         item.setBackground(brush)
 
     # --------------------------------------------------------------------------
-    def refresh_table(self):
+    def refresh_table(self) -> None:
         """
         Update `self.ba_q` from `self.ba` (list with 2 one-dimensional numpy arrays),
         i.e. requantize displayed values (not `self.ba`) and overflow counters.
@@ -449,7 +449,7 @@ class Input_Coeffs(QWidget):
         self.tblCoeff.clearSelection()
 
     # --------------------------------------------------------------------------
-    def load_dict(self):
+    def load_dict(self) -> None:
         """
         - Copy filter dict array `fb.fil[0]['ba']` to the coefficient list `self.ba`
         - Set quantization UI from dict, update quantized coeff. display / overflow
@@ -471,7 +471,7 @@ class Input_Coeffs(QWidget):
         qstyle_widget(self.ui.but_undo, 'normal')
 
     # --------------------------------------------------------------------------
-    def export_table(self):
+    def export_table(self) -> None:
         """
         Export data from coefficient table `self.tblCoeff` to clipboard / file in
         CSV format.
@@ -582,7 +582,7 @@ class Input_Coeffs(QWidget):
         qstyle_widget(self.ui.but_undo, 'changed')
 
     # --------------------------------------------------------------------------
-    def dict2ui(self):
+    def dict2ui(self) -> None:
         """
         - update the UI from the dictionary
         - Update the fixpoint quant. object
@@ -607,8 +607,8 @@ class Input_Coeffs(QWidget):
         self.quant_coeffs_view()
         self.refresh_table()
 
-# ------------------------------------------------------------------------------
-    def qfrmt2dict(self):
+    # ------------------------------------------------------------------------------
+    def qfrmt2dict(self) -> None:
         """
         Read out the UI settings of  `self.ui.cmb_qfrmt` (triggering this method)
         and store it under the 'qfrmt' key if it is a fixpoint format.
@@ -623,8 +623,8 @@ class Input_Coeffs(QWidget):
         self.dict2ui()
         self.emit({'fx_sim': 'specs_changed'})
 
-# ------------------------------------------------------------------------------
-    def fx_base2dict(self):
+    # ------------------------------------------------------------------------------
+    def fx_base2dict(self) -> None:
         """
         Read out the UI settings of `self.ui.cmb_fx_base` (triggering this method)
         which specifies the fx number base (dec, bin, ...) for display
@@ -638,8 +638,8 @@ class Input_Coeffs(QWidget):
         # update quant. widgets and table with the new `fx_base` settings
         self.dict2ui()
 
-# ------------------------------------------------------------------------------
-    def _save_dict(self):
+    # ------------------------------------------------------------------------------
+    def _save_dict(self) -> None:
         """
         Save the coefficient register `self.ba` to the filter dict as `fb.fil[0]['ba']`.
         """
@@ -671,8 +671,8 @@ class Input_Coeffs(QWidget):
         qstyle_widget(self.ui.but_apply, 'normal')
         qstyle_widget(self.ui.but_undo, 'normal')
 
-# ------------------------------------------------------------------------------
-    def clear_table(self):
+    # ------------------------------------------------------------------------------
+    def clear_table(self) -> None:
         """
         Clear self.ba: Initialize coeff for a poles and a zero @ origin,
         a = b = [1; 0].
@@ -684,8 +684,8 @@ class Input_Coeffs(QWidget):
         qstyle_widget(self.ui.but_apply, 'changed')
         qstyle_widget(self.ui.but_undo, 'changed')
 
-# ------------------------------------------------------------------------------
-    def _equalize_ba_length(self):
+    # ------------------------------------------------------------------------------
+    def _equalize_ba_length(self) -> None:
         """
         test and equalize if b and a subarray have different lengths and copy to
         `self.ba_q`:
@@ -708,8 +708,8 @@ class Input_Coeffs(QWidget):
                 self.ba[1] = self.ba[1][:D]  # discard last D elements of a
         self.quant_coeffs_view()
 
-# ------------------------------------------------------------------------------
-    def _delete_cells(self):
+    # ------------------------------------------------------------------------------
+    def _delete_cells(self) -> None:
         """
         Delete all selected elements in self.ba by:
         - determining the indices of all selected cells in the P and Z arrays
@@ -743,8 +743,8 @@ class Input_Coeffs(QWidget):
             qstyle_widget(self.ui.but_apply, 'changed')
             qstyle_widget(self.ui.but_undo, 'changed')
 
-# ------------------------------------------------------------------------------
-    def _add_cells(self):
+    # ------------------------------------------------------------------------------
+    def _add_cells(self) -> None:
         """
         Add the number of selected rows to self.ba and fill new cells with
         zeros from the bottom. If nothing is selected, add one row at the bottom.
@@ -773,9 +773,8 @@ class Input_Coeffs(QWidget):
             qstyle_widget(self.ui.but_apply, 'changed')
             qstyle_widget(self.ui.but_undo, 'changed')
 
-
-# ------------------------------------------------------------------------------
-    def _set_eps(self):
+    # ------------------------------------------------------------------------------
+    def _set_eps(self) -> None:
         """
         Set all coefficients = 0 in self.ba with a magnitude less than eps
         and refresh QTableWidget
@@ -784,8 +783,8 @@ class Input_Coeffs(QWidget):
             self.ui.led_eps.text(), return_type='float', sign='pos', alt_expr=self.ui.eps)
         self.ui.led_eps.setText(str(self.ui.eps))
 
-# ------------------------------------------------------------------------------
-    def _set_coeffs_zero(self):
+    # ------------------------------------------------------------------------------
+    def _set_coeffs_zero(self) -> None:
         """
         Set all coefficients = 0 in self.ba with a magnitude less than eps
         and refresh QTableWidget

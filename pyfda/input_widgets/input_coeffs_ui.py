@@ -39,8 +39,8 @@ class Input_Coeffs_UI(QWidget):
         self.eps = 1.e-6  # initialize tolerance value
 
         self.cmb_qfrmt_items = [
-            "<span>Quantization format for coefficients (affects only "
-            "the display, not the stored values).</span>",
+            "<span>Quantization format for coefficients (only affects "
+            "display, not stored values).</span>",
             ('float64', "Float64", "<span>Full precision floating point format</span>"),
             ('float32', "Float32", "<span>Single precision floating point format</span>"),
             ('qint', "Integer", "<span>Integer format with <i>WI</i> + 1 bits "
@@ -75,7 +75,7 @@ class Input_Coeffs_UI(QWidget):
         emit(self, dict_sig)
 
     # ------------------------------------------------------------------------------
-    def process_sig_rx(self, dict_sig=None) -> None:
+    def process_sig_rx(self, dict_sig: dict) -> None:
         """
         Process signals coming from the CSV pop-up window
         """
@@ -94,7 +94,7 @@ class Input_Coeffs_UI(QWidget):
             self.emit({'ui_global_changed': 'csv'})
 
     # ------------------------------------------------------------------------------
-    def _construct_UI(self):
+    def _construct_UI(self) -> None:
         """
         Intitialize the widget, consisting of:
         - top chkbox row
@@ -132,7 +132,7 @@ class Input_Coeffs_UI(QWidget):
         self.but_quant = QPushButton(self)
         self.but_quant.setToolTip(
             "<span>Quantize selected coefficients / whole table with specified "
-            "settings and save to dict. This modifies the data, not only the view."
+            "settings and store in filter dict, affecting both view and data in memory."
             "</span>")
         self.but_quant.setIcon(QIcon(':/quantize.svg'))
         # self.but_quant.setIconSize(q_icon_size)
@@ -335,7 +335,7 @@ class Input_Coeffs_UI(QWidget):
         self.but_file_clipboard.clicked.connect(self._set_load_save_icons)
 
     # --------------------------------------------------------------------------
-    def _open_csv_win(self):
+    def _open_csv_win(self) -> None:
         """
         Pop-up window for CSV options
         """
@@ -356,13 +356,13 @@ class Input_Coeffs_UI(QWidget):
             # 'ui_global_changed': 'csv' is emitted by closing pop-up box
 
     # ------------------------------------------------------------------------------
-    def _close_csv_win(self):
+    def _close_csv_win(self) -> None:
         dirs.csv_options_handle = None
         self.but_csv_options.setChecked(False)
         qstyle_widget(self.but_csv_options, "normal")
 
     # ------------------------------------------------------------------------------
-    def _set_load_save_icons(self):
+    def _set_load_save_icons(self) -> None:
         """
         Set icon for importing / exporting data to / from file or clipboard
         """
