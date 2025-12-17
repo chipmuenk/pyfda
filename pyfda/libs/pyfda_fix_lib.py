@@ -405,6 +405,7 @@ class Fixed(object):
 
       - 'qint'   : fixpoint integer format
       - 'qfrac'  : fractional fixpoint format
+      - 'float32': 32 bit floating point format
 
     Attributes
     ----------
@@ -547,9 +548,11 @@ class Fixed(object):
             # LSB = 1, MSB = 2 ** (W - 1)
             self.LSB = 1
             self.MSB = 2 ** (self.q_dict['WI'] + self.q_dict['WF']- 1)
-        else:
+        elif fb_get('qfrmt') == 'qfrac':
             self.LSB = 2. ** -self.q_dict['WF']
             self.MSB = 2. ** (self.q_dict['WI'] - 1)
+        else:
+            logger.error('Non-fixpoint format "%s"!', fb_get('qfrmt'))
 
         self.MAX =  2. * self.MSB - self.LSB
         self.MIN = -2. * self.MSB
@@ -938,8 +941,10 @@ class Fixed(object):
         # Convert input signal to fractional format if needed for aligning at fractional point
         if fb_get('qfrmt') == 'qint':
             x_i_frac = x_i / (1 << WI_F)
-        else:
+        elif fb_get('qfrmt') == 'qfrac':
             x_i_frac = x_i
+        else:
+            logger.error("Non-fixpoint format '%s'!", fb_get('qfrmt'))
 
         # Quantize and saturate / overflow based on fractional output format and return
         # either fractional or integer format, depending on `fb.fil[0]['qfrmt']`.
