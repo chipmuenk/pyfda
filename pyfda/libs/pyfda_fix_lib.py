@@ -664,17 +664,18 @@ class Fixed(object):
         # ======================================================================
         if fb_get('qfrmt') == 'float64':
             logger.warning(
-                "fixp() should only be called for quantizing - returning unchanged 'float64'!")
+                "'fixp()' should only be called for quantizing - returning unchanged 'float64'!")
             return y
         if fb_get('qfrmt') == 'float32':
             logger.warning(
-                "fixp() called for 'float32'!")
+                "Converting to 'float32' but 'fixp()' should only be called for "
+                "fixpoint quantization!")
             return y.astype(np.float32)
 
         if not in_frmt in {'qfrac', 'qint'}:
-            logger.error(f"Unknown input format {in_frmt}")
+            logger.error("Unknown input format %s", in_frmt)
         if not out_frmt in {'qfrac', 'qint'}:
-            logger.error(f"Unknown output format {out_frmt}")
+            logger.error("Unknown output format %s", out_frmt)
 
         # logger.warning(f"in_frmt = '{in_frmt}', out_frmt = '{out_frmt}'")
         # logger.error(f"fixp in: y = {pprint_log(y, N=4)}")
@@ -710,8 +711,8 @@ class Fixed(object):
                         self.N += y.size
                         return yq
             else:
-                logger.error(f"Argument '{y}' is of type '{y.dtype}',\n"
-                             "cannot convert to float or complex.")
+                logger.error("Argument '%s' is of type '%s',\n"
+                             "cannot convert to float or complex.", y, y.dtype)
                 y = np.zeros(y.shape)
         else:
             # Input is a scalar
@@ -731,7 +732,7 @@ class Fixed(object):
                     try:
                         y = complex(y)
                     except (TypeError, ValueError):
-                        logger.error(f"'{y}' cannot be converted to a number.")
+                        logger.error("'%s' cannot be converted to a number.", y)
                         y = 0.0
             over_pos = over_neg = yq = 0
             self.N += 1
@@ -740,9 +741,9 @@ class Fixed(object):
         y = np.real_if_close(y)
         # quantize complex values separately and recursively
         if np.iscomplexobj(y):
-            yq = self.fixp(y.real, in_frmt=in_frmt, out_frmt=out_frmt) +\
-                 self.fixp(y.imag, in_frmt=in_frmt, out_frmt=out_frmt) * 1j
-            return yq
+            return self.fixp(y.real, in_frmt=in_frmt, out_frmt=out_frmt) +\
+                   self.fixp(y.imag, in_frmt=in_frmt, out_frmt=out_frmt) * 1j
+
 
         # ======================================================================
         # logger.error(f"fixp: in_frmt = '{in_frmt}', out_frmt = '{out_frmt}'")
@@ -978,15 +979,13 @@ class Fixed(object):
         Quantized floating point (`dtype=np.float64`) representation of input string
         of same shape as `y`.
         """
-        logger.warning("fb.fil[0]['qfrmt'] = '%s'", fb_get('qfrmt'))
         if y is None:
             return 0
-        elif np.isscalar(y):
+        if np.isscalar(y):
             if not y:
                 return 0
-            else:
-                if np.all((y == "")):
-                    return np.zeros_like(y)
+            if np.all((y == "")):
+                return np.zeros_like(y)
         if isinstance(y, np.str_):
             # Convert 'np.str_' to "regular" string
             y = str(y)
@@ -994,7 +993,8 @@ class Fixed(object):
         y_float = None
 
         if not get_fx():
-            # this handles floats, np scalars + arrays and strings / string arrays
+            # non-fixpoint format, handling np scalars + arrays and strings / string arrays
+            # with float or complex representations
             try:
                 y_float = np.float64(y)
             except ValueError:
@@ -1003,18 +1003,18 @@ class Fixed(object):
                 except Exception:
                     y_float = 0.0
                     logger.warning(
-                        f'\n\tCannot convert "{y}" of type "{type(y).__name__}" '
-                        f'to float or complex, setting to zero.')
+                        "\n\tCannot convert '%s' of type '%s'"
+                        "to float or complex, setting to zero.", y, type(y).__name__)
             if fb_get('qfrmt') == 'float32':
                 # convert to float32
                 return y_float.astype(np.float32)
             return y_float  # return unchanged float
         # ======================================================================
-        # Convert various fixpoint formats to float
-        elif np.isscalar(y):
+        # Convert various fixpoint formats (scalar or array) to float
+        if np.isscalar(y):
             return self.frmt2float_scalar(y)
-        else:
-            return self.frmt2float_vec(y)
+
+        return self.frmt2float_vec(y)
 
     # --------------------------------------------------------------------------
     def frmt2float_scalar(self, y: str) -> float:
@@ -1044,7 +1044,7 @@ class Fixed(object):
 
         """
         # -----------------------------------------------------
-        def split_complex_str(y: str) -> tuple:
+        def split_complex_str(y: str) -> tuple[str, str]:
             """
             Parameters
             ----------
@@ -1076,18 +1076,18 @@ class Fixed(object):
             if len(y1) == 2:
                 if not 'j' in y1[0] and 'j' in y1[1]:  # re + im
                     return y1[0], y1[1].replace('j','')
-                elif 'j' in y1[0] and not 'j' in y1[1]:  # im + re
+                if 'j' in y1[0] and not 'j' in y1[1]:  # im + re
                     return y1[1], y1[0].replace('j','')
-                else:  # both parts are imaginary, combine them
-                    y_im = self.frmt2float(y1[0].replace('j',''))\
-                        + self.frmt2float(y1[1].replace('j',''))
-                    return "0", self.float2frmt(y_im)
-            elif len(y1) == 1: # purely imaginary, return 0 for re part
+                # both parts are imaginary, combine them
+                y_im = self.frmt2float(y1[0].replace('j',''))\
+                    + self.frmt2float(y1[1].replace('j',''))
+                return "0", self.float2frmt(y_im)
+            if len(y1) == 1: # purely imaginary, return 0 for re part
                 return "0", y1[0].replace('j', '')
-            else:
-                logger.error(
-                    f"String split into {len(y1)} parts - that's too many!")
-                return "0", "0"
+
+            logger.error(
+                "String split into %s parts - that's too many!", len(y1))
+            return "0", "0"
         # -----------------------------------------
         y = str(y)
         frmt = fb_get('fx_base')
