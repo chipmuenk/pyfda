@@ -539,6 +539,10 @@ class Fixed(object):
         self.verify_q_dict_keys(d)  # check whether all keys are valid
         self.q_dict.update(d)  # merge d into self.q_dict
 
+        if not get_fx():  # float format
+            self.places = 4
+            return
+
         # sanitize WI and WF
         self.q_dict['WI'] = int(self.q_dict['WI'])
         self.q_dict['WF'] = abs(int(self.q_dict['WF']))
@@ -562,11 +566,9 @@ class Fixed(object):
         W = self.q_dict['WI'] + self.q_dict['WF'] + 1
         #
         fx_base = fb_get('fx_base')
-        if not get_fx():  # float format
-            self.places = 4
-        elif fx_base == 'dec':
-            self.places = int(
-                np.ceil(np.log10(W) * np.log10(2.))) + 1
+
+        if fx_base == 'dec':
+            self.places = int(np.ceil(np.log10(W) * np.log10(2.))) + 1
         elif fx_base == 'bin':
             self.places = W + 1
         elif fx_base == 'csd':
