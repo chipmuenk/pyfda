@@ -66,8 +66,7 @@ def emit(self, dict_sig: dict | None = None, sig_name: str = '') -> None:
         if dict_sig['ttl'] < 1:
             logger.warning("Terminated with ttl = 0")
             return
-        else:
-            dict_sig.update({'ttl': dict_sig['ttl'] - 1})
+        dict_sig.update({'ttl': dict_sig['ttl'] - 1})
     else:
         dict_sig.update({'ttl': 10})
     if 'sender_name' not in dict_sig and\
@@ -176,15 +175,14 @@ def qcmb_box_populate(cmb_box: QComboBox, items_list: list, item_init: str) -> i
         if len(items_list[i]) == 3:  # add item tool tip (optional)
             cmb_box.setItemData(i-1, cmb_box.tr(items_list[i][2]), Qt.ToolTipRole)
     cmb_box.sizeAdjustPolicy = QComboBox.AdjustToContents
-    ret = qset_cmb_box(cmb_box, item_init, data=True)
 
-    return ret
+    return qset_cmb_box(cmb_box, item_init, data=True)
 
-    """ icon = QIcon('logo.png')
-    # adding icon to the given index
-    self.combo_box.setItemIcon(i, icon)
-    size = QSize(10, 10)
-    self.combo_box.setIconSize(size)  """
+    # icon = QIcon('logo.png')
+    ## adding icon to the given index
+    # self.combo_box.setItemIcon(i, icon)
+    # size = QSize(10, 10)
+    # self.combo_box.setIconSize(size)
 
 # ------------------------------------------------------------------------------
 def qcmb_box_add_items(cmb_box: QComboBox, items_list: list) -> None:
@@ -511,8 +509,7 @@ def popup_warning(self, N: int = 0, filter: str = "", message: str = "") -> bool
 
     if reply == QMessageBox.Yes:
         return True
-    else:
-        return False
+    return False
 
 
 # ----------------------------------------------------------------------------
@@ -564,9 +561,7 @@ def qtext_width(text: str = '', N_x: int = 17, bold: bool = True, font=None) -> 
     document = QtGui.QTextDocument(text)
     document.setDefaultFont(font)
     # width = int(document.idealWidth())
-    width = int(document.size().width())
-
-    return width
+    return int(document.size().width())
 
 
 # ----------------------------------------------------------------------------
