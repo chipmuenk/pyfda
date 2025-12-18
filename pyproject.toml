@@ -7,7 +7,7 @@ name = "pyfda"
 dynamic = ["dependencies", "optional-dependencies", "version"]
 authors = [{name = "Christian Münker", email = "xxx"}]
 keywords=["digital", "discrete time", "filter design", "DSP", "IIR", "FIR", "GUI"]
-   
+
 readme = {file = "README.md", content-type = "text/markdown"}
 requires-python = ">=3.9"
 classifiers = [
@@ -76,19 +76,21 @@ exclude = [
 select = [
     # "B",  # flake8-bugbear: find likely bugs and design problems
     "B006", # mutable-argument-default, equivalent to "W0102" dangerous default value as argument
-    #"E7",  # pycodestyle errors (like missing whitespace)
-    'E721', # Use isinstance() rather than type() for a typecheck. (unidiomatic-typecheck, C0123)
+    "E3",  # blank lines, indentation, etc. (pycodestyle)
+    "E7",  # pycodestyle errors (like missing whitespace or newline at end of file)
     "F",  # pyflakes
     # "G",  # flake8-logging-format
     # "C90",  # max. mccabe complexity of functions
     # "I",    # isort of imports
-    "NPY201", # numpy 2 style guide
-    "UP008",  # use super() instead of super-call-with-parameters
+    "NPY201", # numpy 2 style guide violations
     "W",  # pycodestyle warnings (like trailing whitespace)
-    "RET",    # flake8-return 505Unnecessary "else"/"elif" after "return", remove the leading "el" from "elif" (no-else-return, R1705)
+    "RET",    # flake8-return (unnecessary "else"/"elif" after "return",
+              # remove the leading "el" from "elif" (no-else-return, R1705)
     "RUF012", # mutable-class-default, equivalent to "W0102"
     "G004",  # Use lazy % formatting in logging functions (logging-fstring-interpolation)
+    "UP008",  # use super() instead of super-call-with-parameters
     "UP031",   # Use format specifiers instead of percent
+    "UP032", # Use f-strings instead of str.format()
     ]
 ignore = ["E501", # line too long
           # "W503", # line break before binary operator
