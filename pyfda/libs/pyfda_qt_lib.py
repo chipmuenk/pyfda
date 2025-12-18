@@ -662,7 +662,7 @@ class QHLine(QFrame):
     > mylayout.addWidget(myline)
     """
     def __init__(self, width=1):
-        super(QHLine, self).__init__()
+        super().__init__()
         self.setFrameShape(QFrame.HLine)
         self.setFrameShadow(QFrame.Plain)
         self.setLineWidth(width)
@@ -678,7 +678,7 @@ class QVLine(QFrame):
     """
 
     def __init__(self, width: int = 2):
-        super(QVLine, self).__init__()
+        super().__init__()
         self.setFrameShape(QFrame.VLine)
         self.setFrameShadow(QFrame.Plain)
         # self.setStyleSheet('border-color: rgb(50,50,50)')
@@ -735,13 +735,13 @@ class PushButton(QPushButton):
             doc_x.setDefaultFont(self.font())
             w_x = int(doc_x.size().width())
             self.w = qtext_width(text=text, N_x=N_x, bold=True, font=self.font()) + w_x
-            self.h = super(PushButton, self).sizeHint().height()
+            self.h = super().sizeHint().height()
             self.setText(text.strip())
         else:
             self.setIcon(icon)
             # use sizeHint of parent
-            self.w = super(PushButton, self).sizeHint().width()
-            self.h = super(PushButton, self).sizeHint().height()
+            self.w = super().sizeHint().width()
+            self.h = super().sizeHint().height()
 
         self.setCheckable(checkable)
         self._checkable = checkable
@@ -775,7 +775,7 @@ class PushButton(QPushButton):
                 self.checked = not self.checked
                 self.style_button()
         # Call base class method to continue normal event processing:
-        return super(PushButton, self).eventFilter(source, event)
+        return super().eventFilter(source, event)
 
     def style_button(self) -> None:
         if self.checked:
@@ -878,7 +878,7 @@ class PushButtonRT(QPushButton):
                 self.checked = not self.checked
                 self.style_button()
         # Call base class method to continue normal event processing:
-        return super(PushButtonRT, self).eventFilter(source, event)
+        return super().eventFilter(source, event)
 
     def style_button(self):
         if self.checked:
@@ -911,7 +911,7 @@ class RotatedButton(QPushButton):
     """
 
     def init(self, text, parent, orientation="west"):
-        super(RotatedButton, self).init(text, parent)
+        super().init(text, parent)
         self.orientation = orientation
 
     def paintEvent(self, event):
@@ -921,12 +921,12 @@ class RotatedButton(QPushButton):
         painter.drawControl(QtGui.QStyle.CE_PushButton, self.getSyleOptions())
 
     def minimumSizeHint(self):
-        size = super(RotatedButton, self).minimumSizeHint()
+        size = super().minimumSizeHint()
         size.transpose()
         return size
 
     def sizeHint(self):
-        size = super(RotatedButton, self).sizeHint()
+        size = super().sizeHint()
         size.transpose()
         return size
 
@@ -1001,12 +1001,12 @@ class QLabelVert(QLabel):
         #     return QSize(self.hint.height(), self.hint.width())
         # else:
         #     return QSize(19, 50)
-        size = super(QLabelVert, self).sizeHint()
+        size = super().sizeHint()
         size.transpose()
         return size
 
     def minimumSizeHint(self):
-        size = super(QLabelVert, self).minimumSizeHint()
+        size = super().minimumSizeHint()
         size.transpose()
         return size
 
