@@ -18,8 +18,8 @@ import re
 import numpy as np
 
 try:
-    import deltasigma as ds
-    from deltasigma import simulateDSM, synthesizeNTF
+    import deltasigma as ds  # noqa: F401
+    from deltasigma import simulateDSM, synthesizeNTF  # noqa: F401
     print("DS Backends:", ds.simulation_backends)
     DS = True
 except ImportError:
@@ -95,8 +95,7 @@ def bin2hex(bin_str: str, WI=0) -> str:
             i = i + 4
 
     # hex_str = hex_str.lstrip("0") # remove leading zeros
-    hex_str = "0" if len(hex_str) == 0 else hex_str
-    return hex_str
+    return "0" if len(hex_str) == 0 else hex_str
 
 
 bin2hex_vec = np.vectorize(bin2hex)  # safer than frompyfunction()
@@ -156,9 +155,7 @@ def bin2oct(bin_str: str, WI=0) -> str:
             i = i + 3
 
     # oct_str = oct_str.lstrip("0") # remove leading zeros
-    oct_str = "0" if len(oct_str) == 0 else oct_str
-    return oct_str
-
+    return "0" if len(oct_str) == 0 else oct_str
 
 bin2oct_vec = np.vectorize(bin2oct)  # safer than frompyfunction()
 
@@ -274,14 +271,10 @@ def dec2csd(dec_val, WF=0):
 #    if np.abs(dec_val) < 1.0:
 #        csd_digits.insert(0, '0')
 
-    csd_str = "".join(csd_digits)
-
-    # logger.debug("CSD result = {0}".format(csd_str))
-
 #    if WF > 0:
 #        csd_str = csd_str[:-WF] + "." + csd_str[-WF:]
 
-    return csd_str
+    return "".join(csd_digits)
 
 
 dec2csd_vec = np.frompyfunc(dec2csd, 2, 1)
@@ -522,7 +515,7 @@ class Fixed(object):
         """
         for k in q_dict.keys():
             if k not in self.q_dict_default:
-                logger.error(u'Unknown Key "{0:s}"!'.format(k))
+                logger.error("Unknown Key '%s'!", k)
 
 # ------------------------------------------------------------------------------
     def set_qdict(self, d: dict) -> None:
@@ -578,8 +571,7 @@ class Fixed(object):
         elif fx_base == 'oct':
             self.places = int(np.ceil(W / 3.)) + 1
         else:
-            raise Exception(
-                u'Unknown number format "%s"!', fx_base)
+            raise Exception('Unknown number base "%s"!', fx_base)
 
 # ------------------------------------------------------------------------------
     def fixp(self, y, in_frmt: str = 'qfrac', out_frmt: str = 'qfrac'):
@@ -1171,8 +1163,11 @@ class Fixed(object):
             neg_sign = False
             if fb_get('qfrmt') == 'qint':
                 W = self.q_dict['WI'] + self.q_dict['WF'] + 1
-            else:
+            elif fb_get('qfrmt') == 'qfrac':
                 W = self.q_dict['WI'] + 1
+            else:
+                logger.error("Non-fixpoint format '%s'!", fb_get('qfrmt')   )
+                return 0.0
             try:
                 if raw_str[0] == '-':
                     neg_sign = True
@@ -1234,13 +1229,13 @@ class Fixed(object):
                 y_float = self.fixp(y_dec / 2 ** frc_places, out_frmt='qfrac')
         # ----
         else:
-            logger.error(f'Unknown output format "{frmt}"!')
+            logger.error("Unknown output format '%s'!", frmt)
             return 0.0
 
         if y_float is not None:
             return y_float
-        else:
-            return 0.0
+
+        return 0.0
 
     # --------------------------------------------------------------------------
     def float2frmt(self, y) -> str:
@@ -1298,11 +1293,11 @@ class Fixed(object):
 
             if type(y_int) in {np.ndarray, list, tuple}:
                 return binary_repr_vec(y_int, W).astype('U')
-            elif isinstance(y_int, (int, np.integer)):
+            if isinstance(y_int, (int, np.integer)):
                 return np.binary_repr(y_int, W)
-            else:
-                logger.error(f"Unsupported data type '{type(y_int)}'!")
-                return "0"
+
+            logger.error("Unsupported data type '%s'!", type(y_int).__name__)
+            return "0"
 
         # ======================================================================
         # logger.warning(f"float2frmt: y = {y}")
@@ -1310,32 +1305,29 @@ class Fixed(object):
             logger.error("Not in fixpoint mode, 'float2frmt()' should not be called!")
             return y
 
-        elif not is_numeric(y):
-            logger.error(f"float2frmt() received a non-numeric argument '{y}'!")
+        if not is_numeric(y):
+            logger.error("float2frmt() received a non-numeric argument '%s'!", y)
             return "0"
 
-        elif np.iscomplexobj(y):  # convert complex arguments recursively to format
+        if np.iscomplexobj(y):  # convert complex arguments recursively to format
             y_re = self.float2frmt(np.real(y))
             y_im = self.float2frmt(np.imag(y))
             if fb_get('fx_base') == 'csd':
+                # CSD coefficients differ in length and require an array with dtype 'object'
+                # which does not support arithmetic or string operations.
                 logger.error(
                     "Complex CSD coefficients are not supported yet, casting  to real. "
                     "\n\tPlease create an issue if you need this feature.")
-                # CSD coefficients differ in length and require an array with dtype 'object'
-                # which does not support arithmetic or string operations.
                 return y_re
-            elif is_numeric(y_re) and is_numeric(y_im):  # return in numeric format
+            if is_numeric(y_re) and is_numeric(y_im):  # return in complex numeric format
                 return y_re + y_im * 1j
-            elif not (is_numeric(y_re) or is_numeric(y_im)):  # return string (array)
-                # logger.error(
-                #     f"real part:\n{y_re}\n{type(y_re)} ({y_re.dtype})\n"
-                #     f"imag. part\n{y_im}\n{type(y_im)} ({y_im.dtype}).")
-                y_str = np.char.add(np.char.add(y_re, '+'), np.char.add(y_im,'j'))
-                # logger.warning(f"ystr={y_str}")
-                return y_str
-            else:
-                logger.error(f"Cannot combine real part ({y_re.dtype}) and imag. part ({y_im.dtype}).")
-                return "0"
+            if not (is_numeric(y_re) or is_numeric(y_im)):
+                # return string (array) representation, concatenate real and imag. part
+                return np.char.add(np.char.add(y_re, '+'), np.char.add(y_im, 'j'))
+
+            logger.error(
+                "Cannot combine real part (%s) and imag. part (%s).", y_re.dtype, y_im.dtype)
+            return "0"
 
         # return a quantized & saturated / wrapped fixpoint (type float) for y (int or frac format)
         y_fix = self.fixp(y, out_frmt=fb_get('qfrmt'))
@@ -1354,9 +1346,11 @@ class Fixed(object):
             if fb_get('qfrmt') == 'qint':
                 # integer case, convert with 0 fractional bits
                 y_str = dec2csd_vec(y_fix, 0)
-            else:
+            elif fb_get('qfrmt') == 'qfrac':
                 # fractional case, convert with WF fractional bits
                 y_str = dec2csd_vec(y_fix, self.q_dict['WF'])
+            else:
+                raise Exception("Unknown fixpoint format '%s'!", fb_get('qfrmt'))
 
         elif fb_get('fx_base') in {'bin', 'oct', 'hex'}:
             # represent fixpoint number as integer in the range -2**(W-1) ... 2**(W-1)
@@ -1368,8 +1362,11 @@ class Fixed(object):
             if fb_get('qfrmt') == 'qint':
                 WI = self.q_dict['WI'] + self.q_dict['WF'] + 1
                 # TODO: Is the "+ 1" correct?
-            else:
+            elif fb_get('qfrmt') == 'qfrac':
                 WI = self.q_dict['WI']
+            else:
+                raise Exception("Unknown fixpoint format '%s'!", fb_get('qfrmt'))
+
             if fb_get('fx_base') == 'hex':
                 y_str = bin2hex_vec(y_bin_str, WI)
             elif fb_get('fx_base') == 'oct':
@@ -1378,10 +1375,12 @@ class Fixed(object):
                 # insert radix point if required
                 if fb_get('qfrmt') == 'qint':
                     y_str = y_bin_str
-                else:
+                elif fb_get('qfrmt') == 'qfrac':
                     y_str = insert_binary_point(y_bin_str, WI)
+                else:
+                    raise Exception("Unknown fixpoint format '%s'!", fb_get('qfrmt'))
         else:
-            raise Exception(f"""Unknown number format "{fb.fil[0]['fx_base']}"!""")
+            raise Exception("Unknown number format '%s'!", fb_get('fx_base'))
 
         if isinstance(y_str, np.ndarray) and np.ndim(y_str) < 1:
             y_str = y_str.item()  # convert singleton array to scalar
