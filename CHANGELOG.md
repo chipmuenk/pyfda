@@ -4,9 +4,11 @@
 
 ### New features
 
-- Float coefficients can be displayed and quanized as 32 bit (single precision) float format
+- Float coefficients can be displayed / quantized / exported as 32 bit (single precision)
+  float format
 - Font sizes for UI and matplotlib can now be set in the config file
 - Highlight poles outside the unit circle in the P/Z input widget
+- numpy 2 is now supported
 
 ### Bugfixes
 
@@ -30,6 +32,8 @@
 ### Maintenance
 
 - Fix 1000s of pylint warnings to improve code quality
+- Added type hinting
+- Use pyproject.toml for packaging
 
 ## [v0.9.5](https://github.com/chipmuenk/pyfda/tree/v0.9.5) (2024-12-22)
 
@@ -49,7 +53,7 @@
 ### Bugfixes
 
 - Modify recipe `pyfdax.spec` for pyinstaller to always use operating system specific seperator `os.sep`. This failed sometimes for windows.
-- Improve qss definitions for combo boxes and push buttons, this should improve things especially for MacOS 
+- Improve qss definitions for combo boxes and push buttons, this should improve things especially for MacOS
 
 ## [v0.9.4](https://github.com/chipmuenk/pyfda/tree/v0.9.4) (2024-12-09)
 
