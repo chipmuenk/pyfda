@@ -227,6 +227,10 @@ class FilterFactory():
             try:
                 #------------------------------------------------------------------
                 self.err_code = getattr(fil_inst, method)()
+                if not isinstance(self.err_code, int):
+                    logger.error("self.err_code = '%s' is of type '%s' but should be 'int'!",
+                                 str(self.err_code), type(self.err_code).__name__)
+                    self.err_code = 0 # assume everything ok if no int returned
                 #------------------------------------------------------------------
             except Exception as e:
                 err_string =\
