@@ -616,7 +616,7 @@ def fb_get(*keys_tuple, fil_dict=fil[0], verbose=True) -> str:
     return ret
 
 # -------------------------
-def fb_set(*keys_tuple, backup: bool = True, fil_dict=fil[0]) -> None:
+def fb_set(*keys_tuple, backup: bool = True, update: bool = False, fil_dict: dict = fil[0]) -> None:
     """
     Use the items of `keys_tuple` to access a nested dict `fil_dict`
     (default: `fil[0]`) and write the last item in `keys_tuple` to the dict.
@@ -631,6 +631,8 @@ def fb_set(*keys_tuple, backup: bool = True, fil_dict=fil[0]) -> None:
         to be set.
     backup : bool
         Whether the previous state of the filter dict should be backed up
+    update : bool
+        Whether the dictionary should be updated with the new value or set
     fil_dict : dict
         The dictionary to traverse.
 
@@ -672,8 +674,11 @@ def fb_set(*keys_tuple, backup: bool = True, fil_dict=fil[0]) -> None:
                 fil[0]['qfrmt_float_last'] = fil_dict['qfrmt']
             # and set new format
             fil_dict['qfrmt'] = val
+        elif not update:
+            d[keys_tuple[-2]] = val  # set new value
         else:
-            d[keys_tuple[-2]] = val  # store new value if valid
+            d[keys_tuple[-2]].update(val)  # update dict with new value
+
     except KeyError:
         # create a meaningful error message with a string of the failed dict
         dict_str = 'fb.fil[0]'
