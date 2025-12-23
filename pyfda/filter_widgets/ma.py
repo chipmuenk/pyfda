@@ -355,37 +355,38 @@ near ``f_S/2`` (highpass).
         self.zpk = np.array([z,p,gain])
         self.b = b
         self._save()
+        return 0
 
 
     def LPman(self):
         self._get_params()
-        self.calc_ma('LP')
+        return self.calc_ma('LP')
 
     def LPmin(self):
         self._get_params()
         self.delays = int(np.ceil(1 / (self.A_SB **(1/self.stages) *
                                                      np.sin(self.F_SB * np.pi))))
-        self.calc_ma('LP')
+        return self.calc_ma('LP')
 
     def HPman(self):
         self._get_params()
-        self.calc_ma('HP')
+        return self.calc_ma('HP')
 
     def HPmin(self):
         self._get_params()
         self.delays = int(np.ceil(1 / (self.A_SB **(1/self.stages) *
                                               np.sin((0.5 - self.F_SB) * np.pi))))
-        self.calc_ma('HP')
+        return self.calc_ma('HP')
 
     def BSman(self):
         self._get_params()
         self.delays = ceil_odd(self.delays)  # enforce odd order
-        self.calc_ma('BS')
+        return self.calc_ma('BS')
 
     def BPman(self):
         self._get_params()
         self.delays = ceil_odd(self.delays)  # enforce odd order
-        self.calc_ma('BP')
+        return  self.calc_ma('BP')
 
 #------------------------------------------------------------------------------
 
