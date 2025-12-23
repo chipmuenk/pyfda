@@ -17,6 +17,7 @@ from pyfda.libs.compat import (
     Qt, QPushButton, QDialog, QVBoxLayout, QHBoxLayout, QIcon, QPixmap,
     QSizePolicy, QTextBrowser, QGridLayout, QLabel)
 
+from pyfda import qrc_resources  # noqa: F401  # load the icons resource file
 from pyfda.libs.pyfda_qt_lib import qwindow_stay_on_top
 from pyfda.libs.pyfda_lib import mod_version, CRLF
 import pyfda.libs.pyfda_dirs as dirs

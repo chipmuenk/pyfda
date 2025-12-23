@@ -11,6 +11,7 @@ Create the UI for the FilterCoeffs class
 """
 import logging
 
+from pyfda import qrc_resources  # noqa: F401  # load the icons resource file
 import pyfda.filterbroker as fb
 from pyfda.libs.compat import (
     pyqtSignal, Qt, QWidget, QLabel, QLineEdit, QComboBox, QPushButton, QFrame,
