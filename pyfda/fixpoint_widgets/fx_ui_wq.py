@@ -42,7 +42,7 @@ class FX_UI_WQ(QWidget):
     q_dict: dict
         A dictionary containing the quantization settings that can be modified via
         the UI of this widget. This is usually a global quantization dict like
-        `fb.fil[0]['fxq']['QCB']`, it can also be a local dict.
+        `<filter dict>['fxq']['QCB']`, it can also be a local dict.
 
         Attention: The dict is passed by reference, its values are modified via the UI.
         The quantizer dict `self.Q.q_dict` contains a copy of these keys / values.
@@ -104,7 +104,7 @@ class FX_UI_WQ(QWidget):
 
     ```
         self.wdg_wq_accu = FX_UI_WQ(
-            fb.fil[0]['fxq']['QACC'], objectName='wdg_wq_accu_inst',
+            fb_get('fxq', 'QACC'), objectName='wdg_wq_accu_inst',
             label='<b>Accu Quantizer <i>Q<sub>A&nbsp;</sub></i>:</b>')
     ```
     """

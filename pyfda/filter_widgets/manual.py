@@ -232,12 +232,12 @@ class Manual_IIR():
 
 if __name__ == '__main__':
     # Run module standalone using "python -m pyfda.filter_widgets.manual"
-    import pyfda.filterbroker as fb # importing filterbroker initializes all its globals
+    from pyfda.filterbroker import fb_get
 
     filt = Manual_IIR()    # instantiate filter
-    filt.LPman(fb.fil[0])  # design a low-pass with parameters from global dict
-    print(fb.fil[0][FRMT]) # return results in default format
+    filt.LPman()  # design a low-pass with parameters from global dict
+    print(fb_get(FRMT)) # return results in default format
 
     filt = Manual_FIR()    # instantiate filter
-    filt.LPman(fb.fil[0])  # design a low-pass with parameters from global dict
-    print(fb.fil[0][FRMT]) # return results in default format
+    filt.LPman()  # design a low-pass with parameters from global dict
+    print(fb_get(FRMT)) # return results in default format
