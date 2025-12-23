@@ -307,10 +307,16 @@ if 'i' in ARGV:
 
 # print help infos and quit
 if 'h' in ARGV:
-    print("Start pyfdax with the following options:\n")
+    print("\nStart pyfdax with the following options:\n")
     print("\tpyfdax -h : Show this help message")
     print("\tpyfdax -i : Print information on user directories")
     print("\tpyfdax -r : Replace the config files")
+    print("\tpyfdax -v : Print version information")
+    sys.exit()
+
+# print version information and quit
+if 'v' in ARGV:
+    print(f"\npyfda version: {VERSION}")
     sys.exit()
 
 # force replacement of config files when 'r' is specified
