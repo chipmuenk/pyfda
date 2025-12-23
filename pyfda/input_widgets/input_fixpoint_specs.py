@@ -700,7 +700,9 @@ class Input_Fixpoint_Specs(QWidget):
             fb_set('fx_mod_class_name', fx_mod_class_name[0])
             # Check which methods the fixpoint widget provides and enable
             # corresponding buttons:
-            self.but_export_code.setVisible(hasattr(self.fx_filt_ui.fx_filt, "to_verilog"))
+            self.but_export_code.setVisible(
+                hasattr(self.fx_filt_ui, "fx_filt") and
+                hasattr(self.fx_filt_ui.fx_filt, "to_verilog"))
 
         else:  # no fixpoint widget found
             fb_set('fx_mod_class_name', "")
