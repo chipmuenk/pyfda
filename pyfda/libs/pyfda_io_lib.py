@@ -9,16 +9,18 @@
 """
 Library with classes and functions for file and text IO
 """
-import os, re, io
-import logging
-import csv
-import wave
-import datetime
-import warnings
-from typing import TextIO
 
-import pickle
+import csv
+import datetime
+import io
 import json
+import logging
+import os
+import pickle
+import re
+from typing import TextIO
+import warnings
+import wave
 
 import numpy as np
 from scipy.io import loadmat, savemat, wavfile
