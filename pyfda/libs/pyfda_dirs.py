@@ -12,13 +12,14 @@ Upon import, all the variables are set.
 This is imported first by pyfdax, logger cannot be used yet. Hence, messages
 are printed to the console.
 """
-import os
-import sys
-from subprocess import check_output, CalledProcessError, STDOUT
-import shutil
-import platform
-import tempfile
 import datetime
+import importlib.metadata
+import os
+import platform
+import shutil
+from subprocess import CalledProcessError, STDOUT, check_output
+import sys
+import tempfile
 
 # ANSI color codes
 CSEL = '\033[96;1m'  # highlight select key (CYAN bold and bright)
@@ -252,6 +253,8 @@ PYINSTALLER = getattr(sys, 'frozen', False) and hasattr(sys, '_MEIPASS')
 
 OS     = platform.system()  # Windows / Linux / Darwin
 OS_VER = platform.release()
+
+VERSION = importlib.metadata.version("pyfda")
 
 CONF_FILE = 'pyfda.conf'            #: name for general configuration file
 LOG_CONF_FILE = 'pyfda_log.conf'    #: name for logging configuration file

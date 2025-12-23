@@ -18,7 +18,6 @@ from pyfda.libs.compat import (
     QSizePolicy, QTextBrowser, QGridLayout, QLabel)
 
 from pyfda.libs.pyfda_qt_lib import qwindow_stay_on_top
-import pyfda.version as version
 from pyfda.libs.pyfda_lib import mod_version, CRLF
 import pyfda.libs.pyfda_dirs as dirs
 import pyfda.filterbroker as fb
@@ -160,7 +159,7 @@ class AboutWindow(QDialog):
 
         self.info_str = self.style_html_links(
             "<b><a href=https://www.github.com/chipmuenk/pyfda>pyfda</a> "
-            f"Version {version.__version__} (c) 2013 - 2025 Christian Münker</b><br />"
+            f"Version {dirs.VERSION} (c) 2013 - 2026 Christian Münker</b><br />"
             "Design, analyze and synthesize digital filters. Docs @ "
             "<a href=https://pyfda.rtfd.org>pyfda.rtfd.org</a>"
             " (<a href=https://media.readthedocs.org/pdf/pyfda/latest/pyfda.pdf>pdf</a>)"

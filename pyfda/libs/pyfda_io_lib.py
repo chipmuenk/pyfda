@@ -41,12 +41,11 @@ from pyfda.pyfda_rc import params
 import pyfda.libs.pyfda_dirs as dirs
 import pyfda.filterbroker as fb  # importing filterbroker initializes all its globals
 from pyfda.filterbroker import get_fx, fb_get
-from pyfda.version import __version__
 
 from .compat import QFileDialog
 
 logger = logging.getLogger(__name__)
-
+__version__ = dirs.VERSION
 
 # ##############################################################################
 # Include this version number as `'_id': ('pyfda', FILTER_FILE_VERSION)` when saving
