@@ -240,11 +240,10 @@ near ``f_S/2`` (highpass).
         Store parameter settings in filter dictionary. Called from _update_UI()
         and _save()
         """
-        fb.fil[0]['filter_widgets'].update({'ma':
-                                        {'delays':self.delays,
-                                         'stages':self.stages,
-                                         'normalize':self.chk_norm.isChecked()}
-                                    })
+        fb_set('filter_widgets', 'ma', {'delays': self.delays,
+                                        'stages': self.stages,
+                                        'normalize': self.chk_norm.isChecked()},
+               update=True)
         # sig_tx -> select_filter -> filter_specs
         self.emit({'filt_changed': 'ma'})
 
