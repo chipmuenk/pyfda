@@ -6,7 +6,7 @@
 # Licensed under the terms of the MIT License
 # (see file LICENSE in root directory for details)
 
-# TODO: wdg_fil, current, copy only par vals to all_filter_dict <-> fb.fil[0]
+# TODO: wdg_fil, current, copy only par vals to all_filter_dict <-> filter dict
 
 """
 Design windowed FIR filters (LP, HP, BP, BS) with fixed order, return
@@ -40,7 +40,6 @@ import scipy.signal as sig
 from scipy.signal import signaltools
 from scipy.special import sinc
 
-import pyfda.filterbroker as fb
 from pyfda.filterbroker import fb_get, fb_set
 import pyfda.libs.pyfda_dirs as dirs
 from pyfda.libs.compat import (QWidget, pyqtSignal, QComboBox, QIcon, QSize,
@@ -170,7 +169,7 @@ class Firwin(QWidget):
         """
         Create additional subwidget(s) needed for filter design:
         These subwidgets are instantiated dynamically when needed in
-        select_filter.py using the handle to the filter object, fb.filObj .
+        select_filter.py using the handle to the filter object.
         """
         # Combobox for selecting the algorithm to estimate minimum filter order
         self.cmb_firwin_alg = QComboBox(self)
@@ -257,21 +256,22 @@ class Firwin(QWidget):
         and set UI elements accordingly. dict2filter_params() is called upon
         initialization and when the filter is loaded from disk.
 
-        Structure of fb.fil[0]['filter_widgets']['firwin']:
+        Structure of filter_dict['filter_widgets']['firwin']:
 
         'firwin':
             {'id': 'hann', # Window id
              'disp_name': 'Hann', # display name
              'par_val': [],    # list of window parameters
+             'win_len': 32  # window length for window viewer
             }
             """
         self.N = fb_get('N')
 
         try:
-            # Get window id from filter dict fb.fil[0]
+            # Get window id from filter dict
             cur_win_id = fb_get('filter_widgets', 'firwin', 'id')
 
-            # Copy all dynamic parameters from fb.fil[0] to cur_win_dict
+            # Copy all dynamic parameters from filter dict to cur_win_dict
             for p in range(len(fb_get('filter_widgets', 'firwin', 'par_val'))):
                 self.all_wins_dict[cur_win_id]['par_val'][p] =\
                     fb_get('filter_widgets', 'firwin', 'par_val', p)
@@ -293,16 +293,14 @@ class Firwin(QWidget):
     def filter_params2dict(self) -> None:
         """
         Store window and parameter settings from current window of `self.all_wins_dict`
-        to filter dictionary fb.fil[0]['filter_widgets']['firwin'].
+        to filter dictionary fil[0]['filter_widgets']['firwin'].
         """
-        cur_win_id = fb.fil[0]['filter_widgets']['firwin']['id']
-        # logger.warning(f"filter_params2dict: cur_win_id: {cur_win_id}\n"
-        #                f" [cur_win_id]['id']: {self.all_wins_dict[cur_win_id]['id']}")
-        fb.fil[0]['filter_widgets']['firwin'].update(
-            {'par_val': self.all_wins_dict[cur_win_id]['par_val'],
-             'disp_name': self.all_wins_dict[cur_win_id]['disp_name']
-             }
-            )
+        cur_win_id = fb_get('filter_widgets', 'firwin', 'id')
+
+        fb_set('filter_widgets', 'firwin', 'par_val',
+               self.all_wins_dict[cur_win_id]['par_val'])
+        fb_set('filter_widgets', 'firwin', 'disp_name',
+               self.all_wins_dict[cur_win_id]['disp_name'])
 
     # --------------------------------------------------------------------------
     def _get_params(self) -> None:
@@ -507,7 +505,8 @@ class Firwin(QWidget):
 
         delta_f = abs(F[1] - F[0]) * 2  # referred to f_Ny
         # delta_A = np.sqrt(A[0] * A[1])
-        if fb.fil[0]['filter_widgets']['firwin']['id'] == "kaiser":
+
+        if fb_get('filter_widgets', 'firwin', 'id') == "kaiser":
             N, beta = sig.kaiserord(20 * np.log10(np.abs(fb_get('A_SB'))), delta_f)
             self.all_wins_dict["kaiser"]["par"][0]["val"] = beta
             self.qfft_win_select.led_win_par_0.setText(str(beta))

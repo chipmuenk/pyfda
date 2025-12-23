@@ -309,8 +309,8 @@ class Equiripple(QWidget):
         - Other keys required by `_get_params`.
 
         Returns:
-            int: Returns -1 if the filter order (`self.N`) is too high or another
-            error occurs, otherwise the designed filter coefficients are saved in `fb.fil[0]`.
+            int: Returns -1 if the filter order (`self.N`) is too high or another error occurs,
+                otherwise the designed filter coefficients are saved in the filter dict.
 
         Notes:
             - The method `_get_params` is used to extract parameters from the filter dictionary.

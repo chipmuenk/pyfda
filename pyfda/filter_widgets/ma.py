@@ -36,7 +36,6 @@ import numpy as np
 
 from pyfda.libs.compat import (QWidget, QLabel, QLineEdit, pyqtSignal, QCheckBox,
                       QVBoxLayout, QHBoxLayout)
-import pyfda.filterbroker as fb
 from pyfda.filterbroker import fb_get, fb_set
 from pyfda.libs.pyfda_lib import ceil_odd, safe_eval
 from pyfda.libs.pyfda_qt_lib import popup_warning, emit
@@ -151,7 +150,7 @@ near ``f_S/2`` (highpass).
         """
         Create additional subwidget(s) needed for filter design:
         These subwidgets are instantiated dynamically when needed in
-        select_filter.py using the handle to the filter instance, fb.fil_inst.
+        select_filter.py using the handle to the filter instance, `filterbroker.fil_inst`.
         """
 
         self.lbl_delays = QLabel("<b><i>M =</ i></ b>", self)
@@ -211,7 +210,7 @@ near ``f_S/2`` (highpass).
         corresponding UI elements. load_dict() is called upon initialization
         and when the filter is loaded from disk.
         """
-        if 'filter_widgets' in fb.fil[0] and 'ma' in fb_get('filter_widgets'):
+        if 'ma' in fb_get('filter_widgets'):
             wdg_fil_par = fb_get('filter_widgets', 'ma')
             if 'delays' in wdg_fil_par:
                 self.delays = wdg_fil_par['delays']
