@@ -339,17 +339,17 @@ fil_ref = {
     'freq_specs_sort': True,  # sort freq. specs in ascending order
     'freq_specs_unit': 'f_S',
     'ft': 'IIR',  # filter type
-    'fx_base': 'dec', # number format for fx display {'dec', 'hex', 'bin', 'oct', 'csd'}
+    'fx_base': 'dec', # global number format for fx display {'dec', 'hex', 'bin', 'oct', 'csd'}
     # string with current fixpoint module and class
     'fx_mod_class_name': 'pyfda.fixpoint_widgets.iir_df1.iir_df1_pyfixp_ui',
     # Settings for quantization subwidgets:
     #   'QI':input, 'QO': output, 'QCA': coeffs a, 'QCB': coeffs b, 'QACC': accumulator
     #    (more subwidgets can be added by fixpoint widget if needed)
     #  Keys:
+    #   'N_over': number of overflows during last quantization process
     #   'WI': integer bits, 'WF': fractional bits,
     #   'w_a_m': word length automatic / manual calculation (not needed for 'QI', 'QO')
     #   'ovfl': overflow behaviour, 'quant': quantizer behaviour
-    #   'N_over': number of overflows during last quantization process
     'fxq':{
         # accumulator quantization
         'QACC': {

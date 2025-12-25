@@ -108,7 +108,7 @@ class FreqUnits(QWidget):
         if 'id' in dict_sig and dict_sig['id'] == id(self):
             logger.debug("Stopped infinite loop")
             return
-        elif ('view_changed' in dict_sig and dict_sig['view_changed'] == 'f_S')\
+        if ('view_changed' in dict_sig and dict_sig['view_changed'] == 'f_S')\
             or 'data_changed' in dict_sig:
             self.update_UI(emit=False)
 
@@ -403,7 +403,7 @@ class FreqUnits(QWidget):
                 source.setText(params['FMT'].format(fb.fil[0]['f_S']))  # reduced prec.
 
             # Call base class method to continue normal event processing:
-        return super(FreqUnits, self).eventFilter(source, event)
+        return super().eventFilter(source, event)
 
     # -------------------------------------------------------------
     def _freq_range(self, emit: bool = True) -> None:

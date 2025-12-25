@@ -520,7 +520,7 @@ class Fixed(object):
     # ------------------------------------------------------------------------------
     def set_qdict(self, d: dict) -> None:
         """
-        Update the instance quantization dict `self.q_dict` from passed dict `d`:
+        Update the instance fx quantization dict `self.q_dict` from passed dict `d`:
 
         * Sanitize `WI` and `WF`
         * Calculate attributes `MSB`, `LSB`, `MIN` and `MAX`
@@ -1391,7 +1391,7 @@ class Fixed(object):
 ########################################
 
 # --------------------------------------------------------------------------
-def quant_coeffs(coeffs: np.iterable, Q, recursive: bool = False, out_frmt: str = ""
+def quant_coeffs(coeffs: np.iterable, Q: object, recursive: bool = False, out_frmt: str = ""
                  ) -> np.ndarray:
     """
     Quantize the coefficients, scale and convert them to a list of integers,
@@ -1404,7 +1404,7 @@ def quant_coeffs(coeffs: np.iterable, Q, recursive: bool = False, out_frmt: str 
         An iterable of coefficients to be quantized
 
     Q: object
-        Instance of Fixed object containing quantization dict `q_dict`
+        Instance of Fixed() class containing quantization dict `q_dict`
 
     recursive: bool
         When `False` (default), process all coefficients. When `True`,
