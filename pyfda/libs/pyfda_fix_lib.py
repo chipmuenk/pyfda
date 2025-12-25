@@ -466,11 +466,9 @@ class Fixed(object):
         """
         Construct `Fixed` object with dict `q_dict`
         """
-        # define valid keys and default values for quantization dict
-        self.q_dict_default = {
-            'WI': 0, 'WF': 15, 'w_a_m': 'm', 'quant': 'round', 'ovfl': 'sat',
-        # these keys are calculated and should normally be regarded as read-only
-            'N_over': 0}
+        # read valid keys and default values for quantization dict from filterbroker
+        # e.g. {'WI': 0, 'WF': 15, 'w_a_m': 'm', 'quant': 'round', 'ovfl': 'sat', 'N_over': 0}
+        self.q_dict_default = fb_get('fxq', 'QACC')
         # these attributes are calculated and should be regarded as read-only
         self.LSB = 2. ** -self.q_dict_default['WF']
         self.MSB = 2. ** (self.q_dict_default['WI'] - 1)
