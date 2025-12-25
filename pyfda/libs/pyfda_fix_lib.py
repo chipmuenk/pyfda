@@ -1466,19 +1466,17 @@ if __name__ == '__main__':
 
     fb_set('qfrmt', 'qfrac')  # set fixpoint format
 
-    q_dict = {'WI': 0, 'WF': 3, 'ovfl': 'sat', 'quant': 'round'}
+    q_dict = {'WI': 0, 'WF': 3, 'ovfl': 'wrap', 'quant': 'round'}
     myQ = Fixed(q_dict)  # instantiate fixpoint object with settings above
-    y_list = [-1.1, -1.0, -0.5, 0, 0.5, 0.99, 1.0]
-
-    myQ.set_qdict(q_dict)
 
     print("\nTesting float2frmt()\n====================")
+    y_list = [-1.1, -1.0, -0.5, 0, 0.5, 0.99, 1.0]
     for y in y_list:
         print(f"y = {y}\t->\ty_fix = {myQ.float2frmt(y)}")
     print("myQ.q_dict = ", myQ.q_dict)
 
     print("\nTesting frmt2float()\n====================")
-    q_dict = {'WI': 3, 'WF': 3, 'ovfl': 'sat', 'quant': 'round'}
+    q_dict = {'WI': 3}  # extend range
     myQ.set_qdict(q_dict)
     dec_list = [-9, -8, -7, -4.0, -3.578, 0, 0.5, 4, 7, 8]
     for dec in dec_list:
