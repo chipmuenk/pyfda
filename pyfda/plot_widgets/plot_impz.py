@@ -1383,13 +1383,12 @@ class Plot_Impz(QWidget):
         if self.spgr:
             if 2 * self.ui.time_nfft_spgr - self.ui.time_ovlp_spgr > self.ui.N:
                 logger.warning(
-                    "Only one segment is calculated since 2 NFFT - N_OVLP = {0} > N = {1}"
-                    .format(2 * self.ui.time_nfft_spgr - self.ui.time_ovlp_spgr,
-                            self.ui.N))
+                    "Only one segment is calculated since 2 NFFT - N_OVLP = %d > N = %d",
+                    2 * self.ui.time_nfft_spgr - self.ui.time_ovlp_spgr, self.ui.N)
             if self.ui.time_nfft_spgr > self.ui.N:
                 logger.warning(
-                    "NFFT per segment = {0} is larger than number N of data points {1}, "
-                    "setting NFFT = N.".format(self.ui.time_nfft_spgr, self.ui.N))
+                    "NFFT per segment = %d is larger than number N of data points %d, "
+                    "setting NFFT = N.", self.ui.time_nfft_spgr, self.ui.N)
                 self.ui.time_nfft_spgr = self.ui.N
             if self.ui.time_ovlp_spgr >= self.ui.time_nfft_spgr:
                 logger.warning("N_OVLP must be less than NFFT, setting N_OVLP = 0.")
@@ -1443,7 +1442,7 @@ class Plot_Impz(QWidget):
                     scaling = "density"
                 else:
                     # display result in W / bin
-                    spgr_unit = r" in {0}W".format(dB_unit)
+                    spgr_unit = f" in {dB_unit}W"
                     scaling = "spectrum"
 
             elif mode in {"magnitude", "complex"}:
@@ -1935,8 +1934,7 @@ class Plot_Impz(QWidget):
                                    bottom=self.ui.bottom_f, plt_fmt=self.fmt_plot_stim,
                                    mkr_fmt=fmt_mkr_stim))
                 if show_info:
-                    l_r.extend([lbl_empty, label_re, "$P_X$ = {0:.3g} {1}"
-                                .format(Px, unit_P)])
+                    l_r.extend([lbl_empty, label_re, f"$P_X$ = {Px:.3g} {unit_P}"])
                     h_r.extend([patch_trans, patch_trans])
                 else:
                     l_r.append(label_re)
@@ -1964,8 +1962,7 @@ class Plot_Impz(QWidget):
                     bottom=self.ui.bottom_f, plt_fmt=self.fmt_plot_stmq,
                     mkr_fmt=fmt_mkr_stmq))
                 if show_info:
-                    l_r.extend([lbl_empty, label_re, "$P_{{Q}}$ = {0:.3g} {1}"
-                                .format(Pxq, unit_P)])
+                    l_r.extend([lbl_empty, label_re, f"$P_{{Q}}$ = {Pxq:.3g} {unit_P}"])
                     h_r.extend([patch_trans, patch_trans])
                 else:
                     l_r.append(label_re)
@@ -1993,8 +1990,7 @@ class Plot_Impz(QWidget):
                     bottom=self.ui.bottom_f, plt_fmt=self.fmt_plot_resp,
                     mkr_fmt=fmt_mkr_resp))
                 if show_info:
-                    l_r.extend([lbl_empty, label_re, "$P_Y$ = {0:.3g} {1}"
-                                .format(Py, unit_P)])
+                    l_r.extend([lbl_empty, label_re, f"$P_Y$ = {Py:.3g} {unit_P}"])
                     h_r.extend([patch_trans, patch_trans])
                 else:
                     l_r.append(label_re)
