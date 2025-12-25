@@ -1227,16 +1227,16 @@ class Plot_Impz(QWidget):
 
         # Create finer grid for plotting interpolated waveforms
         if self.ui.chk_plt_time_stim_interp.isChecked():
-            I = 20
-            # self.t_interp = np.linspace(self.t[0], self.t[-1], (len(self.t) - 1) * I + 1)
+            I_x = 20
+            # self.t_interp = np.linspace(self.t[0], self.t[-1], (len(self.t) - 1) * I_x + 1)
             # self.x_interp = np.interp(self.t_interp, self.t, self.x, left=None, right=None,
             #                      period=None)
             self.x_interp = sig.resample_poly(
-                self.x, I, 1, axis=0, window=('kaiser', 5.0),
-                padtype='line', cval=None)[N_start * I: N_end * I]
+                self.x, I_x, 1, axis=0, window=('kaiser', 5.0),
+                padtype='line', cval=None)[N_start * I_x: N_end * I_x]
             self.t_interp = np.linspace(
-                self.n[0], self.n[-1] + 1, len(self.n) * I,
-                endpoint=False)[N_start * I: N_end * I] * fb.fil[0]['T_S']
+                self.n[0], self.n[-1] + 1, len(self.n) * I_x,
+                endpoint=False)[N_start * I_x: N_end * I_x] * fb.fil[0]['T_S']
 
 
         t = self.t[N_start:N_end]
