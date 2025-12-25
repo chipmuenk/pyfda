@@ -518,6 +518,13 @@ class Fixed(object):
                 logger.error("Unknown Key '%s'!", k)
 
     # ------------------------------------------------------------------------------
+    def get_qdict(self) -> dict:
+        """
+        Return a copy of the instance quantization dict `self.q_dict`.
+        """
+        return self.q_dict.copy.deepcopy()
+
+    # ------------------------------------------------------------------------------
     def set_qdict(self, d: dict) -> None:
         """
         Update the instance fx quantization dict `self.q_dict` from passed dict `d`:
