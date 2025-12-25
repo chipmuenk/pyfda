@@ -25,7 +25,6 @@ try:
 except ImportError:
     DS = False
 
-import pyfda.filterbroker as fb
 from pyfda.filterbroker import get_fx, fb_get, fb_set
 from pyfda.libs.pyfda_lib import is_numeric
 
@@ -182,7 +181,7 @@ def dec2hex(val, nbits, WF=0):
     A string in two's complement hex format
     """
 
-    return "{0:X}".format(np.int64((val + (1 << nbits)) % (1 << nbits)))
+    return f"{np.int64((val + (1 << nbits)) % (1 << nbits)):X}"
 
 
 # ------------------------------------------------------------------------------
@@ -217,7 +216,7 @@ def dec2csd(dec_val, WF=0):
     else:
         k = int(np.ceil(np.log2(np.abs(dec_val) * 1.5)))
 
-    # logger.debug("CSD: Converting {0:f} to {1:d}.{2:d} format".format(dec_val, k, WF))
+    logger.debug("CSD: Converting %f to %d.%d format", dec_val, k, WF)
 
     # Initialize CSD calculation
     csd_digits = []
@@ -228,7 +227,7 @@ def dec2csd(dec_val, WF=0):
     while(k >= -WF):  # has the last fractional digit been reached
         limit = pow(2.0, k+1) / 3.0
 
-        # logger.debug("\t{0} - {1}".format(remainder, limit))
+        logger.debug("\t%s - %s", remainder, limit)
 
         # decimal point?
         if k == -1:
@@ -399,6 +398,7 @@ class Fixed(object):
       - 'qint'   : fixpoint integer format
       - 'qfrac'  : fractional fixpoint format
       - 'float32': 32 bit floating point format
+      - 'float64': 64 bit floating point format
 
     Attributes
     ----------
@@ -462,7 +462,7 @@ class Fixed(object):
     >>> yq = my_q.fixp(y)
     """
 
-    def __init__(self, q_dict):
+    def __init__(self, q_dict: dict):
         """
         Construct `Fixed` object with dict `q_dict`
         """
@@ -517,7 +517,7 @@ class Fixed(object):
             if k not in self.q_dict_default:
                 logger.error("Unknown Key '%s'!", k)
 
-# ------------------------------------------------------------------------------
+    # ------------------------------------------------------------------------------
     def set_qdict(self, d: dict) -> None:
         """
         Update the instance quantization dict `self.q_dict` from passed dict `d`:
@@ -574,7 +574,7 @@ class Fixed(object):
             raise Exception('Unknown number base "%s"!', fx_base)
 
 # ------------------------------------------------------------------------------
-    def fixp(self, y, in_frmt: str = 'qfrac', out_frmt: str = 'qfrac'):
+    def fixp(self, y, in_frmt: str = 'qfrac', out_frmt: str = 'qfrac') -> np.ndarray | float:
         """
         Return a quantized copy `yq` for `y` (scalar or array-like) with the same
         shape as `y`. The returned data is always in float format, use float2frmt()
@@ -666,9 +666,9 @@ class Fixed(object):
                 "fixpoint quantization!")
             return y.astype(np.float32)
 
-        if not in_frmt in {'qfrac', 'qint'}:
+        if in_frmt not in {'qfrac', 'qint'}:
             logger.error("Unknown input format %s", in_frmt)
-        if not out_frmt in {'qfrac', 'qint'}:
+        if out_frmt not in {'qfrac', 'qint'}:
             logger.error("Unknown output format %s", out_frmt)
 
         # logger.warning(f"in_frmt = '{in_frmt}', out_frmt = '{out_frmt}'")
@@ -841,7 +841,7 @@ class Fixed(object):
         return yq
 
     # --------------------------------------------------------------------------
-    def resetN(self):
+    def resetN(self) -> None:
         """ Reset counters and overflow-flag of Fixed object """
         frm = inspect.stack()[1]
         logger.debug("'reset_N' called from {0}.{1}():{2}.".
@@ -1068,9 +1068,9 @@ class Fixed(object):
             y1 = re.split(r"(?!^)(?=[+-][\.\da-fA-F])", y)
 
             if len(y1) == 2:
-                if not 'j' in y1[0] and 'j' in y1[1]:  # re + im
+                if 'j' not in y1[0] and 'j' in y1[1]:  # re + im
                     return y1[0], y1[1].replace('j','')
-                if 'j' in y1[0] and not 'j' in y1[1]:  # im + re
+                if 'j' in y1[0] and 'j' not in y1[1]:  # im + re
                     return y1[1], y1[0].replace('j','')
                 # both parts are imaginary, combine them
                 y_im = self.frmt2float(y1[0].replace('j',''))\
@@ -1302,7 +1302,7 @@ class Fixed(object):
         # ======================================================================
         # logger.warning(f"float2frmt: y = {y}")
         if not get_fx():  # return float input value unchanged (no string)
-            logger.error("Not in fixpoint mode, 'float2frmt()' should not be called!")
+            logger.error("Not in fixpoint mode [%s], 'float2frmt()' should not be called!", fb_get('qfrmt'))
             return y
 
         if not is_numeric(y):
@@ -1454,27 +1454,28 @@ def quant_coeffs(coeffs: np.iterable, Q, recursive: bool = False, out_frmt: str 
 ########################################
 if __name__ == '__main__':
     """
-    Run a simple test with python -m pyfda.libs.pyfda_fix_lib
+    Run a simple smoke test with `python -m pyfda.libs.pyfda_fix_lib`
     or a more elaborate one with
-    python -m pyfda.tests.test_pyfda_fix_lib
+    `python -m pyfda.tests.test_pyfda_fix_lib`
     """
     import pprint
 
-    q_dict = {'WI': 0, 'WF': 3, 'ovfl': 'sat', 'quant': 'round'}
+    q_dict = {'WI': 0, 'WF': 3, 'ovfl': 'sat', 'quant': 'round', 'qfrmt': 'qfrac'}
     myQ = Fixed(q_dict)  # instantiate fixpoint object with settings above
     y_list = [-1.1, -1.0, -0.5, 0, 0.5, 0.99, 1.0]
 
     myQ.set_qdict(q_dict)
 
     print("\nTesting float2frmt()\n====================")
-    pprint.pprint(q_dict)
+    pprint.pprint(myQ.q_dict)
     for y in y_list:
-        print("y = {0}\t->\ty_fix = {1}".format(y, myQ.float2frmt(y)))
+        print(f"y = {y}\t->\ty_fix = {myQ.float2frmt(y)}")
 
     print("\nTesting frmt2float()\n====================")
     q_dict = {'WI': 3, 'WF': 3, 'ovfl': 'sat', 'quant': 'round'}
     pprint.pprint(q_dict)
     myQ.set_qdict(q_dict)
+    print("myQ.q_dict = %s", myQ.q_dict)
     dec_list = [-9, -8, -7, -4.0, -3.578, 0, 0.5, 4, 7, 8]
     for dec in dec_list:
-        print("y={0}\t->\ty_fix={1} ({2})".format(dec, myQ.frmt2float(dec), myQ.frmt))
+        print(f"y={dec}\t->\ty_fix={myQ.frmt2float(dec)}")
