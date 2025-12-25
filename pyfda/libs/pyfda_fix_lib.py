@@ -1463,24 +1463,24 @@ if __name__ == '__main__':
     or a more elaborate one with
     `python -m pyfda.tests.test_pyfda_fix_lib`
     """
-    import pprint
 
-    q_dict = {'WI': 0, 'WF': 3, 'ovfl': 'sat', 'quant': 'round', 'qfrmt': 'qfrac'}
+    fb_set('qfrmt', 'qfrac')  # set fixpoint format
+
+    q_dict = {'WI': 0, 'WF': 3, 'ovfl': 'sat', 'quant': 'round'}
     myQ = Fixed(q_dict)  # instantiate fixpoint object with settings above
     y_list = [-1.1, -1.0, -0.5, 0, 0.5, 0.99, 1.0]
 
     myQ.set_qdict(q_dict)
 
     print("\nTesting float2frmt()\n====================")
-    pprint.pprint(myQ.q_dict)
     for y in y_list:
         print(f"y = {y}\t->\ty_fix = {myQ.float2frmt(y)}")
+    print("myQ.q_dict = ", myQ.q_dict)
 
     print("\nTesting frmt2float()\n====================")
     q_dict = {'WI': 3, 'WF': 3, 'ovfl': 'sat', 'quant': 'round'}
-    pprint.pprint(q_dict)
     myQ.set_qdict(q_dict)
-    print("myQ.q_dict = %s", myQ.q_dict)
     dec_list = [-9, -8, -7, -4.0, -3.578, 0, 0.5, 4, 7, 8]
     for dec in dec_list:
         print(f"y={dec}\t->\ty_fix={myQ.frmt2float(dec)}")
+    print("myQ.q_dict = ", myQ.q_dict)
