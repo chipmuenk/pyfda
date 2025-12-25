@@ -201,7 +201,7 @@ class Tree_Builder():
 
             return success
         # --------------
-        logger.info(f"Reading config file: '{dirs.USER_CONF_DIR_FILE}'\n")
+        logger.info("Reading config file: %s\n", dirs.USER_CONF_DIR_FILE)
         try:
             # Test whether user config file is readable, this is necessary as
             # configParser quietly fails when the file doesn't exist
@@ -232,7 +232,7 @@ class Tree_Builder():
                 read_conf_file()
                 self.commons = self.parse_conf_section("Common")
                 logger.info(
-                    f"Found {len(self.commons)} entries in [Common] (new config file)")
+                    "Found %s entries in [Common] (new config file)", len(self.commons))
 
                 if not read_conf_version():
                     logger.critical("Version number is still invalid, terminating.")
@@ -423,17 +423,16 @@ class Tree_Builder():
 
                     section_conf_dict.update({i[0]: val})
 
-                logger.debug('Found {0:2d} entries in [{1:s}].'
-                             .format(len(section_conf_dict), section))
+                logger.debug('Found %2d entries in [%s].', len(section_conf_dict), section)
             else:
                 logger.warning('Empty section [%s].', section)
 
         except configparser.NoSectionError:
             logger.warning(
-                f'\n[WARNING] No section "[{section}]" in config file '
-                f'{dirs.USER_CONF_DIR_FILE}",'
-                f'\n\tconsider creating a new config file using "pyfdax -r".\n'
-                           )
+                "\n[WARNING] No section '[%s]' in config file %s,\n\t"
+                "consider creating a new config file using 'pyfdax -r' .\n",
+                section, dirs.USER_CONF_DIR_FILE
+            )
             # configparser.NoOptionError
         except configparser.DuplicateOptionError as e:
             logger.warning('%s in config file "%s".', e, dirs.USER_CONF_DIR_FILE)

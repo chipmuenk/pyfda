@@ -404,9 +404,11 @@ fil_ref = {
     'plt_phiUnit': 'rad',
     'plt_tLabel': '$n = t\\, /\\, T_S \\; \\rightarrow$',
     'plt_tUnit': 'T_S',
+
     'qfrmt': 'float64',  # global quantization format {'float64', 'float32', 'qint', 'qfrac'}
     'qfrmt_float_last': 'float64',  # last used float format
     'qfrmt_fx_last': 'qfrac',  # last used fixpoint format
+
     'rt': 'LP',  # filter response type
     # coefficients as second order sections
     'sos': [
@@ -469,13 +471,19 @@ fil_undo = [None] * UNDO_LEN
 fil[0] = {}
 
 # Copy fil_ref to fil[0] ... fil[9] to initialize all memories
-for l in range(len(fil)):
-    fil[l] = copy.deepcopy(fil_ref)
+for i in range(len(fil)):
+    fil[i] = copy.deepcopy(fil_ref)
 
 # -------------------------
-def restore_fil():
+def restore_fil() -> int:
     """
     Restore current global dict `fb.fil[0]` from undo memory `fil_undo`
+
+    Returns
+    -------
+    int
+        -1: undo buffer empty, nothing restored
+         0: successful restore
     """
     global undo_step
     global undo_ptr
@@ -484,11 +492,11 @@ def restore_fil():
     if undo_step < 1:
         undo_step = 0
         return -1
-    else:
-        fil[0] = copy.deepcopy(fil_undo[undo_ptr])
-        undo_step -= 1
-        undo_ptr = (undo_ptr + UNDO_LEN - 1) % UNDO_LEN
-        return 0
+
+    fil[0] = copy.deepcopy(fil_undo[undo_ptr])
+    undo_step -= 1
+    undo_ptr = (undo_ptr + UNDO_LEN - 1) % UNDO_LEN
+    return 0
 
 # -------------------------
 def store_fil():
@@ -546,7 +554,7 @@ def key_list_to_dict(keys_tuple: list, fil_dict: dict) -> dict:
 # -------------------------
 def get_fx()-> bool:
     """
-    Check if a fixpoint mode is active
+    Check if a fixpoint mode is active globally by checking the current
 
     Returns
     -------
