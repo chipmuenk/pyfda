@@ -152,7 +152,7 @@ def cmp_version(mod: str, version: str) -> int:
             inst_ver = list(MODULES[mod].values())[0]
             if inst_ver == 'unknown':
                 logger.warning(
-                    f"Version number of module '{mod}' could not be determined.")
+                    "Version number of module '%s' could not be determined.", mod)
                 return -3
 
         if versiontuple(inst_ver) > versiontuple(version):
@@ -189,7 +189,7 @@ def mod_version(mod: str = "") -> str:
                 # evaluate {V_...} from MOD_VERSIONS entries:
                 v_md += k.format(**MOD_VERSIONS)
             except (KeyError) as e:  # encountered undefined {V_...}
-                logger.warning("KeyError: {0}".format(e))  # simply drop the line
+                logger.warning("KeyError: %s", e)  # simply drop the line
 
         v_html = markdown.markdown(v_md, output_format='html5',
                                    extensions=['markdown.extensions.tables'])
@@ -293,8 +293,8 @@ def clean_ascii(arg):
     """
     if isinstance(arg, str):
         return re.sub(r'[^\x00-\x7f]', r'', arg)
-    else:
-        return arg
+
+    return arg
 
 
 # ------------------------------------------------------------------------------
@@ -381,14 +381,15 @@ def np_shape(data):
     d = np.ndim(data)
     if d == 0:
         return (0, 0)
-    elif d == 1:
+
+    if d == 1:
         return(len(data), 1)
-    elif  d == 2:
+
+    if  d == 2:
         return np.shape(data)
-    else:
-        logger.warning("Unsuitable data shape with "
-        f"{d} dimensions.")
-        return (None, None)
+
+    logger.warning("Unsuitable data shape with %s dimensions.", d)
+    return (None, None)
 
 # -----------------------------------------------------------------------------
 def iter2ndarray(iterable, dtype=complex) -> np.ndarray:
@@ -550,7 +551,7 @@ def pprint_log(d, N: int = 10, tab: str = "\t", debug: bool = False) -> str:
         try:
             _ = np.asarray(d)
         except (TypeError, ValueError) as e:
-            logger.warning(f"pprint_log(): Could not transform data to array:\n{e}")
+            logger.warning("pprint_log(): Could not transform data to array:\n%s", e)
             return ""
 
     if type(d) in {list, np.ndarray, tuple}:
@@ -579,7 +580,7 @@ def pprint_log(d, N: int = 10, tab: str = "\t", debug: bool = False) -> str:
             if rows > N-1:
                     s += cr + tab + ' ...'
         else:
-            logger.warning(f"pprint_log(): Object with ndim = {np.ndim(d)} cannot be processed.")
+            logger.warning("pprint_log(): Object with ndim = %s cannot be processed.", np.ndim(d))
             return ""
     else:  # scalar, string or None
         if type(d) is None:
@@ -644,7 +645,8 @@ def frmt2cmplx(string: str, default: float = 0.) -> complex:
     polar_str = string.replace("\u2220", '<').replace('*', '').split('<', 1)
     if len(polar_str) == 1: # no angle found; real / imag / cartesian complex
         return safe_eval(string, default, return_type='auto')
-    elif len(polar_str) == 2 and polar_str[0] == "": # pure angle, r = 1
+
+    if len(polar_str) == 2 and polar_str[0] == "": # pure angle, r = 1
         phi = str2angle_rad(polar_str[1])
         x = np.cos(phi)
         y = np.sin(phi)
@@ -657,7 +659,7 @@ def frmt2cmplx(string: str, default: float = 0.) -> complex:
     if safe_eval.err > 0:
         x = default.real
         y = default.imag
-        logger.warning(f"Expression '{string}' could not be evaluated.")
+        logger.warning("Expression '%s' could not be evaluated.", string)
     return x + 1j * y
 
 # ------------------------------------------------------------------------------
@@ -782,7 +784,7 @@ def safe_numexpr_eval(expr: str, fallback=None,
         return None  # no fallback, no error checking!
 
     # check if dimensions of converted string agree with expected dimensions
-    elif np.ndim(np_expr) != np.ndim(fallback):
+    if np.ndim(np_expr) != np.ndim(fallback):
         if np.ndim(np_expr) == 0:
             # np_expr is scalar, return array with shape of fallback of constant values
             np_expr = np.ones(fallback_shape) * np_expr
@@ -1020,8 +1022,8 @@ def dB(lin: float, power: bool = False) -> float:
     """
     if power:
         return 10. * np.log10(lin)
-    else:
-        return 20 * np.log10(lin)
+
+    return 20 * np.log10(lin)
 
 
 # ------------------------------------------------------------------------------
@@ -1136,17 +1138,13 @@ def unit2lin(unit_value: float, filt_type: str, amp_label: str,
 
     if msg:
         logger.warning(
-            "Amplitude spec for {0} is ".format(amp_label) + msg
-            + "using {0:.4g} {1} instead."
-            .format(
-                lin2unit(lin_value, filt_type=filt_type, amp_label=amp_label, unit=unit),
-                unit))
-
+            "Amplitude spec for %s is %s using %.4g %s instead.", amp_label, msg,
+            lin2unit(lin_value, filt_type=filt_type, amp_label=amp_label, unit=unit), unit)
     return lin_value
 
 
 # ------------------------------------------------------------------------------
-def cround(x, n_dig=0):
+def cround(x, n_dig: int = 0) -> complex | float:
     """
     Round complex number to n_dig digits. If n_dig == 0, don't round at all,
     just convert complex numbers with an imaginary part very close to zero to
@@ -1162,11 +1160,11 @@ def cround(x, n_dig=0):
 
 
 # ------------------------------------------------------------------------------
-def sawtooth_bl(t):
+def sawtooth_bl(t: np.ndarray) -> np.ndarray:
     """
-    Bandlimited sawtooth function as a direct replacement for
-    `scipy.signal.sawtooth`. It is calculated by Fourier synthesis, i.e.
-    by summing up all sine wave components up to the Nyquist frequency.
+    Bandlimited sawtooth function as a direct replacement for `scipy.signal.sawtooth`.
+    It is calculated by Fourier synthesis, i.e. by summing up all sine wave components
+    up to the Nyquist frequency.
 
     By Endolith, https://gist.github.com/endolith/407991
     """
@@ -1184,11 +1182,11 @@ def sawtooth_bl(t):
 
 
 # ------------------------------------------------------------------------------
-def triang_bl(t):
+def triang_bl(t: np.ndarray) -> np.ndarray:
     """
-    Bandlimited triangle function as a direct replacement for
-    `scipy.signal.sawtooth(width=0.5)`. It is calculated by Fourier synthesis, i.e.
-    by summing up all sine wave components up to the Nyquist frequency.
+    Bandlimited triangle function as a direct replacement for `scipy.signal.sawtooth(width=0.5)`.
+    It is calculated by Fourier synthesis, i.e. by summing up all sine wave components up to
+    the Nyquist frequency.
 
     By Endolith, https://gist.github.com/endolith/407991
     """
@@ -1206,10 +1204,10 @@ def triang_bl(t):
 
 
 # ------------------------------------------------------------------------------
-def rect_bl(t, duty=0.5):
+def rect_bl(t: np.ndarray, duty: float | int = 0.5) -> np.ndarray:
     """
-    Bandlimited rectangular function as a direct replacement for
-    `scipy.signal.square`. It is calculated by Fourier synthesis, i.e.
+    Bandlimited rectangular function as a direct replacement for `scipy.signal.square`.
+    It is derived from sawtooth_bl() which is calculated by Fourier synthesis, i.e.
     by summing up all sine wave components up to the Nyquist frequency.
 
     By Endolith, https://gist.github.com/endolith/407991
@@ -1221,8 +1219,7 @@ def rect_bl(t, duty=0.5):
     y = np.zeros(t.shape, ytype)
     # Get sampling frequency from timebase
     # Sum all multiple sine waves up to the Nyquist frequency:
-    y = sawtooth_bl(t - duty*2*pi) - sawtooth_bl(t) + 2*duty-1
-    return y
+    return sawtooth_bl(t - duty*2*pi) - sawtooth_bl(t) + 2*duty-1
 
 
 # ------------------------------------------------------------------------------
@@ -1418,54 +1415,55 @@ def unique_roots(p, tol: float = 1e-3, magsort: bool = False,
     mult = []  # initialize list for multiplicities
     pout = []  # initialize list for reduced output list of roots
 
+    # handle scalars
     tol = abs(tol)
     p = np.atleast_1d(p)  # convert p to at least 1D array
     if len(p) == 0:
         return pout, mult
 
-    elif len(p) == 1:
+    if len(p) == 1:
         pout = p
         mult = [1]
         return pout, mult
 
+    # handle lists / arrays
+    pout = p[np.isnan(p)].tolist()  # copy nan elements to pout, convert to list
+    mult = len(pout) * [1]  # generate an (empty) list with a "1" for each nan
+    p = p[~np.isnan(p)]     # delete nan elements from p, convert to list
+
+    if len(p) == 0:
+        pass
+
+    elif (np.iscomplexobj(p) and not magsort):
+        while len(p):
+            # calculate distance of first root against all others and itself
+            # -> multiplicity is at least 1, first root is always deleted
+            tolarr = np.less(dist_roots(p[0], p), tol)
+            mult.append(np.sum(tolarr))  # multiplicity = number of "hits"
+            pout.append(comproot(p[tolarr]))  # pick the roots within the tolerance
+
+            p = p[~tolarr]  # and delete them
     else:
-        pout = p[np.isnan(p)].tolist()  # copy nan elements to pout, convert to list
-        mult = len(pout) * [1]  # generate an (empty) list with a "1" for each nan
-        p = p[~np.isnan(p)]     # delete nan elements from p, convert to list
+        sameroots = []  # temporary list for roots within the tolerance
+        p, indx = cmplx_sort(p)
+        indx = len(mult)-1
+        curp = p[0] + 5 * tol  # needed to avoid "self-detection" ?
+        for k in range(len(p)):
+            tr = p[k]
+            if abs(tr - curp) < tol:
+                sameroots.append(tr)
+                curp = comproot(sameroots)  # not correct for 'avg'
+                                            # of multiple (N > 2) root !
+                pout[indx] = curp
+                mult[indx] += 1
+            else:
+                pout.append(tr)
+                curp = tr
+                sameroots = [tr]
+                indx += 1
+                mult.append(1)
 
-        if len(p) == 0:
-            pass
-
-        elif (np.iscomplexobj(p) and not magsort):
-            while len(p):
-                # calculate distance of first root against all others and itself
-                # -> multiplicity is at least 1, first root is always deleted
-                tolarr = np.less(dist_roots(p[0], p), tol)
-                mult.append(np.sum(tolarr))  # multiplicity = number of "hits"
-                pout.append(comproot(p[tolarr]))  # pick the roots within the tolerance
-
-                p = p[~tolarr]  # and delete them
-        else:
-            sameroots = []  # temporary list for roots within the tolerance
-            p, indx = cmplx_sort(p)
-            indx = len(mult)-1
-            curp = p[0] + 5 * tol  # needed to avoid "self-detection" ?
-            for k in range(len(p)):
-                tr = p[k]
-                if abs(tr - curp) < tol:
-                    sameroots.append(tr)
-                    curp = comproot(sameroots)  # not correct for 'avg'
-                                                # of multiple (N > 2) root !
-                    pout[indx] = curp
-                    mult[indx] += 1
-                else:
-                    pout.append(tr)
-                    curp = tr
-                    sameroots = [tr]
-                    indx += 1
-                    mult.append(1)
-
-        return np.array(pout), np.array(mult)
+    return np.array(pout), np.array(mult)
 
 # #### original code ####
 #    p = asarray(p) * 1.0

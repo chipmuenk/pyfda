@@ -9,9 +9,9 @@
 """
 Widget for exporting / importing and saving / loading filter data
 """
+import markdown
 import os
 import re
-import markdown
 
 from pyfda.libs.compat import (
     Qt, QPushButton, QDialog, QVBoxLayout, QHBoxLayout, QIcon, QPixmap,
@@ -32,7 +32,7 @@ class AboutWindow(QDialog):
     # sig_tx = pyqtSignal(dict) # outgoing
 
     def __init__(self, parent=None):
-        super(AboutWindow, self).__init__(parent)
+        super().__init__(parent)
         self.setWindowTitle("About pyFDA")
         self.collect_info()
         self._construct_UI()
