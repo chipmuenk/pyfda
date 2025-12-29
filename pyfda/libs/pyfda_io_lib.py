@@ -93,6 +93,7 @@ def prune_file_ext(file_type: str) -> str:
     Parameters
     ----------
     file_type : str
+        File type description string, e.g. 'Text file (\*.txt)'
 
     Returns
     -------
@@ -1750,48 +1751,63 @@ def load_filter(self, all_filters: bool = False) -> int:
                 fb.fil[0][k] = fb.fil[0][k].decode('utf-8')
             if fb.fil[0][k] is None:
                 logger.warning("Entry fb.fil[0][%s] is empty!", k)
-        if 'ba' not in fb.fil[0]\
-            or type(fb.fil[0]['ba']) not in {list, np.ndarray}\
-                or np.ndim(fb.fil[0]['ba']) != 2\
-                or (np.shape(fb.fil[0]['ba'][0]) != 2
-                    and np.shape(fb.fil[0]['ba'])[1] < 3):
-            logger.error("Missing key 'ba' or wrong data type!")
-            fb.restore_fil()
-            return -1
-        elif 'zpk' not in fb.fil[0]:
-            logger.error("Missing key 'zpk'!")
-            fb.restore_fil()
-            return -1
-        elif 'sos' not in fb.fil[0]\
-                or type(fb.fil[0]['sos']) not in {list, np.ndarray}:
-            logger.error("Missing key 'sos' or wrong data type!")
-            fb.restore_fil()
-            return -1
 
+        if 'ba' not in fb.fil[0]:
+            logger.error(
+                "Missing key 'ba, cancelling file operation.")
+            fb.restore_fil()
+            return -1
         if isinstance(fb.fil[0]['ba'], np.ndarray):
-            if np.ndim(fb.fil[0]['ba']) != 2:
-                logger.error(
-                    "Unsuitable dimension of 'ba' data, ndim = %d", np.ndim(fb.fil[0]['ba']))
-            elif np.shape(fb.fil[0]['ba'])[0] != 2:
-                logger.error(
-                    "Unsuitable shape %s of 'ba' data ", np.shape(fb.fil[0]['ba']))
-        elif type(fb.fil[0]['ba']) in {list, tuple}:
+            pass
+        elif isinstance(fb.fil[0]['ba'], (list, tuple)):
             fb.fil[0]['ba'] = iter2ndarray(fb.fil[0]['ba'])
         else:
-            logger.error("Unsuitable 'ba' data type '%s'!", type(fb.fil[0]['ba']))
+            logger.error("Unsuitable 'ba' data type '%s', cancelling file operation.",
+                         type(fb.fil[0]['ba']).__name__)
+        if np.ndim(fb.fil[0]['ba']) != 2 or len(fb.fil[0]['ba'][0]) < 3:
+            logger.error(
+                "Unsuitable shape %s of 'ba' data, cancelling file operation.",
+                np.shape(fb.fil[0]['ba']))
+            fb.restore_fil()
+            return -1
 
+        if 'zpk' not in fb.fil[0]:
+            logger.error("Missing key 'zpk', cancelling file operation.")
+            fb.restore_fil()
+            return -1
         if isinstance(fb.fil[0]['zpk'], np.ndarray):
-            if np.ndim(fb.fil[0]['zpk']) != 2:
-                logger.error(
-                    "Unsuitable dimension of 'zpk' data, ndim = %d", np.ndim(fb.fil[0]['zpk']))
-            elif np.shape(fb.fil[0]['zpk'])[0] != 3:
-                logger.error(
-                    "Unsuitable shape %s of 'zpk' data ", np.shape(fb.fil[0]['zpk']))
-        elif type(fb.fil[0]['zpk']) in {list, tuple}:
+            pass
+        elif isinstance(fb.fil[0]['zpk'], (list, tuple)):
             fb.fil[0]['zpk'] = iter2ndarray(fb.fil[0]['zpk'])
         else:
-            logger.error("Unsuitable 'zpk' data type '%s'!", type(fb.fil[0]['zpk']))
+            logger.error("Unsuitable 'zpk' data type '%s', cancelling file operation.",
+                         type(fb.fil[0]['zpk']).__name__)
+        if np.ndim(fb.fil[0]['zpk']) != 2 or np.shape(fb.fil[0]['zpk'])[0] != 3:
+            logger.error(
+                "Unsuitable shape %s of 'zpk' data, cancelling file operation.",
+                np.shape(fb.fil[0]['zpk']))
+            fb.restore_fil()
+            return -1
 
+        if 'sos' not in fb.fil[0]:
+            logger.error("Missing key 'sos', cancelling file operation.")
+            fb.restore_fil()
+            return -1
+        if isinstance(fb.fil[0]['sos'], np.ndarray):
+            pass
+        elif isinstance(fb.fil[0]['sos'], (list, tuple)):
+            fb.fil[0]['sos'] = iter2ndarray(fb.fil[0]['sos'])
+        else:
+            logger.error("Unsuitable 'sos' data type '%s', cancelling file operation.",
+                         type(fb.fil[0]['sos']).__name__)
+            fb.restore_fil()
+            return -1
+        if np.ndim(fb.fil[0]['sos']) != 2 or np.shape(fb.fil[0]['sos'])[0] != 3:
+            logger.error(
+                "Unsuitable shape %s of 'sos' data, cancelling file operation.",
+                np.shape(fb.fil[0]['sos']))
+            fb.restore_fil()
+            return -1
 
         logger.info('Successfully loaded filter\n\t"%s"', file_name)
         dirs.last_file_name = file_name
