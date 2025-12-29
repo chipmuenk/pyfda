@@ -52,7 +52,7 @@ __version__ = dirs.VERSION
 # ##############################################################################
 # Include this version number as `'_id': ('pyfda', FILTER_FILE_VERSION)` when saving
 # filter files and test for the version when loading filter files.
-FILTER_FILE_VERSION = 1
+FILTER_FILE_VERSION = '2'
 
 # file filters for the QFileDialog object are constructed from this dict
 file_filters_dict = {
@@ -1631,7 +1631,9 @@ def load_filter(self, all_filters: bool = False) -> int:
                     fb_temp = {}
                     # array containing dict, dtype 'object':
                     arr = np.load(f, allow_pickle=True)
-                    logger.warning("Load 'npz', returned type is %s.", type(arr))
+                    if not isinstance(arr, np.lib.npyio.NpzFile):
+                        logger.warning("Load 'npz', returned type is %s.", type(arr))
+                        raise IOError("Not a valid npz file!")
 
                     # convert arrays to lists and extract scalar objects
                     for key in sorted(arr):
@@ -1705,9 +1707,9 @@ def load_filter(self, all_filters: bool = False) -> int:
     if '_id' not in fb_id or len(fb_id['_id']) != 2 or fb_id['_id'][0] != 'pyfda':
         msg = "This is no pyfda filter or an outdated file format! Load anyway?"
         err = not popup_warning(None, message=msg)
-    elif fb_id['_id'][1] != FILTER_FILE_VERSION:
+    elif str(fb_id['_id'][1]) != FILTER_FILE_VERSION:
         msg = (
-            f"The filter file has version {str(fb_id['_id'][1])} instead of "
+            f"The filter file has version {fb_id['_id'][1]} instead of "
             f"required version {FILTER_FILE_VERSION}! Load anyway?")
         err = not popup_warning(None, message=msg)
 
@@ -1802,12 +1804,11 @@ def load_filter(self, all_filters: bool = False) -> int:
                          type(fb.fil[0]['sos']).__name__)
             fb.restore_fil()
             return -1
-        if np.ndim(fb.fil[0]['sos']) != 2 or np.shape(fb.fil[0]['sos'])[0] != 3:
-            logger.error(
-                "Unsuitable shape %s of 'sos' data, cancelling file operation.",
+        if np.ndim(fb.fil[0]['sos']) != 2 or np.shape(fb.fil[0]['sos'])[0] != 6:
+            logger.warning(
+                "Unsuitable shape %s of 'sos' data, storing empty list.",
                 np.shape(fb.fil[0]['sos']))
-            fb.restore_fil()
-            return -1
+            fb.fil[0]['sos'] = []
 
         logger.info('Successfully loaded filter\n\t"%s"', file_name)
         dirs.last_file_name = file_name
