@@ -1633,7 +1633,8 @@ def load_filter(self, all_filters: bool = False) -> int:
                     # array containing dict, dtype 'object':
                     arr = np.load(f, allow_pickle=True)
                     if not isinstance(arr, np.lib.npyio.NpzFile):
-                        logger.warning("Load 'npz', returned type is %s.", type(arr))
+                        logger.error("Tried to load file with 'npz' format, but file type is %s.",
+                                       type(arr).__name__)
                         raise IOError("Not a valid npz file!")
 
                     # convert arrays to lists and extract scalar objects
