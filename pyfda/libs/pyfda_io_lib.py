@@ -1735,16 +1735,16 @@ def load_filter(self, all_filters: bool = False) -> int:
         if key_errs[0] != []:
             # '\n'.join(...) converts list to multi-line string
             err_str += (
-                f"The following {len(key_errs[0])} key(s) have not been found in "
-                f"the loaded dict,\n"\
-                f"\tthey are copied with their values from the reference dict:\n\t"
-                    + "{0}".format('\n\t'.join(key_errs[0]))
+                f"\n\tThe following {len(key_errs[0])} key(s) have not been found in "
+                "the loaded dict,\n"\
+                "\tthey are copied with their default values from the reference dict:\n\t\t"
+                    + "\n\t\t".join(key_errs[0])
                 )
         if key_errs[1] != []:
             err_str += (
-                f"\nThe following {len(key_errs[1])} key(s) are not part of the "
-                f"reference dict and have been ignored:\n\t"
-                + "{0}".format('\n\t'.join(key_errs[1]))
+                f"\n\tThe following {len(key_errs[1])} key(s) are not part of the "
+                "reference dict and have been ignored:\n\t\t"
+                + "\n\t\t".join(key_errs[1])
             )
         if err_str != "":
             logger.warning(err_str)
