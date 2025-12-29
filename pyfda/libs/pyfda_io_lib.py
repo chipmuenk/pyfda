@@ -147,10 +147,10 @@ def extract_file_ext(file_type: str, return_list: bool = False) -> str:
         file_type_list = [t.strip('(*.)') for t in ext_list]  # remove '(*.)'
         if return_list:
             return file_type_list
-        else:
-            return str(file_type_list[0])
-    else:
-        return file_type
+
+        return str(file_type_list[0])
+
+    return file_type
 
 
 # ------------------------------------------------------------------------------
@@ -346,10 +346,9 @@ def qtable2csv(table: object, data: np.ndarray, zpk: bool = False,
             item = table.item(r, c)
             if item and item.text() != "":
                 return table.itemDelegate().text(item).lstrip(" ") + delim
-            else:
-                return "0" + delim
-        else:
-            return str(safe_eval(data[c][r], return_type='auto')).strip("()") + delim
+            return "0" + delim  # empty table item
+        # unformatted, get data from the model
+        return str(safe_eval(data[c][r], return_type='auto')).strip("()") + delim
 
     text = ""
     if params['CSV']['header'] == 'on':
@@ -408,12 +407,11 @@ def qtable2csv(table: object, data: np.ndarray, zpk: bool = False,
                 text += item2text(r, 2, formatted)  # gain value
             text = text.rstrip(delim) + cr  # finish text line, remove last delimiter
 
-    text = text.rstrip(cr)  # delete CR after last row
-    return text
+    return text.rstrip(cr)  # delete CR after last row
 
 
 # ------------------------------------------------------------------------------
-def csv2array(f: TextIO):
+def csv2array(f: TextIO) -> np.ndarray[str] | None:
     """
     Convert comma-separated values from file or text to numpy array of str,
      taking into account the settings of the CSV dict.
@@ -602,12 +600,11 @@ def csv2array(f: TextIO):
         logger.error("Imported data is a scalar: '%s'", data_arr)
         return None
 
-    elif np.ndim(data_arr) == 1:
+    if np.ndim(data_arr) == 1:
         if len(data_arr) < 2:
             logger.error("Not enough data: '%s'", data_arr)
             return None
-        else:
-            data = data_arr
+        data = data_arr
 
     elif np.ndim(data_arr) == 2:
         rows, cols = np.shape(data_arr)
@@ -681,9 +678,8 @@ def read_csv_info_large(filename):
         lineterminator, delimiter, N, has_header)
 
     if params['CSV']['orientation'] not in {'rows', 'cols', 'auto'}:
-        logger.error(
-            f"Unknown key '{params['CSV']['orientation']}' for "
-            "params['CSV']['orientation']")
+        logger.error("Unknown key '%s' for params['CSV']['orientation']",
+                     params['CSV']['orientation'])
     if params['CSV']['orientation'] == 'auto' and (N < nchans)\
         or params['CSV']['orientation'] == 'rows':  # swap rows and columns
         N, nchans = nchans, N
@@ -842,7 +838,7 @@ def read_wav_info(file) -> int:
 # ------------------------------------------------------------------------------
 def file2array(file_name: str, file_type: str, fkey: str = "",
                from_clipboard: bool = False, as_str: bool = False
-                 ) -> np.ndarray:
+                 ) -> np.ndarray | None:
     r"""
     Import data from a file or from clipboard and convert it to a numpy array.
 
@@ -913,14 +909,14 @@ def file2array(file_name: str, file_type: str, fkey: str = "",
             # an error has occurred
             logger.error("Couldn't import data from clipboard.")
             return None
-        elif isinstance(data_arr, str):
+        if isinstance(data_arr, str):
             # returned an error message instead of numpy data:
             file2array.info_str = ""
             logger.error("You shouldn't see this message!! \n"
                          "Error copying from clipboard:\n%s", data_arr)
             return None
-        else:
-            file2array.info_str = csv2array.info_str
+
+        file2array.info_str = csv2array.info_str
 
     # ----- Data from file -----------------------------------------------------
     else:
@@ -940,7 +936,7 @@ def file2array(file_name: str, file_type: str, fkey: str = "",
                         # an error has occurred
                         logger.error("Error loading file '%s'!", file_name)
                         return None
-                    elif isinstance(data_arr, str):
+                    if isinstance(data_arr, str):
                         # returned an error message instead of numpy data:
                         file2array.info_str = ""
                         logger.error("You shouldn't see this message!! \n"
@@ -1023,9 +1019,8 @@ def save_data_np(file_name: str, file_type: str, data: np.ndarray,
 
     if file_name is None:  # error or operation cancelled
         return -1
-    elif np.ndim(data) < 1 or np.ndim(data) > 2:
+    if np.ndim(data) < 1 or np.ndim(data) > 2:
         logger.error("Unsuitable data format for a wav file, ndim = %d.", np.ndim(data))
-        logger.error(data)
         return -1
     try:
         if file_type == 'wav':
@@ -1034,7 +1029,7 @@ def save_data_np(file_name: str, file_type: str, data: np.ndarray,
                 f_S_int = 1
             if f_S != f_S_int:
                 logger.warning(
-                    "Only integer sampling frequencies can be used for WAV files,\n"
+                    "Only positive integer sampling frequencies can be used for WAV files,\n"
                     "sampling frequency has been changed to f_S = %d", f_S_int)
 
             # audio = data.T  # transpose data, needed?
@@ -1060,25 +1055,36 @@ def save_data_np(file_name: str, file_type: str, data: np.ndarray,
         return -1
 
 # ------------------------------------------------------------------------------
-def write_wav_frame(parent, file_name, data: np.array, f_S = 1,
-                    title: str = "Export"):
+def write_wav_frame(parent: object, file_name: str, data: np.ndarray, f_S: int = 1,
+                    title: str = "Export") -> None:
     """
     Export a frame of data in wav format
+
+    TODO: Currently unused!
 
     Parameters
     ----------
     parent: handle to calling instance for creating file dialog instance
 
-    data: np.array
+    file_name: str
+        Full path and name of the file to be imported
+
+    data: np.ndarray
         data to be exported
+
+    f_S: int
+        Sampling frequency in Hz
 
     title: str
         title string for the file dialog box (e.g. "audio data ")
 
+    Returns
+    -------
+    None
     """
     file_name, file_type = select_file(parent, title=title, mode='wb', file_types=('wav'))
     if file_name is None:
-        return None  # file operation cancelled or other error
+        return  # file operation cancelled or other error
 
     try:
         if np.ndim(data) == 1:  # mono
@@ -1104,7 +1110,7 @@ def write_wav_frame(parent, file_name, data: np.array, f_S = 1,
         with open(file_name, 'w', encoding="utf8", newline='') as f:
                         f.write(data)
 
-        logger.info('Filter saved as\n\t"%s"', file_name)
+        logger.info('Data saved as\n\t"%s"', file_name)
 
     except IOError as e:
         logger.error('Failed saving "%s"!\n%s\n', file_name, e)
@@ -1113,7 +1119,7 @@ def write_wav_frame(parent, file_name, data: np.array, f_S = 1,
 # ------------------------------------------------------------------------------
 def export_fil_data(parent: object, data: str, fkey: str = "", title: str = "Export",
                 file_types: tuple[str, ...] = ('csv', 'mat', 'npy', 'npz'),
-                formatted: bool = True):
+                formatted: bool = True) -> None:
     """
     Export filter coefficients or pole/zero data in various formats, file name and type
     are selected via the ui.
@@ -1165,7 +1171,7 @@ def export_fil_data(parent: object, data: str, fkey: str = "", title: str = "Exp
     file_name, file_type = select_file(parent,title=title, mode='wb',
                                        file_types=file_types)
     if file_name is None:
-        return None  # file operation cancelled or other error
+        return  # file operation cancelled or other error
 
     err = False
 
@@ -1188,14 +1194,14 @@ def export_fil_data(parent: object, data: str, fkey: str = "", title: str = "Exp
                     err = export_coe_cmsis_fir(f, formatted)
                 else:
                     logger.error('Unknown file extension "%s"', file_type)
-                    return None
+                    return
 
         else:  # binary formats, storing numpy arrays
             np_data = csv2array(io.StringIO(data))  # convert csv data to numpy array
             if isinstance(np_data, str):
                 # returned an error message instead of numpy data:
                 logger.error("Error converting %s data:\n%s", description.lower(), np_data)
-                return None
+                return
 
             with open(file_name, 'wb') as f:
                 if file_type == 'mat':
@@ -1352,7 +1358,7 @@ def coe_header(title: str) -> str:
     header += "Designed:\t{0}\n".format(
         datetime.datetime.fromtimestamp(
             int(fb.fil[0]['timestamp'])).strftime(date_frmt))
-    header += "Saved:\t{0}\n\n".format(datetime.datetime.now().strftime(date_frmt))
+    header += f"Saved:\t{datetime.datetime.now().strftime(date_frmt)}\n\n"
     header += f"Filter type:\t{fb.fil[0]['rt']}, {fb.fil[0]['fc']} "
     header += f"(Order = {fb.fil[0]['N']})\n"
     header += f"Sample Frequency \tf_S = {f_S} {unit}\n\n"
@@ -1396,7 +1402,7 @@ def export_coe_xilinx(f: TextIO) -> bool:
         "XILINX CORE Generator(tm) Distributed Arithmetic FIR filter coefficient (.COE) "
         "file").replace("\n", "\n; ")
 
-    exp_str += "\nRadix = {0};\n".format(coe_radix)
+    exp_str += f"\nRadix = {coe_radix};\n"
       # quantized wordlength
     exp_str += f"Coefficient_width = {qc.q_dict['WI'] + qc.q_dict['WF'] + 1};\n"
     coeff_str = "CoefData = "
@@ -1481,7 +1487,7 @@ def export_coe_vhdl_package(f: TextIO) -> bool:
         exp_str += "use IEEE.math_real.all;\n"
     exp_str += "USE IEEE.std_logic_1164.all;\n\n"
     exp_str += "package coeff_package is\n"
-    exp_str += "constant n_taps: integer := {0:d};\n".format(len(bq)-1)
+    exp_str += f"constant n_taps: integer := {len(bq)-1};\n"
     if not get_fx():
         exp_str += "type coeff_type is array(0 to n_taps) of real;\n"
     else:
@@ -1597,10 +1603,19 @@ def export_coe_cmsis_sos(f: TextIO, file_type: str, formatted: bool = False) -> 
 
 
 # ==============================================================================
-def load_filter(self, all_filters=False) -> int:
+def load_filter(self, all_filters: bool = False) -> int:
     """
     Load filter from JSON, zipped binary numpy array or (c)pickled object to
     filter dictionary
+
+    Parameters
+    ----------
+    all_filters: bool
+        If True, load all 10 memory locations, otherwise only the first one.
+
+    Returns
+    -------
+    0 for success, -1 for file cancel or error
     """
     file_name, file_type = select_file(
         self, title="Load Filter", mode="rb", file_types = ("json", "npz", "pkl"))
@@ -1698,7 +1713,7 @@ def load_filter(self, all_filters=False) -> int:
     # Handle errors occurring during id test
     if err:
         return -1
-    elif all_filters:
+    if all_filters:
         fb.fil = fb_temp  # assign all filters
     else:
         fb.fil[0] = fb_temp  # only assign one slice
@@ -1791,10 +1806,14 @@ def load_filter(self, all_filters=False) -> int:
 
 
 # ------------------------------------------------------------------------------
-def save_filter(self):
+def save_filter(self) -> int:
     """
     Save filter `fb.fil[0]` as JSON formatted textfile, zipped binary numpy array
     or pickle object
+
+    Returns
+    -------
+    0 for success, -1 for file cancel or error
     """
     # provide an identifier with version number for pyfda files
     fb.fil[0].update({'_id': ['pyfda', FILTER_FILE_VERSION]})
@@ -1802,8 +1821,9 @@ def save_filter(self):
     file_name, file_type = select_file(
         self, title="Save Filter", mode='w', file_types = ("json", "npz", "pkl"))
 
-    if file_name is None:
+    if not file_name:
         return -1  # operation cancelled or other error
+
     err = False
     # create a copy of the filter to be saved that only contains keys of the
     # reference filter dict and warn of unsupported keys:
@@ -1849,10 +1869,11 @@ def save_filter(self):
         dirs.last_file_name = file_name
         dirs.last_file_dir = os.path.dirname(file_name)  # save new default dir
         dirs.last_file_type = file_type  # save new default file type
-
+        return 0
+    return -1
 
 # ------------------------------------------------------------------------------
-def save_all_filters(self):
+def save_all_filters(self) -> int:
     """
     Save all filters `fb.fil` as JSON formatted textfile, zipped binary numpy array
     or pickle object
@@ -1861,8 +1882,9 @@ def save_all_filters(self):
     file_name, file_type = select_file(
         self, title="Save All Filters", mode='w', file_types = ("json", "npz", "pkl"))
 
-    if file_name is None:
+    if not file_name:
         return -1  # operation cancelled or other error
+
     err = False
     # create a copy of the filters to be saved that only contains keys of the
     # reference filter dict and warn of unsupported keys:
@@ -1913,6 +1935,8 @@ def save_all_filters(self):
         dirs.last_file_name = file_name
         dirs.last_file_dir = os.path.dirname(file_name)  # save new default dir
         dirs.last_file_type = file_type  # save new default file type
+        return 0
+    return -1
 
 
 # ------------------------------------------------------------------------------
@@ -1924,25 +1948,24 @@ class NumpyEncoder(json.JSONEncoder):
     def default(self, obj):
         if isinstance(obj, np.integer):
             return int(obj)
-        elif isinstance(obj, np.floating):
+        if isinstance(obj, np.floating):
             return float(obj)
-        elif isinstance(obj, np.ndarray):
+        if isinstance(obj, np.ndarray):
             return obj.tolist()
-        elif isinstance(obj, complex):
+        if isinstance(obj, complex):
             if obj.imag < 0:
                 return str(obj.real) + str(obj.imag) + "j"
-            else:
-                return str(obj.real) + "+" + str(obj.imag) + "j"
-        elif callable(obj):
+            return str(obj.real) + "+" + str(obj.imag) + "j"
+        if callable(obj):
             logger.warning("Object '%s' not JSON serializable as it is a function.", obj)
             return ""
-        else:
-            try:
-                return json.JSONEncoder.default(self, obj)
-            except TypeError as e:
-                logger.warning(
-                    "Object of type '%s' is not JSON serializable.\n%s", type(obj), e)
-                return ""
+
+        try:
+            return json.JSONEncoder.default(self, obj)
+        except TypeError as e:
+            logger.warning(
+                "Object of type '%s' is not JSON serializable.\n%s", type(obj), e)
+            return ""
 
 
 # ==============================================================================

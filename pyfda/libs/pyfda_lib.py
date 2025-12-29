@@ -16,7 +16,6 @@ import sys
 import struct
 import traceback
 
-# from contextlib import redirect_stdout
 from docutils import __version__ as V_DOC
 # from markdown import __version__ as V_MD
 from matplotlib import __version__ as V_MPL
@@ -144,25 +143,28 @@ def cmp_version(mod: str, version: str) -> int:
         if not mod or mod not in MODULES\
                 or list(MODULES[mod].values())[0] in {'', 'n.a.'}:
             return -2
-        elif dirs.PYINSTALLER:
-            # pyfda is running from an self-extracting archive, version should be ok
+
+        if dirs.PYINSTALLER:
+            # pyfda is running from an self-extracting archive, version has to be ok
             return 1
-        else:
-            # get dict value without knowing the key:
-            inst_ver = list(MODULES[mod].values())[0]
-            if inst_ver == 'unknown':
-                logger.warning(
-                    "Version number of module '%s' could not be determined.", mod)
-                return -3
+
+        # get dict value without knowing the key:
+        inst_ver = list(MODULES[mod].values())[0]
+        if inst_ver == 'unknown':
+            logger.warning(
+                "Version number of module '%s' could not be determined.", mod)
+            return -3
 
         if versiontuple(inst_ver) > versiontuple(version):
             return 1
-        elif versiontuple(inst_ver) == versiontuple(version):
+
+        if versiontuple(inst_ver) == versiontuple(version):
             return 0
-        else:
-            return -1
+
+        return -1
+
     except (TypeError, KeyError) as e:
-        logger.warning(f"Version number of '{mod}' could not be determined:\n{e}")
+        logger.warning("Version number of '%s' could not be determined:\n%s", mod, e)
         return -1
 
 
@@ -176,29 +178,27 @@ def mod_version(mod: str = "") -> str:
     if mod:
         if mod in MODULES:
             return list(MODULES[mod].values())[0]
-        else:
-            return ""
-    else:
-        v_md = ""
-        with open(os.path.join(dirs.INSTALL_DIR, "module_versions.md"), 'r') as f:
-            # return a list, split at linebreaks while keeping linebreaks
-            v = f.read().splitlines(True)
 
-        for k in v:
-            try:
-                # evaluate {V_...} from MOD_VERSIONS entries:
-                v_md += k.format(**MOD_VERSIONS)
-            except (KeyError) as e:  # encountered undefined {V_...}
-                logger.warning("KeyError: %s", e)  # simply drop the line
+        return ""
 
-        v_html = markdown.markdown(v_md, output_format='html5',
-                                   extensions=['markdown.extensions.tables'])
-        # pyinstaller needs explicit definition of extensions path
+    v_md = ""
+    # open and read `module_versions.md` with module version infos
+    with open(os.path.join(dirs.INSTALL_DIR, "module_versions.md"), 'r') as f:
+        # return a list, split at linebreaks while keeping linebreaks
+        v = f.read().splitlines(True)
 
-        return v_html
+    for k in v:
+        try:
+            # evaluate {V_...} from MOD_VERSIONS entries:
+            v_md += k.format(**MOD_VERSIONS)
+        except (KeyError) as e:  # encountered undefined {V_...}
+            logger.warning("KeyError: %s", e)  # simply drop the line
 
+    # pyinstaller needs explicit definition of extensions path
+    return markdown.markdown(v_md, output_format='html5',
+                             extensions=['markdown.extensions.tables'])
 
-# ------------------------------------------------------------------------------
+# ==============================================================================
 logger.info(mod_version())
 
 # Amplitude max, min values to prevent scipy aborts
@@ -392,7 +392,7 @@ def np_shape(data):
     return (None, None)
 
 # -----------------------------------------------------------------------------
-def iter2ndarray(iterable, dtype=complex) -> np.ndarray:
+def iter2ndarray(iterable: np.ndarray | list | tuple, dtype=complex) -> np.ndarray | None:
     """
     Convert an iterable (tuple, list, dict) to a numpy ndarray, egalizing
     different lengths of sub-iterables by adding zeros. This prevents
@@ -400,11 +400,11 @@ def iter2ndarray(iterable, dtype=complex) -> np.ndarray:
 
     Return ndarray or None
     """
-    # try:
     if isinstance(iterable, np.ndarray):
         # no need to convert argument
         return iterable
-    elif type(iterable) in {tuple, list}:
+
+    if isinstance(iterable, (tuple, list)):
         arrs = []  # empty list for sub-arrays
         max_l = 0  # maximum length of sub-arrays
         for i in range(len(iterable)):
@@ -419,9 +419,9 @@ def iter2ndarray(iterable, dtype=complex) -> np.ndarray:
             arrs[i] = np.asarray(np.append(arrs[i], np.zeros(max_l - len(arrs[i]))))
 
         return np.nan_to_num(np.array(arrs, dtype=dtype))  # convert list of arrays to two-dimensional array
-    else:
-        logger.error(f"Unsupported type '{type(iterable)}' of {iterable} for conversion to ndarray.")
-        return None
+
+    logger.error("Unsupported type '{type(iterable)}' of %s for conversion to ndarray.", iterable)
+    return None
 
 # -----------------------------------------------------------------------------
 def set_dict_defaults(d: dict, default_dict: dict) -> None:
@@ -433,7 +433,7 @@ def set_dict_defaults(d: dict, default_dict: dict) -> None:
     for k in list(d.keys()):
         if k not in default_dict:
             d.pop(k)
-            logger.warning(f"Deleted key '{k}' (not part of default dict).")
+            logger.warning("Deleted key '%s' (not part of default dict).", k)
     if d == {}:
         d.update(default_dict)
     else:
@@ -534,8 +534,7 @@ def pprint_log(d, N: int = 10, tab: str = "\t", debug: bool = False) -> str:
     s = tab
     first = True
     if debug:
-        logger.info(f"Data: {type(d).__name__}[{type(d[0]).__name__}], "
-                    f"ndim={np.ndim(d)}")
+        logger.info("Data: %s [%s], ndim=%d", type(d).__name__, type(d[0]).__name__, np.ndim(d))
     if isinstance(d, dict):
         for k in d:
             if not first:
@@ -1212,13 +1211,6 @@ def rect_bl(t: np.ndarray, duty: float | int = 0.5) -> np.ndarray:
 
     By Endolith, https://gist.github.com/endolith/407991
     """
-    if t.dtype.char in ['fFdD']:
-        ytype = t.dtype.char
-    else:
-        ytype = 'd'
-    y = np.zeros(t.shape, ytype)
-    # Get sampling frequency from timebase
-    # Sum all multiple sine waves up to the Nyquist frequency:
     return sawtooth_bl(t - duty*2*pi) - sawtooth_bl(t) + 2*duty-1
 
 
