@@ -1657,9 +1657,10 @@ def load_filter(self, all_filters: bool = False) -> int:
             with io.open(file_name, 'r') as f:  # open in text mode for json files
                 fb_temp = json.load(f)
 
-        except IOError as e:
-            logger.error("Failed loading %s!\n%s", file_name, e)
+        except (IOError, json.JSONDecodeError) as e:
+            logger.error("Failed loading / opening\n\t%s!\n%s", file_name, e)
             return -1
+
     else:
         logger.error('Unknown file type "%s"', file_type)
         return -1
