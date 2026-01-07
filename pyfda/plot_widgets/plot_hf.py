@@ -22,7 +22,8 @@ from matplotlib import rcParams
 from matplotlib.ticker import AutoMinorLocator
 
 from pyfda.libs.compat import (QCheckBox, QWidget, QComboBox, QLabel, QLineEdit,
-                               QFrame, QHBoxLayout, QGridLayout, pyqtSignal)
+                               QFrame, QHBoxLayout, QGridLayout, pyqtSignal, 
+                               QPushButton)
 import pyfda.filterbroker as fb
 from pyfda.filterbroker import fb_get
 from pyfda.pyfda_rc import params
@@ -63,7 +64,7 @@ class Plot_Hf(QWidget):
 
         self._construct_ui()
 
-# ------------------------------------------------------------------------------
+    # ------------------------------------------------------------------------------
     def process_sig_rx(self, dict_sig=None):
         """
         Process signals coming from the navigation toolbar and from sig_rx
@@ -92,6 +93,7 @@ class Plot_Hf(QWidget):
             if 'view_changed' in dict_sig:
                 self.needs_draw = True
 
+    # ------------------------------------------------------------------------------
     def _construct_ui(self):
         """
         Define and construct the subwidgets
@@ -133,7 +135,8 @@ class Plot_Hf(QWidget):
 
         self.cmb_units_a.setSizeAdjustPolicy(QComboBox.AdjustToContents)
 
-        self.but_zerophase = PushButton(self, "Zero Phase")
+        self.but_zerophase = QPushButton(self)
+        self.but_zerophase.setText("Zero Phase")
         self.but_zerophase.setToolTip(
             "<span>Subtract linear phase as calculated from filter order. "
             "Only available for FIR filters and for unit 'V', it "
@@ -226,7 +229,7 @@ class Plot_Hf(QWidget):
 
         self.mplwidget.mplToolbar.sig_tx.connect(self.process_sig_rx)
 
-# ------------------------------------------------------------------------------
+    # ------------------------------------------------------------------------------
     def init_axes(self):
         """
         Initialize and clear the axes (this is run only once)
@@ -238,7 +241,7 @@ class Plot_Hf(QWidget):
         self.ax.xaxis.tick_bottom()  # remove axis ticks on top
         self.ax.yaxis.tick_left()  # remove axis ticks right
 
-# ------------------------------------------------------------------------------
+    # ------------------------------------------------------------------------------
     def align_y_axes(self, ax1, ax2):
         """ Sets tick marks of twinx axes to line up with total number of
             ax1 tick marks
@@ -475,7 +478,7 @@ class Plot_Hf(QWidget):
 
             _plot_specs()
 
-#------------------------------------------------------------------------------
+    #------------------------------------------------------------------------------
     def draw_inset(self):
         """
         Construct / destruct second axes for an inset second plot
@@ -536,7 +539,7 @@ class Plot_Hf(QWidget):
         self.inset_idx = self.cmbInset.currentIndex()  # update index
         self.draw()
 
-# ------------------------------------------------------------------------------
+    # ------------------------------------------------------------------------------
     def draw_phase(self, ax):
         """
         Draw phase on second y-axis in the axes system passed as the argument
@@ -573,7 +576,7 @@ class Plot_Hf(QWidget):
         # -----------------------------------------------------------
             self.ax_p.set_ylabel(phi_str)
 
-#------------------------------------------------------------------------------
+    #------------------------------------------------------------------------------
     def calc_hf(self):
         """
         (Re-)Calculate the complex frequency response H_cmplx(W) (complex)
@@ -583,7 +586,7 @@ class Plot_Hf(QWidget):
             fb_get('ba', 0), fb_get('ba', 1),
             worN=fb.conf_settings['N_FFT'], whole=True, fs=2*np.pi)
 
-#------------------------------------------------------------------------------
+    #------------------------------------------------------------------------------
     def draw(self):
         r"""
         Re-calculate \|H(f)\| and draw the figure
@@ -592,7 +595,7 @@ class Plot_Hf(QWidget):
         self.calc_hf()
         self.update_view()
 
-#------------------------------------------------------------------------------
+    #------------------------------------------------------------------------------
     def update_view(self):
         """
         Draw the figure with new limits, scale etc without recalculating H(f)
@@ -671,7 +674,7 @@ class Plot_Hf(QWidget):
             self.H_c = self.H_cmplx
 
         # remove linear phase if button is checked
-        if self.but_zerophase.checked:
+        if self.but_zerophase.isChecked():
             self.H_c = self.H_c * np.exp(1j * self.W[0:len(self.F)] * fb_get('N')/2.)
 
         H_str = r'$H(\mathrm{e}^{\mathrm{j} \Omega})$'
