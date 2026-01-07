@@ -55,7 +55,7 @@ Binaries for **Linux** are created as Flatpaks as well **(currently broken)** wh
 
 ### pip
 
-**Python 3.8** and above is supported, there is only one version of pyfda for all operating systems at [PyPI](https://pypi.org/project/pyfda/). As pyfda is a pure Python project (no compilation required), you can install pyfda the usual way, required libraries are downloaded automatically if missing:
+**Python 3.10** and above is supported, there is only one version of pyfda for all operating systems at [PyPI](https://pypi.org/project/pyfda/). As pyfda is a pure Python project (no compilation required), you can install pyfda the usual way, required libraries are downloaded automatically if missing:
 
     > pip install pyfda
 
@@ -68,15 +68,17 @@ Uninstall:
     > pip uninstall pyfda
 
 <!--
-If you have cloned `pyfda` to your local drive you can install the local copy (i.e. create local config files and the `pyfdax` starter script) via
+If you have cloned `pyfda` to your local drive you can install an editable local copy (i.e. create local config files and the `pyfdax` starter script) via
 
-    > pip install -e <YOUR_PATH_TO_PYFDA_setup.py>
+    > python -m pip install -e <YOUR_PATH_TO_pyproject.toml>
+
+and edit the software.
 
 -->
 
 #### Starting pyfda
 
-A pip installation creates a start script `pyfdax` in `<python>/Scripts` which should be in your path. So, simply start pyfda using
+A pip installation creates a start script `pyfdax[.exe]` in `<python>/Scripts` which should be in your path. So, simply start pyfda using
 
     > pyfdax
 
@@ -88,12 +90,12 @@ The following libraries are required and installed automatically by pip when mis
 - **[scipy](https://scipy.org/)**: **1.2.0** or higher
 - **[matplotlib](https://matplotlib.org/)**: **3.1** or higher
 - **[Markdown](https://github.com/Python-Markdown/markdown)**
+- **[Amaranth HDL](https://github.com/amaranth-lang/amaranth)** for fixpoint simulation and Verilog export (work in progress, help wanted)
   
 **Optional libraries:**
-
 - **[mplcursors](https://mplcursors.readthedocs.io/)** for annotating cursors
 - **[docutils](https://docutils.sourceforge.io)** for rich text in documentation
-- **[Amaranth HDL](https://github.com/amaranth-lang/amaranth)** for fixpoint simulation and Verilog export (work in progress, help wanted)
+
 - **xlwt** and / or **XlsxWriter** for exporting filter coefficients as *.xls(x) files
 
 ### conda
@@ -109,6 +111,8 @@ If you run into problems that conda brings a different Qt version than PyQt5, yo
     > conda create --name pyfda
     > conda install --channel=conda-forge pyfda
 
+Pleas give me feedback if you are installing pyfda this way.
+
 ### git
 
 If you want to contribute to pyfda (great idea!), fork the latest version from [https://github.com/chipmuenk/pyfda.git](https://github.com/chipmuenk/pyfda.git) and create a local copy using
@@ -119,7 +123,7 @@ This command creates a new folder `pyfda` at your current directory level and co
 
 pyfda can then be installed (i.e. creating local config files and the `pyfdax` starter script) from local files using
 
-    > pip install -e <YOUR_PATH_TO_PYFDA_setup.py>
+    > python -m pip install -e <YOUR_PATH_TO_pyproject.toml>
 
 Now you can edit the code and test it. If you're happy with it, push it to your repo and create a Pull Request so that the code can be reviewed and merged into the `chipmuenk/pyfda` repo.
 

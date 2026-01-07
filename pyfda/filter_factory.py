@@ -101,8 +101,8 @@ class FilterFactory():
 
         except KeyError:
             err_string =("\nKeyError in 'FilterFactory.create_fil_inst()':\n"
-                  "Filter design class '%s' is not in dict 'fb.filter_classes',\n"
-                  "i.e. it was not found by 'FilterTreeBuilder'."%fc)
+                  f"Filter design class '{fc}' is not in dict 'fb.filter_classes',\n"
+                  "i.e. it was not found by 'FilterTreeBuilder'.")
             self.err_code = 1
             logger.warning(err_string)
             debug_exception()

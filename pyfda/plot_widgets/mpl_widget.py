@@ -845,8 +845,7 @@ class MplToolbar(NavigationToolbar):
 
                 self.cb.setText(base64_str)
                 logger.info(
-                    f'Copied plot {title_info} as base64 encoded PNG image '
-                    'to Clipboard.')
+                    "Copied plot %s as base64 encoded PNG image to Clipboard.", title_info)
                 # elif modifiers == Qt.ControlModifier:
                 #     self.cb.setText(
                 #         '<img src="data:image/png;base64,' + base64_str + '"/>')
@@ -854,6 +853,6 @@ class MplToolbar(NavigationToolbar):
                 #                 'with <img> tag to Clipboard.')
             else:
                 self.cb.setImage(img)
-                logger.info(f'Copied plot {title_info} as PNG image to Clipboard.')
+                logger.info("Copied plot %s as PNG image to Clipboard.", title_info)
         except:
-            logger.error('Error copying figure to clipboard:\n{0}'.format(sys.exc_info()))
+            logger.error("Error copying figure to clipboard:\n%s", sys.exc_info())

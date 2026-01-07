@@ -196,8 +196,8 @@ if __name__ == '__main__':
             yield dut.i.eq(int(i))
             yield Tick()
             output.append((yield dut.o))
-        logger.warning(f"in: {stimulus}")
-        logger.warning(f"out: {output}")
+        logger.warning("in: %s", stimulus)
+        logger.warning("out: %s", output)
 
     sim = Simulator(dut)
     # with Simulator(m) as sim:

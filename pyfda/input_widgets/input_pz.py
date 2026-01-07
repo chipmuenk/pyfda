@@ -400,8 +400,7 @@ class Input_PZ(QWidget):
         qstyle_widget(self.ui.but_apply, 'normal')
         qstyle_widget(self.ui.but_undo, 'normal')
 
-        logger.debug(f"b,a = {fb.fil[0]['ba']}\n\n"
-                     f"zpk = {pformat(fb.fil[0]['zpk'])}\n")
+        logger.debug("b,a = %s\n\nzpk = %s\n", fb.fil[0]['ba'], pformat(fb.fil[0]['zpk']))
 
     # ------------------------------------------------------------------------------
     def _clear_table(self) -> None:
@@ -600,33 +599,30 @@ class Input_PZ(QWidget):
 
         if frmt == 'cartesian' or not isinstance(data, complex):
             if full_prec:
-                return f"{data}"
-            else:
-                return f"{data:.{places}g}"
+                return str(data)
+            return f"{data:.{places}g}"
 
-        elif frmt == 'polar_rad':
+        if frmt == 'polar_rad':
             r, phi = np.absolute(data), np.angle(data, deg=False)
             if full_prec:
                 return f"{r} {self.angle_char}{phi} rad"
-
             return f"{r:.{places}g} {self.angle_char}{phi:.{places}g} rad"
 
-        elif frmt == 'polar_deg':
+        if frmt == 'polar_deg':
             r, phi = np.absolute(data), np.angle(data, deg=True)
             if full_prec:
                 return f"{r} {self.angle_char}{phi}°"
-
             return f"{r:.{places}g} {self.angle_char}{phi:.{places}g}°"
 
-        elif frmt == 'polar_pi':
+        if frmt == 'polar_pi':
             r, phi = np.absolute(data), np.angle(data, deg=False) / np.pi
             if full_prec:
                 return f"{r} {self.angle_char}{phi} {self.pi_char}"
 
             return f"{r:.{places}g} {self.angle_char}{phi:.{places}g} {self.pi_char}"
 
-        else:
-            logger.error("Unknown format %s.", frmt)
+        logger.error("Unknown format %s.", frmt)
+        return str(data)
 
     # --------------------------------------------------------------------------
     def export_table(self) -> None:
@@ -680,8 +676,8 @@ class Input_PZ(QWidget):
             orientation_horiz = False
         else:
             logger.error("Imported data is a single value or None.")
-            return None
-        logger.info(f"_import: c x r = {num_cols} x {num_rows}")
+            return
+        logger.info("_import: c x r = %d x %d", num_cols, num_rows)
         zpk = [[], [], []]
 
         if orientation_horiz:
@@ -707,7 +703,6 @@ class Input_PZ(QWidget):
             logger.error(zpk_arr)
             qstyle_widget(self.ui.but_apply, 'error')
             qstyle_widget(self.ui.but_undo, 'changed')  #
-            return
         else:
             self.zpk = zpk_arr
             qstyle_widget(self.ui.but_apply, 'changed')

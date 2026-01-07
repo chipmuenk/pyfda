@@ -42,7 +42,7 @@ import pyfda.libs.pyfda_fix_lib as fx
 from pyfda.pyfda_rc import params
 import pyfda.libs.pyfda_dirs as dirs
 import pyfda.filterbroker as fb  # importing filterbroker initializes all its globals
-from pyfda.filterbroker import get_fx, fb_get
+from pyfda.filterbroker import get_fx, fb_get, fb_set
 
 from .compat import QFileDialog
 
@@ -52,7 +52,7 @@ __version__ = dirs.VERSION
 # ##############################################################################
 # Include this version number as `'_id': ('pyfda', FILTER_FILE_VERSION)` when saving
 # filter files and test for the version when loading filter files.
-FILTER_FILE_VERSION = 1
+FILTER_FILE_VERSION = '2'
 
 # file filters for the QFileDialog object are constructed from this dict
 file_filters_dict = {
@@ -93,6 +93,7 @@ def prune_file_ext(file_type: str) -> str:
     Parameters
     ----------
     file_type : str
+        File type description string, e.g. 'Text file (\*.txt)'
 
     Returns
     -------
@@ -147,10 +148,10 @@ def extract_file_ext(file_type: str, return_list: bool = False) -> str:
         file_type_list = [t.strip('(*.)') for t in ext_list]  # remove '(*.)'
         if return_list:
             return file_type_list
-        else:
-            return str(file_type_list[0])
-    else:
-        return file_type
+
+        return str(file_type_list[0])
+
+    return file_type
 
 
 # ------------------------------------------------------------------------------
@@ -346,10 +347,9 @@ def qtable2csv(table: object, data: np.ndarray, zpk: bool = False,
             item = table.item(r, c)
             if item and item.text() != "":
                 return table.itemDelegate().text(item).lstrip(" ") + delim
-            else:
-                return "0" + delim
-        else:
-            return str(safe_eval(data[c][r], return_type='auto')).strip("()") + delim
+            return "0" + delim  # empty table item
+        # unformatted, get data from the model
+        return str(safe_eval(data[c][r], return_type='auto')).strip("()") + delim
 
     text = ""
     if params['CSV']['header'] == 'on':
@@ -408,12 +408,11 @@ def qtable2csv(table: object, data: np.ndarray, zpk: bool = False,
                 text += item2text(r, 2, formatted)  # gain value
             text = text.rstrip(delim) + cr  # finish text line, remove last delimiter
 
-    text = text.rstrip(cr)  # delete CR after last row
-    return text
+    return text.rstrip(cr)  # delete CR after last row
 
 
 # ------------------------------------------------------------------------------
-def csv2array(f: TextIO):
+def csv2array(f: TextIO) -> np.ndarray[str] | None:
     """
     Convert comma-separated values from file or text to numpy array of str,
      taking into account the settings of the CSV dict.
@@ -602,12 +601,11 @@ def csv2array(f: TextIO):
         logger.error("Imported data is a scalar: '%s'", data_arr)
         return None
 
-    elif np.ndim(data_arr) == 1:
+    if np.ndim(data_arr) == 1:
         if len(data_arr) < 2:
             logger.error("Not enough data: '%s'", data_arr)
             return None
-        else:
-            data = data_arr
+        data = data_arr
 
     elif np.ndim(data_arr) == 2:
         rows, cols = np.shape(data_arr)
@@ -681,9 +679,8 @@ def read_csv_info_large(filename):
         lineterminator, delimiter, N, has_header)
 
     if params['CSV']['orientation'] not in {'rows', 'cols', 'auto'}:
-        logger.error(
-            f"Unknown key '{params['CSV']['orientation']}' for "
-            "params['CSV']['orientation']")
+        logger.error("Unknown key '%s' for params['CSV']['orientation']",
+                     params['CSV']['orientation'])
     if params['CSV']['orientation'] == 'auto' and (N < nchans)\
         or params['CSV']['orientation'] == 'rows':  # swap rows and columns
         N, nchans = nchans, N
@@ -842,7 +839,7 @@ def read_wav_info(file) -> int:
 # ------------------------------------------------------------------------------
 def file2array(file_name: str, file_type: str, fkey: str = "",
                from_clipboard: bool = False, as_str: bool = False
-                 ) -> np.ndarray:
+                 ) -> np.ndarray | None:
     r"""
     Import data from a file or from clipboard and convert it to a numpy array.
 
@@ -913,14 +910,14 @@ def file2array(file_name: str, file_type: str, fkey: str = "",
             # an error has occurred
             logger.error("Couldn't import data from clipboard.")
             return None
-        elif isinstance(data_arr, str):
+        if isinstance(data_arr, str):
             # returned an error message instead of numpy data:
             file2array.info_str = ""
             logger.error("You shouldn't see this message!! \n"
                          "Error copying from clipboard:\n%s", data_arr)
             return None
-        else:
-            file2array.info_str = csv2array.info_str
+
+        file2array.info_str = csv2array.info_str
 
     # ----- Data from file -----------------------------------------------------
     else:
@@ -930,7 +927,7 @@ def file2array(file_name: str, file_type: str, fkey: str = "",
                 f_S, data_arr = wavfile.read(file_name, mmap=False)
                 # data_arr is 1D for single channel (mono) files and
                 # 2D otherwise (n_chans, n_samples)
-                fb.fil[0]['f_s_wav'] = f_S
+                fb_set('f_s_wav', f_S)
 
             elif file_type in {'csv', 'txt'}:
                 with open(file_name, 'r', newline=None) as f:
@@ -940,7 +937,7 @@ def file2array(file_name: str, file_type: str, fkey: str = "",
                         # an error has occurred
                         logger.error("Error loading file '%s'!", file_name)
                         return None
-                    elif isinstance(data_arr, str):
+                    if isinstance(data_arr, str):
                         # returned an error message instead of numpy data:
                         file2array.info_str = ""
                         logger.error("You shouldn't see this message!! \n"
@@ -1023,9 +1020,8 @@ def save_data_np(file_name: str, file_type: str, data: np.ndarray,
 
     if file_name is None:  # error or operation cancelled
         return -1
-    elif np.ndim(data) < 1 or np.ndim(data) > 2:
+    if np.ndim(data) < 1 or np.ndim(data) > 2:
         logger.error("Unsuitable data format for a wav file, ndim = %d.", np.ndim(data))
-        logger.error(data)
         return -1
     try:
         if file_type == 'wav':
@@ -1034,7 +1030,7 @@ def save_data_np(file_name: str, file_type: str, data: np.ndarray,
                 f_S_int = 1
             if f_S != f_S_int:
                 logger.warning(
-                    "Only integer sampling frequencies can be used for WAV files,\n"
+                    "Only positive integer sampling frequencies can be used for WAV files,\n"
                     "sampling frequency has been changed to f_S = %d", f_S_int)
 
             # audio = data.T  # transpose data, needed?
@@ -1060,25 +1056,36 @@ def save_data_np(file_name: str, file_type: str, data: np.ndarray,
         return -1
 
 # ------------------------------------------------------------------------------
-def write_wav_frame(parent, file_name, data: np.array, f_S = 1,
-                    title: str = "Export"):
+def write_wav_frame(parent: object, file_name: str, data: np.ndarray, f_S: int = 1,
+                    title: str = "Export") -> None:
     """
     Export a frame of data in wav format
+
+    TODO: Currently unused!
 
     Parameters
     ----------
     parent: handle to calling instance for creating file dialog instance
 
-    data: np.array
+    file_name: str
+        Full path and name of the file to be imported
+
+    data: np.ndarray
         data to be exported
+
+    f_S: int
+        Sampling frequency in Hz
 
     title: str
         title string for the file dialog box (e.g. "audio data ")
 
+    Returns
+    -------
+    None
     """
     file_name, file_type = select_file(parent, title=title, mode='wb', file_types=('wav'))
     if file_name is None:
-        return None  # file operation cancelled or other error
+        return  # file operation cancelled or other error
 
     try:
         if np.ndim(data) == 1:  # mono
@@ -1104,7 +1111,7 @@ def write_wav_frame(parent, file_name, data: np.array, f_S = 1,
         with open(file_name, 'w', encoding="utf8", newline='') as f:
                         f.write(data)
 
-        logger.info('Filter saved as\n\t"%s"', file_name)
+        logger.info('Data saved as\n\t"%s"', file_name)
 
     except IOError as e:
         logger.error('Failed saving "%s"!\n%s\n', file_name, e)
@@ -1113,7 +1120,7 @@ def write_wav_frame(parent, file_name, data: np.array, f_S = 1,
 # ------------------------------------------------------------------------------
 def export_fil_data(parent: object, data: str, fkey: str = "", title: str = "Export",
                 file_types: tuple[str, ...] = ('csv', 'mat', 'npy', 'npz'),
-                formatted: bool = True):
+                formatted: bool = True) -> None:
     """
     Export filter coefficients or pole/zero data in various formats, file name and type
     are selected via the ui.
@@ -1165,7 +1172,7 @@ def export_fil_data(parent: object, data: str, fkey: str = "", title: str = "Exp
     file_name, file_type = select_file(parent,title=title, mode='wb',
                                        file_types=file_types)
     if file_name is None:
-        return None  # file operation cancelled or other error
+        return  # file operation cancelled or other error
 
     err = False
 
@@ -1188,14 +1195,14 @@ def export_fil_data(parent: object, data: str, fkey: str = "", title: str = "Exp
                     err = export_coe_cmsis_fir(f, formatted)
                 else:
                     logger.error('Unknown file extension "%s"', file_type)
-                    return None
+                    return
 
         else:  # binary formats, storing numpy arrays
             np_data = csv2array(io.StringIO(data))  # convert csv data to numpy array
             if isinstance(np_data, str):
                 # returned an error message instead of numpy data:
                 logger.error("Error converting %s data:\n%s", description.lower(), np_data)
-                return None
+                return
 
             with open(file_name, 'wb') as f:
                 if file_type == 'mat':
@@ -1283,8 +1290,8 @@ def coe_header(title: str) -> str:
     a_lbls = []
     a_targs = []
     a_targs_dB = []
-    ft = fb.fil[0]['ft']  # get filter type ('IIR', 'FIR')
-    unit = fb.fil[0]['amp_specs_unit']
+    ft = fb_get('ft')  # get filter type ('IIR', 'FIR')
+    unit = fb_get('amp_specs_unit')
     unit = 'dB'  # fix this for the moment
     # construct pairs of corner frequency and corresponding amplitude
     # labels in ascending frequency for each response type
@@ -1292,16 +1299,16 @@ def coe_header(title: str) -> str:
         if fb_get('rt') == 'LP':
             f_lbls = ['F_PB', 'F_SB']
             a_lbls = ['A_PB', 'A_SB']
-        elif fb.fil[0]['rt'] == 'HP':
+        elif fb_get('rt') == 'HP':
             f_lbls = ['F_SB', 'F_PB']
             a_lbls = ['A_SB', 'A_PB']
-        elif fb.fil[0]['rt'] == 'BP':
+        elif fb_get('rt') == 'BP':
             f_lbls = ['F_SB', 'F_PB', 'F_PB2', 'F_SB2']
             a_lbls = ['A_SB', 'A_PB', 'A_PB', 'A_SB2']
-        elif fb.fil[0]['rt'] == 'BS':
+        elif fb_get('rt') == 'BS':
             f_lbls = ['F_PB', 'F_SB', 'F_SB2', 'F_PB2']
             a_lbls = ['A_PB', 'A_SB', 'A_SB', 'A_PB2']
-        elif fb.fil[0]['rt'] == 'HIL':
+        elif fb_get('rt') == 'HIL':
             f_lbls = ['F_PB', 'F_PB2']
             a_lbls = ['A_PB', 'A_PB']
 
@@ -1340,21 +1347,21 @@ def coe_header(title: str) -> str:
                 del a_targs_dB[i]
 
     date_frmt = "%d-%B-%Y %H:%M:%S"  # select date format
-    unit = fb.fil[0]['plt_fUnit']
+    unit = fb_get('plt_fUnit')
     if unit in {'f_S', 'f_Ny'}:
         f_S = ""
     else:
-        f_S = fb.fil[0]["f_S"]
+        f_S = fb_get('f_S')
     header = (
         "-" * 85 + "\n\n"
         f"{title}\n"
         f"Generated by pyfda {__version__} (https://github.com/chipmuenk/pyfda)\n\n")
     header += "Designed:\t{0}\n".format(
         datetime.datetime.fromtimestamp(
-            int(fb.fil[0]['timestamp'])).strftime(date_frmt))
-    header += "Saved:\t{0}\n\n".format(datetime.datetime.now().strftime(date_frmt))
-    header += f"Filter type:\t{fb.fil[0]['rt']}, {fb.fil[0]['fc']} "
-    header += f"(Order = {fb.fil[0]['N']})\n"
+            int(fb_get('timestamp'))).strftime(date_frmt))
+    header += f"Saved:\t{datetime.datetime.now().strftime(date_frmt)}\n\n"
+    header += f"Filter type:\t{fb_get('rt')}, {fb_get('fc')} "
+    header += f"(Order = {fb_get('N')})\n"
     header += f"Sample Frequency \tf_S = {f_S} {unit}\n\n"
     header += "Corner Frequencies:\n"
     for lf, f, la, a in zip(f_lbls, f_vals, a_lbls, a_targs_dB):
@@ -1372,31 +1379,31 @@ def export_coe_xilinx(f: TextIO) -> bool:
 
     Returns error status (False if the file was saved successfully)
     """
-    qc = fx.Fixed(fb.fil[0]['fxq']['QCB'])  # instantiate fixpoint object
+    qc = fx.Fixed(fb_get('fxq', 'QCB'))  # instantiate fixpoint object
 
-    if qc.q_dict['WF'] != 0  and fb.fil[0]['qfrmt'] != 'qint':
+    if qc.q_dict['WF'] != 0  and fb_get('qfrmt') != 'qint':
         logger.error("Fractional formats are not supported!")
         return True
 
-    if fb.fil[0]['fx_base'] == 'hex':  # select hex format
+    if fb_get('fx_base') == 'hex':  # select hex format
         coe_radix = 16
-    if fb.fil[0]['fx_base'] == 'bin':  # select binary format
+    if fb_get('fx_base') == 'bin':  # select binary format
         coe_radix = 2
     else:
         logger.warning(
             "Coefficients in %s format are not supported in COE files, converting to "
-            "decimal format.", fb.fil[0]['fx_base'])
-        fb.fil[0]['fx_base'] =  'dec'  # select decimal format in all other cases
+            "decimal format.", fb_get('fx_base'))
+        fb_set('fx_base', 'dec')  # select decimal format in all other cases
         coe_radix = 10
 
     # Quantize coefficients to decimal / hex integer format, return an array of strings
-    bq = qc.float2frmt(fb.fil[0]['ba'][0])
+    bq = qc.float2frmt(fb_get('ba')[0])
 
     exp_str = "; " + coe_header(
         "XILINX CORE Generator(tm) Distributed Arithmetic FIR filter coefficient (.COE) "
         "file").replace("\n", "\n; ")
 
-    exp_str += "\nRadix = {0};\n".format(coe_radix)
+    exp_str += f"\nRadix = {coe_radix};\n"
       # quantized wordlength
     exp_str += f"Coefficient_width = {qc.q_dict['WI'] + qc.q_dict['WF'] + 1};\n"
     coeff_str = "CoefData = "
@@ -1417,19 +1424,19 @@ def export_coe_microsemi(f: TextIO) -> bool:
     For (anti)symmetric filter only one half of the coefficients must be
     specified?
     """
-    qc = fx.Fixed(fb.fil[0]['fxq']['QCB'])  # instantiate fixpoint object
+    qc = fx.Fixed(fb_get('fxq', 'QCB'))  # instantiate fixpoint object
 
-    if qc.q_dict['WF'] != 0  and fb.fil[0]['qfrmt'] != 'qint':
+    if qc.q_dict['WF'] != 0  and fb_get('qfrmt') != 'qint':
         logger.error("Fractional formats are not supported!")
         return True
 
-    if fb.fil[0]['fx_base'] != 'dec':
-        fb.fil[0]['fx_base'] = 'dec'  # select decimal format in all other cases
+    if fb_get('fx_base') != 'dec':
+        fb_set('fx_base', 'dec')  # select decimal format in all other cases
         logger.warning('Converting to decimal coefficient format, other numeric formats '
                        'are not supported by Microsemi tools.')
 
     # Quantize coefficients to decimal integer format, returning an array of strings
-    bq = qc.float2frmt(fb.fil[0]['ba'][0])
+    bq = qc.float2frmt(fb_get('ba')[0])
 
     coeff_str = "coefficient_set_1\n"
     for b in bq:
@@ -1446,32 +1453,33 @@ def export_coe_vhdl_package(f: TextIO) -> bool:
     Save FIR filter coefficients as a VHDL package '\*.vhd', specifying
     the number base and the quantized coefficients (decimal or hex integer).
     """
-    qc = fx.Fixed(fb.fil[0]['fxq']['QCB'])  # instantiate fixpoint object
+    qc = fx.Fixed(fb_get('fxq', 'QCB'))  # instantiate fixpoint object
     if fb_get('qfrmt') == 'qfrac' and qc.q_dict['WF'] != 0:
         logger.error("Fractional numbers are only supported for floats!")
         return True
 
-    WO = fb.fil[0]['fxq']['QO']['WI'] + fb.fil[0]['fxq']['QO']['WF'] + 1
+    WO = fb_get('fxq', 'QO','WI') + fb_get('fxq', 'QO', 'WF') + 1
 
-    if fb.fil[0]['fx_base'] == 'dec' or not get_fx():
+    if fb_get('fx_base') == 'dec' or not get_fx():
         pre = ""
         post = ""
-    elif fb.fil[0]['fx_base'] == 'hex':
+    elif fb_get('fx_base') == 'hex':
         pre = "#16#"
         post = "#"
-    elif fb.fil[0]['fx_base'] == 'bin':
+    elif fb_get('fx_base') == 'bin':
         pre = "#2#"
         post = "#"
     else:
-        fb.fil[0]['fx_base'] = 'dec'  # select decimal format in all other cases
+        prev_fx_base = fb_get('fx_base')
+        fb_set('fx_base', 'dec')  # select decimal format in all other cases
         pre = ""
         post = ""
         logger.warning(
             "Coefficients in %s format are not supported, converting to decimal format.",
-            fb.fil[0]['fx_base'])
+            prev_fx_base)
 
     # Quantize coefficients to selected fixpoint format, returning an array of strings
-    bq = qc.float2frmt(fb.fil[0]['ba'][0])
+    bq = qc.float2frmt(fb_get('ba')[0])
 
     exp_str = "-- " + coe_header(
         "VHDL FIR filter coefficient package file").replace("\n", "\n-- ")
@@ -1481,7 +1489,7 @@ def export_coe_vhdl_package(f: TextIO) -> bool:
         exp_str += "use IEEE.math_real.all;\n"
     exp_str += "USE IEEE.std_logic_1164.all;\n\n"
     exp_str += "package coeff_package is\n"
-    exp_str += "constant n_taps: integer := {0:d};\n".format(len(bq)-1)
+    exp_str += f"constant n_taps: integer := {len(bq)-1};\n"
     if not get_fx():
         exp_str += "type coeff_type is array(0 to n_taps) of real;\n"
     else:
@@ -1524,7 +1532,7 @@ def export_coe_cmsis_fir(f: TextIO, formatted: bool = False) -> bool:
     order, hence the coefficient array is flipped before exporting.
     """
     logger.error("Not implemented yet! (formatted = %s)", formatted)
-    # coeffs = fb.fil[0]['ba'][0][::-1]
+    # coeffs = fb_get('ba')[0][::-1]
     return True
 
 
@@ -1552,16 +1560,16 @@ def export_coe_cmsis_sos(f: TextIO, file_type: str, formatted: bool = False) -> 
     https://github.com/docPhil99/DSP/blob/master/MatlabSOS2CMSIS.m
 
     # TODO: check `scipy.signal.zpk2sos` for details concerning sos pairing
-    # TODO: qc = fx.Fixed(fb.fil[0]['fxq']['QCB'])
+    # TODO: qc = fx.Fixed(fb_get('fxq', 'QCB'))
     """
 
-    sos_coeffs = fb.fil[0]['sos']  # fcopy coeffs in scipy SOS format
+    sos_coeffs = fb_get('sos')  # copy coeffs in scipy SOS format
     if np.ndim(sos_coeffs) < 2 or np.shape(sos_coeffs)[1] != 6\
             or np.shape(sos_coeffs)[0] < 1:
         logger.error("SOS coefficients have a bad shape '%s'!", np.shape(sos_coeffs))
         return True
 
-    if fb.fil[0]['creator'][0] == 'ba':
+    if fb_get('creator')[0] == 'ba':
         logger.warning("Second-order sections have been calculated from "
                        "'ba' format, results may be inaccurate.")
 
@@ -1597,10 +1605,19 @@ def export_coe_cmsis_sos(f: TextIO, file_type: str, formatted: bool = False) -> 
 
 
 # ==============================================================================
-def load_filter(self, all_filters=False) -> int:
+def load_filter(self, all_filters: bool = False) -> int:
     """
     Load filter from JSON, zipped binary numpy array or (c)pickled object to
     filter dictionary
+
+    Parameters
+    ----------
+    all_filters: bool
+        If True, load all 10 memory locations, otherwise only the first one.
+
+    Returns
+    -------
+    0 for success, -1 for file cancel or error
     """
     file_name, file_type = select_file(
         self, title="Load Filter", mode="rb", file_types = ("json", "npz", "pkl"))
@@ -1615,7 +1632,10 @@ def load_filter(self, all_filters=False) -> int:
                     fb_temp = {}
                     # array containing dict, dtype 'object':
                     arr = np.load(f, allow_pickle=True)
-                    logger.warning("Load 'npz', returned type is %s.", type(arr))
+                    if not isinstance(arr, np.lib.npyio.NpzFile):
+                        logger.error("Tried to load file with 'npz' format, but file type is %s.",
+                                       type(arr).__name__)
+                        raise IOError("Not a valid npz file!")
 
                     # convert arrays to lists and extract scalar objects
                     for key in sorted(arr):
@@ -1637,9 +1657,10 @@ def load_filter(self, all_filters=False) -> int:
             with io.open(file_name, 'r') as f:  # open in text mode for json files
                 fb_temp = json.load(f)
 
-        except IOError as e:
-            logger.error("Failed loading %s!\n%s", file_name, e)
+        except (IOError, json.JSONDecodeError) as e:
+            logger.error("Failed loading / opening\n\t%s!\n%s", file_name, e)
             return -1
+
     else:
         logger.error('Unknown file type "%s"', file_type)
         return -1
@@ -1689,16 +1710,16 @@ def load_filter(self, all_filters=False) -> int:
     if '_id' not in fb_id or len(fb_id['_id']) != 2 or fb_id['_id'][0] != 'pyfda':
         msg = "This is no pyfda filter or an outdated file format! Load anyway?"
         err = not popup_warning(None, message=msg)
-    elif fb_id['_id'][1] != FILTER_FILE_VERSION:
+    elif str(fb_id['_id'][1]) != FILTER_FILE_VERSION:
         msg = (
-            f"The filter file has version {str(fb_id['_id'][1])} instead of "
+            f"The filter file has version {fb_id['_id'][1]} instead of "
             f"required version {FILTER_FILE_VERSION}! Load anyway?")
         err = not popup_warning(None, message=msg)
 
     # Handle errors occurring during id test
     if err:
         return -1
-    elif all_filters:
+    if all_filters:
         fb.fil = fb_temp  # assign all filters
     else:
         fb.fil[0] = fb_temp  # only assign one slice
@@ -1714,16 +1735,16 @@ def load_filter(self, all_filters=False) -> int:
         if key_errs[0] != []:
             # '\n'.join(...) converts list to multi-line string
             err_str += (
-                f"The following {len(key_errs[0])} key(s) have not been found in "
-                f"the loaded dict,\n"\
-                f"\tthey are copied with their values from the reference dict:\n\t"
-                    + "{0}".format('\n\t'.join(key_errs[0]))
+                f"\n\tThe following {len(key_errs[0])} key(s) have not been found in "
+                "the loaded dict,\n"\
+                "\tthey are copied with their default values from the reference dict:\n\t\t"
+                    + "\n\t\t".join(key_errs[0])
                 )
         if key_errs[1] != []:
             err_str += (
-                f"\nThe following {len(key_errs[1])} key(s) are not part of the "
-                f"reference dict and have been ignored:\n\t"
-                + "{0}".format('\n\t'.join(key_errs[1]))
+                f"\n\tThe following {len(key_errs[1])} key(s) are not part of the "
+                "reference dict and have been ignored:\n\t\t"
+                + "\n\t\t".join(key_errs[1])
             )
         if err_str != "":
             logger.warning(err_str)
@@ -1735,48 +1756,62 @@ def load_filter(self, all_filters=False) -> int:
                 fb.fil[0][k] = fb.fil[0][k].decode('utf-8')
             if fb.fil[0][k] is None:
                 logger.warning("Entry fb.fil[0][%s] is empty!", k)
-        if 'ba' not in fb.fil[0]\
-            or type(fb.fil[0]['ba']) not in {list, np.ndarray}\
-                or np.ndim(fb.fil[0]['ba']) != 2\
-                or (np.shape(fb.fil[0]['ba'][0]) != 2
-                    and np.shape(fb.fil[0]['ba'])[1] < 3):
-            logger.error("Missing key 'ba' or wrong data type!")
-            fb.restore_fil()
-            return -1
-        elif 'zpk' not in fb.fil[0]:
-            logger.error("Missing key 'zpk'!")
-            fb.restore_fil()
-            return -1
-        elif 'sos' not in fb.fil[0]\
-                or type(fb.fil[0]['sos']) not in {list, np.ndarray}:
-            logger.error("Missing key 'sos' or wrong data type!")
-            fb.restore_fil()
-            return -1
 
-        if isinstance(fb.fil[0]['ba'], np.ndarray):
-            if np.ndim(fb.fil[0]['ba']) != 2:
-                logger.error(
-                    "Unsuitable dimension of 'ba' data, ndim = %d", np.ndim(fb.fil[0]['ba']))
-            elif np.shape(fb.fil[0]['ba'])[0] != 2:
-                logger.error(
-                    "Unsuitable shape %s of 'ba' data ", np.shape(fb.fil[0]['ba']))
-        elif type(fb.fil[0]['ba']) in {list, tuple}:
-            fb.fil[0]['ba'] = iter2ndarray(fb.fil[0]['ba'])
+        if 'ba' not in fb.fil[0]:
+            logger.error(
+                "Missing key 'ba, cancelling file operation.")
+            fb.restore_fil()
+            return -1
+        if isinstance(fb_get('ba'), np.ndarray):
+            pass
+        elif isinstance(fb_get('ba'), (list, tuple)):
+            fb_set('ba', iter2ndarray(fb_get('ba')))
         else:
-            logger.error("Unsuitable 'ba' data type '%s'!", type(fb.fil[0]['ba']))
+            logger.error("Unsuitable 'ba' data type '%s', cancelling file operation.",
+                         type(fb_get('ba')).__name__)
+        if np.ndim(fb_get('ba')) != 2 or len(fb_get('ba')[0]) < 3:
+            logger.error(
+                "Unsuitable shape %s of 'ba' data, cancelling file operation.",
+                np.shape(fb_get('ba')))
+            fb.restore_fil()
+            return -1
 
-        if isinstance(fb.fil[0]['zpk'], np.ndarray):
-            if np.ndim(fb.fil[0]['zpk']) != 2:
-                logger.error(
-                    "Unsuitable dimension of 'zpk' data, ndim = %d", np.ndim(fb.fil[0]['zpk']))
-            elif np.shape(fb.fil[0]['zpk'])[0] != 3:
-                logger.error(
-                    "Unsuitable shape %s of 'zpk' data ", np.shape(fb.fil[0]['zpk']))
-        elif type(fb.fil[0]['zpk']) in {list, tuple}:
-            fb.fil[0]['zpk'] = iter2ndarray(fb.fil[0]['zpk'])
+        if 'zpk' not in fb.fil[0]:
+            logger.error("Missing key 'zpk', cancelling file operation.")
+            fb.restore_fil()
+            return -1
+        if isinstance(fb_get('zpk'), np.ndarray):
+            pass
+        elif isinstance(fb_get('zpk'), (list, tuple)):
+            fb_set('zpk', iter2ndarray(fb_get('zpk')))
         else:
-            logger.error("Unsuitable 'zpk' data type '%s'!", type(fb.fil[0]['zpk']))
+            logger.error("Unsuitable 'zpk' data type '%s', cancelling file operation.",
+                         type(fb_get('zpk')).__name__)
+        if np.ndim(fb_get('zpk')) != 2 or np.shape(fb_get('zpk'))[0] != 3:
+            logger.error(
+                "Unsuitable shape %s of 'zpk' data, cancelling file operation.",
+                np.shape(fb_get('zpk')))
+            fb.restore_fil()
+            return -1
 
+        if 'sos' not in fb.fil[0]:
+            logger.error("Missing key 'sos', cancelling file operation.")
+            fb.restore_fil()
+            return -1
+        if isinstance(fb_get('sos'), np.ndarray):
+            pass
+        elif isinstance(fb_get('sos'), (list, tuple)):
+            fb_set('sos', iter2ndarray(fb_get('sos')))
+        else:
+            logger.error("Unsuitable 'sos' data type '%s', cancelling file operation.",
+                         type(fb_get('sos')).__name__)
+            fb.restore_fil()
+            return -1
+        if np.ndim(fb_get('sos')) != 2 or np.shape(fb_get('sos'))[1] != 6:
+            logger.warning(
+                "Unsuitable shape %s of 'sos' data, storing empty list.",
+                np.shape(fb_get('sos')))
+            fb_set('sos', [])
 
         logger.info('Successfully loaded filter\n\t"%s"', file_name)
         dirs.last_file_name = file_name
@@ -1791,10 +1826,14 @@ def load_filter(self, all_filters=False) -> int:
 
 
 # ------------------------------------------------------------------------------
-def save_filter(self):
+def save_filter(self) -> int:
     """
     Save filter `fb.fil[0]` as JSON formatted textfile, zipped binary numpy array
     or pickle object
+
+    Returns
+    -------
+    0 for success, -1 for file cancel or error
     """
     # provide an identifier with version number for pyfda files
     fb.fil[0].update({'_id': ['pyfda', FILTER_FILE_VERSION]})
@@ -1802,8 +1841,9 @@ def save_filter(self):
     file_name, file_type = select_file(
         self, title="Save Filter", mode='w', file_types = ("json", "npz", "pkl"))
 
-    if file_name is None:
+    if not file_name:
         return -1  # operation cancelled or other error
+
     err = False
     # create a copy of the filter to be saved that only contains keys of the
     # reference filter dict and warn of unsupported keys:
@@ -1849,10 +1889,11 @@ def save_filter(self):
         dirs.last_file_name = file_name
         dirs.last_file_dir = os.path.dirname(file_name)  # save new default dir
         dirs.last_file_type = file_type  # save new default file type
-
+        return 0
+    return -1
 
 # ------------------------------------------------------------------------------
-def save_all_filters(self):
+def save_all_filters(self) -> int:
     """
     Save all filters `fb.fil` as JSON formatted textfile, zipped binary numpy array
     or pickle object
@@ -1861,8 +1902,9 @@ def save_all_filters(self):
     file_name, file_type = select_file(
         self, title="Save All Filters", mode='w', file_types = ("json", "npz", "pkl"))
 
-    if file_name is None:
+    if not file_name:
         return -1  # operation cancelled or other error
+
     err = False
     # create a copy of the filters to be saved that only contains keys of the
     # reference filter dict and warn of unsupported keys:
@@ -1913,6 +1955,8 @@ def save_all_filters(self):
         dirs.last_file_name = file_name
         dirs.last_file_dir = os.path.dirname(file_name)  # save new default dir
         dirs.last_file_type = file_type  # save new default file type
+        return 0
+    return -1
 
 
 # ------------------------------------------------------------------------------
@@ -1924,25 +1968,24 @@ class NumpyEncoder(json.JSONEncoder):
     def default(self, obj):
         if isinstance(obj, np.integer):
             return int(obj)
-        elif isinstance(obj, np.floating):
+        if isinstance(obj, np.floating):
             return float(obj)
-        elif isinstance(obj, np.ndarray):
+        if isinstance(obj, np.ndarray):
             return obj.tolist()
-        elif isinstance(obj, complex):
+        if isinstance(obj, complex):
             if obj.imag < 0:
                 return str(obj.real) + str(obj.imag) + "j"
-            else:
-                return str(obj.real) + "+" + str(obj.imag) + "j"
-        elif callable(obj):
+            return str(obj.real) + "+" + str(obj.imag) + "j"
+        if callable(obj):
             logger.warning("Object '%s' not JSON serializable as it is a function.", obj)
             return ""
-        else:
-            try:
-                return json.JSONEncoder.default(self, obj)
-            except TypeError as e:
-                logger.warning(
-                    "Object of type '%s' is not JSON serializable.\n%s", type(obj), e)
-                return ""
+
+        try:
+            return json.JSONEncoder.default(self, obj)
+        except TypeError as e:
+            logger.warning(
+                "Object of type '%s' is not JSON serializable.\n%s", type(obj), e)
+            return ""
 
 
 # ==============================================================================

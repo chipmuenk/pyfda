@@ -339,17 +339,17 @@ fil_ref = {
     'freq_specs_sort': True,  # sort freq. specs in ascending order
     'freq_specs_unit': 'f_S',
     'ft': 'IIR',  # filter type
-    'fx_base': 'dec', # number format for fx display {'dec', 'hex', 'bin', 'oct', 'csd'}
+    'fx_base': 'dec', # global number format for fx display {'dec', 'hex', 'bin', 'oct', 'csd'}
     # string with current fixpoint module and class
     'fx_mod_class_name': 'pyfda.fixpoint_widgets.iir_df1.iir_df1_pyfixp_ui',
     # Settings for quantization subwidgets:
     #   'QI':input, 'QO': output, 'QCA': coeffs a, 'QCB': coeffs b, 'QACC': accumulator
     #    (more subwidgets can be added by fixpoint widget if needed)
     #  Keys:
+    #   'N_over': number of overflows during last quantization process
     #   'WI': integer bits, 'WF': fractional bits,
     #   'w_a_m': word length automatic / manual calculation (not needed for 'QI', 'QO')
     #   'ovfl': overflow behaviour, 'quant': quantizer behaviour
-    #   'N_over': number of overflows during last quantization process
     'fxq':{
         # accumulator quantization
         'QACC': {
@@ -404,9 +404,11 @@ fil_ref = {
     'plt_phiUnit': 'rad',
     'plt_tLabel': '$n = t\\, /\\, T_S \\; \\rightarrow$',
     'plt_tUnit': 'T_S',
+
     'qfrmt': 'float64',  # global quantization format {'float64', 'float32', 'qint', 'qfrac'}
     'qfrmt_float_last': 'float64',  # last used float format
     'qfrmt_fx_last': 'qfrac',  # last used fixpoint format
+
     'rt': 'LP',  # filter response type
     # coefficients as second order sections
     'sos': [
@@ -469,13 +471,19 @@ fil_undo = [None] * UNDO_LEN
 fil[0] = {}
 
 # Copy fil_ref to fil[0] ... fil[9] to initialize all memories
-for l in range(len(fil)):
-    fil[l] = copy.deepcopy(fil_ref)
+for i in range(len(fil)):
+    fil[i] = copy.deepcopy(fil_ref)
 
 # -------------------------
-def restore_fil():
+def restore_fil() -> int:
     """
     Restore current global dict `fb.fil[0]` from undo memory `fil_undo`
+
+    Returns
+    -------
+    int
+        -1: undo buffer empty, nothing restored
+         0: successful restore
     """
     global undo_step
     global undo_ptr
@@ -484,11 +492,11 @@ def restore_fil():
     if undo_step < 1:
         undo_step = 0
         return -1
-    else:
-        fil[0] = copy.deepcopy(fil_undo[undo_ptr])
-        undo_step -= 1
-        undo_ptr = (undo_ptr + UNDO_LEN - 1) % UNDO_LEN
-        return 0
+
+    fil[0] = copy.deepcopy(fil_undo[undo_ptr])
+    undo_step -= 1
+    undo_ptr = (undo_ptr + UNDO_LEN - 1) % UNDO_LEN
+    return 0
 
 # -------------------------
 def store_fil():
@@ -546,7 +554,7 @@ def key_list_to_dict(keys_tuple: list, fil_dict: dict) -> dict:
 # -------------------------
 def get_fx()-> bool:
     """
-    Check if a fixpoint mode is active
+    Check if a fixpoint mode is active globally by checking the current
 
     Returns
     -------
