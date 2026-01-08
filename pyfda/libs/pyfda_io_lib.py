@@ -927,7 +927,6 @@ def file2array(file_name: str, file_type: str, fkey: str = "",
                 f_S, data_arr = wavfile.read(file_name, mmap=False)
                 # data_arr is 1D for single channel (mono) files and
                 # 2D otherwise (n_chans, n_samples)
-                fb_set('f_s_wav', f_S)
 
             elif file_type in {'csv', 'txt'}:
                 with open(file_name, 'r', newline=None) as f:
