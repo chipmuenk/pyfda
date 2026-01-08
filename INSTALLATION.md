@@ -5,15 +5,18 @@ bundle. The ">" signs below only indicate the command lines, don't enter them.
 
 ## Installation
 ### pip and PyPI
+
+This project is controlled with a `pyproject.toml` file, for details see https://realpython.com/python-pyproject-toml/
+
 If there is a working Python interpreter on your computer, installing pyfda with `pip` (or `pip3`) from the Python Package Inventory [PyPI](https://pypi.org) is most straightforward, required libraries are installed automatically if missing. 
 
 You should create a separate environment for pyfda to avoid e.g. unwanted updating of installed python modules:
 
     > python -m venv <PATH_TO_ENVIRONMENT>
 
-This creates the subdirectory if it doesn't exist. Activation of the environment depends on your OS, see https://docs.python.org/3/library/venv.html for details.
+This creates a subdirectory if it doesn't exist. Activation of the environment depends on your OS, see https://docs.python.org/3/library/venv.html for details.
 
-Installation pyfda with
+Install pyfda with
 
     > pip install pyfda
 
@@ -31,9 +34,9 @@ A **specific version** instead of the latest stable version can be selected with
 	
 **Install from local files** (development mode) using
 
-    > pip install -e <YOUR_PATH_TO_PYFDA>
+    > python -m pip install -e <YOUR_PATH_TO_pyproject.toml>
 	
-where the specified path points to `pyfda/setup.py` (without including `setup.py`).
+where the specified path points to `pyfda/pyproject.toml` (without including `pyproject.toml`).
 In this case, you need to have a local copy of the pyfda project, preferrably 
 synchronized to the GitHub repo using git (see below).
 
@@ -102,27 +105,13 @@ If you end up having *both* installed, you're in
     PyQt5                     5.8.2                     <pip>
     
 gives you a similar result as above, you probably have a corrupted system. 
-
-### setuptools   
-You can also download the project as a zip file from GitHub and extract it to 
-a directory of your choice. Either install a copy to your `<python>/Lib/site-packages` 
-subdirectory using
-
-    > python setup.py install
-
-or just create a link to where you have copied the python source files (for testing
- / development) using
-
-    > python setup.py develop
-    
-Attention: There is no automatic uninstall option when installing pyfda this way!
     
 ### pyInstaller
 pyInstaller bundles all required Python and data files together with a bootloader
 into a self-expanding executable. When executing this file, the content is expanded
 into a temporary directory and deleted when terminating pyfda. Thanks to Github Actions, you can download bundles for Windows 10 and for OS X.
 
-There is no need for an uninstall, simply delete the downloaded executable if you don't need it anymore or replace it by a newer version.
+There is no need for an uninstall, simply delete the downloaded executable or replace it by a newer version.
 
 ### Flatpak
 "[Flatpak](https://flatpak.org/) is a framework for distributing desktop applications across various Linux distributions." 

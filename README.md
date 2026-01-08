@@ -67,15 +67,6 @@ Uninstall:
 
     > pip uninstall pyfda
 
-<!--
-If you have cloned `pyfda` to your local drive you can install an editable local copy (i.e. create local config files and the `pyfdax` starter script) via
-
-    > python -m pip install -e <YOUR_PATH_TO_pyproject.toml>
-
-and edit the software.
-
--->
-
 #### Starting pyfda
 
 A pip installation creates a start script `pyfdax[.exe]` in `<python>/Scripts` which should be in your path. So, simply start pyfda using
@@ -117,7 +108,7 @@ Pleas give me feedback if you are installing pyfda this way.
 
 If you want to contribute to pyfda (great idea!), fork the latest version from [https://github.com/chipmuenk/pyfda.git](https://github.com/chipmuenk/pyfda.git) and create a local copy using
 
-    > git clone https://github.com/<your_username>pyfda
+    > git clone https://github.com/<your_username>/pyfda
 
 This command creates a new folder `pyfda` at your current directory level and copies the complete pyfda project into it. This [Github tutorial](https://docs.github.com/en/get-started/quickstart/fork-a-repo) provides a good starting point for working with git repos.
 
