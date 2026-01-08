@@ -229,9 +229,7 @@ class Plot_FFT_win(QDialog):
         # By default, the enter key triggers the default 'dialog action' in QDialog
         # widgets. This would activate one of the pushbuttons if `default` wasn't False.
         self.lbl_title_time = QLabel("Time: ", objectName="medium")
-        self.but_log_t = PushButton(self, "dB", default=False, autoDefault=False,
-                                     objectName="chk_log_time")
-        self.but_log_t.setMaximumWidth(qtext_width(" dB "))
+        self.but_log_t = PushButtonRT(self, "dB", objectName="chk_log_time")
         self.but_log_t.setToolTip("Display in dB")
 
         self.led_log_bottom_t = QLineEdit(self)
@@ -245,25 +243,16 @@ class Plot_FFT_win(QDialog):
         self.lbl_log_bottom_t.setVisible(self.but_log_t.checked)
 
         self.lbl_title_freq = QLabel("Freq: ", objectName="medium")
-        self.but_norm_f = PushButton(self, "Max=1", default=False, autoDefault=False)
-        self.but_norm_f.setChecked(True)
-        self.but_norm_f.setMaximumWidth(qtext_width(text=" Max=1 "))
-        self.but_norm_f.setToolTip(
-            "Normalize window spectrum for a maximum of 1.")
+        self.but_norm_f = PushButton(self, "Max=1", checked=True)
+        self.but_norm_f.setToolTip("Normalize window spectrum for a maximum of 1.")
 
-        self.but_half_f = PushButton(self, "0...½", default=False, autoDefault=False)
-        self.but_half_f.setChecked(True)
-        self.but_half_f.setMaximumWidth(qtext_width(text=" 0...½ "))
-        self.but_half_f.setToolTip(
-            "Display window spectrum in the range 0 ... 0.5 f_S.")
+        self.but_half_f = PushButton(self, "0...½", checked=True)
+        self.but_half_f.setToolTip("Display window spectrum in the range 0 ... 0.5 f_S.")
 
         # By default, the enter key triggers the default 'dialog action' in QDialog
         # widgets. This activates one of the pushbuttons.
-        self.but_log_f = PushButton(self, "dB", default=False, autoDefault=False,
-                                     objectName="chk_log_freq")
-        self.but_log_f.setMaximumWidth(qtext_width(" dB "))
+        self.but_log_f = PushButtonRT(self, "dB", checked=True, objectName="chk_log_freq")
         self.but_log_f.setToolTip("<span>Display in dB.</span>")
-        self.but_log_f.setChecked(True)
 
         self.lbl_log_bottom_f = QLabel(to_html("min =", frmt='bi'), self)
         self.lbl_log_bottom_f.setVisible(self.but_log_f.checked)
@@ -277,7 +266,6 @@ class Plot_FFT_win(QDialog):
 
         self.but_bin_f = PushButtonRT(
             self, text="<b>&Delta; <i>f</i></b>", checked=True, objectName="but_bin_f")
-        self.but_bin_f.setMaximumWidth(qtext_width(" bins "))
         self.but_bin_f.setToolTip(
             "<span>Display frequencies in bins or multiples of &Delta;<i>f = f<sub>S </sub>/N</i>."
             "</span>")
