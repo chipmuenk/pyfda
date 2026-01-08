@@ -58,7 +58,7 @@ class PlotImpz_UI(QWidget):
         - qfft_win_select
         """
 
-        logger.warning("PROCESS_SIG_RX - vis: %s\n%s", self.isVisible(), pprint_log(dict_sig))
+        logger.debug("PROCESS_SIG_RX - vis: %s\n%s", self.isVisible(), pprint_log(dict_sig))
 
         if 'id' in dict_sig and dict_sig['id'] == id(self):
             logger.warning("Stopped infinite loop:\n%s", pprint_log(dict_sig))
