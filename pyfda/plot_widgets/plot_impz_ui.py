@@ -352,7 +352,7 @@ class PlotImpz_UI(QWidget):
         line1 = QVLine()
         line2 = QVLine(width=5)
 
-        self.but_log_time = PushButton(self, "dB", objectName="but_log_time")
+        self.but_log_time = PushButtonRT(self, "dB", objectName="but_log_time")
         self.but_log_time.setToolTip(
             "<span>Logarithmic scale for y-axis.</span>")
 
@@ -511,7 +511,7 @@ class PlotImpz_UI(QWidget):
         self.cmb_plt_freq_resp.setToolTip(
             "<span>Plot style for response.</span>")
 
-        self.but_log_freq = PushButton(self, text="dB", checked=True, objectName="but_log_freq")
+        self.but_log_freq = PushButtonRT(self, text="dB", checked=True, objectName="but_log_freq")
         self.but_log_freq.setToolTip(
             "<span>Logarithmic scale for y-axis.</span>")
 
