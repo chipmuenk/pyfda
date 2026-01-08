@@ -102,13 +102,13 @@ def main():
     else:
         logger.warning("No Qt attribute 'AA_EnableHighDpiScaling'.")
     # Instantiate QApplication object, passing command line arguments
+    app = QApplication(sys.argv)
+    app.setStyle('Fusion')  # set a platform independent base style
     if len(rc.QSS_RC) > 20:
-        app = QApplication(sys.argv)
         app.setStyleSheet(rc.QSS_RC) # this is a proper style sheet
         style = "'pyfda' style sheet"
     else:
         qstyle = QApplication.setStyle(rc.QSS_RC) # this is just a name for a system stylesheet
-        app = QApplication(sys.argv)
         if qstyle:
             style = f"system style sheet '{rc.QSS_RC}'"
         else:
