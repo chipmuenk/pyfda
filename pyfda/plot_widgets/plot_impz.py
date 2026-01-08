@@ -918,8 +918,8 @@ class Plot_Impz(QWidget):
                 logger.warning("Transient response is 'None', FFT cannot be calculated.")
             else:
                 logger.warning(
-                    "Length of transient response is {0} < N = {1}, FFT cannot be "
-                    "calculated.".format(len(self.y), self.ui.N_end))
+                    "Length of transient response is %d < N = %d, FFT cannot be "
+                    "calculated.", len(self.y), self.ui.N_end)
         else:
             y_win = self.y[self.ui.N_start:self.ui.N_end] * win
             self.Y = np.fft.fft(y_win) / self.ui.N
