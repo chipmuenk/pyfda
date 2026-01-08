@@ -29,7 +29,7 @@ class PlotTabWidgets(QWidget):
     sig_tx = pyqtSignal(object)
 
     def __init__(self, parent=None, objectName: str = "plot_tab_widgets_inst") -> None:
-        super(PlotTabWidgets, self).__init__(parent)
+        super().__init__(parent)
         self.setObjectName(objectName)
         self._construct_UI()
 
@@ -79,8 +79,8 @@ class PlotTabWidgets(QWidget):
                 # and instantiate it
                 inst = wdg_class()
             except ImportError as e:
-                logger.warning('Class "{0}" could not be imported from {1}:\n{2}.'
-                               .format(plot_class, mod_fq_name, e))
+                logger.warning(
+                    'Class "%s" could not be imported from %s:\n%s.', plot_class, mod_fq_name, e)
                 continue  # unsuccessful, try next widget
 
             if hasattr(inst, 'tab_label'):
@@ -100,8 +100,7 @@ class PlotTabWidgets(QWidget):
         if len(inst_wdg_str) == 0:
             logger.warning("No plotting widgets found!")
         else:
-            logger.debug(
-                "Imported {0:d} plotting classes:\n{1}".format(n_wdg, inst_wdg_str))
+            logger.debug("Imported %d plotting classes:\n%s", n_wdg, inst_wdg_str)
         # ----------------------------------------------------------------------
         layVMain = QVBoxLayout()
         layVMain.addWidget(tabWidget)
@@ -172,7 +171,7 @@ class PlotTabWidgets(QWidget):
         Enable `self.sig_rx.connect(self.log_rx)` above for debugging.
         """
         if isinstance(dict_sig, dict):
-            logger.warning("SIG_RX\n{0}".format(pprint_log(dict_sig)))
+            logger.warning("SIG_RX\n%s", pprint_log(dict_sig))
         else:
             logger.warning("empty dict")
 
@@ -201,12 +200,12 @@ class PlotTabWidgets(QWidget):
                 self.timer_id.start(500)
 
         # Call base class method to continue with normal event processing:
-        return super(PlotTabWidgets, self).eventFilter(source, event)
+        return super().eventFilter(source, event)
 
 
 # ==============================================================================
 if __name__ == "__main__":
-    """ Run widget standalone with `python -m pyfda.plot_widgets.plot_tab_widgets` """
+    # Run widget standalone with `python -m pyfda.plot_widgets.plot_tab_widgets`
     import sys
     from pyfda.libs.compat import QApplication
     from pyfda import pyfda_rc as rc

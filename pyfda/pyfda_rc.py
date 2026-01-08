@@ -517,7 +517,7 @@ QSS_COMMON = """
         width: 8px;
         image: url(':/ellipses_h.svg');
         }
-    """ % (FONT_SIZE_BASE, FONT_SIZE_MEDIUM, FONT_SIZE_LARGE, FONT_SIZE_XLARGE)
+    """ % (FONT_SIZE_BASE, FONT_SIZE_MEDIUM, FONT_SIZE_LARGE, FONT_SIZE_XLARGE)  # noqa UP031
 
 # common layout settings for QTabWidget
 QSS_TAB_BAR = """
@@ -603,7 +603,7 @@ QSS_TAB_BAR = """
         margin-top: 0.2em;}
     QTabBar::tab::left:!selected {
         margin-left: 0.2em;}
-    """ % (FONT_SIZE_MEDIUM, FONT_SIZE_MEDIUM)
+    """ % (FONT_SIZE_MEDIUM, FONT_SIZE_MEDIUM)  # noqa UP031
 
 # Overlap effects for QTabWidget, currently not used
 qss_tab_bar_ovlp = """

@@ -74,7 +74,7 @@ def get_home_dir():
         if not valid(home_dir):
             home_dir = env('HOME')
             if not valid(home_dir):
-                home_dir = '%s%s' % (env('HOMEDRIVE'), env('HOMEPATH'))
+                home_dir = f'{env("HOMEDRIVE")}{env("HOMEPATH")}'
                 if not valid(home_dir):
                     home_dir = env('SYSTEMDRIVE')
                     if home_dir and (not home_dir.endswith('\\')):
@@ -101,13 +101,13 @@ def get_log_dir():
         if valid(log_dir_pyfda) and os.access(log_dir_pyfda, os.W_OK):  # R_OK = readable
             return log_dir_pyfda
         # check whether directory .../.pyfda can be created:
-        elif valid(d) and os.access(d, os.W_OK):
+        if valid(d) and os.access(d, os.W_OK):
             try:
                 os.mkdir(log_dir_pyfda)
-                print("Created logging directory {0}".format(log_dir_pyfda))
+                print("Created logging directory %s", log_dir_pyfda)
                 return log_dir_pyfda
             except (IOError, OSError) as e:
-                print("ERROR creating {0}:\n{1}\nUsing '{2}'".format(log_dir_pyfda, e, d))
+                print(f"ERROR creating {log_dir_pyfda}:\n{e}\nUsing '{d}'")
                 return d  # use base directory instead if it is writable
     print("ERROR: No suitable directory found for logging.")
     return None
@@ -144,14 +144,14 @@ def get_conf_dir():
 
     if valid(conf_dir) and os.access(conf_dir, os.W_OK):
         return conf_dir
-    else:
-        try:
-            os.mkdir(conf_dir)
-            print("Creating config directory \n'{0}'".format(conf_dir))
-            return conf_dir
-        except (IOError, OSError) as e:
-            print("Error creating config directory {0}:\n{1}".format(conf_dir, e))
-            return HOME_DIR
+
+    try:
+        os.mkdir(conf_dir)
+        print(f"Creating config directory \n'{conf_dir}'")
+        return conf_dir
+    except (IOError, OSError) as e:
+        print(f"Error creating config directory {conf_dir}:\n{e}")
+        return HOME_DIR
 
 
 # ------------------------------------------------------------------------------
@@ -188,15 +188,15 @@ def copy_conf_files(force_copy=False, logger=None):
         # Create Backup
         if os.path.isfile(USER_CONF_DIR_FILE) and force_copy:
             shutil.move(USER_CONF_DIR_FILE, USER_CONF_DIR_FILE + "_bak_" + TODAY)
-            log_info('Created backup "{0}"\n\tof user config file.'
-                     .format(USER_CONF_DIR_FILE + "_bak_" + TODAY))
+            log_info(f'Created backup "{USER_CONF_DIR_FILE + "_bak_" + TODAY}"\n'
+                     '\tof user config file.')
         # Create config file
         if not os.path.isfile(USER_CONF_DIR_FILE) or force_copy:
             shutil.copyfile(TMPL_CONF_DIR_FILE, USER_CONF_DIR_FILE)
-            log_info('Created user config file "{0}" from template.'
-                     .format(USER_CONF_DIR_FILE))
+            log_info(f'Created user config file "{USER_CONF_DIR_FILE}"\n'
+                     '\tfrom template.')
     except (IOError, FileNotFoundError, FileExistsError) as e:
-        log_err("File error: {0}".format(e))
+        log_err(f"File error: {e}")
 
     # Logging config file
     try:
@@ -208,11 +208,10 @@ def copy_conf_files(force_copy=False, logger=None):
         # Create log config file
         if not os.path.isfile(USER_LOG_CONF_DIR_FILE) or force_copy:
             shutil.copyfile(TMPL_LOG_CONF_DIR_FILE, USER_LOG_CONF_DIR_FILE)
-            log_info('Created user logging config file "{0}" from template.'
-                     .format(USER_LOG_CONF_DIR_FILE))
+            log_info(f'Created user logging config file "{USER_LOG_CONF_DIR_FILE}"\n'
+                     '\tfrom template.')
     except (IOError, FileNotFoundError, FileExistsError) as e:
-        log_err("File error: {0}".format(e))
-
+        log_err(f"File error: {e}")
 
 # -----------------------------------------------------------------------------
 def update_conf_files(logger):
@@ -244,7 +243,7 @@ def update_conf_files(logger):
     elif val == 'q':
         sys.exit()
     else:
-        sys.exit("Unknown option '{0}', quitting.".format(val))
+        sys.exit(f"Unknown option '{val}', quitting.")
 
 
 # ==============================================================================
@@ -271,7 +270,7 @@ TODAY = datetime.datetime.now().strftime("%Y%m%d-%H%M%S")
 
 LOG_DIR  = get_log_dir()
 if LOG_DIR:
-    LOG_FILE = 'pyfda_{0}.log'.format(TODAY)
+    LOG_FILE = f'pyfda_{TODAY}.log'
     #: Name of the log file, can be changed in ``pyfdax.py``
     LOG_DIR_FILE = os.path.join(LOG_DIR, LOG_FILE)
 else:
@@ -299,10 +298,10 @@ for a in sys.argv:
 # print information about pyfda paths and quit
 if 'i' in ARGV:
     print("\n----- pyfda environment variables ------------")
-    print("INSTALL_DIR:            {0}".format(INSTALL_DIR))
-    print("USER_CONF_DIR_FILE:     {0}".format(USER_CONF_DIR_FILE))
-    print("USER_LOG_CONF_DIR_FILE: {0}".format(USER_LOG_CONF_DIR_FILE))
-    print("LOG_DIR_FILE:           {0}".format(LOG_DIR_FILE))
+    print(f"INSTALL_DIR:            {INSTALL_DIR}")
+    print(f"USER_CONF_DIR_FILE:     {USER_CONF_DIR_FILE}")
+    print(f"USER_LOG_CONF_DIR_FILE: {USER_LOG_CONF_DIR_FILE}")
+    print(f"LOG_DIR_FILE:           {LOG_DIR_FILE}")
     sys.exit()
 
 # print help infos and quit
