@@ -6,7 +6,7 @@ bundle. The ">" signs below only indicate the command lines, don't enter them.
 ## Installation
 ### pip and PyPI
 
-This project is controlled with a pyproject.toml file, for details see https://realpython.com/python-pyproject-toml/
+This project is controlled with a `pyproject.toml` file, for details see https://realpython.com/python-pyproject-toml/
 
 If there is a working Python interpreter on your computer, installing pyfda with `pip` (or `pip3`) from the Python Package Inventory [PyPI](https://pypi.org) is most straightforward, required libraries are installed automatically if missing. 
 
@@ -16,7 +16,7 @@ You should create a separate environment for pyfda to avoid e.g. unwanted updati
 
 This creates a subdirectory if it doesn't exist. Activation of the environment depends on your OS, see https://docs.python.org/3/library/venv.html for details.
 
-Installation pyfda with
+Install pyfda with
 
     > pip install pyfda
 
