@@ -16,7 +16,7 @@ import numpy as np
 from pyfda.libs.compat import QWidget, pyqtSignal, QVBoxLayout, QDialog, QPushButton
 
 import pyfda.libs.pyfda_io_lib as io
-import pyfda.filterbroker as fb
+from pyfda.filterbroker import fb_get, fb_set
 import pyfda.libs.pyfda_dirs as dirs
 
 from pyfda.libs.pyfda_lib import safe_eval, pprint_log
@@ -95,7 +95,7 @@ class Tran_IO(QWidget):
 
         self.norm = self.ui.led_normalize_default
         self.nr_loops = self.ui.led_nr_loops_default
-        self.f_s_wav = self.f_s_file = fb.fil[0]['f_S']
+        self.f_s_wav = self.f_s_file = fb_get('f_S')
 
         self._construct_UI()
 
@@ -119,7 +119,7 @@ class Tran_IO(QWidget):
             # Set CSV options button according to state of CSV popup handle
             self.ui.but_csv_options.setChecked(dirs.csv_options_handle is not None)
         elif 'view_changed' in dict_sig and dict_sig['view_changed'] == 'f_S':
-            self.set_f_s_wav(fb.fil[0]['f_S'] * fb.fil[0]['f_s_scale'])
+            self.set_f_s_wav(fb_get('f_S') * fb_get('f_s_scale'))
 
     # -----------------------------------------------------------------------------
     def emit(self, dict_sig):
@@ -162,7 +162,7 @@ class Tran_IO(QWidget):
 
         self.setLayout(layVMain)
 
-        self.set_f_s_wav(fb.fil[0]['f_S'] * fb.fil[0]['f_s_scale'])
+        self.set_f_s_wav(fb_get('f_S') * fb_get('f_s_scale'))
 
     # ------------------------------------------------------------------------------
     def set_f_s_wav(self, f_s_wav=None):
@@ -171,7 +171,7 @@ class Tran_IO(QWidget):
         unchecked) or from argument `f_s_wav` (button `Auto f_s` checked), passed either
         from loaded wav file or from updated f_S some other place in the app.
 
-        The sampling frequency needs to integer and at least 1.
+        The sampling frequency needs to be integer and at least 1.
         """
         if not self.ui.but_f_s_wav_auto.checked or f_s_wav is None:
             f_s_wav = self.ui.led_f_s_wav.text()
@@ -386,8 +386,8 @@ class Tran_IO(QWidget):
 
         self.emit({'data_changed': 'file_io'})
         if self.ui.but_f_s_wav_auto.checked:
-            fb.fil[0]['f_S'] = self.f_s_file
-            fb.fil[0]['freq_specs_unit'] = 'Hz'
+            fb_set('f_S', self.f_s_file)
+            fb_set('freq_specs_unit', 'Hz')
             self.emit({'view_changed': 'f_S'})
         return
 
