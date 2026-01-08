@@ -114,8 +114,7 @@ class InputTabWidgets(QWidget):
             logger.critical("No input widgets found!")
             sys.exit()
         else:
-            logger.debug("Imported {0:d} input classes:\n{1}"
-                         .format(n_wdg, inst_wdg_str))
+            logger.debug("Imported %d input classes:\n%s", n_wdg, inst_wdg_str)
 
         #
         # TODO: document signal options
@@ -158,7 +157,7 @@ class InputTabWidgets(QWidget):
         Enable `self.sig_rx.connect(self.log_rx)` above for debugging.
         """
         if isinstance(dict_sig, dict):
-            logger.warning(f"SIG_RX\n{pprint_log(dict_sig)}")
+            logger.warning("SIG_RX\n%s", pprint_log(dict_sig))
         else:
             logger.warning("empty dict")
 
