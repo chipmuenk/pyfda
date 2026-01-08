@@ -287,9 +287,6 @@ QSS_DARK = """
     QHeaderView::section{background-color:#101010;}
     QHeaderView::section:checked{background-color:blue;}
 
-    QProgressBar::chunk{background-color: #505050;}
-    /* QProgressBar:disabled::chunk{...} */
-
     QScrollBar {background: #707070; border-radius: 3px;}
     QScrollBar::handle {background: #303030; border-radius: 3px; border: 1px solid #A0A0A0}
 
@@ -376,9 +373,6 @@ QSS_LIGHT = """
     QHeaderView{background-color:#F0F0F0;}
     QHeaderView::section{background-color:#808080; color:white;}
     QHeaderView::section:checked{background-color:blue; color:white;}
-
-    QProgressBar::chunk{background-color: #F0F0F0;}
-    /* QProgressBar:disabled::chunk{...} */
 
     QScrollBar {background: darkgrey; border-radius: 3px;}
     QScrollBar::handle {background: lightgrey; border-radius: 3px;}
@@ -486,7 +480,9 @@ QSS_COMMON = """
     .QPushButton:checked, PushButton:checked {color:black;}*/
 
     QProgressBar{background-color: orange;} /* running */
-    QProgressBar{text-align: center; font-weight: bold; border: 1px solid #303030;}
+    QProgressBar{
+        text-align: center; font-weight: bold; border: 1px solid gray; border-radius: 2px;}
+    QProgressBar::chunk{background-color: lightblue;}
 
     /* QSplitter styling adopted from
     http://stackoverflow.com/questions/6832499/qsplitter-show-a-divider-or-a-margin-between-the-two-widgets
