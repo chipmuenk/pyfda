@@ -205,7 +205,7 @@ class PlotImpz_UI(QWidget):
         self.led_N_start.setToolTip("<span>First point to plot.</span>")
         self.led_N_start.setMaximumWidth(qtext_width(N_x=8))
 
-        self.but_N_auto = PushButtonRT(self, text = to_html("N =", frmt="bi"), margin=5)
+        self.but_N_auto = PushButtonRT(self, text = "<b><i>N</i> = </b>")
         self.but_N_auto.setCheckable(True)
         self.but_N_auto.setChecked(True)
         self.but_N_auto.setToolTip(
@@ -511,13 +511,13 @@ class PlotImpz_UI(QWidget):
         self.cmb_plt_freq_resp.setToolTip(
             "<span>Plot style for response.</span>")
 
-        self.but_log_freq = PushButton(self, text="dB", objectName="but_log_freq")
+        self.but_log_freq = PushButton(self, text="dB", checked=True, objectName="but_log_freq")
         self.but_log_freq.setToolTip(
             "<span>Logarithmic scale for y-axis.</span>")
-        self.but_log_freq.setChecked(True)
 
         self.lbl_log_bottom_freq = QLabel(to_html("min =", frmt='bi'), self)
         self.lbl_log_bottom_freq.setVisible(self.but_log_freq.checked)
+
         self.led_log_bottom_freq = QLineEdit(self)
         self.led_log_bottom_freq.setText(str(self.bottom_f))
         self.led_log_bottom_freq.setMaximumWidth(qtext_width(N_x=8))
@@ -528,38 +528,32 @@ class PlotImpz_UI(QWidget):
         if not self.but_log_freq.checked:
             self.bottom_f = 0
 
-        self.cmb_freq_display = QComboBox(self, objectName="cmb_re_im_freq")
+        self.cmb_freq_display = QComboBox(self, objectName="cmb_freq_display")
         qcmb_box_populate(self.cmb_freq_display, self.cmb_freq_display_items,
                           self.cmb_freq_display_item)
 
-        self.but_Hf = PushButtonRT(self, to_html("H_id", frmt="bi"), margin=5,
-                                   objectName="chk_Hf")
+        self.but_Hf = PushButtonRT(self, to_html("H_id", frmt="bi"), objectName="but_Hf")
         self.but_Hf.setToolTip("<span>Show ideal frequency response, calculated "
                                "from the filter coefficients.</span>")
-        self.but_Hf.setChecked(False)
-        self.but_Hf.setCheckable(True)
 
         self.but_freq_norm_impz = PushButtonRT(
-            self, text="<b><i>E<sub>X</sub></i> = 1</b>", margin=5)
+            self, text="<b><i>E<sub>X</sub></i> = 1</b>", checked=True,
+            objectName="but_freq_norm_impz")
         self.but_freq_norm_impz.setToolTip(
             "<span>Normalize the FFT of an impulse stimulus with <i>N<sub>FFT</sub></i> "
             "to an energy <i>E<sub>X</sub></i> = 1. For a dirac pulse, this yields "
             "|<i>Y(f)</i>| = |<i>H(f)</i>|. DC, Noise and file I/O need to be "
             "turned off, window should be <b>Rectangular</b>.</span>")
-        self.but_freq_norm_impz.setCheckable(True)
-        self.but_freq_norm_impz.setChecked(True)
-        self.but_freq_norm_impz.setObjectName("freq_norm_impz")
 
-        self.but_freq_show_info = PushButton(text="Info", objectName="but_show_info_freq")
+        self.but_freq_show_info = PushButton(text="Info", objectName="but_freq_show_info")
         self.but_freq_show_info.setToolTip(
             "<span>Show signal power in legend.</span>")
-        self.but_freq_show_info.setChecked(False)
 
-        self.but_freq_index_k = PushButtonRT(self, text = "<i>k</i>", objectName="but_show_index_k")
+        self.but_freq_index_k = PushButtonRT(
+            self, text = "<i>k</i>", checked=fb.fil[0]["tab_yn"]["display_index_k"],
+            objectName="but_freq_index_k")
         self.but_freq_index_k.setToolTip(
             "<span>Show FFT indices instead of frequencies.</span>")
-        self.but_freq_index_k.setCheckable(True)
-        self.but_freq_index_k.setChecked(fb.fil[0]["tab_yn"]["display_index_k"])
 
         layH_ctrl_freq_0 = QHBoxLayout()
         layH_ctrl_freq_0.addWidget(self.lbl_title_plot_freq)

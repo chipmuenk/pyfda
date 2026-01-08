@@ -276,13 +276,11 @@ class Plot_FFT_win(QDialog):
             "<span>Minimum display value for log. scale.</span>")
 
         self.but_bin_f = PushButtonRT(
-            self, text="<b>&Delta; <i>f</i></b>", margin=5, objectName="but_bin_f")
+            self, text="<b>&Delta; <i>f</i></b>", checked=True, objectName="but_bin_f")
         self.but_bin_f.setMaximumWidth(qtext_width(" bins "))
         self.but_bin_f.setToolTip(
             "<span>Display frequencies in bins or multiples of &Delta;<i>f = f<sub>S </sub>/N</i>."
             "</span>")
-        self.but_bin_f.setCheckable(True)
-        self.but_bin_f.setChecked(True)
 
         # ----------------------------------------------------------------------
         #               ### frm_controls ###

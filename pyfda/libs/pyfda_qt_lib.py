@@ -688,24 +688,17 @@ class QVLine(QFrame):
 
 class PushButton(QPushButton):
     """
-    Create a QPushButton with a width fitting the label with bold font as well
+    Convenience class for creating a checkable QPushButton with attribute `checked` that
+    reflects the checked state of the button and can be used for QSS styling via the
+    `style_button()` method.
 
     Parameters
     ----------
     text : str
         Text for button (optional)
 
-    rtf : bool
-        Render text as rich text
-
     icon : QIcon
         Icon for button. Either `text` or `icon` must be defined.
-
-    N_x : int
-        Width in number of "x"
-
-    margin : int
-        margin for ?
 
     checkable : bool
         Whether button is checkable
@@ -714,9 +707,8 @@ class PushButton(QPushButton):
         Whether initial state is checked
     """
 
-    def __init__(self, parent=None, text: str = "", icon: QIcon = None, N_x: int = 8,
-                 checkable: bool = True, checked: bool = False,
-                 objectName="", **kwargs):
+    def __init__(self, parent=None, text: str = "", icon: QIcon = None, checkable: bool = True,
+                 checked: bool = False, objectName="", **kwargs):
 
         if parent is not None:
             super().__init__(parent, **kwargs)
@@ -726,17 +718,9 @@ class PushButton(QPushButton):
         self.setObjectName(objectName)
 
         if icon is None:
-            doc_x = QtGui.QTextDocument("x")
-            doc_x.setDefaultFont(self.font())
-            w_x = int(doc_x.size().width())
-            self.w = qtext_width(text=text, N_x=N_x, bold=True, font=self.font()) + w_x
-            self.h = super().sizeHint().height()
-            self.setText(text.strip())
+            super().setText(text.strip())
         else:
             self.setIcon(icon)
-            # use sizeHint of parent
-            self.w = super().sizeHint().width()
-            self.h = super().sizeHint().height()
 
         self.setCheckable(checkable)
         self._checkable = checkable
@@ -778,12 +762,6 @@ class PushButton(QPushButton):
         else:
             qstyle_widget(self, "normal")
 
-    def sizeHint(self) -> QtCore.QSize:
-        return QSize(self.w, self.h)
-
-    def minimumSizeHint(self) -> QtCore.QSize:
-        return QSize(self.w, self.h)
-
 class PushButtonRT(QPushButton):
     """
     Subclass QPushButton using QLabel to render rich text
@@ -799,8 +777,8 @@ class PushButtonRT(QPushButton):
     N_x : int
         Width in number of "x"
 
-    margin : int
-        margin for ?
+    pad : int
+        L / R padding for the label inside the button
 
     checkable : bool
         Whether button is checkable
@@ -809,9 +787,8 @@ class PushButtonRT(QPushButton):
         Whether initial state is checked
     """
 
-    def __init__(self, parent=None, text: str = "",
-                  N_x: int = 8, margin: int = 10, checkable: bool = True, checked: bool = False,
-                  objectName="", **kwargs):
+    def __init__(self, parent=None, text: str = "", pad: int = 5, checkable: bool = True,
+                 checked: bool = False, objectName="", **kwargs):
 
         if parent is not None:
             super().__init__(parent, **kwargs)
@@ -821,11 +798,11 @@ class PushButtonRT(QPushButton):
         self.setObjectName(objectName)
 
         self.lbl_rtf = QLabel(self)
-        self.margin = margin
+        self.pad = pad
         if text is not None:
             self.lbl_rtf.setText(text)
         self.layH_main = QHBoxLayout()
-        self.layH_main.setContentsMargins(margin, 0, 0, 0)  # L, T, R, B
+        self.layH_main.setContentsMargins(pad, 0, pad, 0)  # L, T, R, B
         self.layH_main.setSpacing(0)
         self.setLayout(self.layH_main)
         # Make QLabel transparent except for painted pixels
@@ -852,7 +829,6 @@ class PushButtonRT(QPushButton):
     def setText(self, text):
         self.lbl_rtf.setText(text)
         self.updateGeometry()
-        return
 
     def setChecked(self, checked: bool):
         if self._checkable:
@@ -884,15 +860,15 @@ class PushButtonRT(QPushButton):
             qstyle_widget(self.lbl_rtf, "normal")
 
     def sizeHint(self) -> QtCore.QSize:
-        s = QPushButton.sizeHint(self)
+        s = super().sizeHint()
         w = self.lbl_rtf.sizeHint()
-        s.setWidth(w.width() + 2 * self.margin)
+        s.setWidth(w.width() + 2 * self.pad)
         return s
 
     def minimumSizeHint(self) -> QtCore.QSize:
-        s = QPushButton.sizeHint(self)
+        s = super().sizeHint()
         w = self.lbl_rtf.sizeHint()
-        s.setWidth(w.width() + 2 * self.margin)
+        s.setWidth(w.width() + 2 * self.pad)
         return s
 
 

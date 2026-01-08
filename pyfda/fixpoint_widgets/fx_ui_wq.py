@@ -230,8 +230,6 @@ class FX_UI_WQ(QWidget):
         self.cmbW.setVisible(ui_dict['cmb_w_vis'] == 'on')
 
         self.butLock = PushButton(self, icon=QIcon(':/lock-locked.svg'))
-        self.butLock.setCheckable(True)
-        self.butLock.setChecked(False)
         self.butLock.setVisible(ui_dict['lock_vis'] == 'on')
         self.butLock.setToolTip(ui_dict['tip_lock'])
         self.butLock.setFixedWidth(self.butLock.height())

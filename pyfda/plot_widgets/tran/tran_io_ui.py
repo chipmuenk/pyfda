@@ -191,9 +191,7 @@ class Tran_IO_UI(QWidget):
         layH_file_fmt_options.addWidget(self.but_int_as_float)
 
         self.but_f_s_wav_auto = PushButtonRT(
-            self, text="<b>Auto <i>f<sub>S</sub></i></b>", margin=5)
-        self.but_f_s_wav_auto.setCheckable(True)
-        self.but_f_s_wav_auto.setChecked(True)
+            self, text="<b>Auto <i>f<sub>S</sub></i></b>", checked=True)
         self.but_f_s_wav_auto.setToolTip(
             "<span>Copy pyfda sampling frequency to WAV file during export "
             "when selected.</span>")
