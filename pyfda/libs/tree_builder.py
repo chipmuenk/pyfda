@@ -578,7 +578,7 @@ class Tree_Builder():
     # --------------------------------------------------------------------------
     def init_filters(self):
         """
-        Run at startup to populate global dictionaries and lists:
+        Run at startup from pyfdax.py to populate global dictionaries and lists:
 
         - Read attributes (`ft`, `rt`, `fo`) from all valid filter classes (`fc`)
           in the global dict ``fb.filter_classes`` and store them in the filter
@@ -611,11 +611,11 @@ class Tree_Builder():
                 continue  # continue with next entry in fb.filter_classes
 
             # add attributes from dict to fil_tree for filter class fc
-            fil_tree = self.build_fil_tree(fc, ff.fil_inst.rt_dict, fil_tree)
+            fil_tree = self._build_fil_tree(fc, ff.fil_inst.rt_dict, fil_tree)
 
             # merge additional rt_dict (optional) into filter tree
             if hasattr(ff.fil_inst, 'rt_dict_add'):
-                fil_tree_add = self.build_fil_tree(fc, ff.fil_inst.rt_dict_add)
+                fil_tree_add = self._build_fil_tree(fc, ff.fil_inst.rt_dict_add)
                 merge_dicts_hierarchically(fil_tree, fil_tree_add, mode='add1')
 
         # Make the dictionary and all sub-dictionaries read-only ("FrozenDict"):
@@ -630,11 +630,10 @@ class Tree_Builder():
         logger.debug("\nfb.fil_tree =\n%s", pformat(fb.fil_tree))
 
     # --------------------------------------------------------------------------
-    def build_fil_tree(self, fc, rt_dict, fil_tree=None):
+    def _build_fil_tree(self, fc: str, rt_dict: dict, fil_tree: dict = None) -> dict:
         """
-        Read attributes (ft, rt, rt:fo) from filter class fc)
-        Attributes are stored in
-        the design method classes in the format (example from ``common.py``)
+        Read attributes (ft, rt, rt:fo) from filter class where they are stored 
+        in the following format (example from ``common.py``):
 
         .. code-block:: python
 
@@ -644,7 +643,7 @@ class Tree_Builder():
                                    'msg':    ('a', r"<br /><b>Note:</b> Read this!"),
                                    'fspecs': ('a','F_C'),
                                    'tspecs': ('u', {'frq':('u','F_PB','F_SB'),
-                                                   'amp':('u','A_PB','A_SB')})
+                                                    'amp':('u','A_PB','A_SB')})
                                   },
                            'min':{'fo':     ('d','N'),
                                   'fspecs': ('d','F_C'),
@@ -695,16 +694,21 @@ class Tree_Builder():
                    }
              }, ...
 
-        Finally, the whole structure is frozen recursively to avoid inadvertedly
+        Finally, the whole structure is frozen recursively to prevent inadvertedly
         changing the filter tree.
 
-        For a full example, see the default filter tree ``fb.fil_tree`` defined
-        in ``filterbroker.py``.
+        For a full example, see the default filter tree ``fil_tree``.
 
         Parameters
         ----------
-        None
+        fc : str
+            filter class name (e.g. 'Equiripple', 'Cheby1')
 
+        rt_dict : dict
+            dictionary with response type information as defined in the filter class
+
+        fil_tree : dict, optional
+            existing filter tree to be extended (default is None)
 
         Returns
         -------
@@ -756,9 +760,9 @@ if __name__ == "__main__":
     filt_file_name = "filter_list.txt"
     conf_dir = "filter_design"
 
-    # Create a new FilterFileReader instance & initialize it
+    # Create a new Tree_Builder instance & initialize it
     myTreeBuilder = Tree_Builder(conf_dir, filt_file_name)
 
     print("\n===== Start Test ====")
-    filterTree = myTreeBuilder.build_fil_tree()
+    filterTree = myTreeBuilder._build_fil_tree()
     print('fb.fil_tree = ', fb.fil_tree)
