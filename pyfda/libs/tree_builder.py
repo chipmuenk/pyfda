@@ -526,7 +526,7 @@ class Tree_Builder():
                 elif isinstance(mod.classes, str):  # String, create a dict with the
                     mod_dict = {mod.classes: mod.classes}  # string as both key and value
                 elif isinstance(mod.classes, list):  # list, create a dict with list items
-                    mod_dict = {l: l for l in list}  # as both key and value
+                    mod_dict = {i: i for i in list}  # as both key and value
                 else:
                     logger.warning("Skipping module '%s', its attribute 'classes' has the "
                                    "wrong type '%s'.", mod_name, type(mod.classes).__name__)

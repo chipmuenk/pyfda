@@ -434,8 +434,8 @@ class Plot_Impz(QWidget):
                 logger.error("Missing value for key 'fx_sim'.")
 
             else:
-                logger.error(f"""Unknown value "{dict_sig['fx_sim']}" for "fx_sim" key\n"""
-                             f"""\treceived from "{dict_sig['class']}" """)
+                logger.error("Unknown value '%s' for 'fx_sim' key\n\treceived from '%s'",
+                              dict_sig['fx_sim'], dict_sig['class'])
 
         # --- widget is visible, handle all signals except 'fx_sim' -----------
         elif self.isVisible():
