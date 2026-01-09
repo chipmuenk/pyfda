@@ -24,7 +24,7 @@ import pyfda.filterbroker as fb
 import pyfda.filter_factory as ff
 import pyfda.libs.pyfda_dirs as dirs
 
-from .frozendict import freeze_hierarchical
+import pyfda.libs.frozendict as frozendict
 
 logger = logging.getLogger(__name__)
 
@@ -576,15 +576,15 @@ class Tree_Builder():
         return classes_dict
 
     # --------------------------------------------------------------------------
-    def init_filters(self):
+    def init_filters(self) -> 'frozendict.FrozenDict':
         """
-        Run at startup from pyfdax.py to populate global dictionaries and lists:
+        Run at startup from `pyfdax.py` to populate "global" dictionaries and lists:
 
-        - Read attributes (`ft`, `rt`, `fo`) from all valid filter classes (`fc`)
-          in the global dict ``fb.filter_classes`` and store them in the filter
-          tree dict ``fil_tree`` with the hierarchy
+        Read attributes (`ft`, `rt`, `fo`) from all valid filter classes (`fc`)
+        in the global dict ``fb.filter_classes`` and return them as a frozen filter
+        tree dict with the hierarchy
 
-            **rt-ft-fc-fo-subwidget:params** .
+        **rt-ft-fc-fo-subwidget:params** .
 
         Parameters
         ----------
@@ -592,12 +592,12 @@ class Tree_Builder():
 
         Returns
         -------
-        None, but populates the following global attributes:
-
-            - `fb.fil_tree` :
+        fil_tree : FrozenDict
+            A frozen hierarchical dictionary with all filter combinations.
 
         """
         logger.info("Instantiating filter classes, building filter tree ...\n")
+
         fil_tree = {}
 
         for fc in fb.filter_classes:  # iterate over all previously found filter
@@ -618,16 +618,16 @@ class Tree_Builder():
                 fil_tree_add = self._build_fil_tree(fc, ff.fil_inst.rt_dict_add)
                 merge_dicts_hierarchically(fil_tree, fil_tree_add, mode='add1')
 
+            # Test Immutability
+            # fil_tree_ref = tb.fil_tree['LP']['FIR']['Equiripple']['min']
+            # fil_tree_ref.update({'msg':("hallo",)}) # this changes  tb.fil_tree !!
+            # tb.fil_tree['LP']['FIR']['Equiripple']['min']['par'] = ("A_1","F_1")
+            # print(type(tb.fil_tree['LP']['FIR']['Equiripple']))
+
         # Make the dictionary and all sub-dictionaries read-only ("FrozenDict"):
-        fb.fil_tree = freeze_hierarchical(fil_tree)
+        return frozendict.freeze_hierarchical(fil_tree)
 
-        # Test Immutability
-#        fil_tree_ref = fb.fil_tree['LP']['FIR']['Equiripple']['min']
-#        fil_tree_ref.update({'msg':("hallo",)}) # this changes  fb.fil_tree !!
-#        fb.fil_tree['LP']['FIR']['Equiripple']['min']['par'] = ("A_1","F_1")
-#        print(type(fb.fil_tree['LP']['FIR']['Equiripple']))
 
-        logger.debug("\nfb.fil_tree =\n%s", pformat(fb.fil_tree))
 
     # --------------------------------------------------------------------------
     def _build_fil_tree(self, fc: str, rt_dict: dict, fil_tree: dict = None) -> dict:
@@ -751,7 +751,9 @@ class Tree_Builder():
 # filter types (ft), filter class (fc) and filter order (fo).
 # This dictionary is overwritten during initialization.
 #
-fil_tree = freeze_hierarchical({
+# TODO: Move this to a separate file
+
+fil_tree = frozendict.freeze_hierarchical({
     'LP': {
         'FIR': {
             'Equiripple': {

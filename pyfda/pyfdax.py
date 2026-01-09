@@ -20,6 +20,7 @@ from pyfda.libs.compat import Qt, QApplication, QIcon
 # from pyfda.libs.pyfda_lib import ANSIcolors as ACol
 import pyfda.libs.pyfda_dirs as dirs # initial import constructs file paths
 from pyfda.libs.tree_builder import Tree_Builder
+import pyfda.filterbroker as fb
 import pyfda.pyfda_rc as rc
 
 from pyfda.pyfda_class import pyFDA
@@ -151,7 +152,7 @@ def main():
     # initialize the FilterTreeBuilder class:
     # read config file and construct filter tree from it
     tree_builder.build_widget_tree()
-    tree_builder.init_filters()
+    fb.fil_tree = tree_builder.init_filters()
 
     mainw = pyFDA()
     logger.info("Logging to '%s'", dirs.LOG_DIR_FILE)
