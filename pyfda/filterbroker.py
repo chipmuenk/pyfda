@@ -12,20 +12,15 @@
 """
 Dynamic parameters and settings are exchanged via the dictionaries in this file.
 Importing ``filterbroker.py`` runs the module once, defining all module variables
-which have a global scope like class variables and can be imported like
+which have a global scope like class variables.
 
->>> import filterbroker as fb
->>> myfil = fb.fil[0]
-
-Better:
-
->>> import pyfda.filterbroker as fb
-
+The entries in the global dict `fil[0]` contain the current filter design parameters, they
+can be accessed and modified via the getter and setter `fb_get()` and `fb_set()`.
 
 The entries in this file are only used as initial / default entries and to
 demonstrate the structure of the global dicts and lists.
 These initial values are also handy for module-level testing where some useful
-settings of the variables is required.
+setting of the variables is required.
 
 Attributes
 ----------
@@ -119,7 +114,7 @@ name of the module containing the class.
 """
 
 # Dictionary describing the available combinations of response types (rt),
-# filter types (ft), design methods (dm) and filter order (fo). This dictionary
+# filter types (ft), filter class (fc) and filter order (fo). This dictionary
 # is also overwritten during initialization:
 fil_tree = freeze_hierarchical({
     'LP': {
@@ -249,9 +244,9 @@ conf_settings = {
     }
 
 # -----------------------------------------------------------------------------
-# Dictionary containing current filter type, specifications, design and some
-# auxiliary information, the initial definition here is copied into fil[0] ... [9]
-# which can be modified by input widgets and design routines
+# Reference dictionary containing current filter type, specifications, design
+# and some auxiliary information, the initial definition here is copied into
+# fil[0] ... [9] which can be modified by input widgets and design routines
 # ------------------------------------------------------------------------------
 fil_ref = {
     '_id': [], # a list with the keyword 'pyfda' and the version, e.g. ['pyfda', 1]
@@ -342,14 +337,16 @@ fil_ref = {
     'fx_base': 'dec', # global number format for fx display {'dec', 'hex', 'bin', 'oct', 'csd'}
     # string with current fixpoint module and class
     'fx_mod_class_name': 'pyfda.fixpoint_widgets.iir_df1.iir_df1_pyfixp_ui',
-    # Settings for quantization subwidgets:
+    # Settings for quantization subwidgets
+    # ---------------------------------------------------------------------------
+    #  Sub-dicts for quantization of
     #   'QI':input, 'QO': output, 'QCA': coeffs a, 'QCB': coeffs b, 'QACC': accumulator
     #    (more subwidgets can be added by fixpoint widget if needed)
     #  Keys:
     #   'N_over': number of overflows during last quantization process
-    #   'WI': integer bits, 'WF': fractional bits,
-    #   'w_a_m': word length automatic / manual calculation (not needed for 'QI', 'QO')
+    #   'WF': fractional bits, 'WI': integer bits
     #   'ovfl': overflow behaviour, 'quant': quantizer behaviour
+    #   'w_a_m': word length automatic / manual calculation (not needed for 'QI', 'QO')
     'fxq':{
         # accumulator quantization
         'QACC': {
