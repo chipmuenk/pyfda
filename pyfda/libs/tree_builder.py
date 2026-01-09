@@ -31,7 +31,7 @@ logger = logging.getLogger(__name__)
 REQ_VERSION = 4  # required version for config file
 
 # --------------------------------------------------------------------------
-def merge_dicts_hierarchically(d1, d2, path=None, mode='keep1'):
+def merge_dicts_hierarchically(d1: dict, d2: dict, path: str = "", mode: str = "keep1") -> dict:
     """
     Merge the hierarchical dictionaries ``d1`` and ``d2``.  The dict ``d1`` is
     modified in place and returned
@@ -88,8 +88,6 @@ def merge_dicts_hierarchically(d1, d2, path=None, mode='keep1'):
         # at least one of the arguments is not a dict -> don't do anything
         return d1
 
-    if path is None:
-        path = ""
     for key in d2:
         if key in d1:
             if isinstance(d1[key], dict) and isinstance(d2[key], dict):
@@ -143,8 +141,8 @@ class Tree_Builder():
     # --------------------------------------------------------------------------
     def parse_conf_file(self) -> None:
         """
-        Parse the configuration file `pyfda.conf` (specified in
-        ``dirs.USER_CONF_DIR_FILE``). This is run only once at instantiation.
+        Parse the configuration file `pyfda.conf` (specified in ``dirs.USER_CONF_DIR_FILE``).
+        This is called only once at instantiation from `pyfdax.py`.
 
         The following sections are analyzed here:
 
@@ -165,7 +163,8 @@ class Tree_Builder():
         -------
         None
         """
-        def read_conf_file():
+        # -----------------
+        def _print_conf_file() -> None:
             """
             Read configuration file and print its sections.
             """
@@ -178,7 +177,7 @@ class Tree_Builder():
                         dirs.USER_CONF_DIR_FILE, sect)
 
         # -----------------
-        def read_conf_version():
+        def _read_conf_version() -> bool:
             """
             Try to read out the version of the config file, if the version
             number cannot be read or is not equal to the required number,
@@ -200,6 +199,7 @@ class Tree_Builder():
                 success = False
 
             return success
+
         # --------------
         logger.info("Reading config file: %s\n", dirs.USER_CONF_DIR_FILE)
         try:
@@ -219,22 +219,22 @@ class Tree_Builder():
             # Allow interpolation across sections, ${Dirs:dir1}
             self.conf._interpolation = configparser.ExtendedInterpolation()
 
-            read_conf_file()
+            _print_conf_file()
             # ------------------------------------------------------------------
             # Parsing [Common]
             # ------------------------------------------------------------------
-            self.commons = self.parse_conf_section("Common")
+            self.commons = self._parse_conf_section("Common")
             logger.info("Found %d entries in [Common]", len(self.commons))
 
-            if not read_conf_version():
+            if not _read_conf_version():
                 # update configuration files and try again
                 dirs.update_conf_files(logger)
-                read_conf_file()
-                self.commons = self.parse_conf_section("Common")
+                _print_conf_file()
+                self.commons = self._parse_conf_section("Common")
                 logger.info(
                     "Found %s entries in [Common] (new config file)", len(self.commons))
 
-                if not read_conf_version():
+                if not _read_conf_version():
                     logger.critical("Version number is still invalid, terminating.")
                     sys.exit()
 
@@ -256,7 +256,7 @@ class Tree_Builder():
             # ------------------------------------------------------------------
             # Parsing [Config Settings]
             # ------------------------------------------------------------------
-            conf_settings = self.parse_conf_section("Config Settings")
+            conf_settings = self._parse_conf_section("Config Settings")
             if conf_settings:
                 # logger.info(conf_settings)
                 for k in conf_settings:
@@ -286,16 +286,18 @@ class Tree_Builder():
             sys.exit()
 
     # --------------------------------------------------------------------------
-    def build_widget_tree(self):
+    def build_widget_tree(self) -> None:
         """
+        This is only called once during the start from `pyfdax.py`.
+
         This part needs a running application as Qt widgets are instantiated to ensure
         they exist and run without error.
 
         The following sections are processed here, creating OrderedDicts in `fb` with
         widget class names as keys and dictionaries with options as values.
 
-        This is performed using :func:`build_class_dict()` which calls
-        :func:`parse_conf_section()`:
+        This is performed using :func:`_build_class_dict()` which calls
+        :func:`_parse_conf_section()`:
 
         - Try to find and import the modules specified in the corresponding sections
 
@@ -333,15 +335,15 @@ class Tree_Builder():
         # ------------------------------------------------------------------
         # Parsing [Input Widgets]
         # ------------------------------------------------------------------
-        fb.input_classes = self.build_class_dict("Input Widgets", "input_widgets")
+        fb.input_classes = self._build_class_dict("Input Widgets", "input_widgets")
         # ------------------------------------------------------------------
         # Parsing [Plot Widgets]
         # ------------------------------------------------------------------
-        fb.plot_classes = self.build_class_dict("Plot Widgets", "plot_widgets")
+        fb.plot_classes = self._build_class_dict("Plot Widgets", "plot_widgets")
         # ------------------------------------------------------------------
         # Parsing [Filter Widgets]
         # ------------------------------------------------------------------
-        fb.filter_classes = self.build_class_dict("Filter Widgets", "filter_widgets")
+        fb.filter_classes = self._build_class_dict("Filter Widgets", "filter_widgets")
         # currently, option "opt" can only be an association with a fixpoint
         # widget, so replace key "opt" by key "fix":
         # Convert to list in any case
@@ -354,7 +356,7 @@ class Tree_Builder():
         # ------------------------------------------------------------------
         # Parsing [Fixpoint Filters]
         # ------------------------------------------------------------------
-        fb.fixpoint_classes = self.build_class_dict(
+        fb.fixpoint_classes = self._build_class_dict(
             "Fixpoint Widgets", "fixpoint_widgets")
 
         # First check whether fixpoint options of the filter widgets are
@@ -383,7 +385,7 @@ class Tree_Builder():
                 fb.filter_classes[c].update({'fix': list(fix_wdg)})
 
     # --------------------------------------------------------------------------
-    def parse_conf_section(self, section):
+    def _parse_conf_section(self, section: str) -> dict:
         """
         Parse ``section`` in config file `conf` and return an OrderedDict
         with the elements ``{key:<OPTION>}`` where `key` and <OPTION>
@@ -445,7 +447,7 @@ class Tree_Builder():
         return section_conf_dict
 
     # --------------------------------------------------------------------------
-    def build_class_dict(self, section, subpackage=""):
+    def _build_class_dict(self, section: str, subpackage: str = "") -> dict:
         """
         - Try to dynamically import the modules (= files) parsed in `section`
           reading their module level attribute `classes` listing the classes
@@ -464,7 +466,7 @@ class Tree_Builder():
         ----------
         section: str
             Name of the section in the configuration file to be parsed by
-            ``self.parse_conf_section``.
+            ``self._parse_conf_section``.
 
         subpackage: str
             Name of the subpackage containing the module to be imported. Module
@@ -494,7 +496,7 @@ class Tree_Builder():
         imported_classes = ""  # names of successful module imports
         pckg_names = ['pyfda.'+subpackage+'.', '', subpackage+'.']  # search in that order
 
-        section_conf_dict = self.parse_conf_section(section)
+        section_conf_dict = self._parse_conf_section(section)
 
         for mod_name in section_conf_dict:  # iterate over dict keys found in config file
             for p in pckg_names:
@@ -632,7 +634,7 @@ class Tree_Builder():
     # --------------------------------------------------------------------------
     def _build_fil_tree(self, fc: str, rt_dict: dict, fil_tree: dict = None) -> dict:
         """
-        Read attributes (ft, rt, rt:fo) from filter class where they are stored 
+        Read attributes (ft, rt, rt:fo) from filter class where they are stored
         in the following format (example from ``common.py``):
 
         .. code-block:: python

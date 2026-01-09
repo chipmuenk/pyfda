@@ -62,7 +62,7 @@ undo_ptr = 0  # pointer to current undo memory % UNDO_LEN
 #==============================================================================
 # -----------------------------------------------------------------------------
 # Dicts with class names found in the main configuration file,
-# parsed in `tree_builder.build_class_dict()`. Those initial definitions
+# parsed in `tree_builder._build_class_dict()`. Those initial definitions
 # are only meant as examples and for module test, they are overwritten during
 # the initialization.
 #------------------------------------------------------------------------------
