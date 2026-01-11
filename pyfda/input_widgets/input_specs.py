@@ -31,7 +31,7 @@ from pyfda.pyfda_rc import params
 logger = logging.getLogger(__name__)
 
 classes = {'Input_Specs': 'Specs'}  #: Dict containing class name : display name
-# This is read by `tree_builder._build_class_dict()` into the dict `filterbroker.input_classes`
+# This is read by `tree_builder._build_widget_class_dicts()` into the dict `filterbroker.input_classes`
 # and used to create the widgets in input_tab_widgets.
 
 

@@ -296,7 +296,7 @@ class Tree_Builder():
         The following sections are processed here, creating OrderedDicts in `fb` with
         widget class names as keys and dictionaries with options as values.
 
-        This is performed using :func:`_build_class_dict()` which calls
+        This is performed using :func:`_build_widget_class_dicts()` which calls
         :func:`_parse_conf_section()`:
 
         - Try to find and import the modules specified in the corresponding sections
@@ -335,15 +335,15 @@ class Tree_Builder():
         # ------------------------------------------------------------------
         # Parsing [Input Widgets]
         # ------------------------------------------------------------------
-        fb.input_classes = self._build_class_dict("Input Widgets", "input_widgets")
+        fb.input_classes = self._build_widget_class_dicts("Input Widgets", "input_widgets")
         # ------------------------------------------------------------------
         # Parsing [Plot Widgets]
         # ------------------------------------------------------------------
-        fb.plot_classes = self._build_class_dict("Plot Widgets", "plot_widgets")
+        fb.plot_classes = self._build_widget_class_dicts("Plot Widgets", "plot_widgets")
         # ------------------------------------------------------------------
         # Parsing [Filter Widgets]
         # ------------------------------------------------------------------
-        fb.filter_classes = self._build_class_dict("Filter Widgets", "filter_widgets")
+        fb.filter_classes = self._build_widget_class_dicts("Filter Widgets", "filter_widgets")
         # currently, option "opt" can only be an association with a fixpoint
         # widget, so replace key "opt" by key "fix":
         # Convert to list in any case
@@ -356,7 +356,7 @@ class Tree_Builder():
         # ------------------------------------------------------------------
         # Parsing [Fixpoint Filters]
         # ------------------------------------------------------------------
-        fb.fixpoint_classes = self._build_class_dict(
+        fb.fixpoint_classes = self._build_widget_class_dicts(
             "Fixpoint Widgets", "fixpoint_widgets")
 
         # First check whether fixpoint options of the filter widgets are
@@ -447,7 +447,7 @@ class Tree_Builder():
         return section_conf_dict
 
     # --------------------------------------------------------------------------
-    def _build_class_dict(self, section: str, subpackage: str = "") -> dict:
+    def _build_widget_class_dicts(self, section: str, subpackage: str = "") -> dict:
         """
         - Try to dynamically import the modules (= files) parsed in `section`
           reading their module level attribute `classes` listing the classes

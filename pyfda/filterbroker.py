@@ -61,10 +61,13 @@ undo_ptr = 0  # pointer to current undo memory % UNDO_LEN
 
 #==============================================================================
 # -----------------------------------------------------------------------------
-# Dicts with class names found in the main configuration file,
-# parsed in `tree_builder._build_class_dict()`. Those initial definitions
-# are only meant as examples and for module test, they are overwritten during
-# the initialization.
+# Dicts with widget class names from the main configuration file, parsed in 
+# `tree_builder._build_widget_class_dicts()`. Those initial definitions are only meant as examples, 
+# for documentation and for module test, they are overwritten during the initialization.
+#
+# The keys are the class names of the widgets that have been parsed in the configuration file
+# and successfully instantiated. The values are dicts containing display names (e.g. for tabs
+# and comboboxes) and module paths in dotted notation for dynamic importing.
 #------------------------------------------------------------------------------
 
 plot_classes = OrderedDict(
@@ -107,11 +110,6 @@ filter_classes = OrderedDict(
      ('Manual_FIR', {'name': 'Manual', 'mod': 'pyfda.filter_widgets.manual'}),
      ('Manual_IIR', {'name': 'Manual', 'mod': 'pyfda.filter_widgets.manual'})
      ])
-"""
-The keys of this dictionary are the names of all found filter classes, the values
-are the name to be displayed e.g. in the comboboxes and the fully qualified
-name of the module containing the class.
-"""
 
 # Dictionary describing the available combinations of response types (rt),
 # filter types (ft), filter class (fc) and filter order (fo). This dictionary
