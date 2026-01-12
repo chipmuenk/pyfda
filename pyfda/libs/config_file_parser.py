@@ -484,6 +484,7 @@ class ConfigFileParser():
 # ==============================================================================
 if __name__ == "__main__":
     # Run widget standalone with `python -m pyfda.libs.config_file_parser`
+    # The test information is taken from the dicts in filterbroker.py
     #
     logging.basicConfig(level=logging.INFO)
     from pyfda.libs.pyfda_lib import pprint_log
@@ -492,3 +493,5 @@ if __name__ == "__main__":
     cfp.parse_conf_file()
     print('\nfb.INPUT_CLASSES_DICT =\n', pprint_log(fb.INPUT_CLASSES_DICT))
     print('\nfb.PLOT_CLASSES_DICT =\n', pprint_log(fb.PLOT_CLASSES_DICT))
+    print('\nfb.FILTER_CLASSES_DICT =\n', pprint_log(fb.FILTER_CLASSES_DICT))
+    print('\nfb.FIXPOINT_CLASSES_DICT =\n', pprint_log(fb.FIXPOINT_CLASSES_DICT))
