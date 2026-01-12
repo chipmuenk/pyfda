@@ -111,7 +111,7 @@ class FilterFactory():
         except ImportError:
             # Filter module mod is in dictionary 'fb.FILTER_CLASSES_DICT', but could not be imported.
             err_string =("\nImportError in 'FilterFactory.create_fil_inst()':\n"
-                  "Filter design module '%s' could not be imported.", str(mod))
+                  f"Filter design module '{mod}' could not be imported.")
             self.err_code = 2
             logger.warning(err_string)
             debug_exception()
