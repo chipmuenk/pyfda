@@ -874,21 +874,17 @@ fil_tree = frozendict.freeze_hierarchical({
 
 # ==============================================================================
 if __name__ == "__main__":
-
+    # Run widget standalone with `python -m pyfda.libs.tree_builder`
+    #
     # Need to start a QApplication to avoid the error
-    #  "QWidget: Must construct a QApplication before a QPaintDevice"
+    #  "QWidget: Must construct a QApplication before a QWidget"
     # when instantiating filters with dynamic widgets (equiripple, firwin)
     from .compat import QApplication
+    from pyfda.libs.pyfda_lib import pprint_log
     app = QApplication(sys.argv)
-
-    print("===== Initialize FilterReader ====")
-
-    filt_file_name = "filter_list.txt"
-    conf_dir = "filter_design"
+    logging.basicConfig(level=logging.INFO)
 
     # Create a new Tree_Builder instance & initialize it
-    myTreeBuilder = Tree_Builder(conf_dir, filt_file_name)
-
-    print("\n===== Start Test ====")
-    filterTree = myTreeBuilder._build_fil_tree()
-    print('fb.fil_tree = ', fb.fil_tree)
+    tbl = Tree_Builder()
+    filterTree = tbl.init_filters()
+    print('fb.fil_tree = ', pprint_log(fb.fil_tree))
