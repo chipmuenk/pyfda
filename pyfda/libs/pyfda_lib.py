@@ -27,6 +27,7 @@ from mplcursors import __version__ as V_CUR
 from scipy import __version__ as V_SCI
 
 import pyfda.filterbroker as fb
+from pyfda.libs.frozendict import FrozenDict
 import pyfda.libs.pyfda_dirs as dirs
 
 from .compat import QT_VERSION_STR as V_QT
@@ -535,7 +536,7 @@ def pprint_log(d, N: int = 10, tab: str = "\t", debug: bool = False) -> str:
     first = True
     if debug:
         logger.info("Data: %s [%s], ndim=%d", type(d).__name__, type(d[0]).__name__, np.ndim(d))
-    if isinstance(d, dict):
+    if isinstance(d, (dict, FrozenDict)):
         for k in d:
             if not first:
                 s += cr + tab
@@ -591,7 +592,7 @@ def pprint_log(d, N: int = 10, tab: str = "\t", debug: bool = False) -> str:
         elif np.isscalar(d):
             s = str(d) + f' of type: {type(d).__name__}'
         else:
-            s += 'Type: {type(d).__name__}'
+            s += f'Type: {type(d).__name__}'
     return s
 
 # ------------------------------------------------------------------------------
