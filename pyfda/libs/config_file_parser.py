@@ -40,6 +40,9 @@ class ConfigFileParser():
     - fb.FIXPOINT_CLASSES_DICT
     - fb.INPUT_CLASSES_DICT
     - fb.PLOT_CLASSES_DICT
+
+    The existence of filter classes etc. is not tested, entries are generated as found in the
+    config file. Actual testing and importing is done in :func:`_build_widget_class_dict()`.
     """
 
     def __init__(self):
@@ -47,10 +50,8 @@ class ConfigFileParser():
     # --------------------------------------------------------------------------
     def parse_conf_file(self) -> None:
         """
-        Parse the configuration file `pyfda.conf` (specified in ``dirs.USER_CONF_DIR_FILE``).
-        This is called only once at instantiation from `pyfdax.py`.
-
-        The following sections are analyzed here:
+        Parse the following sections from configuration file `pyfda.conf` (specified in
+        ``dirs.USER_CONF_DIR_FILE``).
 
         :[Commons]:
             Try to find user directories; if they exist add them to
@@ -60,6 +61,8 @@ class ConfigFileParser():
             Store settings in `fb.conf_settings`
 
         The other sections are processed in :func:`build_widget_tree()`.
+
+        This is called only once at instantiation from `pyfdax.py`.
 
         Returns
         -------
@@ -109,7 +112,7 @@ class ConfigFileParser():
             # configParser quietly fails when the file doesn't exist
             if not os.access(dirs.USER_CONF_DIR_FILE, os.R_OK):
                 raise IOError(
-                    f'Config file "{dirs.USER_CONF_DIR_FILE}"')
+                    f'Config file not found / not readable\n\t"{dirs.USER_CONF_DIR_FILE}"')
 
             # -----------------------------------------------------------------
             # setup an instance of config parser, allow  keys without value
@@ -147,7 +150,7 @@ class ConfigFileParser():
                         if d not in sys.path:
                             sys.path.append(d)
                     else:
-                        logger.warning("User directory doesn't exist:\n\t%s\n", d)
+                        logger.info("User directory doesn't exist:\n\t%s\n", d)
 
             if dirs.USER_DIRS:
                 logger.info("User directory(s):\n\t%s\n", dirs.USER_DIRS)
@@ -197,7 +200,7 @@ class ConfigFileParser():
         The following sections are processed here, creating dicts with
         widget class names as keys and dictionaries with options as values.
 
-        This is performed using :func:`_build_widget_class_dicts()` which calls
+        This is performed using :func:`_build_widget_class_dict()` which calls
         :func:`_parse_conf_section()`:
 
         - Try to find and import the modules specified in the corresponding sections
@@ -211,16 +214,16 @@ class ConfigFileParser():
         The following sections are processed here:
 
         :[Input Widgets]:
-            Store (user) input widgets in `fb.INPUT_CLASSES_DICT`
+            Store (user) input widget classes in `fb.INPUT_CLASSES_DICT`
 
         :[Plot Widgets]:
-            Store (user) plot widgets in `fb.PLOT_CLASSES_DICT`
+            Store (user) plot widget classes in `fb.PLOT_CLASSES_DICT`
 
         :[Filter Widgets]:
-            Store (user) filter widgets in `fb.FILTER_CLASSES_DICT`
+            Store (user) filter widget classes in `fb.FILTER_CLASSES_DICT`
 
         :[Fixpoint Widgets]:
-            Store (user) fixpoint widgets in `fb.FIXPOINT_CLASSES_DICT`
+            Store (user) fixpoint widget classes in `fb.FIXPOINT_CLASSES_DICT`
 
         Parameters
         ----------
@@ -234,15 +237,15 @@ class ConfigFileParser():
         # ------------------------------------------------------------------
         # Parsing [Input Widgets]
         # ------------------------------------------------------------------
-        fb.INPUT_CLASSES_DICT = self._build_widget_class_dicts("Input Widgets", "input_widgets")
+        fb.INPUT_CLASSES_DICT = self._build_widget_class_dict("Input Widgets", "input_widgets")
         # ------------------------------------------------------------------
         # Parsing [Plot Widgets]
         # ------------------------------------------------------------------
-        fb.PLOT_CLASSES_DICT = self._build_widget_class_dicts("Plot Widgets", "plot_widgets")
+        fb.PLOT_CLASSES_DICT = self._build_widget_class_dict("Plot Widgets", "plot_widgets")
         # ------------------------------------------------------------------
         # Parsing [Filter Widgets]
         # ------------------------------------------------------------------
-        filter_classes = self._build_widget_class_dicts("Filter Widgets", "filter_widgets")
+        filter_classes = self._build_widget_class_dict("Filter Widgets", "filter_widgets")
         # currently, option "opt" can only be an association with a fixpoint
         # widget, so replace key "opt" by key "fix":
         # Convert to list in any case
@@ -255,7 +258,7 @@ class ConfigFileParser():
         # ------------------------------------------------------------------
         # Parsing [Fixpoint Filters] / modifying filter_classes dict
         # ------------------------------------------------------------------
-        fb.FIXPOINT_CLASSES_DICT = self._build_widget_class_dicts(
+        fb.FIXPOINT_CLASSES_DICT = self._build_widget_class_dict(
             "Fixpoint Widgets", "fixpoint_widgets")
 
         # First check whether fixpoint options of the filter widgets are
@@ -348,7 +351,7 @@ class ConfigFileParser():
         return section_conf_dict
 
     # --------------------------------------------------------------------------
-    def _build_widget_class_dicts(self, section: str, subpackage: str = "") -> dict:
+    def _build_widget_class_dict(self, section: str, subpackage: str = "") -> dict:
         """
         - Try to dynamically import the modules (= files) parsed in `section`
           reading their module level attribute `classes` listing the classes
@@ -412,7 +415,7 @@ class ConfigFileParser():
                     ################################################
                     break  # -> successful import, break out of pckg_names loop
                 except ImportError as e:
-                    logger.debug('Import error for "%s":\n%s', mod_fq_name, e)
+                    logger.warning('Import error for "%s":\n%s', mod_fq_name, e)
                     mod_fq_name = None
                     continue  # module not found, try next package
                 except Exception as e:
@@ -491,6 +494,8 @@ if __name__ == "__main__":
     cfp = ConfigFileParser()
 
     cfp.parse_conf_file()
+    cfp.build_widget_tree()  # needs a working config file
+
     print('\nfb.INPUT_CLASSES_DICT =\n', pprint_log(fb.INPUT_CLASSES_DICT))
     print('\nfb.PLOT_CLASSES_DICT =\n', pprint_log(fb.PLOT_CLASSES_DICT))
     print('\nfb.FILTER_CLASSES_DICT =\n', pprint_log(fb.FILTER_CLASSES_DICT))
