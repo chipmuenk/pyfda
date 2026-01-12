@@ -104,7 +104,7 @@ FILTER_CLASSES_DICT =\
      'Cheby1': {'name': 'Chebyshev 1', 'mod': 'pyfda.filter_widgets.cheby1'},
      'Cheby2': {'name': 'Chebyshev 2', 'mod': 'pyfda.filter_widgets.cheby2'},
      'Ellip': {'name': 'Elliptic', 'mod': 'pyfda.filter_widgets.ellip'},
-     'EllipZeroPhz': {'name': 'EllipZeroPhz', 'mod': 'pyfda.filter_widgets.ellip_zero'},
+     'FancyFilter': {'name': 'Fancy', 'mod': 'pyfda.filter_widgets.fancyfilter'}, # test undefined
      # FIR
      'Equiripple': {'name': 'Equiripple', 'mod': 'pyfda.filter_widgets.equiripple'},
      'Firwin': {'name': 'Windowed FIR', 'mod': 'pyfda.filter_widgets.firwin'},
