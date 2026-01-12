@@ -38,11 +38,9 @@ More info on data persistence and storing / accessing global variables:
 * http://stackoverflow.com/questions/9058305/getting-attributes-of-a-class
 * http://stackoverflow.com/questions/2447353/getattr-on-a-module
 """
+import copy
 import logging
 
-import copy
-# import time
-from collections import OrderedDict
 from pyfda.libs.frozendict import freeze_hierarchical
 
 logger = logging.getLogger(__name__)
