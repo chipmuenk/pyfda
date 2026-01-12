@@ -11,8 +11,8 @@
 # which have a global scope like class variables.
 
 # -----------------------------------------------------------------------------
-# This file contains dicts with widget class names from the main configuration file, parsed in 
-# `tree_builder._build_widget_class_dicts()`. Those initial definitions are only meant as examples, 
+# This file contains dicts with widget class names from the main configuration file, parsed in
+# `tree_builder._build_widget_class_dicts()`. Those initial definitions are only meant as examples,
 # for documentation and for module test, they are overwritten during the initialization.
 #
 # The keys are the class names of the widgets that have been parsed in the configuration file
