@@ -22,7 +22,7 @@
 
 from collections import OrderedDict
 
-plot_classes = OrderedDict(
+PLOT_CLASSES_DICT = OrderedDict(
     [('Plot_Hf', {'name': '|H(f)|', 'mod': 'pyfda.plot_widgets.plot_hf'}),
      ('Plot_Phi', {'name': 'φ(f)', 'mod': 'pyfda.plot_widgets.plot_phi'}),
      ('Plot_tau_g', {'name': 'tau_g', 'mod': 'pyfda.plot_widgets.plot_tau_g'}),
@@ -30,7 +30,7 @@ plot_classes = OrderedDict(
      ('Plot_Impz', {'name': 'h[n]', 'mod': 'pyfda.plot_widgets.plot_impz'}),
      ('Plot_3D', {'name': '3D', 'mod': 'pyfda.plot_widgets.plot_3d'})
      ])
-input_classes = OrderedDict(
+INPUT_CLASSES_DICT = OrderedDict(
     [('Input_Specs', {'name': 'Specs', 'mod': 'pyfda.input_widgets.input_specs'}),
      ('Input_Coeffs', {'name': 'b,a', 'mod': 'pyfda.input_widgets.input_coeffs'}),
      ('Input_PZ', {'name': 'P/Z', 'mod': 'pyfda.input_widgets.input_pz'}),
@@ -40,7 +40,7 @@ input_classes = OrderedDict(
                                'mod': 'pyfda.input_widgets.input_fixpoint_specs'})
      ])
 
-fixpoint_classes = OrderedDict(
+FIXPOINT_CLASSES_DICT = OrderedDict(
     [('FIR_DF_wdg', {'name': 'FIR_DF',
                      'mod': 'pyfda.fixpoint_widgets.fir_df', 'opt': ['Equiripple', 'Firwin']}),
      ('Delay_wdg', {'name': 'Delay',
