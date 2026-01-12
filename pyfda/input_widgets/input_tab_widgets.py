@@ -26,7 +26,7 @@ SCROLL = True  # enable scrolling
 
 class InputTabWidgets(QWidget):
     """
-    Create a tabbed widget for all input subwidgets from the dict ``fb.input_classes``.
+    Create a tabbed widget for all input subwidgets from the dict ``fb.INPUT_CLASSES_DICT``.
     This list is created at startup in :class:`pyfda.libs.tree_builder.Tree_Builder`.
     """
     # signals as class variables (shared between instances if more than one exists)
@@ -52,7 +52,7 @@ class InputTabWidgets(QWidget):
     def _construct_UI(self):
         """
         Initialize UI with tabbed subwidgets: Instantiate dynamically each widget
-        from the dict `fb.input_classes` and try to
+        from the dict `fb.INPUT_CLASSES_DICT` and try to
 
         - set the TabToolTip from the instance attribute `tool_tip`
 
@@ -73,23 +73,21 @@ class InputTabWidgets(QWidget):
            coming signals with its own name!
         """
         tab_widget = QTabWidget(self)
-        # tab_widget.setObjectName("input_tabs")
 
         n_wdg = 0  # number and ...
         inst_wdg_str = ""  # ... full names of successfully instantiated widgets
 
-        for input_class in fb.input_classes:
+        for input_class in fb.INPUT_CLASSES_DICT:
             try:
                 # fully qualified module name:
-                mod_fq_name = fb.input_classes[input_class]['mod']
+                mod_fq_name = fb.INPUT_CLASSES_DICT[input_class]['mod']
                 mod = importlib.import_module(mod_fq_name)
                 wdg_class = getattr(mod, input_class)
                 # and instantiate it
                 inst = wdg_class(self)
             except ImportError as e:
                 logger.warning(
-                    'Class "{0}" could not be imported from {1}:\n{2}.'
-                    .format(input_class, mod_fq_name, e))
+                    'Class "%s" could not be imported from %s:\n%s.', input_class, mod_fq_name, e)
                 continue  # unsuccessful, try next widget
 
             if hasattr(inst, "state") and inst.state == "deactivated":

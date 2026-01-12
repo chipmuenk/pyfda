@@ -507,14 +507,14 @@ class Input_Fixpoint_Specs(QWidget):
         self.cmb_fx_wdg.clear()  # clear combobox
         fc = fb_get('fc')  # get current filter class
 
-        if 'fix' in fb.filter_classes[fc]:
+        if 'fix' in fb.FILTER_CLASSES_DICT[fc]:
             self.cmb_fx_wdg.blockSignals(True)
-            for class_name in fb.filter_classes[fc]['fix']:  # get class name
+            for class_name in fb.FILTER_CLASSES_DICT[fc]['fix']:  # get class name
                 try:   # construct module + class name ...
-                    mod_class_name = fb.fixpoint_classes[class_name]['mod'] + '.'\
+                    mod_class_name = fb.FIXPOINT_CLASSES_DICT[class_name]['mod'] + '.'\
                         + class_name
                     # ... and display name
-                    disp_name = fb.fixpoint_classes[class_name]['name']
+                    disp_name = fb.FIXPOINT_CLASSES_DICT[class_name]['name']
                     self.cmb_fx_wdg.addItem(disp_name, mod_class_name)
                     inst_wdg_str += '\t' + class_name + ' : ' + mod_class_name + '\n'
                 except AttributeError as e:

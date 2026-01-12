@@ -151,7 +151,7 @@ class SelectFilter(QWidget):
         ft = qget_cmb_box(self.cmbFilterType)
 
         for fc in fb.fil_tree[rt][ft]:
-            self.cmbFilterClass.addItem(fb.filter_classes[fc]['name'], fc)
+            self.cmbFilterClass.addItem(fb.FILTER_CLASSES_DICT[fc]['name'], fc)
         self.cmbFilterClass.setCurrentIndex(0)  # set initial index
 
         # ----------------------------------------------------------------------
@@ -303,7 +303,7 @@ class SelectFilter(QWidget):
         fc_list = []
 
         for fc in sorted(fb.fil_tree[self.rt][self.ft]):
-            self.cmbFilterClass.addItem(fb.filter_classes[fc]['name'], fc)
+            self.cmbFilterClass.addItem(fb.FILTER_CLASSES_DICT[fc]['name'], fc)
             fc_list.append(fc)
 
         logger.debug("fc_list: {0}\n{1}".format(fc_list, fb.fil[0]['fc']))
@@ -313,7 +313,7 @@ class SelectFilter(QWidget):
         if fb.fil[0]['fc'] in fc_list and ff.fil_inst:
             # yes, set same fc as before
             fc_idx = self.cmbFilterClass.findText(
-                fb.filter_classes[fb.fil[0]['fc']]['name'])
+                fb.FILTER_CLASSES_DICT[fb.fil[0]['fc']]['name'])
             logger.debug("fc_idx : %s", fc_idx)
             self.cmbFilterClass.setCurrentIndex(fc_idx)
         else:

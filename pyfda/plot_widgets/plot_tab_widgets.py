@@ -19,7 +19,7 @@ logger = logging.getLogger(__name__)
 # ------------------------------------------------------------------------------
 class PlotTabWidgets(QWidget):
     """
-    Create a tabbed widget for all plot subwidgets in the list ``fb.plot_classes``.
+    Create a tabbed widget for all plot subwidgets in the list ``fb.PLOT_CLASSES_DICT``.
     This list is compiled at startup in :class:`pyfda.tree_builder.Tree_Builder`, it is
     kept as a module variable in :mod:`pyfda.filterbroker`.
     """
@@ -45,7 +45,7 @@ class PlotTabWidgets(QWidget):
     def _construct_UI(self) -> None:
         """
         Initialize UI with tabbed subwidgets: Instantiate dynamically each widget
-        from the dict `fb.plot_classes` and try to
+        from the dict `fb.PLOT_CLASSES_DICT` and try to
 
         - set the TabToolTip from the instance attribute `tool_tip`
 
@@ -71,9 +71,9 @@ class PlotTabWidgets(QWidget):
         n_wdg = 0  # number and ...
         inst_wdg_str = ""  # ... full names of successfully instantiated plot widgets
         #
-        for plot_class in fb.plot_classes:
+        for plot_class in fb.PLOT_CLASSES_DICT:
             try:
-                mod_fq_name = fb.plot_classes[plot_class]['mod']  # FQN
+                mod_fq_name = fb.PLOT_CLASSES_DICT[plot_class]['mod']  # FQN
                 mod = importlib.import_module(mod_fq_name)  # import plot widget module
                 wdg_class = getattr(mod, plot_class)  # get plot widget class ...
                 # and instantiate it

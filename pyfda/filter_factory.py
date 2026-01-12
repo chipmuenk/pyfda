@@ -44,7 +44,7 @@ class FilterFactory():
     def create_fil_inst(self, fc: str, mod: str = "") -> int:
         """
         Create an instance of the filter design class passed as a string ``fc``
-        from the module found in ``fb.filter_classes[fc]``.
+        from the module found in ``fb.FILTER_CLASSES_DICT[fc]``.
         This dictionary has been collected by ``tree_builder.py``.
 
         The instance can afterwards be globally referenced as ``fil_inst``.
@@ -58,7 +58,7 @@ class FilterFactory():
 
         mod : str (optional, default = "")
             Fully qualified name of the filter module. When not specified, it is
-            read from the global dict ``fb.filter_classes[fc]['mod']``
+            read from the global dict ``fb.FILTER_CLASSES_DICT[fc]['mod']``
 
         Returns
         -------
@@ -94,14 +94,14 @@ class FilterFactory():
             # Try to dynamically import the module fc, i.e. do the following
             # import pyfda.<filter_package>.<fc> as fc_module
             if mod == "":
-                mod = fb.filter_classes[fc]['mod']
+                mod = fb.FILTER_CLASSES_DICT[fc]['mod']
             #------------------------------------------------------------------
             fc_module = importlib.import_module(mod)
             #------------------------------------------------------------------
 
         except KeyError:
             err_string =("\nKeyError in 'FilterFactory.create_fil_inst()':\n"
-                  f"Filter design class '{fc}' is not in dict 'fb.filter_classes',\n"
+                  f"Filter design class '{fc}' is not in dict 'fb.FILTER_CLASSES_DICT',\n"
                   "i.e. it was not found by 'FilterTreeBuilder'.")
             self.err_code = 1
             logger.warning(err_string)
@@ -109,7 +109,7 @@ class FilterFactory():
             return self.err_code
 
         except ImportError:
-            # Filter module mod is in dictionary 'fb.filter_classes', but could not be imported.
+            # Filter module mod is in dictionary 'fb.FILTER_CLASSES_DICT', but could not be imported.
             err_string =("\nImportError in 'FilterFactory.create_fil_inst()':\n"
                   "Filter design module '%s' could not be imported.", str(mod))
             self.err_code = 2
@@ -263,7 +263,7 @@ fil_factory = FilterFactory()
 if __name__ == '__main__':
     # Run module standalone with `python -m pyfda.filter_factory`
 
-    print("\nAll fb.filter_classes:\n", fb.filter_classes.keys())
+    print("\nAll fb.FILTER_CLASSES_DICT:\n", fb.FILTER_CLASSES_DICT.keys())
     print("\nTest 'create_fil_inst:'")
     print("aaa:", fil_factory.create_fil_inst("aaa")) # class doesn't exist
     print("Cheby1:", fil_factory.create_fil_inst("Cheby1")) # first time inst.
