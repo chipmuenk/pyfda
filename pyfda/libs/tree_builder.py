@@ -583,7 +583,7 @@ class Tree_Builder():
         Run at startup from `pyfdax.py` to populate "global" dictionaries and lists:
 
         Read attributes (`ft`, `rt`, `fo`) from all valid filter classes (`fc`)
-        in the global dict ``fb.filter_classes`` and return them as a frozen filter
+        in the global dict ``fb.FILTER_CLASSES_DICT`` and return them as a frozen filter
         tree dict with the hierarchy
 
         **rt-ft-fc-fo-subwidget:params** .
@@ -602,7 +602,7 @@ class Tree_Builder():
 
         fil_tree = {}
 
-        for fc in fb.filter_classes:  # iterate over all previously found filter
+        for fc in fb.FILTER_CLASSES_DICT:  # iterate over all previously found filter
                                       # classes fc
 
             # instantiate a global instance ff.fil_inst() of filter class fc
@@ -610,7 +610,7 @@ class Tree_Builder():
             if err_code > 0:
                 logger.warning(
                     'Skipping filter class "%s" due to import error %d', fc, err_code)
-                continue  # continue with next entry in fb.filter_classes
+                continue  # continue with next entry in fb.FILTER_CLASSES_DICT
 
             # add attributes from dict to fil_tree for filter class fc
             fil_tree = self._build_fil_tree(fc, ff.fil_inst.rt_dict, fil_tree)
