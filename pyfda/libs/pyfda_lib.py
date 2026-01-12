@@ -102,6 +102,75 @@ for k in MODULES.keys():
 
 CRLF = os.linesep  # Windows: "\r\n", Mac OS: "\r", *nix: "\n"
 
+# Amplitude max, min values to prevent scipy aborts
+# (Linear values)
+MIN_PB_AMP  = 1e-5  # min pass band ripple
+MAX_IPB_AMP = 0.85  # max pass band ripple IIR
+MAX_FPB_AMP = 0.5  # max pass band ripple FIR
+MIN_SB_AMP  = 1e-6  # max stop band attenuation
+MAX_ISB_AMP = 0.65  # min stop band attenuation IIR
+MAX_FSB_AMP = 0.45  # min stop band attenuation FIR
+
+# ===============================================================================
+class ANSIcolors:
+    """
+    ANSI Codes for colors etc. in the console
+
+    see https://stackoverflow.com/questions/4842424/list-of-ansi-color-escape-sequences
+        https://stackoverflow.com/questions/384076/how-can-i-color-python-logging-output
+    """
+    if dirs.OS.lower() == "windows":
+        os.system('color')  # needed to activate colored terminal in Windows
+
+    CEND      = '\33[0m'
+    CBOLD     = '\33[1m'
+    CFAINT    = '\33[2m'
+    CITALIC   = '\33[3m'
+    CURL      = '\33[4m'  # underlined
+    CBLINK    = '\33[5m'  # slow blink
+    CBLINK2   = '\33[6m'  # fast blink
+    CSELECTED = '\33[7m'  # reverse video
+
+    # Foreground colors
+    BLACK  = '\33[30m'
+    RED    = '\33[31m'
+    GREEN  = '\33[32m'
+    YELLOW = '\33[33m'
+    BLUE   = '\33[34m'
+    VIOLET = '\33[35m'
+    CYAN   = '\33[36m'
+    WHITE  = '\33[37m'
+
+    # Background colors
+    BLACKBG  = '\33[40m'
+    REDBG    = '\33[41m'
+    GREENBG  = '\33[42m'
+    YELLOWBG = '\33[43m'
+    BLUEBG   = '\33[44m'
+    VIOLETBG = '\33[45m'
+    CYANBG   = '\33[46m'
+    WHITEBG  = '\33[47m'
+
+    # Bright foreground colors
+    GREY2   = '\33[90m'
+    RED2    = '\33[91m'
+    GREEN2  = '\33[92m'
+    YELLOW2 = '\33[93m'
+    BLUE2   = '\33[94m'
+    VIOLET2 = '\33[95m'
+    CYAN2   = '\33[96m'
+    WHITE2  = '\33[97m'
+
+    # Bright foreground colors
+    GREYBG    = '\33[100m'
+    REDBG2    = '\33[101m'
+    GREENBG2  = '\33[102m'
+    YELLOWBG2 = '\33[103m'
+    BLUEBG2   = '\33[104m'
+    VIOLETBG2 = '\33[105m'
+    CYANBG2   = '\33[106m'
+    WHITEBG2  = '\33[107m'
+
 
 # ------------------------------------------------------------------------------
 def cmp_version(mod: str, version: str) -> int:
@@ -136,6 +205,7 @@ def cmp_version(mod: str, version: str) -> int:
          :1: version of installed module is higher than specified version
 
     """
+    # -----
     def versiontuple(v):
         """Convert strings like "1.2.3" to tuples like (1,2,3) for comparisons."""
         return tuple(map(int, (v.split("."))))
@@ -199,79 +269,8 @@ def mod_version(mod: str = "") -> str:
     return markdown.markdown(v_md, output_format='html5',
                              extensions=['markdown.extensions.tables'])
 
-# ==============================================================================
-logger.info(mod_version())
 
-# Amplitude max, min values to prevent scipy aborts
-# (Linear values)
-MIN_PB_AMP  = 1e-5  # min pass band ripple
-MAX_IPB_AMP = 0.85  # max pass band ripple IIR
-MAX_FPB_AMP = 0.5  # max pass band ripple FIR
-MIN_SB_AMP  = 1e-6  # max stop band attenuation
-MAX_ISB_AMP = 0.65  # min stop band attenuation IIR
-MAX_FSB_AMP = 0.45  # min stop band attenuation FIR
-
-
-class ANSIcolors:
-    """
-    ANSI Codes for colors etc. in the console
-
-    see https://stackoverflow.com/questions/4842424/list-of-ansi-color-escape-sequences
-        https://stackoverflow.com/questions/384076/how-can-i-color-python-logging-output
-    """
-    if dirs.OS.lower() == "windows":
-        os.system('color')  # needed to activate colored terminal in Windows
-
-    CEND      = '\33[0m'
-    CBOLD     = '\33[1m'
-    CFAINT    = '\33[2m'
-    CITALIC   = '\33[3m'
-    CURL      = '\33[4m'  # underlined
-    CBLINK    = '\33[5m'  # slow blink
-    CBLINK2   = '\33[6m'  # fast blink
-    CSELECTED = '\33[7m'  # reverse video
-
-    # Foreground colors
-    BLACK  = '\33[30m'
-    RED    = '\33[31m'
-    GREEN  = '\33[32m'
-    YELLOW = '\33[33m'
-    BLUE   = '\33[34m'
-    VIOLET = '\33[35m'
-    CYAN   = '\33[36m'
-    WHITE  = '\33[37m'
-
-    # Background colors
-    BLACKBG  = '\33[40m'
-    REDBG    = '\33[41m'
-    GREENBG  = '\33[42m'
-    YELLOWBG = '\33[43m'
-    BLUEBG   = '\33[44m'
-    VIOLETBG = '\33[45m'
-    CYANBG   = '\33[46m'
-    WHITEBG  = '\33[47m'
-
-    # Bright foreground colors
-    GREY2   = '\33[90m'
-    RED2    = '\33[91m'
-    GREEN2  = '\33[92m'
-    YELLOW2 = '\33[93m'
-    BLUE2   = '\33[94m'
-    VIOLET2 = '\33[95m'
-    CYAN2   = '\33[96m'
-    WHITE2  = '\33[97m'
-
-    # Bright foreground colors
-    GREYBG    = '\33[100m'
-    REDBG2    = '\33[101m'
-    GREENBG2  = '\33[102m'
-    YELLOWBG2 = '\33[103m'
-    BLUEBG2   = '\33[104m'
-    VIOLETBG2 = '\33[105m'
-    CYANBG2   = '\33[106m'
-    WHITEBG2  = '\33[107m'
-
-
+# ------------------------------------------------------------------------------
 def clean_ascii(arg):
     """
     Remove non-ASCII-characters (outside range 0 ... x7F) from `arg` when it
@@ -392,6 +391,7 @@ def np_shape(data):
     logger.warning("Unsuitable data shape with %s dimensions.", d)
     return (None, None)
 
+
 # -----------------------------------------------------------------------------
 def iter2ndarray(iterable: np.ndarray | list | tuple, dtype=complex) -> np.ndarray | None:
     """
@@ -423,6 +423,7 @@ def iter2ndarray(iterable: np.ndarray | list | tuple, dtype=complex) -> np.ndarr
 
     logger.error("Unsupported type '{type(iterable)}' of %s for conversion to ndarray.", iterable)
     return None
+
 
 # -----------------------------------------------------------------------------
 def set_dict_defaults(d: dict, default_dict: dict) -> None:
@@ -595,6 +596,7 @@ def pprint_log(d, N: int = 10, tab: str = "\t", debug: bool = False) -> str:
             s += f'Type: {type(d).__name__}'
     return s
 
+
 # ------------------------------------------------------------------------------
 def frmt2cmplx(string: str, default: float = 0.) -> complex:
     """
@@ -661,6 +663,7 @@ def frmt2cmplx(string: str, default: float = 0.) -> complex:
         y = default.imag
         logger.warning("Expression '%s' could not be evaluated.", string)
     return x + 1j * y
+
 
 # ------------------------------------------------------------------------------
 def safe_numexpr_eval(expr: str, fallback=None,
@@ -813,7 +816,7 @@ def safe_numexpr_eval(expr: str, fallback=None,
 
 # ------------------------------------------------------------------------------
 def safe_eval(expr, alt_expr=0, return_type: str = 'float', sign: str = ''
-              ):  # -> complex|float|int: only works with py3.10 upawards
+              ) -> complex|float|int:
     """
     Try to safely evaluate `expr` using `numexpr.evaluate()` and return the
     result as float (default), complex or int, depending on `return_type`.
@@ -1303,9 +1306,12 @@ def H_mag(num, den, z, H_max, H_min=None, log=False, div_by_0='ignore'):
 
 
 # ------------------------------------------------------------------------------
-# from scipy.sig.signaltools.py:
 def cmplx_sort(p):
-    "sort roots based on magnitude."
+    """
+    sort roots based on magnitude.
+
+    from scipy.signal.signaltools.py:
+    """
     p = np.asarray(p)
     if np.iscomplexobj(p):
         indx = np.argsort(abs(p))
@@ -1315,9 +1321,6 @@ def cmplx_sort(p):
 
 
 # ------------------------------------------------------------------------------
-# adapted from scipy.signal.signaltools.py:
-# TODO:  comparison of real values has several problems (5 * tol ???)
-# TODO: speed improvements
 def unique_roots(p, tol: float = 1e-3, magsort: bool = False,
                  rtype: str = 'min', rdist: str = 'euclidian'):
     """
@@ -1373,6 +1376,11 @@ def unique_roots(p, tol: float = 1e-3, magsort: bool = False,
     >>> vals = np.roots(1,2,3,2,1)
     uniq, mult = unique_roots(vals, rtype='avg')
 
+    Notes
+    -----
+    adapted from scipy.signal.signaltools.py:
+    TODO: comparison of real values has several problems (5 * tol ???)
+    TODO: speed improvements
     """
 
     def manhattan(a, b):
@@ -1558,6 +1566,7 @@ def format_ticks(ax, xy: str, scale: float = 1., format: str = "%.1f") -> None:
         locy = ax.get_yticks()  # get location and content of xticks
         ax.set_yticks(locy, map(lambda y: format % y, locy*scale))
 
+
 # ------------------------------------------------------------------------------
 def round_odd(x) -> int:
     """Return the nearest odd integer from x. x can be integer or float."""
@@ -1604,4 +1613,5 @@ def floor_even(x) -> int:
 
 # ------------------------------------------------------------------------------
 if __name__ == '__main__':
-    pass
+    # ==============================================================================
+    logger.info(mod_version())
