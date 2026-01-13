@@ -295,7 +295,8 @@ class ConfigFileParser():
         # ------------------------------------------------------------------
         # Parsing [Plot Widgets]
         # ------------------------------------------------------------------
-        fb.PLOT_CLASSES_DICT = self._build_widget_class_dict("Plot Widgets", "plot_widgets")
+        ConfigFileParser.PLOT_CLASSES_DICT =\
+            self._build_widget_class_dict("Plot Widgets", "plot_widgets")
         # ------------------------------------------------------------------
         # Parsing [Filter Widgets]
         # ------------------------------------------------------------------
@@ -551,7 +552,7 @@ if __name__ == "__main__":
     cfp.build_widget_tree()  # needs a working config file
 
     print('\nfb.INPUT_CLASSES_DICT =\n', pprint_log(fb.INPUT_CLASSES_DICT))
-    print('\nINPUT_CLASSES_DICT =\n', pprint_log(ConfigFileParser().INPUT_CLASSES_DICT))
-    print('\nfb.PLOT_CLASSES_DICT =\n', pprint_log(fb.PLOT_CLASSES_DICT))
+    # print('\nINPUT_CLASSES_DICT =\n', pprint_log(ConfigFileParser().INPUT_CLASSES_DICT))
+    print('\nfPLOT_CLASSES_DICT =\n', pprint_log(ConfigFileParser().PLOT_CLASSES_DICT))
     print('\nfb.FILTER_CLASSES_DICT =\n', pprint_log(fb.FILTER_CLASSES_DICT))
     print('\nfb.FIXPOINT_CLASSES_DICT =\n', pprint_log(fb.FIXPOINT_CLASSES_DICT))

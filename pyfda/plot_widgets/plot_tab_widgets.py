@@ -13,15 +13,16 @@ from pyfda.libs.compat import QTabWidget, QWidget, QVBoxLayout, QEvent, QtCore, 
 from pyfda.libs.pyfda_lib import pprint_log
 from pyfda.libs.pyfda_qt_lib import emit
 from pyfda.pyfda_rc import params
+from pyfda.config_file_parser import ConfigFileParser as cfp
 
 logger = logging.getLogger(__name__)
 
 # ------------------------------------------------------------------------------
 class PlotTabWidgets(QWidget):
     """
-    Create a tabbed widget for all plot subwidgets in the list ``fb.PLOT_CLASSES_DICT``.
-    This list is compiled at startup in :class:`pyfda.tree_builder.Tree_Builder`, it is
-    kept as a module variable in :mod:`pyfda.filterbroker`.
+    Create a tabbed widget for all plot subwidgets in ``cfp.PLOT_CLASSES_DICT``. This dict
+    is parsed from the config file at startup in :class:`pyfda.ConfigFileParser` and
+    stored as a class variable.
     """
     # incoming, connected to input_tab_widget.sig_tx in pyfdax
     sig_rx = pyqtSignal(object)
@@ -45,7 +46,7 @@ class PlotTabWidgets(QWidget):
     def _construct_UI(self) -> None:
         """
         Initialize UI with tabbed subwidgets: Instantiate dynamically each widget
-        from the dict `fb.PLOT_CLASSES_DICT` and try to
+        from the dict `cfp.PLOT_CLASSES_DICT` and try to
 
         - set the TabToolTip from the instance attribute `tool_tip`
 
@@ -71,9 +72,9 @@ class PlotTabWidgets(QWidget):
         n_wdg = 0  # number and ...
         inst_wdg_str = ""  # ... full names of successfully instantiated plot widgets
         #
-        for plot_class in fb.PLOT_CLASSES_DICT:
+        for plot_class in cfp.PLOT_CLASSES_DICT:
             try:
-                mod_fq_name = fb.PLOT_CLASSES_DICT[plot_class]['mod']  # FQN
+                mod_fq_name = cfp.PLOT_CLASSES_DICT[plot_class]['mod']  # FQN
                 mod = importlib.import_module(mod_fq_name)  # import plot widget module
                 wdg_class = getattr(mod, plot_class)  # get plot widget class ...
                 # and instantiate it
