@@ -263,21 +263,21 @@ class ConfigFileParser():
           the successfully imported classes and their options (like fully qualified module
           names, display name, associated fixpoint widgets etc.).
 
-        - Information for each  section is stored in dicts like `fb.FILTER_CLASSES_DICT`.
+        - Information for each  section is stored in dicts like `FILTER_CLASSES_DICT`.
 
         The following sections are processed here:
 
         :[Input Widgets]:
-            Store (user) input widget classes in `fb.INPUT_CLASSES_DICT`
+            Store (user) input widget classes in `INPUT_CLASSES_DICT`
 
         :[Plot Widgets]:
-            Store (user) plot widget classes in `fb.PLOT_CLASSES_DICT`
+            Store (user) plot widget classes in `PLOT_CLASSES_DICT`
 
         :[Filter Widgets]:
-            Store (user) filter widget classes in `fb.FILTER_CLASSES_DICT`
+            Store (user) filter widget classes in `FILTER_CLASSES_DICT`
 
         :[Fixpoint Widgets]:
-            Store (user) fixpoint widget classes in `fb.FIXPOINT_CLASSES_DICT`
+            Store (user) fixpoint widget classes in `FIXPOINT_CLASSES_DICT`
 
         Parameters
         ----------
@@ -291,7 +291,8 @@ class ConfigFileParser():
         # ------------------------------------------------------------------
         # Parsing [Input Widgets]
         # ------------------------------------------------------------------
-        fb.INPUT_CLASSES_DICT = self._build_widget_class_dict("Input Widgets", "input_widgets")
+        ConfigFileParser.INPUT_CLASSES_DICT =\
+            self._build_widget_class_dict("Input Widgets", "input_widgets")
         # ------------------------------------------------------------------
         # Parsing [Plot Widgets]
         # ------------------------------------------------------------------
@@ -313,27 +314,27 @@ class ConfigFileParser():
         # ------------------------------------------------------------------
         # Parsing [Fixpoint Filters] / modifying filter_classes dict
         # ------------------------------------------------------------------
-        fb.FIXPOINT_CLASSES_DICT = self._build_widget_class_dict(
-            "Fixpoint Widgets", "fixpoint_widgets")
+        ConfigFileParser.FIXPOINT_CLASSES_DICT =\
+            self._build_widget_class_dict("Fixpoint Widgets", "fixpoint_widgets")
 
-        # First check whether fixpoint options of the filter widgets are
-        # valid fixpoint classes by comparing them to the verified items of
-        # fb.FIXPOINT_CLASSES_DICT:
+        # First check whether fixpoint options of the filter_classes are valid fixpoint
+        # classes by comparing them to the verified items of `FIXPOINT_CLASSES_DICT:
         for c in filter_classes:
             if 'fix' in filter_classes[c]:
                 for w in filter_classes[c]['fix']:
-                    if w not in fb.FIXPOINT_CLASSES_DICT:
+                    if w not in ConfigFileParser.FIXPOINT_CLASSES_DICT:
                         logger.warning(
                             'Removing invalid fixpoint module\n\t"%s" for filter class "%s".',
                             w, c)
                         filter_classes[c]['fix'].remove(w)
-        # merge filter_classes info "filter class":[fx_class1, fx_class2]
-        # and fb.FIXPOINT_CLASSES_DICT info "fixpoint class":[fil_class1, fil_class2]
-        # into the filter_classes dict
 
-            # collect all fixpoint widgets (keys in fb.FIXPOINT_CLASSES_DICT) which
+            # merge filter_classes info "filter class":[fx_class1, fx_class2]
+            # and `FIXPOINT_CLASSES_DICT`` info "fixpoint class":[fil_class1, fil_class2]
+            # into the filter_classes dict
+            #
+            # collect all fixpoint widgets (keys in FIXPOINT_CLASSES_DICT) which
             # have the class name c as a value
-            fix_wdg = {k for k, val in fb.FIXPOINT_CLASSES_DICT.items() if c in val['opt']}
+            fix_wdg = {k for k, val in ConfigFileParser.FIXPOINT_CLASSES_DICT.items() if c in val['opt']}
             if len(fix_wdg) > 0:
                 if 'fix' in filter_classes[c]:
                     # ... and merge it with the fixpoint options of class c
@@ -341,7 +342,7 @@ class ConfigFileParser():
 
                 filter_classes[c].update({'fix': list(fix_wdg)})
 
-        fb.FILTER_CLASSES_DICT = filter_classes
+        ConfigFileParser.FILTER_CLASSES_DICT = filter_classes
 
     # --------------------------------------------------------------------------
     def _parse_conf_section(self, section: str) -> dict:
@@ -551,8 +552,7 @@ if __name__ == "__main__":
     cfp.parse_conf_file()
     cfp.build_widget_tree()  # needs a working config file
 
-    print('\nfb.INPUT_CLASSES_DICT =\n', pprint_log(fb.INPUT_CLASSES_DICT))
-    # print('\nINPUT_CLASSES_DICT =\n', pprint_log(ConfigFileParser().INPUT_CLASSES_DICT))
+    print('\nINPUT_CLASSES_DICT =\n', pprint_log(ConfigFileParser().INPUT_CLASSES_DICT))
     print('\nfPLOT_CLASSES_DICT =\n', pprint_log(ConfigFileParser().PLOT_CLASSES_DICT))
-    print('\nfb.FILTER_CLASSES_DICT =\n', pprint_log(fb.FILTER_CLASSES_DICT))
-    print('\nfb.FIXPOINT_CLASSES_DICT =\n', pprint_log(fb.FIXPOINT_CLASSES_DICT))
+    print('\nFILTER_CLASSES_DICT =\n', pprint_log(ConfigFileParser().FILTER_CLASSES_DICT))
+    print('\nFIXPOINT_CLASSES_DICT =\n', pprint_log(ConfigFileParser().FIXPOINT_CLASSES_DICT))

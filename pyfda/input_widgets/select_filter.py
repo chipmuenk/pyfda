@@ -21,6 +21,7 @@ from pyfda.libs.compat import (
 
 import pyfda.filterbroker as fb
 import pyfda.filter_factory as ff
+from pyfda.config_file_parser import ConfigFileParser as cfp
 from pyfda.libs.pyfda_lib import safe_eval
 from pyfda.libs.pyfda_qt_lib import qget_cmb_box, emit
 import pyfda.pyfda_rc as rc
@@ -49,7 +50,7 @@ class SelectFilter(QWidget):
     sig_tx = pyqtSignal(object)  # outgoing
 
     def __init__(self, parent=None, objectName="select_filter_inst"):
-        super(SelectFilter, self).__init__(parent)
+        super().__init__(parent)
 
         self.setObjectName(objectName)
         self.fc_last = ''  # previous filter class
@@ -81,7 +82,7 @@ class SelectFilter(QWidget):
             #               \n{first_item(dict_sig)}")
             return
 
-        elif 'data_changed' in dict_sig:
+        if 'data_changed' in dict_sig:
             if dict_sig['data_changed'] == 'filter_loaded':
                 """
                 Called when a new filter has been LOADED,
@@ -136,7 +137,7 @@ class SelectFilter(QWidget):
                 self.cmbResponseType.addItem(rc.rt_names[rt], rt)
             except KeyError as e:
                 logger.warning(
-                  f"KeyError: {e} has no corresponding full name in rc.rt_names.")
+                  "KeyError: %s has no corresponding full name in rc.rt_names:\n%s", rt, e)
         idx = self.cmbResponseType.findData('LP')  # find index for 'LP'
 
         if idx == -1:  # Key 'LP' does not exist, use first entry instead
@@ -151,7 +152,7 @@ class SelectFilter(QWidget):
         ft = qget_cmb_box(self.cmbFilterType)
 
         for fc in fb.fil_tree[rt][ft]:
-            self.cmbFilterClass.addItem(fb.FILTER_CLASSES_DICT[fc]['name'], fc)
+            self.cmbFilterClass.addItem(cfp.FILTER_CLASSES_DICT[fc]['name'], fc)
         self.cmbFilterClass.setCurrentIndex(0)  # set initial index
 
         # ----------------------------------------------------------------------
@@ -290,7 +291,7 @@ class SelectFilter(QWidget):
         # Read out current setting of comboBox and convert to string
         fb.fil[0]['ft'] = self.ft = qget_cmb_box(self.cmbFilterType)
 
-        logger.debug("InputFilter.set_filter_type triggered: {0}".format(self.ft))
+        logger.debug("SelectFilter.set_filter_type triggered: %s", self.ft)
 
         # ---------------------------------------------------------------
         # Get all available design methods for new ft from fil_tree and
@@ -303,7 +304,7 @@ class SelectFilter(QWidget):
         fc_list = []
 
         for fc in sorted(fb.fil_tree[self.rt][self.ft]):
-            self.cmbFilterClass.addItem(fb.FILTER_CLASSES_DICT[fc]['name'], fc)
+            self.cmbFilterClass.addItem(cfp.FILTER_CLASSES_DICT[fc]['name'], fc)
             fc_list.append(fc)
 
         logger.debug("fc_list: {0}\n{1}".format(fc_list, fb.fil[0]['fc']))
@@ -313,7 +314,7 @@ class SelectFilter(QWidget):
         if fb.fil[0]['fc'] in fc_list and ff.fil_inst:
             # yes, set same fc as before
             fc_idx = self.cmbFilterClass.findText(
-                fb.FILTER_CLASSES_DICT[fb.fil[0]['fc']]['name'])
+                cfp.FILTER_CLASSES_DICT[fb.fil[0]['fc']]['name'])
             logger.debug("fc_idx : %s", fc_idx)
             self.cmbFilterClass.setCurrentIndex(fc_idx)
         else:
@@ -346,8 +347,8 @@ class SelectFilter(QWidget):
             its handle fb.fil_inst
             """
             err = ff.fil_factory.create_fil_inst(fc)
-            logger.debug(f"InputFilter.set_design_method triggered: {fc}\n"
-                         f"Returned error code {err}")
+            logger.debug(
+                "InputFilter.set_design_method triggered: %s\n\tReturned error code %s", fc, err)
             # ==================================================================
 
             # Check whether new design method also provides the old filter order
@@ -474,7 +475,7 @@ class SelectFilter(QWidget):
                     self.dyn_wdg_fil.deleteLater()
 
                 except AttributeError as e:
-                    logger.error("Could not destruct_UI!\n{0}".format(e))
+                    logger.error("Could not destruct_UI!\n\t%s}", e)
             else:
                 logger.error("Dynamic filter instance 'wdg_fil' does not exist, "
                              "you should not see this message!")
