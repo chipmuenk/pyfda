@@ -510,8 +510,7 @@ class Input_Specs(QWidget):
             self.color_design_button("ok")
 
             self.emit({'data_changed': 'filter_designed'})
-            logger.info(
-                f"Designed filter with order = {str(fb.fil[0]['N'])}")
+            logger.info("Designed filter with order = %s", str(fb.fil[0]['N']))
 
 
     def color_design_button(self, state):

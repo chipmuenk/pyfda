@@ -8,7 +8,6 @@
 import logging
 import importlib
 
-import pyfda.filterbroker as fb
 from pyfda.libs.compat import QTabWidget, QWidget, QVBoxLayout, QEvent, QtCore, pyqtSignal
 from pyfda.libs.pyfda_lib import pprint_log
 from pyfda.libs.pyfda_qt_lib import emit

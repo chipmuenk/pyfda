@@ -600,6 +600,8 @@ def fb_set(*keys_tuple, backup: bool = True, update: bool = False, fil_dict: dic
         If `keys_tuple` is not of type Tuple or if the tuple contains less than two items
     """
 
+    # TODO: Check whether nested dicts can be partially overwritten
+
     if not keys_tuple:
         raise KeyError("Tuple of keys is empty!")
     if not isinstance(keys_tuple, tuple):
