@@ -270,7 +270,7 @@ fil_ref = {
              'stages': 2,
              'normalize': True}
         },
-    'fo': 'man',  # filter order, manual or min
+    'fo': 'man',  # filter order, man or min
     'freqSpecsRange': [
         0,
         0.5

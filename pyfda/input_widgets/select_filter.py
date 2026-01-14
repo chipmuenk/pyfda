@@ -284,7 +284,7 @@ class SelectFilter(QWidget):
     def _set_filter_type(self, enb_signal=False):
         """"
         Triggered when cmbFilterType (IIR, FIR, ...) is changed:
-        - read filter type ft and copy it to fb.fil[0]['ft'] and self.ft
+        - read filter type ft and copy it to fil[0]['ft'] and self.ft
         - (re)construct design method combo, adding
           displayed text (e.g. "Chebyshev 1") and hidden data (e.g. "cheby1")
         """

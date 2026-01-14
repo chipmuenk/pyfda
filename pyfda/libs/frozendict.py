@@ -235,7 +235,6 @@ class FrozenOrderedDict(Mapping):
     frozendict package by Marco Sulla
     https://github.com/Marco-Sulla/python-frozendict
     pip install frozendict
-    0.9.4 as of 2024-06-06 does not preserve order of items!!!
     """
     __version__ = "1.3.1"
 
