@@ -14,6 +14,7 @@ import re
 import logging
 
 import pyfda.filterbroker as fb
+from pyfda.filterbroker import fb_get
 from pyfda.libs.compat import (
     QtCore, Qt, QWidget, QLabel, QLineEdit, QFrame, QFont, QVBoxLayout, QHBoxLayout,
     QGridLayout, pyqtSignal, QEvent)
@@ -81,7 +82,7 @@ class FreqSpecs(QWidget):
         lblTitle.setFont(bfont)
         lblTitle.setWordWrap(True)
         self.lblUnit = QLabel(self)
-        self.lblUnit.setText("in " + to_html(fb.fil[0]['freq_specs_unit'], frmt='bi'))
+        self.lblUnit.setText("in " + to_html(fb_get('freq_specs_unit'), frmt='bi'))
 
         layHTitle = QHBoxLayout()
         layHTitle.addWidget(lblTitle)
@@ -168,7 +169,7 @@ class FreqSpecs(QWidget):
         if self.spec_edited:
             f_label = str(event_source.objectName())
             f_value = safe_eval(
-                event_source.text(), self.data_prev, sign='pos') / fb.fil[0]['f_S']
+                event_source.text(), self.data_prev, sign='pos') / fb_get('f_S')
             fb.fil[0].update({f_label: f_value})
             self.sort_dict_freqs()  # sort and update display
             self.emit({'specs_changed': 'f_specs', 'sender_name': f_label})
@@ -200,8 +201,7 @@ class FreqSpecs(QWidget):
 #        W_lbl = max([self.qfm.width(l) for l in new_labels]) # max. label width in pixel
 
         # ---------------------------- logging -----------------------------
-        # logger.debug("update_UI: {0}-{1}-{2}".format(
-        #                     fb.fil[0]['rt'], fb.fil[0]['fc'], fb.fil[0]['fo']))
+        logger.debug("update_UI: %s-%s-%s", fb_get('rt'), fb_get('fc'), fb_get('fo'))
 
         f_range = " (0 &lt; <i>f</i> &lt; <i>f<sub>S </sub></i>/2)"
         for i in range(num_new_labels):
@@ -233,13 +233,14 @@ class FreqSpecs(QWidget):
         Update normalized frequencies when absolute frequencies are locked and
         update frequency unit. This is called by via signal {'view_changed': 'f_S'}.
         """
-        if fb.fil[0]['freq_locked']:
+        if fb_get('freq_locked'):
             for i in range(len(self.qlineedit)):
                 f_name = str(self.qlineedit[i].objectName()).split(":", 1)
                 f_label = f_name[0]
-                f_value = fb.fil[0][f_label] * fb.fil[0]['f_S_prev'] / fb.fil[0]['f_S']
-                # logger.warning(f"Updating freq_specs: f_S = {fb.fil[0]['f_S']}, "
-                #                f"f_S_prev = {fb.fil[0]['f_S_prev']}\n{f_label}: {f_value}")
+                f_value = fb_get(f_label) * fb_get('f_S_prev') / fb_get('f_S')
+                # logger.warning(
+                #     "Updating freq_specs: f_S = %s, f_S_prev = %s\n\t%s: %s",
+                #     fb_get('f_S'), fb_get('f_S_prev'), f_label, f_value)
 
                 fb.fil[0].update({f_label: f_value})
             self.emit({'specs_changed': 'f_specs'})
@@ -249,7 +250,7 @@ class FreqSpecs(QWidget):
         self.load_dict()
 
         # Always set label for frequency unit according to selected unit.
-        unit = fb.fil[0]['plt_fUnit']
+        unit = fb_get('plt_fUnit')
         if unit in {"f_S", "f_Ny"}:
             unit_frmt = 'bi'
         else:
@@ -267,24 +268,24 @@ class FreqSpecs(QWidget):
         """
         f_name = str(source.objectName()).split(':', 1)
         f_label = f_name[0]
-        f_value = fb.fil[0][f_label] * fb.fil[0]['f_S']
+        f_value = fb_get(f_label) * fb_get('f_S')
 
         if source.hasFocus():
             # widget has focus, show full precision
             # logger.warning(f"freq_specs: update_f_display {f_label}: {f_value} (disp) "
-            #                 f"{fb.fil[0][f_label]} (dict) FOK")
+            #                 f"{fb_get(f_label)} (dict) FOK")
             source.setText(str(f_value))
         else:
             # widget has no focus, round the display
             # logger.warning(f"freq_specs: update_f_display {f_label}: {f_value} (disp) "
-            #                f"{fb.fil[0][f_label]} (dict) NFOK")
+            #                f"{fb_get(f_label)} (dict) NFOK")
             source.setText(params['FMT'].format(f_value))
 
         # Check whether normalized freqs are inside the range ]0, 0.5[. If not, highlight
         # widget.
         state = source.property("state")
         err = False
-        if fb.fil[0][f_label] <= 0:
+        if fb_get(f_label) <= 0:
             logger.warning("Frequency %s has to be >= 0", str(source.objectName()))
             err = True
         elif fb.fil[0][f_label] >= 0.5:
@@ -339,7 +340,7 @@ class FreqSpecs(QWidget):
 
             # Print label with "f" for absolute and with "F" for normalized frequencies
             lbl_text = self.qlabels[i].text()
-            if fb.fil[0]['freq_specs_unit'] in {'f_S', 'f_Ny'}:
+            if fb_get('freq_specs_unit') in {'f_S', 'f_Ny'}:
                 lbl_text = re.sub(r'[fF]', 'F', lbl_text)
             else:
                 lbl_text = re.sub(r'[fF]', 'f', lbl_text)
@@ -408,7 +409,7 @@ class FreqSpecs(QWidget):
         f_specs = [fb.fil[0][str(self.qlineedit[i].objectName())]
                    for i in range(self.n_cur_labels)]
         # sort them if required
-        if fb.fil[0]['freq_specs_sort']:
+        if fb_get('freq_specs_sort'):
             f_specs.sort()
         # and write them back to the filter dict
         for i in range(self.n_cur_labels):
@@ -420,7 +421,7 @@ class FreqSpecs(QWidget):
         ident = [x for x in mult if x > 1]
         if ident:
             logger.warning("Frequencies must differ by at least %.4g",
-                           MIN_FREQ_STEP * fb.fil[0]['f_S'])
+                           MIN_FREQ_STEP * fb_get('f_S'))
         self.load_dict()
 # ------------------------------------------------------------------------------
 if __name__ == '__main__':
