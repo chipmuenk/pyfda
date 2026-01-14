@@ -288,8 +288,13 @@ class FreqSpecs(QWidget):
         if fb_get(f_label) <= 0:
             logger.warning("Frequency %s has to be >= 0", str(source.objectName()))
             err = True
-        elif fb.fil[0][f_label] >= 0.5:
-            logger.warning("Frequency %s has to be < f_S /2.", str(source.objectName()))
+        elif fb_get(f_label) >= 0.5:
+            if fb_get('freq_specs_unit') in {'f_S', 'f_Ny'}:
+                lim = "0.5"  # normalized frequency
+            else:
+                lim = "f_S / 2"  # absolute frequency
+            logger.warning("\n\tFrequency %s has to be lower than the Nyquist frequency %s.",
+                           str(source.objectName()), lim)
             err = True
         if not err:
             if state in {'u', 'u_error', 'unused'}:
