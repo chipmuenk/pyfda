@@ -14,7 +14,7 @@ import re
 import logging
 
 import pyfda.filterbroker as fb
-from pyfda.filterbroker import fb_get
+from pyfda.filterbroker import fb_get, fb_set
 from pyfda.libs.compat import (
     QtCore, Qt, QWidget, QLabel, QLineEdit, QFrame, QFont, QVBoxLayout, QHBoxLayout,
     QGridLayout, pyqtSignal, QEvent)
@@ -170,7 +170,7 @@ class FreqSpecs(QWidget):
             f_label = str(event_source.objectName())
             f_value = safe_eval(
                 event_source.text(), self.data_prev, sign='pos') / fb_get('f_S')
-            fb.fil[0].update({f_label: f_value})
+            fb_set(f_label, f_value)
             self.sort_dict_freqs()  # sort and update display
             self.emit({'specs_changed': 'f_specs', 'sender_name': f_label})
             self.spec_edited = False  # reset flag
@@ -210,7 +210,7 @@ class FreqSpecs(QWidget):
                 to_html(new_labels[i][0].lower() + new_labels[i][1:], frmt='bi'))
             qstyle_widget(self.qlabels[i], state)
             self.qlabels[i].setStyleSheet("QLabel { background-color :none;}")
-            self.qlineedit[i].setText(str(fb.fil[0][new_labels[i]]))
+            self.qlineedit[i].setText(str(fb_get(new_labels[i])))
             self.qlineedit[i].setObjectName(new_labels[i])  # update ID
             qstyle_widget(self.qlineedit[i], state)
 
@@ -242,7 +242,7 @@ class FreqSpecs(QWidget):
                 #     "Updating freq_specs: f_S = %s, f_S_prev = %s\n\t%s: %s",
                 #     fb_get('f_S'), fb_get('f_S_prev'), f_label, f_value)
 
-                fb.fil[0].update({f_label: f_value})
+                fb_set(f_label, f_value)
             self.emit({'specs_changed': 'f_specs'})
 
         # Always reload normalized frequencies from dict, check whether they are outside
@@ -411,14 +411,13 @@ class FreqSpecs(QWidget):
         """
         # create list with the normalized frequency values of visible
         # QLineEdit widgets from the filter dict
-        f_specs = [fb.fil[0][str(self.qlineedit[i].objectName())]
-                   for i in range(self.n_cur_labels)]
+        f_specs = [fb_get(str(self.qlineedit[i].objectName())) for i in range(self.n_cur_labels)]
         # sort them if required
         if fb_get('freq_specs_sort'):
             f_specs.sort()
         # and write them back to the filter dict
         for i in range(self.n_cur_labels):
-            fb.fil[0][str(self.qlineedit[i].objectName())] = f_specs[i]
+            fb_set(str(self.qlineedit[i].objectName()), f_specs[i])
 
         # verify that elements differ by at least MIN_FREQ_STEP by
         # checking for (nearly) identical elements:
