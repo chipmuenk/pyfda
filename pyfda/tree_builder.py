@@ -428,7 +428,7 @@ fil_tree = frozendict.freeze_hierarchical({
 
 # ==============================================================================
 if __name__ == "__main__":
-    # Run widget standalone with `python -m pyfda.libs.tree_builder`
+    # Run widget standalone with `python -m pyfda.tree_builder`
     #
     # Need to start a QApplication to avoid the error
     #  "QWidget: Must construct a QApplication before a QWidget"

@@ -875,7 +875,7 @@ if __name__ == '__main__':
     #
     # Resizing the image does not work standalone as the {'ui_global_changed': 'resized'}
     # signal is issued from somewhere else
-    from pyfda.libs.tree_builder import Tree_Builder
+    from pyfda.tree_builder import Tree_Builder
     from pyfda.libs.compat import QApplication
     from pyfda import pyfda_rc as rc
 

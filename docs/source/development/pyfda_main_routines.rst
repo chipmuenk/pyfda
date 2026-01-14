@@ -9,10 +9,10 @@ Main Routines
     :members:
     
    
-:mod:`pyfda.libs.tree_builder`
+:mod:`pyfda.tree_builder`
 ------------------------------
 
-.. automodule:: pyfda.libs.tree_builder
+.. automodule:: pyfda.tree_builder
    :members: 
     
 

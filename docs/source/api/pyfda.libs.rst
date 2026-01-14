@@ -95,7 +95,7 @@ pyfda.libs.pyfda\_sig\_lib module
 pyfda.libs.tree\_builder module
 -------------------------------
 
-.. automodule:: pyfda.libs.tree_builder
+.. automodule:: pyfda.tree_builder
    :members:
    :undoc-members:
    :show-inheritance:
