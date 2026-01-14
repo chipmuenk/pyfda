@@ -22,7 +22,7 @@ from matplotlib import rcParams
 from matplotlib.ticker import AutoMinorLocator
 
 from pyfda.libs.compat import (QCheckBox, QWidget, QComboBox, QLabel, QLineEdit,
-                               QFrame, QHBoxLayout, QGridLayout, pyqtSignal, 
+                               QFrame, QHBoxLayout, QGridLayout, pyqtSignal,
                                QPushButton)
 import pyfda.filterbroker as fb
 from pyfda.filterbroker import fb_get

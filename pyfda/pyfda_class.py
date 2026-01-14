@@ -91,7 +91,7 @@ class QEditHandler(logging.Handler):
     def emit(self, record):
         msg = self.format(record)
         if msg:
-            XStream.stdout().write('%s'%msg)
+            XStream.stdout().write(f'{msg}')
 
 # "register" custom class DynFileHandler as an attribute for the logging module
 # to use it inside the logging config file and pass file name / path and mode
@@ -212,7 +212,7 @@ class pyFDA(QMainWindow):
         - trigger close event in response to 'close_event' emitted in another subwidget:
 
         """
-        logger.debug("Processing {0}: {1}".format(type(dict_sig).__name__, dict_sig))
+        logger.debug("Processing %s: %s", type(dict_sig).__name__, dict_sig)
         if 'close_event' in dict_sig:
             self.close()
 
