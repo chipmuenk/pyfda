@@ -251,7 +251,6 @@ class FilterFactory():
         if self.err_code > 0:
             logger.error("ErrCode %s: %s", self.err_code, err_string)
             debug_exception()
-            raise SystemExit("Doh!")
 
         return self.err_code
 
