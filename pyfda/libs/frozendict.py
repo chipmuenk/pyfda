@@ -13,6 +13,11 @@ a shallow copy. Used by filterbroker.py and filter_tree_builder.py
 
 Taken from http://stackoverflow.com/questions/2703599/what-would-a-frozen-dict-be
 """
+#------------- For FrozenOrderedDict --------------------
+from collections import Mapping, OrderedDict
+from functools import reduce
+import operator
+# ----------------------------------------------------------
 
 def col(i: int):
     """
@@ -49,8 +54,8 @@ def freeze_hierarchical(hier_dict: dict) -> 'FrozenDict':
             if isinstance(hier_dict[k], dict):
                 hier_dict[k] = freeze_hierarchical(hier_dict[k])
         return FrozenDict(hier_dict)
-    else:
-        return(hier_dict)
+
+    return(hier_dict)
 
 
 class Item(tuple):
@@ -195,8 +200,7 @@ class FrozenDict(frozenset):
     def copy(self):
         cls = self.__class__
         items = frozenset.copy(self)
-        dupl = frozenset.__new__(cls, items)
-        return dupl
+        return frozenset.__new__(cls, items)
 
     @classmethod
     def fromkeys(cls, keys, value):
@@ -218,3 +222,48 @@ class FrozenDict(frozenset):
 
     def __ne__(self, other):
         return not self.__eq__(other)
+
+
+class FrozenOrderedDict(Mapping):
+    """
+    Frozen OrderedDict.
+    https://github.com/wsmith323/frozenordereddict
+
+    Alternatives
+    -------------
+    frozendict package by Marco Sulla
+    https://github.com/Marco-Sulla/python-frozendict
+    pip install frozendict
+    0.9.4 as of 2024-06-06 does not preserve order of items!!!
+    """
+    __version__ = "1.3.1"
+
+    def __init__(self, *args, **kwargs):
+        self.__dict = OrderedDict(*args, **kwargs)
+        self.__hash = None
+
+    def __getitem__(self, item):
+        return self.__dict[item]
+
+    def __iter__(self):
+        return iter(self.__dict)
+
+    def __len__(self):
+        return len(self.__dict)
+
+    def __hash__(self):
+        if self.__hash is None:
+            self.__hash = reduce(operator.xor, map(hash, self.__dict.items()), 0)
+
+        return self.__hash
+
+    def __repr__(self):
+        return '{}({!r})'.format(self.__class__.__name__, self.__dict.items())
+
+    def copy(self, *args, **kwargs):
+        new_dict = self.__dict.copy()
+
+        if args or kwargs:
+            new_dict.update(OrderedDict(*args, **kwargs))
+
+        return self.__class__(new_dict)
