@@ -258,7 +258,8 @@ class SelectFilter(QWidget):
         filter type combo box to the old setting
         """
         # Read current setting of comboBox as string and store it in the filter dict
-        fb.fil[0]['rt'] = self.rt = qget_cmb_box(self.cmbResponseType)
+        self.rt = qget_cmb_box(self.cmbResponseType)
+        fb_set('rt', self.rt)
 
         # Get list of available filter types for new rt
         ft_list = list(fb.fil_tree[self.rt].keys())  # explicit list() needed for Py3
@@ -290,7 +291,8 @@ class SelectFilter(QWidget):
           displayed text (e.g. "Chebyshev 1") and hidden data (e.g. "cheby1")
         """
         # Read out current setting of comboBox and convert to string
-        fb.fil[0]['ft'] = self.ft = qget_cmb_box(self.cmbFilterType)
+        self.ft = qget_cmb_box(self.cmbFilterType)
+        fb_set('ft', self.ft)
 
         logger.debug("SelectFilter.set_filter_type triggered: %s", self.ft)
 
@@ -334,7 +336,8 @@ class SelectFilter(QWidget):
         - update dynamic widgets (if fc has changed and if there are any)
         - call load filter order
         """
-        fb.fil[0]['fc'] = fc = qget_cmb_box(self.cmbFilterClass)
+        fc = qget_cmb_box(self.cmbFilterClass)
+        fb_set('fc', fc)
 
         if fc != self.fc_last:  # fc has changed:
 
@@ -352,13 +355,11 @@ class SelectFilter(QWidget):
                 "InputFilter.set_design_method triggered: %s\n\tReturned error code %s", fc, err)
             # ==================================================================
 
-            # Check whether new design method also provides the old filter order
-            # method. If yes, don't change it, else set first available
-            # filter order method
-            if fb.fil[0]['fo'] not in fb.fil_tree[self.rt][self.ft][fc].keys():
-                fb.fil[0].update({'fo': {}})
+            # Check whether new design method also provides the old filter order method.
+            # If yes, don't change it, else set first available filter order method.
+            if fb_get('fo') not in fb.fil_tree[self.rt][self.ft][fc].keys():
                 # explicit list(dict.keys()) needed for Python 3
-                fb.fil[0]['fo'] = list(fb.fil_tree[self.rt][self.ft][fc].keys())[0]
+                fb_set('fo', list(fb.fil_tree[self.rt][self.ft][fc].keys())[0])
 
             # ===================================================================
             # logger.debug("selFilter = %s"
@@ -392,7 +393,7 @@ class SelectFilter(QWidget):
             self.fo = fb_get('fo')  # keep current setting
         else:
             self.fo = fo_list[0]  # use first list entry from filterTree
-            fb.fil[0]['fo'] = self.fo  # and update fo method
+            fb_set('fo', self.fo)  # and update fo method
 
         # check whether fo widget is active, disabled or invisible
         if 'fo' in fo_dict[self.fo] and len(fo_dict[self.fo]['fo']) > 1:
