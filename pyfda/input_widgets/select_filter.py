@@ -20,6 +20,7 @@ from pyfda.libs.compat import (
     QCheckBox, QVBoxLayout, QHBoxLayout, pyqtSignal)
 
 import pyfda.filterbroker as fb
+from pyfda.filterbroker import fb_get, fb_set
 import pyfda.filter_factory as ff
 from pyfda.config_file_parser import ConfigFileParser as cfp
 from pyfda.libs.pyfda_lib import safe_eval
@@ -180,7 +181,7 @@ class SelectFilter(QWidget):
         self.chkMinOrder.setToolTip(
             "<span>Minimum filter order / # of taps is determined automatically.</span>")
         self.lblOrderN = QLabel("<b><i>N =</i></b>")
-        self.ledOrderN = QLineEdit(str(fb.fil[0]['N']), self)
+        self.ledOrderN = QLineEdit(str(fb_get('N')), self)
         self.ledOrderN.setToolTip("Filter order (# of taps - 1).")
 
         # --------------------------------------------------
@@ -243,7 +244,7 @@ class SelectFilter(QWidget):
         also available for the new combination.
         """
         # find index for response type:
-        rt_idx = self.cmbResponseType.findData(fb.fil[0]['rt'])
+        rt_idx = self.cmbResponseType.findData(fb_get('rt'))
         self.cmbResponseType.setCurrentIndex(rt_idx)
         self._set_response_type()
 
@@ -269,8 +270,8 @@ class SelectFilter(QWidget):
             self.cmbFilterType.addItem(rc.ft_names[ft], ft)
 
         # Is current filter type (e.g. IIR) in list for new rt?
-        if fb.fil[0]['ft'] in ft_list:
-            ft_idx = self.cmbFilterType.findText(fb.fil[0]['ft'])
+        if fb_get('ft') in ft_list:
+            ft_idx = self.cmbFilterType.findText(fb_get('ft'))
             self.cmbFilterType.setCurrentIndex(ft_idx)  # yes, set same ft as before
         else:
             self.cmbFilterType.setCurrentIndex(0)     # no, set index 0
@@ -307,14 +308,14 @@ class SelectFilter(QWidget):
             self.cmbFilterClass.addItem(cfp.FILTER_CLASSES_DICT[fc]['name'], fc)
             fc_list.append(fc)
 
-        logger.debug("fc_list: {0}\n{1}".format(fc_list, fb.fil[0]['fc']))
+        logger.debug("fc_list: {0}\n{1}".format(fc_list, fb_get('fc')))
 
         # Does new ft also provide the previous design method (e.g. ellip)?
         # Has filter been instantiated?
-        if fb.fil[0]['fc'] in fc_list and ff.fil_inst:
+        if fb_get('fc') in fc_list and ff.fil_inst:
             # yes, set same fc as before
             fc_idx = self.cmbFilterClass.findText(
-                cfp.FILTER_CLASSES_DICT[fb.fil[0]['fc']]['name'])
+                cfp.FILTER_CLASSES_DICT[fb_get('fc')]['name'])
             logger.debug("fc_idx : %s", fc_idx)
             self.cmbFilterClass.setCurrentIndex(fc_idx)
         else:
@@ -371,7 +372,7 @@ class SelectFilter(QWidget):
             if hasattr(ff.fil_inst, 'construct_UI'):
                 self._construct_dyn_widgets()
 
-            self.fc_last = fb.fil[0]['fc']
+            self.fc_last = fb_get('fc')  # store current fc as last fc
 
         self.load_filter_order(enb_signal)
 
@@ -383,12 +384,12 @@ class SelectFilter(QWidget):
         """
         # collect dict_keys of available filter order [fo] methods for selected
         # design method [fc] from fil_tree (explicit list() needed for Python 3)
-        fo_dict = fb.fil_tree[fb.fil[0]['rt']][fb.fil[0]['ft']][fb.fil[0]['fc']]
+        fo_dict = fb.fil_tree[fb_get('rt')][fb_get('ft')][fb_get('fc')]
         fo_list = list(fo_dict.keys())
 
         # is currently selected fo setting available for (new) fc ?
-        if fb.fil[0]['fo'] in fo_list:
-            self.fo = fb.fil[0]['fo']  # keep current setting
+        if fb_get('fo') in fo_list:
+            self.fo = fb_get('fo')  # keep current setting
         else:
             self.fo = fo_list[0]  # use first list entry from filterTree
             fb.fil[0]['fo'] = self.fo  # and update fo method
@@ -405,8 +406,8 @@ class SelectFilter(QWidget):
         self.lblOrderN.setVisible(status in {'a', 'd'})
 
         # Determine which subwidgets are __enabled__
-        self.chkMinOrder.setChecked(fb.fil[0]['fo'] == 'min')
-        self.ledOrderN.setText(str(fb.fil[0]['N']))
+        self.chkMinOrder.setChecked(fb_get('fo') == 'min')
+        self.ledOrderN.setText(str(fb_get('N')))
         self.ledOrderN.setEnabled(not self.chkMinOrder.isChecked() and status == 'a')
         self.lblOrderN.setEnabled(not self.chkMinOrder.isChecked() and status == 'a')
 
@@ -427,7 +428,7 @@ class SelectFilter(QWidget):
 
             if self.chkMinOrder.isChecked() is True:
                 # update in case N has been changed outside this class
-                self.ledOrderN.setText(str(fb.fil[0]['N']))
+                self.ledOrderN.setText(str(fb_get('N')))
                 fb.fil[0].update({'fo': 'min'})
 
             else:
@@ -440,7 +441,7 @@ class SelectFilter(QWidget):
         # read manual filter order, convert to positive integer and store it
         # in filter dictionary.
         ordn = safe_eval(
-            self.ledOrderN.text(), fb.fil[0]['N'], return_type='int', sign='pos')
+            self.ledOrderN.text(), fb_get('N'), return_type='int', sign='pos')
         ordn = ordn if ordn > 0 else 1
         self.ledOrderN.setText(str(ordn))
         fb.fil[0].update({'N': ordn})
