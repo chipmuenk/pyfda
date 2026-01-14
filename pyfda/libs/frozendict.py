@@ -14,7 +14,8 @@ a shallow copy. Used by filterbroker.py and filter_tree_builder.py
 Taken from http://stackoverflow.com/questions/2703599/what-would-a-frozen-dict-be
 """
 #------------- For FrozenOrderedDict --------------------
-from collections import Mapping, OrderedDict
+from collections import OrderedDict
+from collections.abc import Mapping
 from functools import reduce
 import operator
 # ----------------------------------------------------------
