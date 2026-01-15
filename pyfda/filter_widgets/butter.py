@@ -215,16 +215,14 @@ class Butter():
         self._get_params()
         self.N, self.F_PBC = buttord(
             self.F_PB, self.F_SB, self.A_PB, self.A_SB, analog = self.analog)
-        ret = self._save(
+        return self._save(
             butter(self.N, self.F_PBC, btype='low', analog=self.analog, output=self.FRMT))
-        return ret
 
     def LPman(self) -> int:
         """Butterworth LP filter, fixed order"""
         self._get_params()
-        ret = self._save(
+        return self._save(
             butter(self.N, self.F_C, btype='low', analog=self.analog, output=self.FRMT))
-        return ret
 
     # HP: F_SB < F_PB -------------------------------------------------------
     def HPmin(self) -> int:
@@ -232,16 +230,15 @@ class Butter():
         self._get_params()
         self.N, self.F_PBC = buttord(
             self.F_PB,self.F_SB, self.A_PB, self.A_SB, analog = self.analog)
-        ret = self._save(
+        return self._save(
             butter(self.N, self.F_PBC, btype='highpass', analog=self.analog, output=self.FRMT))
-        return ret
 
     def HPman(self) -> int:
         """Butterworth HP filter, fixed order"""
         self._get_params()
-        ret = self._save(
+        return self._save(
             butter(self.N, self.F_PB, btype='highpass', analog=self.analog, output=self.FRMT))
-        return ret
+
 
     # For BP and BS, F_xx have two elements each,  A_xx only have one element.
     # The min. filter order and the design algorithms use half the actual filter order,
@@ -254,17 +251,15 @@ class Butter():
         self.N, self.F_PBC = buttord(
             [self.F_PB, self.F_PB2], [self.F_SB, self.F_SB2], self.A_PB, self.A_SB,
             analog = self.analog)
-        ret = self._save(
+        return self._save(
             butter(self.N, self.F_PBC, btype='bandpass', analog=self.analog, output=self.FRMT))
-        return ret
 
     def BPman(self) -> int:
         """Butterworth BP filter, fixed order"""
         self._get_params()
-        ret = self._save(
+        return self._save(
             butter(self.N//2, [self.F_C, self.F_C2], btype='bandpass',
                    analog=self.analog, output=self.FRMT))
-        return ret
 
     # BS: F_SB[0] > F_PB[0], F_SB[1] < F_PB[1] --------------------------------
     def BSmin(self) -> int:
@@ -273,20 +268,17 @@ class Butter():
         self.N, self.F_PBC = buttord(
             [self.F_PB, self.F_PB2], [self.F_SB, self.F_SB2], self.A_PB, self.A_SB,
             analog = self.analog)
-        ret = self._save(
+        return self._save(
             butter(self.N, self.F_PBC, btype='bandstop', analog=self.analog, output=self.FRMT))
-        return ret
 
     def BSman(self) -> int:
         """Butterworth BS filter, fixed order"""
         self._get_params()
         if not self._test_n():
             return -1
-        ret = self._save(
+        return self._save(
             butter(self.N//2, [self.F_C, self.F_C2], btype='bandstop',
                    analog=self.analog, output=self.FRMT))
-        return ret
-
 #------------------------------------------------------------------------------
 
 if __name__ == '__main__':
