@@ -320,12 +320,10 @@ class Equiripple(QWidget):
               used in the Remez algorithm.
         """
         self._get_params()
-        ret = self._save(
+        return self._save(
             remez(self.N,[0, self.F_PB, self.F_SB, 0.5], [1, 0],
                   weight = [fb_get('W_PB'), fb_get('W_SB')], fs = 1,
                   grid_density = self.grid_density))
-        return ret
-
     def LPmin(self) -> int:
         """
         Design a low-pass FIR filter using the Remez exchange algorithm.
@@ -351,9 +349,8 @@ class Equiripple(QWidget):
         # A is always [1, 0] for LP filters
         fb_set('W_PB', W[0])
         fb_set('W_SB', W[1])
-        ret = self._save(
+        return self._save(
             remez(self.N, F, A, weight = W, fs = 1, grid_density = self.grid_density))
-        return ret
 
     def HPman(self) -> int:
         """
@@ -362,16 +359,15 @@ class Equiripple(QWidget):
         """
         self._get_params()
         if self.N % 2 == 0: # even order, use odd symmetry (type III)
-            ret = self._save(
+            return self._save(
                 remez(self.N,[0, self.F_SB, self.F_PB, 0.5], [0, 1],
                       weight = [fb_get('W_SB'), fb_get('W_PB')], fs = 1,
                       type = 'hilbert', grid_density = self.grid_density))
-        else: # odd order,
-            ret = self._save(
-                remez(self.N,[0, self.F_SB, self.F_PB, 0.5], [0, 1],
-                      weight = [fb_get('W_SB'), fb_get('W_PB')], fs = 1,
-                      type = 'bandpass', grid_density = self.grid_density))
-        return ret
+        # odd order,
+        return self._save(
+            remez(self.N,[0, self.F_SB, self.F_PB, 0.5], [0, 1],
+                    weight = [fb_get('W_SB'), fb_get('W_PB')], fs = 1,
+                    type = 'bandpass', grid_density = self.grid_density))
 
     def HPmin(self) -> int:
         """
@@ -383,18 +379,17 @@ class Equiripple(QWidget):
                                      [self.A_SB, self.A_PB], fs = 1, alg = self.alg)
         # A is always [0, 1] for HP filters
 
-#        self.N = ceil_odd(N)  # enforce odd order
+        # self.N = ceil_odd(N)  # enforce odd order
         fb_set('W_SB', W[0])
         fb_set('W_PB', W[1])
         if self.N % 2 == 0: # even order
-            ret = self._save(
+            return self._save(
                 remez(self.N, F, A, weight = W, fs = 1, type = 'hilbert',
                       grid_density = self.grid_density))
-        else:
-            ret = self._save(
-                remez(self.N, F, A, weight = W, fs = 1, type = 'bandpass',
-                      grid_density = self.grid_density))
-        return ret
+        # odd order
+        return self._save(
+            remez(self.N, F, A, weight = W, fs = 1, type = 'bandpass',
+                    grid_density = self.grid_density))
 
     # For BP and BS, F_PB and F_SB have two elements each
     def BPman(self) -> int:
@@ -403,11 +398,10 @@ class Equiripple(QWidget):
         For more details, see the `LPman` method.
         """
         self._get_params()
-        ret = self._save(
+        return self._save(
             remez(self.N, [0, self.F_SB, self.F_PB, self.F_PB2, self.F_SB2, 0.5], [0, 1, 0],
                   weight = [fb_get('W_SB'), fb_get('W_PB'), fb_get('W_SB2')], fs = 1,
                   grid_density = self.grid_density))
-        return ret
 
     def BPmin(self) -> int:
         """
@@ -421,9 +415,8 @@ class Equiripple(QWidget):
         fb_set('W_SB', W[0])
         fb_set('W_PB', W[1])
         fb_set('W_SB2', W[2])
-        ret = self._save(
+        return self._save(
             remez(self.N, F, A, weight = W, fs = 1, grid_density = self.grid_density))
-        return ret
 
     def BSman(self) -> int:
         """
@@ -432,11 +425,10 @@ class Equiripple(QWidget):
         """
         self._get_params()
         self.N = round_odd(self.N) # enforce odd order
-        ret = self._save(
+        return self._save(
             remez(self.N,[0, self.F_PB, self.F_SB, self.F_SB2, self.F_PB2, 0.5], [1, 0, 1],
                   weight = [fb_get('W_PB'), fb_get('W_SB'), fb_get('W_PB2')], fs = 1,
                   grid_density = self.grid_density))
-        return ret
 
     def BSmin(self) -> int:
         """
@@ -450,9 +442,8 @@ class Equiripple(QWidget):
         fb_set('W_PB', W[0])
         fb_set('W_SB', W[1])
         fb_set('W_PB2', W[2])
-        ret = self._save(
+        return self._save(
             remez(self.N, F, A, weight = W, fs = 1, grid_density = self.grid_density))
-        return ret
 
     def HILman(self) -> int:
         """
@@ -461,11 +452,10 @@ class Equiripple(QWidget):
         used to shift the phase of the input signal by 90 degrees.
         """
         self._get_params()
-        ret = self._save(
+        return self._save(
             remez(self.N,[0, self.F_SB, self.F_PB, self.F_PB2, self.F_SB2, 0.5], [0, 1, 0],
                   weight = [fb_get('W_SB'), fb_get('W_PB'), fb_get('W_SB2')], fs = 1,
                   type = 'hilbert', grid_density = self.grid_density))
-        return ret
 
     def DIFFman(self) -> int:
         """
@@ -481,10 +471,9 @@ class Equiripple(QWidget):
             fb_set('F_PB', self.F_PB)
             self.emit({'specs_changed': 'equiripple'})
 
-        ret = self._save(
+        return self._save(
             remez(self.N, [0, self.F_PB], [np.pi * fb_get('W_PB')], fs = 1,
                   type = 'differentiator', grid_density = self.grid_density))
-        return ret
 
 #------------------------------------------------------------------------------
 

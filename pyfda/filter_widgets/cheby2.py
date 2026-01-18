@@ -183,18 +183,16 @@ class Cheby2():
         self._get_params()
         self.N, self.F_SBC = cheb2ord(
             self.F_PB,self.F_SB, self.A_PB, self.A_SB, analog=self.analog)
-        ret = self._save(
+        return self._save(
             cheby2(self.N, self.A_SB, self.F_SBC, btype='lowpass',
                    analog=self.analog, output=self.FRMT))
-        return ret
 
     def LPman(self) -> int:
         """Cheby2 LP filter, fixed order"""
         self._get_params()
-        ret = self._save(
+        return self._save(
             cheby2(self.N, self.A_SB, self.F_C, btype='low',
                    analog=self.analog, output=self.FRMT))
-        return ret
 
     # HP: F_SB < F_PB ---------------------------------------------------------
     def HPmin(self) -> int:
@@ -202,18 +200,16 @@ class Cheby2():
         self._get_params()
         self.N, self.F_SBC = cheb2ord(
             self.F_PB, self.F_SB, self.A_PB, self.A_SB, analog=self.analog)
-        ret = self._save(cheby2(
+        return self._save(cheby2(
             self.N, self.A_SB, self.F_SBC, btype='highpass',
             analog=self.analog, output=self.FRMT))
-        return ret
 
     def HPman(self) -> int:
         """Cheby2 HP filter, fixed order"""
         self._get_params()
-        ret = self._save(
+        return self._save(
             cheby2(self.N, self.A_SB, self.F_C, btype='highpass',
                    analog=self.analog, output=self.FRMT))
-        return ret
 
     # For BP and BS, A_PB, A_SB, F_PB and F_SB have two elements each.
     # The min. filter order and the design algorithms use half the actual filter order,
@@ -227,18 +223,16 @@ class Cheby2():
         self.N, self.F_SBC = cheb2ord(
             [self.F_PB, self.F_PB2], [self.F_SB, self.F_SB2], self.A_PB, self.A_SB,
              analog=self.analog)
-        ret = self._save(
+        return self._save(
             cheby2(self.N, self.A_SB, self.F_SBC, btype='bandpass',
                    analog=self.analog, output=self.FRMT))
-        return ret
 
     def BPman(self) -> int:
         """Cheby2 BP filter, fixed order"""
         self._get_params()
-        ret = self._save(cheby2(
+        return self._save(cheby2(
             self.N//2, self.A_SB, [self.F_C, self.F_C2], btype='bandpass',
             analog=self.analog, output=self.FRMT))
-        return ret
 
     # BS: F_SB[0] > F_PB[0], F_SB[1] < F_PB[1] --------------------------------
     def BSmin(self) -> int:
@@ -247,18 +241,16 @@ class Cheby2():
         self.N, self.F_SBC = cheb2ord(
             [self.F_PB, self.F_PB2], [self.F_SB, self.F_SB2], self.A_PB, self.A_SB,
             analog=self.analog)
-        ret = self._save(
+        return self._save(
             cheby2(self.N, self.A_SB, self.F_SBC, btype='bandstop',
                    analog=self.analog, output=self.FRMT))
-        return ret
 
     def BSman(self) -> int:
         """Cheby2 BS filter, fixed order"""
         self._get_params()
-        ret = self._save(
+        return self._save(
             cheby2(self.N//2, self.A_SB, [self.F_C, self.F_C2], btype='bandstop',
                    analog=self.analog, output=self.FRMT))
-        return ret
 
 #------------------------------------------------------------------------------
 

@@ -341,11 +341,6 @@ class Firwin(QWidget):
         filter dictionary.
         """
         fil_save(arg, self.FRMT, __name__)
-
-        try:  # has the order been calculated by a "min" filter design?
-            fb_set('N', self.N)  # yes, update filterbroker
-        except AttributeError:
-            pass
         self.filter_params2dict()
 
 # ------------------------------------------------------------------------------
@@ -528,6 +523,7 @@ class Firwin(QWidget):
         fb_set('F_C', (self.F_SB + self.F_PB)/2)  # average calculated F_PB and F_SB
         self._save(self.firwin(self.N, fb_get('F_C'), nyq=0.5,
                                window=self.qfft_win_select.calc_window(self.N, sym=True)))
+        fb_set('N', self.N)  # update filterbroker with calculated order
         return 0
 
     def LPman(self) -> int:
@@ -550,6 +546,7 @@ class Firwin(QWidget):
         fb_set('F_C', (self.F_SB + self.F_PB)/2)  # average calculated F_PB and F_SB
         self._save(self.firwin(self.N, fb_get('F_C'), pass_zero=False, nyq=0.5,
                                window=self.qfft_win_select.calc_window(self.N, sym=True)))
+        fb_set('N', self.N)  # update filterbroker with calculated order
         return 0
 
     def HPman(self) -> int:
@@ -576,6 +573,7 @@ class Firwin(QWidget):
         self._save(self.firwin(self.N, [fb_get('F_C'), fb_get('F_C2')], nyq=0.5,
                                pass_zero=False,
                                window=self.qfft_win_select.calc_window(self.N, sym=True)))
+        fb_set('N', self.N)  # update filterbroker with calculated order
         return 0
 
     def BPman(self) -> int:
@@ -601,6 +599,7 @@ class Firwin(QWidget):
         self._save(self.firwin(self.N, [fb_get('F_C'), fb_get('F_C2')],
                                window=self.qfft_win_select.calc_window(self.N, sym=True),
                                pass_zero=True, nyq=0.5))
+        fb_set('N', self.N)  # update filterbroker with calculated order
         return 0
 
     def BSman(self) -> int:
