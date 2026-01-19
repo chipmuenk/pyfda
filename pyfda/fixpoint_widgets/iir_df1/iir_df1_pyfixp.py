@@ -13,7 +13,6 @@ import logging
 
 import numpy as np
 
-import pyfda.filterbroker as fb
 from pyfda.filterbroker import fb_get, fb_set, get_fx
 import pyfda.libs.pyfda_fix_lib as fx
 
@@ -117,8 +116,8 @@ class IIR_DF1_pyfixp(object):
 
         # Quantize coefficients and store them in local attributes
         # This also resets the overflow counters.
-        self.a_q = fx.quant_coeffs(fb.fil[0]['ba'][1], self.Q_a, recursive=True)
-        self.b_q = fx.quant_coeffs(fb.fil[0]['ba'][0], self.Q_b)
+        self.a_q = fx.quant_coeffs(fb_get('ba', 1), self.Q_a, recursive=True)
+        self.b_q = fx.quant_coeffs(fb_get('ba', 0), self.Q_b)
 
         if np.iscomplexobj(self.a_q):
             self.a_q = self.a_q.real
@@ -147,11 +146,11 @@ class IIR_DF1_pyfixp(object):
             if len(zi_a) == self.L - 1:   # use zi_a as it is
                 self.zi_a = zi_a
             else:
-                logger.warning(f"length of zi_a is {len(zi_a)} != {len(self.L)-1}")
+                logger.warning("length of zi_a is %d != %d", len(zi_a), self.L - 1)
                 self.zi_a = np.zeros(self.L - 1)
 
     # ---------------------------------------------------------
-    def reset(self):
+    def reset(self) -> None:
         """
         Reset registers and overflow counters of quantizers
         (except for coefficient quant.)
@@ -276,9 +275,8 @@ class IIR_DF1_pyfixp(object):
 
         # Overflows in Q_mul are added to overflows in Q_Acc, then Q_mul is reset
         if self.Q_acc.N_over > 0 or self.Q_mul_a.N_over > 0 or self.Q_mul_b.N_over > 0:
-            logger.warning(f"Overflows: N_Acc = {self.Q_acc.N_over}, "
-                           f"N_Mul_a = {self.Q_mul_a.N_over}, "
-                           f"N_Mul_b = {self.Q_mul_b.N_over}.")
+            logger.warning("Overflows: N_Acc = %d, N_Mul_a = %d, N_Mul_b = %d.",
+                           self.Q_acc.N_over, self.Q_mul_a.N_over, self.Q_mul_b.N_over)
         self.Q_acc.N_over += self.Q_mul_a.N_over + self.Q_mul_b.N_over
         self.Q_mul_a.resetN()
         self.Q_mul_b.resetN()

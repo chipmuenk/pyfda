@@ -111,7 +111,7 @@ class FIR_DF_pyfixp():
                 self.zi = zi[:self.L - 1]
 
     # ---------------------------------------------------------
-    def reset(self):
+    def reset(self) -> None:
         """
         Reset register and overflow counters of quantizers
         (but don't reset coefficient quantizers)
@@ -132,7 +132,7 @@ class FIR_DF_pyfixp():
         ----------
         x : array of float or float or None
             input value(s) scaled and quantized according to the setting of `p['QI']`
-            and fb.fil[0]['qfrmt']
+            and fb_get('qfrmt')
             - When x is a scalar, calculate impulse response with the
                 amplitude defined by the scalar.
             - When `x == None`, calculate impulse response with amplitude = 1.
@@ -181,8 +181,8 @@ class FIR_DF_pyfixp():
 
         # Overflows in Q_mul are added to overflows in Q_Acc, then Q_mul is reset
         if self.Q_acc.q_dict['N_over'] > 0 or self.Q_mul.q_dict['N_over'] > 0:
-            logger.warning(f"Overflows: N_Acc = {self.Q_acc.q_dict['N_over']}, "
-                           f"N_Mul = {self.Q_mul.q_dict['N_over']}")
+            logger.warning("Overflows: N_Acc = %d, N_Mul = %d",
+                           self.Q_acc.q_dict['N_over'], self.Q_mul.q_dict['N_over'])
 
         self.Q_acc.q_dict['N_over'] = self.Q_acc.q_dict['N_over'] + self.Q_mul.q_dict['N_over']
         self.Q_mul.resetN()
@@ -195,7 +195,7 @@ if __name__ == '__main__':
     # Run widget standalone with
     # `python -m pyfda.fixpoint_widgets.fir_df.fir_df_pyfixp`
 
-    fb.fil[0]['ba'] = [[1.1, 2.2, 3.3, 2, 1], []]
+    fb_set('ba', [[1.1, 2.2, 3.3, 2, 1], []])
     p = {'QCB': {'WI': 2, 'WF': 5, 'w_a_m': 'a',
                 'ovfl': 'wrap', 'quant': 'floor', 'N_over': 0},
          'QACC': {'WI': 6, 'WF': 3, 'ovfl': 'wrap', 'quant': 'round'},

@@ -13,7 +13,7 @@ import sys
 import logging
 logger = logging.getLogger(__name__)
 
-import pyfda.filterbroker as fb
+from pyfda.filterbroker import fb_get
 
 from pyfda.libs.compat import QWidget#, QLabel, QVBoxLayout, QHBoxLayout
 
@@ -140,7 +140,7 @@ class Delay_wdg(QWidget):
 # A delay with quantization and parametrizable length
 class Delay(Module):
     def __init__(self):
-        p = fb.fil[0]['fxq']
+        p = fb_get('fxq')
         # ------------- Define I/Os -------------------------------------------
         self.WI = p['QI']['WI'] + p['QI']['WF'] + 1
         self.WO = p['QO']['WI'] + p['QO']['WF'] + 1

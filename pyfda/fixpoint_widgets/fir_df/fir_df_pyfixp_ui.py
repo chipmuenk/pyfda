@@ -15,6 +15,7 @@ import logging
 import numpy as np
 
 import pyfda.filterbroker as fb
+from pyfda.filterbroker import fb_get, fb_set
 from pyfda.filterbroker import set_fx
 from pyfda.libs.pyfda_lib import set_dict_defaults, pprint_log, first_item
 from pyfda.libs.pyfda_qt_lib import qget_cmb_box, emit
@@ -61,7 +62,7 @@ class FIR_DF_pyfixp_UI(QWidget):
         self._construct_UI()
         # Construct an instance of the fixpoint filter using the settings from
         # the 'fxq' quantizer dict
-        self.fx_filt = FIR_DF_pyfixp(fb.fil[0]['fxq'])
+        self.fx_filt = FIR_DF_pyfixp(fb_get('fxq'))
         self.update_ovfl_cnt_all()  # initialize all overflow counters / display
 
     # -------------------------------------------------------------------------
@@ -73,18 +74,18 @@ class FIR_DF_pyfixp_UI(QWidget):
         emit(self, dict_sig)
 
     # --------------------------------------------------------------------------
-    def _construct_UI(self):
+    def _construct_UI(self) -> None:
         """
         Intitialize the UI with widgets for coefficient format and input and
         output quantization
         """
         # widget for quantization of coefficients 'b'
         # Attention: fb.fil[0]['fxq']['QCB'] == self.wdg_wq_coeffs.q_dict
-        if 'QCB' not in fb.fil[0]['fxq']:
+        if 'QCB' not in fb_get('fxq'):
             fb.fil[0]['fxq'].update({'QCB': {}})  # no coefficient settings in dict yet
             logger.warning("QCB key missing")
         self.wdg_wq_coeffs = FX_UI_WQ(
-            fb.fil[0]['fxq']['QCB'], objectName='fx_ui_wq_fir_df_coeffs_b',
+            fb_get('fxq', 'QCB'), objectName='fx_ui_wq_fir_df_coeffs_b',
             label='<b>Coeff. Quantization <i>b<sub>I.F&nbsp;</sub></i>:</b>',
             MSB_LSB_vis='max')
         lay_v_wq_coeffs = QVBoxLayout()
@@ -92,7 +93,7 @@ class FIR_DF_pyfixp_UI(QWidget):
 
         # widget for accumulator quantization
         # Attention: fb.fil[0]['fxq']['QACC'] == self.wdg_wq_accu.q_dict
-        if 'QACC' not in fb.fil[0]['fxq']:
+        if 'QACC' not in fb_get('fxq'):
             fb.fil[0]['fxq']['QACC'] = {}
         set_dict_defaults(fb.fil[0]['fxq']['QACC'],
             {'WI': 0, 'WF': 31, 'ovfl': 'wrap', 'quant': 'floor', 'w_a_m': 'a',
@@ -145,8 +146,8 @@ class FIR_DF_pyfixp_UI(QWidget):
 
         if 'ui_local_changed' in dict_sig:
             # signal generated locally by modifying coefficient / accu format
-            if not dict_sig['sender_name']\
-                    in {'fx_ui_wq_fir_df_coeffs_b', 'fx_ui_wq_fir_df_accu'}:
+            if dict_sig['sender_name'] not in\
+                    {'fx_ui_wq_fir_df_coeffs_b', 'fx_ui_wq_fir_df_accu'}:
                 logger.error("Unknown widget name '%s' in '%s' !", dict_sig['sender_name'], __name__)
                 return
 
@@ -184,9 +185,9 @@ class FIR_DF_pyfixp_UI(QWidget):
         """
         # try:
         if qget_cmb_box(self.wdg_wq_accu.cmbW) == 'f':
-            A_coeff = int(np.ceil(np.log2(len(fb.fil[0]['ba'][0]))))
+            A_coeff = int(np.ceil(np.log2(len(fb_get('ba', 0)))))
         elif qget_cmb_box(self.wdg_wq_accu.cmbW) == 'a':
-            A_coeff = int(np.ceil(np.log2(np.sum(np.abs(fb.fil[0]['ba'][0])))))
+            A_coeff = int(np.ceil(np.log2(np.sum(np.abs(fb_get('ba', 0))))))
         else:
             A_coeff = 0
         # except BaseException as e: # Exception as e:
@@ -195,16 +196,16 @@ class FIR_DF_pyfixp_UI(QWidget):
 
         # calculate required accumulator word format and update filter dict
         if qget_cmb_box(self.wdg_wq_accu.cmbW) in {'f', 'a'}:
-            fb.fil[0]['fxq']['QACC']['WF'] = fb.fil[0]['fxq']['QI']['WF']\
-                + fb.fil[0]['fxq']['QCB']['WF']
-            fb.fil[0]['fxq']['QACC']['WI'] = fb.fil[0]['fxq']['QI']['WI']\
-                + fb.fil[0]['fxq']['QCB']['WI'] + A_coeff
+            fb.fil[0]['fxq']['QACC']['WF'] = fb_get('fxq', 'QI', 'WF')\
+                + fb_get('fxq', 'QCB', 'WF')
+            fb.fil[0]['fxq']['QACC']['WI'] = fb_get('fxq', 'QI', 'WI')\
+                + fb_get('fxq', 'QCB', 'WI') + A_coeff
 
         # update UI and Q.q_dict (quantization settings) from filter dict
-        self.wdg_wq_accu.dict2ui(fb.fil[0]['fxq']['QACC'])
+        self.wdg_wq_accu.dict2ui(fb_get('fxq', 'QACC'))
 
     # --------------------------------------------------------------------------
-    def dict2ui(self):
+    def dict2ui(self) -> None:
         """
         Update all parts of the UI that need to be updated when specs have been
         changed outside this class, e.g. coefficients and coefficient wordlength.
@@ -214,7 +215,7 @@ class FIR_DF_pyfixp_UI(QWidget):
         This is called from one level above by
         :class:`pyfda.input_widgets.input_fixpoint_specs.Input_Fixpoint_Specs`.
         """
-        self.wdg_wq_coeffs.dict2ui(fb.fil[0]['fxq']['QCB'])  # update coefficient wordlength
+        self.wdg_wq_coeffs.dict2ui(fb_get('fxq', 'QCB'))  # update coefficient wordlength
         self.update_accu_settings()   # update accumulator q settings and UI
 
     # --------------------------------------------------------------------------
