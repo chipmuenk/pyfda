@@ -1307,7 +1307,7 @@ def fil_convert(format_in) -> None:
 
         if 'ba' not in format_in:
             try:
-                fb_set('ba', sig.sos2tf(fb_get('sos')))
+                fb_set('ba', np.ndarray(sig.sos2tf(fb_get('sos'))))
             except Exception as e:
                 raise ValueError(e)
             # check whether sos conversion has created additional (superfluous)
@@ -1328,9 +1328,9 @@ def fil_convert(format_in) -> None:
                     k = zpk[2][0]
                 else:
                     k = zpk[2]
-                fb_set('sos', sig.zpk2sos(zpk[0], zpk[1], k))
+                fb_set('sos', sig.zpk2sos(zpk[0], zpk[1], k))  # np.ndarray
             except ValueError as e:
-                fb_set('sos', [])
+                fb_set('sos', np.ndarray([]))
                 logger.warning(
                     "Complex-valued coefficients? Could not convert zpk\n%s"
                     "\n\tto SOS.\n\t%s", zpk, e)
@@ -1365,7 +1365,7 @@ def fil_convert(format_in) -> None:
         try:
             fb_set('sos', sig.tf2sos(fb_get('ba')[0], fb_get('ba')[1]))
         except ValueError:
-            fb_set('sos', [])
+            fb_set('sos', np.ndarray([]))
             logger.warning("Complex-valued coefficients, could not convert to SOS.")
 
     else:

@@ -195,7 +195,7 @@ if __name__ == '__main__':
     # Run widget standalone with
     # `python -m pyfda.fixpoint_widgets.fir_df.fir_df_pyfixp`
 
-    fb_set('ba', [[1.1, 2.2, 3.3, 2, 1], []])
+    fb_set('ba', np.array([1.1, 2.2, 3.3, 2, 1], []))  # example coefficients
     p = {'QCB': {'WI': 2, 'WF': 5, 'w_a_m': 'a',
                 'ovfl': 'wrap', 'quant': 'floor', 'N_over': 0},
          'QACC': {'WI': 6, 'WF': 3, 'ovfl': 'wrap', 'quant': 'round'},

@@ -288,7 +288,7 @@ class IIR_DF1_pyfixp(object):
 if __name__ == '__main__':
     # Run widget standalone with
     # `python -m pyfda.fixpoint_widgets.iir_df1.iir_df1_pyfixp`
-    fb_set('ba', [[1.1, 2.2, 3.3, 2, 1], [1, 0, 0, 0, 0.81]])
+    fb_set('ba', np.array([1.1, 2.2, 3.3, 2, 1], [1, 0, 0, 0, 0.81]))
     p = {'QCB': {'WI': 0, 'WF': 5, 'w_a_m': 'a',
                 'ovfl': 'wrap', 'quant': 'floor', 'N_over': 0},
         'QCA': {'WI': 1, 'WF': 5, 'w_a_m': 'a',
