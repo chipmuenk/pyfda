@@ -70,8 +70,7 @@ def impz(b, a=1, FS=1, N=0, step=False):
         if len(b) == 1:
             raise TypeError(
                 'No proper filter coefficients: len(a) = len(b) = 1 !')
-        else:
-            IIR = False
+        IIR = False
     else:
         if len(b) == 1:
             IIR = True
@@ -280,9 +279,7 @@ def angle_zero(X, n_eps=1e3, mode='auto', wrapped='auto'):
     Otherwise, zero is returned.
     """
 
-    phi = np.angle(np.where((np.abs(X) > n_eps * np.spacing(1)), X, 0))
-
-    return phi
+    return np.angle(np.where((np.abs(X) > n_eps * np.spacing(1)), X, 0))
 
 
 # ------------------------------------------------------------------------------
@@ -331,7 +328,7 @@ def div_safe(num, den, n_eps: float = 1., i_scale: float = 1., verbose: bool = F
     if verbose and np.any(singular):
         logger.warning('div_safe singularity -> setting to 0 at:')
         for i in singular:
-            logger.warning('i = {0} '.format(i * i_scale))
+            logger.warning("i = %s ", (i * i_scale))
 
     num[singular] = 0
     den[singular] = 1
@@ -1142,10 +1139,10 @@ def fil_save(arg: np.ndarray, format_in: str, sender: str, convert: bool = True)
             "\t'fil_save()': data in '%s' format needs to be a numpy array but is '%s'!",
             format_in, type(arg))
 
-    elif arg.size == 0:
+    if arg.size == 0:
         raise ValueError("'fil_save()': data in '%s' format is empty!", format_in)
 
-    elif np.isscalar(arg):
+    if np.isscalar(arg):
         raise ValueError("'fil_save()': data in '%s' format is a scalar!", format_in)
 
     if format_in == 'sos':
@@ -1181,7 +1178,7 @@ def fil_save(arg: np.ndarray, format_in: str, sender: str, convert: bool = True)
             else:
                 fb_set('ft', 'FIR')
         else:
-            raise ValueError("\t'fil_save()': Unknown 'zpk' format {0}".format(arg))
+            raise ValueError(f"\t'fil_save()': Unknown 'zpk' format {arg}")
 
     elif format_in == 'ba':
         if np.ndim(arg) == 1:  # arg = [b] -> FIR
@@ -1222,7 +1219,7 @@ def fil_save(arg: np.ndarray, format_in: str, sender: str, convert: bool = True)
         fb_set('ba', np.asarray([np.array(b, dtype=complex), np.array(a, dtype=complex)]))
 
     else:
-        raise ValueError("\t'fil_save()':Unknown input format {0:s}".format(format_in))
+        raise ValueError(f"\t'fil_save()':Unknown input format {format_in}")
 
     fb_set('creator', [format_in, sender])
     fb_set('timestamp', time.time())
