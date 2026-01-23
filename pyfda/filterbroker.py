@@ -544,6 +544,11 @@ def fb_get(*keys_tuple, fil_dict=fil[0], verbose=True) -> str | int | float | It
     verbose : bool
         Whether to log errors and warnings, default is True. Setting this to False
         can be used to detect silently whether a key exists in the dictionary
+    Returns
+    -------
+    str | None
+        The value of the specified key in the dictionary, or None if the key
+        does not exist.
 
     TODO: Keys need to be protected from accidental overwriting by
     the user. This will be done by prepending the keys with an underscore
@@ -576,7 +581,8 @@ def fb_get(*keys_tuple, fil_dict=fil[0], verbose=True) -> str | int | float | It
     return ret
 
 # -------------------------
-def fb_set(*keys_tuple, backup: bool = True, update: bool = False, fil_dict: dict = fil[0]) -> None:
+def fb_set(*key_list: list | tuple, backup: bool = True, update: bool = False,
+           fil_dict: dict = fil[0]) -> int:
     """
     Use the items of `keys_tuple` to access a nested dict `fil_dict`
     (default: `fil[0]`) and write the last item in `keys_tuple` to the dict.
@@ -586,9 +592,9 @@ def fb_set(*keys_tuple, backup: bool = True, update: bool = False, fil_dict: dic
 
     Parameters
     ----------
-    keys_tuple : tuple
-        Tuple of keys for traversing the nested dictionary, the last element is the value
-        to be set.
+    key_list : list or tuple
+        List or tuple of keys for traversing the (nested) dictionary, the last element
+        is the value to be set.
     backup : bool
         Whether the previous state of the filter dict should be backed up
     update : bool
@@ -605,49 +611,62 @@ def fb_set(*keys_tuple, backup: bool = True, update: bool = False, fil_dict: dic
     ------
     KeyError
         If a key does not exist in the dictionary or the tuple of keys is empty
+
     TypeError
-        If `keys_tuple` is not of type Tuple or if the tuple contains less than two items
+        If `key_list` is not of type List or Tuple or if it has than two items
     """
 
-    # TODO: Check whether nested dicts can be partially overwritten
+    if not key_list:
+        raise KeyError("Key_list is empty!")
+    if not isinstance(key_list, (tuple, list)):
+        raise TypeError(
+            "Key_list needs to be Tuple or List, not a '%s'!", type(key_list).__name__)
+    if len(key_list) < 2:
+        raise KeyError("Not enough arguments for setting a dictionary value!")
 
-    if not keys_tuple:
-        raise KeyError("Tuple of keys is empty!")
-    if not isinstance(keys_tuple, tuple):
-        raise TypeError("Keys container needs to be a Tuple, not a '%s'!", type(keys_tuple))
-        # logger.error("Wrong type of arguments collection '%s'", type(keys_tuple))
-        # return -1
-    if len(keys_tuple) < 2:
-        raise TypeError("Not enough arguments for setting a dictionary value!")
-
-    val = keys_tuple[-1]  # last element is not a key but the value to be set
-
+    set_val = key_list[-1]  # last element is the value to be set
+    set_key = key_list[-2]  # second last element is the key for setting
     try:
-        d = key_list_to_dict(keys_tuple[:-1], fil_dict)  # create nested dict from the other arguments
-        _ =  d[keys_tuple[-2]]  # test accessing the dictionary
+        # traverse nested dict 'fil_dict' using tuple of keys amd access subdictionary
+        d = traverse_dict(key_list[:-1], fil_dict)
+        # Test accessing the dictionary and whether the accessed item is a dict.
+        # This could be dangerous because the keys in this sub-dictionary could be altered!
+        if isinstance(d[set_key], dict):
+            keys1 = d[set_key].keys()
+            logger.warning(
+                "Danger! Trying to set the sub-dictionary 'dict[%s]'\n\t%s with \n\t%s",
+                set_key, d[set_key], set_val)
         if backup:
             store_fil()  # backup old setting
 
-        if keys_tuple[-2] =='qfrmt' and len(keys_tuple) == 2:
-            # remember current fixpoint / float format
-            if get_fx():  # store old fixpoint format
+        if set_key =='qfrmt':
+            if len(key_list) > 2:
+                raise KeyError("Too many arguments for setting 'qfrmt'!")
+            # store current fixpoint / float format
+            if get_fx():  # fixpoint mode, store old fixpoint format
                 fil_dict['qfrmt_fx_last'] = fil_dict['qfrmt']
-            else:  # store old float format
+            else:  # float mode, store current float format
                 fil[0]['qfrmt_float_last'] = fil_dict['qfrmt']
             # and set new format
-            fil_dict['qfrmt'] = val
-        elif not update:
-            d[keys_tuple[-2]] = val  # set new value
+            fil_dict['qfrmt'] = set_val
+            return 0
+        if type(set_val) is not type(d[set_key]):
+            logger.error("Type mismatch: Trying to set\n\t'dict[%s]' of type '%s' with value "
+                         "of type '%s'",
+                         set_key, type(d[set_key]).__name__, type(set_val).__name__)
+            return -1
+        if not update:
+            d[set_key] = set_val  # set new value
         else:
-            d[keys_tuple[-2]].update(val)  # update dict with new value
+            d[set_key].update(set_val)  # update dict with new value
 
     except KeyError:
         # create a meaningful error message with a string of the failed dict
         dict_str = 'fb.fil[0]'
-        if len(keys_tuple) < 3:  # only one level dictionary, keys_tuple[-1] is already the key
-            dict_str += '[' + keys_tuple[-2] + ']'
+        if len(key_list) < 3:  # only one level dictionary, keys_tuple[-1] is already the key
+            dict_str += '[' + key_list[-2] + ']'
         else:
-            for k in keys_tuple[:-1]:
+            for k in key_list[:-1]:
                 dict_str += '[' + k + ']'
         logger.error("Dict '%s' does not exist!", dict_str)
         return -1
