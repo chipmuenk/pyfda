@@ -1224,7 +1224,7 @@ def fil_save(arg: np.ndarray, format_in: str, sender: str, convert: bool = True)
     else:
         raise ValueError("\t'fil_save()':Unknown input format {0:s}".format(format_in))
 
-    fb_set('creator', (format_in, sender))
+    fb_set('creator', [format_in, sender])
     fb_set('timestamp', time.time())
 
     if convert:

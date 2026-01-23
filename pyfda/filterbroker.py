@@ -457,17 +457,17 @@ def store_fil():
     fil_undo[undo_ptr] = copy.deepcopy(fil[0])
 
 # -------------------------
-def key_list_to_dict(keys_tuple: list, fil_dict: dict) -> dict:
+def traverse_dict(key_list: list | tuple, fil_dict: dict) -> dict:
     """
-    Use a list or tuple of strings `keys_tuple` to access a nested dict `fil_dict` that
-    can be written to and return that dict.
+    Use the list or tuple of strings `key_list` to traverse the (nested) dict `fil_dict`
+    and return the addressed subdictionary.
 
-    In order to set the value of the returned nested dict, use the key for the lowest
+    In order to set the value of the returned dict, use the key for the lowest
     nesting level on the returned dict `d`, i.e. `d[keys_tuple[-1]] = arg` .
 
     Parameters
     ----------
-    keys_tuple : list
+    key_list : list or tuple
         List of keys to traverse the nested dictionary.
 
     fil_dict : dict
@@ -476,22 +476,21 @@ def key_list_to_dict(keys_tuple: list, fil_dict: dict) -> dict:
     Returns
     -------
     dict
-        The nested dictionary at the specified level.
+        A copy of the the traversed dictionary at the specified (usually lowest) level.
 
     Raises
     ------
     KeyError
-        If the keys do not exist in the dictionary.
+        If a key does not exist in the dictionary or does not point to another dictionary
     """
-    if not keys_tuple:
+    if not key_list:
         raise KeyError("List of keys was empty!")
 
     d = fil_dict
-    for key in keys_tuple[:-1]:  # Traverse all keys except the last one
-        if key not in d or not isinstance(d[key], dict):
-            raise KeyError(f"Key '{key}' not found or is not a dictionary!")
-        d = d[key]
-
+    for k in key_list[:-1]:  # Traverse all keys except the last one
+        if k not in d or not isinstance(d[k], dict):
+            raise KeyError(f"Key '{k}' not found or is not a dictionary!")
+        d = d[k]
     return d
 
 # -------------------------
