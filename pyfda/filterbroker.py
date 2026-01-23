@@ -502,9 +502,18 @@ def get_fx()-> bool:
     -------
     bool
         True if qfrmt is one of the fixpoint formats 'qint' or 'qfrac'
+        False if qfrmt is one of the floating point formats 'float32' or 'float64'
 
+    Raises
+    ------
+    KeyError
+        If qfrmt is not one of the expected values above
     """
-    return fb_get('qfrmt') in ['qint', 'qfrac']
+    qfrmt = fb_get('qfrmt')
+    if qfrmt not in ['qint', 'qfrac', 'float32', 'float64']:
+        raise KeyError("Invalid value for qfrmt!")
+
+    return qfrmt in ['qint', 'qfrac']
 
 # -------------------------
 def set_fx(fx: bool)-> None:
