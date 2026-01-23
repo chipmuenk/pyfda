@@ -40,6 +40,7 @@ More info on data persistence and storing / accessing global variables:
 """
 import copy
 import logging
+from typing import Iterable
 
 from pyfda.libs.frozendict import freeze_hierarchical
 
@@ -527,7 +528,7 @@ def set_fx(fx: bool)-> None:
         fb_set('qfrmt', fb_get('qfrmt_float_last'))
 
 # -------------------------
-def fb_get(*keys_tuple, fil_dict=fil[0], verbose=True) -> str:
+def fb_get(*keys_tuple, fil_dict=fil[0], verbose=True) -> str | int | float | Iterable | None:
     """
     Get the value of a key in the global dict `fil[0]`. Multiple arguments
     access nested dicts:
