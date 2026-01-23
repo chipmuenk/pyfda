@@ -437,10 +437,12 @@ def set_dict_defaults(d: dict, default_dict: dict) -> None:
             d.pop(k)
             logger.warning("Deleted key '%s' (not part of default dict).", k)
     if d == {}:
+        logger.warning("Dict %s was empty", d)
         d.update(default_dict)
     else:
         for k, v in default_dict.items():
             if k not in d:
+                logger.warning("Key %s in dict %s was empty", k, d)
                 d[k] = v
 
 
