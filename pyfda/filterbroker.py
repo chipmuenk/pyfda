@@ -564,7 +564,7 @@ def set_fx(fx: bool)-> None:
         fb_set('qfrmt', fb_get('qfrmt_float_last'))
 
 # -------------------------
-def fb_get(*keys_tuple, fil_dict=fil[0], verbose=True) -> str | int | float | Iterable | None:
+def fb_get(*key_list, fil_dict=fil[0], verbose=True) -> str | int | float | Iterable | None:
     """
     Get the value of a key in the global dict `fil[0]`. Multiple arguments
     access nested dicts:
@@ -573,8 +573,8 @@ def fb_get(*keys_tuple, fil_dict=fil[0], verbose=True) -> str | int | float | It
 
     Parameters
     ----------
-    keys_tuple : tuple
-        Tuple of keys for traversing the nested dictionary.
+    key_list : list or tuple
+        List of tuple of keys for traversing the nested dictionary.
     fil_dict : dict
         The dictionary to traverse, the default is the global `fil[0]`.
     verbose : bool
@@ -590,15 +590,15 @@ def fb_get(*keys_tuple, fil_dict=fil[0], verbose=True) -> str | int | float | It
     the user. This will be done by prepending the keys with an underscore
     (e.g. `_f_S`) once all direct accesses have been removed.
     """
-    if len(keys_tuple) == 0:
+    if len(key_list) == 0:
         # called without arguments, return a copy of the whole dict
         return copy.deepcopy(fil_dict)
 
     ret = fil_dict
     try:
-        for key in keys_tuple:
+        for key in key_list:
             ret = ret[key]
-            # ret = fil_dict[keys_tuple[0]][keys_tuple[1]][keys_tuple[2]] ...
+            # ret = fil_dict[key_list[0]][key_list[1]][key_list[2]] ...
     except (KeyError, IndexError, TypeError):
         # create a meaningful error message with a string of the failed dict
         if verbose:
@@ -613,7 +613,7 @@ def fb_get(*keys_tuple, fil_dict=fil[0], verbose=True) -> str | int | float | It
         return None
 
     if ret is None and verbose:
-        logger.warning("Key '%s' not found in filter dict!", keys_tuple[-1])
+        logger.warning("Key '%s' not found in filter dict!", key_list[-1])
     return ret
 
 # -------------------------
