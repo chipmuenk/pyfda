@@ -600,14 +600,7 @@ def fb_get(*key_list, fil_dict=fil[0], verbose=True) -> str | int | float | Iter
     except (KeyError, IndexError, TypeError):
         # create a meaningful error message with a string of the failed dict
         if verbose:
-            dict_str = fil_dict
-            if len(keys_tuple) < 3:  # only one level dictionary, keys_tuple[-1] is already the key
-                logger.warning(keys_tuple)
-                dict_str += '[' + keys_tuple[-2] + ']'
-            else:
-                for k in keys_tuple[:-1]:
-                    dict_str += '[' + k + ']'
-            logger.error("Dict '%s' does not exist!", dict_str)
+            logger.error("Dict '%s' does not exist!", _print_dict(key_list))
         return None
 
     if ret is None and verbose:
@@ -699,14 +692,8 @@ def fb_set(*key_list: list | tuple, backup: bool = True, update: bool = False,
             d[set_key].update(set_val)  # update dict with new value
 
     except KeyError:
-        # create a meaningful error message with a string of the failed dict
-        dict_str = 'fb.fil[0]'
-        if len(key_list) < 3:  # only one level dictionary, keys_tuple[-1] is already the key
-            dict_str += '[' + key_list[-2] + ']'
-        else:
-            for k in key_list[:-1]:
-                dict_str += '[' + k + ']'
-        logger.error("Dict '%s' does not exist!", dict_str)
+        # create a meaningful error message with a string of the name of the failed dict
+        logger.error("Dict '%s' does not exist!", _print_dict(key_list))
         return -1
 
     return 0
