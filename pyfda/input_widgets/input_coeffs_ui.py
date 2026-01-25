@@ -12,7 +12,7 @@ Create the UI for the FilterCoeffs class
 import logging
 
 from pyfda import qrc_resources  # noqa: F401  # load the icons resource file
-import pyfda.filterbroker as fb
+from pyfda.filterbroker import fb_get
 from pyfda.libs.compat import (
     pyqtSignal, Qt, QWidget, QLabel, QLineEdit, QComboBox, QPushButton, QFrame,
     QSpinBox, QFont, QIcon, QVBoxLayout, QHBoxLayout, QSizePolicy)
@@ -301,12 +301,12 @@ class Input_Coeffs_UI(QWidget):
 
         # -------------------
         self.wdg_wq_coeffs_b = FX_UI_WQ(
-            fb.fil[0]['fxq']['QCB'], objectName='fx_ui_wq_coeffs_b',
+            fb_get('fxq', 'QCB'), objectName='fx_ui_wq_coeffs_b',
             label='<b>Coeff. Quantization <i>b<sub>I.F&nbsp;</sub></i>:</b>',
             MSB_LSB_vis='max')
         # -------------------
         self.wdg_wq_coeffs_a = FX_UI_WQ(
-            fb.fil[0]['fxq']['QCA'], objectName='fx_ui_wq_coeffs_a',
+            fb_get('fxq', 'QCA'), objectName='fx_ui_wq_coeffs_a',
             label='<b>Coeff. Quantization <i>a<sub>I.F&nbsp;</sub></i>:</b>',
             MSB_LSB_vis='max')
 

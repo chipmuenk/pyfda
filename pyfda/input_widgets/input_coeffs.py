@@ -376,13 +376,13 @@ class Input_Coeffs(QWidget):
         i.e. requantize displayed values (not `self.ba`) and overflow counters.
 
         Refresh the table from it. Data is displayed via `ItemDelegate.displayText()` in
-        the number format set by `fb.fil[0]['fx_base']`.
+        the number format set by `fil[0]['fx_base']`.
 
         - self.ba[0] -> b coefficients
         - self.ba[1] -> a coefficients
 
         The table dimensions are set according to the filter type set in
-        `fb.fil[0]['ft']` which is either 'FIR' or 'IIR' and by the number of
+        `fil[0]['ft']` which is either 'FIR' or 'IIR' and by the number of
         rows in `self.ba`.
 
         Called at the end of nearly every method.
@@ -451,7 +451,7 @@ class Input_Coeffs(QWidget):
     # --------------------------------------------------------------------------
     def load_dict(self) -> None:
         """
-        - Copy filter dict array `fb.fil[0]['ba']` to the coefficient list `self.ba`
+        - Copy filter dict array `fil[0]['ba']` to the coefficient list `self.ba`
         - Set quantization UI from dict, update quantized coeff. display / overflow
           counter
         - Update the display via `self.refresh_table()`.
@@ -461,7 +461,7 @@ class Input_Coeffs(QWidget):
         for different lengths of b and a subarrays while adding / deleting items.
         """
         # TODO: deepcopy can be removed once the setter / getters work properly)
-        self.ba = copy.deepcopy(fb_get('ba'))  # fb.fil[0]['ba'])
+        self.ba = copy.deepcopy(fb_get('ba'))
 
         # set quantization UI from dictionary, update quantized coeff. display and
         # overflow counter, and refresh table
@@ -599,9 +599,9 @@ class Input_Coeffs(QWidget):
         # update ui
         qset_cmb_box(self.ui.cmb_qfrmt, fb_get('qfrmt'), data=True)
         if get_fx():  # fixpoint mode, update quantizer objects and widgets
-            # qset_cmb_box(self.ui.cmb_qfrmt, fb.fil[0]['qfrmt'], data=True)
-            self.ui.wdg_wq_coeffs_a.dict2ui(fb.fil[0]['fxq']['QCA'])
-            self.ui.wdg_wq_coeffs_b.dict2ui(fb.fil[0]['fxq']['QCB'])
+            # qset_cmb_box(self.ui.cmb_qfrmt, fb_get('qfrmt'), data=True)
+            self.ui.wdg_wq_coeffs_a.dict2ui(fb_get('fxq', 'QCA'))
+            self.ui.wdg_wq_coeffs_b.dict2ui(fb_get('fxq', 'QCB'))
 
         # quantize coefficient view according to new settings and update table
         self.quant_coeffs_view()
@@ -628,7 +628,7 @@ class Input_Coeffs(QWidget):
         """
         Read out the UI settings of `self.ui.cmb_fx_base` (triggering this method)
         which specifies the fx number base (dec, bin, ...) for display
-        and store it in `fb.fil[0]['fx_base']`.
+        and store it in `fil[0]['fx_base']`.
 
         Refresh the table and update quantization widgets. Don't emit a signal
         because this only influences the view not the data itself.
@@ -641,7 +641,7 @@ class Input_Coeffs(QWidget):
     # ------------------------------------------------------------------------------
     def _save_dict(self) -> None:
         """
-        Save the coefficient register `self.ba` to the filter dict as `fb.fil[0]['ba']`.
+        Save the coefficient register `self.ba` to the filter dict as `fil[0]['ba']`.
         """
         fb_set('N', max(len(self.ba[0]), len(self.ba[1])) - 1)
 
@@ -758,7 +758,7 @@ class Input_Coeffs(QWidget):
 
         if not any(sel):  # nothing selected, append row of zeros after last row
             self.ba = np.insert(self.ba, len(self.ba[0]), 0, axis=1)
-        # elif fb.fil[0]['ft'] == 'IIR':
+        # elif fb_get('ft') == 'IIR':
         else:
             self.ba = np.insert(self.ba, sel_01, 0, axis=1)
         # else:

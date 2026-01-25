@@ -14,9 +14,9 @@ from pprint import pformat
 import sys
 
 import numpy as np
-# from scipy.signal import freqz, zpk2tf
 
-import pyfda.filterbroker as fb  # importing filterbroker initializes all its globals
+import pyfda.filterbroker as fb
+from pyfda.filterbroker import fb_get, fb_set
 from pyfda.libs.compat import (
     QtCore, QWidget, QLineEdit, pyqtSignal, QEvent, QApplication,
     QTableWidget, QTableWidgetItem, Qt, QVBoxLayout)
@@ -324,9 +324,9 @@ class Input_PZ(QWidget):
     # ------------------------------------------------------------------------------
     def load_dict(self) -> None:
         """
-        Load all entries from filter dict fb.fil[0]['zpk'] into the Zero/Pole/Gain list
+        Load all entries from filter dict fil[0]['zpk'] into the Zero/Pole/Gain list
         self.zpk and update the display via `self._refresh_table()`.
-        The explicit np.array( ... ) statement enforces a deep copy of fb.fil[0],
+        The explicit np.array( ... ) statement enforces a deep copy of fil[0],
         otherwise the filter dict would be modified inadvertedly. `dtype=object`
         needs to be specified to create a numpy array from the nested lists with
         differing lengths without creating the deprecation warning
@@ -334,17 +334,17 @@ class Input_PZ(QWidget):
         "Creating an ndarray from ragged nested sequences (which is a list-or-tuple of
         lists-or-tuples-or ndarrays with different lengths or shapes) is deprecated."
 
-        The filter dict fb.fil[0]['zpk'] is a list of numpy float ndarrays for z / p / k
+        The filter dict fil[0]['zpk'] is a list of numpy float ndarrays for z / p / k
         values `self.zpk` is an array of float ndarrays with different lengths of
         z / p / k subarrays to allow adding / deleting items.
 
         Format is: [array[zeros, ...], array[poles, ...], k]
         """
-        if type(fb.fil[0]['zpk']) is not np.ndarray:
-            logger.warning("fb.fil[0]['zpk'] is of type %s with len = %s",
-                           type(fb.fil[0]['zpk']), len(fb.fil[0]['zpk']))
+        if not isinstance(fb_get('zpk'), np.ndarray):
+            logger.warning("fil[0]['zpk'] is of type %s with len = %s",
+                           type(fb_get('zpk')).__name__, len(fb_get('zpk')))
 
-        zpk = list(fb.fil[0]['zpk']).copy()
+        zpk = list(fb_get('zpk'))
 
         if len(zpk) == 3:  # number of rows
             if np.isscalar(zpk[2]):
@@ -355,14 +355,14 @@ class Input_PZ(QWidget):
         elif len(zpk) == 2:  # k is missing in zpk:
             zpk.append(zeros_with_val(len(zpk[0])))  # add a row with k = 1
         else:
-            logger.error("P/Z array 'fb.fil[0]['zpk']' has wrong number of rows = %s", len(zpk))
+            logger.error("P/Z array 'fil[0]['zpk']' has wrong number of rows = %s", len(zpk))
             return
 
         if len(zpk[0]) != len(zpk[1]):
-            logger.warning("fb.fil[0]['zpk'] has differing row lengths, %s != %s",
-                           len(fb.fil[0]['zpk'][0]), len(fb.fil[0]['zpk'][1]))
+            logger.warning("fil[0]['zpk'] has differing row lengths, %s != %s",
+                           len(zpk[0]), len(zpk[1]))
             return
-        # logger.warning(f"New shape (zpk) = {np.shape(zpk)}")
+
         self.zpk = np.array(zpk)  # this enforces a deep copy and converts back to ndarray
         qstyle_widget(self.ui.but_apply, 'normal')
         qstyle_widget(self.ui.but_undo, 'normal')
@@ -374,13 +374,13 @@ class Input_PZ(QWidget):
         Save the values from self.zpk to the filter PZ dict,
         the QLineEdit for setting the gain has to be treated separately.
         """
-        fb.fil[0]['N'] = len(self.zpk[0])
+        fb_set('N', len(self.zpk[0]))
         # Switch to manual filter order and 'Manual_IIR' resp. 'Manual_FIR' filter class
-        fb.fil[0]['fo'] = 'man'
+        fb_set('fo', 'man')
         if np.any(self.zpk[1]):  # any non-zero poles?
-            fb.fil[0]['fc'] = 'Manual_IIR'
+            fb_set('fc', 'Manual_IIR')
         else:
-            fb.fil[0]['fc'] = 'Manual_FIR'
+            fb_set('fc', 'Manual_FIR')
 
         try:
             fil_save(self.zpk, 'zpk', __name__)  # save with new gain
@@ -400,7 +400,7 @@ class Input_PZ(QWidget):
         qstyle_widget(self.ui.but_apply, 'normal')
         qstyle_widget(self.ui.but_undo, 'normal')
 
-        logger.debug("b,a = %s\n\nzpk = %s\n", fb.fil[0]['ba'], pformat(fb.fil[0]['zpk']))
+        logger.debug("b,a = %s\n\nzpk = %s\n", fb_get('ba'), pformat(fb_get('zpk')))
 
     # ------------------------------------------------------------------------------
     def _clear_table(self) -> None:
