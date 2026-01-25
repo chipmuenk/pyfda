@@ -458,6 +458,42 @@ def store_fil():
     fil_undo[undo_ptr] = copy.deepcopy(fil[0])
 
 # -------------------------
+def _print_dict(key_list: list | tuple, top_dict_str = "fil[0]") -> str:
+    """
+    Print a (nested) dict, defined by the list or tuple of strings `key_list`. The last
+    element of `key_list` is not included in the printed string, as it is the value to
+    be set.
+
+    Parameters
+    ----------
+    key_list : list or tuple
+        List of keys to create the nested dictionary.
+    top_dict_str : str
+        The top-level dictionary string to use for printing.
+
+    Returns
+    -------
+    str
+        The string representation of the (nested) dictionary.
+
+    Example
+    -------
+    key_list = ['fxq', 'QCA', 'WF'] returns "fil[0]['fxq']['QCA']['WF']"
+
+    """
+    if len(key_list) < 2:
+        raise KeyError("Not enough arguments to define a dictionary!")
+
+    dict_str = top_dict_str
+    if len(key_list) < 3:  # only one level dictionary, key_list[-1] is already the key
+        dict_str += '[' + key_list[-2] + ']'
+    else:
+        for k in key_list[:-1]:
+            dict_str += '[' + k + ']'
+    return dict_str
+
+
+# -------------------------
 def traverse_dict(key_list: list | tuple, fil_dict: dict) -> dict:
     """
     Use the list or tuple of strings `key_list` to traverse the (nested) dict `fil_dict`
