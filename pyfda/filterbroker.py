@@ -527,8 +527,10 @@ def _traverse_dict(key_list: list | tuple, fil_dict: dict) -> dict:
 
     d = fil_dict
     for k in key_list[:-1]:  # Traverse all keys except the last one
-        if k not in d or not isinstance(d[k], dict):
+        if k not in d or not isinstance(k, str):
             raise KeyError(f"Key '{k}' not found or is not a dictionary!")
+        if not isinstance(d[k], dict):
+            raise TypeError(f"Key '{k}' points to '{d[k]}' which is not a dict!")
         d = d[k]
     return d
 
@@ -582,6 +584,7 @@ def fb_get(*key_list, fil_dict=fil[0], verbose=True) -> str | int | float | Iter
     verbose : bool
         Whether to log errors and warnings, default is True. Setting this to False
         can be used to detect silently whether a key exists in the dictionary
+
     Returns
     -------
     str | int | float | Iterable | None
@@ -651,7 +654,7 @@ def fb_set(*key_list: list | tuple, backup: bool = True, update: bool = False,
         raise KeyError("Key_list is empty!")
     if not isinstance(key_list, (tuple, list)):
         raise TypeError(
-            "Key_list needs to be Tuple or List, not a '%s'!", type(key_list).__name__)
+            "'key_list' needs to be Tuple or List, not a '%s'!", type(key_list).__name__)
     if len(key_list) < 2:
         raise KeyError("Not enough arguments for setting a dictionary value!")
 
@@ -665,8 +668,8 @@ def fb_set(*key_list: list | tuple, backup: bool = True, update: bool = False,
         if isinstance(d[set_key], dict):
             keys1 = d[set_key].keys()
             logger.warning(
-                "Danger! Trying to set the sub-dictionary 'dict[%s]'\n\t%s with \n\t%s",
-                set_key, d[set_key], set_val)
+                "Danger! Overwriting the dict '%s'\n\t%s with \n\t%s",
+                _print_dict(key_list), d[set_key], set_val)
         if backup:
             store_fil()  # backup old setting
 
@@ -682,10 +685,18 @@ def fb_set(*key_list: list | tuple, backup: bool = True, update: bool = False,
             fil_dict['qfrmt'] = set_val
             return 0
         if type(set_val) is not type(d[set_key]):
-            logger.error("Type mismatch: Trying to set\n\t'dict[%s]' of type '%s' with value "
-                         "of type '%s'",
-                         set_key, type(d[set_key]).__name__, type(set_val).__name__)
-            return -1
+            types = {type(set_val).__name__, type(d[set_key]).__name__}
+            if not types.issubset({'list', 'tuple', 'ndarray'})\
+                    and not types.issubset({'float', 'float64'}):
+                logger.error("Type mismatch: Refusing to set\n\t'dict[%s]' of type '%s' "
+                            "with value of type '%s'",
+                            set_key, type(d[set_key]).__name__, type(set_val).__name__)
+                return -1
+
+            logger.warning("Type mismatch: Setting\n\t'%s' of type '%s' with value "
+                            "of similar type '%s'", _print_dict(key_list),
+                            type(d[set_key]).__name__, type(set_val).__name__)
+
         if not update:
             d[set_key] = set_val  # set new value
         else:
