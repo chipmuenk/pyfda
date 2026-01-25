@@ -500,7 +500,7 @@ def _traverse_dict(key_list: list | tuple, fil_dict: dict) -> dict:
     and return the addressed subdictionary.
 
     In order to set the value of the returned dict, use the key for the lowest
-    nesting level on the returned dict `d`, i.e. `d[keys_tuple[-1]] = arg` .
+    nesting level on the returned dict `d`, i.e. `d[key_list[-1]] = arg` .
 
     Parameters
     ----------
@@ -518,7 +518,9 @@ def _traverse_dict(key_list: list | tuple, fil_dict: dict) -> dict:
     Raises
     ------
     KeyError
-        If a key does not exist in the dictionary or does not point to another dictionary
+        If a key does not exist in the dictionary or is not of type string
+    TypeError
+        If a key does not point to another dictionary
     """
     if not key_list:
         raise KeyError("List of keys was empty!")
@@ -582,13 +584,9 @@ def fb_get(*key_list, fil_dict=fil[0], verbose=True) -> str | int | float | Iter
         can be used to detect silently whether a key exists in the dictionary
     Returns
     -------
-    str | None
+    str | int | float | Iterable | None
         The value of the specified key in the dictionary, or None if the key
         does not exist.
-
-    TODO: Keys need to be protected from accidental overwriting by
-    the user. This will be done by prepending the keys with an underscore
-    (e.g. `_f_S`) once all direct accesses have been removed.
     """
     if len(key_list) == 0:
         # called without arguments, return a copy of the whole dict
@@ -620,11 +618,11 @@ def fb_get(*key_list, fil_dict=fil[0], verbose=True) -> str | int | float | Iter
 def fb_set(*key_list: list | tuple, backup: bool = True, update: bool = False,
            fil_dict: dict = fil[0]) -> int:
     """
-    Use the items of `keys_tuple` to access a nested dict `fil_dict`
-    (default: `fil[0]`) and write the last item in `keys_tuple` to the dict.
+    Use the items of `key_list` to access a nested dict `fil_dict`
+    (default: `fil[0]`) and write the last item in `key_list` to the dict.
 
     In order to set the value of the returned nested dict, use the key for the lowest
-    nesting level on the returned dict `d`, i.e. `d[keys_tuple[-1]] = arg` .
+    nesting level on the returned dict `d`, i.e. `d[key_list[-1]] = arg` .
 
     Parameters
     ----------
@@ -649,7 +647,11 @@ def fb_set(*key_list: list | tuple, backup: bool = True, update: bool = False,
         If a key does not exist in the dictionary or the tuple of keys is empty
 
     TypeError
-        If `key_list` is not of type List or Tuple or if it has than two items
+        If `key_list` is not of type List or Tuple or if it has less than two items
+
+    TODO: Dict entries need to be protected from accidental overwriting by
+    the user. This will be done by prepending the keys with an underscore
+    (e.g. `_f_S`) once all direct accesses have been removed.
     """
 
     if not key_list:
