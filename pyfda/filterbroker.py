@@ -494,7 +494,7 @@ def _print_dict(key_list: list | tuple, top_dict_str = "fil[0]") -> str:
 
 
 # -------------------------
-def traverse_dict(key_list: list | tuple, fil_dict: dict) -> dict:
+def _traverse_dict(key_list: list | tuple, fil_dict: dict) -> dict:
     """
     Use the list or tuple of strings `key_list` to traverse the (nested) dict `fil_dict`
     and return the addressed subdictionary.
@@ -664,7 +664,7 @@ def fb_set(*key_list: list | tuple, backup: bool = True, update: bool = False,
     set_key = key_list[-2]  # second last element is the key for setting
     try:
         # traverse nested dict 'fil_dict' using tuple of keys amd access subdictionary
-        d = traverse_dict(key_list[:-1], fil_dict)
+        d = _traverse_dict(key_list[:-1], fil_dict)
         # Test accessing the dictionary and whether the accessed item is a dict.
         # This could be dangerous because the keys in this sub-dictionary could be altered!
         if isinstance(d[set_key], dict):
