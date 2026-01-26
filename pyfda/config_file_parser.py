@@ -30,13 +30,19 @@ REQ_VERSION = 4  # required version for config file
 
 # --------------------------------------------------------------------------
 class ParseError(Exception):
+    """
+    Exception raised for errors in the config file parsing, not yet implemented.
+    Could be used as raise ParseError("message") in the code below to indicate
+    problems during parsing.
+    """
     pass
 
 
 class ConfigFileParser():
     """
-    Parse the config file and store the information in the following class variables. The resulting
-    hierarchical dicts may not be modified afterwards, however, this cannot be enforced at the moment.
+    Parse the config file and store the information in the following class variables. The
+    resulting hierarchical dicts may not be modified afterwards, however, this cannot be
+    enforced at the moment.
 
     - FILTER_CLASSES_DICT
     - FIXPOINT_CLASSES_DICT
@@ -88,7 +94,8 @@ class ConfigFileParser():
         'Cheby1': {'name': 'Chebyshev 1', 'mod': 'pyfda.filter_widgets.cheby1'},
         'Cheby2': {'name': 'Chebyshev 2', 'mod': 'pyfda.filter_widgets.cheby2'},
         'Ellip': {'name': 'Elliptic', 'mod': 'pyfda.filter_widgets.ellip'},
-        'FancyFilter': {'name': 'Fancy', 'mod': 'pyfda.filter_widgets.fancyfilter'}, # test undefined
+         # test undefined:
+        'FancyFilter': {'name': 'Fancy', 'mod': 'pyfda.filter_widgets.fancyfilter'},
         # FIR
         'Equiripple': {'name': 'Equiripple', 'mod': 'pyfda.filter_widgets.equiripple'},
         'Firwin': {'name': 'Windowed FIR', 'mod': 'pyfda.filter_widgets.firwin'},
@@ -334,7 +341,8 @@ class ConfigFileParser():
             #
             # collect all fixpoint widgets (keys in FIXPOINT_CLASSES_DICT) which
             # have the class name c as a value
-            fix_wdg = {k for k, val in ConfigFileParser.FIXPOINT_CLASSES_DICT.items() if c in val['opt']}
+            fix_wdg = {
+                k for k, val in ConfigFileParser.FIXPOINT_CLASSES_DICT.items() if c in val['opt']}
             if len(fix_wdg) > 0:
                 if 'fix' in filter_classes[c]:
                     # ... and merge it with the fixpoint options of class c
