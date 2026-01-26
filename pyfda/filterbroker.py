@@ -568,7 +568,8 @@ def set_fx(fx: bool)-> None:
         fb_set('qfrmt', fb_get('qfrmt_float_last'))
 
 # -------------------------
-def fb_get(*key_list, fil_dict=fil[0], verbose=True) -> str | int | float | Iterable | None:
+def fb_get(*key_list: list | tuple, fil_dict: dict = fil[0], verbose: bool = True)\
+    -> str | int | float | Iterable | None:
     """
     Get the value of a key in the global dict `fil[0]`. Multiple arguments
     access nested dicts:
@@ -666,7 +667,7 @@ def fb_set(*key_list: list | tuple, backup: bool = True, update: bool = False,
         # Test accessing the dictionary and whether the accessed item is a dict.
         # This could be dangerous because the keys in this sub-dictionary could be altered!
         if isinstance(d[set_key], dict):
-            keys1 = d[set_key].keys()
+            # keys1 = d[set_key].keys()
             logger.warning(
                 "Danger! Overwriting the dict '%s'\n\t%s with \n\t%s",
                 _print_dict(key_list), d[set_key], set_val)
