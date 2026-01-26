@@ -224,7 +224,7 @@ class FilterFactory():
 
         else: # everything ok so far, try calling method
               # err_code = -1 means "operation cancelled"
-            if True: #try:
+            try:
                 #------------------------------------------------------------------
                 self.err_code = getattr(fil_inst, method)()
                 if not isinstance(self.err_code, int):
@@ -232,7 +232,7 @@ class FilterFactory():
                                  str(self.err_code), type(self.err_code).__name__)
                     self.err_code = 0 # assume everything ok if no int returned
                 #------------------------------------------------------------------
-            else: #except Exception as e:
+            except Exception as e:
                 err_string =\
                     f"Error in method '{method}' of class '{type(fil_inst).__name__}':\n\t{e}"
                 if e:
