@@ -1302,12 +1302,12 @@ def fil_convert(format_in) -> None:
             # convert to an array (zeros, poles, gain) where gain is a scalar appended
             # with zeros to the same length as p and z
             zpk_array = np.array([z, p, zeros_with_val(len(z), k)], dtype=complex)
-            logger.debug("zpk_array = %s", zpk_array)
             fb_set('zpk', zpk_array)
 
         if 'ba' not in format_in:
             try:
-                fb_set('ba', np.ndarray(sig.sos2tf(fb_get('sos'))))
+                # returns a tuple of lists with shape (L, 5) where L is the number of sections
+                fb_set('ba', np.array(sig.sos2tf(fb_get('sos'))))
             except Exception as e:
                 raise ValueError(e)
             # check whether sos conversion has created additional (superfluous)
@@ -1319,7 +1319,7 @@ def fil_convert(format_in) -> None:
         zpk = fb_get('zpk')
         if 'ba' not in format_in:
             try:
-                fb_set('ba', sig.zpk2tf(zpk[0], zpk[1], zpk[2][0]))
+                fb_set('ba', np.array(sig.zpk2tf(zpk[0], zpk[1], zpk[2][0])))
             except Exception as e:
                 raise ValueError(e)
         if 'sos' not in format_in:
@@ -1328,9 +1328,9 @@ def fil_convert(format_in) -> None:
                     k = zpk[2][0]
                 else:
                     k = zpk[2]
-                fb_set('sos', sig.zpk2sos(zpk[0], zpk[1], k))  # np.ndarray
+                fb_set('sos', np.array(sig.zpk2sos(zpk[0], zpk[1], k)))  # np.ndarray
             except ValueError as e:
-                fb_set('sos', np.ndarray([]))
+                fb_set('sos', np.array([]))
                 logger.warning(
                     "Complex-valued coefficients? Could not convert zpk\n%s"
                     "\n\tto SOS.\n\t%s", zpk, e)
@@ -1365,7 +1365,7 @@ def fil_convert(format_in) -> None:
         try:
             fb_set('sos', sig.tf2sos(fb_get('ba')[0], fb_get('ba')[1]))
         except ValueError:
-            fb_set('sos', np.ndarray([]))
+            fb_set('sos', np.array([]))
             logger.warning("Complex-valued coefficients, could not convert to SOS.")
 
     else:
