@@ -10,10 +10,10 @@ This document needs to be updated. Building is now performed by the following gi
 
 Creating a versioned release requires a workflow like
 
-* update ```version.py```, PyPI version number is created from this
+* update ```__version__``` in ```pyfda.__init__.py```, PyPI version number is created from this
 * merge develop and main, push develop (default branch)  
 
-```
+```bash
 git tag v0.4.5           # create new local tag (adapt version number says Capt. Obvious)
 git push origin v0.4.5   # push only tag to origin
 git push                 # push all matching repos to origin, creating a 'push' event
@@ -27,6 +27,7 @@ Tags can be deleted with:
     git push --delete origin <tag_name>
      
 ## pip and PyPI
+
 Pip packages (source only) are created using the `setuptools` flow:
 
     > python setup.py clean
@@ -48,10 +49,10 @@ that an existing file `SOURCES.txt` is not updated.
 Check the integrity of this package and upload it to <https://pypi.org/project/pyfda/> using twine by
 
 	> twine check dist/*
-    > twine upload dist/pyfda-<VERSION>-py3-none-any.whl
-
+  > twine upload dist/pyfda-<VERSION>-py3-none-any.whl
 
 ## pyInstaller
+
 pyInstaller can build executables with the help of a `*.spec`  file that is provided 
 in the directory `ressource`. Hopefully, this works out of the box across operating
 systems with
@@ -59,13 +60,14 @@ systems with
     > pyinstaller pyfdax.spec
 
 ## Flatpak
+
 It is only possible to build flatpaks under Linux. In addition to `flatpak` itself, you need to install `flatpak-builder` to build your own flatpaks:
 
     > sudo apt install flatpak flatpak-builder
 
 The first steps are described in ["Building your first Flatpak"](https://docs.flatpak.org/en/latest/first-build.html) and
 <https://docs.flatpak.org/en/latest/python.html> w.r.t. python.
-    
+
 Next, you need a manifest file `org.flatpak.pyfda.json` or `...yaml` with information 
 and build instructions for the app. 
 
@@ -75,9 +77,9 @@ can be collected for pip / PyPI projects with the python helper file
 by running
 
     > python flatpak-pip-generator pyfda 
-	
+
 generating the file `python3-pyfda.json`
-    
+
 You can also get the dependencies from pip's `requirements.txt`:
 
     > python flatpak-pip-generator --requirements-file=requirements.txt
@@ -165,7 +167,6 @@ resp. in `org.flatpak.pyfda.yaml`:
     rename-icon:pyfda_icon # Image will renamed to match the app-id konvention
     rename-appdata-file: pyfda.appdata.xml
     rename-desktop-file: pyfda.desktop # launcher for the desktop
-
 
 Finally, the build process is started with
 

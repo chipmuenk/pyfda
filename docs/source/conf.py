@@ -22,7 +22,7 @@ http://www.sphinx-doc.org/en/master/config
 import os
 import sys
 
-from pyfda.version import __version__
+from pyfda import __version__
 
 sys.path.insert(0, os.path.abspath('.'))
 sys.path.insert(0, os.path.abspath('../'))
@@ -36,22 +36,11 @@ project = 'pyfda'
 copyright = '2025, Christian Muenker'
 author = 'Christian Muenker'
 
-# version_nr contains ... well ... the version in the form  __version__ = '0.1b10'
-# version_nr = {}
-# with open("../../pyfda/version.py") as fp:
-#    exec(fp.read(), version_nr)
-
-# The short X.Y version
-# version = version_nr['__version__']
-# The full version, including alpha/beta/rc tags
-# release = version
-
 # Currently both are the same, unclear what `version` and `release` are used for
 # The short X.Y version
 version = __version__
 # The full version, including alpha/beta/rc tags
 release = __version__
-
 
 # -- General configuration ---------------------------------------------------
 

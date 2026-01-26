@@ -15,9 +15,9 @@
 #
 #    The latter requires a workflow like
 #
-#    * <update version.py>      # PyPI version number is created from this
+#    * <update __version__ in pyfda.__init__.py>   # PyPI version number is created from this)
 #    * <merge develop and main, push develop (default branch)
-#    * git tag v0.4.5           # create new local tag
+#    * git tag v0.4.5           # create new local tag (should be same as __version__
 #    * git push origin tag v0.4.5  # push only specified tag to origin
 #    * git checkout main
 #    * git push                 # push changes to origin, sending a 'push main' event
