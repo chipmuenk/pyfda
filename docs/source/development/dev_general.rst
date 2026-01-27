@@ -151,5 +151,5 @@ Persistence: Where's the data?
 ------------------------------
 
 At startup, a dictionary is constructed with information about the filter
-classes and their methods. The central dictionary ``fb.dict`` is initialized.
+classes and their methods. The central dictionary ``fb.fil[0]`` is initialized.
 

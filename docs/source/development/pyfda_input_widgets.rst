@@ -63,19 +63,19 @@ input_info
 input_fixpoint_specs
 ---------------------
 
-The configuration file `libs.pyfda_template.conf` lists which fixpoint classes (e.g. ``FIR_DF`` 
+The configuration file `libs.pyfda_template.conf` lists which fixpoint classes (e.g. ``FIR_DF``
 and ``IIR_DF1``) can be used with which filter design algorithm.
-`tree_builder` parses this file and writes all fixpoint modules
-into the list `fb.fixpoint_widgets_list`. The input widget 
-:mod:`pyfda.input_widgets.input_fixpoint_specs` constructs a combo box from this list 
-with references to all successfully imported fixpoint modules. The currently 
-selected fixpoint widget (e.g. `FIR_DF`) is imported from :ref:`dev_mod_fixpoint_widgets` 
+`config_tree_parser` parses this file and writes all fixpoint modules
+into the dict `cfp.FIXPOINT_CLASSES_DICT`. The input widget
+:mod:`pyfda.input_widgets.input_fixpoint_specs` constructs a combo box from this list
+with references to all successfully imported fixpoint modules. The currently
+selected fixpoint widget (e.g. `FIR_DF`) is imported from :ref:`dev_mod_fixpoint_widgets`
 together with the referenced picture.
 
 Each fixpoint module / class contains a widget that is constructed using helper
 classes from `fixpoint_widgets.fixpoint_helpers.py`. The widgets allow entering
-fixpoint specifications like word lengths and formats for input, output and 
-internal structures (like an accumulator) for each class. It also contains a 
+fixpoint specifications like word lengths and formats for input, output and
+internal structures (like an accumulator) for each class. It also contains a
 reference to a picture showing the filter topology.
 
 Details of the mechanism and the module are described in :ref:`dev_input_fixpoint_specs`.

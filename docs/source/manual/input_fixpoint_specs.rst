@@ -7,9 +7,9 @@ Fixpoint Specs
 Overview
 ---------
 
-The **Fixpoint** tab (:numref:`fig_input_fixpoint`) provides options for 
-generating and simulating discrete-time filters that 
-can be implemented in hardware. Hardware implementations for discrete-time filters 
+The **Fixpoint** tab (:numref:`fig_input_fixpoint`) provides options for
+generating and simulating discrete-time filters that
+can be implemented in hardware. Hardware implementations for discrete-time filters
 usually imply fixpoint arithmetics but this could change in the future as floating point
 arithmetics can be implemented on FPGAs using dedicated floating point units (FPUs).
 
@@ -20,7 +20,7 @@ target filter specifications (usually in the frequency domain).
 In this tab, a fixpoint implementation can be selected in the upper left corner
 (fixpoint filter implementations
 are available only for a few filter design algorithms at the moment, most notably
-IIR filters are missing). 
+IIR filters are missing).
 
 The fixpoint format of input word :math:`Q_X` and output word
 :math:`Q_Y` can be adjusted for all fixpoint filters, pressing the "lock" button
@@ -44,7 +44,7 @@ See also [Yates_2020]_ and [Lyons]_
    :alt: Fixpoint parameter entry widget
    :width: 80%
    :align: center
-   
+
    Fixpoint parameter entry widget (overflow = wrap)
 
 Typical simulation results are shown in :numref:`fig_pyfda_screenshot_hn_fix_t`
@@ -56,13 +56,13 @@ Typical simulation results are shown in :numref:`fig_pyfda_screenshot_hn_fix_t`
    :alt: Screenshot of fixpoint simulation results (time domain)
    :width: 100%
    :align: center
-   
+
    Fixpoint simulation results (time domain)
 
 Fixpoint filters are inherently non-linear due to quantization and saturation effects,
 that's why frequency characteristics can only be derived by running a transient
 simulation and calculating the Fourier response afterwards:
-   
+
 .. _fig_pyfda_screenshot_hn_fix_f:
 
 .. figure:: ../screenshots/pyfda_screenshot_fix_yn_f.png
@@ -119,13 +119,13 @@ More info on fixpoint numbers and arithmetics can be found under
 Configuration
 -------------
 
-The configuration file ``pyfda.conf`` lists the fixpoint classes to be used, 
-e.g. ``DF1`` and ``DF2``. :class:`pyfda.tree_builder.Tree_Builder` parses this file 
-and writes all fixpoint modules 
-into the list ``fb.fixpoint_widgets_list``. The input widget 
-:class:`pyfda.input_widgets.input_fixpoint_specs.Input_Fixpoint_Specs` constructs a combo box from this list 
-with references to all successfully imported fixpoint modules. 
-The currently selected fixpoint widget (e.g. ``DF1``) is imported from 
+The configuration file ``pyfda.conf`` lists the fixpoint classes to be used,
+e.g. ``DF1`` and ``DF2``. :class:`pyfda.config_tree_parser.Config_Tree_Parser` parses this file
+and writes all fixpoint modules
+into the dict ``cfp.FIXPOINT_CLASSES_DICT``. The input widget
+:class:`pyfda.input_widgets.input_fixpoint_specs.Input_Fixpoint_Specs` constructs a combo box from
+this dict with references to all successfully imported fixpoint modules.
+The currently selected fixpoint widget (e.g. ``DF1``) is imported from
 :mod:`pyfda.fixpoint_widgets` together with the referenced image.
 
 Development
