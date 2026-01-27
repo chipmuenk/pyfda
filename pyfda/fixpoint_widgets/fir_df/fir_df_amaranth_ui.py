@@ -92,9 +92,9 @@ class FIR_DF_amaranth_UI(QWidget):
         output quantization
         """
         # widget for quantization of coefficients 'b'
-        # Attention: fb.fil[0]['fxq']['QCB'] == self.wdg_wq_coeffs.q_dict
-        # if 'QCB' not in fb.fil[0]['fxq']:
-        #     fb.fil[0]['fxq'].update({'QCB': {}})  # no coefficient settings in dict yet
+        # Attention: fil[0]['fxq']['QCB'] == self.wdg_wq_coeffs.q_dict
+        # if 'QCB' not in fil[0]['fxq']:
+        #     fil[0]['fxq'].update({'QCB': {}})  # no coefficient settings in dict yet
         #     logger.warning("QCB key missing")
         self.wdg_wq_coeffs = FX_UI_WQ(
             fb.fil[0]['fxq']['QCB'], objectName='fx_ui_wq_fir_df_coeffs_b',
