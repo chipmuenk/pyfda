@@ -16,7 +16,8 @@ import numpy as np
 
 from pyfda.plot_widgets.mpl_widget import MplWidget
 from pyfda.pyfda_rc import params
-from pyfda.filterbroker import fb_get, conf_settings
+from pyfda.config_file_parser import ConfigFileParser as cfp
+from pyfda.filterbroker import fb_get
 from pyfda.libs.pyfda_qt_lib import qcmb_box_populate
 from pyfda.libs.pyfda_sig_lib import group_delay
 from pyfda.libs.compat import (QCheckBox, QWidget, QFrame, QComboBox,
@@ -143,17 +144,17 @@ class Plot_tau_g(QWidget):
         aa = fb_get('ba', 1)
 
         # calculate H_cmplx(W) (complex) for W = 0 ... 2 pi:
-        # scipy: self.W, self.tau_g = group_delay((bb, aa), w=fb.conf_settings['N_FFT'],
+        # scipy: self.W, self.tau_g = group_delay((bb, aa), w=cfp.conf_settings['N_FFT'],
         #                                           whole = True)
 
         if fb_get('creator', 0) == 'sos':  # one of 'sos', 'zpk', 'ba'
             self.W, self.tau_g = group_delay(
-                fb_get('sos'), nfft=conf_settings['N_FFT'],
+                fb_get('sos'), nfft=cfp.conf_settings['N_FFT'],
                 sos=True, whole=True, verbose=self.chkWarnings.isChecked(),
                 alg=self.cmbAlgorithm.currentData())
         else:
             self.W, self.tau_g = group_delay(
-                bb, aa, nfft=conf_settings['N_FFT'], whole=True,
+                bb, aa, nfft=cfp.conf_settings['N_FFT'], whole=True,
                 verbose=self.chkWarnings.isChecked(),
                 alg=self.cmbAlgorithm.currentData())
             #                                   self.chkWarnings.isChecked())
@@ -182,8 +183,8 @@ class Plot_tau_g(QWidget):
             F -= f_max_2
         elif fb_get('freqSpecsRangeType') == 'half':
             # only use the first half of H and F
-            tau_g = self.tau_g[0:conf_settings['N_FFT']//2]
-            F = F[0:conf_settings['N_FFT']//2]
+            tau_g = self.tau_g[0:cfp.conf_settings['N_FFT']//2]
+            F = F[0:cfp.conf_settings['N_FFT']//2]
         else:  # fb_get('freqSpecsRangeType') == 'whole'
             # use H and F as calculated
             tau_g = self.tau_g

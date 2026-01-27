@@ -26,7 +26,7 @@ import markdown
 from mplcursors import __version__ as V_CUR
 from scipy import __version__ as V_SCI
 
-import pyfda.filterbroker as fb
+from pyfda.config_file_parser import ConfigFileParser as cfp
 from pyfda.libs.frozendict import FrozenDict
 import pyfda.libs.pyfda_dirs as dirs
 
@@ -912,8 +912,8 @@ def debug_exception(msg: str = "") -> None:
     React to an exception depending on the debug level. When debug level is high,
     use the traceback module for full traceback. Otherwise, keep quiet.
     """
-    if fb.conf_settings['EXCEPTION_LEVEL'] >= 1:
-        logger.info("debug_exception(): Level %s.", fb.conf_settings['EXCEPTION_LEVEL'])
+    if cfp.conf_settings['EXCEPTION_LEVEL'] >= 1:
+        logger.info("debug_exception(): Level %s.", cfp.conf_settings['EXCEPTION_LEVEL'])
         # get current stack trace as a list of strings. Each string consists of
         #   "  File '...'\n, line ..., in ...\n"
         err_list = traceback.format_stack()
@@ -922,7 +922,7 @@ def debug_exception(msg: str = "") -> None:
         for s in err_list[4:-2]:
             err_str += s.strip(' \t\n').replace("\n", "\n\t\t") + "\n\t" # indent traceback lines
         logger.error(err_str)
-    if fb.conf_settings['EXCEPTION_LEVEL'] >= 2:
+    if cfp.conf_settings['EXCEPTION_LEVEL'] >= 2:
         raise SystemExit("from debug_exception!")
 
 

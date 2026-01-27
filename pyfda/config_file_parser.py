@@ -104,6 +104,19 @@ class ConfigFileParser():
         'Manual_IIR': {'name': 'Manual', 'mod': 'pyfda.filter_widgets.manual'}
         }
 
+    # -----------------------------------------------------------------------------
+    # Dictionary containing configuration settings for pyfda which can be modified
+    # in the [Config Settings] of `pyfda.conf` and from the UI
+    # ------------------------------------------------------------------------------
+
+    conf_settings: ClassVar[dict[str, object]] =\
+        {
+        'EXCEPTION_LEVEL': 0,  # 0: quiet, 1: print error stack, 2: end pyfda
+        'THEME': 'light',
+        'N_FFT':  8192  # number of FFT points for most widgets except y[n]
+        }
+
+
     # ==============================================================================
     def __init__(self):
         logger.info("Instantiating ConfigFileParser")
@@ -119,7 +132,7 @@ class ConfigFileParser():
             `dirs.USER_DIRS` and `sys.path`
 
         :[Config Settings]
-            Store settings in `fb.conf_settings`
+            Store settings in class attribute `ConfigFileParser.conf_settings`
 
         The other sections are processed in :func:`build_widget_tree()`.
 
@@ -222,20 +235,25 @@ class ConfigFileParser():
             # Parsing [Config Settings]
             # ------------------------------------------------------------------
             conf_settings = self._parse_conf_section("Config Settings")
+            i = 0
             if conf_settings:
                 # logger.info(conf_settings)
                 for k in conf_settings:
-                    if k in fb.conf_settings:
+                    if k in ConfigFileParser.conf_settings:
                         # TODO: why are the values lists?
                         try:
                             # try to convert to a numeric type
-                            fb.conf_settings[k] = ast.literal_eval(conf_settings[k][0])
+                            ConfigFileParser.conf_settings[k] = ast.literal_eval(conf_settings[k][0])
                         except ValueError:
                             # unsuccessful, store entry as string
-                            fb.conf_settings[k] = conf_settings[k][0]
+                            ConfigFileParser.conf_settings[k] = conf_settings[k][0]
+                        i += 1
                     else:
                         logger.warning(
                             "Ignoring unknown entry '[%s]' in configuration file 'pyfda.conf'", k)
+                logger.info("Found %d entries in [Config Settings]", i)
+            else:
+                logger.info("No valid entries in [Config Settings]")
 
         # ----- Exceptions ----------------------
         except configparser.DuplicateSectionError as e:

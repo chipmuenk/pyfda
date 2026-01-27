@@ -24,6 +24,7 @@ from matplotlib.ticker import AutoMinorLocator
 from pyfda.libs.compat import (QCheckBox, QWidget, QComboBox, QLabel, QLineEdit,
                                QFrame, QHBoxLayout, QGridLayout, pyqtSignal,
                                QPushButton)
+from pyfda.config_file_parser import ConfigFileParser as cfp
 import pyfda.filterbroker as fb
 from pyfda.filterbroker import fb_get
 from pyfda.pyfda_rc import params
@@ -584,7 +585,7 @@ class Plot_Hf(QWidget):
         """
         self.W, self.H_cmplx = sig.freqz(
             fb_get('ba', 0), fb_get('ba', 1),
-            worN=fb.conf_settings['N_FFT'], whole=True, fs=2*np.pi)
+            worN=cfp.conf_settings['N_FFT'], whole=True, fs=2*np.pi)
 
     #------------------------------------------------------------------------------
     def draw(self):
@@ -667,8 +668,8 @@ class Plot_Hf(QWidget):
             self.F -= self.f_max/2.
         elif fb_get('freqSpecsRangeType') == 'half':
             # only use the first half of H and F
-            self.H_c = self.H_cmplx[0:fb.conf_settings['N_FFT']//2]
-            self.F = self.F[0:fb.conf_settings['N_FFT']//2]
+            self.H_c = self.H_cmplx[0:cfp.conf_settings['N_FFT']//2]
+            self.F = self.F[0:cfp.conf_settings['N_FFT']//2]
         else:  # fb_get('freqSpecsRangeType') == 'whole'
             # use H and F as calculated
             self.H_c = self.H_cmplx

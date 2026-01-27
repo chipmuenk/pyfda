@@ -18,8 +18,9 @@ import numpy as np
 from numpy import pi, log10
 import scipy.signal as sig
 
-import pyfda.filterbroker as fb  # importing filterbroker initializes all its globals
-import pyfda.filter_factory as ff  # importing filterbroker initializes all its globals
+from pyfda.config_file_parser import ConfigFileParser as cfp
+import pyfda.filterbroker as fb
+import pyfda.filter_factory as ff
 from pyfda.input_widgets.input_info_about import AboutWindow
 from pyfda.libs.compat import (
     QtGui, QWidget, QFont, QFrame, QLabel, QTableWidget, QTableWidgetItem,
@@ -141,12 +142,12 @@ class Input_Info(QWidget):
 
         lbl_settings_NFFT = QLabel(to_html("N_FFT =", frmt='bi'), self)
         self.led_settings_NFFT = QLineEdit(self)
-        self.led_settings_NFFT.setText(str(fb.conf_settings['N_FFT']))
+        self.led_settings_NFFT.setText(str(cfp.conf_settings['N_FFT']))
         self.led_settings_NFFT.setToolTip("<span>Number of FFT points for frequency "
                                           "domain widgets.</span>")
         lbl_exception_handling = QLabel(to_html("Exception Level =", frmt='b'), self)
         self.led_exception_handling = QLineEdit(self)
-        self.led_exception_handling.setText(str(fb.conf_settings['EXCEPTION_LEVEL']))
+        self.led_exception_handling.setText(str(cfp.conf_settings['EXCEPTION_LEVEL']))
         self.led_exception_handling.setToolTip(
             "<span>Set level for handling exceptions: "
             "0: quiet, 1: print error stack, 2: end pyfda.</span>")
@@ -245,19 +246,19 @@ class Input_Info(QWidget):
     # -------------------------------------------------------------------------
     def _update_settings_nfft(self):
         """ Update value for self.par1 from QLineEdit Widget"""
-        fb.conf_settings['N_FFT'] = safe_eval(
-            self.led_settings_NFFT.text(), fb.conf_settings['N_FFT'],
+        cfp.conf_settings['N_FFT'] = safe_eval(
+            self.led_settings_NFFT.text(), cfp.conf_settings['N_FFT'],
             sign='pos', return_type='int')
-        self.led_settings_NFFT.setText(str(fb.conf_settings['N_FFT']))
+        self.led_settings_NFFT.setText(str(cfp.conf_settings['N_FFT']))
         self.emit({'data_changed': 'n_fft'})
 
     # -------------------------------------------------------------------------
     def _set_exception_handling(self):
         """ Update value for exception handling from QLineEdit Widget"""
-        fb.conf_settings['EXCEPTION_LEVEL'] = safe_eval(
-            self.led_exception_handling.text(), fb.conf_settings['EXCEPTION_LEVEL'],
+        cfp.conf_settings['EXCEPTION_LEVEL'] = safe_eval(
+            self.led_exception_handling.text(), cfp.conf_settings['EXCEPTION_LEVEL'],
             sign='poszero', return_type='int')
-        self.led_exception_handling.setText(str(fb.conf_settings['EXCEPTION_LEVEL']))
+        self.led_exception_handling.setText(str(cfp.conf_settings['EXCEPTION_LEVEL']))
 
     # --------------------------------------------------------------------------
     def load_dict(self):
@@ -311,12 +312,9 @@ class Input_Info(QWidget):
         of docstrings.
 
         Finally, join lines and linebreaks to a new string.
-
         """
         lines = [l for l in doc.splitlines() if ".. versionadded::" not in l]
-        result = "\n" + lines[0].lstrip() + "\n" + textwrap.dedent("\n".join(lines[1:]))
-
-        return result
+        return "\n" + lines[0].lstrip() + "\n" + textwrap.dedent("\n".join(lines[1:]))
 
     # --------------------------------------------------------------------------
     def _show_filt_perf(self):
@@ -331,7 +329,7 @@ class Input_Info(QWidget):
             for the filter defined in the filter dict in a given frequency band
             [f_start, f_stop].
             """
-            w = np.linspace(f_start, f_stop, fb.conf_settings['N_FFT'])*2*np.pi
+            w = np.linspace(f_start, f_stop, cfp.conf_settings['N_FFT'])*2*np.pi
             [w, H] = sig.freqz(bb, aa, worN=w)
 
             f = w / (2.0 * pi)  # frequency normalized to f_S
@@ -418,7 +416,7 @@ class Input_Info(QWidget):
 
                 f_vals = np.asarray(f_vals)  # convert to numpy array
 
-                logger.debug("F_test_labels = %s" % f_lbls)
+                logger.debug("F_test_labels = %s", f_lbls)
 
                 # Calculate frequency response at test frequencies
                 [w_test, a_test] = sig.freqz(bb, aa, 2.0 * pi * f_vals.astype(float))
