@@ -122,7 +122,7 @@ Configuration
 The configuration file ``pyfda.conf`` lists the fixpoint classes to be used,
 e.g. ``DF1`` and ``DF2``. :class:`pyfda.config_tree_parser.Config_Tree_Parser` parses this file
 and writes all fixpoint modules
-into the dict ``cfp.FIXPOINT_CLASSES_DICT``. The input widget
+into the dict ``CFP.FIXPOINT_CLASSES_DICT``. The input widget
 :class:`pyfda.input_widgets.input_fixpoint_specs.Input_Fixpoint_Specs` constructs a combo box from
 this dict with references to all successfully imported fixpoint modules.
 The currently selected fixpoint widget (e.g. ``DF1``) is imported from

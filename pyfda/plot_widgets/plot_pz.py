@@ -19,7 +19,7 @@ from matplotlib.ticker import AutoMinorLocator
 import numpy as np
 import scipy.signal as sig
 
-from pyfda.config_file_parser import ConfigFileParser as cfp
+from pyfda.config_file_parser import ConfigFileParser as CFP
 import pyfda.filterbroker as fb
 from pyfda.libs.compat import (
     QWidget, QLabel, QFrame, QDial, QHBoxLayout, pyqtSignal, QComboBox, QLineEdit)
@@ -580,7 +580,7 @@ class Plot_PZ(QWidget):
         old_settings_seterr = np.seterr()
         np.seterr(divide='ignore')
         ba = fb.fil[0]['ba']
-        w, H = sig.freqz(ba[0], ba[1], worN=cfp.conf_settings['N_FFT'], whole=True)
+        w, H = sig.freqz(ba[0], ba[1], worN=CFP.conf_settings['N_FFT'], whole=True)
         H = np.abs(H)
         if self.but_log.checked:
             H = np.clip(np.log10(H), -6, None)  # clip to -120 dB

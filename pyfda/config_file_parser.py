@@ -42,12 +42,14 @@ class ConfigFileParser():
     """
     Parse the config file and store the information in the following class variables. The
     resulting hierarchical dicts may not be modified afterwards, however, this cannot be
-    enforced at the moment.
+    enforced at the moment as the FrozenDict() class is derived from FrozenSet() and does
+    not preserve the order of the dict entries.
 
     - FILTER_CLASSES_DICT
     - FIXPOINT_CLASSES_DICT
     - INPUT_CLASSES_DICT
     - PLOT_CLASSES_DICT
+    - conf_settings
 
     The existence of filter classes etc. is not tested, entries are generated as found in the
     config file. Actual testing and importing is done in :func:`_build_widget_class_dict()`.

@@ -22,7 +22,7 @@ from cycler import cycler
 import matplotlib.font_manager
 
 from pyfda.libs.pyfda_lib import CRLF
-from pyfda.config_file_parser import ConfigFileParser as cfp
+from pyfda.config_file_parser import ConfigFileParser as CFP
 
 logger = logging.getLogger(__name__)
 
@@ -630,7 +630,7 @@ qss_tab_bar_ovlp = """
 # QApplication.setStyle(QStyleFactory.create('Cleanlooks')) re-create default styles
 
 
-THEME = cfp.conf_settings['THEME']
+THEME = CFP.conf_settings['THEME']
 
 if THEME == 'dark':
     mpl_rc.update(mpl_rc_dark)

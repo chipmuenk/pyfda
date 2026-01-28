@@ -20,7 +20,7 @@ from matplotlib.ticker import AutoMinorLocator
 
 from pyfda.libs.compat import (
     QWidget, pyqtSignal, QTabWidget, QVBoxLayout, QIcon, QSize, QSizePolicy)
-from pyfda.config_file_parser import ConfigFileParser as cfp
+from pyfda.config_file_parser import ConfigFileParser as CFP
 import pyfda.filterbroker as fb
 from pyfda.filterbroker import get_fx, set_fx, fb_get, fb_set
 import pyfda.libs.pyfda_fix_lib as fx
@@ -1658,7 +1658,7 @@ class Plot_Impz(QWidget):
                 "'<i>k</i>' specifies frequencies w.r.t. " + to_html("f_S", frmt = 'i') +
                 " but plots graphs over the frequency index <i>k</i>.</span>",
                 """
-                # By default, k = cfp.conf_settings['N_FFT'] which is used for the calculation
+                # By default, k = CFP.conf_settings['N_FFT'] which is used for the calculation
                 # of the non-transient tabs and for F_id / H_id here.
                 # Here, the frequency axes must be scaled to fit the number of
                 # frequency points self.ui.N
@@ -1669,7 +1669,7 @@ class Plot_Impz(QWidget):
 
             # freqz-based ideal frequency response:
             F_id, H_id = sig.freqz(fb_get('ba', 0), fb_get('ba', 1),
-                                   worN=cfp.conf_settings['N_FFT'], whole=True, fs=f_max)
+                                   worN=CFP.conf_settings['N_FFT'], whole=True, fs=f_max)
 
             # frequency vector for FFT-based frequency plots:
             F = np.fft.fftfreq(self.ui.N, d=1. / f_max)
@@ -1760,8 +1760,8 @@ class Plot_Impz(QWidget):
                     X_q = X_q[0:self.ui.N//2]
 
                 F = F[0:self.ui.N//2]
-                F_id = F_id[0:cfp.conf_settings['N_FFT']//2]
-                H_id = H_id[0:cfp.conf_settings['N_FFT']//2]
+                F_id = F_id[0:CFP.conf_settings['N_FFT']//2]
+                H_id = H_id[0:CFP.conf_settings['N_FFT']//2]
 
             else:  # fb.fil[0]['freqSpecsRangeType'] == 'whole'
                 # display 0 ... f_S -> shift frequency axis

@@ -25,7 +25,7 @@ reference to a picture showing the filter topology.
 The configuration file `pyfda.conf` lists which fixpoint classes (e.g. ``FIR_DF``
 and ``IIR_DF1``) can be used with which filter design algorithm.
 `config_tree_parser` parses this file and writes all fixpoint modules
-into the dict `cfp.FIXPOINT_CLASSES_DICT`.
+into the dict `CFP.FIXPOINT_CLASSES_DICT`.
 
 The widgets are selected and instantiated in the widget :ref:`dev_input_fixpoint_specs`.
 

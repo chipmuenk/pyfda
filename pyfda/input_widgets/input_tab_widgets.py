@@ -18,7 +18,7 @@ from pyfda.libs.compat import QTabWidget, QWidget, QVBoxLayout, QScrollArea, pyq
 from pyfda.libs.pyfda_lib import pprint_log
 from pyfda.libs.pyfda_qt_lib import emit
 from pyfda.pyfda_rc import params
-from pyfda.config_file_parser import ConfigFileParser as cfp
+from pyfda.config_file_parser import ConfigFileParser as CFP
 
 logger = logging.getLogger(__name__)
 
@@ -27,7 +27,7 @@ SCROLL = True  # enable scrolling
 
 class InputTabWidgets(QWidget):
     """
-    Create a tabbed widget for all input subwidgets in ``cfp.INPUT_CLASSES_DICT``. This dict
+    Create a tabbed widget for all input subwidgets in ``CFP.INPUT_CLASSES_DICT``. This dict
     is parsed from the config file at startup in :class:`pyfda.ConfigFileParser` and
     stored as a class variable.
     """
@@ -54,7 +54,7 @@ class InputTabWidgets(QWidget):
     def _construct_UI(self):
         """
         Initialize UI with tabbed subwidgets: Instantiate dynamically each widget
-        from the dict `cfp.INPUT_CLASSES_DICT` and try to
+        from the dict `CFP.INPUT_CLASSES_DICT` and try to
 
         - set the TabToolTip from the instance attribute `tool_tip`
 
@@ -79,10 +79,10 @@ class InputTabWidgets(QWidget):
         n_wdg = 0  # number and ...
         inst_wdg_str = ""  # ... full names of successfully instantiated widgets
 
-        for input_class in cfp.INPUT_CLASSES_DICT:
+        for input_class in CFP.INPUT_CLASSES_DICT:
             try:
                 # fully qualified module name:
-                mod_fq_name = cfp.INPUT_CLASSES_DICT[input_class]['mod']
+                mod_fq_name = CFP.INPUT_CLASSES_DICT[input_class]['mod']
                 mod = importlib.import_module(mod_fq_name)
                 wdg_class = getattr(mod, input_class)
                 # and instantiate it

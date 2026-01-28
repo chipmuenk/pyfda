@@ -66,7 +66,7 @@ input_fixpoint_specs
 The configuration file `libs.pyfda_template.conf` lists which fixpoint classes (e.g. ``FIR_DF``
 and ``IIR_DF1``) can be used with which filter design algorithm.
 `config_tree_parser` parses this file and writes all fixpoint modules
-into the dict `cfp.FIXPOINT_CLASSES_DICT`. The input widget
+into the dict `CFP.FIXPOINT_CLASSES_DICT`. The input widget
 :mod:`pyfda.input_widgets.input_fixpoint_specs` constructs a combo box from this list
 with references to all successfully imported fixpoint modules. The currently
 selected fixpoint widget (e.g. `FIR_DF`) is imported from :ref:`dev_mod_fixpoint_widgets`

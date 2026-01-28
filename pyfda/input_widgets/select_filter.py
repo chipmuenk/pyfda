@@ -22,7 +22,7 @@ from pyfda.libs.compat import (
 from pyfda.filterbroker import fb_get, fb_set
 import pyfda.filter_factory as ff
 from pyfda.tree_builder import Tree_Builder as TB
-from pyfda.config_file_parser import ConfigFileParser as cfp
+from pyfda.config_file_parser import ConfigFileParser as CFP
 from pyfda.libs.pyfda_lib import safe_eval
 from pyfda.libs.pyfda_qt_lib import qget_cmb_box, emit
 import pyfda.pyfda_rc as rc
@@ -153,7 +153,7 @@ class SelectFilter(QWidget):
         ft = qget_cmb_box(self.cmbFilterType)
 
         for fc in TB.fil_tree[rt][ft]:
-            self.cmbFilterClass.addItem(cfp.FILTER_CLASSES_DICT[fc]['name'], fc)
+            self.cmbFilterClass.addItem(CFP.FILTER_CLASSES_DICT[fc]['name'], fc)
         self.cmbFilterClass.setCurrentIndex(0)  # set initial index
 
         # ----------------------------------------------------------------------
@@ -307,7 +307,7 @@ class SelectFilter(QWidget):
         fc_list = []
 
         for fc in sorted(TB.fil_tree[self.rt][self.ft]):
-            self.cmbFilterClass.addItem(cfp.FILTER_CLASSES_DICT[fc]['name'], fc)
+            self.cmbFilterClass.addItem(CFP.FILTER_CLASSES_DICT[fc]['name'], fc)
             fc_list.append(fc)
 
         logger.debug("fc_list: {0}\n{1}".format(fc_list, fb_get('fc')))
@@ -317,7 +317,7 @@ class SelectFilter(QWidget):
         if fb_get('fc') in fc_list and ff.fil_inst:
             # yes, set same fc as before
             fc_idx = self.cmbFilterClass.findText(
-                cfp.FILTER_CLASSES_DICT[fb_get('fc')]['name'])
+                CFP.FILTER_CLASSES_DICT[fb_get('fc')]['name'])
             logger.debug("fc_idx : %s", fc_idx)
             self.cmbFilterClass.setCurrentIndex(fc_idx)
         else:

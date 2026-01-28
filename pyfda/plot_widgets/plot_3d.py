@@ -20,7 +20,7 @@ import numpy as np
 from numpy import pi, ones, sin, cos, log10
 import scipy.signal as sig
 
-from pyfda.config_file_parser import ConfigFileParser as cfp
+from pyfda.config_file_parser import ConfigFileParser as CFP
 import pyfda.filterbroker as fb
 from pyfda.libs.compat import (
     QWidget, QComboBox, QLabel, QLineEdit, QDial, QGridLayout, QFrame, pyqtSignal)
@@ -407,7 +407,7 @@ class Plot_3D(QWidget):
 
         # wholeF = fb.fil[0]['freqSpecsRangeType'] != 'half'  # not used
         # f_S = fb.fil[0]['f_S']
-        N_FFT = cfp.conf_settings['N_FFT']
+        N_FFT = CFP.conf_settings['N_FFT']
 
         alpha = self.diaAlpha.value()/10.
 

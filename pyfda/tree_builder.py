@@ -16,7 +16,7 @@ from typing import ClassVar
 
 import pyfda.filterbroker as fb
 import pyfda.filter_factory as ff
-from pyfda.config_file_parser import ConfigFileParser as cfp
+from pyfda.config_file_parser import ConfigFileParser as CFP
 
 import pyfda.libs.frozendict as frozendict
 
@@ -261,7 +261,7 @@ class Tree_Builder():
         Run at startup from `pyfdax.py` to populate class attribute dictionaries and lists:
 
         Read attributes (`ft`, `rt`, `fo`) from all valid filter classes (`fc`)
-        of the global dict ``cfp.FILTER_CLASSES_DICT`` and return them as a frozen dict
+        of the class attribute ``CFP.FILTER_CLASSES_DICT`` and return them as a frozen dict
         `fil_tree` with the hierarchy
 
         **rt-ft-fc-fo-subwidget:params** .
@@ -280,7 +280,7 @@ class Tree_Builder():
 
         fil_tree = {}
 
-        for fc in cfp.FILTER_CLASSES_DICT:  # iterate over all previously found filter
+        for fc in CFP.FILTER_CLASSES_DICT:  # iterate over all previously found filter
                                             # classes fc
 
             # try to instantiate an instance ff.fil_inst() of filter class fc
@@ -288,7 +288,7 @@ class Tree_Builder():
             if err_code > 0:
                 logger.warning(
                     'Skipping filter class "%s" due to import error %d', fc, err_code)
-                continue  # continue with next entry in cfp.FILTER_CLASSES_DICT
+                continue  # continue with next entry in CFP.FILTER_CLASSES_DICT
 
             # add attributes from `rt_dict` to `fil_tree`` for filter class fc
             fil_tree = self._build_fil_tree_fc(fc, ff.fil_inst.rt_dict, fil_tree)
