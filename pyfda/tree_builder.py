@@ -123,18 +123,16 @@ class ParseError(Exception):
 
 class Tree_Builder():
     """
-    Read the config file and construct dictionary trees with
+    Read the config file and construct the fil_tree dictionary as a class attribute with
 
     - all filter combinations
     - valid combinations of filter widgets and fixpoint implementations
     """
     # --------------------------------------------------------------------------
-    # Class attribute: Default filter tree structure:
-    # Example for dict with the available combinations of response types (rt),
+    # Filter tree dict as a class attribute:
+    # Example for dict with available combinations of response types (rt),
     # filter types (ft), filter class (fc) and filter order (fo).
-    # This dictionary is overwritten during initialization as a frozendict.
-    #
-    # TODO: Move fil_tree from filterbroker to here
+    # This default dictionary is overwritten and frozen during initialization.
 
     fil_tree: ClassVar[dict[str, object]] =\
         {
@@ -260,11 +258,11 @@ class Tree_Builder():
     # --------------------------------------------------------------------------
     def init_filters(self) -> 'frozendict.FrozenDict':
         """
-        Run at startup from `pyfdax.py` to populate "global" dictionaries and lists:
+        Run at startup from `pyfdax.py` to populate class attribute dictionaries and lists:
 
         Read attributes (`ft`, `rt`, `fo`) from all valid filter classes (`fc`)
-        in the global dict ``cfp.FILTER_CLASSES_DICT`` and return them as a frozen dict
-        tree dict with the hierarchy
+        of the global dict ``cfp.FILTER_CLASSES_DICT`` and return them as a frozen dict
+        `fil_tree` with the hierarchy
 
         **rt-ft-fc-fo-subwidget:params** .
 
@@ -285,41 +283,54 @@ class Tree_Builder():
         for fc in cfp.FILTER_CLASSES_DICT:  # iterate over all previously found filter
                                             # classes fc
 
-            # instantiate a global instance ff.fil_inst() of filter class fc
+            # try to instantiate an instance ff.fil_inst() of filter class fc
             err_code = ff.fil_factory.create_fil_inst(fc)
             if err_code > 0:
                 logger.warning(
                     'Skipping filter class "%s" due to import error %d', fc, err_code)
                 continue  # continue with next entry in cfp.FILTER_CLASSES_DICT
 
-            # add attributes from dict to fil_tree for filter class fc
-            fil_tree = self._build_fil_tree(fc, ff.fil_inst.rt_dict, fil_tree)
+            # add attributes from `rt_dict` to `fil_tree`` for filter class fc
+            fil_tree = self._build_fil_tree_fc(fc, ff.fil_inst.rt_dict, fil_tree)
 
-            # merge additional rt_dict (optional) into filter tree
+            # merge optional instance specific `rt_dict_add` into `fil_tree`:
             if hasattr(ff.fil_inst, 'rt_dict_add'):
-                fil_tree_add = self._build_fil_tree(fc, ff.fil_inst.rt_dict_add)
+                fil_tree_add = self._build_fil_tree_fc(fc, ff.fil_inst.rt_dict_add)
                 merge_dicts_hierarchically(fil_tree, fil_tree_add, mode='add1')
-
-            # Test Immutability
-            # fil_tree_ref = tb.fil_tree['LP']['FIR']['Equiripple']['min']
-            # fil_tree_ref.update({'msg':("hallo",)}) # this changes  tb.fil_tree !!
-            # tb.fil_tree['LP']['FIR']['Equiripple']['min']['par'] = ("A_1","F_1")
-            # print(type(tb.fil_tree['LP']['FIR']['Equiripple']))
 
         # Make the dictionary and all sub-dictionaries read-only ("FrozenDict"):
         return frozendict.freeze_hierarchical(fil_tree)
 
-
-
     # --------------------------------------------------------------------------
-    def _build_fil_tree(self, fc: str, rt_dict: dict, fil_tree: dict = None) -> dict:
+    def _build_fil_tree_fc(self, fc: str, rt_dict: dict[str, dict], fil_tree: dict = None) -> dict:
         """
-        Read attributes (ft, rt, rt:fo) from filter class where they are stored
-        in the following format (example from ``common.py``):
+        Read attributes (ft, rt, rt:fo) from attribute `rt_dict` of filter class ``fc``.
+        Sort the attributes and return them as a dict with the parameters to be displayed and
+        whether they are active, unused, disabled or invisible for each response type (`rt`)
+        of the filter class.
+
+        Parameters
+        ----------
+        fc : str
+            filter class name (e.g. 'Equiripple', 'Cheby1')
+
+        rt_dict : dict
+            dictionary with response type information as defined in the filter class
+
+        fil_tree : dict, optional
+            existing filter tree to be extended (default: None -> create new tree)
+
+        Returns
+        -------
+        dict
+            filter tree
+
+        Example
+        -------
+        Structure of `rt_dict` (taken from ``common.py``):
 
         .. code-block:: python
 
-            self.ft = 'IIR'
             self.rt_dict = {
                      'LP': {'man':{'fo':     ('a','N'),
                                    'msg':    ('a', r"<br /><b>Note:</b> Read this!"),
@@ -351,10 +362,7 @@ class Tree_Builder():
         response types -> filter types -> filter classes  -> filter order
         rt (e.g. 'LP')    ft (e.g. 'IIR') fc (e.g. 'cheby1') fo ('min' or 'man')
 
-        All attributes found for fc are arranged in a dict, e.g.
-        for ``cheby1.LPman`` and ``cheby1.LPmin``, listing the parameters to be
-        displayed and whether they are active, unused, disabled or invisible for
-        each subwidget:
+        Resulting dictionary for fc for the example above:
 
         .. code-block:: python
 
@@ -376,26 +384,7 @@ class Tree_Builder():
                    }
              }, ...
 
-        Finally, the whole structure is frozen recursively to prevent inadvertedly
-        changing the filter tree.
-
-        For a full example, see the default filter tree ``fil_tree``.
-
-        Parameters
-        ----------
-        fc : str
-            filter class name (e.g. 'Equiripple', 'Cheby1')
-
-        rt_dict : dict
-            dictionary with response type information as defined in the filter class
-
-        fil_tree : dict, optional
-            existing filter tree to be extended (default is None)
-
-        Returns
-        -------
-        dict
-            filter tree
+        For a full example of the resulting dict, see the default filter tree ``fil_tree``.
 
         """
         if not fil_tree:
@@ -435,7 +424,7 @@ if __name__ == "__main__":
     # Need to start a QApplication to avoid the error
     #  "QWidget: Must construct a QApplication before a QWidget"
     # when instantiating filters with dynamic widgets (equiripple, firwin)
-    from .compat import QApplication
+    from pyfda.libs.compat import QApplication
     from pyfda.libs.pyfda_lib import pprint_log
     app = QApplication(sys.argv)
     logging.basicConfig(level=logging.INFO)
@@ -443,4 +432,10 @@ if __name__ == "__main__":
     # Create a new Tree_Builder instance & initialize it
     tbl = Tree_Builder()
     filterTree = tbl.init_filters()
-    print('fb.fil_tree = ', pprint_log(fb.fil_tree))
+    print('Tree_Builder.fil_tree = ', pprint_log(Tree_Builder.fil_tree))
+
+    # Test Immutability
+    # fil_tree_ref = tb.fil_tree['LP']['FIR']['Equiripple']['min']
+    # fil_tree_ref.update({'msg':("hallo",)}) # this changes  tb.fil_tree !!
+    # tb.fil_tree['LP']['FIR']['Equiripple']['min']['par'] = ("A_1","F_1")
+    # print(type(tb.fil_tree['LP']['FIR']['Equiripple']))
