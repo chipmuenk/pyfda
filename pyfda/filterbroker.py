@@ -289,7 +289,7 @@ for i in range(len(fil)):
 # -------------------------
 def restore_fil() -> int:
     """
-    Restore current global dict `fb.fil[0]` from undo memory `fil_undo`
+    Restore current global dict `fil[0]` from undo memory `fil_undo`
 
     Returns
     -------
