@@ -19,8 +19,9 @@ from numpy import pi, log10
 import scipy.signal as sig
 
 from pyfda.config_file_parser import ConfigFileParser as cfp
-import pyfda.filterbroker as fb
+from pyfda.filterbroker import fb_get
 import pyfda.filter_factory as ff
+from pyfda.tree_builder import Tree_Builder as TB
 from pyfda.input_widgets.input_info_about import AboutWindow
 from pyfda.libs.compat import (
     QtGui, QWidget, QFont, QFrame, QLabel, QTableWidget, QTableWidgetItem,
@@ -313,7 +314,7 @@ class Input_Info(QWidget):
 
         Finally, join lines and linebreaks to a new string.
         """
-        lines = [l for l in doc.splitlines() if ".. versionadded::" not in l]
+        lines = [ln for ln in doc.splitlines() if ".. versionadded::" not in ln]
         return "\n" + lines[0].lstrip() + "\n" + textwrap.dedent("\n".join(lines[1:]))
 
     # --------------------------------------------------------------------------
@@ -347,10 +348,10 @@ class Input_Info(QWidget):
         self.tbl_filt_perf.setVisible(self.butFiltPerf.checked)
         if self.butFiltPerf.checked:
 
-            bb = fb.fil[0]['ba'][0]
-            aa = fb.fil[0]['ba'][1]
+            bb = fb_get('ba', 0)
+            aa = fb_get('ba')[1]
 
-            f_S = fb.fil[0]['f_S']
+            f_S = fb_get('f_S')
 
             f_lbls = []
             f_vals = []
@@ -358,25 +359,26 @@ class Input_Info(QWidget):
             a_targs = []
             a_targs_dB = []
             a_test = []
-            ft = fb.fil[0]['ft']  # get filter type ('IIR', 'FIR')
-            unit = fb.fil[0]['amp_specs_unit']
+            ft = fb_get('ft')  # get filter type ('IIR', 'FIR')
+            unit = fb_get('amp_specs_unit')
             unit = 'dB'  # fix this for the moment
             # construct pairs of corner frequency and corresponding amplitude
             # labels in ascending frequency for each response type
-            if fb.fil[0]['rt'] in {'LP', 'HP', 'BP', 'BS', 'HIL'}:
-                if fb.fil[0]['rt'] == 'LP':
+            _rt = fb_get('rt')
+            if _rt in {'LP', 'HP', 'BP', 'BS', 'HIL'}:
+                if _rt == 'LP':
                     f_lbls = ['F_PB', 'F_SB']
                     a_lbls = ['A_PB', 'A_SB']
-                elif fb.fil[0]['rt'] == 'HP':
+                elif _rt == 'HP':
                     f_lbls = ['F_SB', 'F_PB']
                     a_lbls = ['A_SB', 'A_PB']
-                elif fb.fil[0]['rt'] == 'BP':
+                elif _rt == 'BP':
                     f_lbls = ['F_SB', 'F_PB', 'F_PB2', 'F_SB2']
                     a_lbls = ['A_SB', 'A_PB', 'A_PB', 'A_SB2']
-                elif fb.fil[0]['rt'] == 'BS':
+                elif _rt == 'BS':
                     f_lbls = ['F_PB', 'F_SB', 'F_SB2', 'F_PB2']
                     a_lbls = ['A_PB', 'A_SB', 'A_SB', 'A_PB2']
-                elif fb.fil[0]['rt'] == 'HIL':
+                elif _rt == 'HIL':
                     f_lbls = ['F_PB', 'F_PB2']
                     a_lbls = ['A_PB', 'A_PB']
 
@@ -389,15 +391,15 @@ class Input_Info(QWidget):
                 a_targs = []
                 for i in range(len(f_lbls)):
                     try:
-                        f = fb.fil[0][f_lbls[i]]
+                        f = fb_get(f_lbls[i])
                         f_vals.append(f)
                     except KeyError as e:
                         f_vals.append('')
                         err[i] = True
                         logger.debug(e)
                     try:
-                        a = fb.fil[0][a_lbls[i]]
-                        a_dB = lin2unit(fb.fil[0][a_lbls[i]], ft, a_lbls[i], unit)
+                        a = fb_get(a_lbls[i])
+                        a_dB = lin2unit(fb_get(a_lbls[i]), ft, a_lbls[i], unit)
                         a_targs.append(a)
                         a_targs_dB.append(a_dB)
                     except KeyError as e:
@@ -436,8 +438,8 @@ class Input_Info(QWidget):
             a_test_dB = -20*log10(abs(a_test))
 
             # get filter type ('IIR', 'FIR') for dB <-> lin conversion
-            ft = fb.fil[0]['ft']
-            # unit = fb.fil[0]['amp_specs_unit']
+            ft = fb_get('ft')
+            # unit = fb_get('amp_specs_unit')
             unit = 'dB'  # make this fixed for the moment
 
             # build a list with the corresponding target specs:
@@ -455,40 +457,40 @@ class Input_Info(QWidget):
             self.targs_spec_passed = np.all(a_targs_pass)
 
             logger.debug(
-                "H_targ = {0}\n"
-                "H_test = {1}\n"
-                "H_test_dB = {2}\n"
-                "F_test = {3}\n"
-                "H_targ_pass = {4}\n"
-                "passed: {5}\n".format(a_targs,  a_test,  a_test_dB, f_vals,
-                                       a_targs_pass, self.targs_spec_passed))
+                "H_targ = %s\n"
+                "H_test = %s\n"
+                "H_test_dB = %s\n"
+                "F_test = %s\n"
+                "H_targ_pass = %s\n"
+                "passed: %s\n", a_targs,  a_test,  a_test_dB, f_vals,
+                    a_targs_pass, self.targs_spec_passed)
 
             self.tbl_filt_perf.setRowCount(len(a_test))  # number of table rows
             self.tbl_filt_perf.setColumnCount(5)  # number of table columns
 
             self.tbl_filt_perf.setHorizontalHeaderLabels([
-                'f/{0:s}'.format(fb.fil[0]['freq_specs_unit']), 'Spec\n(dB)',
+                'f/{0:s}'.format(fb_get('freq_specs_unit')), 'Spec\n(dB)',
                 '|H(f)|\n(dB)', 'Spec', '|H(f)|'])
             self.tbl_filt_perf.setVerticalHeaderLabels(f_lbls)
             for row in range(len(a_test)):
                 self.tbl_filt_perf.setItem(
-                    row, 0, QTableWidgetItem(str('{0:.4g}'.format(f_vals[row]*f_S))))
+                    row, 0, QTableWidgetItem(str(f'{(f_vals[row]*f_S):.4g}')))
                 self.tbl_filt_perf.setItem(
-                    row, 1, QTableWidgetItem(str('%2.3g'%(-a_targs_dB[row]))))
+                    row, 1, QTableWidgetItem(str(f'{-a_targs_dB[row]:2.3g}')))
                 self.tbl_filt_perf.setItem(
-                    row, 2, QTableWidgetItem(str('%2.3f'%(-a_test_dB[row]))))
+                    row, 2, QTableWidgetItem(str(f'{-a_test_dB[row]:2.3f}')))
                 if a_targs[row] < 0.01:
                     self.tbl_filt_perf.setItem(
-                        row, 3, QTableWidgetItem(str('%.3e'%(a_targs[row]))))
+                        row, 3, QTableWidgetItem(str(f'{a_targs[row]:.3e}')))
                 else:
                     self.tbl_filt_perf.setItem(
-                        row, 3, QTableWidgetItem(str('%2.4f'%(a_targs[row]))))
+                        row, 3, QTableWidgetItem(str(f'{a_targs[row]:2.4f}')))
                 if a_test[row] < 0.01:
                     self.tbl_filt_perf.setItem(
-                        row, 4, QTableWidgetItem(str('%.3e'%(abs(a_test[row])))))
+                        row, 4, QTableWidgetItem(str(f'{abs(a_test[row]):.3e}')))
                 else:
                     self.tbl_filt_perf.setItem(
-                        row, 4, QTableWidgetItem(str('%.4f'%(abs(a_test[row])))))
+                        row, 4, QTableWidgetItem(str(f'{abs(a_test[row]):.4f}')))
 
                 if not a_targs_pass[row]:
                     self.tbl_filt_perf.item(row, 1).setBackground(QtGui.QColor('red'))
@@ -504,10 +506,10 @@ class Input_Info(QWidget):
         """
         self.txt_filt_dict.setVisible(self.butFiltDict.checked)
 
-        fb_sorted = [str(key) + ' : ' + str(fb.fil[0][key])
-                     for key in sorted(fb.fil[0].keys())]
+        fb_sorted = [str(key) + ' : ' + str(fb_get(key))
+                     for key in sorted(fb_get().keys())]
         dictstr = pprint.pformat(fb_sorted)
-        # dictstr = pprint.pformat(fb.fil[0])
+        # dictstr = pprint.pformat(fb_get())
         self.txt_filt_dict.setText(dictstr)
 
     # --------------------------------------------------------------------------
@@ -517,10 +519,10 @@ class Input_Info(QWidget):
         """
         self.txt_filt_tree.setVisible(self.butFiltTree.checked)
 
-        ftree_sorted = ['<b>' + str(key) + ' : ' + '</b>' + str(fb.fil_tree[key])
-                        for key in sorted(fb.fil_tree.keys())]
+        ftree_sorted = ['<b>' + str(key) + ' : ' + '</b>' + str(TB.fil_tree[key])
+                        for key in sorted(TB.fil_tree.keys())]
         dictstr = pprint.pformat(ftree_sorted, indent=4)
-#        dictstr = pprint.pformat(fb.fil[0])
+#        dictstr = pprint.pformat(fb_get())
         self.txt_filt_tree.setText(dictstr)
 
 

@@ -152,9 +152,9 @@ def main():
     rc.mpl_rc['font.size'] = fontsize
     rc.params['screen'] = {'ref_dpi': ref_dpi, 'scaling': scaling,
                            'height': height, 'width': width}
-    # initialize the FilterTreeBuilder class:
-    # read config file and construct filter tree from it
-    fb.fil_tree = tree_builder.init_filters()
+    # initialize the Tree_Builder class:
+    # read config file and construct the dict `fil_tree` from it
+    Tree_Builder().build_fil_tree()
 
     mainw = pyFDA()
     logger.info("Logging to '%s'", dirs.LOG_DIR_FILE)

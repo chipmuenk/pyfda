@@ -25,7 +25,7 @@ from pyfda.libs.compat import (QCheckBox, QWidget, QComboBox, QLabel, QLineEdit,
                                QFrame, QHBoxLayout, QGridLayout, pyqtSignal,
                                QPushButton)
 from pyfda.config_file_parser import ConfigFileParser as cfp
-import pyfda.filterbroker as fb
+from pyfda.tree_builder import Tree_Builder as TB
 from pyfda.filterbroker import fb_get
 from pyfda.pyfda_rc import params
 from pyfda.plot_widgets.mpl_widget import MplWidget
@@ -607,7 +607,7 @@ class Plot_Hf(QWidget):
 
         # Get corners for spec display from the parameters of the target specs subwidget
         try:
-            param_list = fb.fil_tree[fb_get('rt')][fb_get('ft')]\
+            param_list = TB.fil_tree[fb_get('rt')][fb_get('ft')]\
                                     [fb_get('fc')][fb_get('fo')]['tspecs'][1]['amp']
         except KeyError:
             param_list = []

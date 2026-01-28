@@ -13,7 +13,8 @@ only amplitude and frequency specs.)
 import sys
 import logging
 
-import pyfda.filterbroker as fb
+from pyfda.filterbroker import fb_get
+from pyfda.tree_builder import Tree_Builder as TB
 from pyfda.libs.compat import (
     QWidget, QLabel, QFont, QFrame, pyqtSignal, Qt, QHBoxLayout, QVBoxLayout)
 from pyfda.libs.pyfda_lib import first_item
@@ -167,14 +168,14 @@ if __name__ == '__main__':
     app.setStyleSheet(rc.QSS_RC)
 
     # Read freq / amp / weight labels for current filter design
-    rt = fb.fil[0]['rt']
-    ft = fb.fil[0]['ft']
-    fc = 'Cheby1'  # fb.fil[0]['fc']
+    rt = fb_get('rt')
+    ft = fb_get('ft')
+    fc = 'Cheby1'  # fb_get('fc')
 
-    if 'min' in fb.fil_tree[rt][ft][fc]:
+    if 'min' in TB.fil_tree[rt][ft][fc]:
         # extract target parameters from filter tree
-        print(fb.fil_tree[rt][ft][fc]['min']['tspecs'])
-        target_params = fb.fil_tree[rt][ft][fc]['min']['tspecs'][1]
+        print(TB.fil_tree[rt][ft][fc]['min']['tspecs'])
+        target_params = TB.fil_tree[rt][ft][fc]['min']['tspecs'][1]
     else:
         target_params = {}
 

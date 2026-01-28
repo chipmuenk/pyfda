@@ -256,7 +256,7 @@ class Tree_Builder():
         logger.info("Instantiating TreeBuilder")
 
     # --------------------------------------------------------------------------
-    def init_filters(self) -> 'frozendict.FrozenDict':
+    def build_fil_tree(self) -> None:
         """
         Run at startup from `pyfdax.py` to populate class attribute dictionaries and lists:
 
@@ -299,7 +299,7 @@ class Tree_Builder():
                 merge_dicts_hierarchically(fil_tree, fil_tree_add, mode='add1')
 
         # Make the dictionary and all sub-dictionaries read-only ("FrozenDict"):
-        return frozendict.freeze_hierarchical(fil_tree)
+        Tree_Builder.fil_tree = frozendict.freeze_hierarchical(fil_tree)
 
     # --------------------------------------------------------------------------
     def _build_fil_tree_fc(self, fc: str, rt_dict: dict[str, dict], fil_tree: dict = None) -> dict:
@@ -429,13 +429,22 @@ if __name__ == "__main__":
     app = QApplication(sys.argv)
     logging.basicConfig(level=logging.INFO)
 
-    # Create a new Tree_Builder instance & initialize it
-    tbl = Tree_Builder()
-    filterTree = tbl.init_filters()
-    print('Tree_Builder.fil_tree = ', pprint_log(Tree_Builder.fil_tree))
+    # Initialize Tree_Builder class attribute 'fil_tree'
+    Tree_Builder().build_fil_tree()
 
-    # Test Immutability
-    # fil_tree_ref = tb.fil_tree['LP']['FIR']['Equiripple']['min']
-    # fil_tree_ref.update({'msg':("hallo",)}) # this changes  tb.fil_tree !!
-    # tb.fil_tree['LP']['FIR']['Equiripple']['min']['par'] = ("A_1","F_1")
-    # print(type(tb.fil_tree['LP']['FIR']['Equiripple']))
+    fil_tree_ref = Tree_Builder.fil_tree['LP']['FIR']['Equiripple']['min']
+    # Test Immutability - the following lines should all raise an exception
+    try:
+        fil_tree_ref.update({'msg':("hallo",)}) # this would change 'fil_tree'
+    except AttributeError as e:
+        print(f"\nExpected AttributeError on update(): {e}\n")
+
+    try:
+        Tree_Builder.fil_tree['LP']['FIR']['Equiripple']['min']['par'] = ("A_1","F_1")
+    except TypeError as e:
+        print(f"\nExpected TypeError on item assignment: {e}\n")
+
+    print(f"\nDict type: {type(Tree_Builder.fil_tree['LP']['FIR']['Equiripple']).__name__}\n")
+
+    print('Tree_Builder.fil_tree["BP"] = ', pprint_log(Tree_Builder.fil_tree["BP"]))
+

@@ -15,8 +15,9 @@ import logging
 import sys
 
 import pyfda.filterbroker as fb
-from pyfda.filterbroker import fb_get
+from pyfda.filterbroker import fb_get, fb_set
 import pyfda.filter_factory as ff
+from pyfda.tree_builder import Tree_Builder as TB
 from pyfda.input_widgets import (
     select_filter, amplitude_specs, freq_specs, freq_units, weight_specs, target_specs)
 from pyfda.libs.compat import (
@@ -53,7 +54,7 @@ class Input_Specs(QWidget):
 
         self.led_info_tool_tip = "Filter info:"
 
-        filter_load_help_txt = "Load <- Mem {0}: " + fb.fil[0]['info']
+        filter_load_help_txt = "Load <- Mem {0}: " + fb_get('info')
         self.cmb_filter_load_items = [
             "<span>Load current filter(s) from memory location or file.</span>",
             ("0", "LOAD", "Current filter, no action."),
@@ -71,7 +72,7 @@ class Input_Specs(QWidget):
         ]
         self.cmb_filter_load_default = "0"
 
-        filter_save_help_txt = "Copy -> Mem {0}: " + fb.fil[0]['info']
+        filter_save_help_txt = "Copy -> Mem {0}: " + fb_get('info')
         self.cmb_filter_save_items = [
             "<span>Copy / save current filter(s) to memory location or file.</span>",
             ("0", "SAVE", "Current filter, no action."),
@@ -167,7 +168,7 @@ class Input_Specs(QWidget):
         self.cmb_filter_save.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
         lbl_info_1 = QLabel(to_html(">", frmt='b'))
         lbl_info_2 = QLabel(to_html(">", frmt='b'))
-        self.led_info = QLineEdit(fb.fil[0]['info'])
+        self.led_info = QLineEdit(fb_get('info'))
         self.led_info.setToolTip(self.led_info_tool_tip)
         # self.led_info.home(True)  # move cursor to beginning of line
         lay_h_buttons_load_save_1 = QHBoxLayout()
@@ -294,7 +295,7 @@ class Input_Specs(QWidget):
         """
         Update_filter dict and tooltip every time the info field is changed
         """
-        fb.fil[0]['info'] = self.led_info.text()
+        fb_set('info', self.led_info.text())
         self.led_info.setToolTip("<span>" + self.led_info_tool_tip + "\n"
                                  + self.led_info.text() + "</span>")
         self.led_info.home(True)  # move cursor to beginning
@@ -311,24 +312,24 @@ class Input_Specs(QWidget):
         the name of the design method (e.g. 'cheby1') in select_filter.py.
         Its handle has been stored in `fb.fil_inst`.
 
-        fb.fil[0] (currently selected filter) is read, then general information
+        The dict fil[0] with the current filter info is read, then general information
         for the selected filter type and order (min/man) is gathered from
-        the filter tree [fb.fil_tree], i.e. which parameters are needed, which
+        the filter tree [TB.fil_tree], i.e. which parameters are needed, which
         widgets are visible and which message shall be displayed.
 
         Then, the UIs of all subwidgets are updated using their `update_UI()` methods.
         """
-        rt = fb.fil[0]['rt']  # e.g. 'LP'
-        ft = fb.fil[0]['ft']  # e.g. 'FIR'
-        fc = fb.fil[0]['fc']  # e.g. 'equiripple'
-        fo = fb.fil[0]['fo']  # e.g. 'man'
+        rt = fb_get('rt')  # e.g. 'LP'
+        ft = fb_get('ft')  # e.g. 'FIR'
+        fc = fb_get('fc')  # e.g. 'equiripple'
+        fo = fb_get('fo')  # e.g. 'man'
 
         # the keys of the all_widgets dict are the names of the subwidgets,
         # the values are a tuple with the corresponding parameters
-        all_widgets = fb.fil_tree[rt][ft][fc][fo]
+        all_widgets = TB.fil_tree[rt][ft][fc][fo]
 
-        # logger.debug("rt: {0} - ft: {1} - fc: {2} - fo: {3}".format(rt, ft, fc, fo))
-        # logger.debug("fb.fil_tree[rt][ft][fc][fo]:\n{0}".format(fb.fil_tree[rt][ft][fc][fo]))
+        # logger.debug("rt: '%s' - ft: '%s' - fc: '%s' - fo: '%s'", rt, ft, fc, fo)
+        # logger.debug("fil_tree[rt][ft][fc][fo]:\n\t%s", TB.fil_tree[rt][ft][fc][fo])
 
         # update filter order subwidget, called by select_filter:
         # self.sel_fil.load_filter_order()
@@ -386,7 +387,7 @@ class Input_Specs(QWidget):
     # --------------------------------------------------------------------------
     def _load_filter(self):
         """
-        Load filter dict `fb.fil[0]` either from file or from memory and update the
+        Load filter dict `fil[0]` either from file or from memory and update the
         widgets via `load_dict()` and via sig_tx: {'data_changed':'filter_loaded'}.
         """
         sel = qget_cmb_box(self.cmb_filter_load)
@@ -418,7 +419,7 @@ class Input_Specs(QWidget):
             self.load_dict()
 
         # update info string
-        self.led_info.setText(str(fb.fil[0]['info']))
+        self.led_info.setText(str(fb_get('info')))
         self.cmb_filter_load.setCurrentIndex(0)
         self.emit({'data_changed': 'filter_loaded'})
 
@@ -456,7 +457,7 @@ class Input_Specs(QWidget):
         """
         Reload info text from global dict `fb.fil[0]` and reset 'DESIGN' button
         """
-        self.led_info.setText(str(fb.fil[0]['info']))
+        self.led_info.setText(str(fb_get('info')))
         for i in range(1,10):
             self.cmb_filter_save.setItemData(
                 i + 1, f"Copy -> Mem {i}: {str(fb.fil[i]['info'])}", Qt.ToolTipRole)
@@ -510,11 +511,11 @@ class Input_Specs(QWidget):
             self.color_design_button("ok")
 
             self.emit({'data_changed': 'filter_designed'})
-            logger.info("Designed filter with order = %s", str(fb.fil[0]['N']))
+            logger.info("Designed filter with order = %s", str(fb_get('N')))
 
 
     def color_design_button(self, state):
-        man = "manual" in fb.fil[0]['fc'].lower()
+        man = "manual" in fb_get('fc').lower()
         self.butDesignFilt.setDisabled(man)
         if man:
             state = 'ok'
