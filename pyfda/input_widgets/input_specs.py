@@ -12,6 +12,7 @@ filter design is started here as well.
 """
 import copy
 import logging
+from math import e
 import sys
 
 import pyfda.filterbroker as fb
@@ -67,8 +68,10 @@ class Input_Specs(QWidget):
             ("7", "Mem 7", filter_load_help_txt.format("7")),
             ("8", "Mem 8", filter_load_help_txt.format("8")),
             ("9", "Mem 9", filter_load_help_txt.format("9")),
-            ("file", "File", "Save current filter to file."),
-            ("file_all", "File (all)", "Save all filters to file.")
+            ("def", "Default", "Load default filter."),
+            ("def_all", "Default (all)", "Copy default filter to all memory locations."),
+            ("file", "File", "Load filter from file."),
+            ("file_all", "File (all)", "Load all filters from file.")
         ]
         self.cmb_filter_load_default = "0"
 
@@ -395,8 +398,7 @@ class Input_Specs(QWidget):
         if sel == "file":
             ret = load_filter(self)
             if ret == 0:
-                self.load_dict()
-                self.emit({'data_changed': 'filter_loaded'})
+                pass
             elif ret == -1:
                 return  # aborted or error occurred -> do nothing
             else:
@@ -406,19 +408,26 @@ class Input_Specs(QWidget):
         elif sel == "file_all":
             ret = load_filter(self, all_filters=True)
             if ret == 0:
-                self.load_dict()
-                self.emit({'data_changed': 'filter_loaded'})
+                pass
             elif ret == -1:
                 return  # aborted or error occurred -> do nothing
             else:
                 logger.error('Unknown return code "%s"!', ret)
                 return
+
+        elif sel == "def":  # restore default filter
+            fb.fil[0] = copy.deepcopy(fb.fil_ref)
+
+        elif sel == "def_all":  # Copy defaults to all memories
+            for i in range(1, 10):
+                fb.fil[i] = copy.deepcopy(fb.fil_ref)
+
         # 'Mem <i>', copy fil[i] to fil[0]
         else:
             fb.fil[0] = copy.deepcopy(fb.fil[int(sel)])
-            self.load_dict()
 
         # update info string
+        self.load_dict()
         self.led_info.setText(str(fb_get('info')))
         self.cmb_filter_load.setCurrentIndex(0)
         self.emit({'data_changed': 'filter_loaded'})
