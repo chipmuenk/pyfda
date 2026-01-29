@@ -22,6 +22,7 @@ import sys
 from typing import ClassVar
 
 import pyfda.filterbroker as fb
+from pyfda.libs.frozendict import freeze_hierarchical
 import pyfda.libs.pyfda_dirs as dirs
 
 logger = logging.getLogger(__name__)
@@ -63,10 +64,16 @@ class ConfigFileParser():
 
     The following initial definitions are only meant to illustrate the expected structure
     for documentation and for module test, they are overwritten during the initialization.
+
+    see @classmethod in docs.python.org/3/library/functions.html#classmethod
+    C.func() is class method, C().func() instance method
+
+    Use self.__class__  to access class variables from instance methods
     """
 
     PLOT_CLASSES_DICT: ClassVar[dict[str, dict[str, str]]] =\
-        {'Plot_Hf': {'name': '|H(f)|', 'mod': 'pyfda.plot_widgets.plot_hf'},
+        {
+        'Plot_Hf': {'name': '|H(f)|', 'mod': 'pyfda.plot_widgets.plot_hf'},
         'Plot_Phi': {'name': 'φ(f)', 'mod': 'pyfda.plot_widgets.plot_phi'},
         'Plot_tau_g': {'name': 'tau_g', 'mod': 'pyfda.plot_widgets.plot_tau_g'},
         'Plot_PZ': {'name': 'P / Z', 'mod': 'pyfda.plot_widgets.plot_pz'},
@@ -74,7 +81,8 @@ class ConfigFileParser():
         'Plot_3D': {'name': '3D', 'mod': 'pyfda.plot_widgets.plot_3d'}
         }
     INPUT_CLASSES_DICT: ClassVar[dict[str, dict[str, str]]] =\
-        {'Input_Specs': {'name': 'Specs', 'mod': 'pyfda.input_widgets.input_specs'},
+        {
+        'Input_Specs': {'name': 'Specs', 'mod': 'pyfda.input_widgets.input_specs'},
         'Input_Coeffs': {'name': 'b,a', 'mod': 'pyfda.input_widgets.input_coeffs'},
         'Input_PZ': {'name': 'P/Z', 'mod': 'pyfda.input_widgets.input_pz'},
         'Input_Info': {'name': 'Info', 'mod': 'pyfda.input_widgets.input_info'},
@@ -84,10 +92,11 @@ class ConfigFileParser():
         }
 
     FIXPOINT_CLASSES_DICT: ClassVar[dict[str, dict[str, str]]] =\
-        {'FIR_DF_wdg': {'name': 'FIR_DF',
-                        'mod': 'pyfda.fixpoint_widgets.fir_df', 'opt': ['Equiripple', 'Firwin']},
+        {
+        'FIR_DF_wdg': {'name': 'FIR_DF',
+                       'mod': 'pyfda.fixpoint_widgets.fir_df', 'opt': ['Equiripple', 'Firwin']},
         'Delay_wdg': {'name': 'Delay',
-                        'mod': 'pyfda.fixpoint_widgets.delay1', 'opt': ['Equiripple']}
+                      'mod': 'pyfda.fixpoint_widgets.delay1', 'opt': ['Equiripple']}
         }
     FILTER_CLASSES_DICT: ClassVar[dict[str, dict[str, str]]] =\
         {# IIR
@@ -342,7 +351,8 @@ class ConfigFileParser():
         # Parsing [Fixpoint Filters] / modifying filter_classes dict
         # ------------------------------------------------------------------
         ConfigFileParser.FIXPOINT_CLASSES_DICT =\
-            self._build_widget_class_dict("Fixpoint Widgets", "fixpoint_widgets")
+            freeze_hierarchical(
+                self._build_widget_class_dict("Fixpoint Widgets", "fixpoint_widgets"))
 
         # First check whether fixpoint options of the filter_classes are valid fixpoint
         # classes by comparing them to the verified items of `FIXPOINT_CLASSES_DICT:
@@ -370,7 +380,7 @@ class ConfigFileParser():
 
                 filter_classes[c].update({'fix': list(fix_wdg)})
 
-        ConfigFileParser.FILTER_CLASSES_DICT = filter_classes
+        ConfigFileParser.FILTER_CLASSES_DICT = freeze_hierarchical(filter_classes)
 
     # --------------------------------------------------------------------------
     def _parse_conf_section(self, section: str) -> dict:
