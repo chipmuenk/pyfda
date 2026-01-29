@@ -14,7 +14,8 @@ from matplotlib.ticker import AutoMinorLocator
 import numpy as np
 import scipy.signal as sig
 
-from pyfda.filterbroker import fb_get, fb_set, conf_settings
+from pyfda.config_file_parser import ConfigFileParser as CFP
+from pyfda.filterbroker import fb_get, fb_set
 from pyfda.libs.compat import (
     QWidget, QComboBox, QHBoxLayout, QFrame, pyqtSignal)
 from pyfda.plot_widgets.mpl_widget import MplWidget
@@ -167,7 +168,7 @@ class Plot_Phi(QWidget):
         """
         # calculate H_cplx(W) (complex) for W = 0 ... 2 pi:
         self.W, self.H_cmplx = sig.freqz(
-            fb_get('ba', 0), fb_get('ba', 1), worN=conf_settings['N_FFT'],
+            fb_get('ba', 0), fb_get('ba', 1), worN=CFP.conf_settings['N_FFT'],
             whole=True, fs=2*np.pi)
         # replace nan and inf by finite values, otherwise np.unwrap yields
         # an array full of nans
@@ -202,8 +203,8 @@ class Plot_Phi(QWidget):
             F -= f_max_2
         elif fb_get('freqSpecsRangeType') == 'half':
             # only use the first half of H and F
-            H = self.H_cmplx[0:conf_settings['N_FFT']//2]
-            F = F[0:conf_settings['N_FFT']//2]
+            H = self.H_cmplx[0:CFP.conf_settings['N_FFT']//2]
+            F = F[0:CFP.conf_settings['N_FFT']//2]
         else:  # fb_get('freqSpecsRangeType') == 'whole'
             # use H and F as calculated
             H = self.H_cmplx

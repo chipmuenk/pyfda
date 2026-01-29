@@ -42,8 +42,6 @@ import copy
 import logging
 from typing import Iterable
 
-from pyfda.libs.frozendict import freeze_hierarchical
-
 logger = logging.getLogger(__name__)
 
 clipboard = None
