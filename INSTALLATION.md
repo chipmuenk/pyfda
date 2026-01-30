@@ -34,7 +34,11 @@ A **specific version** instead of the latest stable version can be selected with
 	
 **Install from local files** (development mode) using
 
-    > python -m pip install -e <YOUR_PATH_TO_pyproject.toml>
+    > python -m pip install <YOUR_PATH_TO_pyproject.toml>
+
+	or (including the development tools ruff and nose)
+
+    > python -m pip install <YOUR_PATH_TO_pyproject.toml>**[dev]**
 	
 where the specified path points to `pyfda/pyproject.toml` (without including `pyproject.toml`).
 In this case, you need to have a local copy of the pyfda project, preferrably 
