@@ -328,7 +328,7 @@ def _print_dict(key_list: list | tuple, top_dict_str = "fil[0]") -> str:
     """
     Print a (nested) dict, defined by the list or tuple of strings `key_list`. The last
     element of `key_list` is not included in the printed string, as it is the value to
-    be set.
+    be set. This is used to issue meaningful error messages.
 
     Parameters
     ----------
@@ -553,16 +553,17 @@ def fb_set(*key_list: list | tuple, backup: bool = True, update: bool = False,
             return 0
         if type(set_val) is not type(d[set_key]):
             types = {type(set_val).__name__, type(d[set_key]).__name__}
-            if not types.issubset({'list', 'tuple', 'ndarray'})\
-                    and not types.issubset({'float', 'float64'}):
+            if types.issubset({'float', 'float64'}):
+                pass
+            elif types.issubset({'list', 'tuple', 'ndarray'}):
+                logger.warning("Type mismatch: Setting\n\t'%s' of type '%s' with value "
+                                "of similar type '%s'", _print_dict(key_list),
+                                type(d[set_key]).__name__, type(set_val).__name__)
+            else:
                 logger.error("Type mismatch: Refusing to set\n\t'dict[%s]' of type '%s' "
                             "with value of type '%s'",
                             set_key, type(d[set_key]).__name__, type(set_val).__name__)
                 return -1
-
-            logger.warning("Type mismatch: Setting\n\t'%s' of type '%s' with value "
-                            "of similar type '%s'", _print_dict(key_list),
-                            type(d[set_key]).__name__, type(set_val).__name__)
 
         if not update:
             d[set_key] = set_val  # set new value
