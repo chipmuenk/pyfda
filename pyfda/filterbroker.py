@@ -42,6 +42,8 @@ import copy
 import logging
 from typing import Iterable
 
+import numpy as np
+
 logger = logging.getLogger(__name__)
 
 clipboard = None
@@ -80,14 +82,14 @@ fil_ref = {
     'N': 4,  # filter order
     'T_S': 1.0,  # sample time
     # weights for pass- and stopbands
-    'W_PB': 1,
-    'W_PB2': 1,
-    'W_SB': 1,
-    'W_SB2': 1,
+    'W_PB': 1.0,
+    'W_PB2': 1.0,
+    'W_SB': 1.0,
+    'W_SB2': 1.0,
     #
     'amp_specs_unit': 'dB',
     # [b, a] coefficients:
-    'ba': [
+    'ba': np.array([
         [
             0.005009993265049969,
             0.002969044992011087,
@@ -102,16 +104,16 @@ fil_ref = {
             -2.567503107299107,
             0.639724627220979
         ]
-    ],
+    ]),
     'creator': [
         'sos',
         'pyfda.filter_widgets.ellip'
     ],
     'f_S': 1.0,
-    'f_S_prev': 1,  # previous sampling frequency
+    'f_S_prev': 1.0,  # previous sampling frequency
     # 'f_s_wav': 16000,  # sampling frequency for wav files
     'f_max': 1.0,
-    'f_s_scale': 1,
+    'f_s_scale': 1.0,
     'fc': 'Ellip',  # filter class
     # Window parameters for frequency domain analysis of transient signals
     'tran_freq_win': {
@@ -221,7 +223,7 @@ fil_ref = {
 
     'rt': 'LP',  # filter response type
     # coefficients as second order sections
-    'sos': [
+    'sos': np.array([
         [
             0.005009993265049969,
             0.005370024900373368,
@@ -238,12 +240,12 @@ fil_ref = {
             -1.5523656037391145,
             0.8935430745699543
         ]
-    ],
+    ]),
     'timestamp': 1717151329.1387591,  # time when filter was created
     # 'timestamp': time.time(),
 
     # causal zeros/poles/gain
-    'zpk': [
+    'zpk': np.array([
         [
             -0.5359313492330422+0.8442615642733304j,
             -0.5359313492330422-0.8442615642733304j,
@@ -262,7 +264,7 @@ fil_ref = {
             0.0+0.0j,
             0.0+0.0j
         ]
-    ],
+    ]),
     # Tab-specific infos
     'tab_yn':{
         'display_index_k': False
