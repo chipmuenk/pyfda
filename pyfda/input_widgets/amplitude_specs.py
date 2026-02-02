@@ -19,7 +19,7 @@ from pyfda.libs.compat import (
     QtCore, Qt, QEvent, pyqtSignal, QWidget, QLabel, QLineEdit, QComboBox, QFrame,
     QFont, QVBoxLayout, QHBoxLayout, QGridLayout)
 
-import pyfda.filterbroker as fb
+from pyfda.filterbroker import fb_get, fb_set
 from pyfda.libs.pyfda_lib import(
     to_html, lin2unit, unit2lin, safe_eval, pprint_log, first_item)
 from pyfda.libs.pyfda_qt_lib import qstyle_widget, qget_cmb_box, emit
@@ -67,7 +67,7 @@ class AmplitudeSpecs(QWidget):
             # this should never happen
             logger.warning("Stopped infinite loop:\n%s", pprint_log(dict_sig))
             return
-        elif 'data_changed' in dict_sig and dict_sig['data_changed'] == 'filter_loaded':
+        if 'data_changed' in dict_sig and dict_sig['data_changed'] == 'filter_loaded':
             self.load_dict()
 
     # ------------------------------------------------------------------------------
@@ -95,7 +95,7 @@ class AmplitudeSpecs(QWidget):
         self.cmbUnitsA.setSizeAdjustPolicy(QComboBox.AdjustToContents)
 
         # find index for default unit from dictionary and set the unit
-        amp_idx = self.cmbUnitsA.findData(fb.fil[0]['amp_specs_unit'])
+        amp_idx = self.cmbUnitsA.findData(fb_get('amp_specs_unit'))
         if amp_idx < 0:
             amp_idx = 0
         self.cmbUnitsA.setCurrentIndex(amp_idx)  # initialize for dBs
@@ -128,8 +128,7 @@ class AmplitudeSpecs(QWidget):
         # - Build a list from all entries in the fil_dict dictionary starting
         #   with "A" (= amplitude specifications of the current filter)
         # - Pass the list to update_UI which recreates the widget
-        # ATTENTION: Entries need to be converted from QString to str for Py 2
-        new_labels = [str(l) for l in fb.fil[0] if l[0] == 'A']
+        new_labels = [str(lbl) for lbl in fb_get() if lbl[0] == 'A']
         self.update_UI(new_labels=new_labels)
 
         # ----------------------------------------------------------------------
@@ -219,7 +218,7 @@ class AmplitudeSpecs(QWidget):
             qstyle_widget(self.qlabels[i], state)
             self.qlabels[i].setStyleSheet("QLabel {background-color :none;}")
 
-            self.qlineedit[i].setText(str(fb.fil[0][new_labels[i]]))
+            self.qlineedit[i].setText(str(fb_get(new_labels[i])))
             self.qlineedit[i].setObjectName(new_labels[i])  # update ID
 
             if "sb" in new_labels[i].lower():
@@ -243,13 +242,13 @@ class AmplitudeSpecs(QWidget):
           to reflect changed settings unit.
         - Update the lineedit fields, rounded to specified format.
         """
-        unit = fb.fil[0]['amp_specs_unit']
+        unit = fb_get('amp_specs_unit')
 
-        filt_type = fb.fil[0]['ft']
+        filt_type = fb_get('ft')
 
         for i in range(len(self.qlineedit)):
             amp_label = str(self.qlineedit[i].objectName())
-            amp_value = lin2unit(fb.fil[0][amp_label], filt_type, amp_label, unit=unit)
+            amp_value = lin2unit(fb_get(amp_label), filt_type, amp_label, unit=unit)
 
             if not self.qlineedit[i].hasFocus():
                 # widget has no focus, round the display
@@ -264,7 +263,7 @@ class AmplitudeSpecs(QWidget):
         Store unit for amplitude in filter dictionary, reload amplitude spec
         entries via load_dict and fire a sigUnitChanged signal
         """
-        fb.fil[0]['amp_specs_unit'] = qget_cmb_box(self.cmbUnitsA, data=False)
+        fb_set('amp_specs_unit', qget_cmb_box(self.cmbUnitsA, data=False))
         self.load_dict()
 
         self.emit({'view_changed': 'a_unit'})
@@ -282,10 +281,11 @@ class AmplitudeSpecs(QWidget):
         """
         if self.spec_edited:
             unit = str(self.cmbUnitsA.currentText())
-            filt_type = fb.fil[0]['ft']
+            filt_type = fb_get('ft')
             amp_label = str(source.objectName())
             amp_value = safe_eval(source.text(), self.data_prev, sign='pos')
-            fb.fil[0].update({amp_label: unit2lin(amp_value, filt_type, amp_label, unit)})
+            is_new_key = amp_label not in fb_get()
+            fb_set(amp_label, unit2lin(amp_value, filt_type, amp_label, unit), new_key=is_new_key)
             self.emit({'specs_changed': 'a_specs'})
             self.spec_edited = False  # reset flag
         self.load_dict()
