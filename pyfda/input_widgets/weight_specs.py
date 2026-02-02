@@ -12,7 +12,7 @@ Widget for entering weight specifications
 import logging
 import sys
 
-import pyfda.filterbroker as fb
+from pyfda.filterbroker import fb_get, fb_set
 from pyfda.libs.compat import (
     QtCore, QWidget, QLabel, QLineEdit, QFrame, QFont,
     QVBoxLayout, QHBoxLayout, QGridLayout, pyqtSignal, QEvent)
@@ -105,7 +105,7 @@ class WeightSpecs(QWidget):
         #   with "W" (= weight specifications of the current filter)
         # - Pass the list to setEntries which recreates the widget
         self.n_cur_labels = 0  # number of currently visible labels / qlineedits
-        new_labels = [str(lbl) for lbl in fb.fil[0] if lbl[0] == 'W']
+        new_labels = [str(lbl) for lbl in fb_get() if lbl[0] == 'W']
         self.update_UI(new_labels=new_labels)
 
         # ----------------------------------------------------------------------
@@ -191,7 +191,7 @@ class WeightSpecs(QWidget):
             # Update ALL labels and corresponding values
             self.qlabels[i].setText(to_html(new_labels[i], frmt='bi'))
 
-            self.qlineedit[i].setText(str(fb.fil[0][new_labels[i]]))
+            self.qlineedit[i].setText(str(fb_get(new_labels[i])))
             self.qlineedit[i].setObjectName(new_labels[i])  # update ID
             self.qlineedit[i].setToolTip(
                 "<span>Relative weight (importance) for approximating this band.</span>")
@@ -206,7 +206,7 @@ class WeightSpecs(QWidget):
         Reload textfields from filter dictionary to update changed settings
         """
         for i in range(len(self.qlineedit)):
-            weight_value = fb.fil[0][str(self.qlineedit[i].objectName())]
+            weight_value = fb_get(str(self.qlineedit[i].objectName()))
 
             if not self.qlineedit[i].hasFocus():
                 # widget has no focus, round the display
@@ -228,7 +228,7 @@ class WeightSpecs(QWidget):
                 w_value = 1
             if w_value > 1.e6:
                 w_value = 1.e6
-            fb.fil[0].update({w_label: w_value})
+            fb_set(w_label, w_value, new_key=w_label not in fb_get())
             self.emit({'specs_changed': 'w_specs'})
             self.spec_edited = False  # reset flag
         self.load_dict()
@@ -284,7 +284,7 @@ class WeightSpecs(QWidget):
             self.qlineedit[i].setText("1")
 
             w_label = str(self.qlineedit[i].objectName())
-            fb.fil[0].update({w_label: 1})
+            fb_set(w_label, 1.0)
 
         self.load_dict()
         self.emit({'specs_changed': 'w_specs'})
