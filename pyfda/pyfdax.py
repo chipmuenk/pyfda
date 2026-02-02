@@ -21,7 +21,6 @@ from pyfda.libs.compat import Qt, QApplication, QIcon
 import pyfda.libs.pyfda_dirs as dirs # initial import constructs file paths
 from pyfda.tree_builder import Tree_Builder
 from pyfda.config_file_parser import ConfigFileParser
-import pyfda.filterbroker as fb
 import pyfda.pyfda_rc as rc
 
 from pyfda.pyfda_class import pyFDA

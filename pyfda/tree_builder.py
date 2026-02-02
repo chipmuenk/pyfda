@@ -14,7 +14,6 @@ import logging
 import sys
 from typing import ClassVar
 
-import pyfda.filterbroker as fb
 import pyfda.filter_factory as ff
 from pyfda.config_file_parser import ConfigFileParser as CFP
 
