@@ -480,7 +480,7 @@ def fb_get(*key_list: list | tuple, fil_dict: dict = fil[0], verbose: bool = Tru
     return ret
 
 # -------------------------
-def fb_set(*key_list: list | tuple, backup: bool = True, update: bool = False,
+def fb_set(*key_list: list | tuple, backup: bool = True, new_key: bool = False,
            fil_dict: dict = fil[0]) -> int:
     """
     Use the items of `key_list` to access a nested dict `fil_dict`
@@ -496,8 +496,8 @@ def fb_set(*key_list: list | tuple, backup: bool = True, update: bool = False,
         is the value to be set.
     backup : bool
         Whether the previous state of the filter dict should be backed up
-    update : bool
-        Whether the dictionary should be updated with the new value or set
+    set_key : bool
+        Whether a new key:value pair should be added to the dictionary
     fil_dict : dict
         The dictionary to traverse.
 
@@ -518,29 +518,39 @@ def fb_set(*key_list: list | tuple, backup: bool = True, update: bool = False,
     the user. This will be done by prepending the keys with an underscore
     (e.g. `_f_S`) once all direct accesses have been removed.
     """
-
     if not key_list:
         raise KeyError("Key_list is empty!")
+
     if not isinstance(key_list, (tuple, list)):
         raise TypeError(
-            "'key_list' needs to be Tuple or List, not a '%s'!", type(key_list).__name__)
+            "'key_list' needs to be tuple or list, not a '%s'!", type(key_list).__name__)
+
     if len(key_list) < 2:
         raise KeyError("Not enough arguments for setting a dictionary value!")
 
     set_val = key_list[-1]  # last element is the value to be set
     set_key = key_list[-2]  # second last element is the key for setting
+
     try:
-        # traverse nested dict 'fil_dict' using tuple of keys amd access subdictionary
+        if backup:
+            store_fil()  # backup old setting
+
+        # traverse nested dict 'fil_dict' using tuple of keys and access subdictionary
         d = _traverse_dict(key_list[:-1], fil_dict)
         # Test accessing the dictionary and whether the accessed item is a dict.
         # This could be dangerous because the keys in this sub-dictionary could be altered!
+        if new_key:
+            if set_key in d:
+                logger.warning("Key '%s' already exists in dictionary, overwriting\n"
+                               "\texisting value '%s' with '%s'!", d[set_key], set_key)
+            d[set_key] = set_val  # set new key:value pair
+            return 0
+
         if isinstance(d[set_key], dict):
             # keys1 = d[set_key].keys()
             logger.warning(
                 "Danger! Overwriting the dict '%s'\n\t%s with \n\t%s",
                 _print_dict(key_list), d[set_key], set_val)
-        if backup:
-            store_fil()  # backup old setting
 
         if set_key =='qfrmt':
             if len(key_list) > 2:
@@ -553,6 +563,7 @@ def fb_set(*key_list: list | tuple, backup: bool = True, update: bool = False,
             # and set new format
             fil_dict['qfrmt'] = set_val
             return 0
+
         if type(set_val) is not type(d[set_key]):
             types = {type(set_val).__name__, type(d[set_key]).__name__}
             if types.issubset({'float', 'float64'}):
@@ -562,19 +573,21 @@ def fb_set(*key_list: list | tuple, backup: bool = True, update: bool = False,
                                 "of similar type '%s'", _print_dict(key_list),
                                 type(d[set_key]).__name__, type(set_val).__name__)
             else:
-                logger.error("Type mismatch: Refusing to set\n\t'dict[%s]' of type '%s' "
-                            "with value of type '%s'",
-                            set_key, type(d[set_key]).__name__, type(set_val).__name__)
-                return -1
-
-        if not update:
-            d[set_key] = set_val  # set new value
-        else:
-            d[set_key].update(set_val)  # update dict with new value
+                raise ValueError
+        d[set_key] = set_val  # update key with new value
 
     except KeyError:
         # create a meaningful error message with a string of the name of the failed dict
-        logger.error("Dict '%s' does not exist!", _print_dict(key_list))
+        logger.error("No key %s in dict '%s'!", set_key, _print_dict(key_list))
+        if backup:
+            restore_fil()
+        return -1
+    except ValueError:
+        logger.error("Type mismatch: Refusing to set\n\t'dict[%s]' of type '%s' "
+                     "with value of type '%s'",
+                     set_key, type(d[set_key]).__name__, type(set_val).__name__)
+        if backup:
+            restore_fil()
         return -1
 
     return 0
