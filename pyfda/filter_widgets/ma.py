@@ -242,8 +242,7 @@ near ``f_S/2`` (highpass).
         """
         fb_set('filter_widgets', 'ma', {'delays': self.delays,
                                         'stages': self.stages,
-                                        'normalize': self.chk_norm.isChecked()},
-               update=True)
+                                        'normalize': self.chk_norm.isChecked()})
         # sig_tx -> select_filter -> filter_specs
         self.emit({'filt_changed': 'ma'})
 
