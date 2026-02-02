@@ -59,7 +59,7 @@ class WeightSpecs(QWidget):
         if dict_sig['id'] == id(self):
             # logger.warning("Stopped infinite loop:\n{0}".format(pprint_log(dict_sig)))
             return
-        elif 'data_changed' in dict_sig:
+        if 'data_changed' in dict_sig:
             if dict_sig['data_changed'] in {'filter_loaded', 'filter_designed'}:
                 self.load_dict()
 

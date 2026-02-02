@@ -421,7 +421,7 @@ def blackmanharris(N: int, L: str, sym: bool) -> np.ndarray:
     if L == '4':
         return sig.windows.blackmanharris(N, sym)
 
-    elif L == '5':
+    if L == '5':
         """ 5 Term Cosine, 125.427 dB, NBW 2.21535 bins, 9.81016 dB gain """
         a = [3.232153788877343e-001,
              -4.714921439576260e-001,

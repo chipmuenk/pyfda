@@ -12,7 +12,6 @@ filter design is started here as well.
 """
 import copy
 import logging
-from math import e
 import sys
 
 import pyfda.filterbroker as fb

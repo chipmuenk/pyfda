@@ -123,7 +123,7 @@ class Input_Fixpoint_Specs(QWidget):
         # ---------------------------------------------------------------------
         # Updated fixpoint specs in filter widget, update UI + emit with self id
 
-        elif 'fx_sim' in dict_sig and dict_sig['fx_sim'] == 'specs_changed':
+        if 'fx_sim' in dict_sig and dict_sig['fx_sim'] == 'specs_changed':
             self.dict2ui() # update fixpoint widgets
             dict_sig.update({'id': id(self)})  # propagate 'specs_changed' with self 'id'
             self.emit(dict_sig)
@@ -212,7 +212,7 @@ class Input_Fixpoint_Specs(QWidget):
                 self.load_fx_filter()
                 # TODO: should self._update_filter_cmb() be called here?
                 return
-            elif dict_sig['data_changed'] == "filter_designed":
+            if dict_sig['data_changed'] == "filter_designed":
                 # New filter has been designed, update list of available filter topologies
                 self._update_filter_cmb()
 

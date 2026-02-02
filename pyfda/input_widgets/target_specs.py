@@ -60,7 +60,7 @@ class TargetSpecs(QWidget):
         if dict_sig['id'] == id(self):
           logger.warning("Stopped infinite loop.")
           return
-        elif 'view_changed' in dict_sig and dict_sig['view_changed'] == 'f_S':
+        if 'view_changed' in dict_sig and dict_sig['view_changed'] == 'f_S':
             # update target frequencies with new f_S
             self.emit(dict_sig, sig_name='sig_tx_local')
         elif 'data_changed' in dict_sig and dict_sig['data_changed'] == 'filter_loaded':
