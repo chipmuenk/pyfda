@@ -531,8 +531,9 @@ class Firwin(QWidget):
         self._get_params()
         if not self._test_n():
             return -1
-        self._save(self.firwin(self.N, fb_get('F_C'), nyq=0.5,
-                               window=self.qfft_win_select.calc_window(self.N, sym=True)))
+        numtaps = self.N + 1  # UI N is order; firwin/calc_window expect numtaps
+        self._save(self.firwin(numtaps, fb_get('F_C'), nyq=0.5,
+                               window=self.qfft_win_select.calc_window(numtaps, sym=True)))
         return 0
 
     def HPmin(self) -> int:
@@ -555,8 +556,9 @@ class Firwin(QWidget):
         self.N = round_odd(self.N)  # enforce odd order
         if not self._test_n():
             return -1
-        self._save(self.firwin(self.N, fb_get('F_C'), pass_zero=False, nyq=0.5,
-                               window=self.qfft_win_select.calc_window(self.N, sym=True)))
+        numtaps = self.N + 1  # UI N is order; firwin/calc_window expect numtaps
+        self._save(self.firwin(numtaps, fb_get('F_C'), pass_zero=False, nyq=0.5,
+                               window=self.qfft_win_select.calc_window(numtaps, sym=True)))
         return 0
 
     # For BP and BS, F_PB and F_SB have two elements each
@@ -581,9 +583,10 @@ class Firwin(QWidget):
         self._get_params()
         if not self._test_n():
             return -1
-        self._save(self.firwin(self.N, [fb_get('F_C'), fb_get('F_C2')], nyq=0.5,
+        numtaps = self.N + 1  # UI N is order; firwin/calc_window expect numtaps
+        self._save(self.firwin(numtaps, [fb_get('F_C'), fb_get('F_C2')], nyq=0.5,
                                pass_zero=False,
-                               window=self.qfft_win_select.calc_window(self.N, sym=True)))
+                               window=self.qfft_win_select.calc_window(numtaps, sym=True)))
         return 0
 
     def BSmin(self) -> int:
@@ -608,8 +611,9 @@ class Firwin(QWidget):
         self.N = round_odd(self.N)  # enforce odd order
         if not self._test_n():
             return -1
-        self._save(self.firwin(self.N, [fb_get('F_C'), fb_get('F_C2')],
-                               window=self.qfft_win_select.calc_window(self.N, sym=True),
+        numtaps = self.N + 1  # UI N is order; firwin/calc_window expect numtaps
+        self._save(self.firwin(numtaps, [fb_get('F_C'), fb_get('F_C2')],
+                               window=self.qfft_win_select.calc_window(numtaps, sym=True),
                                pass_zero=True, nyq=0.5))
         return 0
 
