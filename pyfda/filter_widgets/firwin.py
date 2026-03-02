@@ -521,8 +521,9 @@ class Firwin(QWidget):
             return -1
 
         fb_set('F_C', (self.F_SB + self.F_PB)/2)  # average calculated F_PB and F_SB
-        self._save(self.firwin(self.N, fb_get('F_C'), nyq=0.5,
-                               window=self.qfft_win_select.calc_window(self.N, sym=True)))
+        numtaps = self.N + 1
+        self._save(self.firwin(numtaps, fb_get('F_C'), nyq=0.5,
+                               window=self.qfft_win_select.calc_window(numtaps, sym=True)))
         fb_set('N', self.N)  # update filterbroker with calculated order
         return 0
 
@@ -545,8 +546,9 @@ class Firwin(QWidget):
         if not self._test_n():
             return -1
         fb_set('F_C', (self.F_SB + self.F_PB)/2)  # average calculated F_PB and F_SB
-        self._save(self.firwin(self.N, fb_get('F_C'), pass_zero=False, nyq=0.5,
-                               window=self.qfft_win_select.calc_window(self.N, sym=True)))
+        numtaps = self.N + 1
+        self._save(self.firwin(numtaps, fb_get('F_C'), pass_zero=False, nyq=0.5,
+                               window=self.qfft_win_select.calc_window(numtaps, sym=True)))
         fb_set('N', self.N)  # update filterbroker with calculated order
         return 0
 
@@ -572,9 +574,10 @@ class Firwin(QWidget):
 
         fb_set('F_C', (self.F_SB + self.F_PB)/2)  # average calculated F_PB and F_SB
         fb_set('F_C2', (self.F_SB2 + self.F_PB2)/2)
-        self._save(self.firwin(self.N, [fb_get('F_C'), fb_get('F_C2')], nyq=0.5,
+        numtaps = self.N + 1
+        self._save(self.firwin(numtaps, [fb_get('F_C'), fb_get('F_C2')], nyq=0.5,
                                pass_zero=False,
-                               window=self.qfft_win_select.calc_window(self.N, sym=True)))
+                               window=self.qfft_win_select.calc_window(numtaps, sym=True)))
         fb_set('N', self.N)  # update filterbroker with calculated order
         return 0
 
@@ -599,8 +602,9 @@ class Firwin(QWidget):
             return -1
         fb_set('F_C', (self.F_SB + self.F_PB) / 2)  # average calculated F_PB and F_SB
         fb_set('F_C2', (self.F_SB2 + self.F_PB2) / 2)
-        self._save(self.firwin(self.N, [fb_get('F_C'), fb_get('F_C2')],
-                               window=self.qfft_win_select.calc_window(self.N, sym=True),
+        numtaps = self.N + 1
+        self._save(self.firwin(numtaps, [fb_get('F_C'), fb_get('F_C2')],
+                               window=self.qfft_win_select.calc_window(numtaps, sym=True),
                                pass_zero=True, nyq=0.5))
         fb_set('N', self.N)  # update filterbroker with calculated order
         return 0
