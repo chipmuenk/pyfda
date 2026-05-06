@@ -14,7 +14,6 @@ import logging
 import logging.config
 import sys
 
-import pyfda.filterbroker as fb
 from pyfda.libs.compat import (Qt, QtCore, QMainWindow, QApplication, QSplitter,
                      QMessageBox, QPlainTextEdit, QMenu, pyqtSignal)
 import pyfda.libs.pyfda_dirs as dirs # initial import constructs file paths
@@ -118,7 +117,7 @@ class pyFDA(QMainWindow):
         self.setAttribute(QtCore.Qt.WA_DeleteOnClose)
 
         # create clipboard instance that can be accessed from other modules
-        fb.clipboard = QApplication.clipboard()
+        dirs.clipboard = QApplication.clipboard()
 
         self._construct_UI()
 
@@ -256,7 +255,7 @@ class pyFDA(QMainWindow):
             # Clear clipboard before exit to avoid error message on older Qt versions
             # "QClipboard: Unable to receive an event from the clipboard manager
             # in a reasonable time
-            fb.clipboard.clear()
+            dirs.clipboard.clear()
             event.accept()
         else:  # restore hidden pop-up windows
             if fir_win_handle_vis:

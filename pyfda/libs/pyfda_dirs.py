@@ -25,6 +25,7 @@ import tempfile
 CSEL = '\033[96;1m'  # highlight select key (CYAN bold and bright)
 CEND = '\033[0m'     # end coloring
 
+clipboard = None  # Placeholder for clipboard instance, set by pyfdax when needed
 
 # ------------------------------------------------------------------------------
 def valid(path):

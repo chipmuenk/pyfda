@@ -15,7 +15,6 @@ import sys
 
 import numpy as np
 
-import pyfda.filterbroker as fb
 from pyfda.filterbroker import fb_get, fb_set
 from pyfda.libs.compat import (
     QtCore, QWidget, QLineEdit, pyqtSignal, QEvent, QApplication,
@@ -633,7 +632,7 @@ class Input_PZ(QWidget):
         text = qtable2csv(
             self.tblPZ, self.zpk, zpk=True, formatted=self.ui.but_format.checked)
         if self.ui.load_save_clipboard:  # data to clipboard:
-            fb.clipboard.setText(text)
+            dirs.clipboard.setText(text)
         else:
             # pass csv formatted text, key for accessing data in ``*.npz`` file or
             # Matlab workspace (``*.mat``) and a title for the file export dialog

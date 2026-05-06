@@ -23,6 +23,7 @@ from pyfda.libs.compat import (
     QFrame, QFont, QTextBrowser, QSplitter, QTableWidget, QTableWidgetItem,
     QSizePolicy, QHeaderView)
 from pyfda.libs.fft_windows_cmb_box import QFFTWinCmbBox
+import pyfda.libs.pyfda_dirs as dirs
 from pyfda.libs.pyfda_lib import safe_eval, to_html, pprint_log
 from pyfda.libs.pyfda_qt_lib import (
     qwindow_stay_on_top, qtext_width, QVLine, QHLine, PushButton, PushButtonRT, emit)
@@ -591,7 +592,7 @@ class Plot_FFT_win(QDialog):
 
         elif item.column() % 3 == 1:  # clicked on value field
             logger.info("%s copied to clipboard.", item.text())
-            fb.clipboard.setText(item.text())
+            dirs.clipboard.setText(item.text())
 
         self.update_view()
 
@@ -832,7 +833,7 @@ if __name__ == '__main__':
 
     app = QApplication(sys.argv)
     app.setStyleSheet(rc.QSS_RC)
-    fb.clipboard = QApplication.clipboard()  # create clipboard instance
+    dirs.clipboard = QApplication.clipboard()  # create clipboard instance
 
     mainw = Plot_FFT_win(app='spec', cur_win_dict=fb.fil[0]['tran_freq_win'],
                          ignore_close_event=False)

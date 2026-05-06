@@ -15,7 +15,6 @@ import sys
 
 import numpy as np
 
-import pyfda.filterbroker as fb  # importing filterbroker initializes all its globals
 from pyfda.filterbroker import fb_get, fb_set, get_fx
 
 from pyfda.libs.compat import (
@@ -480,7 +479,7 @@ class Input_Coeffs(QWidget):
             self.tblCoeff, self.ba, formatted=self.ui.but_format.checked)
         if self.ui.load_save_clipboard:
             # clipboard is selected as export target
-            fb.clipboard.setText(text)
+            dirs.clipboard.setText(text)
         else:
             # pass csv formatted text, key for accessing data in ``*.npz`` file or
             # Matlab workspace (``*.mat``) and a title for the file export dialog

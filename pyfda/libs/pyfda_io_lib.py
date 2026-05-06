@@ -895,7 +895,7 @@ def file2array(file_name: str, file_type: str, fkey: str = "",
 
     # ----- Data from clipboard -----------------------------------------------
     if from_clipboard:
-        clip_text = fb.clipboard.text()
+        clip_text = dirs.clipboard.text()
         if clip_text in {None, ""}:
             # an error has occurred
             logger.error("Clipboard is empty!")

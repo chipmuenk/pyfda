@@ -21,7 +21,6 @@ from pyfda import qrc_resources  # noqa: F401  # load the icons resource file
 from pyfda.libs.pyfda_qt_lib import qwindow_stay_on_top
 from pyfda.libs.pyfda_lib import mod_version, CRLF
 import pyfda.libs.pyfda_dirs as dirs
-import pyfda.filterbroker as fb
 from pyfda.pyfda_rc import params
 
 # ------------------------------------------------------------------------------
@@ -143,9 +142,9 @@ class AboutWindow(QDialog):
             # *? : make the '*' non-greedy, i.e. match as few chars as possible, e.g.
             #     only '<a>', not '<a> b <c>'
             clean = re.compile('<style>.*</style>|<.*?>')
-            fb.clipboard.setText(re.sub(clean, '', my_string))
+            dirs.clipboard.setText(re.sub(clean, '', my_string))
         else:
-            fb.clipboard.setText(my_string)  # copy untreated string
+            dirs.clipboard.setText(my_string)  # copy untreated string
 # ------------------------------------------------------------------------------
 
     def collect_info(self):
@@ -264,7 +263,7 @@ if __name__ == '__main__':
 
     app = QApplication(sys.argv)
     app.setStyleSheet(rc.QSS_RC)
-    fb.clipboard = QApplication.clipboard()
+    dirs.clipboard = QApplication.clipboard()
     mainw = AboutWindow()  # Test_button
     app.setActiveWindow(mainw)
     mainw.show()

@@ -25,7 +25,7 @@ except ImportError:
     figureoptions = None
 import mplcursors
 
-import pyfda.filterbroker as fb
+import pyfda.libs.pyfda_dirs as dirs
 from pyfda.libs.compat import (
     Qt, QtCore, QtGui, QWidget, pyqtSignal, QSizePolicy, QIcon, QImage, QVBoxLayout,
     QHBoxLayout, QInputDialog, FigureCanvas, NavigationToolbar, QtWidgets, QEvent)
@@ -491,7 +491,7 @@ class MplToolbar(NavigationToolbar):
         # --------------------------------------
         # Copy to clipboard:
         # --------------------------------------
-        self.cb = fb.clipboard
+        self.cb = dirs.clipboard
         self.a_cb = self.addAction(
             QIcon(':/to_clipboard.svg'), 'To Clipboard', self.mpl2Clip)
         self.a_cb.setToolTip(

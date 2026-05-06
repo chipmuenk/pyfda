@@ -46,9 +46,6 @@ import numpy as np
 
 logger = logging.getLogger(__name__)
 
-clipboard = None
-""" Handle to central clipboard instance """
-
 base_dir = ""  #: Project base directory
 
 # State of filter design: 'ok', 'changed', 'error', 'active'
