@@ -78,6 +78,7 @@ line-length = 100
 target-version = "py312"
 exclude = [
     "widget_templates",
+    "pyfda_rc_extras.py",
     "old",
     "tests",
     ".venv",
@@ -95,13 +96,13 @@ exclude = [
 [tool.ruff.lint]
 # select rules to enable for linting
 select = [
-    # "B",  # flake8-bugbear: find likely bugs and design problems
-    "B006", # mutable-argument-default, equivalent to "W0102" dangerous default value as argument
-    "B018", # useless-expression on strings (flake8-bugbear)
-    "E3",  # blank lines, indentation, etc. (pycodestyle)
-    "E7",  # pycodestyle errors (like missing whitespace or newline at end of file)
+    "B",  # flake8-bugbear: find likely bugs and design problems
+    # "B006", # mutable-argument-default, equivalent to "W0102" dangerous default value as argument
+    # "B018", # useless-expression on strings (flake8-bugbear)
+    "E",  # # pycodestyle errors (like missing whitespace or newline at end of file)
     "F",  # pyflakes
-    # "G",  # flake8-logging-format
+    "G",  # flake8-logging-format
+    # "G004",  # Use lazy % formatting in logging functions (logging-fstring-interpolation)
     # "C90",  # max. mccabe complexity of functions
     # "I",    # isort of imports
     "NPY201", # numpy 2 style guide violations
@@ -109,12 +110,11 @@ select = [
     "RET",    # flake8-return (unnecessary "else"/"elif" after "return",
               # remove the leading "el" from "elif" (no-else-return, R1705)
     "RUF012", # mutable-class-default, equivalent to "W0102"
-    "G004",  # Use lazy % formatting in logging functions (logging-fstring-interpolation)
     "UP008",  # use super() instead of super-call-with-parameters
     "UP031",   # Use format specifiers instead of percent
     "UP032", # Use f-strings instead of str.format()
     ]
-ignore = ["E501", # line too long
+ignore = [# "E501", # line too long
           # "W503", # line break before binary operator
           # "F403", # 'from module import *' used; unable to detect undefined names
           # "E203"  # whitespace before ':', conflicts with black
