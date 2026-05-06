@@ -53,6 +53,16 @@ After downloading the Linux archive, you might need to make it executable (`chmo
 
 Binaries for **Linux** are created as Flatpaks as well **(currently broken)** which can also be downloaded from [Flathub](https://flathub.org/apps/details/com.github.chipmuenk.pyfda) **(also broken)**. Many Linux distros have built-in flatpak support, for others it's easy to install with e.g. `sudo apt install flatpak`. For details check the [Flatpak](https://www.flatpak.org/) home page.
 
+### Web App
+
+[borish127](https://github.com/borish127) has created a great serverless web-based port of PyFDA. It uses Pyodide to run scipy.signal and numpy via WebAssembly directly in the browser, with a Material Design 3 frontend and Plotly for visualization.
+
+Live Web App: [https://borish127.github.io/PyFDA-Web/](https://borish127.github.io/PyFDA-Web/)
+
+Source Code: [https://github.com/borish127/PyFDA-Web](https://github.com/borish127/PyFDA-Web)
+
+It replicates the main functionality (IIR/FIR design, P/Z plots, fixpoint simulation, transient analysis) without requiring users to install local Python environments. 
+
 ### pip
 
 **Python 3.10** and above is supported, there is only one version of pyfda for all operating systems at [PyPI](https://pypi.org/project/pyfda/). As pyfda is a pure Python project (no compilation required), you can install pyfda the usual way, required libraries are downloaded automatically if missing:
