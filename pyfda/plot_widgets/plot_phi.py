@@ -92,7 +92,7 @@ class Plot_Phi(QWidget):
         self.cmbUnitsPhi = QComboBox(self, objectName="cmbUnitsA")
         units = ["rad", "rad/pi",  "deg"]
         scales = [1.,   1. / np.pi, 180./np.pi]
-        for unit, scale in zip(units, scales):
+        for unit, scale in zip(units, scales, strict=True):
             self.cmbUnitsPhi.addItem(unit, scale)
         self.cmbUnitsPhi.setToolTip("Set unit for phase.")
         self.cmbUnitsPhi.setCurrentIndex(0)

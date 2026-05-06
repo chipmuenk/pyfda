@@ -1241,7 +1241,8 @@ class Plot_Impz(QWidget):
 
 
         t = self.t[N_start:N_end]
-        x = self.x[N_start:N_end] * self.scale_i  # obtain same scaling for x as for quantized signals
+        # obtain same scaling for x as for quantized signals:
+        x = self.x[N_start:N_end] * self.scale_i
         y = self.y[N_start:N_end]
 
         if self.cmplx:

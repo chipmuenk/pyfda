@@ -253,7 +253,8 @@ class ConfigFileParser():
                         # TODO: why are the values lists?
                         try:
                             # try to convert to a numeric type
-                            ConfigFileParser.conf_settings[k] = ast.literal_eval(conf_settings[k][0])
+                            ConfigFileParser.conf_settings[k]\
+                                = ast.literal_eval(conf_settings[k][0])
                         except ValueError:
                             # unsuccessful, store entry as string
                             ConfigFileParser.conf_settings[k] = conf_settings[k][0]

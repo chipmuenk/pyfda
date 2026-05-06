@@ -97,6 +97,7 @@ exclude = [
 # select rules to enable for linting
 select = [
     "B",  # flake8-bugbear: find likely bugs and design problems
+    # "C",  # flake8-comprehensions
     # "B006", # mutable-argument-default, equivalent to "W0102" dangerous default value as argument
     # "B018", # useless-expression on strings (flake8-bugbear)
     "E",  # # pycodestyle errors (like missing whitespace or newline at end of file)

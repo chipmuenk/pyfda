@@ -191,7 +191,7 @@ def create_file_filters(file_types: tuple, file_filters: str = ""):
         else:
             logger.warning("Unknown file extension '.%s'", t)
     # remove trailing ';;', otherwise file filter '*' is appended
-    file_filters = file_filters.rstrip(';;')
+    file_filters = file_filters.removesuffix(';;')
 
     if dirs.last_file_type and dirs.last_file_type in file_filters_dict:
         last_file_filter =\
@@ -956,7 +956,8 @@ def file2array(file_name: str, file_type: str, fkey: str = "",
                             data_arr = fdict  # pick the whole array
                         elif fkey not in fdict:
                             raise IOError(
-                                "Key '%s' not in file '%s'.\nKeys found: %s", fkey, file_name, fdict.files)
+                                "Key '%s' not in file '%s'.\nKeys found: %s",
+                                fkey, file_name, fdict.files)
                         else:
                             data_arr = fdict[fkey]  # pick the array `fkey` from the dict
                     else:
@@ -1363,7 +1364,7 @@ def coe_header(title: str) -> str:
     header += f"(Order = {fb_get('N')})\n"
     header += f"Sample Frequency \tf_S = {f_S} {unit}\n\n"
     header += "Corner Frequencies:\n"
-    for lf, f, la, a in zip(f_lbls, f_vals, a_lbls, a_targs_dB):
+    for lf, f, la, a in zip(f_lbls, f_vals, a_lbls, a_targs_dB, strict=True):
         header += "\t" + lf + " = " + str(f) + " " + unit + " : " + la + " = "
         header += str(a) + " dB\n"
     header += "-" * 85 + "\n"

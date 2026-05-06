@@ -179,8 +179,8 @@ class FIR_DF_amaranth_UI(QWidget):
 
         if 'ui_local_changed' in dict_sig:
             # signal generated locally by modifying coefficient / accu format
-            if not dict_sig['sender_name']\
-                    in {'fx_ui_wq_fir_df_coeffs_b', 'fx_ui_wq_fir_df_accu'}:
+            if dict_sig['sender_name']\
+                    not in {'fx_ui_wq_fir_df_coeffs_b', 'fx_ui_wq_fir_df_accu'}:
                 logger.error(
                     "Unknown widget name '%s' in '%s'!", dict_sig['sender_name'], __name__)
                 return
