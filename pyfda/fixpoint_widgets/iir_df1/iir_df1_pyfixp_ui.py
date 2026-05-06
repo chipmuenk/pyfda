@@ -171,23 +171,22 @@ class IIR_DF1_pyfixp_UI(QWidget):
         if 'ui_local_changed' in dict_sig:
             # signal generated locally by modifying coefficient / accu format
             ui_changed = dict_sig['ui_local_changed']  # name of changed ui element
-            if not dict_sig['sender_name']\
-                    in {'fx_ui_wq_iir_df1_coeffs_b', 'fx_ui_wq_iir_df1_coeffs_a',
+            if dict_sig['sender_name']\
+                    not in {'fx_ui_wq_iir_df1_coeffs_b', 'fx_ui_wq_iir_df1_coeffs_a',
                         'fx_ui_wq_iir_df1_accu'}:
-                logger.error(f"Unknown sender name '{dict_sig['sender_name']}' "
-                             f"in '{__name__}' !")
+                logger.error("Unknown sender name '%s' in '%s' !",
+                             dict_sig['sender_name'], __name__)
                 return
 
             # changes in accu widget
-            elif dict_sig['sender_name'] == 'fx_ui_wq_iir_df1_accu':  # accu format updated
+            if dict_sig['sender_name'] == 'fx_ui_wq_iir_df1_accu':  # accu format updated
                 if ui_changed in {'cmbW', 'WF', 'WI'}:
                     cmbW = qget_cmb_box(self.wdg_wq_accu.cmbW)
                     if cmbW == 'm':
                         if ui_changed == 'cmbW':
                             # returning to manual setting, don't do anything
                             return
-                        else:
-                            pass  # WI or WF have been edited, emit 'specs_changed'
+                            # else: WI or WF have been edited, emit 'specs_changed'
                     elif cmbW == 'a':
                         # when switching to auto settings, run automatic accu calculation
                         # this also reverses manual edits of WI or WF wordlengths
@@ -195,7 +194,7 @@ class IIR_DF1_pyfixp_UI(QWidget):
                         # additional logic in the wdg_wq_accu widget (class FX_UI_WQ)
                         self.update_accu_settings()
                     else:
-                        logger.error(f"Unknown accu combobox setting '{cmbW}'!")
+                        logger.error("Unknown accu combobox setting '%s'!", cmbW)
                         return
 
             # changes in coeffs 'a' widget
@@ -204,10 +203,9 @@ class IIR_DF1_pyfixp_UI(QWidget):
                     cmbW = qget_cmb_box(self.wdg_wq_coeffs_a.cmbW)
                     if cmbW == 'm':
                         if ui_changed == 'cmbW':
-                            # returning to manual setting, don't do anything
+                            # returning to manual setting, don't do anything,
+                            # else: WI or WF have been edited, emit 'specs_changed'
                             return
-                        else:
-                            pass  # WI or WF have been edited, emit 'specs_changed'
 
                     elif cmbW == 'a':
                         # when switching to auto settings, run automatic calculation
@@ -215,7 +213,7 @@ class IIR_DF1_pyfixp_UI(QWidget):
                         # this also reverses manual edits of WI or WF wordlengths
                         self.calc_wi_coeffs_a()
                     else:
-                        logger.error(f"Unknown coeff. combobox setting '{cmbW}'!")
+                        logger.error("Unknown coeff. combobox setting '%s'!", cmbW)
                         return
 
                     # in case coefficient length has been changed, update accu as well
@@ -229,9 +227,8 @@ class IIR_DF1_pyfixp_UI(QWidget):
                     if cmbW == 'm':
                         if ui_changed == 'cmbW':
                             # returning to manual setting, don't do anything
+                            # else: WI or WF have been edited, emit 'specs_changed'
                             return
-                        else:
-                            pass  # WI or WF have been edited, emit 'specs_changed'
 
                     elif cmbW == 'a':
                         # when switching to auto settings, run automatic calculation
@@ -239,7 +236,7 @@ class IIR_DF1_pyfixp_UI(QWidget):
                         # this also reverses manual edits of WI or WF wordlengths
                         self.calc_wi_coeffs_b()
                     else:
-                        logger.error(f"Unknown coeff. combobox setting '{cmbW}'!")
+                        logger.error("Unknown coeff. combobox setting '%s'!", cmbW)
                         return
 
                     # in case coefficient length has been changed, update accu as well

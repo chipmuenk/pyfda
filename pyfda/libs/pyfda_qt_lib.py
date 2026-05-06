@@ -15,7 +15,7 @@ from .pyfda_lib import pprint_log
 
 from .compat import (
     Qt, QtGui, QtCore, QFrame, QMessageBox, QPushButton, QLabel, QComboBox, QDialog,
-    QFont, QSize, QFontMetrics, QSizePolicy, QIcon, QEvent, QHBoxLayout)
+    QFont, QFontMetrics, QSizePolicy, QIcon, QEvent, QHBoxLayout)
 from .pyfda_dirs import OS, OS_VER
 
 logger = logging.getLogger(__name__)

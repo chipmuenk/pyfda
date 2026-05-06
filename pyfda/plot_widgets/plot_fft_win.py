@@ -181,7 +181,7 @@ class Plot_FFT_win(QDialog):
             logger.warning("Stopped infinite loop:\n%s", pprint_log(dict_sig))
             return
 
-        elif not self.isVisible():
+        if not self.isVisible():
             self.needs_calc = True
 
         elif 'view_changed' in dict_sig and 'fft_win' in dict_sig['view_changed']\

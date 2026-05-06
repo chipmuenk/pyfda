@@ -421,7 +421,7 @@ class FX_UI_WQ(QWidget):
         ovfl = qget_cmb_box(self.cmbOvfl)
         quant = qget_cmb_box(self.cmbQuant)
         w_a_m = qget_cmb_box(self.cmbW)
-        if not w_a_m in {'m', 'a', 'f'}:
+        if w_a_m not in {'m', 'a', 'f'}:
             logger.error("Unknown option '%s' for cmbW combobox!", w_a_m)
 
         # update quantizer dict and derived quantities like W and reset counters

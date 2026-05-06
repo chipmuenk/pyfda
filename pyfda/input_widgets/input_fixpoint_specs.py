@@ -130,7 +130,7 @@ class Input_Fixpoint_Specs(QWidget):
             return
 
         # ---- Process input and output quantizer settings ('ui_local_changed') --
-        elif 'ui_local_changed' in dict_sig:
+        if 'ui_local_changed' in dict_sig:
             if 'sender_name' not in dict_sig:
                 logger.warning(
                     "No key 'sender_name' in dict_sig:\n%s", pprint_log(dict_sig))
@@ -256,8 +256,8 @@ class Input_Fixpoint_Specs(QWidget):
                                     'fxfilter_func': self.fx_filt_ui.fxfilter})
                         else:
                             logger.error(
-                                "Couldn't find fixpoint filter definition\n"
-                                f"\t'{self.fx_filt_ui.__class__.__name__}.fxfilter'!")
+                                "Couldn't find fixpoint filter definition\n\t'%s.fxfilter'!",
+                                 self.fx_filt_ui.__class__.__name__)
                             self.emit({'fx_sim': 'error'})
 
                         # next, start fx response calculation in `plot_impz()`
@@ -832,8 +832,8 @@ class Input_Fixpoint_Specs(QWidget):
 
             return 0
         except (ValueError, AttributeError) as e:
-            logger.error(f'Fixpoint filter reset or instantiation failed.'
-                         f'\nwith "{e} "')
+            logger.error(
+                'Fixpoint filter reset or instantiation failed\nwith " %s "', e)
             return -1
 
     # --------------------------------------------------------------------------
@@ -861,11 +861,12 @@ class Input_Fixpoint_Specs(QWidget):
 
         except AssertionError as e:
             logger.error(
-                f'Fixpoint simulation failed for dict\n{pprint_log(dict_sig)}'
-                f'\twith msg. "{e}"\n\tStimuli: Shape {np.shape(dict_sig["fx_stimulus"])} '
-                f'of type {dict_sig["fx_stimulus"].dtype}'
-                f'\n\tResponse: Shape {np.shape(fb.fx_results)} of type '
-                f'"{type(fb.fx_results)}"')
+                'Fixpoint simulation failed for dict\n%s\n\twith msg. " %s "' \
+                '\n\tStimuli: Shape %s of type %s'
+                '\n\tResponse: Shape %s of type "%s"',
+                pprint_log(dict_sig), e,
+                np.shape(dict_sig["fx_stimulus"]), dict_sig["fx_stimulus"].dtype,
+                np.shape(fb.fx_results), type(fb.fx_results))
             fb.fx_results = None
 
 

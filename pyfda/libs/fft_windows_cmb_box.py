@@ -88,7 +88,7 @@ class QFFTWinCmbBox(QWidget):
         if dict_sig['id'] == id(self):
             return  # signal has been emitted from same instance
 
-        elif 'view_changed' in dict_sig:
+        if 'view_changed' in dict_sig:
             if dict_sig['view_changed'] == 'fft_win_par':
                 self.dict2ui_params()
             elif dict_sig['view_changed'] == 'fft_win_type':

@@ -21,7 +21,6 @@ import re
 import sys
 from typing import ClassVar
 
-import pyfda.filterbroker as fb
 from pyfda.libs.frozendict import freeze_hierarchical
 import pyfda.libs.pyfda_dirs as dirs
 
