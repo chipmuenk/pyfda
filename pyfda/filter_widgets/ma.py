@@ -148,9 +148,9 @@ near ``f_S/2`` (highpass).
     #--------------------------------------------------------------------------
     def construct_UI(self):
         """
-        Create additional subwidget(s) needed for filter design:
-        These subwidgets are instantiated dynamically when needed in
-        select_filter.py using the handle to the filter instance, `filterbroker.fil_inst`.
+        Create the user interface for the Moving Average filter design widget.
+        This includes labels, line edits, and checkboxes for setting delays,
+        stages, and normalization options.
         """
 
         self.lbl_delays = QLabel("<b><i>M =</ i></ b>", self)
@@ -235,7 +235,6 @@ near ``f_S/2`` (highpass).
         self._store_entries()
 
     def _store_entries(self):
-
         """
         Store parameter settings in filter dictionary. Called from _update_UI()
         and _save()
@@ -249,8 +248,9 @@ near ``f_S/2`` (highpass).
 
     def _get_params(self):
         """
-        Translate parameters from the passed dictionary to instance
-        parameters, scaling / transforming them if needed.
+        Retrieve and set filter parameters from the filter dictionary.
+        This method fetches the stopband frequency (F_SB) and stopband
+        attenuation (A_SB) from the filterbroker.
         """
         # N is total order, L is number of taps per stage
         self.F_SB  = fb_get('F_SB')
@@ -358,35 +358,78 @@ near ``f_S/2`` (highpass).
 
 
     def LPman(self):
+        """
+        Design a low-pass Moving Average filter using manual specifications.
+        Retrieves parameters and calculates the filter coefficients.
+
+        Returns:
+            int: Status code of the filter calculation.
+        """
         self._get_params()
         return self.calc_ma('LP')
 
     def LPmin(self):
+        """
+        Design a low-pass Moving Average filter with minimum specifications.
+        Calculates the minimum number of delays required to meet the stopband
+        attenuation and frequency specifications.
+
+        Returns:
+            int: Status code of the filter calculation.
+        """
         self._get_params()
         self.delays = int(np.ceil(1 / (self.A_SB **(1/self.stages) *
                                                      np.sin(self.F_SB * np.pi))))
         return self.calc_ma('LP')
 
     def HPman(self):
+        """
+        Design a high-pass Moving Average filter using manual specifications.
+        Retrieves parameters and calculates the filter coefficients.
+
+        Returns:
+            int: Status code of the filter calculation.
+        """
         self._get_params()
         return self.calc_ma('HP')
 
     def HPmin(self):
+        """
+        Design a high-pass Moving Average filter with minimum specifications.
+        Calculates the minimum number of delays required to meet the stopband
+        attenuation and frequency specifications.
+
+        Returns:
+            int: Status code of the filter calculation.
+        """
         self._get_params()
         self.delays = int(np.ceil(1 / (self.A_SB **(1/self.stages) *
                                               np.sin((0.5 - self.F_SB) * np.pi))))
         return self.calc_ma('HP')
 
     def BSman(self):
+        """
+        Design a band-stop Moving Average filter using manual specifications.
+        Enforces an odd order for the filter and calculates the coefficients.
+
+        Returns:
+            int: Status code of the filter calculation.
+        """
         self._get_params()
         self.delays = ceil_odd(self.delays)  # enforce odd order
         return self.calc_ma('BS')
 
     def BPman(self):
+        """
+        Design a band-pass Moving Average filter using manual specifications.
+        Enforces an odd order for the filter and calculates the coefficients.
+
+        Returns:
+            int: Status code of the filter calculation.
+        """
         self._get_params()
         self.delays = ceil_odd(self.delays)  # enforce odd order
-        return  self.calc_ma('BP')
-
+        return self.calc_ma('BP')
 #------------------------------------------------------------------------------
 
 if __name__ == '__main__':
