@@ -273,7 +273,8 @@ class QFFTWinCmbBox(QWidget):
         fn_name = self.all_wins_dict[win_id]['fn_name']
         n_par = len(self.all_wins_dict[win_id]['par_val'])
 
-        # logger.error(f"id: {win_id}, par: {self.all_wins_dict[win_id]['par_val']}, len: {len(self.all_wins_dict[win_id]['par_val'])}")
+        # logger.error(f"id: {win_id}, par: {self.all_wins_dict[win_id]['par_val']},
+        #      len: {len(self.all_wins_dict[win_id]['par_val'])}")
         # logger.error(f"fnct_calc: {self.win_fnct}")
 
         try:

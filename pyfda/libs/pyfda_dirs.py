@@ -224,17 +224,14 @@ def update_conf_files(logger):
         os.system('color')  # activate colored terminal under windows
 
     logger.error("Please either\n"
-                 "\t- {R_str}eplace the existing user and log config files \n"
-                 "\t     by copies of the templates (backups will be created).\n"
-                 "\t\t{tmpl_conf} and \n\t\t{tmpl_log}\n"
-                 "\t- {Q_str}uit and edit or delete the user config files yourself.\n\t"
-                 "     When deleted, new config files will be created at the next start."
-                 "\n\n"
-                 "\tEnter 'q' to quit or 'r' to replace existing user config file:"
-                 .format(tmpl_conf=TMPL_CONF_DIR_FILE,
-                         tmpl_log=TMPL_LOG_CONF_DIR_FILE,
-                         R_str=CSEL+"[R]"+CEND,
-                         Q_str=CSEL+"[Q]"+CEND))
+             "\t- %seplace the existing user and log config files \n"
+             "\t     by copies of the templates (backups will be created).\n"
+             "\t\t%s and \n\t\t%s\n"
+             "\t- %suit and edit or delete the user config files yourself.\n\t"
+             "     When deleted, new config files will be created at the next start."
+             "\n\n"
+             "\tEnter 'q' to quit or 'r' to replace existing user config file:",
+             CSEL + "[R]" + CEND, TMPL_CONF_DIR_FILE, TMPL_LOG_CONF_DIR_FILE, CSEL + "[Q]" + CEND)
     val = input(
         "Enter 'q' to quit or 'r' to replace the existing user config file:").lower()
     if val == 'r':

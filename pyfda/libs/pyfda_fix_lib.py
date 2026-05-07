@@ -849,9 +849,8 @@ class Fixed(object):
     def resetN(self) -> None:
         """ Reset counters and overflow-flag of Fixed object """
         frm = inspect.stack()[1]
-        logger.debug("'reset_N' called from {0}.{1}():{2}.".
-                     format(inspect.getmodule(frm[0]).__name__.split('.')[-1],
-                            frm[3], frm[2]))
+        logger.debug("'reset_N' called from %s.%s():%s.",
+             inspect.getmodule(frm[0]).__name__.split('.')[-1], frm[3], frm[2])
         self.q_dict.update({'N_over': 0})
 
         self.ovr_flag = 0
@@ -1307,7 +1306,8 @@ class Fixed(object):
         # ======================================================================
         # logger.warning(f"float2frmt: y = {y}")
         if not get_fx():  # return float input value unchanged (no string)
-            logger.error("Not in fixpoint mode [%s], 'float2frmt()' should not be called!", fb_get('qfrmt'))
+            logger.error("Not in fixpoint mode [%s], 'float2frmt()' should not be called!",
+                         fb_get('qfrmt'))
             return y
 
         if not is_numeric(y):

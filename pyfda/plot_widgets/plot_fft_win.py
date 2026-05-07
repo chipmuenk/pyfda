@@ -701,25 +701,22 @@ class Plot_FFT_win(QDialog):
                 p1 = self.cur_win_dict['par_val'][0]
             else:
                 p1 = "{0:.3g}".format(self.cur_win_dict['par_val'][0])
-            param_txt = " ({0:s} = {1:s})".format(
-                self.all_wins_dict[cur_id]['par'][0]['name_tex'], p1)
-
+            param_txt = f" ({self.all_wins_dict[cur_id]['par'][0]['name_tex']} = {p1})"
         if len(self.cur_win_dict['par_val']) > 1:
             if type(self.cur_win_dict['par_val'][1]) in {str}:
                 p2 = self.cur_win_dict['par_val'][1]
             else:
                 p2 = "{0:.3g}".format(self.cur_win_dict['par_val'][1])
-            param_txt = param_txt[:-1] + ", {0:s} = {1:s})".format(
-                self.all_wins_dict[cur_id]['par'][1]['name_tex'], p2)
-
-        self.mplwidget.fig.suptitle(r'{0} Window'.format(cur_name) + param_txt)
+            param_txt = param_txt[:-1] +\
+                f", {self.all_wins_dict[cur_id]['par'][1]['name_tex']} = {p2})"
+        self.mplwidget.fig.suptitle(f"{cur_name} Window" + param_txt)
 
         # white background for plots
         patch = mpl_patches.Rectangle((0, 0), 1, 1, fc="white", ec="white",
                                       lw=0, alpha=0)
         # Info legend for time domain window
         labels_t = []
-        labels_t.append("$N$ = {0:d}".format(self.N_view))
+        labels_t.append(f"$N$ = {self.N_view}")
         self.ax_t.legend([patch], labels_t, loc='best', fontsize='small',
                          fancybox=True, framealpha=0.7,
                          handlelength=0, handletextpad=0)
@@ -728,34 +725,29 @@ class Plot_FFT_win(QDialog):
         labels_f = []
         N_patches = 0
         if self.tbl_sel[0]:  # NENBW
-            labels_f.append("$NENBW$ = {0:.3g} {1}".format(self.nenbw_disp,
-                                                           self.nenbw_unit))
+            labels_f.append(f"$NENBW$ = {self.nenbw_disp:.3g} {self.nenbw_unit}")
             N_patches += 1
 
         if self.tbl_sel[1]:  # Correlated gain
-            labels_f.append("$CGAIN$ = {0:.3g} {1}".format(self.cgain_disp,
-                                                           self.cgain_unit))
+            labels_f.append(f"$CGAIN$ = {self.cgain_disp:.3g} {self.cgain_unit}")
             N_patches += 1
 
         if self.tbl_sel[2]:  # first_zero
-            labels_f.append("1$^{{st}}$ Zero = {0:.3g} {1}".format(self.first_zero_disp,
-                                                            self.first_zero_unit))
+            labels_f.append(f"1$^{{st}}$ Zero = {self.first_zero_disp:.3g} {self.first_zero_unit}")
             N_patches += 1
             # plot a line at the first zero
             if not np.isnan(self.first_zero_f):
                 self.ax_f.axvline(self.first_zero_disp, ls='dotted', c='b')
 
         if self.tbl_sel[3]:  # 3dB bandwidth
-            labels_f.append("$W_{{3dB}}$ = {0:.3g} {1}".format(self.mainlobe_3dB_disp,
-                                                               self.mainlobe_3dB_unit))
+            labels_f.append(f"$W_{{3dB}}$ = {self.mainlobe_3dB_disp:.3g} {self.mainlobe_3dB_unit}")
             N_patches += 1
             # plot a line at the -3dB bandwidth
             if not np.isnan(self.mainlobe_3dB_disp):
                 self.ax_f.axvline(self.mainlobe_3dB_disp, ls='dotted', c='b')
 
         if self.tbl_sel[4]:  # max ampl. error
-            labels_f.append("$A_{{err,max}}$ = {0:.3g} {1}".format(self.max_a_err_disp,
-                                                                   self.max_a_err_unit))
+            labels_f.append(f"$A_{{err,max}}$ = {self.max_a_err_disp:.3g} {self.max_a_err_unit}")
             N_patches += 1
 
         if self.tbl_sel[5]:  # max. sidelobe
@@ -763,8 +755,7 @@ class Plot_FFT_win(QDialog):
             if not np.isnan(self.first_zero_f):
                 self.ax_f.axhline(self.sidelobe_level_disp, ls='dotted', c='b')
                 labels_f.append(
-                    "$A_{{SL,max}}$ = {0:.3g} {1}".format(self.sidelobe_level_disp,
-                                                          self.cgain_unit))
+                    f"$A_{{SL,max}}$ = {self.sidelobe_level_disp:.3g} {self.cgain_unit}")
             N_patches += 1
 
         if N_patches > 0:
@@ -790,27 +781,27 @@ class Plot_FFT_win(QDialog):
 
         # 0
         self._set_table_item(0, 0, "NENBW", font=self.bfont)  # , sel=True)
-        self._set_table_item(0, 1, "{0:.4g}".format(self.nenbw_disp))
+        self._set_table_item(0, 1, f"{self.nenbw_disp:.4g}")
         self._set_table_item(0, 2, self.nenbw_unit)
         # 1
         self._set_table_item(0, 3, "Correlated Gain", font=self.bfont)  # , sel=True)
-        self._set_table_item(0, 4, "{0:.4g}".format(self.cgain_disp))
+        self._set_table_item(0, 4, f"{self.cgain_disp:.4g}")
         self._set_table_item(0, 5, self.cgain_unit)
         # 2
         self._set_table_item(1, 0, "1st Zero", font=self.bfont)  # , sel=True)
-        self._set_table_item(1, 1, "{0:.4g}".format(self.first_zero_disp))
+        self._set_table_item(1, 1, f"{self.first_zero_disp:.4g}")
         self._set_table_item(1, 2, self.first_zero_unit)
         # 3
         self._set_table_item(1, 3, "3dB Width Mainlobe", font=self.bfont)  # , sel=True)
-        self._set_table_item(1, 4, "{0:.4g}".format(self.mainlobe_3dB_disp))
+        self._set_table_item(1, 4, f"{self.mainlobe_3dB_disp:.4g}")
         self._set_table_item(1, 5, self.mainlobe_3dB_unit)
         # 4
         self._set_table_item(2, 0, "Max. Amp. Error", font=self.bfont)  # , sel=True)
-        self._set_table_item(2, 1, "{0:.4g}".format(self.max_a_err_disp))
+        self._set_table_item(2, 1, f"{self.max_a_err_disp:.4g}")
         self._set_table_item(2, 2, self.max_a_err_unit)
         # 5
         self._set_table_item(2, 3, "Max. Sidelobe", font=self.bfont)  # , sel=True)
-        self._set_table_item(2, 4, "{0:.4g}".format(self.sidelobe_level_disp))
+        self._set_table_item(2, 4, f"{self.sidelobe_level_disp:.4g}")
         self._set_table_item(2, 5, self.cgain_unit)
 
         self.tbl_win_props.resizeColumnsToContents()
