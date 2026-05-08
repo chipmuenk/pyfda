@@ -177,6 +177,8 @@ disallow_untyped_defs = false
 # no Warning level messages displayed, use "--disable=all --enable=classes
 # --disable=W".
 "messages control".disable = [
+  "invalid-name",
+  #
   "raw-checker-failed",
   "bad-inline-option",
   "locally-disabled",
