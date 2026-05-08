@@ -943,27 +943,71 @@ class RotatedButton(QPushButton):
     https://forum.qt.io/topic/9279/moved-how-to-rotate-qpushbutton-63/7
     """
 
-    def init(self, text, parent, orientation="west"):
+    def init(self, text: str, parent, orientation: str = "west") -> None:
+        """
+        Initialize the rotated button with text, parent, and orientation.
+
+        Parameters
+        ----------
+        text : str
+            The text to display on the button.
+        parent : QWidget
+            The parent widget of the button.
+        orientation : str, optional
+            The orientation of the button, default is "west".
+        """
         super().init(text, parent)
         self.orientation = orientation
 
-    def paintEvent(self, event):
+    def paintEvent(self, event: QEvent) -> None:
+        """
+        Handle the paint event to draw the rotated button.
+
+        Parameters
+        ----------
+        event : QEvent
+            The paint event to process.
+        """
         painter = QtGui.QStylePainter(self)
         painter.rotate(90)
         painter.translate(0, -1 * self.width())
         painter.drawControl(QtGui.QStyle.CE_PushButton, self.getSyleOptions())
 
-    def minimumSizeHint(self):
+    def minimumSizeHint(self) -> QtCore.QSize:
+        """
+        Provide the minimum size hint for the rotated button.
+
+        Returns
+        -------
+        QtCore.QSize
+            The minimum size hint for the button.
+        """
         size = super().minimumSizeHint()
         size.transpose()
         return size
 
-    def sizeHint(self):
+    def sizeHint(self) -> QtCore.QSize:
+        """
+        Provide the size hint for the rotated button.
+
+        Returns
+        -------
+        QtCore.QSize
+            The recommended size for the button.
+        """
         size = super().sizeHint()
         size.transpose()
         return size
 
-    def getSyleOptions(self):
+    def getSyleOptions(self) -> QtGui.QStyleOptionButton:
+        """
+        Retrieve the style options for the rotated button.
+
+        Returns
+        -------
+        QtGui.QStyleOptionButton
+            The style options for the button.
+        """
         options = QtGui.QStyleOptionButton()
         options.initFrom(self)
         size = options.rect.size()
@@ -1014,9 +1058,18 @@ class QLabelVert(QLabel):
     #     self.update()
     #     self.updateGeometry()
 
-    def paintEvent(self, ev):
-        p = QtGui.QPainter(self)
+    def paintEvent(self, ev: QEvent) -> None:
+        """
+        Handle the paint event to draw the rotated label.
+
+        Parameters
+        ----------
+        ev : QEvent
+            The paint event to process.
+        """
+        # p = QtGui.QPainter(self)
         # p.setPen(QtCore.Qt.black)
+        p = QtGui.QPainter(self)
         p.rotate(-90)
         rgn = QtCore.QRect(-self.height(), 0, self.height(), self.width())
         # align = self.alignment()  # use alignment of original widget
@@ -1029,16 +1082,28 @@ class QLabelVert(QLabel):
         # p.drawControl()
         p.end()
 
-    def sizeHint(self):
-        # if hasattr(self, 'hint'):
-        #     return QSize(self.hint.height(), self.hint.width())
-        # else:
-        #     return QSize(19, 50)
+    def sizeHint(self) -> QtCore.QSize:
+        """
+        Provide a size hint for the label based on its dimensions.
+
+        Returns
+        -------
+        QSize
+            The recommended size for the label.
+        """
         size = super().sizeHint()
         size.transpose()
         return size
 
-    def minimumSizeHint(self):
+    def minimumSizeHint(self) -> QtCore.QSize:
+        """
+        Provide a minimum size hint for the label based on its dimensions.
+
+        Returns
+        -------
+        QSize
+            The minimum recommended size for the label.
+        """
         size = super().minimumSizeHint()
         size.transpose()
         return size
