@@ -36,15 +36,20 @@ DICT_SIG_KEYS = {'id', 'class', 'ttl', 'sender_name', 'object_name',
 def emit(self, dict_sig: dict | None = None, sig_name: str = '') -> None:
     """
     Emit a signal `self.<sig_name>` (defined as a class attribute) with a
-    dict `dict_sig` using Qt's `emit()`.
+    dictionary `dict_sig` using Qt's `emit()`.
 
-    - Add the keys `'id'` and `'class'` with id resp. class name of the calling
-      instance if not contained in the dict
-    - If key 'ttl' is in the dict and its value is less than one, terminate the
-      signal. Otherwise, reduce the value by one.
-    - If the sender has passed an objectName, add it with the key "sender_name"
-      to the dict.
+    Parameters:
+    -----------
+    dict_sig : dict | None
+        Dictionary containing signal data. If None, an empty dictionary is used.
+    sig_name : str
+        Name of the signal to emit. Defaults to 'sig_tx'.
+
+    Returns:
+    --------
+    None
     """
+
     if sig_name == '':
         sig_name = 'sig_tx'
     if dict_sig is None:
@@ -110,13 +115,23 @@ def emit(self, dict_sig: dict | None = None, sig_name: str = '') -> None:
 # ------------------------------------------------------------------------------
 def qwindow_stay_on_top(win: QDialog, top: bool) -> None:
     """
-    Set flags for a window such that it stays on top (True) or not
+    Set the window flags to make a dialog stay on top or not.
 
-    On Windows 7 the new window stays on top anyway.
-    Additionally setting WindowStaysOnTopHint blocks the message window when
-    trying to close pyfda.
+    On Windows 7 the new window stays on top anyway. Additionally setting WindowStaysOnTopHint
+    blocks the message window when trying to close pyfda.
 
     On Windows 10 and Linux, `WindowStaysOnTopHint` needs to be set.
+
+    Parameters:
+    -----------
+    win : QDialog
+        The dialog window to modify.
+    top : bool
+        If True, the window stays on top; otherwise, it does not.
+
+    Returns:
+    --------
+    None
     """
 
     win_flags = (Qt.CustomizeWindowHint | Qt.Window |  # always needed
@@ -141,10 +156,8 @@ def qcmb_box_populate(cmb_box: QComboBox, items_list: list, item_init: str) -> i
 
     Parameters
     ----------
-
     cmb_box: instance of QComboBox
         Combobox to be populated
-
     items_list: list
         List of combobox entries, in the format
         ["Tooltip for Combobox",
@@ -159,7 +172,6 @@ def qcmb_box_populate(cmb_box: QComboBox, items_list: list, item_init: str) -> i
 
     Returns
     -------
-
     ret: int
         Index of `item_init` in combobox. If index == -1, `item_init` was not in `items_list`
     """
@@ -194,10 +206,8 @@ def qcmb_box_add_items(cmb_box: QComboBox, items_list: list) -> None:
 
     Parameters
     ----------
-
     cmb_box: instance of QComboBox
         Combobox to be populated
-
     items_list: list
         List of combobox entries, in the format
          ("data 1st item", "text 1st item", "tooltip for 1st item" # [optional]),
@@ -226,24 +236,27 @@ def qcmb_box_add_items(cmb_box: QComboBox, items_list: list) -> None:
 # ------------------------------------------------------------------------------
 def qget_cmb_box(cmb_box: QComboBox, data: bool = True) -> str:
     """
-    Get current itemData or Text of comboBox and convert it to string.
+    Retrieve the current item data or text from a combo box.
 
-    In Python 3, python Qt objects are automatically converted to QVariant
-    when stored as "data" e.g. in a QComboBox and converted back when
-    retrieving.
+    Parameters:
+    -----------
+    cmb_box : QComboBox
+        The combo box to retrieve data from.
+    data : bool
+        If True, retrieves the item data; otherwise, retrieves the item text.
 
     Returns:
-
-    The current text or data of combobox as a string
+    --------
+    str
+        The current item data or text as a string.
     """
+
     if data:
         idx = cmb_box.currentIndex()
         cmb_data = cmb_box.itemData(idx)
         cmb_str = str(cmb_data)  # convert QVariant, QString, string to plain string
     else:
         cmb_str = cmb_box.currentText()
-
-    # cmb_str = str(cmb_str)
 
     return cmb_str
 
@@ -258,26 +271,24 @@ def qset_cmb_box(cmb_box: QComboBox, string: str, data: bool = False,
     `fireSignals` is set `True`. By default, the search is case insensitive, this
     can be changed by passing `caseSensitive=False`.
 
-    Parameters
-    ----------
-
-    string: str
-        The label in the text or data field to be selected. When the string is
+    Parameters:
+    -----------
+    cmb_box : QComboBox
+        The combo box to modify.
+    string : str
+        The string to match in the combo box. When the string is
         not found, select the first entry of the combo box.
+    data : bool
+        If True, matches against item data; otherwise, matches against item text.
+    fireSignals : bool
+        If True, signals are fired during the update.
+    caseSensitive : bool
+        If True, performs a case-sensitive search.
 
-    data: bool (default: False)
-        Whether the string refers to the data or text fields of the combo box
-
-    fireSignals: bool (default: False)
-        When True, fire a signal if the index is changed (useful for GUI testing)
-
-    caseSensitive: bool (default: False)
-        When true, perform case sensitive search.
-
-    Returns
-    -------
-        The index of the string. When the string was not found in the combo box,
-        select first entry of combo box and return index -1.
+    Returns:
+    --------
+    int
+        The index of the matched string, or -1 if not found.
     """
     sig_blocked_old = cmb_box.signalsBlocked()
 
@@ -321,7 +332,6 @@ def qcmb_box_del_item(cmb_box: QComboBox, string: str, data: bool = False,
 
     Parameters
     ----------
-
     string: str
         The label in the text or data field to be deleted.
 
@@ -334,10 +344,10 @@ def qcmb_box_del_item(cmb_box: QComboBox, string: str, data: bool = False,
     caseInsensitive: bool (default: False)
         When true, perform case sensitive search.
 
-    Returns
-    -------
-        The index of the item with string / data. When not found in the combo box,
-        return index -1.
+    Returns:
+    --------
+    int
+        The index of the deleted item, or -1 if not found.
     """
     sig_blocked_old = cmb_box.signalsBlocked()
 
@@ -375,7 +385,6 @@ def qcmb_box_add_item(cmb_box, item_list, data=True, fireSignals=False,
 
     Parameters
     ----------
-
     item_list: list
         List with `["new_data", "new_text", "new_tooltip"]` to be added.
 
@@ -463,7 +472,6 @@ def qget_selected(table, select_all=False, reverse=True):
 
     Parameters
     ----------
-
     select_all : bool
         select all table items and create a list when True
 
@@ -523,7 +531,6 @@ def qtext_width(text: str = '', N_x: int = 17, bold: bool = True, font=None) -> 
 
     Parameters
     ----------
-
     test: str
         string to calculate the width for
 
@@ -535,7 +542,6 @@ def qtext_width(text: str = '', N_x: int = 17, bold: bool = True, font=None) -> 
 
     Returns
     -------
-
     width: int
         The width of the text in points
 
@@ -574,13 +580,11 @@ def qtext_height(text: str = 'X', font=None) -> int:
 
     Parameters
     ----------
-
     test: str
         string to calculate the height for (default: "X")
 
     Returns
     -------
-
     lineSpacing: int
         The height of the text (line spacing) in points
 
@@ -826,16 +830,40 @@ class PushButtonRT(QPushButton):
 
         self.installEventFilter(self)
 
-    def setText(self, text):
+    def setText(self, text: str) -> None:
+        """
+        Set the text for the QLabel inside the button and update its geometry.
+
+        Parameters
+        ----------
+        text : str
+            The text to set for the QLabel.
+        """
         self.lbl_rtf.setText(text)
         self.updateGeometry()
 
-    def setChecked(self, checked: bool):
+    def setChecked(self, checked: bool) -> None:
+        """
+        Set the checked state of the button and update its style.
+
+        Parameters
+        ----------
+        checked : bool
+            The new checked state of the button.
+        """
         if self._checkable:
             self.checked = checked
             self.style_button()
 
-    def setCheckable(self, checkable: bool):
+    def setCheckable(self, checkable: bool) -> None:
+        """
+        Set whether the button is checkable and update its state accordingly.
+
+        Parameters
+        ----------
+        checkable : bool
+            Whether the button should be checkable.
+        """
         self._checkable = checkable
         if not self._checkable:
             self.setChecked(False)
@@ -843,6 +871,21 @@ class PushButtonRT(QPushButton):
             self.style_button()
 
     def eventFilter(self, source: QtCore.QObject, event: QEvent) -> bool:
+        """
+        Handle events for the button, such as mouse button presses.
+
+        Parameters
+        ----------
+        source : QtCore.QObject
+            The source object of the event.
+        event : QEvent
+            The event to process.
+
+        Returns
+        -------
+        bool
+            True if the event was handled, False otherwise.
+        """
         if event.type() == QEvent.MouseButtonPress:
             if self.isEnabled() and self._checkable and event.button() == Qt.LeftButton:
                 # signal is passed to base class where "self.toggle()" is performed
@@ -851,7 +894,10 @@ class PushButtonRT(QPushButton):
         # Call base class method to continue normal event processing:
         return super().eventFilter(source, event)
 
-    def style_button(self):
+    def style_button(self) -> None:
+        """
+        Apply the appropriate style to the button and its QLabel based on the checked state.
+        """
         if self.checked:
             qstyle_widget(self, "highlight")
             qstyle_widget(self.lbl_rtf, "highlight")
@@ -860,12 +906,28 @@ class PushButtonRT(QPushButton):
             qstyle_widget(self.lbl_rtf, "normal")
 
     def sizeHint(self) -> QtCore.QSize:
+        """
+        Provide a size hint for the button based on the QLabel's size and padding.
+
+        Returns
+        -------
+        QtCore.QSize
+            The recommended size for the button.
+        """
         s = super().sizeHint()
         w = self.lbl_rtf.sizeHint()
         s.setWidth(w.width() + 2 * self.pad)
         return s
 
     def minimumSizeHint(self) -> QtCore.QSize:
+        """
+        Provide a minimum size hint for the button based on the QLabel's size and padding.
+
+        Returns
+        -------
+        QtCore.QSize
+            The minimum recommended size for the button.
+        """
         s = super().sizeHint()
         w = self.lbl_rtf.sizeHint()
         s.setWidth(w.width() + 2 * self.pad)
