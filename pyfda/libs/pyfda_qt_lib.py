@@ -176,16 +176,16 @@ def qcmb_box_populate(cmb_box: QComboBox, items_list: list, item_init: str) -> i
         Index of `item_init` in combobox. If index == -1, `item_init` was not in `items_list`
     """
     cmb_box.clear()
-    if type(items_list[0]) is str:  # combo box tool tipp (optional)
+    if isinstance(items_list[0], str):  # combo box tool tipp (optional)
         cmb_box.setToolTip(cmb_box.tr(items_list[0]))
-    for i in range(1, len(items_list)):
-        if isinstance(items_list[i][1], QtGui.QIcon):
-            cmb_box.addItem("", items_list[i][0])
-            cmb_box.setItemIcon(i-1, items_list[i][1])
+    for i, item in enumerate(items_list):
+        if isinstance(item[1], QtGui.QIcon):
+            cmb_box.addItem("", item[0])
+            cmb_box.setItemIcon(i-1, item[1])
         else:
-            cmb_box.addItem(cmb_box.tr(items_list[i][1]), items_list[i][0])
-        if len(items_list[i]) == 3:  # add item tool tip (optional)
-            cmb_box.setItemData(i-1, cmb_box.tr(items_list[i][2]), Qt.ToolTipRole)
+            cmb_box.addItem(cmb_box.tr(item[1]), item[0])
+        if len(item) == 3:  # add item tool tip (optional)
+            cmb_box.setItemData(i-1, cmb_box.tr(item[2]), Qt.ToolTipRole)
     cmb_box.sizeAdjustPolicy = QComboBox.AdjustToContents
 
     return qset_cmb_box(cmb_box, item_init, data=True)
@@ -217,20 +217,20 @@ def qcmb_box_add_items(cmb_box: QComboBox, items_list: list) -> None:
     -------
     None
     """
-    for i in range(0, len(items_list)):
-        if isinstance(items_list[i][1], QtGui.QIcon):
-            cmb_box.addItem("", items_list[i][0])
-            cmb_box.setItemIcon(i-1, items_list[i][1])
+    for i, item in enumerate(items_list):
+        if isinstance(item[1], QtGui.QIcon):
+            cmb_box.addItem("", item[0])
+            cmb_box.setItemIcon(i-1, item[1])
         else:
-            cmb_box.addItem(cmb_box.tr(items_list[i][1]), items_list[i][0])
-        if len(items_list[i]) == 3:  # add item tool tip (optional)
-            cmb_box.setItemData(i-1, cmb_box.tr(items_list[i][2]), Qt.ToolTipRole)
+            cmb_box.addItem(cmb_box.tr(item[1]), item[0])
+        if len(item) == 3:  # add item tool tip (optional)
+            cmb_box.setItemData(i-1, cmb_box.tr(item[2]), Qt.ToolTipRole)
 
-    """ icon = QIcon('logo.png')
-    # adding icon to the given index
-    self.combo_box.setItemIcon(i, icon)
-    size = QSize(10, 10)
-    self.combo_box.setIconSize(size)  """
+    # icon = QIcon('logo.png')
+    ## adding icon to the given index
+    # self.combo_box.setItemIcon(i, icon)
+    # size = QSize(10, 10)
+    # self.combo_box.setIconSize(size)
 
 
 # ------------------------------------------------------------------------------
@@ -936,6 +936,7 @@ class PushButtonRT(QPushButton):
 
 class RotatedButton(QPushButton):
     """
+    ##### Currently Unused #####
     Create a rotated QPushButton
 
     Taken from
@@ -999,7 +1000,7 @@ class RotatedButton(QPushButton):
         size.transpose()
         return size
 
-    def getSyleOptions(self) -> QtGui.QStyleOptionButton:
+    def getSyleOptions(self):
         """
         Retrieve the style options for the rotated button.
 
@@ -1008,6 +1009,7 @@ class RotatedButton(QPushButton):
         QtGui.QStyleOptionButton
             The style options for the button.
         """
+        # TODO: Does this exist in QtGui?
         options = QtGui.QStyleOptionButton()
         options.initFrom(self)
         size = options.rect.size()
