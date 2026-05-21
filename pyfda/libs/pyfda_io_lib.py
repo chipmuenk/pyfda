@@ -479,7 +479,7 @@ def csv2array(f: TextIO) -> np.ndarray[str] | None:
     # throw an error (instead of just issuing a deprecation warning) when trying to
     # create a numpy array from nested ragged sequences. This error can then be
     # caught easily.
-    warnings.filterwarnings('error', category=np.exceptions.VisibleDeprecationWarning)
+    warnings.filterwarnings('error', category=DeprecationWarning)
     # ------------------------------------------------------------------------------
     # Get CSV parameter settings
     # ------------------------------------------------------------------------------
@@ -520,7 +520,7 @@ def csv2array(f: TextIO) -> np.ndarray[str] | None:
             dialect = csv.Sniffer().sniff(sample, delimiters=['\t', ';', ',', '|', ' '])
         except csv.Error as e:
             logger.warning(
-                'CSV sniffing reported error "%s",\ncontinuing with format "excel-tab"', e)
+                'CSV sniffing reported error "%s",\n\tcontinuing with format "excel-tab"', e)
             dialect = csv.get_dialect('excel-tab')
     else:
         # fall back, alternatives: 'excel', 'unix':
