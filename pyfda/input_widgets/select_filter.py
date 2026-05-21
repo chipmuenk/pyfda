@@ -310,7 +310,7 @@ class SelectFilter(QWidget):
             self.cmbFilterClass.addItem(CFP.FILTER_CLASSES_DICT[fc]['name'], fc)
             fc_list.append(fc)
 
-        logger.debug("fc_list: {0}\n{1}".format(fc_list, fb_get('fc')))
+        logger.debug("fc_list: %s\n%s", fc_list, fb_get('fc'))
 
         # Does new ft also provide the previous design method (e.g. ellip)?
         # Has filter been instantiated?
@@ -499,7 +499,7 @@ class SelectFilter(QWidget):
         # ff.fil_inst.construct_UI()
         if hasattr(ff.fil_inst, 'wdg_fil'):
             try:
-                self.dyn_wdg_fil = getattr(ff.fil_inst, 'wdg_fil')
+                self.dyn_wdg_fil = ff.fil_inst.wdg_fil
                 self.layHDynWdg.addWidget(self.dyn_wdg_fil, stretch=1)
             except AttributeError as e:
                 logger.warning(e)
