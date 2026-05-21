@@ -105,9 +105,11 @@ class Item(tuple):
     def __ne__(self, other):
         return not self.__eq__(other)
     def __str__(self):
-        return '%r: %r' % self
+        # return '%r: %r' % self
+        return f'{self[0]!r}: {self[1]!r}'
     def __repr__(self):
-        return 'Item((%r, %r))' % self
+        # return 'Item((%r, %r))' % self
+        return f'Item(({self[0]!r}, {self[1]!r}))'
 
 class FrozenDict(frozenset):
     """
@@ -167,7 +169,7 @@ class FrozenDict(frozenset):
         cls = self.__class__.__name__
         items = frozenset.__iter__(self)
         _repr = ', '.join(map(str, items))
-        return '%s({%s})' % (cls, _repr)
+        return f'{cls}({_repr})'
 
     def __getitem__(self, key):
         if key not in self:
@@ -258,7 +260,9 @@ class FrozenOrderedDict(Mapping):
         return self.__hash
 
     def __repr__(self):
-        return '{}({!r})'.format(self.__class__.__name__, self.__dict.items())
+        # return '{}({!r})'.format(self.__class__.__name__, self.__dict.items())
+        return f'{self.__class__.__name__}({list(self.__dict.items())!r})'
+
 
     def copy(self, *args, **kwargs):
         new_dict = self.__dict.copy()
