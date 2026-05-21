@@ -181,7 +181,7 @@ class Plot_Tran_Stim(QWidget):
 
 
     # ------------------------------------------------------------------------------
-    def calc_stimulus_frame(self, x: np.ndarray = np.random.randn(10), N_first: int = 0,
+    def calc_stimulus_frame(self, x: np.ndarray, N_first: int = 0,
                             N_frame: int = 10, N_end: int = 10) -> None:
         """
         Calculate a data frame of stimulus `x` with a length of `N_frame` samples,

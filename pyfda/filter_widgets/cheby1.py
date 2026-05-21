@@ -67,7 +67,8 @@ class Cheby1():
 
     The passband has a constant ripple (equiripple) with a total of :math:`N` maxima
     and minima (for example, a 5th-order filter has 3 maxima and 2 minima). Consequently,
-    the DC gain is unity for odd-order low-pass filters, and :math:`-A_PB` dB for even-order filters.
+    the DC gain is unity for odd-order low-pass filters, and :math:`-A_PB` dB for even-order
+    filters.
 
     For a manual filter design, the order :math:`N`, the passband ripple :math:`A_PB` and
     the critical frequency / frequencies :math:`F_C` where the gain drops below

@@ -487,10 +487,9 @@ if __name__ == '__main__':
     # instantiate filter widget
     filt = Equiripple()
     filt.construct_UI()
-    wdg_equiripple = getattr(filt, 'wdg_fil')
 
     layVDynWdg = QVBoxLayout()
-    layVDynWdg.addWidget(wdg_equiripple, stretch = 1)
+    layVDynWdg.addWidget(filt.wdg_fil, stretch = 1)
 
     filt.LPman()  # design a low-pass with parameters from global dict
     print(fb_get(filt.FRMT)) # return results in default format
@@ -504,4 +503,3 @@ if __name__ == '__main__':
     form.show()
 
     app.exec_()
-    #------------------------------------------------------------------------------

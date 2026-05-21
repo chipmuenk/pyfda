@@ -431,8 +431,8 @@ near ``f_S/2`` (highpass).
         self.delays = ceil_odd(self.delays)  # enforce odd order
         return self.calc_ma('BP')
 #------------------------------------------------------------------------------
-
 if __name__ == '__main__':
+    # run module standalone using "python -m pyfda.filter_widgets.ma"
     import sys
     from pyfda.libs.compat import QApplication, QFrame
 
@@ -441,10 +441,9 @@ if __name__ == '__main__':
     # instantiate filter widget
     filt = MA()
     filt.construct_UI()
-    wdg_ma = getattr(filt, 'wdg_fil')
 
     layVDynWdg = QVBoxLayout()
-    layVDynWdg.addWidget(wdg_ma, stretch = 1)
+    layVDynWdg.addWidget(filt.wdg_fil, stretch = 1)
 
     filt.LPman()  # design a low-pass with parameters from global dict
     print(fb_get('zpk')) # return results in default format
@@ -455,8 +454,4 @@ if __name__ == '__main__':
 
     form.show()
 
-
     app.exec_()
-    #------------------------------------------------------------------------------
-
-# test using "python -m pyfda.filter_widgets.ma"

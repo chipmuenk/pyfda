@@ -636,7 +636,8 @@ class Firwin(QWidget):
 
 
 # ------------------------------------------------------------------------------
-def main():
+if __name__ == "__main__":
+    # Run this module standalone with 'python -m pyfda.filter_widgets.firwin'
     import sys
     from pyfda.libs.compat import QApplication, QFrame
 
@@ -645,10 +646,9 @@ def main():
     # instantiate filter widget
     filt = Firwin()
     filt.construct_UI()
-    wdg_firwin = getattr(filt, 'wdg_fil')
 
     layVDynWdg = QVBoxLayout()
-    layVDynWdg.addWidget(wdg_firwin, stretch=1)
+    layVDynWdg.addWidget(filt.wdg_fil, stretch=1)
 
     # fb_set('fo', 'min')
     filt.LPman()  # design a low-pass with parameters from global dict
@@ -662,8 +662,3 @@ def main():
     mainw.show()
 
     app.exec_()
-
-
-if __name__ == "__main__":
-    # Run this module standalone with 'python -m pyfda.filter_widgets.firwin'
-    main()

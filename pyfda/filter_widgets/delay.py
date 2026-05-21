@@ -193,10 +193,9 @@ if __name__ == '__main__':
     # instantiate filter widget
     filt = Delay()
     filt.construct_UI()
-    wdg_delay = getattr(filt, 'wdg_fil')
 
     layVDynWdg = QVBoxLayout()
-    layVDynWdg.addWidget(wdg_delay, stretch = 1)
+    layVDynWdg.addWidget(filt.wdg_fil, stretch = 1)
 
     filt.APman()  # design a low-pass with parameters from global dict
     print(fb_get(filt.FRMT)) # return results in default format
@@ -210,4 +209,3 @@ if __name__ == '__main__':
     form.show()
 
     app.exec_()
-    #------------------------------------------------------------------------------

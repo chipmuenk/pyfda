@@ -15,7 +15,7 @@ import logging
 import numpy as np
 
 import pyfda.filterbroker as fb
-from pyfda.filterbroker import fb_get, fb_set
+from pyfda.filterbroker import fb_get
 from pyfda.filterbroker import set_fx
 from pyfda.libs.pyfda_lib import set_dict_defaults, pprint_log, first_item
 from pyfda.libs.pyfda_qt_lib import qget_cmb_box, emit
@@ -148,7 +148,8 @@ class FIR_DF_pyfixp_UI(QWidget):
             # signal generated locally by modifying coefficient / accu format
             if dict_sig['sender_name'] not in\
                     {'fx_ui_wq_fir_df_coeffs_b', 'fx_ui_wq_fir_df_accu'}:
-                logger.error("Unknown widget name '%s' in '%s' !", dict_sig['sender_name'], __name__)
+                logger.error(
+                    "Unknown widget name '%s' in '%s' !", dict_sig['sender_name'], __name__)
                 return
 
             if dict_sig['sender_name'] == 'fx_ui_wq_fir_df_accu':  # accu format updated
