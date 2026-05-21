@@ -419,7 +419,8 @@ def iter2ndarray(iterable: np.ndarray | list | tuple, dtype=complex) -> np.ndarr
         for i in range(len(iterable)):
             arrs[i] = np.asarray(np.append(arrs[i], np.zeros(max_l - len(arrs[i]))))
 
-        return np.nan_to_num(np.array(arrs, dtype=dtype))  # convert list of arrays to two-dimensional array
+        # convert list of arrays to two-dimensional array
+        return np.nan_to_num(np.array(arrs, dtype=dtype))
 
     logger.error("Unsupported type '{type(iterable)}' of %s for conversion to ndarray.", iterable)
     return None
@@ -889,7 +890,7 @@ def safe_eval(expr, alt_expr=0, return_type: str = 'float', sign: str = ''
                     logger.error('Unknown sign enforcement "%s".', sign)
 
                 if result == 0 and sign in {'pos', 'neg'}:
-                    logger.warning(fallback + 'Argument must not be zero.')
+                    logger.warning('%sArgument must not be zero.', fallback)
                     result = None
 
                 if return_type == 'int' and result is not None:
@@ -1081,7 +1082,7 @@ def unit2lin(unit_value: float, filt_type: str, amp_label: str,
 
             \\text{IIR:}\quad A_{PB,lin} &= 1 - 10 ^{-unit\_value/20}
 
-            \\text{FIR:}\quad A_{PB,lin} &= \\frac{10 ^ {unit\_value/20} - 1}{10 ^ {unit\_value/20} + 1}
+            \\text{FIR:}\quad A_{PB,lin} &= \\frac{10^{unit\_value/20}-1}{10^{unit\_value/20} + 1}
 
     - Stopband:
         .. math::
