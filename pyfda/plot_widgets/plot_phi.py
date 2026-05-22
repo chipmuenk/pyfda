@@ -60,7 +60,7 @@ class Plot_Phi(QWidget):
                      pprint_log(dict_sig), self.needs_calc, self.isVisible())
 
         if dict_sig['id'] == id(self):
-            logger.warning("Stopped infinite loop:\n%s", pprint_log(dict_sig))
+            logger.debug("Stopped infinite loop:\n%s", pprint_log(dict_sig))
             return
 
         if self.isVisible():
@@ -148,7 +148,11 @@ class Plot_Phi(QWidget):
         """
         Initialize and clear the axes - this is only called once
         """
-        self.ax = self.mplwidget.fig.subplots()
+        # add_subplot() always returns a single Axes. It is needed because otherwise self.ax
+        # is None and self.ax.clear() in update_view() throws an error.
+        # Pylint's static checker infers that self.ax = self.mplwidget.fig.subplots() may be a
+        # numpy.ndarray because subplots() can return a single Axes object or an array of Axes
+        self.ax = self.mplwidget.fig.add_subplot(1, 1, 1)
         self.ax.xaxis.tick_bottom()  # remove axis ticks on top
         self.ax.yaxis.tick_left()  # remove axis ticks right
 

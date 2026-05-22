@@ -236,7 +236,7 @@ class Plot_Hf(QWidget):
         Initialize and clear the axes (this is run only once)
         """
         if len(self.mplwidget.fig.get_axes()) == 0:  # empty figure, no axes
-            self.ax = self.mplwidget.fig.subplots()  # initialize axes
+            self.ax = self.mplwidget.fig.subplots(nrows=1, ncols=1)  # initialize axes
         else:
             logger.error("Axes are not empty:\n\t%s", self.mplwidget.fig.get_axes())
         self.ax.xaxis.tick_bottom()  # remove axis ticks on top
