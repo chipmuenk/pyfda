@@ -235,8 +235,12 @@ class Plot_Hf(QWidget):
         """
         Initialize and clear the axes (this is run only once)
         """
+        # add_subplot() always returns a single Axes. It is needed because otherwise self.ax
+        # is None and self.ax.clear() in update_view() throws an error.
+        # Pylint's static checker infers that self.ax = self.mplwidget.fig.subplots() may be a
+        # numpy.ndarray because subplots() can return a single Axes object or an array of Axes
         if len(self.mplwidget.fig.get_axes()) == 0:  # empty figure, no axes
-            self.ax = self.mplwidget.fig.subplots()  # initialize axes
+            self.ax = self.mplwidget.fig.add_subplot(1, 1, 1)  # initialize axes
         else:
             logger.error("Axes are not empty:\n\t%s", self.mplwidget.fig.get_axes())
         self.ax.xaxis.tick_bottom()  # remove axis ticks on top
