@@ -338,7 +338,7 @@ near ``f_S/2`` (highpass).
 
         z0 = np.exp(-2j*np.pi*i/L)
         # calculate filter for multiple cascaded stages
-        for i in range(self.stages):
+        for _ in range(self.stages):
             b = np.convolve(b0, b)
         z = np.repeat(z0, self.stages)
 
