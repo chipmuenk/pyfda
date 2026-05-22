@@ -208,7 +208,8 @@ class AboutWindow(QDialog):
         if False:  # dirs.PYINSTALLER:
             self.lic_str = ""
         else:
-            with open(os.path.join(dirs.INSTALL_DIR, "license_info.md"), 'r') as f:
+            with open(os.path.join(dirs.INSTALL_DIR, "license_info.md"), 'r',
+                      encoding="utf-8") as f:
                 self.lic_str = markdown.markdown(
                     f.read(), output_format='html5',
                     extensions=['markdown.extensions.tables'])
@@ -227,7 +228,8 @@ class AboutWindow(QDialog):
 
     def display_changelog(self):
         """ Display changelog """
-        with open(os.path.join(dirs.INSTALL_DIR, "..", "CHANGELOG.md"), 'r') as f:
+        with open(os.path.join(dirs.INSTALL_DIR, "..", "CHANGELOG.md"), 'r',
+                  encoding="utf-8") as f:
             log_str = markdown.markdown(f.read(), output_format='html5')
         self.txtDisplay.setText(self.style_html_links(log_str))
 
@@ -235,7 +237,8 @@ class AboutWindow(QDialog):
 
     def display_MIT_lic(self):
         """ Display MIT license """
-        with open(os.path.join(dirs.INSTALL_DIR, "..", "LICENSE.md"), 'r') as f:
+        with open(os.path.join(dirs.INSTALL_DIR, "..", "LICENSE.md"), 'r',
+                  encoding="utf-8") as f:
             lic_str = markdown.markdown(f.read(), output_format='html5')
         self.txtDisplay.setText(self.style_html_links(lic_str))
 
@@ -243,7 +246,8 @@ class AboutWindow(QDialog):
 
     def display_GPL_lic(self):
         """ Display GPL license """
-        with open(os.path.join(dirs.INSTALL_DIR, "..", "LICENSE_GPLv3.md"), 'r') as f:
+        with open(os.path.join(dirs.INSTALL_DIR, "..", "LICENSE_GPLv3.md"), 'r',
+                  encoding="utf-8") as f:
             lic_str = markdown.markdown(f.read(), output_format='html5')
         self.txtDisplay.setText(self.style_html_links(lic_str))
 
