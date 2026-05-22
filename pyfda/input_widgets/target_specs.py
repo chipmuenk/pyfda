@@ -58,8 +58,8 @@ class TargetSpecs(QWidget):
         """
         logger.debug("SIG_RX: %s", first_item(dict_sig))
         if dict_sig['id'] == id(self):
-          logger.warning("Stopped infinite loop.")
-          return
+            logger.warning("Stopped infinite loop.")
+            return
         if 'view_changed' in dict_sig and dict_sig['view_changed'] == 'f_S':
             # update target frequencies with new f_S
             self.emit(dict_sig, sig_name='sig_tx_local')
@@ -80,9 +80,9 @@ class TargetSpecs(QWidget):
         self.a_specs = amplitude_specs.AmplitudeSpecs(self, title="Ripple",
                                                       objectName="amplitude_specs_targ")
         self.a_specs.setVisible(True)
-        """
-        LAYOUT
-        """
+        ###########
+        # LAYOUT
+        ###########
         bfont = QFont()
         bfont.setBold(True)
         lblTitle = QLabel(self)  # field for widget title
