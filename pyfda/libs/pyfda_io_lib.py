@@ -717,7 +717,7 @@ def read_wav_info(file) -> int:
         """ convert argument from str `s` in little endian format to int """
         int = 0
         for i in range(len(s)):
-             int = int + ord(s[i]) * pow(256, i)
+            int = int + ord(s[i]) * pow(256, i)
         return int
 
     f = open(file,'r', encoding='latin-1')
@@ -1109,7 +1109,7 @@ def write_wav_frame(parent: object, file_name: str, data: np.ndarray, f_S: int =
             f.setframerate(f_S)
             f.writeframes(audio.tobytes())
         with open(file_name, 'w', encoding="utf8", newline='') as f:
-                        f.write(data)
+            f.write(data)
 
         logger.info('Data saved as\n\t"%s"', file_name)
 
