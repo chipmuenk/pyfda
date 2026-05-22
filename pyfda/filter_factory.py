@@ -109,7 +109,8 @@ class FilterFactory():
             return self.err_code
 
         except ImportError:
-            # Filter module mod is in dictionary 'CFP.FILTER_CLASSES_DICT', but could not be imported.
+            # Filter module 'mod' is in dictionary 'CFP.FILTER_CLASSES_DICT',
+            # but could not be imported:
             err_string =("\nImportError in 'FilterFactory.create_fil_inst()':\n"
                   f"Filter design module '{mod}' could not be imported.")
             self.err_code = 2

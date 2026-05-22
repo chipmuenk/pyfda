@@ -35,14 +35,16 @@ from matplotlib.backends.backend_qt5agg import NavigationToolbar2QT as Navigatio
 #    try:
 #        import win32gui, win32con
 #        flag = win32con.HWND_TOPMOST if b else win32con.HWND_NOTOPMOST
-#        win32gui.SetWindowPos(self.winId(), flag, 0, 0, 0, 0, win32con.SWP_NOSIZE | win32con.SWP_NOMOVE)
+#        win32gui.SetWindowPos(self.winId(), flag, 0, 0, 0, 0,
+#                              win32con.SWP_NOSIZE | win32con.SWP_NOMOVE)
 #    except ModuleNotFoundError:
 #        pass
 #    if b:
 #        flag = self.windowFlags() | QtCore.Qt.WindowStaysOnTopHint
 #    else:
 #        flag = self.windowFlags() & ~QtCore.Qt.WindowStaysOnTopHint
-#    self.setGeometry(self.geometry())  # `setWindowFlags` resets size if setGeometry is never called
+#    # `setWindowFlags` resets size if setGeometry is never called:
+#    self.setGeometry(self.geometry())
 #    self.setWindowFlags(flag)
 #    self.show()
 

@@ -854,5 +854,5 @@ class MplToolbar(NavigationToolbar):
             else:
                 self.cb.setImage(img)
                 logger.info("Copied plot %s as PNG image to Clipboard.", title_info)
-        except:
+        except IOError:
             logger.error("Error copying figure to clipboard:\n%s", sys.exc_info())
