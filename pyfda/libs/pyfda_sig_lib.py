@@ -1273,15 +1273,21 @@ def fil_convert(format_in) -> None:
                         "\tTry relaxing the specifications.")
 
         if 'zpk' not in format_in:
-            try:
-                # sos2zpk returns a tuple of zeros and poles (ndarrays) and gain (a scalar)
-                zpk = sig.sos2zpk(fb_get('sos'))
-                z = np.asarray(zpk[0])
-                p = np.asarray(zpk[1])
-                k = zpk[2]
-                logger.debug("\nz = %s\n\tp = %s", z, p)
-            except Exception as e:
-                raise ValueError(e)
+            # sos2zpk returns a tuple of zeros and poles (ndarrays) and gain (a scalar)
+            zpk = sig.sos2zpk(fb_get('sos'))
+            z = np.asarray(zpk[0])
+            p = np.asarray(zpk[1])
+            k = zpk[2]
+            logger.debug("\nz = %s\n\tp = %s", z, p)
+            # try:
+            #     # sos2zpk returns a tuple of zeros and poles (ndarrays) and gain (a scalar)
+            #     zpk = sig.sos2zpk(fb_get('sos'))
+            #     z = np.asarray(zpk[0])
+            #     p = np.asarray(zpk[1])
+            #     k = zpk[2]
+            #     logger.debug("\nz = %s\n\tp = %s", z, p)
+            # except Exception as e:
+            #     raise ValueError(e)
             # check whether sos conversion has created one or more superfluous
             # pole / zero pairs at the origin and delete them:
 
@@ -1305,11 +1311,12 @@ def fil_convert(format_in) -> None:
             fb_set('zpk', zpk_array)
 
         if 'ba' not in format_in:
-            try:
-                # returns a tuple of lists with shape (L, 5) where L is the number of sections
-                fb_set('ba', np.array(sig.sos2tf(fb_get('sos'))))
-            except Exception as e:
-                raise ValueError(e)
+            fb_set('ba', np.array(sig.sos2tf(fb_get('sos'))))
+            # try:
+            #     # returns a tuple of lists with shape (L, 5) where L is the number of sections
+            #     fb_set('ba', np.array(sig.sos2tf(fb_get('sos'))))
+            # except Exception as e:
+            #     raise ValueError(e)
             # check whether sos conversion has created additional (superfluous)
             # highest order polynomial with coefficient 0 and delete them (last row)
             if fb_get('ba')[0][-1] == 0 and fb_get('ba')[1][-1] == 0:
@@ -1318,10 +1325,11 @@ def fil_convert(format_in) -> None:
     elif 'zpk' in format_in:  # z, p, k have been generated,convert to other formats
         zpk = fb_get('zpk')
         if 'ba' not in format_in:
-            try:
-                fb_set('ba', np.array(sig.zpk2tf(zpk[0], zpk[1], zpk[2][0])))
-            except Exception as e:
-                raise ValueError(e)
+            fb_set('ba', np.array(sig.zpk2tf(zpk[0], zpk[1], zpk[2][0])))
+            # try:
+            #     fb_set('ba', np.array(sig.zpk2tf(zpk[0], zpk[1], zpk[2][0])))
+            # except Exception as e:
+            #     raise ValueError(e)
         if 'sos' not in format_in:
             try:
                 if not np.isscalar(zpk[2]):
