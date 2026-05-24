@@ -514,7 +514,7 @@ similarities.ignore-imports = true
 # Signatures are removed from the similarity computation
 similarities.ignore-signatures = true
 # Minimum lines number of a similarity.
-similarities.min-similarity-lines = 4
+similarities.min-similarity-lines = 8
 # Limits count of emitted suggestions for spelling mistakes.
 spelling.max-spelling-suggestions = 4
 # Spelling dictionary name. Available dictionaries: en (aspell), en_AU (aspell),
