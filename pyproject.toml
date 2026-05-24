@@ -98,7 +98,7 @@ exclude = [
 # select rules to enable for linting
 select = [
     "B",  # flake8-bugbear: find likely bugs and design problems
-    # "C",  # flake8-comprehensions
+    "C",  # flake8-comprehensions
     "E",  # # pycodestyle errors (like missing whitespace or newline at end of file)
     "F",  # pyflakes
     "G",  # flake8-logging-format
@@ -113,7 +113,8 @@ select = [
     "UP031",   # Use format specifiers instead of percent
     "UP032", # Use f-strings instead of str.format()
     ]
-ignore = [# "E501", # line too long
+ignore = ["C901", # ... is too complex
+          # "E501", # line too long
           # "W503", # line break before binary operator
           # "F403", # 'from module import *' used; unable to detect undefined names
           # "E203"  # whitespace before ':', conflicts with black
