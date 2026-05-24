@@ -426,8 +426,8 @@ class Input_PZ(QWidget):
         idx = []
         for _ in table.selectedItems():
             idx.append([_.column(), _.row(), ])
-        cols = sorted(list({i[0] for i in idx}))
-        rows = sorted(list({i[1] for i in idx}))
+        cols = sorted({i[0] for i in idx})
+        rows = sorted({i[1] for i in idx})
         cur = (table.currentColumn(), table.currentRow())
         # cur_idx_row = table.currentIndex().row()
 

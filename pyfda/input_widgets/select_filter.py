@@ -131,7 +131,7 @@ class SelectFilter(QWidget):
         # Translate short response type ("LP") to displayed names ("Lowpass")
         # (correspondence is defined in pyfda_rc.py) and populate rt combo box
         #
-        rt_list = sorted(list(TB.fil_tree.keys()))
+        rt_list = sorted(TB.fil_tree.keys())
 
         for rt in rt_list:
             try:

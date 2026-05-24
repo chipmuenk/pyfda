@@ -753,7 +753,7 @@ class Input_Coeffs(QWidget):
         sel = qget_selected(self.tblCoeff)['sel']
 
         # merge selections in both columns, remove duplicates and sort
-        sel_01 = sorted(list(set(sel[0]).union(set(sel[1]))))
+        sel_01 = sorted(set(sel[0]).union(set(sel[1])))
 
         if not any(sel):  # nothing selected, append row of zeros after last row
             self.ba = np.insert(self.ba, len(self.ba[0]), 0, axis=1)
