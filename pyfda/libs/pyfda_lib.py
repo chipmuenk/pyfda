@@ -1564,10 +1564,14 @@ def format_ticks(ax, xy: str, scale: float = 1., format: str = "%.1f") -> None:
         # get location and content of xticks
         # locx,labelx = ax.get_xticks(), ax.get_xticklabels()
         locx = ax.get_xticks()
-        ax.set_xticks(locx, map(lambda x: format % x, locx*scale))
+        ax.set_xticks(locx)
+        ax.set_xticklabels(list(map(lambda x: format % x, locx*scale)))
+        # ax.set_xticks(locx, map(lambda x: format % x, locx*scale))
+
     if xy == 'y' or xy == 'xy':
         locy = ax.get_yticks()  # get location and content of xticks
-        ax.set_yticks(locy, map(lambda y: format % y, locy*scale))
+        ax.set_yticks(locy)
+        ax.set_yticklabels(list(map(lambda y: format % y, locy*scale)))
 
 
 # ------------------------------------------------------------------------------
