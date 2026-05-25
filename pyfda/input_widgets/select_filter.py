@@ -77,18 +77,15 @@ class SelectFilter(QWidget):
         its parent widget to prevent infinite loops.
 
         """
-        # logger.warning(f"SIG_RX: {pprint_log(dict_sig)}")
+        # logger.warning("SIG_RX: \n%s", pprint_log(dict_sig))
         if dict_sig['id'] == id(self):
             # logger.warning(f"Stopped infinite loop:\n\tPropagate = {propagate}\
             #               \n{first_item(dict_sig)}")
             return
 
-        if 'data_changed' in dict_sig:
-            if dict_sig['data_changed'] == 'filter_loaded':
-                """
-                Called when a new filter has been LOADED,
-                pass new filter data from the global filter dict to load_dict()
-                """
+        if 'data_changed' in dict_sig and dict_sig['data_changed'] == 'filter_loaded':
+            # Called when a new filter has been LOADED,
+            # updating UI and settings via load_dict()
             self.load_dict()
 
     # -------------------------------------------------------------------------
