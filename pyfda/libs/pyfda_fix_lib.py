@@ -336,7 +336,7 @@ csd2dec_vec = np.vectorize(csd2dec)  # safer than np.frompyfunc()
 
 
 # ------------------------------------------------------------------------
-class Fixed(object):
+class Fixed():
     """
     Implement binary quantization of signed scalar or array-like objects
     in the form WI.WF where WI and WF are the wordlength of integer resp.
