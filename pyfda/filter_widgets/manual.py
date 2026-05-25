@@ -120,27 +120,21 @@ class Manual_FIR():
 
     def LPman(self):
         """ Dummy method, to display widgets corresponding to filter type in UI """
-        pass
 
     def HPman(self):
         """ Dummy method, to display widgets corresponding to filter type in UI """
-        pass
 
     def BPman(self):
         """ Dummy method, to display widgets corresponding to filter type in UI """
-        pass
 
     def BSman(self):
         """ Dummy method, to display widgets corresponding to filter type in UI """
-        pass
 
     def HILman(self):
         """ Dummy method, to display widgets corresponding to filter type in UI """
-        pass
 
     def DIFFman(self):
         """ Dummy method, to display widgets corresponding to filter type in UI """
-        pass
 
 #############################################################################
 class Manual_IIR():
@@ -205,31 +199,24 @@ class Manual_IIR():
 
     def LPman(self):
         """ Dummy method, to display widgets corresponding to filter type in UI """
-        pass
 
     def HPman(self):
         """ Dummy method, to display widgets corresponding to filter type in UI """
-        pass
 
     def BPman(self):
         """ Dummy method, to display widgets corresponding to filter type in UI """
-        pass
 
     def BSman(self):
         """ Dummy method, to display widgets corresponding to filter type in UI """
-        pass
 
     def HILman(self):
         """ Dummy method, to display widgets corresponding to filter type in UI """
-        pass
 
     def DIFFman(self):
         """ Dummy method, to display widgets corresponding to filter type in UI """
-        pass
 
 
 #------------------------------------------------------------------------------
-
 if __name__ == '__main__':
     # Run module standalone using "python -m pyfda.filter_widgets.manual"
     from pyfda.filterbroker import fb_get
