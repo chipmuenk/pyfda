@@ -14,7 +14,7 @@ import logging
 from .pyfda_lib import pprint_log
 
 from .compat import (
-    Qt, QtGui, QtCore, QFrame, QMessageBox, QPushButton, QLabel, QComboBox, QDialog,
+    Qt, QtGui, QtCore, QFrame, QMessageBox, QPushButton, QLabel, QComboBox, QDialog, QtWidgets,
     QFont, QFontMetrics, QSizePolicy, QIcon, QEvent, QHBoxLayout)
 from .pyfda_dirs import OS, OS_VER
 
@@ -969,10 +969,10 @@ class RotatedButton(QPushButton):
         event : QEvent
             The paint event to process.
         """
-        painter = QtGui.QStylePainter(self)
+        painter = QtWidgets.QStylePainter(self)
         painter.rotate(90)
         painter.translate(0, -1 * self.width())
-        painter.drawControl(QtGui.QStyle.CE_PushButton, self.getSyleOptions())
+        painter.drawControl(QtWidgets.QStyle.CE_PushButton, self.getSyleOptions())
 
     def minimumSizeHint(self) -> QtCore.QSize:
         """
@@ -1000,36 +1000,35 @@ class RotatedButton(QPushButton):
         size.transpose()
         return size
 
-    def getSyleOptions(self):
+    def getSyleOptions(self) -> QtWidgets.QStyleOptionButton:
         """
         Retrieve the style options for the rotated button.
 
         Returns
         -------
-        QtGui.QStyleOptionButton
+        QtWidgets.QStyleOptionButton
             The style options for the button.
         """
-        # TODO: Does this exist in QtGui?
-        options = QtGui.QStyleOptionButton()
+        options = QtWidgets.QStyleOptionButton()
         options.initFrom(self)
         size = options.rect.size()
         size.transpose()
         options.rect.setSize(size)
-        # options.features = QtGui.QStyleOptionButton.None
+        # options.features = QtWidgets.QStyleOptionButton.None
         if self.isFlat():
-            options.features |= QtGui.QStyleOptionButton.Flat
+            options.features |= QtWidgets.QStyleOptionButton.Flat
         if self.menu():
-            options.features |= QtGui.QStyleOptionButton.HasMenu
+            options.features |= QtWidgets.QStyleOptionButton.HasMenu
         if self.autoDefault() or self.isDefault():
-            options.features |= QtGui.QStyleOptionButton.AutoDefaultButton
+            options.features |= QtWidgets.QStyleOptionButton.AutoDefaultButton
         if self.isDefault():
-            options.features |= QtGui.QStyleOptionButton.DefaultButton
+            options.features |= QtWidgets.QStyleOptionButton.DefaultButton
         if self.isDown() or (self.menu() and self.menu().isVisible()):
-            options.state |= QtGui.QStyle.State_Sunken
+            options.state |= QtWidgets.QStyle.State_Sunken
         if self.isChecked():
-            options.state |= QtGui.QStyle.State_On
+            options.state |= QtWidgets.QStyle.State_On
         if not self.isFlat() and not self.isDown():
-            options.state |= QtGui.QStyle.State_Raised
+            options.state |= QtWidgets.QStyle.State_Raised
 
         options.text = self.text()
         options.icon = self.icon()
