@@ -68,11 +68,11 @@ def bin2hex(bin_str: str, WI=0) -> str:
         # slice string with integer bits and prepend with zeros to obtain a
         # multiple of 4 length:
         bin_i_str = bin_str[:WI+1]
-        while (len(bin_i_str) % 4 != 0):
+        while len(bin_i_str) % 4 != 0:
             bin_i_str = "0" + bin_i_str
 
         i = 0
-        while (i < len(bin_i_str)):  # map chunks of 4 binary bits to one hex digit
+        while i < len(bin_i_str):  # map chunks of 4 binary bits to one hex digit
             hex_str = hex_str + wmap[bin_i_str[i:i + 4]]
             i = i + 4
     else:
@@ -85,11 +85,11 @@ def bin2hex(bin_str: str, WI=0) -> str:
         hex_str = hex_str + '.'
         bin_f_str = bin_str[WI+1:]
 
-        while (len(bin_f_str) % 4 != 0):
+        while len(bin_f_str) % 4 != 0:
             bin_f_str = bin_f_str + "0"
 
         i = 0
-        while (i < len(bin_f_str)):  # map chunks of 4 binary bits to one hex digit
+        while i < len(bin_f_str):  # map chunks of 4 binary bits to one hex digit
             hex_str = hex_str + wmap[bin_f_str[i:i + 4]]
             i = i + 4
 
@@ -126,11 +126,11 @@ def bin2oct(bin_str: str, WI=0) -> str:
         # slice string with integer bits and prepend with zeros to obtain a
         # multiple of 3 length:
         bin_i_str = bin_str[:WI+1]
-        while (len(bin_i_str) % 3 != 0):
+        while len(bin_i_str) % 3 != 0:
             bin_i_str = "0" + bin_i_str
 
         i = 0
-        while (i < len(bin_i_str)):  # map chunks of 3 binary bits to one oct digit
+        while i < len(bin_i_str):  # map chunks of 3 binary bits to one oct digit
             oct_str = oct_str + wmap[bin_i_str[i:i + 3]]
             i = i + 3
     else:
@@ -144,12 +144,12 @@ def bin2oct(bin_str: str, WI=0) -> str:
         oct_str = oct_str + '.'
         bin_f_str = bin_str[WI+1:]
 
-        while (len(bin_f_str) % 3 != 0):
+        while len(bin_f_str) % 3 != 0:
             bin_f_str = bin_f_str + "0"
 
         # map chunks of 3 binary bits to one octal digit
         i = 0
-        while (i < len(bin_f_str)):
+        while i < len(bin_f_str):
             oct_str = oct_str + wmap[bin_f_str[i:i + 3]]
             i = i + 3
 
@@ -224,7 +224,7 @@ def dec2csd(dec_val, WF=0):
     prev_non_zero = False
     k -= 1  # current exponent in the CSD string under construction
 
-    while(k >= -WF):  # has the last fractional digit been reached
+    while k >= -WF:  # has the last fractional digit been reached?
         limit = pow(2.0, k+1) / 3.0
 
         logger.debug("\t%s - %s", remainder, limit)
@@ -806,8 +806,8 @@ class Fixed():
             self.N_over = 0  # self.N_over_neg = self.N_over_pos =
         else:
             # Bool. vectors with '1' for every neg./pos overflow:
-            over_neg = (yq < MIN)
-            over_pos = (yq > MAX)
+            over_neg = yq < MIN
+            over_pos = yq > MAX
             # create flag / array of flags for pos. / neg. overflows
             self.ovr_flag = over_pos.astype(int) - over_neg.astype(int)
             # No. of pos. / neg. / all overflows occured since last reset:
