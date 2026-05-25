@@ -205,7 +205,7 @@ class WeightSpecs(QWidget):
         """
         Reload textfields from filter dictionary to update changed settings
         """
-        for _, qle in enumerate(self.qlineedit):
+        for qle in self.qlineedit:
             weight_value = fb_get(str(qle.objectName()))
 
             if not qle.hasFocus():
@@ -278,7 +278,7 @@ class WeightSpecs(QWidget):
         """
         Reset all entries to "1.0" and store them in the filter dictionary
         """
-        for _, qle in enumerate(self.qlineedit):
+        for qle in self.qlineedit:
             qle.setText("1")
 
             w_label = str(qle.objectName())
