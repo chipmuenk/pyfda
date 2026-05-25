@@ -104,6 +104,7 @@ select = [
     "G",  # flake8-logging-format
     # "C90",  # max. mccabe complexity of functions
     # "I",    # isort of imports
+    "E721",
     "NPY201", # numpy 2 style guide violations
     "W",  # pycodestyle warnings (like trailing whitespace)
     "RET",    # flake8-return (unnecessary "else"/"elif" after "return",
@@ -396,7 +397,7 @@ logging.logging-modules = [ "logging" ]
 # A comma-separated list of package or module names from where C extensions may
 # be loaded. Extensions are loading into the active Python interpreter and may
 # run arbitrary code.
-# extension-pkg-allow-list =
+extension-pkg-allow-list = ["PyQt5.QtCore"]
 # A comma-separated list of package or module names from where C extensions may
 # be loaded. Extensions are loading into the active Python interpreter and may
 # run arbitrary code. (This is an alternative name to extension-pkg-allow-list
@@ -412,13 +413,12 @@ main.fail-under = 10
 # the module_or_package argument.
 # from-stdin =
 # Files or directories to be skipped. They should be base names, not paths.
-main.ignore = [ "CVS", "bak", "tests"]
+main.ignore = [ "CVS", "bak", "tests", "qrc_resources"]
 # Add files or directories matching the regular expressions patterns to the
 # ignore-list. The regex matches against paths and can be in Posix or Windows
 # format. Because '\\' represents the directory delimiter on Windows systems, it
 # can't be used as an escape character.
 ignore-paths=['^bak/.*$', '^pyfda/bak/.*$', '^pyfda/tests/.*$', '^pyfda/fixpoint_widgets/old/.*$']
-# ignore-paths =
 # Files or directories matching the regular expression patterns are skipped. The
 # regex matches against base names, not paths. The default value ignores Emacs
 # file locks
