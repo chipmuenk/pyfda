@@ -11,6 +11,9 @@
 #
 # Author: Christian Münker
 ######################################################
+"""
+Subwidget for entering amplitude specifications
+"""
 
 import sys
 import logging
