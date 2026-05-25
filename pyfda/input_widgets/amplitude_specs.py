@@ -96,8 +96,7 @@ class AmplitudeSpecs(QWidget):
 
         # find index for default unit from dictionary and set the unit
         amp_idx = self.cmbUnitsA.findData(fb_get('amp_specs_unit'))
-        if amp_idx < 0:
-            amp_idx = 0
+        amp_idx = max(amp_idx, 0)
         self.cmbUnitsA.setCurrentIndex(amp_idx)  # initialize for dBs
 
         layHTitle = QHBoxLayout()  # layout for title and unit
