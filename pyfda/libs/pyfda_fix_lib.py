@@ -314,19 +314,19 @@ def csd2dec(csd_str):
     dec_val = 0.0
 
     # start from the MSB and work all the way down to the last digit
-    for ii in range(len(csd_str)):
+    for pos, digit in enumerate(csd_str):
 
-        power_of_two = 2.0**(msb_power-ii)
+        power_of_two = 2.0**(msb_power-pos)
 
-        if csd_str[ii] == '+':
+        if digit == '+':
             dec_val += power_of_two
-        elif csd_str[ii] == '-':
+        elif digit == '-':
             dec_val -= power_of_two
         # else
         #    ... all other values are ignored
 
         # logger.debug('  "{0:s}" (QI = {1:d}); 2**{2:d} = {3}; Num={4:f}'.format(
-        #        csd_str[ii], len(csd_str), msb_power-ii, power_of_two, dec_val))
+        #        digit, len(csd_str), msb_power-pos, power_of_two, dec_val))
 
     return dec_val
 
