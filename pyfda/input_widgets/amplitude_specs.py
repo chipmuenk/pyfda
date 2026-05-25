@@ -245,16 +245,16 @@ class AmplitudeSpecs(QWidget):
 
         filt_type = fb_get('ft')
 
-        for i in range(len(self.qlineedit)):
-            amp_label = str(self.qlineedit[i].objectName())
+        for qle in self.qlineedit:
+            amp_label = str(qle.objectName())
             amp_value = lin2unit(fb_get(amp_label), filt_type, amp_label, unit=unit)
 
-            if not self.qlineedit[i].hasFocus():
+            if not qle.hasFocus():
                 # widget has no focus, round the display
-                self.qlineedit[i].setText(params['FMT'].format(amp_value))
+                qle.setText(params['FMT'].format(amp_value))
             else:
                 # widget has focus, show full precision
-                self.qlineedit[i].setText(str(amp_value))
+                qle.setText(str(amp_value))
 
     # --------------------------------------------------------------------------
     def _set_amp_unit(self) -> None:

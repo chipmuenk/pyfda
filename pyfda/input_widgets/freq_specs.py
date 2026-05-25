@@ -233,8 +233,8 @@ class FreqSpecs(QWidget):
         update frequency unit. This is called by via signal {'view_changed': 'f_S'}.
         """
         if fb_get('freq_locked'):
-            for i in range(len(self.qlineedit)):
-                f_name = str(self.qlineedit[i].objectName()).split(":", 1)
+            for qle in self.qlineedit:
+                f_name = str(qle.objectName()).split(":", 1)
                 f_label = f_name[0]
                 f_value = fb_get(f_label) * fb_get('f_S_prev') / fb_get('f_S')
                 # logger.warning(
@@ -339,8 +339,8 @@ class FreqSpecs(QWidget):
         at another place, indicating that a reload is required.
         """
         # update displayed freq spec values for (maybe) changed f_S
-        for i in range(len(self.qlineedit)):
-            self.update_f_display(self.qlineedit[i])
+        for i, qle in enumerate(self.qlineedit):
+            self.update_f_display(qle)
 
             # Print label with "f" for absolute and with "F" for normalized frequencies
             lbl_text = self.qlabels[i].text()
