@@ -12,7 +12,7 @@ been removed
 """
 # disable warnings about unused imports, as this is a compatibility module
 # ruff: noqa: F401
-from PyQt5 import QtGui, QtCore, QtTest, QtWidgets
+from PyQt5 import QtGui, QtCore, QtWidgets
 from PyQt5.QtCore import (Qt, QEvent, QT_VERSION_STR, PYQT_VERSION_STR, QSize, QSysInfo,
                           QObject, QVariant, QPoint, pyqtSignal, pyqtSlot)
 from PyQt5.QtGui import (QFont, QFontMetrics, QIcon, QImage, QTextCursor, QColor,
@@ -27,7 +27,6 @@ from PyQt5.QtWidgets import (QAction, QMenu,
                              QSizePolicy, QAbstractItemView, QSpacerItem,
                              QHBoxLayout, QVBoxLayout, QGridLayout,
                              QStyledItemDelegate, QStyle, QStyleOption)
-from PyQt5.QtTest import QTest, QSignalSpy
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.backends.backend_qt5agg import NavigationToolbar2QT as NavigationToolbar
 

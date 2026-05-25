@@ -9,8 +9,8 @@ import unittest
 import logging
 
 from pyfda.libs.pyfda_qt_lib import qget_cmb_box, qset_cmb_box
-from pyfda.libs.compat import (
-    Qt, QTest, QSignalSpy, QPoint, QApplication, QTableWidgetItem)
+from pyfda.libs.compat import (Qt, QPoint, QApplication, QTableWidgetItem)
+from PyQt5.QtTest import QTest, QSignalSpy
 from pyfda.input_widgets.input_coeffs import Input_Coeffs
 
 app = QApplication(sys.argv)
@@ -68,8 +68,8 @@ class FilterCoeffsTest(unittest.TestCase):
         edit_wdg.clear()
         QTest.keyClicks(edit_wdg, arg)
         # name.setText(str(arg))
-        # QtTest.QTest.keyPress(name.setText(), Qt.Key_Enter, NULL, 100)
-        # QtTest.QTest.keyRelease(name.setText(), Qt.Key_Enter, NULL, 100)
+        # QTest.keyPress(name.setText(), Qt.Key_Enter, NULL, 100)
+        # QTest.keyRelease(name.setText(), Qt.Key_Enter, NULL, 100)
 
     def initialize_form(self):
         """ utility function for initializing the form """
@@ -220,5 +220,5 @@ class FilterCoeffsTest(unittest.TestCase):
 
 
 if __name__ == '__main__':
-    """run tests with python -m pyfda.tests.widgets.test_input_coeffs"""
+    """run tests with python -m pyfda.tests.widgets.input_widgets.test_input_coeffs"""
     unittest.main()
