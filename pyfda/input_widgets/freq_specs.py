@@ -314,8 +314,6 @@ class FreqSpecs(QWidget):
             else:
                 logger.warning("Unsupported state '%s'!", state)
 
-        return
-
 # -------------------------------------------------------------
     def load_dict(self) -> None:
         """
