@@ -205,15 +205,15 @@ class WeightSpecs(QWidget):
         """
         Reload textfields from filter dictionary to update changed settings
         """
-        for i in range(len(self.qlineedit)):
-            weight_value = fb_get(str(self.qlineedit[i].objectName()))
+        for _, qle in enumerate(self.qlineedit):
+            weight_value = fb_get(str(qle.objectName()))
 
-            if not self.qlineedit[i].hasFocus():
+            if not qle.hasFocus():
                 # widget has no focus, round the display
-                self.qlineedit[i].setText(params['FMT'].format(weight_value))
+                qle.setText(params['FMT'].format(weight_value))
             else:
                 # widget has focus, show full precision
-                self.qlineedit[i].setText(str(weight_value))
+                qle.setText(str(weight_value))
 
     # ------------------------------------------------------------------------------
     def _store_entry(self, widget: QtCore.QObject) -> None:
@@ -224,10 +224,8 @@ class WeightSpecs(QWidget):
         if self.spec_edited:
             w_label = str(widget.objectName())
             w_value = safe_eval(widget.text(), self.data_prev, sign='pos')
-            if w_value < 1:
-                w_value = 1
-            if w_value > 1.e6:
-                w_value = 1.e6
+            w_value = max(w_value, 1)
+            w_value = min(w_value, 1.e6)
             fb_set(w_label, w_value, new_key=w_label not in fb_get())
             self.emit({'specs_changed': 'w_specs'})
             self.spec_edited = False  # reset flag
@@ -280,10 +278,10 @@ class WeightSpecs(QWidget):
         """
         Reset all entries to "1.0" and store them in the filter dictionary
         """
-        for i in range(len(self.qlineedit)):
-            self.qlineedit[i].setText("1")
+        for _, qle in enumerate(self.qlineedit):
+            qle.setText("1")
 
-            w_label = str(self.qlineedit[i].objectName())
+            w_label = str(qle.objectName())
             fb_set(w_label, 1.0)
 
         self.load_dict()
