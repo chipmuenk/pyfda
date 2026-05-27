@@ -35,7 +35,6 @@ class ParseError(Exception):
     Could be used as raise ParseError("message") in the code below to indicate
     problems during parsing.
     """
-    pass
 
 
 class ConfigFileParser():
@@ -199,14 +198,13 @@ class ConfigFileParser():
                     f'Config file not found / not readable\n\t"{dirs.USER_CONF_DIR_FILE}"')
 
             # -----------------------------------------------------------------
-            # setup an instance of config parser, allow  keys without value
+            # setup an instance of config parser, allow  keys without value and
+            # interpolation across sections, i.e. ${Dirs:dir1}
             # -----------------------------------------------------------------
-            self.conf = configparser.ConfigParser(allow_no_value=True)
+            self.conf = configparser.ConfigParser(allow_no_value=True,
+                                                  interpolation=configparser.ExtendedInterpolation())
             # preserve case of parsed options by overriding optionxform(), set it to function str()
             self.conf.optionxform = str
-            # Allow interpolation across sections, i.e. ${Dirs:dir1}
-            self.conf._interpolation = configparser.ExtendedInterpolation()
-
             _print_conf_file()
             # ------------------------------------------------------------------
             # Parsing [Common]
