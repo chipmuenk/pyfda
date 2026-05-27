@@ -300,7 +300,7 @@ near ``f_S/2`` (highpass).
             b0[::2] = -1. # h[n] = {1; -1; 1; -1; ...}
 
             i = np.arange(L)
-            if (L % 2 == 0): # even order, remove middle element
+            if L % 2 == 0: # even order, remove middle element
                 i = np.delete(i ,round(L/2.))
             else: # odd order, shift by 0.5 and remove middle element
                 i = np.delete(i, int(L/2.)) + 0.5
