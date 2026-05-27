@@ -68,7 +68,7 @@ class FIR_DF_amaranth_UI(QWidget):
             self.update_ovfl_cnt_all()  # initialize all overflow counters / display
         elif _cmp_ver < -1:
             # Amaranth is not installed or version cannot be determined
-            logger.error("Module amaranth needs to be installed to use the fixpoint filter ",
+            logger.error("Module amaranth needs to be installed to use the fixpoint filter %s!",
             self.__class__.__name__)
         else:
             # Version is too old
@@ -280,7 +280,7 @@ if __name__ == '__main__':
     # Run widget standalone with
     # `python -m pyfda.fixpoint_widgets.fir_df.fir_df_amaranth_ui`
     from pyfda.libs.compat import QApplication
-    from pyfda import pyfda_rc, qrc_resources  # noqa: F401
+    from pyfda import pyfda_rc, qrc_resources  # noqa: F401 # pylint: disable=unused-import
 
     app = QApplication(sys.argv)
     app.setStyleSheet(pyfda_rc.QSS_RC)
