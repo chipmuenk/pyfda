@@ -333,9 +333,15 @@ class ConfigFileParser():
         ConfigFileParser.PLOT_CLASSES_DICT =\
             self._build_widget_class_dict("Plot Widgets", "plot_widgets")
         # ------------------------------------------------------------------
-        # Parsing [Filter Widgets]
+        # Parsing [Filter Widgets] -> filter_widgets
         # ------------------------------------------------------------------
         filter_classes = self._build_widget_class_dict("Filter Widgets", "filter_widgets")
+        # Dict with filter classes as keys and dicts with options as values, e.g.
+        # {'Cheby1':{'name':'Chebyshev 1',
+        #            'mod':'pyfda.filter_design.cheby1',
+        #            'fix': 'IIR_cascade',
+        #            'opt': ["option1", "option2"]}}
+        #
         # currently, option "opt" can only be an association with a fixpoint
         # widget, so replace key "opt" by key "fix":
         # Convert to list in any case
