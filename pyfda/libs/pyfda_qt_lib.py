@@ -178,6 +178,7 @@ def qcmb_box_populate(cmb_box: QComboBox, items_list: list, item_init: str) -> i
     cmb_box.clear()
     if isinstance(items_list[0], str):  # combo box tool tipp (optional)
         cmb_box.setToolTip(cmb_box.tr(items_list[0]))
+        items_list.pop(0)  # remove tooltip from list of items
     for i, item in enumerate(items_list):
         if isinstance(item[1], QtGui.QIcon):
             cmb_box.addItem("", item[0])
