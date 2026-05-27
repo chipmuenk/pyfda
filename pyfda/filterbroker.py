@@ -508,8 +508,8 @@ def fb_set(*key_list: list | tuple, backup: bool = True, new_key: bool = False,
     the user. This will be done by prepending the keys with an underscore
     (e.g. `_f_S`) once all direct accesses have been removed.
     """
-    if not key_list:
-        raise KeyError("Key_list is empty!")
+    # if not key_list:
+    #     raise KeyError("Key_list is empty!")
 
     if not isinstance(key_list, (tuple, list)):
         raise TypeError(
