@@ -46,27 +46,36 @@ __version__ = "2.2"
 classes = {'MA':'Moving Average'} #: Dict containing class name : display name
 
 class MA(QWidget):
+    """Moving Average filter design widget.
+
+    This class implements the GUI and design logic for moving-average
+    FIR filters. It supports lowpass and highpass responses and can return
+    the design in coefficient form ("ba") or as zeros/poles/k gain ("zpk").
+
+    The class is re-instantiated dynamically every time the filter design
+    method is selected, so initialization is performed in the constructor.
+    """
 
     FRMT = ('zpk', 'ba') # output format(s) of filter design routines 'zpk' / 'ba' / 'sos'
 
 
-    info ="""
-**Moving average filters**
+    info = """
+    **Moving average filters**
 
-can only be specified via their length and the number of cascaded sections.
+    can only be specified via their length and the number of cascaded sections.
 
-The minimum order to obtain a certain attenuation at a given frequency is
-calculated via the si function.
+    The minimum order to obtain a certain attenuation at a given frequency is
+    calculated via the si function.
 
-Moving average filters can be implemented very efficiently in hard- and software
-as they require no multiplications but only addition and subtractions. Probably
-only the lowpass is really useful, as the other response types only filter out resp.
-leave components at ``f_S/4`` (bandstop resp. bandpass) resp. leave components
-near ``f_S/2`` (highpass).
+    Moving average filters can be implemented very efficiently in hard- and software
+    as they require no multiplications but only addition and subtractions. Probably
+    only the lowpass is really useful, as the other response types only filter out resp.
+    leave components at ``f_S/4`` (bandstop resp. bandpass) resp. leave components
+    near ``f_S/2`` (highpass).
 
-**Design routines:**
+    **Design routines:**
 
-``ma.calc_ma()``
+    ``ma.calc_ma()``
     """
     sig_tx = pyqtSignal(object)
 
