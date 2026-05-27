@@ -33,7 +33,7 @@ print(sys.path)
 
 # -- Project information -----------------------------------------------------
 project = 'pyfda'
-copyright = '2025, Christian Muenker'
+project_copyright = '2026, Christian Muenker'
 author = 'Christian Muenker'
 
 # Currently both are the same, unclear what `version` and `release` are used for
