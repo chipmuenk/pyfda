@@ -364,6 +364,8 @@ class ConfigFileParser():
         # classes by comparing them to the verified items of `FIXPOINT_CLASSES_DICT:
         for cls, options in filter_classes.items():
             if 'fix' in options:
+                if isinstance(options['fix'], str):
+                    options['fix'] = [options['fix']]
                 for fx_cls in options['fix']:
                     if fx_cls not in ConfigFileParser.FIXPOINT_CLASSES_DICT:
                         logger.warning(
