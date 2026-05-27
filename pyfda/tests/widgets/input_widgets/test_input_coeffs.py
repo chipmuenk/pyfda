@@ -34,7 +34,7 @@ class FilterCoeffsTest(unittest.TestCase):
 
     def set_cmb_box(self, cmb_wdg, arg):
         """
-        Set combobox `name` to item `arg`. Throw an error if the item
+        Set combobox `cmb_wdg` to item `arg`. Throw an error if the item
         doesn't exist in the combobox list.
         """
         if not cmb_wdg.isVisible():
