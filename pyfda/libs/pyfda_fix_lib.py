@@ -703,10 +703,9 @@ class Fixed():
                         self.N += y.size * 2
                     # try converting elements recursively:
                     except (TypeError, ValueError):
-                        yq = np.asarray(
-                            list(map(lambda y_scalar:\
-                                     self.fixp(y_scalar, in_frmt=in_frmt, out_frmt=out_frmt),
-                                     y)))
+                        yq = np.asarray([
+                            self.fixp(y_scalar, in_frmt=in_frmt, out_frmt=out_frmt)
+                            for y_scalar in y])
                         self.N += y.size
                         return yq
             else:
