@@ -486,7 +486,7 @@ def fb_set(*key_list: list | tuple, backup: bool = True, new_key: bool = False,
         is the value to be set.
     backup : bool
         Whether the previous state of the filter dict should be backed up
-    set_key : bool
+    new_key : bool
         Whether a new key:value pair should be added to the dictionary
     fil_dict : dict
         The dictionary to traverse.
@@ -532,8 +532,8 @@ def fb_set(*key_list: list | tuple, backup: bool = True, new_key: bool = False,
         # This could be dangerous because the keys in this sub-dictionary could be altered!
         if new_key:
             if set_key in d:
-                logger.warning("Key '%s' already exists in dictionary, overwriting\n"
-                               "\tprevious value '%s' with '%s'!", d[set_key], set_key)
+                logger.warning("Overwriting existing key '%s' in dictionary \n"
+                               "\twith '%s'!", d[set_key], set_key)
             d[set_key] = set_val  # set new key:value pair
             return 0
 
