@@ -362,14 +362,15 @@ class ConfigFileParser():
 
         # First check whether fixpoint options of the filter_classes are valid fixpoint
         # classes by comparing them to the verified items of `FIXPOINT_CLASSES_DICT:
-        for c in filter_classes:
-            if 'fix' in filter_classes[c]:
-                for w in filter_classes[c]['fix']:
-                    if w not in ConfigFileParser.FIXPOINT_CLASSES_DICT:
+        for cls, options in filter_classes.items():
+            if 'fix' in options:
+                for fx_cls in options['fix']:
+                    if fx_cls not in ConfigFileParser.FIXPOINT_CLASSES_DICT:
                         logger.warning(
                             'Removing invalid fixpoint module\n\t"%s" for filter class "%s".',
-                            w, c)
-                        filter_classes[c]['fix'].remove(w)
+                            fx_cls, cls)
+                        options['fix'].remove(fx_cls)
+                        logger.warning("fix: %s", options['fix'])
 
             # merge filter_classes info "filter class":[fx_class1, fx_class2]
             # and `FIXPOINT_CLASSES_DICT`` info "fixpoint class":[fil_class1, fil_class2]
@@ -378,13 +379,15 @@ class ConfigFileParser():
             # collect all fixpoint widgets (keys in FIXPOINT_CLASSES_DICT) which
             # have the class name c as a value
             fix_wdg = {
-                k for k, val in ConfigFileParser.FIXPOINT_CLASSES_DICT.items() if c in val['opt']}
+                k for k, val in ConfigFileParser.FIXPOINT_CLASSES_DICT.items() if cls in val['opt']}
             if len(fix_wdg) > 0:
-                if 'fix' in filter_classes[c]:
-                    # ... and merge it with the fixpoint options of class c
-                    fix_wdg = fix_wdg.union(filter_classes[c]['fix'])
+                if 'fix' in options:
+                    # if there are already fixpoint options for the filter class, add the new ones
+                    # and merge it with the fixpoint options of class cls, remove duplicates
+                    # by converting to set and back to list
+                    fix_wdg = fix_wdg.union(options['fix'])
 
-                filter_classes[c].update({'fix': list(fix_wdg)})
+                options.update({'fix': list(fix_wdg)})
 
         ConfigFileParser.FILTER_CLASSES_DICT = freeze_hierarchical(filter_classes)
 
