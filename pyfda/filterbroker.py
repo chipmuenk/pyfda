@@ -268,16 +268,9 @@ fil_ref = {
     }
 }
 
-  # create empty lists with length 10 for multiple filter designs and undo functions
+  # create empty lists with length 10 for multiple filter designs and undo memory
 fil = [None] * 10
 fil_undo = [None] * UNDO_LEN
-
-# https://nedbatchelder.com/text/names.html :
-# define fil[0] as a dict with "built-in" default. The argument defines the default
-# factory that is called when a key is missing. Here, lambda simply returns a float.
-# When e.g. list is given as the default_factory, an empty list is returned.
-# fil[0] = defaultdict(lambda: 0.123)
-fil[0] = {}
 
 # Copy fil_ref to fil[0] ... fil[9] to initialize all memories
 for i in range(len(fil)):
@@ -520,7 +513,8 @@ def fb_set(*key_list: list | tuple, backup: bool = True, new_key: bool = False,
 
     if not isinstance(key_list, (tuple, list)):
         raise TypeError(
-            "'key_list' needs to be tuple or list, not a '%s'!", type(key_list).__name__)
+            "A tuple or list of keys is needed for traversing the filter dict, not a '%s'!",
+            type(key_list).__name__)
 
     if len(key_list) < 2:
         raise KeyError("Not enough arguments for setting a dictionary value!")
@@ -539,7 +533,7 @@ def fb_set(*key_list: list | tuple, backup: bool = True, new_key: bool = False,
         if new_key:
             if set_key in d:
                 logger.warning("Key '%s' already exists in dictionary, overwriting\n"
-                               "\texisting value '%s' with '%s'!", d[set_key], set_key)
+                               "\tprevious value '%s' with '%s'!", d[set_key], set_key)
             d[set_key] = set_val  # set new key:value pair
             return 0
 
@@ -566,7 +560,7 @@ def fb_set(*key_list: list | tuple, backup: bool = True, new_key: bool = False,
             if types.issubset({'float', 'float64'}):
                 pass
             elif types.issubset({'list', 'tuple', 'ndarray'}):
-                logger.warning("Type mismatch: Setting\n\t'%s' of type '%s' with value "
+                logger.warning("Possible type mismatch: Setting\n\t'%s' of type '%s' with value "
                                 "of similar type '%s'", _print_dict(key_list),
                                 type(d[set_key]).__name__, type(set_val).__name__)
             else:
