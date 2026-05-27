@@ -345,12 +345,14 @@ class ConfigFileParser():
         # currently, option "opt" can only be an association with a fixpoint
         # widget, so replace key "opt" by key "fix":
         # Convert to list in any case
-        for c in filter_classes:
-            if 'opt' in filter_classes[c]:
-                filter_classes[c]['fix'] = filter_classes[c].pop('opt')
-            if 'fix' in filter_classes[c] and\
-                    isinstance(filter_classes[c]['fix'], str):
-                filter_classes[c]['fix'] = filter_classes[c]['fix'].split(',')
+
+        for options in filter_classes.values():
+            if 'opt' in options:
+                options['fix'] = options.pop('opt')
+            if 'fix' in options and\
+                    isinstance(options['fix'], str):
+                options['fix'] = options['fix'].split(',')
+
         # ------------------------------------------------------------------
         # Parsing [Fixpoint Filters] / modifying filter_classes dict
         # ------------------------------------------------------------------
