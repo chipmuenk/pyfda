@@ -201,9 +201,9 @@ class ConfigFileParser():
             # setup an instance of config parser, allow  keys without value and
             # interpolation across sections, i.e. ${Dirs:dir1}
             # -----------------------------------------------------------------
-            self.conf = configparser.ConfigParser(allow_no_value=True,
-                                                  interpolation=configparser.ExtendedInterpolation())
-            # preserve case of parsed options by overriding optionxform(), set it to function str()
+            self.conf = configparser.ConfigParser(
+                allow_no_value=True, interpolation=configparser.ExtendedInterpolation())
+            # preserve case of parsed options by overriding optionxform() with function str()
             self.conf.optionxform = str
             _print_conf_file()
             # ------------------------------------------------------------------
