@@ -273,8 +273,8 @@ fil = [None] * 10
 fil_undo = [None] * UNDO_LEN
 
 # Copy fil_ref to fil[0] ... fil[9] to initialize all memories
-for i in range(len(fil)):
-    fil[i] = copy.deepcopy(fil_ref)
+for f in fil:
+    f = copy.deepcopy(fil_ref)
 
 # -------------------------
 def restore_fil() -> int:
