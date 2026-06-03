@@ -82,7 +82,7 @@ class Delay(QWidget):
         """
         Create additional subwidget(s) needed for filter design:
         These subwidgets are instantiated dynamically when needed in
-        select_filter.py using the handle to the filter instance, fb.fil_inst.
+        select_filter.py using the handle to the filter instance.
         """
 
         self.lbl_delay = QLabel("Delays", self)

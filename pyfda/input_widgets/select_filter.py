@@ -347,7 +347,7 @@ class SelectFilter(QWidget):
             # its handle fb.fil_inst
             err = ff.fil_factory.create_fil_inst(fc)
             logger.debug(
-                "InputFilter.set_design_method triggered: %s\n\tReturned error code %s", fc, err)
+                "fil_factory.create_fil_inst triggered: %s\n\tReturned error code %s", fc, err)
             # ==================================================================
 
             # Check whether new design method also provides the old filter order method.

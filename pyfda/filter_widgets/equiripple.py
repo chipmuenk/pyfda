@@ -186,7 +186,7 @@ class Equiripple(QWidget):
         """
         Create additional subwidget(s) needed for filter design:
         These subwidgets are instantiated dynamically when needed in
-        select_filter.py using the handle to the filter instance, fb.fil_inst.
+        select_filter.py using the handle to the filter instance.
         """
         self.lbl_remez_1 = QLabel("Grid Density", self)
         self.lbl_remez_1.setObjectName('wdg_lbl_remez_1')

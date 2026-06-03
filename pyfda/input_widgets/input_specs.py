@@ -491,8 +491,8 @@ class Input_Specs(QWidget):
             fb_get('fc'), fb_get('rt'), fb_get('fo'))
 
         # ----------------------------------------------------------------------
-        # A globally accessible instance fb.fil_inst of selected filter class fc
-        # has been instantiated in InputFilter.set_design_method, now
+        # A globally accessible instance of selected filter class fc
+        # has been instantiated in filter_factory.set_design_method, now
         # call the method specified in the filter dict fil[0].
 
         # The name of the instance method is constructed from the response
