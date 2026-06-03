@@ -262,7 +262,7 @@ class Plot_Impz(QWidget):
         """
         Toggle setting of index_k button in filterbroker, update frequency scaling and call `draw()`
         """
-        fb.fil[0]["tab_yn"]["display_index_k"] = self.ui.but_freq_index_k.checked
+        fb_set("tab_yn", "display_index_k", self.ui.but_freq_index_k.checked)
         self.stim_wdg.ui.normalize_freqs()
         self.draw()
 

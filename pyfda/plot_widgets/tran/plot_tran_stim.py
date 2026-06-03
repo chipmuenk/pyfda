@@ -18,7 +18,7 @@ from scipy.special import sinc, diric
 
 from pyfda.libs.compat import QWidget, pyqtSignal, QVBoxLayout
 from pyfda.libs.pyfda_qt_lib import qget_cmb_box, qstyle_widget, emit
-import pyfda.filterbroker as fb
+from pyfda.filterbroker import fb_get
 from pyfda.libs.pyfda_lib import (
     pprint_log, rect_bl, sawtooth_bl, triang_bl, comb_bl, safe_numexpr_eval)
 
@@ -277,7 +277,7 @@ class Plot_Tran_Stim(QWidget):
         N_last = N_first + N_frame  # calculate last element index
         frm_slc = slice(N_first, N_last)  # current slice
         n = np.arange(N_first, N_last)  #  create frame index vector
-        t = n * fb.fil[0]['T_S']  # create time vector
+        t = n * fb_get('T_S')  # create time vector
         noi = 0  # fallback when no noise is selected
         # ====================================================================
 
@@ -446,7 +446,7 @@ class Plot_Tran_Stim(QWidget):
                 "A1": self.ui.A1, "A2": self.ui.A2, "f1": self.ui.f1, "f2": self.ui.f2,
                 "phi1": self.ui.phi1, "phi2": self.ui.phi2,
                 "T1": self.ui.T1, "T2": self.ui.T2, "N1": self.ui.N1, "N2": self.ui.N2,
-                "BW1": self.ui.BW1, "BW2": self.ui.BW2, "f_S": fb.fil[0]['f_S'],
+                "BW1": self.ui.BW1, "BW2": self.ui.BW2, "f_S": fb_get('f_S'),
                 "n": n, "t": t, "j": 1j}
 
             x[frm_slc] = safe_numexpr_eval(self.ui.stim_formula, (N_frame,), param_dict)

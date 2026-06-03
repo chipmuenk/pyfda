@@ -11,7 +11,7 @@ Create the UI for the PlotImz class
 """
 import logging
 
-import pyfda.filterbroker as fb
+from filterbroker import fb_get
 from pyfda.libs.compat import (
     QCheckBox, QWidget, QComboBox, QLineEdit, QLabel,
     QIcon, QProgressBar, pyqtSignal, QSize, QFrame,
@@ -115,8 +115,8 @@ class PlotImpz_UI(QWidget):
         self.bottom_f = -120  # initial value for log. scale
         self.param = None
 
-        self.f_scale = fb.fil[0]['f_S']
-        self.t_scale = fb.fil[0]['T_S']
+        self.f_scale = fb_get('f_S')
+        self.t_scale = fb_get('T_S')
 
         self.cur_win_id = "rectangular"  # set initial window type
 
@@ -254,12 +254,12 @@ class PlotImpz_UI(QWidget):
         self.but_fft_wdg.setCheckable(True)
         self.but_fft_wdg.setChecked(False)
 
-        self.qfft_win_select = QFFTWinCmbBox(fb.fil[0]['tran_freq_win'],
+        self.qfft_win_select = QFFTWinCmbBox(fb_get('tran_freq_win'),
             app='spec', objectName='qfft_win_select')
         self.all_wins_dict = self.qfft_win_select.all_wins_dict
 
         # instantiate FFT window with default windows dict
-        self.win_viewer = Plot_FFT_win(fb.fil[0]['tran_freq_win'],
+        self.win_viewer = Plot_FFT_win(fb_get('tran_freq_win'),
             app='spec', all_wins_dict=self.all_wins_dict, sym=False,
             title="pyFDA Spectral Window Viewer", object_name="impz_win_viewer")
         # create handle to window to hide it during the "quit" dialogue,
@@ -550,7 +550,7 @@ class PlotImpz_UI(QWidget):
             "<span>Show signal power in legend.</span>")
 
         self.but_freq_index_k = PushButtonRT(
-            self, text = "<i>k</i>", checked=fb.fil[0]["tab_yn"]["display_index_k"],
+            self, text = "<i>k</i>", checked=fb_get("tab_yn", "display_index_k"),
             objectName="but_freq_index_k")
         self.but_freq_index_k.setToolTip(
             "<span>Show FFT indices instead of frequencies.</span>")
@@ -687,7 +687,7 @@ class PlotImpz_UI(QWidget):
             self.N = self.N_end - self.N_start
         else:
             if self.but_N_auto.checked:  # automatic calculation
-                self.N = impz_len(fb.fil[0]['ba'], level=-40)
+                self.N = impz_len(fb_get('ba'), level=-40)
 
             # total number of points to be calculated: N_end = N + N_start
             self.N_end = self.N + self.N_start

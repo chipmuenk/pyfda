@@ -11,11 +11,11 @@ This class controls the view of QTableWidget items in a Model-View-Delegate
 architecture of the `Input_Coeffs()` widget. Coefficients of a digital filter
 can be viewed and edited in various fixpoint and float formats.
 
-Globally, coefficients are stored in the 2D float list `fb.fil[0]['ba']`
+Globally, coefficients are stored in the 2D numpy array `<fil_dict>['ba']`
 where the numerator b is the first and the denominator a the second column.
 A local copy is created as `self.parent.ba` of `Input_Coeffs()`where edits are
 stored via `setModelData()`. Changes are only passed back to the original
-`fb.fil[0]['ba']` list by `self.parent._save_dict()` when the user presses
+`<fil_dict>['ba']` list by `self.parent._save_dict()` when the user presses
 the `Apply` button in the `Input_Coeffs_UI()`.
 
 Coefficients are displayed and stored in a QTableWidget as string objects

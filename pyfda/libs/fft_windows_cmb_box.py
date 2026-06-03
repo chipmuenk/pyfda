@@ -42,7 +42,7 @@ class QFFTWinCmbBox(QWidget):
         super().__init__()
 
         self.setObjectName(objectName)
-        # key for storing / retrieving filter data from `fb.fil[0]['filter_widgets']`:
+        # key for storing / retrieving filter data from `<fil_dict>['filter_widgets']`:
         self.cur_win_dict = cur_win_dict
         self.err = False  # error flag for window calculation
 
@@ -162,7 +162,7 @@ class QFFTWinCmbBox(QWidget):
 
         Additionally, update the handle `self.win_fnct` to the window function and
         the entries for keys 'par_val' and 'id' of
-            `self.cur_win_dict = fb.fil[0][self.key_fil]`
+            `self.cur_win_dict = fb_get(self.key_fil)`
 
         Parameters
         ----------

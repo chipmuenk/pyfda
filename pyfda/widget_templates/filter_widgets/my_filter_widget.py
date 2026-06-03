@@ -21,6 +21,7 @@ import logging
 import numpy as np
 
 import pyfda.filterbroker as fb
+from pyfda.filterbroker import fb_get, fb_set
 from pyfda.libs.compat import QWidget, QLabel, QLineEdit, pyqtSignal, QVBoxLayout, QHBoxLayout
 from pyfda.libs.pyfda_qt_lib import popup_warning, emit
 from pyfda.libs.pyfda_lib import safe_eval
@@ -85,7 +86,7 @@ class AllpPZ(QWidget):
         """
         Create additional subwidget(s) needed for filter design:
         These subwidgets are instantiated dynamically when needed in
-        select_filter.py using the handle to the filter instance, fb.fil_inst.
+        select_filter.py
         """
         self.lbl_pole1 = QLabel("Pole 1", self)
         self.lbl_pole1.setObjectName('wdg_lbl_pole1')
