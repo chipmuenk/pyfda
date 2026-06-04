@@ -137,8 +137,7 @@ class AllpPZ(QWidget):
         self.p[1] = safe_eval(self.led_pole2.text(), self.p[1], return_type='cmplx')
         self.led_pole2.setText(str(self.p[1]))
 
-        fb.fil[0]['filter_widgets'].update({'allpass':{'p1':self.p[0], 'p2':self.p[1]}
-                                    })
+        fb_set('filter_widgets', {'allpass':{'p1':self.p[0], 'p2':self.p[1]}})
 
         # sig_tx -> select_filter -> filter_specs
         self.emit({'filt_changed': 'pole_1_2'})
@@ -150,8 +149,8 @@ class AllpPZ(QWidget):
         corresponding UI elements. dict2filter_params() is called upon initialization
         and when the filter is loaded from disk.
         """
-        if 'allpass' in fb.fil[0]['wdg_fil']:
-            wdg_fil_par = fb.fil[0]['filter_widgets']['allpass']
+        if 'allpass' in fb_get('wdg_fil'):
+            wdg_fil_par = fb_get('wdg_fil', 'allpass')
             if 'p1' in wdg_fil_par:
                 self.p1 = wdg_fil_par['p1']
                 self.led_pole1.setText(str(self.p1))
@@ -159,14 +158,14 @@ class AllpPZ(QWidget):
                 self.p2 = wdg_fil_par['p2']
                 self.led_pole2.setText(str(self.p2))
 
-    def _get_params(self, fil_dict):
+    def _get_params(self):
         """
         Get parameters needed for filter design from the passed dictionary and
         translate them to instance parameters, scaling / transforming them if needed.
         """
-        #self.p1     = fil_dict['zpk'][1][0]  # get the first and second pole
-        #self.p2     = fil_dict['zpk'][1][1]  # from central filter dect
-        logger.info(fil_dict['zpk'])
+        #self.p1     = fb_get('zpk')[1][0]  # get the first and second pole
+        #self.p2     = fb_get('zpk')[1][1]  # from central filter dect
+        logger.info(fb_get('zpk'))
 
     def _test_poles(self):
         """
@@ -174,21 +173,20 @@ class AllpPZ(QWidget):
         """
         if abs(self.p[0]) >= 1 or abs(self.p[1])  >=1:
             return popup_warning(self, self.p[0], "Delay")
-        else:
-            return True
 
-    def _save(self, fil_dict, arg=None):
+        return True
+
+    def _save(self, arg=None):
         """
         Convert between poles / zeros / gain, filter coefficients (polynomes)
-        and second-order sections and store all available formats in the passed
-        dictionary 'fil_dict'.
+        and second-order sections and store all available formats in the filter dict.
         """
         if arg is None:
             logger.error("Passed empty filter dict")
         logger.info(arg)
-        fil_save(fil_dict, arg, self.FRMT, __name__)
+        fil_save(arg, self.FRMT, __name__)
 
-        fil_dict['N'] = len(self.p)
+        fb_set('N', len(self.p))
 
 
     #--------------------------------------------------------------------------
@@ -196,18 +194,18 @@ class AllpPZ(QWidget):
     #--------------------------------------------------------------------------
     # The method name MUST be "FilterType"+"MinMan", e.g. LPmin or BPman
 
-    def APman(self, fil_dict):
+    def APman(self):
         """
         Calculate z =1/p* for a given set of poles p. If p=0, set z=0.
         The gain factor k is calculated from z and p at z = 1.
         """
-        self._get_params(fil_dict) # not needed here
+        self._get_params() # not needed here
         if not self._test_poles():
             return -1
-        self.z=[0,0]
+        self.z = [0,0]
         if self.p[0] != 0:
             self.z[0] = np.conj(1/self.p[0])
-        if type(self.p[0]) == complex:
+        if isinstance(self.p[0], complex):
             pass
         if self.p[1] != 0:
             self.z[1] = np.conj(1/self.p[1])
@@ -215,11 +213,12 @@ class AllpPZ(QWidget):
         k = np.abs(np.polyval(np.poly(self.p),1) / np.polyval(np.poly(self.z),1))
         zpk_list = [self.z,self.p,k]
 
-        self._save(fil_dict, zpk_list)
+        self._save(zpk_list)
 
 #------------------------------------------------------------------------------
 
 if __name__ == '__main__':
+    # Run module standalone with `python -m pyfda.widget_templates.filter_widgets.my_filter_widget`
     import sys
     from pyfda.libs.compat import QApplication, QFrame
 
@@ -234,7 +233,7 @@ if __name__ == '__main__':
     layVDynWdg.addWidget(wdg_allpass, stretch = 1)
 
     filt.APman(fb.fil[0])  # design an all pass filter with parameters from global dict
-    print(fb.fil[0][filt.FRMT]) # return results in default format
+    print(fb_get(filt.FRMT)) # return results in default format
 
     frmMain = QFrame()
     frmMain.setFrameStyle(QFrame.StyledPanel|QFrame.Sunken)
@@ -245,4 +244,3 @@ if __name__ == '__main__':
     form.show()
 
     app.exec_()
-    #------------------------------------------------------------------------------
