@@ -273,8 +273,16 @@ fil = [None] * 10
 fil_undo = [None] * UNDO_LEN
 
 # Copy fil_ref to fil[0] ... fil[9] to initialize all memories
-for f in fil:
-    f = copy.deepcopy(fil_ref)
+
+# Why doesn't this work? It seems that all entries in fil[0] ... fil[9] are references to the
+# same dict fil_ref, so that changing one of them changes all of them. This is not the case
+# for the nested dicts and lists, which are also references but they are not changed by changing
+# the reference to the outer dict. So we need to create a deep copy of fil_ref for each entry
+# in fil.
+# for f in fil:
+#   f = copy.deepcopy(fil_ref)
+for i in range(len(fil)):
+    fil[i] = copy.deepcopy(fil_ref)
 
 # -------------------------
 def restore_fil() -> int:
