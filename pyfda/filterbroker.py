@@ -346,14 +346,14 @@ def _print_dict(key_list: list | tuple, top_dict_str = "fil[0]") -> str:
     key_list = ['fxq', 'QCA', 'WF'] returns "fil[0]['fxq']['QCA']['WF']"
 
     """
-    if len(key_list) < 2:
-        raise KeyError("Not enough arguments to define a dictionary!")
+    if not key_list or not isinstance(key_list, (tuple, list)):
+        raise KeyError("Need a non-empty list or tuple of keys for printing the dictionary!")
 
     dict_str = top_dict_str
-    if len(key_list) < 3:  # only one level dictionary, key_list[-1] is already the key
-        dict_str += '[' + key_list[-2] + ']'
+    if len(key_list) == 1:  # only one level dictionary with key_list[0]
+        dict_str += '[' + key_list[0] + ']'
     else:
-        for k in key_list[:-1]:
+        for k in key_list:
             dict_str += '[' + k + ']'
     return dict_str
 
@@ -491,7 +491,7 @@ def fb_set(*key_list: list | tuple, backup: bool = True, new_key: bool = False,
     ----------
     key_list : list or tuple
         List or tuple of keys for traversing the (nested) dictionary, the last element
-        is the value to be set.
+        is the value to be set. Hence, this element is not used for traversing the dictionary.
     backup : bool
         Whether the previous state of the filter dict should be backed up
     new_key : bool
@@ -549,7 +549,7 @@ def fb_set(*key_list: list | tuple, backup: bool = True, new_key: bool = False,
             # keys1 = d[set_key].keys()
             logger.warning(
                 "Danger! Overwriting the dict '%s'\n\t%s with \n\t%s",
-                _print_dict(key_list), d[set_key], set_val)
+                _print_dict(key_list[:-1]), d[set_key], set_val)
 
         if set_key =='qfrmt':
             if len(key_list) > 2:
@@ -569,15 +569,16 @@ def fb_set(*key_list: list | tuple, backup: bool = True, new_key: bool = False,
                 pass
             elif types.issubset({'list', 'tuple', 'ndarray'}):
                 logger.warning("Possible type mismatch: Setting\n\t'%s' of type '%s' with value "
-                                "of similar type '%s'", _print_dict(key_list),
-                                type(d[set_key]).__name__, type(set_val).__name__)
+                                "of similar type '%s'",
+                                _print_dict(key_list[:-1]), type(d[set_key]).__name__,
+                                type(set_val).__name__)
             else:
                 raise ValueError
         d[set_key] = set_val  # update key with new value
 
     except KeyError:
         # create a meaningful error message with a string of the name of the failed dict
-        logger.error("No key %s in dict '%s'!", set_key, _print_dict(key_list))
+        logger.error("No key %s in dict '%s'!", set_key, _print_dict(key_list[:-1]))
         if backup:
             restore_fil()
         return -1
