@@ -318,16 +318,15 @@ def store_fil():
 # -------------------------
 def _print_dict(key_list: list | tuple, top_dict_str = "fil[0]") -> str:
     """
-    Print a (nested) dict, defined by the list or tuple of strings `key_list`. The last
-    element of `key_list` is not included in the printed string, as it is the value to
-    be set. This is used to issue meaningful error messages.
+    Print a string representation for a nested dictionary, defined by the list
+    or tuple of strings `key_list`. This is used to issue meaningful error messages.
 
     Parameters
     ----------
     key_list : list or tuple
         List of keys to create the nested dictionary.
     top_dict_str : str
-        The top-level dictionary string to use for printing.
+        The top-level dictionary as a string to use for printing.
 
     Returns
     -------
@@ -427,7 +426,7 @@ def set_fx(fx: bool)-> None:
 
 # -------------------------
 def fb_get(*key_list: list | tuple, fil_dict: dict = fil[0], verbose: bool = True)\
-    -> str | int | float | Iterable | None:
+    -> str | int | float | Iterable | dict | None:
     """
     Get the value of a key in the global dict `fil[0]`. Multiple arguments
     access nested dicts:
@@ -437,7 +436,7 @@ def fb_get(*key_list: list | tuple, fil_dict: dict = fil[0], verbose: bool = Tru
     Parameters
     ----------
     key_list : list or tuple
-        List of tuple of keys for traversing the nested dictionary.
+        List or tuple of keys for traversing the nested dictionary.
     fil_dict : dict
         The dictionary to traverse, the default is the global `fil[0]`.
     verbose : bool
@@ -446,14 +445,15 @@ def fb_get(*key_list: list | tuple, fil_dict: dict = fil[0], verbose: bool = Tru
 
     Returns
     -------
-    str | int | float | Iterable | None
+    str | int | float | Iterable | dict | None
         The value of the specified key in the dictionary, or None if the key
-        does not exist.
+        does not exist or a deep copy if key_list is empty.
     """
     if len(key_list) == 0:
-        # called without arguments, return a copy of the whole dict
+        # called without arguments, return a deepcopy of the whole dict
         return copy.deepcopy(fil_dict)
 
+    # traverse nested dict 'fil_dict' using tuple of keys and access subdictionary
     ret = fil_dict
     try:
         for key in key_list:
