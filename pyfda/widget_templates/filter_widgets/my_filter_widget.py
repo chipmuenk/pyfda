@@ -232,7 +232,7 @@ if __name__ == '__main__':
     layVDynWdg = QVBoxLayout()
     layVDynWdg.addWidget(wdg_allpass, stretch = 1)
 
-    filt.APman(fb.fil[0])  # design an all pass filter with parameters from global dict
+    filt.APman()  # design an all pass filter with parameters from global dict
     print(fb_get(filt.FRMT)) # return results in default format
 
     frmMain = QFrame()
