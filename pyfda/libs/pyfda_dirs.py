@@ -91,7 +91,8 @@ def get_log_dir():
     Try different OS-dependent locations for creating log files and return
     the first suitable directory name. Only called once at startup.
 
-    see https://stackoverflow.com/questions/847850/cross-platform-way-of-getting-temp-directory-in-python
+    see https://stackoverflow.com/questions/847850/cross-platform-way-of-getting-temp-directory\
+        -in-python
     """
 
     # list of base directories for constructing the logging directory
@@ -204,8 +205,8 @@ def copy_conf_files(force_copy=False, logger=None):
         # Create Backup
         if os.path.isfile(USER_LOG_CONF_DIR_FILE) and force_copy:
             shutil.move(USER_LOG_CONF_DIR_FILE, USER_LOG_CONF_DIR_FILE + "_bak_" + TODAY)
-            log_info('Created backup "{0}"\n\tof user logging config file'
-                     .format(USER_LOG_CONF_DIR_FILE + "_bak_" + TODAY))
+            log_info(f'Created backup "{USER_LOG_CONF_DIR_FILE + "_bak_" + TODAY}"\n'
+                     '\tof user logging config file')
         # Create log config file
         if not os.path.isfile(USER_LOG_CONF_DIR_FILE) or force_copy:
             shutil.copyfile(TMPL_LOG_CONF_DIR_FILE, USER_LOG_CONF_DIR_FILE)
@@ -317,20 +318,19 @@ if 'v' in ARGV:
     sys.exit()
 
 # force replacement of config files when 'r' is specified
-copy_conf_files(force_copy=('r' in ARGV))
+copy_conf_files(force_copy='r' in ARGV)
 
 # ------------------------------------------------------------------------------
-""" Place holder for storing the name of the last file"""
+# Place holder for storing the name of the last file
 last_file_name = ""
-""" Place holder for storing the directory location of the last file"""
+# Place holder for storing the directory location of the last file
 last_file_dir = HOME_DIR
-""" Place holder for file type selected (e.g. "csv") in last file dialog"""
+# Place holder for file type selected (e.g. "csv") in last file dialog
 last_file_type = ''
-"""
-Global handle to pop-up window for CSV options - this window must be closed
-before opening another pop-up window! Otherwise, the second window becomes
-unaccessible (?) and pyfda becomes unresponsive.
-"""
+
+# Global handle to pop-up window for CSV options - this window must be closed
+# before opening another pop-up window! Otherwise, the second window becomes
+# unaccessible (?) and pyfda becomes unresponsive.
 csv_options_handle = None
 tran_freq_win_handle = None
 firwin_handle = None
