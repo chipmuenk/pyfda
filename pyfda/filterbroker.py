@@ -324,15 +324,15 @@ def store_fil():
     fil_undo[undo_ptr] = copy.deepcopy(fil[0])
 
 # -------------------------
-def _print_dict(key_list: list | tuple, top_dict_str = "fil[0]") -> str:
+def _print_dict(keys_tuple: tuple, top_dict_str = "fil[0]") -> str:
     """
     Print a string representation for a nested dictionary, defined by the list
-    or tuple of strings `key_list`. This is used to issue meaningful error messages.
+    or tuple of strings `keys_tuple`. This is used to issue meaningful error messages.
 
     Parameters
     ----------
-    key_list : list or tuple
-        List of keys to create the nested dictionary.
+    keys_tuple : tuple
+        Tuple of keys to create representation of the nested dictionary.
     top_dict_str : str
         The top-level dictionary as a string to use for printing.
 
@@ -343,34 +343,34 @@ def _print_dict(key_list: list | tuple, top_dict_str = "fil[0]") -> str:
 
     Example
     -------
-    key_list = ['fxq', 'QCA', 'WF'] returns "fil[0]['fxq']['QCA']['WF']"
+    keys_tuple = ('fxq', 'QCA', 'WF') returns "fil[0]['fxq']['QCA']['WF']"
 
     """
-    if not key_list or not isinstance(key_list, (tuple, list)):
-        raise KeyError("Need a non-empty list or tuple of keys for printing the dictionary!")
+    if not keys_tuple or not isinstance(keys_tuple, tuple):
+        raise KeyError("Need a non-empty tuple of keys for printing the dictionary!")
 
     dict_str = top_dict_str
-    if len(key_list) == 1:  # only one level dictionary with key_list[0]
-        dict_str += '[' + key_list[0] + ']'
+    if len(keys_tuple) == 1:  # only one level dictionary with keys_tuple[0]
+        dict_str += '[' + keys_tuple[0] + ']'
     else:
-        for k in key_list:
+        for k in keys_tuple:
             dict_str += '[' + k + ']'
     return dict_str
 
 
 # -------------------------
-def _traverse_dict(key_list: list | tuple, fil_dict: dict) -> dict:
+def _traverse_dict(keys_tuple: tuple, fil_dict: dict) -> dict:
     """
-    Use the list or tuple of strings `key_list` to traverse the (nested) dict `fil_dict`
+    Use the tuple of strings `keys_tuple` to traverse the (nested) dict `fil_dict`
     and return the addressed subdictionary.
 
     In order to set the value of the returned dict, use the key for the lowest
-    nesting level on the returned dict `d`, i.e. `d[key_list[-1]] = arg` .
+    nesting level on the returned dict `d`, i.e. `d[keys_tuple[-1]] = arg` .
 
     Parameters
     ----------
-    key_list : list or tuple
-        List of keys to traverse the nested dictionary.
+    keys_tuple : tuple
+        Tuple of keys to traverse the nested dictionary.
 
     fil_dict : dict
         The dictionary to traverse.
@@ -387,11 +387,11 @@ def _traverse_dict(key_list: list | tuple, fil_dict: dict) -> dict:
     TypeError
         If a key does not point to another dictionary
     """
-    if not key_list:
-        raise KeyError("List of keys was empty!")
+    if not keys_tuple:
+        raise KeyError("Tuple of keys was empty!")
 
     d = fil_dict
-    for k in key_list[:-1]:  # Traverse all keys except the last one
+    for k in keys_tuple[:-1]:  # Traverse all keys except the last one
         if k not in d or not isinstance(k, str):
             raise KeyError(f"Key '{k}' not found or is not a dictionary!")
         if not isinstance(d[k], dict):
@@ -433,7 +433,7 @@ def set_fx(fx: bool)-> None:
         fb_set('qfrmt', fb_get('qfrmt_float_last'))
 
 # -------------------------
-def fb_get(*key_list: list | tuple, fil_dict: dict = fil[0], verbose: bool = True)\
+def fb_get(*keys_tuple: tuple, fil_dict: dict = fil[0], verbose: bool = True)\
     -> str | int | float | Iterable | dict | None:
     """
     Get the value of a key in the global dict `fil[0]`. Multiple arguments
@@ -443,8 +443,8 @@ def fb_get(*key_list: list | tuple, fil_dict: dict = fil[0], verbose: bool = Tru
 
     Parameters
     ----------
-    key_list : list or tuple
-        List or tuple of keys for traversing the nested dictionary.
+    keys_tuple : tuple
+        Tuple of keys for traversing the nested dictionary.
     fil_dict : dict
         The dictionary to traverse, the default is the global `fil[0]`.
     verbose : bool
@@ -455,47 +455,54 @@ def fb_get(*key_list: list | tuple, fil_dict: dict = fil[0], verbose: bool = Tru
     -------
     str | int | float | Iterable | dict | None
         The value of the specified key in the dictionary, or None if the key
-        does not exist or a deep copy if key_list is empty.
+        does not exist or a deep copy if keys_tuple is empty.
     """
-    if len(key_list) == 0:
+    if not isinstance(keys_tuple, tuple):
+        logger.error("A tuple of keys is needed for traversing the filter dict '%s', not a '%s'!",
+                     keys_tuple, type(keys_tuple).__name__)
+    if len(keys_tuple) == 0:
         # called without arguments, return a deepcopy of the whole dict
         return copy.deepcopy(fil_dict)
 
     # traverse nested dict 'fil_dict' using tuple of keys and access subdictionary
     ret = fil_dict
     try:
-        for key in key_list:
+        for key in keys_tuple:
             ret = ret[key]
-            # ret = fil_dict[key_list[0]][key_list[1]][key_list[2]] ...
+            # ret = fil_dict[keys_tuple[0]][keys_tuple[1]][keys_tuple[2]] ...
     except (KeyError, IndexError, TypeError):
         # create a meaningful error message with a string of the failed dict
         if verbose:
-            logger.error("Dict '%s' does not exist!", _print_dict(key_list))
+            logger.error("Dict '%s' does not exist!", _print_dict(keys_tuple))
         return None
 
     if ret is None and verbose:
-        logger.warning("Key '%s' not found in filter dict!", key_list[-1])
+        logger.warning("Key '%s' not found in filter dict!", keys_tuple[-1])
     return ret
 
 # -------------------------
-def fb_set(*key_list: list | tuple, backup: bool = True, new_key: bool = False,
+def fb_set(*keys_tuple: tuple, backup: bool = True, new_key: bool = False,
            fil_dict: dict = fil[0]) -> int:
     """
-    Use the items of `key_list` to access a nested dict `fil_dict`
-    (default: `fil[0]`) and write the last item in `key_list` to the dict.
+    Use the items of `keys_tuple` to access a nested dict `fil_dict`
+    (default: `fil[0]`) and write the last item in `keys_tuple` to the dict.
 
     In order to set the value of the returned nested dict, use the key for the lowest
-    nesting level on the returned dict `d`, i.e. `d[key_list[-1]] = arg` .
+    nesting level on the returned dict `d`, i.e. `d[keys_tuple[-1]] = arg` .
 
     Parameters
     ----------
-    key_list : list or tuple
-        List or tuple of keys for traversing the (nested) dictionary, the last element
+    keys_tuple : tuple
+        Tuple of keys for traversing the (nested) dictionary, the last element
         is the value to be set. Hence, this element is not used for traversing the dictionary.
     backup : bool
-        Whether the previous state of the filter dict should be backed up
+        Whether the previous state of the filter dict should be backed up (default: True)
     new_key : bool
-        Whether a new key:value pair should be added to the dictionary
+        Whether a new key:value pair should be added to the dictionary (default: False). 
+        If False, the value of an existing key is updated, if True, a new key:value pair is added
+        to the dictionary. Setting this to True can be used to add new entries to the filter dict,
+        but it can also be dangerous because it allows for accidental overwriting of existing keys
+        and values in the dictionary.
     fil_dict : dict
         The dictionary to traverse.
 
@@ -510,33 +517,32 @@ def fb_set(*key_list: list | tuple, backup: bool = True, new_key: bool = False,
         If a key does not exist in the dictionary or the tuple of keys is empty
 
     TypeError
-        If `key_list` is not of type List or Tuple or if it has less than two items
+        If `keys_tuple` is not of type Tuple or if it has less than two items
 
     TODO: Dict entries need to be protected from accidental overwriting by
     the user. This will be done by prepending the keys with an underscore
     (e.g. `_f_S`) once all direct accesses have been removed.
     """
-    # if not key_list:
-    #     raise KeyError("Key_list is empty!")
 
-    if not isinstance(key_list, (tuple, list)):
-        raise TypeError(
-            "A tuple or list of keys is needed for traversing the filter dict, not a '%s'!",
-            type(key_list).__name__)
+    if not isinstance(keys_tuple, tuple):
+        logger.error("A tuple of keys is needed for traversing the filter dict '%s', not a '%s'!",
+                     keys_tuple, type(keys_tuple).__name__)
+        raise KeyError
 
-    if len(key_list) < 2:
-        raise KeyError("Not enough arguments for setting a dictionary value!")
+    if len(keys_tuple) < 2:
+        logger.error("Not enough arguments for setting a dictionary value!")
+        raise KeyError
 
-    set_val = key_list[-1]  # last element is the value to be set
-    set_key = key_list[-2]  # second last element is the key for setting
+    set_val = keys_tuple[-1]  # last element is the value to be set
+    set_key = keys_tuple[-2]  # second last element is the key for setting
 
     try:
         if backup:
             store_fil()  # backup old setting
 
         # traverse nested dict 'fil_dict' using tuple of keys and access subdictionary
-        d = _traverse_dict(key_list[:-1], fil_dict)
-        # Test accessing the dictionary and whether the accessed item is a dict.
+        d = _traverse_dict(keys_tuple[:-1], fil_dict)
+        # Test accessing the dictionary and whether the key to be written is a dict.
         # This could be dangerous because the keys in this sub-dictionary could be altered!
         if new_key:
             if set_key in d:
@@ -546,14 +552,16 @@ def fb_set(*key_list: list | tuple, backup: bool = True, new_key: bool = False,
             return 0
 
         if isinstance(d[set_key], dict):
-            # keys1 = d[set_key].keys()
-            logger.warning(
-                "Danger! Overwriting the dict '%s'\n\t%s with \n\t%s",
-                _print_dict(key_list[:-1]), d[set_key], set_val)
+            logger.error(
+                f"\n\tCannot set key '{set_key}' with dict value\n\t"
+                f"{set_val}!\n\tThis would overwrite the old dict\n\t{d[set_key]}.")
+            raise KeyError
 
         if set_key =='qfrmt':
-            if len(key_list) > 2:
-                raise KeyError("Too many arguments for setting 'qfrmt'!")
+            if len(keys_tuple) > 2:
+                logger.error(f"More than one value '{keys_tuple[1:]}' for setting 'qfrmt'!")
+                raise KeyError
+                    
             # store current fixpoint / float format
             if get_fx():  # fixpoint mode, store old fixpoint format
                 fil_dict['qfrmt_fx_last'] = fil_dict['qfrmt']
@@ -564,28 +572,27 @@ def fb_set(*key_list: list | tuple, backup: bool = True, new_key: bool = False,
             return 0
 
         if type(set_val) is not type(d[set_key]):
+            # union of types of current and new value, e.g. {'float', 'float64'}
             types = {type(set_val).__name__, type(d[set_key]).__name__}
+            # the following types are considered compatible
             if types.issubset({'float', 'float64'}):
                 pass
+            # the following types are considered compatible but a warning is issued because
+            # because the conversion might lead to problems later on.
             elif types.issubset({'list', 'tuple', 'ndarray'}):
                 logger.warning("Possible type mismatch: Setting\n\t'%s' of type '%s' with value "
                                 "of similar type '%s'",
-                                _print_dict(key_list[:-1]), type(d[set_key]).__name__,
+                                _print_dict(keys_tuple[:-1]), type(d[set_key]).__name__,
                                 type(set_val).__name__)
             else:
-                raise ValueError
+                logger.error("Type mismatch: Refusing to set\n\t'%s' of type '%s' "
+                    "with value of type '%s'",
+                    _print_dict(keys_tuple[:-1]), type(d[set_key]).__name__,
+                    type(set_val).__name__)
+                raise KeyError
         d[set_key] = set_val  # update key with new value
 
-    except KeyError:
-        # create a meaningful error message with a string of the name of the failed dict
-        logger.error("No key %s in dict '%s'!", set_key, _print_dict(key_list[:-1]))
-        if backup:
-            restore_fil()
-        return -1
-    except ValueError:
-        logger.error("Type mismatch: Refusing to set\n\t'dict[%s]' of type '%s' "
-                     "with value of type '%s'",
-                     set_key, type(d[set_key]).__name__, type(set_val).__name__)
+    except KeyError as e:
         if backup:
             restore_fil()
         return -1
