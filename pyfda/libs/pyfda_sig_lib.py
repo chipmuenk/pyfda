@@ -1135,9 +1135,10 @@ def fil_save(arg: np.ndarray, format_in: str, sender: str, convert: bool = True)
         the shape of ``arg`` is not suitable for the specified ``format_in``.
     """
     if not isinstance(arg, np.ndarray):
-        raise ValueError(
+        logger.error(
             "\t'fil_save()': data in '%s' format needs to be a numpy array but is '%s'!",
-            format_in, type(arg))
+            format_in, type(arg).__name__)
+        raise ValueError
 
     if arg.size == 0:
         raise ValueError("'fil_save()': data in '%s' format is empty!", format_in)
@@ -1178,7 +1179,7 @@ def fil_save(arg: np.ndarray, format_in: str, sender: str, convert: bool = True)
             else:
                 fb_set('ft', 'FIR')
         else:
-            raise ValueError(f"\t'fil_save()': Unknown 'zpk' format {arg}")
+            raise ValueError(f"\t'fil_save()': Unknown 'zpk' format '{arg}'!")
 
     elif format_in == 'ba':
         if np.ndim(arg) == 1:  # arg = [b] -> FIR
@@ -1219,7 +1220,8 @@ def fil_save(arg: np.ndarray, format_in: str, sender: str, convert: bool = True)
         fb_set('ba', np.asarray([np.array(b, dtype=complex), np.array(a, dtype=complex)]))
 
     else:
-        raise ValueError(f"\t'fil_save()':Unknown input format {format_in}")
+        logger.error(f"\t'fil_save()':Unknown input format '{format_in}'!")
+        raise ValueError
 
     fb_set('creator', [format_in, sender])
     fb_set('timestamp', time.time())

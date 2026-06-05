@@ -553,8 +553,8 @@ def fb_set(*keys_tuple: tuple, backup: bool = True, new_key: bool = False,
 
         if isinstance(d[set_key], dict):
             logger.error(
-                f"\n\tCannot set key '{set_key}' with dict value\n\t"
-                f"{set_val}!\n\tThis would overwrite the old dict\n\t{d[set_key]}.")
+                f"\n\tCannot assign '{set_key}' with sub-dict\n\t"
+                f"{set_val}!\n\tThis would overwrite the old sub-dict\n\t{d[set_key]}.")
             raise KeyError
 
         if set_key =='qfrmt':
