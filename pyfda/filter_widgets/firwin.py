@@ -44,7 +44,7 @@ from pyfda.filterbroker import fb_get, fb_set
 import pyfda.libs.pyfda_dirs as dirs
 from pyfda.libs.compat import (QWidget, pyqtSignal, QComboBox, QIcon, QSize,
                                QHBoxLayout, QVBoxLayout)
-from pyfda.libs.pyfda_lib import round_odd, pprint_log
+from pyfda.libs.pyfda_lib import round_even, pprint_log
 from pyfda.libs.pyfda_qt_lib import popup_warning, PushButton, emit
 from pyfda.libs.pyfda_sig_lib import fil_save
 from pyfda.libs.fft_windows_cmb_box import QFFTWinCmbBox
@@ -521,8 +521,9 @@ class Firwin(QWidget):
             return -1
 
         fb_set('F_C', (self.F_SB + self.F_PB)/2)  # average calculated F_PB and F_SB
-        self._save(self.firwin(self.N, fb_get('F_C'), nyq=0.5,
-                               window=self.qfft_win_select.calc_window(self.N, sym=True)))
+        numtaps = self.N + 1
+        self._save(self.firwin(numtaps, fb_get('F_C'), nyq=0.5,
+                               window=self.qfft_win_select.calc_window(numtaps, sym=True)))
         fb_set('N', self.N)  # update filterbroker with calculated order
         return 0
 
@@ -531,8 +532,9 @@ class Firwin(QWidget):
         self._get_params()
         if not self._test_n():
             return -1
-        self._save(self.firwin(self.N, fb_get('F_C'), nyq=0.5,
-                               window=self.qfft_win_select.calc_window(self.N, sym=True)))
+        numtaps = self.N + 1  # UI N is order; firwin/calc_window expect numtaps
+        self._save(self.firwin(numtaps, fb_get('F_C'), nyq=0.5,
+                               window=self.qfft_win_select.calc_window(numtaps, sym=True)))
         return 0
 
     def HPmin(self) -> int:
@@ -540,23 +542,25 @@ class Firwin(QWidget):
         self._get_params()
         N = self._firwin_ord([self.F_SB, self.F_PB], [0, 1],
                              [self.A_SB, self.A_PB], alg=self.alg)
-        self.N = round_odd(N)  # enforce odd order
+        self.N = round_even(N)  # enforce even order
         if not self._test_n():
             return -1
         fb_set('F_C', (self.F_SB + self.F_PB)/2)  # average calculated F_PB and F_SB
-        self._save(self.firwin(self.N, fb_get('F_C'), pass_zero=False, nyq=0.5,
-                               window=self.qfft_win_select.calc_window(self.N, sym=True)))
+        numtaps = self.N + 1
+        self._save(self.firwin(numtaps, fb_get('F_C'), pass_zero=False, nyq=0.5,
+                               window=self.qfft_win_select.calc_window(numtaps, sym=True)))
         fb_set('N', self.N)  # update filterbroker with calculated order
         return 0
 
     def HPman(self) -> int:
         """ Design a high-pass FIR filter with user-defined order using the window method."""
         self._get_params()
-        self.N = round_odd(self.N)  # enforce odd order
+        self.N = round_even(self.N)  # enforce even order
         if not self._test_n():
             return -1
-        self._save(self.firwin(self.N, fb_get('F_C'), pass_zero=False, nyq=0.5,
-                               window=self.qfft_win_select.calc_window(self.N, sym=True)))
+        numtaps = self.N + 1  # UI N is order; firwin/calc_window expect numtaps
+        self._save(self.firwin(numtaps, fb_get('F_C'), pass_zero=False, nyq=0.5,
+                               window=self.qfft_win_select.calc_window(numtaps, sym=True)))
         return 0
 
     # For BP and BS, F_PB and F_SB have two elements each
@@ -570,9 +574,10 @@ class Firwin(QWidget):
 
         fb_set('F_C', (self.F_SB + self.F_PB)/2)  # average calculated F_PB and F_SB
         fb_set('F_C2', (self.F_SB2 + self.F_PB2)/2)
-        self._save(self.firwin(self.N, [fb_get('F_C'), fb_get('F_C2')], nyq=0.5,
+        numtaps = self.N + 1
+        self._save(self.firwin(numtaps, [fb_get('F_C'), fb_get('F_C2')], nyq=0.5,
                                pass_zero=False,
-                               window=self.qfft_win_select.calc_window(self.N, sym=True)))
+                               window=self.qfft_win_select.calc_window(numtaps, sym=True)))
         fb_set('N', self.N)  # update filterbroker with calculated order
         return 0
 
@@ -581,9 +586,10 @@ class Firwin(QWidget):
         self._get_params()
         if not self._test_n():
             return -1
-        self._save(self.firwin(self.N, [fb_get('F_C'), fb_get('F_C2')], nyq=0.5,
+        numtaps = self.N + 1  # UI N is order; firwin/calc_window expect numtaps
+        self._save(self.firwin(numtaps, [fb_get('F_C'), fb_get('F_C2')], nyq=0.5,
                                pass_zero=False,
-                               window=self.qfft_win_select.calc_window(self.N, sym=True)))
+                               window=self.qfft_win_select.calc_window(numtaps, sym=True)))
         return 0
 
     def BSmin(self) -> int:
@@ -591,13 +597,14 @@ class Firwin(QWidget):
         self._get_params()
         N = remezord([self.F_PB, self.F_SB, self.F_SB2, self.F_PB2], [1, 0, 1],
                      [self.A_PB, self.A_SB, self.A_PB2], fs=1, alg=self.alg)[0]
-        self.N = round_odd(N)  # enforce odd order
+        self.N = round_even(N)  # enforce even order
         if not self._test_n():
             return -1
         fb_set('F_C', (self.F_SB + self.F_PB) / 2)  # average calculated F_PB and F_SB
         fb_set('F_C2', (self.F_SB2 + self.F_PB2) / 2)
-        self._save(self.firwin(self.N, [fb_get('F_C'), fb_get('F_C2')],
-                               window=self.qfft_win_select.calc_window(self.N, sym=True),
+        numtaps = self.N + 1
+        self._save(self.firwin(numtaps, [fb_get('F_C'), fb_get('F_C2')],
+                               window=self.qfft_win_select.calc_window(numtaps, sym=True),
                                pass_zero=True, nyq=0.5))
         fb_set('N', self.N)  # update filterbroker with calculated order
         return 0
@@ -605,11 +612,12 @@ class Firwin(QWidget):
     def BSman(self) -> int:
         """ Design a band-stop FIR filter with user-defined order using the window method."""
         self._get_params()
-        self.N = round_odd(self.N)  # enforce odd order
+        self.N = round_even(self.N)  # enforce even order
         if not self._test_n():
             return -1
-        self._save(self.firwin(self.N, [fb_get('F_C'), fb_get('F_C2')],
-                               window=self.qfft_win_select.calc_window(self.N, sym=True),
+        numtaps = self.N + 1  # UI N is order; firwin/calc_window expect numtaps
+        self._save(self.firwin(numtaps, [fb_get('F_C'), fb_get('F_C2')],
+                               window=self.qfft_win_select.calc_window(numtaps, sym=True),
                                pass_zero=True, nyq=0.5))
         return 0
 
