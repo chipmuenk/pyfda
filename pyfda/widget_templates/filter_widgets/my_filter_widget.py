@@ -72,6 +72,7 @@ class AllpPZ(QWidget):
             }
 
         self.info_doc = []
+        self._construct_ui()
 
     # -------------------------------------------------------------------------
     def emit(self, dict_sig):
@@ -226,7 +227,6 @@ if __name__ == '__main__':
 
     # instantiate filter widget
     filt = AllpPZ()
-    filt._construct_ui()
     wdg_allpass = getattr(filt, 'wdg_fil')
 
     layVDynWdg = QVBoxLayout()
