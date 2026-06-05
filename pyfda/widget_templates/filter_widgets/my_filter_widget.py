@@ -150,7 +150,7 @@ class AllpPZ(QWidget):
         corresponding UI elements. dict2filter_params() is called upon initialization
         and when the filter is loaded from disk.
         """
-        if 'allpass' in fb_get('wdg_fil'):
+        if 'allpass' in fb_get('filter_widgets'):
             wdg_fil_par = fb_get('wdg_fil', 'allpass')
             if 'p1' in wdg_fil_par:
                 self.p1 = wdg_fil_par['p1']
