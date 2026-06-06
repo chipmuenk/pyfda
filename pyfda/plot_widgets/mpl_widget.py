@@ -243,8 +243,8 @@ class MplWidget(QWidget):
         """
         if self.fig.axes:
             self.mplToolbar.cycle_draw_grid(cycle=False, axes=self.fig.axes)
-            for ax in self.fig.axes:
-
+            # self.fig.axes is a list of one or more axes, e.g. for subplots
+            for ax in self.fig.axes:  # pylint: disable=not-an-iterable
                 if self.mplToolbar.a_zo_locked:
                     ax.axis(self.limits)  # restore old limits
                 else:
@@ -257,10 +257,12 @@ class MplWidget(QWidget):
         """
         Zoom to full extent of data if axes is set to "navigationable"
         by the navigation toolbar
+
+        Add current view limits to view history to enable "back to previous view"
         """
-        # Add current view limits to view history to enable "back to previous view"
         self.mplToolbar.push_current()
-        for ax in self.fig.axes:
+        # self.fig.axes is a list of one or more axes, e.g. for subplots
+        for ax in self.fig.axes:  # pylint: disable=not-an-iterable
             if ax.get_navigate():
                 ax.autoscale()
         self.redraw()
