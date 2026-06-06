@@ -942,15 +942,12 @@ class MplToolbar(NavigationToolbar):
                 # ... convert to base64 bytes -> str -> strip b' ... '
                 base64_str = str(ba.toBase64().data()).lstrip("b'").rstrip("'")
                 # ... and copy as string to clipboard after removing b' ... '
+                self.cb.setText('<img src="data:image/png;base64,' + base64_str + '"/>')
 
-                self.cb.setText(base64_str)
                 logger.info(
-                    "Copied plot %s as base64 encoded PNG image to Clipboard.", title_info)
-                # elif modifiers == Qt.ControlModifier:
-                #     self.cb.setText(
-                #         '<img src="data:image/png;base64,' + base64_str + '"/>')
-                #     logger.info(f'Copied plot {title_info}as base64 encoded PNG image '
-                #                 'with <img> tag to Clipboard.')
+                    "Copied plot %s as base64 encoded PNG image\n\twith <img> tag to Clipboard.",
+                    title_info)
+
             else:
                 self.cb.setImage(img)
                 logger.info("Copied plot %s as PNG image to Clipboard.", title_info)
