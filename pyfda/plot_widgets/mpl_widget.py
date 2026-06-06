@@ -638,11 +638,13 @@ class MplToolbar(NavigationToolbar):
             figureoptions.figure_edit(axes, self)
 
     # ---------------------------------------------------------------
-    def home(self) -> None:
+    def home(self, *args) -> None:
         """
         Reset zoom to default settings (defined by plotting widget).
         This method shadows `home()` inherited from NavigationToolbar.
         """
+        if args:
+            logger.warning("home() received unexpected arguments: %s", args)
         self.push_current()
         self.emit({'mpl_toolbar': 'home'})
         self.mpl_widget.redraw()  # Redraw with saving / restoring plot limit
