@@ -72,6 +72,7 @@ class AllpPZ(QWidget):
             }
 
         self.info_doc = []
+        self._construct_ui()
 
     # -------------------------------------------------------------------------
     def emit(self, dict_sig):
@@ -149,7 +150,7 @@ class AllpPZ(QWidget):
         corresponding UI elements. dict2filter_params() is called upon initialization
         and when the filter is loaded from disk.
         """
-        if 'allpass' in fb_get('wdg_fil'):
+        if 'allpass' in fb_get('filter_widgets'):
             wdg_fil_par = fb_get('wdg_fil', 'allpass')
             if 'p1' in wdg_fil_par:
                 self.p1 = wdg_fil_par['p1']
@@ -226,13 +227,12 @@ if __name__ == '__main__':
 
     # instantiate filter widget
     filt = AllpPZ()
-    filt._construct_ui()
     wdg_allpass = getattr(filt, 'wdg_fil')
 
     layVDynWdg = QVBoxLayout()
     layVDynWdg.addWidget(wdg_allpass, stretch = 1)
 
-    filt.APman(fb.fil[0])  # design an all pass filter with parameters from global dict
+    filt.APman()  # design an all pass filter with parameters from global dict
     print(fb_get(filt.FRMT)) # return results in default format
 
     frmMain = QFrame()
