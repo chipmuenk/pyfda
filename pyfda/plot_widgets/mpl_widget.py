@@ -338,9 +338,6 @@ class MplToolbar(NavigationToolbar):
 
     sig_tx = pyqtSignal(object)  # general signal, containing a dict
 
-    def _init_toolbar(self):
-        pass  # needed for backward compatibility with mpl < 3.3
-
     # turn off coordinate display
     def set_message(self, msg):
         pass
