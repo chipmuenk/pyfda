@@ -551,11 +551,11 @@ class MplToolbar(NavigationToolbar):
         self.a_cb = self.addAction(
             QIcon(':/to_clipboard.svg'), 'To Clipboard', self.mpl2clip)
         self.a_cb.setToolTip(
-            '<span>Copy figure to clipboard in png format (CTRL+C). '
+            '<span>Copy figure to clipboard in png format (&lt;LeftMouse&gt; or CTRL+C). '
             'Modifiers:'
             '<ul><li>&lt;SHIFT&gt; to hide title.</li> '
-            '<li>&lt;ALT&gt; (keyboard) resp. &lt;CTRL&gt; (mouse) for base64 '
-            'encoded png format (e.g. for Jupyter Notebooks).</li> '
+            '<li>&lt;CTRL&gt;-&lt;ALT&gt;-C resp. &lt;CTRL&gt;-&lt;LeftMouse&gt; for base64 '
+            'encoded png format in an &lt;img&gt; tag (e.g. for Jupyter Notebooks).</li> '
             '</ul></span>')
         # Don't set a shortcut here, as this jumps to `self.mpl2clip` and
         # interprets the CTRL key as a modifier!
