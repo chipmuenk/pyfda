@@ -873,25 +873,40 @@ class MplToolbar(NavigationToolbar):
 # ------------------------------------------------------------------------------
     def mpl2clip(self, key_event: bool = False) -> None:
         """
-        Copy current figure to the clipboard, either directly as PNG file or as
-        base64 encoded PNG file, with or without title.
+        Copy current figure to the clipboard using CTRL-C or by clicking on the icon.
 
-        Qt.ShiftModifier = 0x02000000 # Shift key pressed
+        When CTRL-ALT-C or CTRL-META-C or CTRL-LeftMouse is pressed, copy the figure as
+        base64 encoded PNG string with <img> tag for direct embedding in e.g. Jupyter Notebooks
+        or a HTML document.
+
+        Otherwise copy it as PNG image
+
+        When SHIFT key is pressed, remove the title before saving.
+
+        The following modifiers are used:
+
+        Qt.ShiftModifier   = 0x02000000 # Shift key pressed -> remove title
         Qt.ControlModifier = 0x04000000 # Control key
-        Qt.AltModifier   = 0x08000000 # Alt key, doesn't work under Linux?
-        Qt.MetaModifier  = 0x10000000 # Meta key
+        Qt.AltModifier     = 0x08000000 # Alt key, doesn't work under Linux?
+        Qt.MetaModifier    = 0x10000000 # Meta key
 
         When `key_event == True`, the trigger was a CTRL+C keypress and the Control
         modifier has to be blanked out.
 
         ALT-key doesn't work as a mouse modifier because it shifts the focus from the
               toolbar to the menubar (? not implemented here)
+
+        Parameters
+        ----------
+        key_event : bool, optional
+            Set to True when the trigger was a CTRL+C keypress and the Control modifier
+            has to be blanked out. For a mouse event ALT and META modifiers are blanked out.
         """
         try:
             modifiers = QtWidgets.QApplication.keyboardModifiers()
-            if key_event: # blank out ControlModifier
+            if key_event: # blank out ControlModifier for CTRL-C key event
                 modifiers = modifiers &~ Qt.ControlModifier
-            else: # blank out ALT / META modifier
+            else: # blank out ALT / META modifier for mouse event
                 modifiers = modifiers & ~Qt.AltModifier & ~Qt.MetaModifier
 
             title = self.mpl_widget.fig.get_axes()[0].get_title()  # store title text
@@ -914,6 +929,7 @@ class MplToolbar(NavigationToolbar):
             else:
                 img = QImage(self.canvas.grab())  # grab original screen
 
+            # CTRL, ALT or META modifier detected -> copy as base64 encoded PNG string
             if modifiers & Qt.AltModifier == Qt.AltModifier\
                     or modifiers & Qt.MetaModifier == Qt.MetaModifier\
                     or modifiers & Qt.ControlModifier == Qt.ControlModifier:
