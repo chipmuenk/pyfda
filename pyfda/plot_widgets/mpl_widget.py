@@ -209,7 +209,7 @@ class MplWidget(QWidget):
 
                 # logger.warning(f"Key = {key}, meta = {meta}, ctrl = {ctrl}, shift = {shift}")
                 if key == 67 and ctrl:  # "ctrl-c"
-                    self.mplToolbar.mpl2Clip(key_event=True)
+                    self.mplToolbar.mpl2clip(key_event=True)
 
         # elif event.type() == QtGui.QMouseEvent.MouseButtonPress:
         #     logger.warning("Mouse Event")
@@ -547,7 +547,7 @@ class MplToolbar(NavigationToolbar):
         # --------------------------------------
         self.cb = dirs.clipboard
         self.a_cb = self.addAction(
-            QIcon(':/to_clipboard.svg'), 'To Clipboard', self.mpl2Clip)
+            QIcon(':/to_clipboard.svg'), 'To Clipboard', self.mpl2clip)
         self.a_cb.setToolTip(
             '<span>Copy figure to clipboard in png format (CTRL+C). '
             'Modifiers:'
@@ -555,7 +555,7 @@ class MplToolbar(NavigationToolbar):
             '<li>&lt;ALT&gt; (keyboard) resp. &lt;CTRL&gt; (mouse) for base64 '
             'encoded png format (e.g. for Jupyter Notebooks).</li> '
             '</ul></span>')
-        # Don't set a shortcut here, as this jumps to `self.mpl2Clip` and
+        # Don't set a shortcut here, as this jumps to `self.mpl2clip` and
         # interprets the CTRL key as a modifier!
         # Decoding "CTRL+C" is performed in the event filter instead
 
@@ -869,7 +869,7 @@ class MplToolbar(NavigationToolbar):
             self.save_figure()
 
 # ------------------------------------------------------------------------------
-    def mpl2Clip(self, key_event = False):
+    def mpl2clip(self, key_event: bool = False) -> None:
         """
         Copy current figure to the clipboard, either directly as PNG file or as
         base64 encoded PNG file, with or without title.
