@@ -375,8 +375,8 @@ def qcmb_box_del_item(cmb_box: QComboBox, string: str, data: bool = False,
 
 
 # ----------------------------------------------------------------------------
-def qcmb_box_add_item(cmb_box, item_list, data=True, fireSignals=False,
-                      caseSensitive=False):
+def qcmb_box_add_item(cmb_box: QComboBox, item_list: list, data: bool = True,
+                      fireSignals: bool = False, caseSensitive: bool = False) -> int:
     """
     Add an entry in combobox with text / data / tooltipp from `item_list`.
     When the item is already in combobox (searching for data or text item, depending
@@ -428,7 +428,7 @@ def qcmb_box_add_item(cmb_box, item_list, data=True, fireSignals=False,
 
 
 # ------------------------------------------------------------------------------
-def qstyle_widget(widget, state):
+def qstyle_widget(widget: QtGui.QWidget, state: str) -> None:
     """
     Apply the "state" defined in pyfda_rc.py to the widget, e.g.:
     Color the >> DESIGN FILTER << button according to the filter design state.
@@ -461,15 +461,14 @@ def qstyle_widget(widget, state):
 
 
 # ----------------------------------------------------------------------------
-def qget_selected(table, select_all=False, reverse=True):
+def qget_selected(
+        table: QtGui.QTableWidget, select_all: bool = False, reverse: bool = True) -> dict:
     """
-    Get selected cells in ``table`` and return a dictionary with the following keys:
+    Get selected cells in ``table`` and return a dictionary with the following key / value pairs:
 
-    'idx': indices of selected cells as an unsorted list of tuples
-
-    'sel': list of lists of selected cells per column, by default sorted in reverse
-
-    'cur':  current cell selection as a tuple
+    - 'idx': indices of selected cells as an unsorted list of tuples
+    - 'sel': list of lists of selected cells per column, by default sorted in reverse
+    - 'cur':  current cell selection as a tuple
 
     Parameters
     ----------
@@ -478,6 +477,12 @@ def qget_selected(table, select_all=False, reverse=True):
 
     reverse : bool
         return selected fields upside down when True
+
+    Returns
+    -------
+    dict
+        A dictionary containing the indices, selected cells, and current cell selection.
+        {'idx': idx, 'sel': sel, 'cur': cur}
     """
     if select_all:
         table.selectAll()
@@ -522,7 +527,7 @@ def popup_warning(self, N: int = 0, filter: str = "", message: str = "") -> bool
 
 
 # ----------------------------------------------------------------------------
-def qtext_width(text: str = '', N_x: int = 17, bold: bool = True, font=None) -> int:
+def qtext_width(text: str = '', N_x: int = 17, bold: bool = True, font: QFont = None) -> int:
     """
     Calculate width of `text` in points`. When `text=``, calculate the width
     of number `N_x` of characters 'x'.
@@ -572,7 +577,7 @@ def qtext_width(text: str = '', N_x: int = 17, bold: bool = True, font=None) -> 
 
 
 # ----------------------------------------------------------------------------
-def qtext_height(text: str = 'X', font=None) -> int:
+def qtext_height(text: str = 'X', font: QFont = None) -> int:
     """
     Calculate size of `text` in points`.
 
@@ -655,7 +660,13 @@ class EventTypes:
 # ----------------------------------------------------------------------------
 class QHLine(QFrame):
     """
-    Create a thin horizontal line utilizing the HLine property of QFrames
+    Create a thin horizontal line utilizing the HLine property of QFrames.
+
+    Parameters
+    ----------
+    width : int, optional
+        Line width in pixels (default: 1).
+
     Usage:
 
     > myline = QHLine()
@@ -670,7 +681,14 @@ class QHLine(QFrame):
 
 class QVLine(QFrame):
     """
-    Create a thin vertical line utilizing the HLine property of QFrames
+    Create a thin vertical line utilizing the HLine property of QFrames.
+
+    Parameters
+    ----------
+    width : int, optional
+        Border width in pixels (default: 2). The width controls the visual
+        thickness of the vertical line.
+
     Usage:
 
     > myline = QVLine()
@@ -699,21 +717,30 @@ class PushButton(QPushButton):
 
     Parameters
     ----------
-    text : str
-        Text for button (optional)
+    parent : QWidget, optional
+        Parent widget of the button.
 
-    icon : QIcon
+    text : str, optional
+        Text for button (default: empty string).
+
+    icon : QIcon, optional
         Icon for button. Either `text` or `icon` must be defined.
 
-    checkable : bool
-        Whether button is checkable
+    checkable : bool, optional
+        Whether button is checkable (default: True).
 
-    checked : bool
-        Whether initial state is checked
+    checked : bool, optional
+        Whether initial state is checked (default: False).
+
+    objectName : str, optional
+        Object name to set on the widget (useful for styling and testing).
+
+    **kwargs
+        Additional keyword arguments forwarded to `QPushButton`.
     """
 
-    def __init__(self, parent=None, text: str = "", icon: QIcon = None, checkable: bool = True,
-                 checked: bool = False, objectName="", **kwargs):
+    def __init__(self, parent: QtGui.QWidget = None, text: str = "", icon: QIcon = None,
+                 checkable: bool = True, checked: bool = False, objectName: str = "", **kwargs):
 
         if parent is not None:
             super().__init__(parent, **kwargs)
@@ -740,12 +767,29 @@ class PushButton(QPushButton):
 
         self.installEventFilter(self)
 
-    def setChecked(self, checked: bool):
+    def setChecked(self, checked: bool) -> None:
+        """
+        Set the checked state of the button and update its visual style.
+
+        Parameters
+        ----------
+        checked : bool
+            New checked state. Ignored when the button is not checkable.
+        """
         if self._checkable:
             self.checked = checked
             self.style_button()
 
-    def setCheckable(self, checkable: bool):
+    def setCheckable(self, checkable: bool) -> None:
+        """
+        Enable or disable the button's checkable behavior.
+
+        Parameters
+        ----------
+        checkable : bool
+            When False, the button is made non-checkable and its checked state
+            is cleared.
+        """
         self._checkable = checkable
         if not self._checkable:
             self.setChecked(False)
@@ -753,6 +797,22 @@ class PushButton(QPushButton):
             self.style_button()
 
     def eventFilter(self, source: QtCore.QObject, event: QEvent) -> bool:
+        """
+        Intercept events targeted at the button to handle toggle behavior on
+        mouse press events when the button is checkable.
+
+        Parameters
+        ----------
+        source : QtCore.QObject
+            Object that generated the event.
+        event : QEvent
+            The event instance to process.
+
+        Returns
+        -------
+        bool
+            The return value of the base class `eventFilter`.
+        """
         if event.type() == QEvent.MouseButtonPress:
             if self.isEnabled() and self._checkable and event.button() == Qt.LeftButton:
                 # signal is passed to base class where "self.toggle()" is performed
@@ -762,6 +822,12 @@ class PushButton(QPushButton):
         return super().eventFilter(source, event)
 
     def style_button(self) -> None:
+        """
+        Apply the visual style for the button based on its `checked` state.
+
+        Uses `qstyle_widget` with the properties defined in the application's
+        stylesheet to reflect states like 'highlight' or 'normal'.
+        """
         if self.checked:
             qstyle_widget(self, "highlight")
         else:
@@ -769,31 +835,34 @@ class PushButton(QPushButton):
 
 class PushButtonRT(QPushButton):
     """
-    Subclass QPushButton using QLabel to render rich text
+    Subclass QPushButton using QLabel to render rich text.
 
     Parameters
     ----------
-    text : str
-        Text for button (optional)
+    parent : QWidget, optional
+        Parent widget of the button.
 
-    rtf : bool
-        Render text as rich text
+    text : str, optional
+        Text for the button (default: empty string).
 
-    N_x : int
-        Width in number of "x"
+    pad : int, optional
+        Left/right padding in pixels applied around the label (default: 5).
 
-    pad : int
-        L / R padding for the label inside the button
+    checkable : bool, optional
+        Whether button is checkable (default: True).
 
-    checkable : bool
-        Whether button is checkable
+    checked : bool, optional
+        Whether initial state is checked (default: False).
 
-    checked : bool
-        Whether initial state is checked
+    objectName : str, optional
+        Object name to set on the widget.
+
+    **kwargs
+        Additional keyword arguments forwarded to `QPushButton`.
     """
 
-    def __init__(self, parent=None, text: str = "", pad: int = 5, checkable: bool = True,
-                 checked: bool = False, objectName="", **kwargs):
+    def __init__(self, parent: QtGui.QWidget=None, text: str = "", pad: int = 5,
+                 checkable: bool = True, checked: bool = False, objectName: str = "", **kwargs):
 
         if parent is not None:
             super().__init__(parent, **kwargs)
@@ -1039,7 +1108,7 @@ class RotatedButton(QPushButton):
 
 class QLabelVert(QLabel):
     """
-    Create a vertical label
+    Create a vertical label.
 
     Adapted from
     https://pyqtgraph.readthedocs.io/en/latest/_modules/pyqtgraph/widgets/VerticalLabel.html
@@ -1047,9 +1116,20 @@ class QLabelVert(QLabel):
     https://stackoverflow.com/questions/34080798/pyqt-draw-a-vertical-label
 
     check https://stackoverflow.com/questions/29892203/draw-rich-text-with-qpainter
+
+    Parameters
+    ----------
+    text : str
+        Label text to display (will be drawn rotated).
+
+    orientation : str, optional
+        Orientation of the label; currently 'west' (default) is supported.
+
+    forceWidth : bool, optional
+        Reserved for future use; if True, forces width handling (default True).
     """
 
-    def __init__(self, text, orientation='west', forceWidth=True):
+    def __init__(self, text: str, orientation: str = 'west', forceWidth: bool = True):
         QLabel.__init__(self, text)
         # self.forceWidth = forceWidth
         self.orientation = orientation

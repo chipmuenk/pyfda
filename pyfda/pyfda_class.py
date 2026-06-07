@@ -14,7 +14,7 @@ import logging
 import logging.config
 import sys
 
-from pyfda.libs.compat import (Qt, QtCore, QMainWindow, QApplication, QSplitter,
+from pyfda.libs.compat import (Qt, QtGui, QtCore, QMainWindow, QApplication, QSplitter,
                      QMessageBox, QPlainTextEdit, QMenu, pyqtSignal)
 import pyfda.libs.pyfda_dirs as dirs # initial import constructs file paths
 from pyfda.libs.pyfda_lib import to_html
@@ -60,20 +60,50 @@ class XStream(QtCore.QObject):
     _stdout = None
     messageWritten = pyqtSignal(str) # pass str to slot
 
-    def flush( self ):
-        pass
+    def flush( self ) -> None:
+        """
+        Flush the stream.
 
-    def fileno( self ):
+        Implemented to satisfy the file-like stream interface. This is a
+        no-op because the XStream writes immediately via Qt signals.
+        """
+
+    def fileno( self ) -> int:
+        """
+        Return a file descriptor number.
+
+        XStream does not correspond to a real OS file descriptor so it
+        returns -1 to indicate an invalid descriptor (compatible with
+        Python expectation for non-file-like streams).
+        """
         return -1
 
-    def write(self, msg):
+    def write(self, msg: str) -> None:
+        """
+        Write a message to the stream.
+
+        The message is converted to HTML (for the logger widget) and
+        emitted via the `messageWritten` Qt signal unless signals are
+        currently blocked.
+
+        Parameters
+        ----------
+        msg : str
+            The text message to write to the stream.
+        """
         if not self.signalsBlocked():
             msg = to_html(msg,frmt='log')
 
             self.messageWritten.emit(msg)
 
     @staticmethod
-    def stdout():
+    def stdout() -> 'XStream':
+        """
+        Return the singleton XStream instance used as `sys.stdout`.
+
+        If no instance exists yet, create one and redirect `sys.stdout`
+        to it so all standard output is routed through this stream.
+        """
         if not XStream._stdout:
             XStream._stdout = XStream()
             sys.stdout = XStream._stdout
@@ -81,13 +111,13 @@ class XStream(QtCore.QObject):
 
 class QEditHandler(logging.Handler):
     """
-    subclass Handler to also log messages to textWidget on main display
+    Subclass QEditHandler to also log messages to textWidget on main display
     Overrides stdout to print messages to textWidget (XStream)
     """
     def __init__(self):
         logging.Handler.__init__(self)
 
-    def emit(self, record):
+    def emit(self, record: logging.LogRecord) -> None:
         msg = self.format(record)
         if msg:
             XStream.stdout().write(f'{msg}')
@@ -121,7 +151,7 @@ class pyFDA(QMainWindow):
 
         self._construct_UI()
 
-    def _construct_UI(self):
+    def _construct_UI(self) -> None:
         """
         Construct the main GUI, consisting of:
             - Tabbed input widgets (left side)
@@ -205,10 +235,10 @@ class pyFDA(QMainWindow):
         XStream.stdout().messageWritten.connect(self.loggerWin.appendHtml)
 
 #------------------------------------------------------------------------------
-    def process_sig_rx(self, dict_sig=None):
+    def process_sig_rx(self, dict_sig: dict=None) -> None:
         """
         Process signals coming from sig_rx:
-        - trigger close event in response to 'close_event' emitted in another subwidget:
+            Trigger close event in response to 'close_event' emitted in another subwidget
 
         """
         logger.debug("Processing %s: %s", type(dict_sig).__name__, dict_sig)
@@ -225,12 +255,12 @@ class pyFDA(QMainWindow):
 #
 #==============================================================================
 
-    def logger_win_context_menu(self, point):
+    def logger_win_context_menu(self, point: QtCore.QPoint) -> None:
         """ Show right mouse button context  menu """
         self.popMenu.exec_(self.loggerWin.mapToGlobal(point))
 
 # =============================================================================
-    def closeEvent(self, event):
+    def closeEvent(self, event: QtGui.QCloseEvent) -> None:
         """
         reimplement QMainWindow.closeEvent() to prompt the user
         """
