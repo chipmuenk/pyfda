@@ -142,7 +142,7 @@ class pyFDA(QMainWindow):
     sig_rx = pyqtSignal(object) # incoming
     # sig_tx = pyqtSignal(object) # outgoing
 
-    def __init__(self, parent=None):
+    def __init__(self):
         super().__init__()
         self.setAttribute(QtCore.Qt.WA_DeleteOnClose)
 
@@ -293,4 +293,3 @@ class pyFDA(QMainWindow):
             if tran_freq_win_handle_vis:
                 dirs.tran_freq_win_handle.show()
             event.ignore()
-
