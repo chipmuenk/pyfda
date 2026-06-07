@@ -249,7 +249,8 @@ class MA(QWidget):
         """
         fb_set('filter_widgets', 'ma', {'delays': self.delays,
                                         'stages': self.stages,
-                                        'normalize': self.chk_norm.isChecked()})
+                                        'normalize': self.chk_norm.isChecked()},
+                                        accept_dict = True)
         # sig_tx -> select_filter -> filter_specs
         self.emit({'filt_changed': 'ma'})
 
