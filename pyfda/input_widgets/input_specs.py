@@ -92,7 +92,7 @@ class Input_Specs(QWidget):
         ]
         self.cmb_filter_save_default = "0"
 
-        self._construct_UI()
+        self._construct_ui()
 
     # -------------------------------------------------------------------------
     def emit(self, dict_sig: dict) -> None:
@@ -122,7 +122,7 @@ class Input_Specs(QWidget):
 
         """
         if dict_sig['id'] == id(self):
-            logger.debug("Stopped infinite loop:\n\tPropagate = %s\n",
+            logger.debug("Stopped infinite loop (propagate = %s)\n:\n\t%s",
                          propagate, first_item(dict_sig))
             return
 
@@ -154,7 +154,7 @@ class Input_Specs(QWidget):
             self.emit(dict_sig)
 
     # -------------------------------------------------------------------------
-    def _construct_UI(self) -> None:
+    def _construct_ui(self) -> None:
         """
         Construct User Interface from all input subwidgets
         """
@@ -387,7 +387,7 @@ class Input_Specs(QWidget):
         self.color_design_button('changed')
 
     # --------------------------------------------------------------------------
-    def _load_filter(self):
+    def _load_filter(self) -> None:
         """
         Load filter dict `fil[0]` either from file or from memory and update the
         widgets via `load_dict()` and via sig_tx: {'data_changed':'filter_loaded'}.
@@ -432,7 +432,7 @@ class Input_Specs(QWidget):
         self.emit({'data_changed': 'filter_loaded'})
 
     # --------------------------------------------------------------------------
-    def _save_filter(self):
+    def _save_filter(self) -> None:
         """
         Save current filter fb.fil[0] either to file or to one of the memories
         """
@@ -461,7 +461,7 @@ class Input_Specs(QWidget):
         self.cmb_filter_save.setCurrentIndex(0)
 
     # --------------------------------------------------------------------------
-    def load_dict(self):
+    def load_dict(self) -> None:
         """
         Reload info text from global dict `fb.fil[0]` and reset 'DESIGN' button
         """
@@ -474,7 +474,7 @@ class Input_Specs(QWidget):
         self.color_design_button("ok")
 
     # --------------------------------------------------------------------------
-    def start_design_filt(self):
+    def start_design_filt(self) -> None:
         """
         Start the actual filter design process:
 
@@ -522,7 +522,14 @@ class Input_Specs(QWidget):
             logger.info("Designed filter with order = %s", str(fb_get('N')))
 
 
-    def color_design_button(self, state):
+    def color_design_button(self, state: str) -> None:
+        """
+        Color the >> DESIGN FILTER << button according to the filter design state
+        using `qstyle_widget()` and the states defined in pyfda_rc.py, e.g.:
+        - "ok": filter designed and up to date with specs
+        - "changed": specs have been changed and filter needs to be re-designed
+        - "error": filter design failed with current specs
+        """
         man = "manual" in fb_get('fc').lower()
         self.butDesignFilt.setDisabled(man)
         if man:
@@ -531,7 +538,7 @@ class Input_Specs(QWidget):
         qstyle_widget(self.butDesignFilt, state)
 
     # --------------------------------------------------------------------------
-    def quit_program(self):
+    def quit_program(self) -> None:
         """
         When <QUIT> button is pressed, send 'close_event'
         """

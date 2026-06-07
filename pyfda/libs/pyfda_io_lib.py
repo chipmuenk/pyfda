@@ -1848,7 +1848,7 @@ def save_filter(self) -> int:
     # create a copy of the filter to be saved that only contains keys of the
     # reference filter dict and warn of unsupported keys:
     keys_unsupported = [k for k in fb.fil[0] if k not in fb.fil_ref]
-    if keys_unsupported != []:
+    if keys_unsupported:
         fil_clean = {k:v for k, v in fb.fil[0].items() if k in fb.fil_ref}
         logger.warning(
             "The following keys are ignored because they are not part of the\n"
