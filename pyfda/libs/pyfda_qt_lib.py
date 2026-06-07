@@ -428,7 +428,7 @@ def qcmb_box_add_item(cmb_box: QComboBox, item_list: list, data: bool = True,
 
 
 # ------------------------------------------------------------------------------
-def qstyle_widget(widget: QtGui.QWidget, state: str) -> None:
+def qstyle_widget(widget: QtWidgets.QWidget, state: str) -> None:
     """
     Apply the "state" defined in pyfda_rc.py to the widget, e.g.:
     Color the >> DESIGN FILTER << button according to the filter design state.
@@ -462,7 +462,7 @@ def qstyle_widget(widget: QtGui.QWidget, state: str) -> None:
 
 # ----------------------------------------------------------------------------
 def qget_selected(
-        table: QtGui.QTableWidget, select_all: bool = False, reverse: bool = True) -> dict:
+        table: QtWidgets.QTableWidget, select_all: bool = False, reverse: bool = True) -> dict:
     """
     Get selected cells in ``table`` and return a dictionary with the following key / value pairs:
 
@@ -739,7 +739,7 @@ class PushButton(QPushButton):
         Additional keyword arguments forwarded to `QPushButton`.
     """
 
-    def __init__(self, parent: QtGui.QWidget = None, text: str = "", icon: QIcon = None,
+    def __init__(self, parent: QtWidgets.QWidget = None, text: str = "", icon: QIcon = None,
                  checkable: bool = True, checked: bool = False, objectName: str = "", **kwargs):
 
         if parent is not None:
@@ -861,7 +861,7 @@ class PushButtonRT(QPushButton):
         Additional keyword arguments forwarded to `QPushButton`.
     """
 
-    def __init__(self, parent: QtGui.QWidget=None, text: str = "", pad: int = 5,
+    def __init__(self, parent: QtWidgets.QWidget=None, text: str = "", pad: int = 5,
                  checkable: bool = True, checked: bool = False, objectName: str = "", **kwargs):
 
         if parent is not None:
