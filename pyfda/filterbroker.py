@@ -499,10 +499,8 @@ def fb_set(*keys_tuple: tuple, backup: bool = True, new_key: bool = False,
         Whether the previous state of the filter dict should be backed up (default: True)
     new_key : bool
         Whether a new key:value pair should be added to the dictionary (default: False). 
-        If False, the value of an existing key is updated, if True, a new key:value pair is added
-        to the dictionary. Setting this to True can be used to add new entries to the filter dict,
-        but it can also be dangerous because it allows for accidental overwriting of existing keys
-        and values in the dictionary.
+        If False, an error is generated if the key does not exist, if True, a new key:value pair is added
+        to the dictionary. If the key already exists, a warning is issued and the old value is overwritten.
     fil_dict : dict
         The dictionary to traverse.
 
@@ -520,8 +518,8 @@ def fb_set(*keys_tuple: tuple, backup: bool = True, new_key: bool = False,
         If `keys_tuple` is not of type Tuple or if it has less than two items
 
     TODO: Dict entries need to be protected from accidental overwriting by
-    the user. This will be done by prepending the keys with an underscore
-    (e.g. `_f_S`) once all direct accesses have been removed.
+    the user. This will be done by prepending the dict name with an underscore
+    `_fil[0]` once all direct accesses have been removed.
     """
 
     if not isinstance(keys_tuple, tuple):
