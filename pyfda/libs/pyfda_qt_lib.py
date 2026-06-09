@@ -505,15 +505,30 @@ def qget_selected(
 
 
 # ----------------------------------------------------------------------------
-def popup_warning(self, N: int = 0, filter: str = "", message: str = "") -> bool:
+def popup_warning(self, N: int = 0, filter_name: str = "", message: str = "") -> bool:
     """
     Pop-up a warning box and require a user prompt. When `message == ""`, warn of
     very large filter orders, otherwise display the passed message
+
+    Parameters
+    ----------
+    N: int
+        Filter order, used for default message when `message == ""`
+    filter_name: str
+        Filter type, used for default message when `message == ""`
+    message: str
+        Custom message to be displayed in the warning box. When `message == ""`,
+        a message is generated about a high filter order `N` filter `filter_name`.
+
+    Returns
+    -------
+    bool
+        True if the user clicks "Yes" to continue, False if the user clicks "No".
     """
     if message == "":
         message = (
             f"<span><b><i>N</i> = {N}</b> is a rather high order for a<br />"
-            f"{filter} filter and may cause large <br />"
+            f"{filter_name} filter and may cause large <br />"
             "numerical errors and compute times.<br />Continue?</span>")
 
     reply = QMessageBox.warning(
@@ -535,7 +550,7 @@ def qtext_width(text: str = '', N_x: int = 17, bold: bool = True, font: QFont = 
 
     Parameters
     ----------
-    test: str
+    text: str
         string to calculate the width for
 
     N_x: int
@@ -575,7 +590,7 @@ def qtext_width(text: str = '', N_x: int = 17, bold: bool = True, font: QFont = 
 
 
 # ----------------------------------------------------------------------------
-def qtext_height(text: str = 'X', font: QFont = None) -> int:
+def qtext_height(font: QFont = None) -> int:
     """
     Calculate size of `text` in points`.
 
@@ -584,8 +599,10 @@ def qtext_height(text: str = 'X', font: QFont = None) -> int:
 
     Parameters
     ----------
-    test: str
-        string to calculate the height for (default: "X")
+
+    font: QFont
+        When `None`, use default font, otherwise use the passed font to calculate
+        the height of the text.
 
     Returns
     -------
@@ -611,14 +628,6 @@ def qtext_height(text: str = 'X', font: QFont = None) -> int:
     fm = QFontMetrics(font)
 
     return fm.lineSpacing()
-
-    # width_frm = wdg.textMargins().left() + wdg.textMargins().right() +\
-    #     wdg.contentsMargins().left() + wdg.contentsMargins().left() +\
-    #     8  # 2 * horizontalMargin() + 2 * frame margin.
-
-    # fm = QFontMetrics(loggerWin.font())
-    # row4_height = fm.lineSpacing() * 4
-    # fm_size = fm.size(0, text)
 
 
 # ==============================================================================
