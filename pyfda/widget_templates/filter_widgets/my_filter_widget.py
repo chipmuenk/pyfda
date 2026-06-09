@@ -195,7 +195,7 @@ class AllpPZ(QWidget):
     #--------------------------------------------------------------------------
     # The method name MUST be "FilterType"+"MinMan", e.g. LPmin or BPman
 
-    def APman(self):
+    def APman(self) -> int:
         """
         Calculate z =1/p* for a given set of poles p. If p=0, set z=0.
         The gain factor k is calculated from z and p at z = 1.
@@ -212,9 +212,10 @@ class AllpPZ(QWidget):
             self.z[1] = np.conj(1/self.p[1])
 
         k = np.abs(np.polyval(np.poly(self.p),1) / np.polyval(np.poly(self.z),1))
-        zpk_list = [self.z,self.p,k]
+        zpk = np.array([self.z, self.p, zeros_with_val(len(self.z), k)])
 
-        self._save(zpk_list)
+        self._save(zpk)
+        return 0
 
 #------------------------------------------------------------------------------
 
