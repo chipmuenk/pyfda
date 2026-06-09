@@ -138,7 +138,7 @@ class AllpPZ(QWidget):
         self.p[1] = safe_eval(self.led_pole2.text(), self.p[1], return_type='cmplx')
         self.led_pole2.setText(str(self.p[1]))
 
-        fb_set('filter_widgets', {'allpass':{'p1':self.p[0], 'p2':self.p[1]}})
+        fb_set('filter_widgets', 'allpass', {'p1':self.p[0], 'p2':self.p[1]}, new_key = True)
 
         # sig_tx -> select_filter -> filter_specs
         self.emit({'filt_changed': 'pole_1_2'})
