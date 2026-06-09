@@ -18,8 +18,9 @@ from pyfda.libs.compat import (
     QHBoxLayout, QVBoxLayout, QGridLayout, QIcon, QSizePolicy)
 from pyfda.libs.pyfda_lib import to_html
 from pyfda.libs.pyfda_qt_lib import (
-    QVLine, PushButton, PushButtonRT, qget_cmb_box, qcmb_box_populate,
+    qget_cmb_box, qcmb_box_populate,
     qcmb_box_add_items, qcmb_box_del_item, qtext_width)
+from pyfda.libs.pyfda_qt_classes import QVLine, PushButton, PushButtonRT
 
 logger = logging.getLogger(__name__)
 

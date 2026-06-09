@@ -45,7 +45,8 @@ import pyfda.libs.pyfda_dirs as dirs
 from pyfda.libs.compat import (QWidget, pyqtSignal, QComboBox, QIcon, QSize,
                                QHBoxLayout, QVBoxLayout)
 from pyfda.libs.pyfda_lib import round_odd, pprint_log
-from pyfda.libs.pyfda_qt_lib import popup_warning, PushButton, emit
+from pyfda.libs.pyfda_qt_lib import popup_warning, emit
+from pyfda.libs.pyfda_qt_classes import PushButton
 from pyfda.libs.pyfda_sig_lib import fil_save
 from pyfda.libs.fft_windows_cmb_box import QFFTWinCmbBox
 # from pyfda.libs.pyfda_fft_windows_lib import all_wins_dict_ref

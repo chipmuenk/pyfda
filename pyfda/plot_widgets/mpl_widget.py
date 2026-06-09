@@ -28,7 +28,8 @@ import pyfda.libs.pyfda_dirs as dirs
 from pyfda.libs.compat import (
     Qt, QtCore, QtGui, QWidget, pyqtSignal, QSizePolicy, QIcon, QImage, QVBoxLayout,
     QHBoxLayout, QInputDialog, FigureCanvas, NavigationToolbar, QtWidgets, QEvent)
-from pyfda.libs.pyfda_qt_lib import EventTypes, emit
+from pyfda.libs.pyfda_qt_lib import emit
+from pyfda.libs.pyfda_qt_classes import EventTypes
 from pyfda import pyfda_rc
 # Disallow "unused import" warning - needed to register resources like icons
 from pyfda import qrc_resources  # noqa: F401 # pylint: disable=unused-import

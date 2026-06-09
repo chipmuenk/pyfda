@@ -24,8 +24,8 @@ import pyfda.filterbroker as fb
 from pyfda.libs.compat import (
     QWidget, QLabel, QFrame, QDial, QHBoxLayout, pyqtSignal, QComboBox, QLineEdit)
 from pyfda.libs.pyfda_lib import unique_roots, H_mag, to_html, safe_eval
-from pyfda.libs.pyfda_qt_lib import (
-    PushButton, qcmb_box_populate, qget_cmb_box, qtext_width)
+from pyfda.libs.pyfda_qt_lib import qcmb_box_populate, qget_cmb_box, qtext_width
+from pyfda.libs.pyfda_qt_classes import PushButton
 from pyfda.pyfda_rc import params
 
 from pyfda.plot_widgets.mpl_widget import MplWidget
