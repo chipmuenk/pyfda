@@ -234,7 +234,7 @@ def normalize_zpk_gain(zpk: np.ndarray, h_max_target: float = 1.0) -> np.ndarray
     return zpk
 
 # ------------------------------------------------------------------------------
-def zpk2array(zpk: list):
+def zpk2array(zpk: list) -> np.ndarray  | str:
     """
     Test whether Z = zpk[0] and P = zpk[1] have the same length, if not, equalize
     the lengths by adding zeros.
@@ -287,14 +287,31 @@ def zpk2array(zpk: list):
     return pyfda_lib.iter2ndarray(zpk)
 
 # ------------------- -----------------------------------------------------------
-def angle_zero(X, n_eps=1e3, mode='auto', wrapped='auto'):
+def angle_zero(X: np.ndarray, n_eps: float = 1e3, wrapped: bool = True) -> np.ndarray:
 
     """
     Calculate angle of argument `X` when abs(X) > `n_eps` * machine resolution.
     Otherwise, zero is returned.
-    """
 
-    return np.angle(np.where((np.abs(X) > n_eps * np.spacing(1)), X, 0))
+    Parameters
+    ----------
+    X : np.ndarray
+        Input array
+    n_eps : float
+        Scaling factor for the machine epsilon
+    wrapped : bool
+        Whether to wrap the angle (default: True)
+
+    Returns
+    -------
+    np.ndarray
+        Angle of the input array, with zeros where the magnitude of the input is
+        below the threshold
+    """
+    if wrapped:
+        return np.angle(np.where((np.abs(X) > n_eps * np.spacing(1)), X, 0))
+    else:
+        return np.unwrap(np.angle(np.where((np.abs(X) > n_eps * np.spacing(1)), X, 0)))
 
 
 # ------------------------------------------------------------------------------
