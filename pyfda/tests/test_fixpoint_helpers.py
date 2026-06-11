@@ -26,8 +26,8 @@ except ImportError:
 class TestSequenceFunctions(unittest.TestCase):
 
     def setUp(self):
-        self.q_in =  {'WI':0, 'WF':15, 'W':16, 'ovfl':'wrap', 'quant':'round'}
-        self.q_out = {'WI':0, 'WF':15, 'W':16, 'ovfl':'wrap', 'quant':'round'}
+        self.q_in =  {'WI':0, 'WF':15, 'ovfl':'wrap', 'quant':'round'}
+        self.q_out = {'WI':0, 'WF':15, 'ovfl':'wrap', 'quant':'round'}
         if HAS_MIGEN:
             self.dut = DUT(self.q_in, self.q_out)
 
@@ -114,9 +114,9 @@ class TestSequenceFunctions(unittest.TestCase):
         is shortened by 3 bits.
         """
         # Input quantization format, range: -512 ... 511:
-        q_in =  {'WI':9, 'WF':0, 'W':10, 'ovfl':'wrap', 'quant':'round'}
+        q_in =  {'WI':9, 'WF':0, 'ovfl':'wrap', 'quant':'round'}
         # Output quantization format, range: -64 ... 63:
-        q_out = {'WI':6, 'WF':0, 'W':7, 'ovfl':'wrap', 'quant':'round'}
+        q_out = {'WI':6, 'WF':0, 'ovfl':'wrap', 'quant':'round'}
         targ_out = np.array([0,1,15,-64,-1,-1,-64,0])
 
         q_out_pyfda = q_out.copy()
@@ -135,12 +135,12 @@ class TestSequenceFunctions(unittest.TestCase):
         Test rescaling for fixpoint fractional representation when 3 fractional
         bits are thrown away.
         """
-        q_in =  {'WI':0, 'WF':9, 'W':10, 'ovfl':'wrap', 'quant':'round'}
-        q_out = {'WI':0, 'WF':6, 'W':7, 'ovfl':'wrap', 'quant':'round'}
+        q_in =  {'WI':0, 'WF':9, 'ovfl':'wrap', 'quant':'round'}
+        q_out = {'WI':0, 'WF':6, 'ovfl':'wrap', 'quant':'round'}
         targ_out = np.array([0,0,2,8,0,0,-8,0])
 
         q_out_pyfda = q_out.copy()
-        q_out_pyfda.update({'WI':6, 'WF':0, 'W':7}) # use integer representation
+        q_out_pyfda.update({'WI':6, 'WF':0}) # use integer representation
         self.myQ.set_qdict(q_out_pyfda)
 
         self.dut = DUT(q_in, q_out)
