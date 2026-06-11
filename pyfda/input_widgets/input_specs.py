@@ -393,24 +393,13 @@ class Input_Specs(QWidget):
         widgets via `load_dict()` and via sig_tx: {'data_changed':'filter_loaded'}.
         """
         sel = qget_cmb_box(self.cmb_filter_load)
-        # 'File' selected, update fil[0] from file
-        if sel == "file":
-            ret = load_filter(self)
-            if ret == 0:
-                pass
-            elif ret == -1:
+        # 'File' or 'File (all)' selected, update fil[0] resp. fil[0] ... fil[9] from file
+        if sel in {"file", "file_all"}:
+            ret = load_filter(self, all_filters=sel == "file_all")
+
+            if ret == -1:
                 return  # aborted or error occurred -> do nothing
-            else:
-                logger.error('Unknown return code "%s"!', ret)
-                return
-        # 'File (all)' selected, update fil[0] ... fil[9] from file
-        elif sel == "file_all":
-            ret = load_filter(self, all_filters=True)
-            if ret == 0:
-                pass
-            elif ret == -1:
-                return  # aborted or error occurred -> do nothing
-            else:
+            if ret != 0:
                 logger.error('Unknown return code "%s"!', ret)
                 return
 
