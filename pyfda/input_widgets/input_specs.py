@@ -136,8 +136,8 @@ class Input_Specs(QWidget):
             self.color_design_button('changed')
         elif 'filt_changed' in dict_sig:
             # Changing the filter design requires updating UI because number or
-            # kind of input fields changes -> reload filter parameters and update_UI
-            self.update_UI()
+            # kind of input fields changes -> reload filter parameters and _update_ui
+            self._update_ui()
             self.sel_fil.load_dict()
             # Update state of "DESIGN FILTER" button
             # It is disabled for "Manual_IIR" and "Manual_FIR" filter classes
@@ -289,7 +289,7 @@ class Input_Specs(QWidget):
         self.butQuit.clicked.connect(self.quit_program)  # emit 'close_event'
         # ----------------------------------------------------------------------
 
-        self.update_UI()  # first time initialization
+        self._update_ui()  # first time initialization
         self.start_design_filt()  # design first filter using default values
 
     # --------------------------------------------------------------------------
@@ -304,9 +304,9 @@ class Input_Specs(QWidget):
         self.led_info.deselect()
 
     # --------------------------------------------------------------------------
-    def update_UI(self) -> None:
+    def _update_ui(self) -> None:
         """
-        update_UI is called every time the filter design method or order
+        _update_ui is called every time the filter design method or order
         (min / man) has been changed as this usually requires a different set of
         frequency and amplitude specs.
 
