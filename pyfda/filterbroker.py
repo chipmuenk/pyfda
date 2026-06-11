@@ -267,6 +267,7 @@ fil_ref = {
         'display_index_k': False
     }
 }
+# =============================================================================
 
   # create empty lists with length 10 for multiple filter designs and undo memory
 fil = [None] * 10
