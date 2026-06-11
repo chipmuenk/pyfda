@@ -19,8 +19,7 @@ API version info:
     1.1: mark private methods as private
     1.2: - new API using fil_save & fil_convert (allow multiple formats,
                 save 'ba' _and_ 'zpk' precisely)
-         - include method _store_entries in _update_UI
-    1.3: new public methods destruct_UI + construct_UI (no longer called by __init__)
+         - include method _store_entries in _update_ui
     1.4: module attribute `filter_classes` contains class name and combo box name
          instead of class attribute `name`
         `FRMT` is now a class attribute
@@ -79,7 +78,7 @@ class MA(QWidget):
     """
     sig_tx = pyqtSignal(object)
 
-    def __init__(self, objectName='ma_inst'):
+    def __init__(self, objectName: str = 'ma_inst'):
         QWidget.__init__(self)
 
         self.setObjectName(objectName)
@@ -144,10 +143,10 @@ class MA(QWidget):
 #        self.info_doc.append('remezord()\n==========')
 #        self.info_doc.append(remezord.__doc__)
 
-        self.construct_UI()
+        self._construct_ui()
 
     # -------------------------------------------------------------------------
-    def emit(self, dict_sig):
+    def emit(self, dict_sig: dict) -> None:
         """
         Access imported function `emit()` as instance method, passing `self`
         with its attributes
@@ -155,7 +154,7 @@ class MA(QWidget):
         emit(self, dict_sig)
 
     #--------------------------------------------------------------------------
-    def construct_UI(self):
+    def _construct_ui(self) -> None:
         """
         Create the user interface for the Moving Average filter design widget.
         This includes labels, line edits, and checkboxes for setting delays,
@@ -203,17 +202,17 @@ class MA(QWidget):
         #----------------------------------------------------------------------
         # SIGNALS & SLOTs
         #----------------------------------------------------------------------
-        self.led_delays.editingFinished.connect(self._update_UI)
-        self.led_stages.editingFinished.connect(self._update_UI)
+        self.led_delays.editingFinished.connect(self._update_ui)
+        self.led_stages.editingFinished.connect(self._update_ui)
         # fires when edited line looses focus or when RETURN is pressed
-        self.chk_norm.clicked.connect(self._update_UI)
+        self.chk_norm.clicked.connect(self._update_ui)
         #----------------------------------------------------------------------
 
         self.dict2filter_params() # get initial / last setting from dictionary
-        self._update_UI()
+        self._update_ui()
 
 
-    def dict2filter_params(self):
+    def dict2filter_params(self) -> None:
         """
         Reload parameter(s) from filter dictionary (if they exist) and set
         corresponding UI elements. load_dict() is called upon initialization
@@ -231,7 +230,7 @@ class MA(QWidget):
                 self.chk_norm.setChecked(wdg_fil_par['normalize'])
 
 
-    def _update_UI(self):
+    def _update_ui(self) -> None:
         """
         Update UI when line edit field is changed (here, only the text is read
         and converted to integer) and resize the textfields according to content.
@@ -243,19 +242,20 @@ class MA(QWidget):
 
         self._store_entries()
 
-    def _store_entries(self):
+    def _store_entries(self) -> None:
         """
-        Store parameter settings in filter dictionary. Called from _update_UI()
+        Store parameter settings in filter dictionary. Called from _update_ui()
         and _save()
         """
         fb_set('filter_widgets', 'ma', {'delays': self.delays,
                                         'stages': self.stages,
-                                        'normalize': self.chk_norm.isChecked()})
+                                        'normalize': self.chk_norm.isChecked()},
+                                        accept_dict = True)
         # sig_tx -> select_filter -> filter_specs
         self.emit({'filt_changed': 'ma'})
 
 
-    def _get_params(self):
+    def _get_params(self) -> None:
         """
         Retrieve and set filter parameters from the filter dictionary.
         This method fetches the stopband frequency (F_SB) and stopband
@@ -266,7 +266,7 @@ class MA(QWidget):
         self.A_SB  = fb_get('A_SB')
 
 
-    def _save(self):
+    def _save(self) -> None:
         """
         Save MA-filters both in 'zpk' and 'ba' format; no conversion has to be
         performed except maybe deleting an 'sos' entry from an earlier
@@ -288,7 +288,7 @@ class MA(QWidget):
         self._store_entries()
 
 
-    def calc_ma(self, rt):
+    def calc_ma(self, rt: str) -> int:
         """
         Calculate coefficients and P/Z for moving average filter based on
         filter length L = N + 1 and number of cascaded stages and save the
@@ -297,12 +297,11 @@ class MA(QWidget):
         b = 1.
         k = 1.
         L = self.delays + 1
+        norm = L
 
         if rt == 'LP':
             b0 = np.ones(L) #  h[n] = {1; 1; 1; ...}
             i = np.arange(1, L)
-
-            norm = L
 
         elif rt == 'HP':
             b0 = np.ones(L)
@@ -344,7 +343,6 @@ class MA(QWidget):
             if not popup_warning(None, self.delays*self.stages, "Moving Average"):
                 return -1
 
-
         z0 = np.exp(-2j*np.pi*i/L)
         # calculate filter for multiple cascaded stages
         for _ in range(self.stages):
@@ -366,7 +364,7 @@ class MA(QWidget):
         return 0
 
 
-    def LPman(self):
+    def LPman(self) -> int:
         """
         Design a low-pass Moving Average filter using manual specifications.
         Retrieves parameters and calculates the filter coefficients.
@@ -377,7 +375,7 @@ class MA(QWidget):
         self._get_params()
         return self.calc_ma('LP')
 
-    def LPmin(self):
+    def LPmin(self) -> int:
         """
         Design a low-pass Moving Average filter with minimum specifications.
         Calculates the minimum number of delays required to meet the stopband
@@ -391,7 +389,7 @@ class MA(QWidget):
                                                      np.sin(self.F_SB * np.pi))))
         return self.calc_ma('LP')
 
-    def HPman(self):
+    def HPman(self) -> int:
         """
         Design a high-pass Moving Average filter using manual specifications.
         Retrieves parameters and calculates the filter coefficients.
@@ -402,7 +400,7 @@ class MA(QWidget):
         self._get_params()
         return self.calc_ma('HP')
 
-    def HPmin(self):
+    def HPmin(self) -> int:
         """
         Design a high-pass Moving Average filter with minimum specifications.
         Calculates the minimum number of delays required to meet the stopband
@@ -416,7 +414,7 @@ class MA(QWidget):
                                               np.sin((0.5 - self.F_SB) * np.pi))))
         return self.calc_ma('HP')
 
-    def BSman(self):
+    def BSman(self) -> int:
         """
         Design a band-stop Moving Average filter using manual specifications.
         Enforces an odd order for the filter and calculates the coefficients.
@@ -428,7 +426,7 @@ class MA(QWidget):
         self.delays = ceil_odd(self.delays)  # enforce odd order
         return self.calc_ma('BS')
 
-    def BPman(self):
+    def BPman(self) -> int:
         """
         Design a band-pass Moving Average filter using manual specifications.
         Enforces an odd order for the filter and calculates the coefficients.
@@ -449,7 +447,6 @@ if __name__ == '__main__':
 
     # instantiate filter widget
     filt = MA()
-    filt.construct_UI()
 
     layVDynWdg = QVBoxLayout()
     layVDynWdg.addWidget(filt.wdg_fil, stretch = 1)

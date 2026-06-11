@@ -23,7 +23,8 @@ logger = logging.getLogger(__name__)
 
 # ------------------------------------------------------------------------------
 
-def impz(b, a=1, FS=1, N=0, step=False):
+def impz(b: np.ndarray, a: np.ndarray | float = 1, FS: float = 1, N: int = 0,
+         step: bool = False) -> tuple[np.ndarray, np.ndarray]:
     """
     Calculate impulse response of a discrete time filter, specified by
     numerator coefficients b and denominator coefficients a of the system
@@ -98,7 +99,7 @@ def impz(b, a=1, FS=1, N=0, step=False):
     return hn, td
 
 # ------------------------------------------------------------------------------
-def impz_len(system, zpk: bool = False, level: float = -40) -> int:
+def impz_len(system: list[np.ndarray], zpk: bool = False, level: float = -40) -> int:
     r"""
     Calculate length of impulse response for FIR and IIR filters.
 
@@ -177,7 +178,7 @@ def impz_len(system, zpk: bool = False, level: float = -40) -> int:
     return N
 
 # --------------------------------------------------------------------------
-def zeros_with_val(N: int, val: float = 1., pos: int = 0):
+def zeros_with_val(N: int, val: float = 1., pos: int = 0) -> np.ndarray:
     """
     Create a 1D array of `N` zeros where the element at position `pos` has the
     value `val`. Returns `[1. 0, 0, ...] when no argument except the length is
@@ -206,10 +207,23 @@ def zeros_with_val(N: int, val: float = 1., pos: int = 0):
     return a
 
 # ------------------------------------------------------------------------------
-def normalize_zpk_gain(zpk, h_max_target: float = 1.0):
+def normalize_zpk_gain(zpk: np.ndarray, h_max_target: float = 1.0) -> np.ndarray:
     """
     Scale the system given in zero, pole, gain form in such a way that the
     maximum of the magnitude response is `h_max_target`.
+
+    Parameters
+    ----------
+    zpk : np.ndarray
+        Zeros, poles and gain of the system. Gain is expected to be a vector with the same length
+        as the number of poles and zeros, only the first element is used.
+    h_max_target : float
+        Target maximum of the magnitude response
+
+    Returns
+    -------
+    np.ndarray
+        Normalized zpk array
     """
     b, a = sig.zpk2tf(zpk[0], zpk[1], zpk[2][0])
     [w, H] = sig.freqz(b, a, whole=True)
@@ -220,7 +234,7 @@ def normalize_zpk_gain(zpk, h_max_target: float = 1.0):
     return zpk
 
 # ------------------------------------------------------------------------------
-def zpk2array(zpk: list):
+def zpk2array(zpk: list) -> np.ndarray  | str:
     """
     Test whether Z = zpk[0] and P = zpk[1] have the same length, if not, equalize
     the lengths by adding zeros.
@@ -239,7 +253,8 @@ def zpk2array(zpk: list):
 
     Returns
     -----
-    zpk as a numpy array or an error string
+    np.ndarray or str
+        zpk as a numpy array or an error string
     """
     try:
         _ = len(zpk)
@@ -272,18 +287,36 @@ def zpk2array(zpk: list):
     return pyfda_lib.iter2ndarray(zpk)
 
 # ------------------- -----------------------------------------------------------
-def angle_zero(X, n_eps=1e3, mode='auto', wrapped='auto'):
+def angle_zero(X: np.ndarray, n_eps: float = 1e3, wrapped: bool = True) -> np.ndarray:
 
     """
     Calculate angle of argument `X` when abs(X) > `n_eps` * machine resolution.
     Otherwise, zero is returned.
-    """
 
-    return np.angle(np.where((np.abs(X) > n_eps * np.spacing(1)), X, 0))
+    Parameters
+    ----------
+    X : np.ndarray
+        Input array
+    n_eps : float
+        Scaling factor for the machine epsilon
+    wrapped : bool
+        Whether to wrap the angle (default: True)
+
+    Returns
+    -------
+    np.ndarray
+        Angle of the input array, with zeros where the magnitude of the input is
+        below the threshold
+    """
+    if wrapped:
+        return np.angle(np.where((np.abs(X) > n_eps * np.spacing(1)), X, 0))
+    else:
+        return np.unwrap(np.angle(np.where((np.abs(X) > n_eps * np.spacing(1)), X, 0)))
 
 
 # ------------------------------------------------------------------------------
-def div_safe(num, den, n_eps: float = 1., i_scale: float = 1., verbose: bool = False):
+def div_safe(num: np.ndarray, den: np.ndarray, n_eps: float = 1., i_scale: float = 1.,
+             verbose: bool = False) -> np.ndarray:
 
     """
     Perform elementwise array division after treating singularities, meaning:
@@ -314,7 +347,7 @@ def div_safe(num, den, n_eps: float = 1., i_scale: float = 1., verbose: bool = F
         the singularities.
 
     verbose : bool, optional
-        whether to print  The default is False.
+        whether to print warnings about singularities (default: False)
 
     Returns
     -------
@@ -337,7 +370,7 @@ def div_safe(num, den, n_eps: float = 1., i_scale: float = 1., verbose: bool = F
 
 
 # ------------------------------------------------------------------------------
-def sos2zpk(sos):
+def sos2zpk(sos: np.ndarray | list) -> tuple[np.ndarray, np.ndarray, float]:
     """
     Taken from scipy/signal/filter_design.py - edit to eliminate first
     order section
@@ -359,6 +392,7 @@ def sos2zpk(sos):
         Poles of the transfer function.
     k : float
         System gain.
+
     Notes
     -----
     .. versionadded:: 0.16.0
@@ -381,11 +415,23 @@ def sos2zpk(sos):
 
 
 # ------------------------------------------------------------------------------
-def validate_sos(sos):
+def validate_sos(sos: np.ndarray) -> tuple[np.ndarray, int]:
     """
     Helper to validate a SOS input
 
     Copied from `scipy.signal._filter_design._validate_sos()`
+
+    Parameters
+    ----------
+    sos : array_like
+        Array of second-order filter coefficients, must have shape
+        ``(n_sections, 6)``. See `sosfilt` for the SOS filter format
+        specification.
+
+    Returns
+    -------
+    tuple[np.ndarray, int]
+        Validated SOS array and number of sections.
     """
     sos = np.atleast_2d(sos)
     if sos.ndim != 2:
@@ -399,8 +445,9 @@ def validate_sos(sos):
 
 
 # ------------------------------------------------------------------------------
-def group_delay(b, a=1, nfft=512, whole=False, analog=False, verbose=True,
-                fs=2.*pi, sos=False, alg="scipy", n_eps=100):
+def group_delay(b: np.ndarray, a: np.ndarray = 1, nfft: int = 512, whole: bool = False,
+                verbose: bool = True, fs: float = 2.*np.pi,
+                sos: bool = False, alg: str = "scipy", n_eps: int = 100) -> tuple[np.ndarray, np.ndarray]:
     r"""Calculate group delay of a discrete time filter, specified by
     numerator coefficients `b` and denominator coefficients `a` of the system
     function `H` ( `z`).
@@ -416,6 +463,9 @@ def group_delay(b, a=1, nfft=512, whole=False, analog=False, verbose=True,
     a :  array_like (optional, default = 1 for FIR-filter)
         Denominator coefficients (recursive part of filter)
 
+    nfft :  integer (optional, default: 512)
+        Number of FFT-points for calculating the group delay.
+
     whole : boolean (optional, default : False)
         Only when True calculate group delay around
         the complete unit circle (0 ... 2 pi)
@@ -424,11 +474,11 @@ def group_delay(b, a=1, nfft=512, whole=False, analog=False, verbose=True,
         Print warnings about frequency points with undefined group delay (amplitude = 0)
         and the time used for calculating the group delay
 
-    nfft :  integer (optional, default: 512)
-        Number of FFT-points
-
     fs : float (optional, default: fs = 2*pi)
         Sampling frequency.
+
+    sos : bool (optional, default: False)
+        Whether the input coefficients are in second-order sections (SOS) format.
 
     alg : str (default: "scipy")
         The algorithm for calculating the group delay:
@@ -789,17 +839,6 @@ def group_delay(b, a=1, nfft=512, whole=False, analog=False, verbose=True,
             nfft = nfft/2
             tau_g = tau_g[0:nfft]
             w = w[0:nfft]
-
-        # if analog: # doesnt work yet
-        #     a_b = np.convolve(a,b)
-        #     if ob > 1:
-        #         br_a = np.convolve(b[1:] * np.arange(1,ob), a)
-        #     else:
-        #         br_a = 0
-        #     ar_b = np.convolve(a[1:] * np.arange(1,oa), b)
-
-        #     num = np.fft.fft(ar_b - br_a, nfft)
-        #     den = np.fft.fft(a_b,nfft)
 
     # ---------------------
     elif alg == "scipy":  # implementation as in scipy.signal
@@ -1231,7 +1270,7 @@ def fil_save(arg: np.ndarray, format_in: str, sender: str, convert: bool = True)
 
 
 # ------------------------------------------------------------------------------
-def fil_convert(format_in) -> None:
+def fil_convert(format_in: str | set[str]) -> None:
     """
     Convert between poles / zeros / gain, filter coefficients (polynomes)
     and second-order sections and store all formats not generated by the filter

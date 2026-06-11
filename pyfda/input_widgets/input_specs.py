@@ -92,7 +92,7 @@ class Input_Specs(QWidget):
         ]
         self.cmb_filter_save_default = "0"
 
-        self._construct_UI()
+        self._construct_ui()
 
     # -------------------------------------------------------------------------
     def emit(self, dict_sig: dict) -> None:
@@ -122,7 +122,7 @@ class Input_Specs(QWidget):
 
         """
         if dict_sig['id'] == id(self):
-            logger.debug("Stopped infinite loop:\n\tPropagate = %s\n",
+            logger.debug("Stopped infinite loop (propagate = %s)\n:\n\t%s",
                          propagate, first_item(dict_sig))
             return
 
@@ -136,8 +136,8 @@ class Input_Specs(QWidget):
             self.color_design_button('changed')
         elif 'filt_changed' in dict_sig:
             # Changing the filter design requires updating UI because number or
-            # kind of input fields changes -> reload filter parameters and update_UI
-            self.update_UI()
+            # kind of input fields changes -> reload filter parameters and _update_ui
+            self._update_ui()
             self.sel_fil.load_dict()
             # Update state of "DESIGN FILTER" button
             # It is disabled for "Manual_IIR" and "Manual_FIR" filter classes
@@ -154,7 +154,7 @@ class Input_Specs(QWidget):
             self.emit(dict_sig)
 
     # -------------------------------------------------------------------------
-    def _construct_UI(self) -> None:
+    def _construct_ui(self) -> None:
         """
         Construct User Interface from all input subwidgets
         """
@@ -289,7 +289,7 @@ class Input_Specs(QWidget):
         self.butQuit.clicked.connect(self.quit_program)  # emit 'close_event'
         # ----------------------------------------------------------------------
 
-        self.update_UI()  # first time initialization
+        self._update_ui()  # first time initialization
         self.start_design_filt()  # design first filter using default values
 
     # --------------------------------------------------------------------------
@@ -304,9 +304,9 @@ class Input_Specs(QWidget):
         self.led_info.deselect()
 
     # --------------------------------------------------------------------------
-    def update_UI(self) -> None:
+    def _update_ui(self) -> None:
         """
-        update_UI is called every time the filter design method or order
+        _update_ui is called every time the filter design method or order
         (min / man) has been changed as this usually requires a different set of
         frequency and amplitude specs.
 
@@ -387,30 +387,19 @@ class Input_Specs(QWidget):
         self.color_design_button('changed')
 
     # --------------------------------------------------------------------------
-    def _load_filter(self):
+    def _load_filter(self) -> None:
         """
         Load filter dict `fil[0]` either from file or from memory and update the
         widgets via `load_dict()` and via sig_tx: {'data_changed':'filter_loaded'}.
         """
         sel = qget_cmb_box(self.cmb_filter_load)
-        # 'File' selected, update fil[0] from file
-        if sel == "file":
-            ret = load_filter(self)
-            if ret == 0:
-                pass
-            elif ret == -1:
+        # 'File' or 'File (all)' selected, update fil[0] resp. fil[0] ... fil[9] from file
+        if sel in {"file", "file_all"}:
+            ret = load_filter(self, all_filters=sel == "file_all")
+
+            if ret == -1:
                 return  # aborted or error occurred -> do nothing
-            else:
-                logger.error('Unknown return code "%s"!', ret)
-                return
-        # 'File (all)' selected, update fil[0] ... fil[9] from file
-        elif sel == "file_all":
-            ret = load_filter(self, all_filters=True)
-            if ret == 0:
-                pass
-            elif ret == -1:
-                return  # aborted or error occurred -> do nothing
-            else:
+            if ret != 0:
                 logger.error('Unknown return code "%s"!', ret)
                 return
 
@@ -432,7 +421,7 @@ class Input_Specs(QWidget):
         self.emit({'data_changed': 'filter_loaded'})
 
     # --------------------------------------------------------------------------
-    def _save_filter(self):
+    def _save_filter(self) -> None:
         """
         Save current filter fb.fil[0] either to file or to one of the memories
         """
@@ -461,7 +450,7 @@ class Input_Specs(QWidget):
         self.cmb_filter_save.setCurrentIndex(0)
 
     # --------------------------------------------------------------------------
-    def load_dict(self):
+    def load_dict(self) -> None:
         """
         Reload info text from global dict `fb.fil[0]` and reset 'DESIGN' button
         """
@@ -474,7 +463,7 @@ class Input_Specs(QWidget):
         self.color_design_button("ok")
 
     # --------------------------------------------------------------------------
-    def start_design_filt(self):
+    def start_design_filt(self) -> None:
         """
         Start the actual filter design process:
 
@@ -522,7 +511,14 @@ class Input_Specs(QWidget):
             logger.info("Designed filter with order = %s", str(fb_get('N')))
 
 
-    def color_design_button(self, state):
+    def color_design_button(self, state: str) -> None:
+        """
+        Color the >> DESIGN FILTER << button according to the filter design state
+        using `qstyle_widget()` and the states defined in pyfda_rc.py, e.g.:
+        - "ok": filter designed and up to date with specs
+        - "changed": specs have been changed and filter needs to be re-designed
+        - "error": filter design failed with current specs
+        """
         man = "manual" in fb_get('fc').lower()
         self.butDesignFilt.setDisabled(man)
         if man:
@@ -531,7 +527,7 @@ class Input_Specs(QWidget):
         qstyle_widget(self.butDesignFilt, state)
 
     # --------------------------------------------------------------------------
-    def quit_program(self):
+    def quit_program(self) -> None:
         """
         When <QUIT> button is pressed, send 'close_event'
         """

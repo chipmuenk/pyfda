@@ -1795,23 +1795,20 @@ def load_filter(self, all_filters: bool = False) -> int:
             return -1
 
         if 'sos' not in fb.fil[0]:
-            logger.error("Missing key 'sos', cancelling file operation.")
-            fb.restore_fil()
-            return -1
-        if isinstance(fb_get('sos'), np.ndarray):
-            pass
+            logger.error("Missing key 'sos', creating key and empty list.")
+            fb_set('sos', [])
         elif isinstance(fb_get('sos'), (list, tuple)):
             fb_set('sos', iter2ndarray(fb_get('sos')))
-        else:
-            logger.error("Unsuitable 'sos' data type '%s', cancelling file operation.",
+        elif not isinstance(fb_get('sos'), np.ndarray):
+            logger.error("Unsuitable 'sos' data type '%s', creating empty list.",
                          type(fb_get('sos')).__name__)
-            fb.restore_fil()
-            return -1
-        if np.ndim(fb_get('sos')) != 2 or np.shape(fb_get('sos'))[1] != 6:
-            logger.warning(
-                "Unsuitable shape %s of 'sos' data, storing empty list.",
+            fb_set('sos', [])
+        elif np.ndim(fb_get('sos')) != 2 or np.shape(fb_get('sos'))[1] != 6:
+            logger.warning("Unsuitable shape %s of 'sos' data, storing empty list.",
                 np.shape(fb_get('sos')))
             fb_set('sos', [])
+        # TODO: create an extra function, checking whether the sos data can be converted 
+        # to the correct shape instead of deleting it
 
         logger.info('Successfully loaded filter\n\t"%s"', file_name)
         dirs.last_file_name = file_name
@@ -1848,7 +1845,7 @@ def save_filter(self) -> int:
     # create a copy of the filter to be saved that only contains keys of the
     # reference filter dict and warn of unsupported keys:
     keys_unsupported = [k for k in fb.fil[0] if k not in fb.fil_ref]
-    if keys_unsupported != []:
+    if keys_unsupported:
         fil_clean = {k:v for k, v in fb.fil[0].items() if k in fb.fil_ref}
         logger.warning(
             "The following keys are ignored because they are not part of the\n"

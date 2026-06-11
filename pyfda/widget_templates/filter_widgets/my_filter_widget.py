@@ -20,12 +20,11 @@ import logging
 
 import numpy as np
 
-import pyfda.filterbroker as fb
 from pyfda.filterbroker import fb_get, fb_set
 from pyfda.libs.compat import QWidget, QLabel, QLineEdit, pyqtSignal, QVBoxLayout, QHBoxLayout
 from pyfda.libs.pyfda_qt_lib import popup_warning, emit
 from pyfda.libs.pyfda_lib import safe_eval
-from pyfda.libs.pyfda_sig_lib import fil_save
+from pyfda.libs.pyfda_sig_lib import fil_save, zeros_with_val
 
 logger = logging.getLogger(__name__)
 
@@ -75,7 +74,7 @@ class AllpPZ(QWidget):
         self._construct_ui()
 
     # -------------------------------------------------------------------------
-    def emit(self, dict_sig):
+    def emit(self, dict_sig: dict) -> None:
         """
         Access imported function `emit()` as instance method, passing `self`
         with its attributes
@@ -83,7 +82,7 @@ class AllpPZ(QWidget):
         emit(self, dict_sig)
 
     #--------------------------------------------------------------------------
-    def _construct_ui(self):
+    def _construct_ui(self) -> None:
         """
         Create additional subwidget(s) needed for filter design:
         These subwidgets are instantiated dynamically when needed in
@@ -126,7 +125,7 @@ class AllpPZ(QWidget):
         self.dict2filter_params() # get initial / last setting from dictionary
         self._update_ui()
 
-    def _update_ui(self):
+    def _update_ui(self) -> None:
         """
         Update UI when line edit field is changed (here, only the text is read
         and converted to integer) and store parameter settings in filter
@@ -138,13 +137,13 @@ class AllpPZ(QWidget):
         self.p[1] = safe_eval(self.led_pole2.text(), self.p[1], return_type='cmplx')
         self.led_pole2.setText(str(self.p[1]))
 
-        fb_set('filter_widgets', {'allpass':{'p1':self.p[0], 'p2':self.p[1]}})
+        fb_set('filter_widgets', 'allpass', {'p1':self.p[0], 'p2':self.p[1]}, new_key = True)
 
         # sig_tx -> select_filter -> filter_specs
         self.emit({'filt_changed': 'pole_1_2'})
 
 
-    def dict2filter_params(self):
+    def dict2filter_params(self) -> None:
         """
         Reload parameter(s) from filter dictionary (if they exist) and set
         corresponding UI elements. dict2filter_params() is called upon initialization
@@ -159,7 +158,7 @@ class AllpPZ(QWidget):
                 self.p2 = wdg_fil_par['p2']
                 self.led_pole2.setText(str(self.p2))
 
-    def _get_params(self):
+    def _get_params(self) -> None:
         """
         Get parameters needed for filter design from the passed dictionary and
         translate them to instance parameters, scaling / transforming them if needed.
@@ -168,7 +167,7 @@ class AllpPZ(QWidget):
         #self.p2     = fb_get('zpk')[1][1]  # from central filter dect
         logger.info(fb_get('zpk'))
 
-    def _test_poles(self):
+    def _test_poles(self) -> bool:
         """
         Warn the user if one of the poles is outside the unit circle
         """
@@ -177,13 +176,14 @@ class AllpPZ(QWidget):
 
         return True
 
-    def _save(self, arg=None):
+    def _save(self, arg: np.ndarray = None) -> None:
         """
         Convert between poles / zeros / gain, filter coefficients (polynomes)
         and second-order sections and store all available formats in the filter dict.
         """
         if arg is None:
-            logger.error("Passed empty filter dict")
+            logger.error("Passed empty filter array, cannot save filter.")
+            return
         logger.info(arg)
         fil_save(arg, self.FRMT, __name__)
 
@@ -195,7 +195,7 @@ class AllpPZ(QWidget):
     #--------------------------------------------------------------------------
     # The method name MUST be "FilterType"+"MinMan", e.g. LPmin or BPman
 
-    def APman(self):
+    def APman(self) -> int:
         """
         Calculate z =1/p* for a given set of poles p. If p=0, set z=0.
         The gain factor k is calculated from z and p at z = 1.
@@ -212,9 +212,10 @@ class AllpPZ(QWidget):
             self.z[1] = np.conj(1/self.p[1])
 
         k = np.abs(np.polyval(np.poly(self.p),1) / np.polyval(np.poly(self.z),1))
-        zpk_list = [self.z,self.p,k]
+        zpk = np.array([self.z, self.p, zeros_with_val(len(self.z), k)])
 
-        self._save(zpk_list)
+        self._save(zpk)
+        return 0
 
 #------------------------------------------------------------------------------
 

@@ -267,6 +267,7 @@ fil_ref = {
         'display_index_k': False
     }
 }
+# =============================================================================
 
   # create empty lists with length 10 for multiple filter designs and undo memory
 fil = [None] * 10
@@ -482,7 +483,7 @@ def fb_get(*keys_tuple: tuple, fil_dict: dict = fil[0], verbose: bool = True)\
 
 # -------------------------
 def fb_set(*keys_tuple: tuple, backup: bool = True, new_key: bool = False,
-           fil_dict: dict = fil[0]) -> int:
+           accept_dict: bool = False, fil_dict: dict = fil[0]) -> int:
     """
     Use the items of `keys_tuple` to access a nested dict `fil_dict`
     (default: `fil[0]`) and write the last item in `keys_tuple` to the dict.
@@ -498,11 +499,14 @@ def fb_set(*keys_tuple: tuple, backup: bool = True, new_key: bool = False,
     backup : bool
         Whether the previous state of the filter dict should be backed up (default: True)
     new_key : bool
-        Whether a new key:value pair should be added to the dictionary (default: False). 
-        If False, the value of an existing key is updated, if True, a new key:value pair is added
-        to the dictionary. Setting this to True can be used to add new entries to the filter dict,
-        but it can also be dangerous because it allows for accidental overwriting of existing keys
-        and values in the dictionary.
+        Whether a new key:value pair should be added to the dictionary (default: False).
+        If False, an error is generated if the key does not exist, if True, a new key:value pair
+        is added to the dictionary. If the key already exists, a warning is issued and the old
+        value is overwritten (default: False).
+    accept_dict : bool
+        Allow a dictionary to be stored as a value in the filter dict, this speeds up storing
+        complex data but is dangerous because the keys of the new dict might be different from the
+        old dict (default: False).
     fil_dict : dict
         The dictionary to traverse.
 
@@ -520,8 +524,8 @@ def fb_set(*keys_tuple: tuple, backup: bool = True, new_key: bool = False,
         If `keys_tuple` is not of type Tuple or if it has less than two items
 
     TODO: Dict entries need to be protected from accidental overwriting by
-    the user. This will be done by prepending the keys with an underscore
-    (e.g. `_f_S`) once all direct accesses have been removed.
+    the user. This will be done by prepending the dict name with an underscore
+    `_fil[0]` once all direct accesses have been removed.
     """
 
     if not isinstance(keys_tuple, tuple):
@@ -542,8 +546,7 @@ def fb_set(*keys_tuple: tuple, backup: bool = True, new_key: bool = False,
 
         # traverse nested dict 'fil_dict' using tuple of keys and access subdictionary
         d = _traverse_dict(keys_tuple[:-1], fil_dict)
-        # Test accessing the dictionary and whether the key to be written is a dict.
-        # This could be dangerous because the keys in this sub-dictionary could be altered!
+
         if new_key:
             if set_key in d:
                 logger.warning("Overwriting existing key '%s' in dictionary \n"
@@ -551,17 +554,24 @@ def fb_set(*keys_tuple: tuple, backup: bool = True, new_key: bool = False,
             d[set_key] = set_val  # set new key:value pair
             return 0
 
-        if isinstance(d[set_key], dict):
-            logger.error(
-                f"\n\tCannot assign '{set_key}' with sub-dict\n\t"
-                f"{set_val}!\n\tThis would overwrite the old sub-dict\n\t{d[set_key]}.")
+        if set_key not in d:
+            logger.error("Key '%s' not found in filter dictionary!", set_key )
             raise KeyError
+
+        # Test accessing the dictionary and whether the value to be written is a dict.
+        # This could be dangerous because the keys in this sub-dictionary could be altered!
+        if isinstance(d[set_key], dict):
+            if not accept_dict:
+                logger.error(
+                    f"\n\tCannot assign '{set_key}' with sub-dict\n\t"
+                    f"{set_val}!\n\tThis would overwrite the old sub-dict\n\t{d[set_key]}.")
+                raise KeyError
 
         if set_key =='qfrmt':
             if len(keys_tuple) > 2:
                 logger.error(f"More than one value '{keys_tuple[1:]}' for setting 'qfrmt'!")
                 raise KeyError
-                    
+
             # store current fixpoint / float format
             if get_fx():  # fixpoint mode, store old fixpoint format
                 fil_dict['qfrmt_fx_last'] = fil_dict['qfrmt']
@@ -578,7 +588,7 @@ def fb_set(*keys_tuple: tuple, backup: bool = True, new_key: bool = False,
             if types.issubset({'float', 'float64'}):
                 pass
             # the following types are considered compatible but a warning is issued because
-            # because the conversion might lead to problems later on.
+            # the conversion might lead to problems later on.
             elif types.issubset({'list', 'tuple', 'ndarray'}):
                 logger.warning("Possible type mismatch: Setting\n\t'%s' of type '%s' with value "
                                 "of similar type '%s'",
@@ -592,8 +602,9 @@ def fb_set(*keys_tuple: tuple, backup: bool = True, new_key: bool = False,
                 raise KeyError
         d[set_key] = set_val  # update key with new value
 
-    except KeyError as e:
+    except KeyError:
         if backup:
+            # backup is not needed, nothing was changed
             restore_fil()
         return -1
 

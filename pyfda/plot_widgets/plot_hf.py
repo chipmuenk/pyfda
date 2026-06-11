@@ -30,7 +30,8 @@ from pyfda.filterbroker import fb_get
 from pyfda.pyfda_rc import params
 from pyfda.plot_widgets.mpl_widget import MplWidget
 from pyfda.libs.pyfda_lib import pprint_log, safe_eval, to_html
-from pyfda.libs.pyfda_qt_lib import PushButton, qtext_width, qcmb_box_populate
+from pyfda.libs.pyfda_qt_lib import qtext_width, qcmb_box_populate
+from pyfda.libs.pyfda_qt_classes import PushButton
 
 logger = logging.getLogger(__name__)
 

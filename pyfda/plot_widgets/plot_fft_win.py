@@ -25,8 +25,8 @@ from pyfda.libs.compat import (
 from pyfda.libs.fft_windows_cmb_box import QFFTWinCmbBox
 import pyfda.libs.pyfda_dirs as dirs
 from pyfda.libs.pyfda_lib import safe_eval, to_html, pprint_log
-from pyfda.libs.pyfda_qt_lib import (
-    qwindow_stay_on_top, qtext_width, QVLine, QHLine, PushButton, PushButtonRT, emit)
+from pyfda.libs.pyfda_qt_lib import qwindow_stay_on_top, qtext_width, emit
+from pyfda.libs.pyfda_qt_classes import QVLine, QHLine, PushButton, PushButtonRT
 from pyfda.plot_widgets.mpl_widget import MplWidget
 
 logger = logging.getLogger(__name__)

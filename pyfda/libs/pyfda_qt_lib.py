@@ -13,9 +13,7 @@ import logging
 
 from .pyfda_lib import pprint_log
 
-from .compat import (
-    Qt, QtGui, QtCore, QFrame, QMessageBox, QPushButton, QLabel, QComboBox, QDialog, QtWidgets,
-    QFont, QFontMetrics, QSizePolicy, QIcon, QEvent, QHBoxLayout)
+from .compat import Qt, QtGui, QMessageBox, QComboBox, QDialog, QtWidgets, QFont, QFontMetrics
 from .pyfda_dirs import OS, OS_VER
 
 logger = logging.getLogger(__name__)
@@ -375,8 +373,8 @@ def qcmb_box_del_item(cmb_box: QComboBox, string: str, data: bool = False,
 
 
 # ----------------------------------------------------------------------------
-def qcmb_box_add_item(cmb_box, item_list, data=True, fireSignals=False,
-                      caseSensitive=False):
+def qcmb_box_add_item(cmb_box: QComboBox, item_list: list, data: bool = True,
+                      fireSignals: bool = False, caseSensitive: bool = False) -> int:
     """
     Add an entry in combobox with text / data / tooltipp from `item_list`.
     When the item is already in combobox (searching for data or text item, depending
@@ -428,7 +426,7 @@ def qcmb_box_add_item(cmb_box, item_list, data=True, fireSignals=False,
 
 
 # ------------------------------------------------------------------------------
-def qstyle_widget(widget, state):
+def qstyle_widget(widget: QtWidgets.QWidget, state: str) -> None:
     """
     Apply the "state" defined in pyfda_rc.py to the widget, e.g.:
     Color the >> DESIGN FILTER << button according to the filter design state.
@@ -461,15 +459,14 @@ def qstyle_widget(widget, state):
 
 
 # ----------------------------------------------------------------------------
-def qget_selected(table, select_all=False, reverse=True):
+def qget_selected(
+        table: QtWidgets.QTableWidget, select_all: bool = False, reverse: bool = True) -> dict:
     """
-    Get selected cells in ``table`` and return a dictionary with the following keys:
+    Get selected cells in ``table`` and return a dictionary with the following key / value pairs:
 
-    'idx': indices of selected cells as an unsorted list of tuples
-
-    'sel': list of lists of selected cells per column, by default sorted in reverse
-
-    'cur':  current cell selection as a tuple
+    - 'idx': indices of selected cells as an unsorted list of tuples
+    - 'sel': list of lists of selected cells per column, by default sorted in reverse
+    - 'cur':  current cell selection as a tuple
 
     Parameters
     ----------
@@ -478,6 +475,12 @@ def qget_selected(table, select_all=False, reverse=True):
 
     reverse : bool
         return selected fields upside down when True
+
+    Returns
+    -------
+    dict
+        A dictionary containing the indices, selected cells, and current cell selection.
+        {'idx': idx, 'sel': sel, 'cur': cur}
     """
     if select_all:
         table.selectAll()
@@ -502,15 +505,30 @@ def qget_selected(table, select_all=False, reverse=True):
 
 
 # ----------------------------------------------------------------------------
-def popup_warning(self, N: int = 0, filter: str = "", message: str = "") -> bool:
+def popup_warning(self, N: int = 0, filter_name: str = "", message: str = "") -> bool:
     """
     Pop-up a warning box and require a user prompt. When `message == ""`, warn of
     very large filter orders, otherwise display the passed message
+
+    Parameters
+    ----------
+    N: int
+        Filter order, used for default message when `message == ""`
+    filter_name: str
+        Filter type, used for default message when `message == ""`
+    message: str
+        Custom message to be displayed in the warning box. When `message == ""`,
+        a message is generated about a high filter order `N` filter `filter_name`.
+
+    Returns
+    -------
+    bool
+        True if the user clicks "Yes" to continue, False if the user clicks "No".
     """
     if message == "":
         message = (
             f"<span><b><i>N</i> = {N}</b> is a rather high order for a<br />"
-            f"{filter} filter and may cause large <br />"
+            f"{filter_name} filter and may cause large <br />"
             "numerical errors and compute times.<br />Continue?</span>")
 
     reply = QMessageBox.warning(
@@ -522,7 +540,7 @@ def popup_warning(self, N: int = 0, filter: str = "", message: str = "") -> bool
 
 
 # ----------------------------------------------------------------------------
-def qtext_width(text: str = '', N_x: int = 17, bold: bool = True, font=None) -> int:
+def qtext_width(text: str = '', N_x: int = 17, bold: bool = True, font: QFont = None) -> int:
     """
     Calculate width of `text` in points`. When `text=``, calculate the width
     of number `N_x` of characters 'x'.
@@ -532,7 +550,7 @@ def qtext_width(text: str = '', N_x: int = 17, bold: bool = True, font=None) -> 
 
     Parameters
     ----------
-    test: str
+    text: str
         string to calculate the width for
 
     N_x: int
@@ -572,7 +590,7 @@ def qtext_width(text: str = '', N_x: int = 17, bold: bool = True, font=None) -> 
 
 
 # ----------------------------------------------------------------------------
-def qtext_height(text: str = 'X', font=None) -> int:
+def qtext_height(font: QFont = None) -> int:
     """
     Calculate size of `text` in points`.
 
@@ -581,8 +599,10 @@ def qtext_height(text: str = 'X', font=None) -> int:
 
     Parameters
     ----------
-    test: str
-        string to calculate the height for (default: "X")
+
+    font: QFont
+        When `None`, use default font, otherwise use the passed font to calculate
+        the height of the text.
 
     Returns
     -------
@@ -609,506 +629,6 @@ def qtext_height(text: str = 'X', font=None) -> int:
 
     return fm.lineSpacing()
 
-    # width_frm = wdg.textMargins().left() + wdg.textMargins().right() +\
-    #     wdg.contentsMargins().left() + wdg.contentsMargins().left() +\
-    #     8  # 2 * horizontalMargin() + 2 * frame margin.
-
-    # fm = QFontMetrics(loggerWin.font())
-    # row4_height = fm.lineSpacing() * 4
-    # fm_size = fm.size(0, text)
-
-# ----------------------------------------------------------------------------
-class EventTypes:
-    """
-    https://stackoverflow.com/questions/62196835/how-to-get-string-name-for-qevent-in-pyqt5
-    Events in Qt5: https://doc.qt.io/qt-5/qevent.html
-
-    Stores a string name for each event type.
-
-    With PySide2 str() on the event type gives a nice string name,
-    but with PyQt5 it does not. So this method works with both systems.
-
-    Example usage (simultaneous initialization and method call / translation)
-    > event_str = EventTypes().as_string(QEvent.UpdateRequest)
-    > assert event_str == "UpdateRequest"
-
-    Example usage, separate initialization and method call
-    > event types = EventTypes()
-    > event_str = event_types.as_string(event.type())
-    """
-
-    def __init__(self):
-        """Create mapping for all known event types."""
-        self.string_name = {}
-        for name in vars(QEvent):
-            attribute = getattr(QEvent, name)
-            if isinstance(attribute, QEvent.Type):
-                self.string_name[attribute] = name
-
-    def as_string(self, event: QEvent.Type) -> str:
-        """Return the string name for this event."""
-        try:
-            return self.string_name[event]
-        except KeyError:
-            return f"UnknownEvent:{event}"
-
-# ----------------------------------------------------------------------------
-class QHLine(QFrame):
-    """
-    Create a thin horizontal line utilizing the HLine property of QFrames
-    Usage:
-
-    > myline = QHLine()
-    > mylayout.addWidget(myline)
-    """
-    def __init__(self, width=1):
-        super().__init__()
-        self.setFrameShape(QFrame.HLine)
-        self.setFrameShadow(QFrame.Plain)
-        self.setLineWidth(width)
-
-
-class QVLine(QFrame):
-    """
-    Create a thin vertical line utilizing the HLine property of QFrames
-    Usage:
-
-    > myline = QVLine()
-    > mylayout.addWidget(myline)
-    """
-
-    def __init__(self, width: int = 2):
-        super().__init__()
-        self.setFrameShape(QFrame.VLine)
-        self.setFrameShadow(QFrame.Plain)
-        # self.setStyleSheet('border-color: rgb(50,50,50)')
-        # self.setFrameShadow(QFrame.Sunken)
-        # self.setLineWidth(width)
-        # self.setFrameShape(QFrame.StyledPanel);
-        self.setStyleSheet(
-            f"border-width: {str(width)}px; border-top-style: none; "
-            "border-right-style: none; border-bottom-style: none; "
-            "border-left-style: solid; border-color: grey;")
-
-
-class PushButton(QPushButton):
-    """
-    Convenience class for creating a checkable QPushButton with attribute `checked` that
-    reflects the checked state of the button and can be used for QSS styling via the
-    `style_button()` method.
-
-    Parameters
-    ----------
-    text : str
-        Text for button (optional)
-
-    icon : QIcon
-        Icon for button. Either `text` or `icon` must be defined.
-
-    checkable : bool
-        Whether button is checkable
-
-    checked : bool
-        Whether initial state is checked
-    """
-
-    def __init__(self, parent=None, text: str = "", icon: QIcon = None, checkable: bool = True,
-                 checked: bool = False, objectName="", **kwargs):
-
-        if parent is not None:
-            super().__init__(parent, **kwargs)
-        else:
-            super().__init__(**kwargs)
-
-        self.setObjectName(objectName)
-
-        if icon is None:
-            super().setText(text.strip())
-        else:
-            self.setIcon(icon)
-
-        self.setCheckable(checkable)
-        self._checkable = checkable
-        if self._checkable:
-            self.setChecked(checked)
-            self.checked = checked
-        else:
-            self.setChecked(False)
-            self.checked = False
-
-        self.style_button()
-
-        self.installEventFilter(self)
-
-    def setChecked(self, checked: bool):
-        if self._checkable:
-            self.checked = checked
-            self.style_button()
-
-    def setCheckable(self, checkable: bool):
-        self._checkable = checkable
-        if not self._checkable:
-            self.setChecked(False)
-            self.checked = False
-            self.style_button()
-
-    def eventFilter(self, source: QtCore.QObject, event: QEvent) -> bool:
-        if event.type() == QEvent.MouseButtonPress:
-            if self.isEnabled() and self._checkable and event.button() == Qt.LeftButton:
-                # signal is passed to base class where "self.toggle()" is performed
-                self.checked = not self.checked
-                self.style_button()
-        # Call base class method to continue normal event processing:
-        return super().eventFilter(source, event)
-
-    def style_button(self) -> None:
-        if self.checked:
-            qstyle_widget(self, "highlight")
-        else:
-            qstyle_widget(self, "normal")
-
-class PushButtonRT(QPushButton):
-    """
-    Subclass QPushButton using QLabel to render rich text
-
-    Parameters
-    ----------
-    text : str
-        Text for button (optional)
-
-    rtf : bool
-        Render text as rich text
-
-    N_x : int
-        Width in number of "x"
-
-    pad : int
-        L / R padding for the label inside the button
-
-    checkable : bool
-        Whether button is checkable
-
-    checked : bool
-        Whether initial state is checked
-    """
-
-    def __init__(self, parent=None, text: str = "", pad: int = 5, checkable: bool = True,
-                 checked: bool = False, objectName="", **kwargs):
-
-        if parent is not None:
-            super().__init__(parent, **kwargs)
-        else:
-            super().__init__(**kwargs)
-
-        self.setObjectName(objectName)
-
-        self.lbl_rtf = QLabel(self)
-        self.pad = pad
-        if text is not None:
-            self.lbl_rtf.setText(text)
-        self.layH_main = QHBoxLayout()
-        self.layH_main.setContentsMargins(pad, 0, pad, 0)  # L, T, R, B
-        self.layH_main.setSpacing(0)
-        self.setLayout(self.layH_main)
-        # Make QLabel transparent except for painted pixels
-        self.lbl_rtf.setAttribute(Qt.WA_TranslucentBackground)
-        # Disable the delivery of mouse events to the QLabel widget and its children,
-        self.lbl_rtf.setAttribute(Qt.WA_TransparentForMouseEvents)
-        self.lbl_rtf.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
-        self.lbl_rtf.setTextFormat(Qt.RichText)
-        self.layH_main.addWidget(self.lbl_rtf, Qt.AlignHCenter)
-
-        self.setCheckable(checkable)
-        self._checkable = checkable
-        if self._checkable:
-            self.setChecked(checked)
-            self.checked = checked
-        else:
-            self.setChecked(False)
-            self.checked = False
-
-        self.style_button()
-
-        self.installEventFilter(self)
-
-    def setText(self, text: str) -> None:
-        """
-        Set the text for the QLabel inside the button and update its geometry.
-
-        Parameters
-        ----------
-        text : str
-            The text to set for the QLabel.
-        """
-        self.lbl_rtf.setText(text)
-        self.updateGeometry()
-
-    def setChecked(self, checked: bool) -> None:
-        """
-        Set the checked state of the button and update its style.
-
-        Parameters
-        ----------
-        checked : bool
-            The new checked state of the button.
-        """
-        if self._checkable:
-            self.checked = checked
-            self.style_button()
-
-    def setCheckable(self, checkable: bool) -> None:
-        """
-        Set whether the button is checkable and update its state accordingly.
-
-        Parameters
-        ----------
-        checkable : bool
-            Whether the button should be checkable.
-        """
-        self._checkable = checkable
-        if not self._checkable:
-            self.setChecked(False)
-            self.checked = False
-            self.style_button()
-
-    def eventFilter(self, source: QtCore.QObject, event: QEvent) -> bool:
-        """
-        Handle events for the button, such as mouse button presses.
-
-        Parameters
-        ----------
-        source : QtCore.QObject
-            The source object of the event.
-        event : QEvent
-            The event to process.
-
-        Returns
-        -------
-        bool
-            True if the event was handled, False otherwise.
-        """
-        if event.type() == QEvent.MouseButtonPress:
-            if self.isEnabled() and self._checkable and event.button() == Qt.LeftButton:
-                # signal is passed to base class where "self.toggle()" is performed
-                self.checked = not self.checked
-                self.style_button()
-        # Call base class method to continue normal event processing:
-        return super().eventFilter(source, event)
-
-    def style_button(self) -> None:
-        """
-        Apply the appropriate style to the button and its QLabel based on the checked state.
-        """
-        if self.checked:
-            qstyle_widget(self, "highlight")
-            qstyle_widget(self.lbl_rtf, "highlight")
-        else:
-            qstyle_widget(self, "normal")
-            qstyle_widget(self.lbl_rtf, "normal")
-
-    def sizeHint(self) -> QtCore.QSize:
-        """
-        Provide a size hint for the button based on the QLabel's size and padding.
-
-        Returns
-        -------
-        QtCore.QSize
-            The recommended size for the button.
-        """
-        s = super().sizeHint()
-        w = self.lbl_rtf.sizeHint()
-        s.setWidth(w.width() + 2 * self.pad)
-        return s
-
-    def minimumSizeHint(self) -> QtCore.QSize:
-        """
-        Provide a minimum size hint for the button based on the QLabel's size and padding.
-
-        Returns
-        -------
-        QtCore.QSize
-            The minimum recommended size for the button.
-        """
-        s = super().sizeHint()
-        w = self.lbl_rtf.sizeHint()
-        s.setWidth(w.width() + 2 * self.pad)
-        return s
-
-
-class RotatedButton(QPushButton):
-    """
-    ##### Currently Unused #####
-    Create a rotated QPushButton
-
-    Taken from
-
-    https://forum.qt.io/topic/9279/moved-how-to-rotate-qpushbutton-63/7
-    """
-
-    def init(self, text: str, parent, orientation: str = "west") -> None:
-        """
-        Initialize the rotated button with text, parent, and orientation.
-
-        Parameters
-        ----------
-        text : str
-            The text to display on the button.
-        parent : QWidget
-            The parent widget of the button.
-        orientation : str, optional
-            The orientation of the button, default is "west".
-        """
-        super().init(text, parent)
-        self.orientation = orientation
-
-    def paintEvent(self, event: QEvent) -> None:
-        """
-        Handle the paint event to draw the rotated button.
-
-        Parameters
-        ----------
-        event : QEvent
-            The paint event to process.
-        """
-        painter = QtWidgets.QStylePainter(self)
-        painter.rotate(90)
-        painter.translate(0, -1 * self.width())
-        painter.drawControl(QtWidgets.QStyle.CE_PushButton, self.getSyleOptions())
-
-    def minimumSizeHint(self) -> QtCore.QSize:
-        """
-        Provide the minimum size hint for the rotated button.
-
-        Returns
-        -------
-        QtCore.QSize
-            The minimum size hint for the button.
-        """
-        size = super().minimumSizeHint()
-        size.transpose()
-        return size
-
-    def sizeHint(self) -> QtCore.QSize:
-        """
-        Provide the size hint for the rotated button.
-
-        Returns
-        -------
-        QtCore.QSize
-            The recommended size for the button.
-        """
-        size = super().sizeHint()
-        size.transpose()
-        return size
-
-    def getSyleOptions(self) -> QtWidgets.QStyleOptionButton:
-        """
-        Retrieve the style options for the rotated button.
-
-        Returns
-        -------
-        QtWidgets.QStyleOptionButton
-            The style options for the button.
-        """
-        options = QtWidgets.QStyleOptionButton()
-        options.initFrom(self)
-        size = options.rect.size()
-        size.transpose()
-        options.rect.setSize(size)
-        # options.features = QtWidgets.QStyleOptionButton.None
-        if self.isFlat():
-            options.features |= QtWidgets.QStyleOptionButton.Flat
-        if self.menu():
-            options.features |= QtWidgets.QStyleOptionButton.HasMenu
-        if self.autoDefault() or self.isDefault():
-            options.features |= QtWidgets.QStyleOptionButton.AutoDefaultButton
-        if self.isDefault():
-            options.features |= QtWidgets.QStyleOptionButton.DefaultButton
-        if self.isDown() or (self.menu() and self.menu().isVisible()):
-            options.state |= QtWidgets.QStyle.State_Sunken
-        if self.isChecked():
-            options.state |= QtWidgets.QStyle.State_On
-        if not self.isFlat() and not self.isDown():
-            options.state |= QtWidgets.QStyle.State_Raised
-
-        options.text = self.text()
-        options.icon = self.icon()
-        options.iconSize = self.iconSize()
-        return options
-
-
-class QLabelVert(QLabel):
-    """
-    Create a vertical label
-
-    Adapted from
-    https://pyqtgraph.readthedocs.io/en/latest/_modules/pyqtgraph/widgets/VerticalLabel.html
-
-    https://stackoverflow.com/questions/34080798/pyqt-draw-a-vertical-label
-
-    check https://stackoverflow.com/questions/29892203/draw-rich-text-with-qpainter
-    """
-
-    def __init__(self, text, orientation='west', forceWidth=True):
-        QLabel.__init__(self, text)
-        # self.forceWidth = forceWidth
-        self.orientation = orientation
-        # self.setOrientation(orientation)
-
-    # def setOrientation(self, o):
-    #     self.orientation = o
-    #     self.update()
-    #     self.updateGeometry()
-
-    def paintEvent(self, ev: QEvent) -> None:
-        """
-        Handle the paint event to draw the rotated label.
-
-        Parameters
-        ----------
-        ev : QEvent
-            The paint event to process.
-        """
-        # p = QtGui.QPainter(self)
-        # p.setPen(QtCore.Qt.black)
-        p = QtGui.QPainter(self)
-        p.rotate(-90)
-        rgn = QtCore.QRect(-self.height(), 0, self.height(), self.width())
-        # align = self.alignment()  # use alignment of original widget
-        align = QtCore.Qt.AlignVCenter | QtCore.Qt.AlignHCenter
-        # p.translate(0, -1 * self.width())
-
-        # Draw plain text in `rgn` with alignment `align`
-        self.hint = p.drawText(rgn, align, self.text())
-        p.drawText(rgn, align, self.text())  # returns (height, width)
-        # p.drawControl()
-        p.end()
-
-    def sizeHint(self) -> QtCore.QSize:
-        """
-        Provide a size hint for the label based on its dimensions.
-
-        Returns
-        -------
-        QSize
-            The recommended size for the label.
-        """
-        size = super().sizeHint()
-        size.transpose()
-        return size
-
-    def minimumSizeHint(self) -> QtCore.QSize:
-        """
-        Provide a minimum size hint for the label based on its dimensions.
-
-        Returns
-        -------
-        QSize
-            The minimum recommended size for the label.
-        """
-        size = super().minimumSizeHint()
-        size.transpose()
-        return size
 
 # ==============================================================================
 

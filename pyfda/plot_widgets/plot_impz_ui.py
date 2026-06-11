@@ -20,9 +20,8 @@ import pyfda.libs.pyfda_dirs as dirs
 from pyfda.libs.fft_windows_cmb_box import QFFTWinCmbBox
 from pyfda.libs.pyfda_lib import to_html, safe_eval, pprint_log
 from pyfda.libs.pyfda_sig_lib import impz_len
-from pyfda.libs.pyfda_qt_lib import (
-    emit, qcmb_box_populate, qstyle_widget, qtext_width, QVLine,
-    PushButton, PushButtonRT)
+from pyfda.libs.pyfda_qt_lib import emit, qcmb_box_populate, qstyle_widget, qtext_width
+from pyfda.libs.pyfda_qt_classes import QVLine, PushButton, PushButtonRT
 # FMT string for QLineEdit fields, e.g. '{:.3g}'
 from pyfda.pyfda_rc import params
 

@@ -28,7 +28,8 @@ from pyfda.libs.compat import (
     QTextBrowser, QTextCursor, QLineEdit, QVBoxLayout, QHBoxLayout, QGridLayout,
     QSplitter, Qt, pyqtSignal)
 from pyfda.libs.pyfda_lib import lin2unit, mod_version, to_html, safe_eval
-from pyfda.libs.pyfda_qt_lib import PushButton, emit
+from pyfda.libs.pyfda_qt_lib import emit
+from pyfda.libs.pyfda_qt_classes import PushButton
 from pyfda.pyfda_rc import params
 
 logger = logging.getLogger(__name__)
