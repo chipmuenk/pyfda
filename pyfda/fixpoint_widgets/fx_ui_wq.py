@@ -131,7 +131,7 @@ class FX_UI_WQ(QWidget):
 
         self.q_dict = q_dict
 
-        self._construct_UI(**kwargs)
+        self._construct_ui(**kwargs)
 
     # This is not needed, it is called from one level above
     # # --------------------------------------------------------------------------
@@ -153,7 +153,7 @@ class FX_UI_WQ(QWidget):
         emit(self, dict_sig)
 
     # --------------------------------------------------------------------------
-    def _construct_UI(self, **kwargs) -> None:
+    def _construct_ui(self, **kwargs) -> None:
         """ Construct widget """
         cmb_q = ["Select the kind of quantization.",
                  ("round", "Round",
@@ -196,7 +196,6 @@ class FX_UI_WQ(QWidget):
                 logger.warning("Unknown key '%s'", key)
             else:
                 ui_dict.update({key: val})
-        # ui_dict.update(map(kwargs)) # same as above?
 
         lbl_wdg = QLabel(ui_dict['label'], self)
 
