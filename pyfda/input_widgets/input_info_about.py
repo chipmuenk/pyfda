@@ -75,16 +75,17 @@ class AboutWindow(QDialog):
 
         lbl_info = QLabel(self)
         lbl_info.setText(self.info_str)
-        lbl_info.setFixedHeight(int(lbl_info.height()*1.2))
-        # lbl_info.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
         lbl_info.setOpenExternalLinks(True)
+        lbl_info.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Minimum)
 
         lbl_icon = QLabel(self)
         lbl_icon.setPixmap(
             QPixmap(':/pyfda_icon.svg').scaledToHeight(lbl_info.height(),
                                                        Qt.SmoothTransformation))
+        but_clipboard.setFixedHeight(lbl_info.height())
         but_clipboard.setFixedWidth(lbl_info.height())
         but_close.setFixedWidth(lbl_info.height())
+        but_close.setFixedHeight(lbl_info.height())
 
         lay_h_info = QHBoxLayout()
         lay_h_info.addWidget(lbl_icon)
@@ -94,10 +95,8 @@ class AboutWindow(QDialog):
         self.txt_display.setOpenExternalLinks(True)
         self.display_about_str()
         self.txt_display.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
-        # self.txt_display.setFixedHeight(self.txt_display.width() * 2)
 
         lay_v_main = QVBoxLayout()
-        # lay_v_main.setAlignment(Qt.AlignTop) # this affects only the first widget
         lay_v_main.addLayout(lay_g_buttons)
         lay_v_main.addLayout(lay_h_info)
         lay_v_main.addWidget(self.txt_display)
@@ -106,7 +105,7 @@ class AboutWindow(QDialog):
         self.setLayout(lay_v_main)
 
         but_clipboard.clicked.connect(
-            lambda: self.to_clipboard(self.info_str + self.about_str))
+            lambda: self.to_clipboard(self.info_str + "<br />" + self.about_str))
         but_about.clicked.connect(self.display_about_str)
         but_changelog.clicked.connect(self.display_changelog)
         but_lic_mit.clicked.connect(self.display_MIT_lic)
@@ -173,8 +172,7 @@ class AboutWindow(QDialog):
             f"Version {dirs.VERSION} (c) 2013 - 2026 Christian Münker</b><br />"
             "Design, analyze and synthesize digital filters. Docs @ "
             "<a href=https://pyfda.rtfd.org>pyfda.rtfd.org</a>"
-            " (<a href=https://media.readthedocs.org/pdf/pyfda/latest/pyfda.pdf>pdf</a>)"
-            "<br />")
+            " (<a href=https://media.readthedocs.org/pdf/pyfda/latest/pyfda.pdf>pdf</a>)")
 
         # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
@@ -228,7 +226,6 @@ class AboutWindow(QDialog):
     # ------------------------------------------------------------------------------
     def display_about_str(self) -> None:
         """ Display general "About" info """
-
         self.txt_display.setText(self.style_html_links(self.about_str + self.lic_str))
 
     # ------------------------------------------------------------------------------
