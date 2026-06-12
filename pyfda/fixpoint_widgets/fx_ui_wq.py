@@ -132,7 +132,7 @@ class FX_UI_WQ(QWidget):
 
         self.q_dict = q_dict
 
-        self._construct_UI(**kwargs)
+        self._construct_ui(**kwargs)
 
     # This is not needed, it is called from one level above
     # # --------------------------------------------------------------------------
@@ -154,7 +154,7 @@ class FX_UI_WQ(QWidget):
         emit(self, dict_sig)
 
     # --------------------------------------------------------------------------
-    def _construct_UI(self, **kwargs) -> None:
+    def _construct_ui(self, **kwargs) -> None:
         """ Construct widget """
         cmb_q = ["Select the kind of quantization.",
                  ("round", "Round",
@@ -197,7 +197,6 @@ class FX_UI_WQ(QWidget):
                 logger.warning("Unknown key '%s'", key)
             else:
                 ui_dict.update({key: val})
-        # ui_dict.update(map(kwargs)) # same as above?
 
         lbl_wdg = QLabel(ui_dict['label'], self)
 
@@ -392,30 +391,30 @@ class FX_UI_WQ(QWidget):
     # --------------------------------------------------------------------------
     def ui2dict(self) -> None:
         """
-        The subwidgets for `ovfl`, `quant`, `WI`, `WF`, `w_a_m` trigger this method
-        when modified.
+        This method is triggered when one of the subwidgets for `ovfl`, `quant`, `WI`, `WF`,
+        `w_a_m` trigger is modified.
 
-        Update the quantization dict `self.Q.q_dict` and the global quantization
-        dict `self.q_dict` from the UI.
+        Update local quantization dict `self.Q.q_dict` and global quantization dict `self.q_dict`
+        with the new values from the UI.
 
         Emit a signal with `{'ui_local_changed': <objectName of the sender>}`.
         """
+        # read, sanitize and write back to UI fractional part WF
         WF = int(safe_eval(self.ledWF.text(), self.Q.q_dict['WF'], return_type="int",
                            sign='poszero'))
         self.ledWF.setText(str(WF))
 
+        # read, sanitize and write back to UI integer part WI of word length. In 'qfrac' mode,
+        # the WI field shows the number of integer bits, in 'qint' mode, it shows the total word
+        # length W. In both cases, the value for 'WI' is stored in the dicts.
         WI = int(safe_eval(self.ledWI.text(), self.Q.q_dict['WI'] + WF + 1, return_type="int",
                            sign='poszero'))
-        if fb_get('qfrmt') == 'qint':
-            if WI <= WF:
-                logger.warning(
-                    "Total word length has to be larger than Fractional scaling WF = %s!", WF)
-                WI = self.Q.q_dict['WI'] + WF + 1
-
+        if fb_get('qfrmt') == 'qint' and WI <= WF:
+            logger.warning(
+                "Total word length has to be larger than Fractional scaling WF = %s!", WF)
+            WI = self.Q.q_dict['WI'] + WF + 1
         self.ledWI.setText(str(WI))
 
-        # In 'qint' mode, the WI field shows the total word length W. Nevertheless, the value
-        # for 'WI' is stored in the dicts.
         if fb_get('qfrmt') == 'qint':
             WI = WI - WF - 1
 

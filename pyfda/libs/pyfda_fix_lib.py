@@ -545,11 +545,14 @@ class Fixed():
         self.q_dict['WI'] = int(self.q_dict['WI'])
         self.q_dict['WF'] = abs(int(self.q_dict['WF']))
 
+        # total word length W = WI + WF + 1 (sign bit)
+        W = self.q_dict['WI'] + self.q_dict['WF'] + 1
+
         # Calculate min., max., LSB and MSB from word lengths
         if fb_get('qfrmt') == 'qint':
             # LSB = 1, MSB = 2 ** (W - 1)
             self.LSB = 1
-            self.MSB = 2 ** (self.q_dict['WI'] + self.q_dict['WF']- 1)
+            self.MSB = 2 ** (W - 1)
         elif fb_get('qfrmt') == 'qfrac':
             self.LSB = 2. ** -self.q_dict['WF']
             self.MSB = 2. ** (self.q_dict['WI'] - 1)
@@ -561,7 +564,6 @@ class Fixed():
 
         # Calculate required number of places for different bases from total
         # number of bits:
-        W = self.q_dict['WI'] + self.q_dict['WF'] + 1
         #
         fx_base = fb_get('fx_base')
 

@@ -97,7 +97,7 @@ class FIR_DF_amaranth_UI(QWidget):
         #     fil[0]['fxq'].update({'QCB': {}})  # no coefficient settings in dict yet
         #     logger.warning("QCB key missing")
         self.wdg_wq_coeffs = FX_UI_WQ(
-            fb.fil[0]['fxq']['QCB'], objectName='fx_ui_wq_fir_df_coeffs_b',
+            fb_get('fxq', 'QCB'), objectName='fx_ui_wq_fir_df_coeffs_b',
             label='<b>Coeff. Quantization <i>b<sub>I.F&nbsp;</sub></i>:</b>',
             MSB_LSB_vis='max',
             cmb_ov_items=["<span>Select overflow behaviour.</span>",
@@ -117,11 +117,11 @@ class FIR_DF_amaranth_UI(QWidget):
         # Attention: fb.fil[0]['fxq']['QACC'] == self.wdg_wq_accu.q_dict
         # if 'QACC' not in fb.fil[0]['fxq']:
         #     fb.fil[0]['fxq']['QACC'] = {}
-        set_dict_defaults(fb.fil[0]['fxq']['QACC'],
+        set_dict_defaults(fb_get('fxq', 'QACC'),
             {'WI': 0, 'WF': 31, 'ovfl': 'wrap', 'quant': 'floor', 'w_a_m': 'a',
              'N_over': 0})
         self.wdg_wq_accu = FX_UI_WQ(
-            fb.fil[0]['fxq']['QACC'], objectName='fx_ui_wq_fir_df_accu',
+            fb_get('fxq', 'QACC'), objectName='fx_ui_wq_fir_df_accu',
             cmb_w_vis='on', cmb_w_items=self.cmb_wq_accu_items,
             count_ovfl_vis='auto',
             label='<b>Accu Format <i>Q<sub>ACC&nbsp;</sub></i>:</b>',
