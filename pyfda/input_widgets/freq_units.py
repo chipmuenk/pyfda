@@ -47,7 +47,7 @@ class FreqUnits(QWidget):
     # outgoing: from various and when normalized frequencies have been changed
     sig_tx = pyqtSignal(object)  # outgoing
 
-    def __init__(self, parent=None, title="Frequency Units", objectName=""):
+    def __init__(self, parent=None, title: str = "Frequency Units", objectName: str = ""):
 
         super().__init__(parent)
         self.title = title
@@ -85,7 +85,7 @@ class FreqUnits(QWidget):
         self.t_units = ['T_S', 'T_S', 'ks', 's', 'ms', r'$\mu$s', 'ns']
         self.f_scale = [1, 1, 1e-3, 1, 1e3, 1e6, 1e9]
 
-        self._construct_UI()
+        self._construct_ui()
 
     # -------------------------------------------------------------------------
     def emit(self, dict_sig: dict) -> None:
@@ -113,7 +113,7 @@ class FreqUnits(QWidget):
             self.update_UI(emit_signal=False)
 
 # ------------------------------------------------------------------------------
-    def _construct_UI(self) -> None:
+    def _construct_ui(self) -> None:
         """
         Construct the User Interface
         """
@@ -122,9 +122,9 @@ class FreqUnits(QWidget):
         bfont = QFont()
         bfont.setBold(True)
 
-        self.lblUnits = QLabel(self)
-        self.lblUnits.setText("Freq. Unit")
-        self.lblUnits.setFont(bfont)
+        self.lbl_units = QLabel(self)
+        self.lbl_units.setText("Freq. Unit")
+        self.lbl_units.setFont(bfont)
 
         self.f_s_old = fb.fil[0]['f_S']  # store current sampling frequency
         self.T_s_old = fb.fil[0]['T_S']  # store current sampling period
@@ -143,9 +143,9 @@ class FreqUnits(QWidget):
             "<b>Locked:</b> When <i>f<sub>S</sub></i> is changed, displayed absolute "
             "frequency values don't change but normalized frequencies do.</span>")
 
-        layHF_S = QHBoxLayout()
-        layHF_S.addWidget(self.led_f_s)
-        layHF_S.addWidget(self.butLock)
+        lay_h_f_s = QHBoxLayout()
+        lay_h_f_s.addWidget(self.led_f_s)
+        lay_h_f_s.addWidget(self.butLock)
 
         self.cmb_f_units = QComboBox(self, objectName="cmb_f_units")
         qcmb_box_populate(self.cmb_f_units, self.cmb_f_unit_items, self.cmb_f_unit_init)
@@ -160,29 +160,29 @@ class FreqUnits(QWidget):
         self.cmb_f_units.setSizeAdjustPolicy(QComboBox.AdjustToContents)
         self.cmb_f_range.setSizeAdjustPolicy(QComboBox.AdjustToContents)
 
-        self.butSort = PushButton(self, icon=QIcon(':/sort-ascending.svg'))
-        self.butSort.setChecked(True)
-        self.butSort.setToolTip("Sort frequencies in ascending order when activated.")
-        self.butSort.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
+        self.but_sort = PushButton(self, icon=QIcon(':/sort-ascending.svg'))
+        self.but_sort.setChecked(True)
+        self.but_sort.setToolTip("Sort frequencies in ascending order when activated.")
+        self.but_sort.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
 
         self.layHUnits = QHBoxLayout()
         self.layHUnits.addWidget(self.cmb_f_units)
         self.layHUnits.addWidget(self.cmb_f_range)
-        self.layHUnits.addWidget(self.butSort)
+        self.layHUnits.addWidget(self.but_sort)
 
         # Create a gridLayout consisting of QLabel and QLineEdit fields
         # for setting f_S, the units and the actual frequency specs:
         self.layGSpecWdg = QGridLayout()  # sublayout for spec fields
         self.layGSpecWdg.addWidget(self.lbl_f_s, 1, 0)
         # self.layGSpecWdg.addWidget(self.led_f_s,1,1)
-        self.layGSpecWdg.addLayout(layHF_S, 1, 1)
-        self.layGSpecWdg.addWidget(self.lblUnits, 0, 0)
+        self.layGSpecWdg.addLayout(lay_h_f_s, 1, 1)
+        self.layGSpecWdg.addWidget(self.lbl_units, 0, 0)
         self.layGSpecWdg.addLayout(self.layHUnits, 0, 1)
 
-        frmMain = QFrame(self)
-        frmMain.setLayout(self.layGSpecWdg)
+        frm_main = QFrame(self)
+        frm_main.setLayout(self.layGSpecWdg)
 
-        self.layVMain.addWidget(frmMain)
+        self.layVMain.addWidget(frm_main)
         self.layVMain.setContentsMargins(*params['wdg_margins'])
 
         self.setLayout(self.layVMain)
@@ -199,7 +199,7 @@ class FreqUnits(QWidget):
         self.cmb_f_units.currentIndexChanged.connect(lambda: self.update_UI(self))
         self.butLock.clicked.connect(self._lock_freqs)
         self.cmb_f_range.currentIndexChanged.connect(self._freq_range)
-        self.butSort.clicked.connect(self._store_sort_flag)
+        self.but_sort.clicked.connect(self._store_sort_flag)
         # ----------------------------------------------------------------------
 
         self.update_UI()  # first-time initialization
@@ -453,8 +453,8 @@ class FreqUnits(QWidget):
         Store sort flag in filter dict and emit 'specs_changed':'f_sort'
         when sort button is checked.
         """
-        fb.fil[0]['freq_specs_sort'] = self.butSort.checked
-        if self.butSort.checked:
+        fb.fil[0]['freq_specs_sort'] = self.but_sort.checked
+        if self.but_sort.checked:
             self.emit({'specs_changed': 'f_sort'})
 
 # ------------------------------------------------------------------------------

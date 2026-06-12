@@ -86,7 +86,7 @@ class AmplitudeSpecs(QWidget):
         lblTitle.setFont(bfont)
         lblTitle.setWordWrap(True)
 
-        lblUnits = QLabel("in", self)
+        lbl_units = QLabel("in", self)
 
         self.cmbUnitsA = QComboBox(self, objectName="cmbUnitsA")
         self.cmbUnitsA.addItems(amp_units)
@@ -105,7 +105,7 @@ class AmplitudeSpecs(QWidget):
         layHTitle = QHBoxLayout()  # layout for title and unit
         layHTitle.addWidget(lblTitle)
         layHTitle.addStretch(5)
-        layHTitle.addWidget(lblUnits, Qt.AlignLeft)
+        layHTitle.addWidget(lbl_units, Qt.AlignLeft)
         layHTitle.addWidget(self.cmbUnitsA, Qt.AlignLeft)
 
         self.layGSpecs = QGridLayout()  # sublayout for spec fields
