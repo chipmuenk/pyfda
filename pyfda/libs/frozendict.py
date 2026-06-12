@@ -50,7 +50,7 @@ def col(i: int) -> property:
     return _col
 
 #--------------------------------------------------------------------------
-def freeze_hierarchical(hier_dict: Any) -> Any | 'FrozenDict':
+def freeze_hierarchical(hier_dict: Any) -> Any :
     """
     Recursively convert a dictionary and its nested dictionaries to FrozenDict.
 
