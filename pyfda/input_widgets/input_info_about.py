@@ -9,9 +9,10 @@
 """
 Widget for exporting / importing and saving / loading filter data
 """
-import markdown
 import os
 import re
+
+import markdown
 
 from pyfda.libs.compat import (
     Qt, QPushButton, QDialog, QVBoxLayout, QHBoxLayout, QIcon, QPixmap,
@@ -29,97 +30,106 @@ class AboutWindow(QDialog):
     """
     Create a pop-up widget for the About Window.
     """
-    # sig_tx = pyqtSignal(dict) # outgoing
 
     def __init__(self, parent=None):
         super().__init__(parent)
         self.setWindowTitle("About pyFDA")
         self.collect_info()
-        self._construct_UI()
+        self._construct_ui()
         qwindow_stay_on_top(self, True)
 
-# ------------------------------------------------------------------------------
-    def _construct_UI(self):
+    # ------------------------------------------------------------------------------
+    def _construct_ui(self) -> None:
         """ initialize the User Interface """
-        butClipboard = QPushButton(self)
-        butClipboard.setIcon(QIcon(':/to_clipboard.svg'))
-        butClipboard.setToolTip("Copy text to clipboard.")
+        but_clipboard = QPushButton(self)
+        but_clipboard.setIcon(QIcon(':/to_clipboard.svg'))
+        but_clipboard.setToolTip("Copy text to clipboard.")
 
-        butAbout = QPushButton(self)
-        butAbout.setText("About")
-        butAbout.setToolTip("Display 'About' info")
+        but_about = QPushButton(self)
+        but_about.setText("About")
+        but_about.setToolTip("Display 'About' info")
 
-        butChangelog = QPushButton(self)
-        butChangelog.setText("Changelog")
-        butChangelog.setToolTip("Display changelog")
+        but_changelog = QPushButton(self)
+        but_changelog.setText("Changelog")
+        but_changelog.setToolTip("Display changelog")
 
-        butLicMIT = QPushButton(self)
-        butLicMIT.setText("MIT License")
-        butLicMIT.setToolTip("MIT License for pyFDA source code")
+        but_lic_mit = QPushButton(self)
+        but_lic_mit.setText("MIT License")
+        but_lic_mit.setToolTip("MIT License for pyFDA source code")
 
-        butLicGPLv3 = QPushButton(self)
-        butLicGPLv3.setText("GPLv3 License")
-        butLicGPLv3.setToolTip("GPLv3 License for bundled distribution")
+        but_lic_gpl_v3 = QPushButton(self)
+        but_lic_gpl_v3.setText("GPLv3 License")
+        but_lic_gpl_v3.setToolTip("GPLv3 License for bundled distribution")
 
-        butClose = QPushButton(self)
-        butClose.setIcon(QIcon(':/circle-x.svg'))
-        butClose.setToolTip("Close Window.")
+        but_close = QPushButton(self)
+        but_close.setIcon(QIcon(':/circle-x.svg'))
+        but_close.setToolTip("Close Window.")
 
-        layGButtons = QGridLayout()
-        layGButtons.addWidget(butClipboard, 0, 0)
-        layGButtons.addWidget(butAbout, 0, 1)
-        layGButtons.addWidget(butChangelog, 0, 2)
-        layGButtons.addWidget(butLicMIT, 0, 3)
-        layGButtons.addWidget(butLicGPLv3, 0, 4)
-        layGButtons.addWidget(butClose, 0, 5)
+        lay_g_buttons = QGridLayout()
+        lay_g_buttons.addWidget(but_clipboard, 0, 0)
+        lay_g_buttons.addWidget(but_about, 0, 1)
+        lay_g_buttons.addWidget(but_changelog, 0, 2)
+        lay_g_buttons.addWidget(but_lic_mit, 0, 3)
+        lay_g_buttons.addWidget(but_lic_gpl_v3, 0, 4)
+        lay_g_buttons.addWidget(but_close, 0, 5)
 
-        lblInfo = QLabel(self)
-        lblInfo.setText(self.info_str)
-        lblInfo.setFixedHeight(int(lblInfo.height()*1.2))
-        # lblInfo.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
-        lblInfo.setOpenExternalLinks(True)
+        lbl_info = QLabel(self)
+        lbl_info.setText(self.info_str)
+        lbl_info.setFixedHeight(int(lbl_info.height()*1.2))
+        # lbl_info.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
+        lbl_info.setOpenExternalLinks(True)
 
-        lblIcon = QLabel(self)
-        lblIcon.setPixmap(
-            QPixmap(':/pyfda_icon.svg').scaledToHeight(lblInfo.height(),
+        lbl_icon = QLabel(self)
+        lbl_icon.setPixmap(
+            QPixmap(':/pyfda_icon.svg').scaledToHeight(lbl_info.height(),
                                                        Qt.SmoothTransformation))
-        butClipboard.setFixedWidth(lblInfo.height())
-        butClose.setFixedWidth(lblInfo.height())
+        but_clipboard.setFixedWidth(lbl_info.height())
+        but_close.setFixedWidth(lbl_info.height())
 
-        layHInfo = QHBoxLayout()
-        layHInfo.addWidget(lblIcon)
-        layHInfo.addWidget(lblInfo)
+        lay_h_info = QHBoxLayout()
+        lay_h_info.addWidget(lbl_icon)
+        lay_h_info.addWidget(lbl_info)
 
-        self.txtDisplay = QTextBrowser(self)
-        self.txtDisplay.setOpenExternalLinks(True)
+        self.txt_display = QTextBrowser(self)
+        self.txt_display.setOpenExternalLinks(True)
         self.display_about_str()
-        self.txtDisplay.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
-        # self.txtDisplay.setFixedHeight(self.txtDisplay.width() * 2)
+        self.txt_display.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+        # self.txt_display.setFixedHeight(self.txt_display.width() * 2)
 
-        layVMain = QVBoxLayout()
-        # layVMain.setAlignment(Qt.AlignTop) # this affects only the first widget
-        layVMain.addLayout(layGButtons)
-        layVMain.addLayout(layHInfo)
-        layVMain.addWidget(self.txtDisplay)
+        lay_v_main = QVBoxLayout()
+        # lay_v_main.setAlignment(Qt.AlignTop) # this affects only the first widget
+        lay_v_main.addLayout(lay_g_buttons)
+        lay_v_main.addLayout(lay_h_info)
+        lay_v_main.addWidget(self.txt_display)
 
-        layVMain.setContentsMargins(*params['wdg_margins_spc'])
-        self.setLayout(layVMain)
+        lay_v_main.setContentsMargins(*params['wdg_margins_spc'])
+        self.setLayout(lay_v_main)
 
-        butClipboard.clicked.connect(
+        but_clipboard.clicked.connect(
             lambda: self.to_clipboard(self.info_str + self.about_str))
-        butAbout.clicked.connect(self.display_about_str)
-        butChangelog.clicked.connect(self.display_changelog)
-        butLicMIT.clicked.connect(self.display_MIT_lic)
-        butLicGPLv3.clicked.connect(self.display_GPL_lic)
-        butClose.clicked.connect(self.close)
+        but_about.clicked.connect(self.display_about_str)
+        but_changelog.clicked.connect(self.display_changelog)
+        but_lic_mit.clicked.connect(self.display_MIT_lic)
+        but_lic_gpl_v3.clicked.connect(self.display_GPL_lic)
+        but_close.clicked.connect(self.close)
 
-# ------------------------------------------------------------------------------
-    def to_clipboard(self, my_string, html=False):
+    # ------------------------------------------------------------------------------
+    def to_clipboard(self, my_string: str, html: bool = False) -> None:
         """
         Copy version info to clipboard
         TODO: This is stupid: md -> html -> md ?!
+
+        Parameters
+        ----------
+        my_string: str
+            The string to be copied to the clipboard
+
+        html: bool
+            When true, map some HTML tags to control codes and remove the rest
         """
-        if not html:
+        if html:
+            dirs.clipboard.setText(my_string)  # copy untreated string
+        else:
             # remove line breaks from string
             my_string = re.sub('\n', '', my_string)
             # a_string.replace("\n", " ")
@@ -144,11 +154,11 @@ class AboutWindow(QDialog):
             #     only '<a>', not '<a> b <c>'
             clean = re.compile('<style>.*</style>|<.*?>')
             dirs.clipboard.setText(re.sub(clean, '', my_string))
-        else:
-            dirs.clipboard.setText(my_string)  # copy untreated string
-# ------------------------------------------------------------------------------
 
-    def collect_info(self):
+
+
+    # ------------------------------------------------------------------------------
+    def collect_info(self) -> None:
         """
         Collect information about version, imported modules in strings:
 
@@ -206,55 +216,47 @@ class AboutWindow(QDialog):
         ver_str = mod_version()
         # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-        if False:  # dirs.PYINSTALLER:
-            self.lic_str = ""
-        else:
-            with open(os.path.join(dirs.INSTALL_DIR, "license_info.md"), 'r',
-                      encoding="utf-8") as f:
-                self.lic_str = markdown.markdown(
-                    f.read(), output_format='html5',
-                    extensions=['markdown.extensions.tables'])
-            # pyinstaller needs explicit definition of extensions path
+        with open(os.path.join(dirs.INSTALL_DIR, "license_info.md"), 'r',
+                    encoding="utf-8") as f:
+            self.lic_str = markdown.markdown(
+                f.read(), output_format='html5',
+                extensions=['markdown.extensions.tables'])
+        # pyinstaller needs explicit definition of extensions path
 
         self.about_str = os_str + dirs_str + ver_str
 
-# ------------------------------------------------------------------------------
-
-    def display_about_str(self):
+    # ------------------------------------------------------------------------------
+    def display_about_str(self) -> None:
         """ Display general "About" info """
 
-        self.txtDisplay.setText(self.style_html_links(self.about_str + self.lic_str))
+        self.txt_display.setText(self.style_html_links(self.about_str + self.lic_str))
 
-# ------------------------------------------------------------------------------
-
-    def display_changelog(self):
+    # ------------------------------------------------------------------------------
+    def display_changelog(self) -> None:
         """ Display changelog """
         with open(os.path.join(dirs.INSTALL_DIR, "..", "CHANGELOG.md"), 'r',
                   encoding="utf-8") as f:
             log_str = markdown.markdown(f.read(), output_format='html5')
-        self.txtDisplay.setText(self.style_html_links(log_str))
+        self.txt_display.setText(self.style_html_links(log_str))
 
-# ------------------------------------------------------------------------------
-
-    def display_MIT_lic(self):
+    # ------------------------------------------------------------------------------
+    def display_MIT_lic(self) -> None:
         """ Display MIT license """
         with open(os.path.join(dirs.INSTALL_DIR, "..", "LICENSE.md"), 'r',
                   encoding="utf-8") as f:
             lic_str = markdown.markdown(f.read(), output_format='html5')
-        self.txtDisplay.setText(self.style_html_links(lic_str))
+        self.txt_display.setText(self.style_html_links(lic_str))
 
-# ------------------------------------------------------------------------------
-
-    def display_GPL_lic(self):
+    # ------------------------------------------------------------------------------
+    def display_GPL_lic(self) -> None:
         """ Display GPL license """
         with open(os.path.join(dirs.INSTALL_DIR, "..", "LICENSE_GPLv3.md"), 'r',
                   encoding="utf-8") as f:
             lic_str = markdown.markdown(f.read(), output_format='html5')
-        self.txtDisplay.setText(self.style_html_links(lic_str))
+        self.txt_display.setText(self.style_html_links(lic_str))
 
-# ------------------------------------------------------------------------------
-
-    def style_html_links(self, text):
+    # ------------------------------------------------------------------------------
+    def style_html_links(self, text: str) -> None:
         """ Embed HTML string between <body> tags with styling for links """
         return (f"<head><style>a:link {{color: {params['link_color']}}}</style></head>"
                 f"<body>{text}</body>")
