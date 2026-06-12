@@ -396,7 +396,6 @@ class Input_Specs(QWidget):
         # 'File' or 'File (all)' selected, update fil[0] resp. fil[0] ... fil[9] from file
         if sel in {"file", "file_all"}:
             ret = load_filter(self, all_filters=sel == "file_all")
-
             if ret == -1:
                 return  # aborted or error occurred -> do nothing
             if ret != 0:
