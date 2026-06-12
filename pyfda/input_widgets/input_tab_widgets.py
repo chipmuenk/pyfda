@@ -129,7 +129,8 @@ class InputTabWidgets(QWidget):
         self.sig_tx.connect(self.sig_rx)
         # self.sig_rx.connect(self.log_rx) # enable for debugging
         # When user has selected a different tab, trigger a redraw of current tab
-        tab_widget.currentChanged.connect(self.current_tab_changed)
+        tab_widget.currentChanged.connect(lambda: self.emit({'ui_global_changed': 'tab'})
+)
         # The following does not work: maybe current scope must be left?
         # tab_widget.currentChanged.connect(tab_widget.currentWidget().redraw)
 
@@ -159,10 +160,6 @@ class InputTabWidgets(QWidget):
             logger.warning("SIG_RX\n%s", pprint_log(dict_sig))
         else:
             logger.warning("empty dict")
-
-    # ------------------------------------------------------------------------------
-    def current_tab_changed(self):
-        self.emit({'ui_global_changed': 'tab'})
 
 
 # ------------------------------------------------------------------------
