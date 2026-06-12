@@ -110,7 +110,7 @@ class FreqUnits(QWidget):
             return
         if ('view_changed' in dict_sig and dict_sig['view_changed'] == 'f_S')\
             or 'data_changed' in dict_sig:
-            self.update_UI(emit=False)
+            self.update_UI(emit_signal=False)
 
 # ------------------------------------------------------------------------------
     def _construct_UI(self) -> None:
@@ -239,21 +239,21 @@ class FreqUnits(QWidget):
             self.butLock.setIcon(QIcon(':/lock-unlocked.svg'))
 
 # -------------------------------------------------------------
-    def update_UI(self, emit: bool = True) -> None:
+    def update_UI(self, emit_signal: bool = True) -> None:
         """
         update_UI is called
         - during init (direct call)
         - when the unit combobox is changed (signal-slot)
         - when a signal {'view_changed': 'f_S'} or {'data_changed': ...} has been
           received. In this case, the UI is updated from the fb.fil[0] dictionary
-          and no signal is emitted (`emit==False`).
+          and no signal is emitted (`emit_signal==False`).
 
         Set various scale factors and labels depending on the setting of the unit
         combobox.
 
         Update the freqSpecsRange and finally, emit 'view_changed':'f_S' signal
         """
-        if not emit:  # triggered by function call, not by a change of UI
+        if not emit_signal:  # triggered by function call, not by a change of UI
             # Load f_S display from dict
             self.led_f_s.setText(str(fb.fil[0]['f_S']))
             # Load freq. unit setting from dict
@@ -326,7 +326,7 @@ class FreqUnits(QWidget):
                 f_s_scale = self.f_scale[idx]
                 fb.fil[0]['f_S'] = f_S / f_s_scale
                 fb.fil[0]['T_S'] = f_s_scale / f_S
-                emit = True
+                emit_signal = True
             # -------------------------------------------------------------
             self.f_s_old = fb.fil[0]['f_S']
             self.T_s_old = fb.fil[0]['T_S']
@@ -344,8 +344,8 @@ class FreqUnits(QWidget):
         fb.fil[0].update({"plt_fLabel": f_label})
         fb.fil[0].update({"plt_tLabel": t_label})
 
-        self._freq_range(emit=False)  # update f_lim setting without emitting signal
-        if emit:  # UI was updated by user or a rescaling of f_S
+        self._freq_range(emit_signal=False)  # update f_lim setting without emit_signalting signal
+        if emit_signal:  # UI was updated by user or a rescaling of f_S
             self.emit({'view_changed': 'f_S'})
 
 # ------------------------------------------------------------------------------
@@ -379,7 +379,7 @@ class FreqUnits(QWidget):
                 fb.fil[0].update({'T_S': 1./f_S_tmp})
                 fb.fil[0].update({'f_max': f_S_tmp})
 
-                self._freq_range(emit=False)  # update plotting range
+                self._freq_range(emit_signal=False)  # update plotting range
                 self.emit({'view_changed': 'f_S'})
                 # Now store current f_S as f_S_prev
                 fb.fil[0].update({'f_S_prev': fb.fil[0]['f_S']})
@@ -406,15 +406,15 @@ class FreqUnits(QWidget):
         return super().eventFilter(source, event)
 
     # -------------------------------------------------------------
-    def _freq_range(self, emit: bool = True) -> None:
+    def _freq_range(self, emit_signal: bool = True) -> None:
         """
         Set frequency plotting range for single-sided spectrum up to f_S/2 or f_S
         or for double-sided spectrum between -f_S/2 and f_S/2
 
-        Emit 'view_changed':'f_range' when `emit=True`
+        Emit 'view_changed':'f_range' when `emit_signal=True`
         """
-        if isinstance(emit, int):  # signal was emitted by combobox
-            emit = True
+        if isinstance(emit_signal, int):  # signal was emitted by combobox
+            emit_signal = True
 
         rangeType = qget_cmb_box(self.cmb_f_range)
 
@@ -430,7 +430,7 @@ class FreqUnits(QWidget):
 
         fb.fil[0]['freqSpecsRange'] = f_lim  # store settings in dict
 
-        if emit:
+        if emit_signal:
             self.emit({'view_changed': 'f_range'})
 
     # -------------------------------------------------------------
@@ -440,7 +440,7 @@ class FreqUnits(QWidget):
         Block signals during update of combobox / lineedit widgets
         This is called from `input_specs.load_dict()`
         """
-        self.update_UI(emit=False)
+        self.update_UI(emit_signal=False)
         # This updates the following widgets:
         # - `self.led_f_s` from `fb.fil[0]['f_S']`
         # - `self.cmb_f_units` with `fb.fil[0]['freq_specs_unit']`
