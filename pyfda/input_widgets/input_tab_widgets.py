@@ -13,7 +13,6 @@ import importlib
 import logging
 import sys
 
-import pyfda.filterbroker as fb
 from pyfda.libs.compat import QTabWidget, QWidget, QVBoxLayout, QScrollArea, pyqtSignal
 from pyfda.libs.pyfda_lib import pprint_log
 from pyfda.libs.pyfda_qt_lib import emit
@@ -173,8 +172,6 @@ if __name__ == "__main__":
     from pyfda import pyfda_rc as rc
     app = QApplication(sys.argv)
     app.setStyleSheet(rc.QSS_RC)
-    # change initial settings to FIR (no IIR fixpoint filters available yet)
-    fb.fil[0].update({'ft': 'FIR', 'fc': 'Equiripple'})
 
     mainw = InputTabWidgets()
     app.setActiveWindow(mainw)

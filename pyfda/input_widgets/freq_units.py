@@ -12,7 +12,7 @@ Subwidget for entering frequency units
 import sys
 import logging
 
-import pyfda.filterbroker as fb
+from pyfda.filterbroker import fb_get, fb_set
 from pyfda.libs.compat import (
     QtCore, QWidget, QLabel, QLineEdit, QComboBox, QFrame, QFont, QSizePolicy,
     QIcon, QVBoxLayout, QHBoxLayout, QGridLayout, pyqtSignal, QEvent)
@@ -28,7 +28,7 @@ class FreqUnits(QWidget):
     Build and update widget for entering frequency unit, frequency range and
     sampling frequency f_S
 
-    The following key-value pairs of the `fb.fil[0]` dict are modified:
+    The following key-value pairs of the `fil[0]` dict are modified:
 
         - `'freq_specs_unit'` : The unit ('f_S', 'f_Ny', 'Hz' etc.) as a string
         - `'freqSpecsRange'` : A list with two entries for minimum and maximum frequency
@@ -83,7 +83,7 @@ class FreqUnits(QWidget):
         # t_units and f_scale have the same index as the f_unit_items, i.e.
         # 'f_S', 'f_Ny', 'mHz', 'Hz', 'kHz', 'MHz', 'GHz'
         self.t_units = ['T_S', 'T_S', 'ks', 's', 'ms', r'$\mu$s', 'ns']
-        self.f_scale = [1, 1, 1e-3, 1, 1e3, 1e6, 1e9]
+        self.f_scale = [1., 1., 1e-3, 1., 1e3, 1e6, 1e9]
 
         self._construct_ui()
 
@@ -126,14 +126,14 @@ class FreqUnits(QWidget):
         self.lbl_units.setText("Freq. Unit")
         self.lbl_units.setFont(bfont)
 
-        self.f_s_old = fb.fil[0]['f_S']  # store current sampling frequency
-        self.T_s_old = fb.fil[0]['T_S']  # store current sampling period
+        self.f_s_old = fb_get('f_S')  # store current sampling frequency
+        self.T_s_old = fb_get('T_S')  # store current sampling period
 
         self.lbl_f_s = QLabel(self)
         self.lbl_f_s.setText(to_html("f_S =", frmt='bi'))
 
-        self.led_f_s = QLineEdit(objectName="f_S")
-        self.led_f_s.setText(str(fb.fil[0]["f_S"]))
+        self.led_f_s = QLineEdit(objectName='f_S')
+        self.led_f_s.setText(str(fb_get('f_S')))
         self.led_f_s.installEventFilter(self)  # filter events
 
         self.butLock = PushButton(self, icon=QIcon(':/lock-unlocked.svg'))
@@ -208,7 +208,7 @@ class FreqUnits(QWidget):
     def _lock_freqs(self) -> None:
         """
         Lock / unlock frequency entries: The values of frequency related widgets
-        are stored in normalized form (w.r.t. sampling frequency)`fb.fil[0]['f_S']`.
+        are stored in normalized form (w.r.t. sampling frequency)`fil[0]['f_S']`.
 
         When the sampling frequency changes, absolute frequencies displayed in the
         widgets change their values. Most of the time, this is the desired behaviour,
@@ -218,24 +218,24 @@ class FreqUnits(QWidget):
         When the effect of varying the sampling frequency is to be analyzed, the
         displayed values in the widgets can be locked by pressing the Lock button.
         After changing the sampling frequency, normalized frequencies have to be
-        rescaled like `f_a *= fb.fil[0]['f_S_prev'] / fb.fil[0]['f_S']` to maintain
+        rescaled like `f_a *= fil[0]['f_S_prev'] / fil[0]['f_S']` to maintain
         the displayed value `f_a * f_S`.
 
         This has to be accomplished by each frequency widget (currently, these are
         freq_specs and plot_tran_stim) when receiving the signal {'view_changed': 'f_S'}.
 
-        The setting is stored as bool in the global dict entry `fb.fil[0]['freq_locked'`.
+        The setting is stored as bool in the global dict entry `fil[0]['freq_locked']`.
         No signal is emitted because there is no immediate need for action, all the values
         remain unchanged.
         """
 
         if self.butLock.checked:
             # Lock has been activated, keep displayed frequencies locked
-            fb.fil[0]['freq_locked'] = True
+            fb_set('freq_locked', True)
             self.butLock.setIcon(QIcon(':/lock-locked.svg'))
         else:
             # Lock has been unlocked, scale displayed frequencies with f_S
-            fb.fil[0]['freq_locked'] = False
+            fb_set('freq_locked', False)
             self.butLock.setIcon(QIcon(':/lock-unlocked.svg'))
 
 # -------------------------------------------------------------
@@ -245,7 +245,7 @@ class FreqUnits(QWidget):
         - during init (direct call)
         - when the unit combobox is changed (signal-slot)
         - when a signal {'view_changed': 'f_S'} or {'data_changed': ...} has been
-          received. In this case, the UI is updated from the fb.fil[0] dictionary
+          received. In this case, the UI is updated from the fil[0] dictionary
           and no signal is emitted (`emit_signal==False`).
 
         Set various scale factors and labels depending on the setting of the unit
@@ -255,17 +255,17 @@ class FreqUnits(QWidget):
         """
         if not emit_signal:  # triggered by function call, not by a change of UI
             # Load f_S display from dict
-            self.led_f_s.setText(str(fb.fil[0]['f_S']))
+            self.led_f_s.setText(str(fb_get('f_S')))
             # Load freq. unit setting from dict
-            idx = qset_cmb_box(self.cmb_f_units, fb.fil[0]['freq_specs_unit'],
+            idx = qset_cmb_box(self.cmb_f_units, fb_get('freq_specs_unit'),
                                caseSensitive=True)
             if idx == -1:
                 logger.warning(
                     "Unknown frequency unit %s, using 'f_S'.",
-                    fb.fil[0]['freq_specs_unit']
+                    fb_get('freq_specs_unit')
                 )
             # Load Frequency range type (0 ... f_S/2 etc.) from dict
-            qset_cmb_box(self.cmb_f_range, fb.fil[0]['freqSpecsRangeType'],
+            qset_cmb_box(self.cmb_f_range, fb_get('freqSpecsRangeType'),
                          data=True, fireSignals=True)
 
         f_unit = qget_cmb_box(self.cmb_f_units, data=False)  # selected frequency unit,
@@ -282,32 +282,35 @@ class FreqUnits(QWidget):
             # store current sampling frequency to restore it when returning to
             # absolute (not normalized) frequencies
             if f_unit == "f_S":  # normalized to f_S
-                fb.fil[0]['f_S'] = fb.fil[0]['f_max'] = 1.
+                fb_set('f_S', 1.)
+                fb_set('f_max', 1.)
                 f_label = r"$F = f\, /\, f_S = \Omega \, /\,  2 \mathrm{\pi} \; \rightarrow$"
             elif f_unit == "f_Ny":  # normalized to f_nyq = f_S / 2
-                fb.fil[0]['f_S'] = fb.fil[0]['f_max'] = 2.
+                fb_set('f_S', 2.)
+                fb_set('f_max', 2.)
                 f_label = r"$F = 2f \, / \, f_S = \Omega \, / \, \mathrm{\pi} \; \rightarrow$"
             else: # frequency index k,
                 logger.error("Unit k is no longer supported!")
 
             # always use T_S = 1 for normalized frequencies
-            fb.fil[0]['T_S'] = 1.
+            fb_set('T_S', 1.)
             t_label = r"$n = t\, /\, T_S \; \rightarrow$"
 
             # Don't lock frequency scaling with normalized frequencies
-            fb.fil[0]['freq_locked'] = False
+            fb_set('freq_locked', False)
             self.butLock.setIcon(QIcon(':/lock-unlocked.svg'))
 
         else:  # Hz, kHz, ...
             # Restore sampling frequency when selecting absolute instead of
             # normalized frequencies
 
-            if fb.fil[0]['freq_specs_unit'] in {"f_S", "f_Ny"}:  # previous setting normalized?
-                fb.fil[0]['f_S'] = fb.fil[0]['f_max'] = self.f_s_old  # yes, restore prev. f_S
-                fb.fil[0]['T_S'] = self.T_s_old  # yes, restore prev. T_S
+            if fb_get('freq_specs_unit') in {"f_S", "f_Ny"}:  # previous setting normalized?
+                fb_set('f_S', self.f_s_old)
+                fb_set('f_max', self.f_s_old) # yes, restore prev. f_S
+                fb_set('T_S', self.T_s_old)  # yes, restore prev. T_S
 
             # --- try to pick the most suitable unit for f_S --------------
-            f_S = fb.fil[0]['f_S'] * f_s_scale
+            f_S = fb_get('f_S') * f_s_scale
             if f_S >= 1e9:
                 f_unit = "GHz"
             elif f_S >= 1e6:
@@ -324,25 +327,25 @@ class FreqUnits(QWidget):
                 # sampling frequency unit has been changed, f_S and T_S need to be scaled
                 idx = new_idx
                 f_s_scale = self.f_scale[idx]
-                fb.fil[0]['f_S'] = f_S / f_s_scale
-                fb.fil[0]['T_S'] = f_s_scale / f_S
+                fb_set('f_S', f_S / f_s_scale)
+                fb_get('T_S', f_s_scale / f_S)
                 emit_signal = True
             # -------------------------------------------------------------
-            self.f_s_old = fb.fil[0]['f_S']
-            self.T_s_old = fb.fil[0]['T_S']
-            self.led_f_s.setText(params['FMT'].format(fb.fil[0]['f_S']))
+            self.f_s_old = fb_get('f_S')
+            self.T_s_old = fb_get('T_S')
+            self.led_f_s.setText(params['FMT'].format(fb_get('f_S')))
 
             f_label = r"$f$ in " + f_unit + r"$\; \rightarrow$"
             t_label = r"$t$ in " + self.t_units[idx] + r"$\; \rightarrow$"
 
-        fb.fil[0].update({'f_s_scale': f_s_scale})  # scale factor for f_S (Hz, kHz, ...)
-        fb.fil[0].update({'freq_specs_unit': f_unit})  # frequency unit
+        fb_set('f_s_scale', f_s_scale)  # scale factor for f_S (Hz, kHz, ...)
+        fb_set('freq_specs_unit', f_unit)  # frequency unit
         # time and frequency unit as string e.g. for plot axis labeling
-        fb.fil[0].update({"plt_fUnit": f_unit})
-        fb.fil[0].update({"plt_tUnit": self.t_units[idx]})
+        fb_set('plt_fUnit', f_unit)
+        fb_set('plt_tUnit', self.t_units[idx])
         # complete plot axis labels including unit and arrow
-        fb.fil[0].update({"plt_fLabel": f_label})
-        fb.fil[0].update({"plt_tLabel": t_label})
+        fb_set('plt_fLabel', f_label)
+        fb_set('plt_tLabel', t_label)
 
         self._freq_range(emit_signal=False)  # update f_lim setting without emit_signalting signal
         if emit_signal:  # UI was updated by user or a rescaling of f_S
@@ -363,9 +366,9 @@ class FreqUnits(QWidget):
         - When a QLineEdit widget loses input focus (QEvent.FocusOut`), store
           current value with full precision (only if `spec_edited`== True) and
           display the stored value in selected format. Emit 'view_changed':'f_S'
-        - When f_S has been changed, update `fb.fil[0]['f_S']`,
+        - When f_S has been changed, update `fil[0]['f_S']`,
           emit `{'view_changed': 'f_S'}` to update other widgets and only *then*
-          update {'f_S_prev': fb.fil[0]['f_S']} to allow correction of normalized
+          update {'f_S_prev': fil[0]['f_S']} to allow correction of normalized
           frequency with the old value of f_S.
         """
         def _store_entry() -> None:
@@ -374,22 +377,22 @@ class FreqUnits(QWidget):
             and emit `{'view_changed': 'f_S'}`.
             """
             if self.spec_edited:
-                f_S_tmp = safe_eval(source.text(), fb.fil[0]['f_S'], sign='pos')
-                fb.fil[0].update({'f_S': f_S_tmp})
-                fb.fil[0].update({'T_S': 1./f_S_tmp})
-                fb.fil[0].update({'f_max': f_S_tmp})
+                f_S_tmp = safe_eval(source.text(), fb_get('f_S'), sign='pos')
+                fb_set('f_S', f_S_tmp)
+                fb_set('T_S', 1./f_S_tmp)
+                fb_set('f_max', f_S_tmp)
 
                 self._freq_range(emit_signal=False)  # update plotting range
                 self.emit({'view_changed': 'f_S'})
                 # Now store current f_S as f_S_prev
-                fb.fil[0].update({'f_S_prev': fb.fil[0]['f_S']})
+                fb_set('f_S_prev', fb_get('f_S'))
 
                 self.spec_edited = False  # reset flag, changed entry has been saved
         # ----------------------
         if source.objectName() == 'f_S':
             if event.type() == QEvent.FocusIn:
                 self.spec_edited = False
-                source.setText(str(fb.fil[0]['f_S']))  # full precision
+                source.setText(str(fb_get('f_S')))  # full precision
             elif event.type() == QEvent.KeyPress:
                 self.spec_edited = True  # entry has been changed
                 key = event.key()
@@ -397,10 +400,10 @@ class FreqUnits(QWidget):
                     _store_entry()
                 elif key == QtCore.Qt.Key_Escape:  # revert changes
                     self.spec_edited = False
-                    source.setText(str(fb.fil[0]['f_S']))  # full precision
+                    source.setText(str(fb_get('f_S')))  # full precision
             elif event.type() == QEvent.FocusOut:
                 _store_entry()
-                source.setText(params['FMT'].format(fb.fil[0]['f_S']))  # reduced prec.
+                source.setText(params['FMT'].format(fb_get('f_S')))  # reduced prec.
 
             # Call base class method to continue normal event processing:
         return super().eventFilter(source, event)
@@ -418,8 +421,8 @@ class FreqUnits(QWidget):
 
         rangeType = qget_cmb_box(self.cmb_f_range)
 
-        fb.fil[0].update({'freqSpecsRangeType': rangeType})
-        f_max = fb.fil[0]["f_max"]
+        fb_set('freqSpecsRangeType', rangeType)
+        f_max = fb_get('f_max')
 
         if rangeType == 'whole':
             f_lim = [0, f_max]
@@ -428,7 +431,7 @@ class FreqUnits(QWidget):
         else:
             f_lim = [0, f_max/2.]
 
-        fb.fil[0]['freqSpecsRange'] = f_lim  # store settings in dict
+        fb_set('freqSpecsRange', f_lim)  # store settings in dict
 
         if emit_signal:
             self.emit({'view_changed': 'f_range'})
@@ -442,9 +445,9 @@ class FreqUnits(QWidget):
         """
         self.update_UI(emit_signal=False)
         # This updates the following widgets:
-        # - `self.led_f_s` from `fb.fil[0]['f_S']`
-        # - `self.cmb_f_units` with `fb.fil[0]['freq_specs_unit']`
-        # - `self.cmb_f_range` from `fb.fil[0]['freqSpecsRangeType']``
+        # - `self.led_f_s` from `fb_get('f_S')`
+        # - `self.cmb_f_units` with `fb_get('freq_specs_unit')`
+        # - `self.cmb_f_range` from `fb_get('freqSpecsRangeType')``
         # The other widgets are updated automatically.
 
 # -------------------------------------------------------------
@@ -453,7 +456,7 @@ class FreqUnits(QWidget):
         Store sort flag in filter dict and emit 'specs_changed':'f_sort'
         when sort button is checked.
         """
-        fb.fil[0]['freq_specs_sort'] = self.but_sort.checked
+        fb_set('freq_specs_sort', self.but_sort.checked)
         if self.but_sort.checked:
             self.emit({'specs_changed': 'f_sort'})
 
