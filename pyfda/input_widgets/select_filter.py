@@ -329,7 +329,7 @@ class SelectFilter(QWidget):
         """
         Triggered when cmbFilterClass (cheby1, ...) is changed:
         - read design method fc and copy it to fil[0]
-        - create / update global filter instance fb.fil_inst of fc class
+        - create / update filter instance ff.fil_inst of fc class
         - update dynamic widgets (if fc has changed and if there are any)
         - call load filter order
         """
@@ -344,7 +344,7 @@ class SelectFilter(QWidget):
 
             # ==================================================================
             # Create new instance of the selected filter class, accessible via
-            # its handle fb.fil_inst
+            # its handle ff.fil_inst
             err = ff.fil_factory.create_fil_inst(fc)
             logger.debug(
                 "fil_factory.create_fil_inst triggered: %s\n\tReturned error code %s", fc, err)

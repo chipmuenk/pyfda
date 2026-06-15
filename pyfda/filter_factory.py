@@ -28,12 +28,13 @@ from pyfda.libs.pyfda_lib import debug_exception
 
 logger = logging.getLogger(__name__)
 
+# Class variable for instance of filter class
 fil_inst = None
 
 class FilterFactory():
     """
-    This class implements a filter factory that (re)creates the globally accessible
-    filter instance ``fil_inst`` from module path and class name, passed as strings.
+    This class implements a filter factory that (re)creates the class attribute 
+    ``fil_inst`` from module path and class name, passed as strings.
     """
     def __init__(self):
         #--------------------------------------
@@ -47,8 +48,7 @@ class FilterFactory():
         from the module found in ``CFP.FILTER_CLASSES_DICT[fc]``.
         This dictionary has been collected by ``tree_builder.py``.
 
-        The instance can afterwards be globally referenced as ``fil_inst``.
-
+        The instance can afterwards be referenced as class attribute ``fil_inst`` of FilterFactory
 
         Parameters
         ----------

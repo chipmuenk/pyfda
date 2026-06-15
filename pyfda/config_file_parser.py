@@ -319,7 +319,7 @@ class ConfigFileParser():
 
         Returns
         -------
-        None, but `fb.xxx` contains the parsed configuration file sections
+        None, but `ConfigFileParser.xxx_DICT` contain the parsed configuration file sections
         """
 
         # ------------------------------------------------------------------
