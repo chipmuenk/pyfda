@@ -27,7 +27,7 @@ API version info:
          first element controls whether the widget is visible and / or enabled.
          This dict is now called self.rt_dict. When present, the dict self.rt_dict_add
          is read and merged with the first one.
-    2.1: Remove method destruct_UI and attributes self.wdg and self.hdl
+    2.1: Remove method destruct_ui and attributes self.wdg and self.hdl
 
    :2.2: Rename `filter_classes` -> `classes`, remove Py2 compatibility
 """

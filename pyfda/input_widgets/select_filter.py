@@ -174,22 +174,22 @@ class SelectFilter(QWidget):
         # Filter Order Subwidgets
         # ----------------------------------------------------------------------
         self.lblOrder = QLabel("<b>Order:</b>")
-        self.chkMinOrder = QCheckBox("Minimum", self)
-        self.chkMinOrder.setToolTip(
+        self._chk_min_order = QCheckBox("Minimum", self)
+        self._chk_min_order.setToolTip(
             "<span>Minimum filter order / # of taps is determined automatically.</span>")
-        self.lblOrderN = QLabel("<b><i>N =</i></b>")
-        self.ledOrderN = QLineEdit(str(fb_get('N')), self)
-        self.ledOrderN.setToolTip("Filter order (# of taps - 1).")
+        self._lbl_order_n = QLabel("<b><i>N =</i></b>")
+        self._led_order_n = QLineEdit(str(fb_get('N')), self)
+        self._led_order_n.setToolTip("Filter order (# of taps - 1).")
 
         # --------------------------------------------------
         #  Layout for filter order subwidgets
         # --------------------------------------------------
         layHOrdWdg = QHBoxLayout()
         layHOrdWdg.addWidget(self.lblOrder)
-        layHOrdWdg.addWidget(self.chkMinOrder)
+        layHOrdWdg.addWidget(self._chk_min_order)
         layHOrdWdg.addStretch()
-        layHOrdWdg.addWidget(self.lblOrderN)
-        layHOrdWdg.addWidget(self.ledOrderN)
+        layHOrdWdg.addWidget(self._lbl_order_n)
+        layHOrdWdg.addWidget(self._led_order_n)
 
         # ----------------------------------------------------------------------
         # OVERALL LAYOUT (stack standard + dynamic subwidgets vertically)
@@ -226,9 +226,9 @@ class SelectFilter(QWidget):
                 lambda: self._set_filter_type(enb_signal=True))  # 'IIR'
         self.cmbFilterClass.currentIndexChanged.connect(
                 lambda: self._set_design_method(enb_signal=True))  # 'cheby1'
-        self.chkMinOrder.clicked.connect(
+        self._chk_min_order.clicked.connect(
                 lambda: self._set_filter_order(enb_signal=True))  # Min. Order
-        self.ledOrderN.editingFinished.connect(
+        self._led_order_n.editingFinished.connect(
                 lambda: self._set_filter_order(enb_signal=True))  # Manual Order
 
     # --------------------------------------------------------------------------
@@ -365,7 +365,7 @@ class SelectFilter(QWidget):
             #         ))
             # ===================================================================
             # construct dyn. subwidgets if available
-            if hasattr(ff.fil_inst, 'construct_UI'):
+            if hasattr(ff.fil_inst, 'construct_ui'):
                 self._construct_dyn_widgets()
 
             self.fc_last = fb_get('fc')  # store current fc as last fc
@@ -397,15 +397,15 @@ class SelectFilter(QWidget):
             status = 'i'
 
         # Determine which subwidgets are __visible__
-        self.chkMinOrder.setVisible('min' in fo_list)
-        self.ledOrderN.setVisible(status in {'a', 'd'})
-        self.lblOrderN.setVisible(status in {'a', 'd'})
+        self._chk_min_order.setVisible('min' in fo_list)
+        self._led_order_n.setVisible(status in {'a', 'd'})
+        self._lbl_order_n.setVisible(status in {'a', 'd'})
 
         # Determine which subwidgets are __enabled__
-        self.chkMinOrder.setChecked(fb_get('fo') == 'min')
-        self.ledOrderN.setText(str(fb_get('N')))
-        self.ledOrderN.setEnabled(not self.chkMinOrder.isChecked() and status == 'a')
-        self.lblOrderN.setEnabled(not self.chkMinOrder.isChecked() and status == 'a')
+        self._chk_min_order.setChecked(fb_get('fo') == 'min')
+        self._led_order_n.setText(str(fb_get('N')))
+        self._led_order_n.setEnabled(not self._chk_min_order.isChecked() and status == 'a')
+        self._lbl_order_n.setEnabled(not self._chk_min_order.isChecked() and status == 'a')
 
         if enb_signal:
             self.emit({'filt_changed': 'filter_type'})
@@ -413,33 +413,33 @@ class SelectFilter(QWidget):
     # ------------------------------------------------------------------------------
     def _set_filter_order(self, enb_signal=False):
         """
-        Triggered when either ledOrderN or chkMinOrder are edited:
+        Triggered when either _led_order_n or _chk_min_order are edited:
         - copy settings to fil[0]
         - emit 'filt_changed' if enb_signal is True
         """
         # Determine which subwidgets are _enabled_
-        if self.chkMinOrder.isVisible():
-            self.ledOrderN.setEnabled(not self.chkMinOrder.isChecked())
-            self.lblOrderN.setEnabled(not self.chkMinOrder.isChecked())
+        if self._chk_min_order.isVisible():
+            self._led_order_n.setEnabled(not self._chk_min_order.isChecked())
+            self._lbl_order_n.setEnabled(not self._chk_min_order.isChecked())
 
-            if self.chkMinOrder.isChecked() is True:
+            if self._chk_min_order.isChecked() is True:
                 # update in case N has been changed outside this class
-                self.ledOrderN.setText(str(fb_get('N')))
+                self._led_order_n.setText(str(fb_get('N')))
                 fb_set('fo', 'min')
 
             else:
                 fb_set('fo', 'man')
 
         else:
-            self.lblOrderN.setEnabled(self.fo == 'man')
-            self.ledOrderN.setEnabled(self.fo == 'man')
+            self._lbl_order_n.setEnabled(self.fo == 'man')
+            self._led_order_n.setEnabled(self.fo == 'man')
 
         # read manual filter order, convert to positive integer and store it
         # in filter dictionary.
         ordn = safe_eval(
-            self.ledOrderN.text(), fb_get('N'), return_type='int', sign='pos')
+            self._led_order_n.text(), fb_get('N'), return_type='int', sign='pos')
         ordn = ordn if ordn > 0 else 1
-        self.ledOrderN.setText(str(ordn))
+        self._led_order_n.setText(str(ordn))
         fb_set('N', ordn)
 
         if enb_signal:
@@ -472,7 +472,7 @@ class SelectFilter(QWidget):
                     self.dyn_wdg_fil.deleteLater()
 
                 except AttributeError as e:
-                    logger.error("Could not destruct_UI!\n\t%s}", e)
+                    logger.error("Could not destruct_ui!\n\t%s}", e)
             else:
                 logger.error("Dynamic filter instance 'wdg_fil' does not exist, "
                              "you should not see this message!")
@@ -491,7 +491,7 @@ class SelectFilter(QWidget):
         Create filter widget UI dynamically and
         connect its sig_tx signal to sig_tx in this scope.
         """
-        # ff.fil_inst.construct_UI()
+        # ff.fil_inst.construct_ui()
         if hasattr(ff.fil_inst, 'wdg_fil'):
             try:
                 self.dyn_wdg_fil = ff.fil_inst.wdg_fil

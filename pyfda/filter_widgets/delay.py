@@ -78,7 +78,7 @@ class Delay(QWidget):
         emit(self, dict_sig)
 
     #--------------------------------------------------------------------------
-    def construct_UI(self) -> None:
+    def construct_ui(self) -> None:
         """
         Create additional subwidget(s) needed for filter design:
         These subwidgets are instantiated dynamically when needed in
@@ -192,7 +192,7 @@ if __name__ == '__main__':
 
     # instantiate filter widget
     filt = Delay()
-    filt.construct_UI()
+    filt.construct_ui()
 
     layVDynWdg = QVBoxLayout()
     layVDynWdg.addWidget(filt.wdg_fil, stretch = 1)

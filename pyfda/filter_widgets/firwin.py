@@ -20,7 +20,7 @@ API version info:
     1.0: initial working release
     1.1: mark private methods as private
     1.2: new API using fil_save
-    1.3: new public methods destruct_UI + construct_UI (no longer called by __init__)
+    1.3: new public methods destruct_ui + construct_ui (no longer called by __init__)
     1.4: module attribute `filter_classes` contains class name and combo box name
          instead of class attribute `name`
          `FRMT` is now a class attribute
@@ -29,7 +29,7 @@ API version info:
          This dict is now called self.rt_dict. When present, the dict self.rt_dict_add
          is read and merged with the first one.
 
-    2.1: Remove method destruct_UI and attributes self.wdg and self.hdl
+    2.1: Remove method destruct_ui and attributes self.wdg and self.hdl
 
    :2.2: Rename `filter_classes` -> `classes`, remove Py2 compatibility
 """
@@ -125,7 +125,7 @@ class Firwin(QWidget):
 
         # ------------------- end of static info for filter tree ---------------
 
-        self.construct_UI()
+        self.construct_ui()
         # get initial / last setting from dictionary, updating self.all_wins_dict
         self.dict2filter_params()
 
@@ -166,7 +166,7 @@ class Firwin(QWidget):
                 self.emit(dict_sig, sig_name='sig_tx_local')
 
     # --------------------------------------------------------------------------
-    def construct_UI(self) -> None:
+    def construct_ui(self) -> None:
         """
         Create additional subwidget(s) needed for filter design:
         These subwidgets are instantiated dynamically when needed in
@@ -646,7 +646,7 @@ if __name__ == "__main__":
 
     # instantiate filter widget
     filt = Firwin()
-    filt.construct_UI()
+    filt.construct_ui()
 
     layVDynWdg = QVBoxLayout()
     layVDynWdg.addWidget(filt.wdg_fil, stretch=1)

@@ -33,7 +33,7 @@ fil_inst = None
 
 class FilterFactory():
     """
-    This class implements a filter factory that (re)creates the class attribute 
+    This class implements a filter factory that (re)creates the class attribute
     ``fil_inst`` from module path and class name, passed as strings.
     """
     def __init__(self):
