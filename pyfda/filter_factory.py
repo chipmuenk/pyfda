@@ -227,6 +227,7 @@ class FilterFactory():
               # err_code = -1 means "operation cancelled"
             try:
                 #------------------------------------------------------------------
+                # call the actual filter method, results are stored in the filter dict
                 self.err_code = getattr(fil_inst, method)()
                 if not isinstance(self.err_code, int):
                     logger.error("self.err_code = '%s' is of type '%s' but should be 'int'!",
@@ -256,8 +257,12 @@ class FilterFactory():
         return self.err_code
 
 #------------------------------------------------------------------------------
-# Class instance of FilterFactory that can be accessed in other modules
+# Class instance of FilterFactory.
 fil_factory = FilterFactory()
+# Usage:
+# from filter_factory import fil_factory
+# fil_factory.create_fil_inst(...)  # test whether class can be instantiated
+# fil_factory.call_fil_method(...)
 
 ######################################################################
 if __name__ == '__main__':

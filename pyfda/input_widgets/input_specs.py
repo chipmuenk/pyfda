@@ -493,7 +493,7 @@ class Input_Specs(QWidget):
         # this is the same as e.g.
         # from pyfda.filter_design import ellip
         # inst = ellip.ellip()
-        # inst.LPmin(fb.fil[0])
+        # inst.LPmin()
         # -----------------------------------------------------------------------
 
         if err > 0:
