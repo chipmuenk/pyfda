@@ -109,7 +109,7 @@ def merge_dicts_hierarchically(d1: dict, d2: dict, path: str = "", mode: str = "
 
                     else:
                         logger.warning("Unknown merge mode %s.", mode)
-                except Exception as e:
+                except (TypeError, IndexError) as e:
                     logger.warning("Merge conflict at %s: %s", path + str(key), e)
         else:
             d1[key] = d2[key]  # add new entry to dict1
@@ -117,6 +117,13 @@ def merge_dicts_hierarchically(d1: dict, d2: dict, path: str = "", mode: str = "
 
 
 class ParseError(Exception):
+    """
+    Exception raised when parsing filter tree data fails.
+
+    This exception is used by :mod:`pyfda.tree_builder` when the
+    configuration data for a filter tree cannot be interpreted or
+    merged correctly.
+    """
     pass
 
 
@@ -271,7 +278,7 @@ class Tree_Builder():
 
         Returns
         -------
-        fil_tree : FrozenDict
+        fil_tree : FrozenDict | None
             A frozen hierarchical dictionary with all filter combinations.
 
         """
@@ -446,4 +453,3 @@ if __name__ == "__main__":
     print(f"\nDict type: {type(Tree_Builder.fil_tree['LP']['FIR']['Equiripple']).__name__}\n")
 
     print('Tree_Builder.fil_tree["BP"] = ', pprint_log(Tree_Builder.fil_tree["BP"]))
-
