@@ -20,7 +20,7 @@ from pyfda.libs.compat import (
     QCheckBox, QVBoxLayout, QHBoxLayout, pyqtSignal)
 
 from pyfda.filterbroker import fb_get, fb_set
-import pyfda.filter_factory as ff
+from pyfda.filter_factory import create_fil_inst, get_fil_inst
 from pyfda.tree_builder import Tree_Builder as TB
 from pyfda.config_file_parser import ConfigFileParser as CFP
 from pyfda.libs.pyfda_lib import safe_eval
@@ -311,7 +311,7 @@ class SelectFilter(QWidget):
 
         # Does new ft also provide the previous design method (e.g. ellip)?
         # Has filter been instantiated?
-        if fb_get('fc') in fc_list and ff.fil_inst:
+        if fb_get('fc') in fc_list and get_fil_inst():
             # yes, set same fc as before
             fc_idx = self.cmbFilterClass.findText(
                 CFP.FILTER_CLASSES_DICT[fb_get('fc')]['name'])
@@ -329,7 +329,7 @@ class SelectFilter(QWidget):
         """
         Triggered when cmbFilterClass (cheby1, ...) is changed:
         - read design method fc and copy it to fil[0]
-        - create / update filter instance ff.fil_inst of fc class
+        - create / update filter instance fil_inst of fc class
         - update dynamic widgets (if fc has changed and if there are any)
         - call load filter order
         """
@@ -344,10 +344,10 @@ class SelectFilter(QWidget):
 
             # ==================================================================
             # Create new instance of the selected filter class, accessible via
-            # its handle ff.fil_inst
-            err = ff.fil_factory.create_fil_inst(fc)
+            # its handle fil_inst
+            err = create_fil_inst(fc)
             logger.debug(
-                "fil_factory.create_fil_inst triggered: %s\n\tReturned error code %s", fc, err)
+                "create_fil_inst triggered: %s\n\tReturned error code %s", fc, err)
             # ==================================================================
 
             # Check whether new design method also provides the old filter order method.
@@ -365,7 +365,7 @@ class SelectFilter(QWidget):
             #         ))
             # ===================================================================
             # construct dyn. subwidgets if available
-            if hasattr(ff.fil_inst, 'construct_ui'):
+            if hasattr(get_fil_inst(), 'construct_ui'):
                 self._construct_dyn_widgets()
 
             self.fc_last = fb_get('fc')  # store current fc as last fc
@@ -461,9 +461,9 @@ class SelectFilter(QWidget):
         design method is the same as the old one.
         """
 
-        if hasattr(ff.fil_inst, 'wdg_fil'):
+        if hasattr(get_fil_inst(), 'wdg_fil'):
             # not needed, connection is destroyed automatically
-            # ff.fil_inst.sig_tx.disconnect()
+            # get_fil_inst().sig_tx.disconnect()
             if hasattr(self, 'dyn_wdg_fil'):
                 try:
                     # remove widget from layout
@@ -476,11 +476,11 @@ class SelectFilter(QWidget):
             else:
                 logger.error("Dynamic filter instance 'wdg_fil' does not exist, "
                              "you should not see this message!")
-            if hasattr(ff, 'fil_inst'):
-                try:
-                    ff.fil_inst.deleteLater()  # delete QWidget when scope has been left
-                except RuntimeError as e:
-                    logger.error(e)
+
+            try:
+                get_fil_inst().deleteLater()  # delete QWidget when scope has been left
+            except RuntimeError as e:
+                logger.error(e)
             else:
                 logger.error("Dynamic filter instance 'fil_inst' does not exist, "
                              "you should not see this message!")
@@ -491,16 +491,16 @@ class SelectFilter(QWidget):
         Create filter widget UI dynamically and
         connect its sig_tx signal to sig_tx in this scope.
         """
-        # ff.fil_inst.construct_ui()
-        if hasattr(ff.fil_inst, 'wdg_fil'):
+        # get_fil_inst().construct_ui()
+        if hasattr(get_fil_inst(), 'wdg_fil'):
             try:
-                self.dyn_wdg_fil = ff.fil_inst.wdg_fil
+                self.dyn_wdg_fil = get_fil_inst().wdg_fil
                 self.layHDynWdg.addWidget(self.dyn_wdg_fil, stretch=1)
             except AttributeError as e:
                 logger.warning(e)
 
-        if hasattr(ff.fil_inst, 'sig_tx'):
-            ff.fil_inst.sig_tx.connect(self.sig_tx)
+        if hasattr(get_fil_inst(), 'sig_tx'):
+            get_fil_inst().sig_tx.connect(self.sig_tx)
 
 
 # ------------------------------------------------------------------------------

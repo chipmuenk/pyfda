@@ -14,7 +14,7 @@ import logging
 import sys
 from typing import ClassVar
 
-import pyfda.filter_factory as ff
+from pyfda.filter_factory import get_fil_inst, create_fil_inst
 from pyfda.config_file_parser import ConfigFileParser as CFP
 
 import pyfda.libs.frozendict as frozendict
@@ -289,19 +289,19 @@ class Tree_Builder():
         for fc in CFP.FILTER_CLASSES_DICT:  # iterate over all previously found filter
                                             # classes fc
 
-            # try to instantiate an instance ff.fil_inst() of filter class fc
-            err_code = ff.fil_factory.create_fil_inst(fc)
+            # try to instantiate filter class fc
+            err_code = create_fil_inst(fc)
             if err_code > 0:
                 logger.warning(
                     'Skipping filter class "%s" due to import error %d', fc, err_code)
                 continue  # continue with next entry in CFP.FILTER_CLASSES_DICT
 
             # add attributes from `rt_dict` to `fil_tree`` for filter class fc
-            fil_tree = self._build_fil_tree_fc(fc, ff.fil_inst.rt_dict, fil_tree)
+            fil_tree = self._build_fil_tree_fc(fc, get_fil_inst().rt_dict, fil_tree)
 
             # merge optional instance specific `rt_dict_add` into `fil_tree`:
-            if hasattr(ff.fil_inst, 'rt_dict_add'):
-                fil_tree_add = self._build_fil_tree_fc(fc, ff.fil_inst.rt_dict_add)
+            if hasattr(get_fil_inst(), 'rt_dict_add'):
+                fil_tree_add = self._build_fil_tree_fc(fc, get_fil_inst().rt_dict_add)
                 merge_dicts_hierarchically(fil_tree, fil_tree_add, mode='add1')
 
         # Make the dictionary and all sub-dictionaries read-only ("FrozenDict"):
@@ -396,7 +396,7 @@ class Tree_Builder():
         if not fil_tree:
             fil_tree = {}
 
-        ft = ff.fil_inst.ft                    # get filter type (e.g. 'FIR')
+        ft = get_fil_inst().ft                 # get filter type (e.g. 'FIR')
 
         for rt in rt_dict:                     # iterate over all response types
             if rt == 'COM':                    # handle common info later

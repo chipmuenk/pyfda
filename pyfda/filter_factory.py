@@ -7,18 +7,11 @@
 # (see file LICENSE in root directory for details)
 
 """
-Dynamic parameters and settings are exchanged via the dictionaries in this file.
-Importing ``filterbroker.py`` runs the module once, defining all module variables
-which have a global scope like class variables and can be imported like
+An instance of a filter design class (e.g. "Cheby1") is created with:
 
->>> import filter_factory as ff
->>> myfil = ff.fil_factory
-
-A globally accessible instance of a filter design class (e.g. "cheby1") is created with:
-
->>> import filter_factory as ff
->>> ff.fil_factory.create_fil_instance('cheby1') # create instance of dynamic class
->>> ff.fil_inst.LPmin(fil[0]) # design a filter
+>>> from filter_factory import create_fil_instance, get_fil_inst
+>>> create_fil_instance('Cheby1') # create instance of dynamic class
+>>> get_fil_inst().LPmin(fil[0]) # design a filter
 """
 
 import importlib
@@ -36,6 +29,8 @@ class FilterFactory():
     This class implements a filter factory that (re)creates the class attribute
     ``fil_inst`` from module path and class name, passed as strings.
     """
+    fil_inst = None
+
     def __init__(self):
         #--------------------------------------
         # return error codes for class instantiation and method
@@ -88,8 +83,6 @@ class FilterFactory():
         passing the global filter dictionary fil[0] as the parameter.
 
         """
-        global fil_inst # allow writing to variable
-
         try:
             # Try to dynamically import the module fc, i.e. do the following
             # import pyfda.<filter_package>.<fc> as fc_module
@@ -123,7 +116,7 @@ class FilterFactory():
         # the design method has been changed since last time.
         # In both cases, a (new) filter object is instantiated.
 
-        if fil_inst is None or fc != fil_inst.__class__.__name__:
+        if FilterFactory.fil_inst is None or fc != FilterFactory.fil_inst.__class__.__name__:
             err_string = ""
             self.err_code = -1
             # get attribute fc from fc_module, here, this returns the class fc
@@ -136,7 +129,7 @@ class FilterFactory():
                 self.err_code = 3
             else:
                 try:
-                    fil_inst = fil_class() # instantiate an object
+                    FilterFactory.fil_inst = fil_class() # instantiate an object
                     self.err_code = 0 # filter instance has been created / changed successfully
                     logger.debug(
                         "FilterFactory.create_fil_inst(): successfully created '%s'", fc)
@@ -152,7 +145,7 @@ class FilterFactory():
     def call_fil_method(self, method: str, fc: str = "") -> int:
         """
         Instantiate the filter design class passed  as string ``fc`` with the
-        globally accessible handle ``fil_inst``. If ``fc = None``, use the previously
+        class attribute ``fil_inst``. If ``fc = None``, use the previously
         instantiated filter design class.
 
         Next, call the design method passed as string ``method`` of the instantiated
@@ -219,8 +212,9 @@ class FilterFactory():
             self.err_code = 16
 
         # Test whether filter class contains passed method
-        elif not hasattr(fil_inst, method):
-            err_string = f"Method '{method}' doesn't exist in class '{fil_inst}'."
+        elif not hasattr(FilterFactory.fil_inst, method):
+            err_string = f"Method '{method}' doesn't exist in class "\
+                f"'{FilterFactory.fil_inst.__class__.__name__}'."
             self.err_code = 17
 
         else: # everything ok so far, try calling method
@@ -228,7 +222,7 @@ class FilterFactory():
             try:
                 #------------------------------------------------------------------
                 # call the actual filter method, results are stored in the filter dict
-                self.err_code = getattr(fil_inst, method)()
+                self.err_code = getattr(FilterFactory.fil_inst, method)()
                 if not isinstance(self.err_code, int):
                     logger.error("self.err_code = '%s' is of type '%s' but should be 'int'!",
                                  str(self.err_code), type(self.err_code).__name__)
@@ -236,7 +230,8 @@ class FilterFactory():
                 #------------------------------------------------------------------
             except Exception as e:
                 err_string =\
-                    f"Error in method '{method}' of class '{type(fil_inst).__name__}':\n\t{e}"
+                    f"Error in method '{method}' of class "\
+                    f"'{type(FilterFactory.fil_inst).__name__}':\n\t{e}"
                 if e:
                     err_string += "\n" # add line break at the end of error message
                 if "order n is too high" in str(e).lower():
@@ -257,34 +252,38 @@ class FilterFactory():
         return self.err_code
 
 #------------------------------------------------------------------------------
-# Class instance of FilterFactory.
-fil_factory = FilterFactory()
+# Module instance of FilterFactory():
+_fil_factory = FilterFactory()
+# accessors
+create_fil_inst = _fil_factory.create_fil_inst
+call_fil_method = _fil_factory.call_fil_method
+def get_fil_inst():
+    return _fil_factory.fil_inst
 # Usage:
-# from filter_factory import fil_factory
-# fil_factory.create_fil_inst(...)  # test whether class can be instantiated
-# fil_factory.call_fil_method(...)
+# from filter_factory import create_fil_inst, call_fil_method, get_fil_inst
+# create_fil_inst(...)  # test whether class can be instantiated
+# call_fil_method(...)  # do the actual method call
+# get_fil_inst().ft     # access the 'ft' attribute
 
 ######################################################################
 if __name__ == '__main__':
     # Run module standalone with `python -m pyfda.filter_factory`
 
     print("\nAll CFP.FILTER_CLASSES_DICT:\n", CFP.FILTER_CLASSES_DICT.keys())
-    print("\nTest 'create_fil_inst:'")
-    print("aaa:", fil_factory.create_fil_inst("aaa")) # class doesn't exist
-    print("Cheby1:", fil_factory.create_fil_inst("Cheby1")) # first time inst.
-    print("Cheby1:", fil_factory.create_fil_inst("Cheby1")) # second time inst.
-    print("Cheby2:", fil_factory.create_fil_inst("Cheby2")) # new class
-    print("bbb:", fil_factory.create_fil_inst("bbb"),"\n") # class doesn't exist
+    print("\nTest 'create_fil_inst:'\n========================")
+    print("aaa:", create_fil_inst("aaa")) # class doesn't exist
+    print("Cheby1:", create_fil_inst("Cheby1")) # first time inst.
+    print("Cheby1:", create_fil_inst("Cheby1")) # second time inst.
+    print("Cheby2:", create_fil_inst("Cheby2")) # new class
+    print("Cheby2.rt_dict", FilterFactory.fil_inst.rt_dict)
 
-    print("\nTest 'call_fil_method:'")
+    print("\nTest 'call_fil_method:'\n=======================")
     print("LPman, fc = Cheby2:",
-          fil_factory.call_fil_method("LPman", fc = "Cheby2"),"\n")
-    print("\tLPmax:", fil_factory.call_fil_method("LPmax", fc = "Cheby2")) # doesn't exist
-    print("Int 1:", fil_factory.call_fil_method(1, fc = "Cheby2"),"\n") # not a string
-    print("LPmin:", fil_factory.call_fil_method("LPmin"),"\n") # changed method
+          call_fil_method("LPman", fc = "Cheby2"),"\n")
+    print("\tLPmax:", call_fil_method("LPmax", fc = "Cheby2")) # doesn't exist
+    print("Int 1:", call_fil_method(1, fc = "Cheby2"),"\n") # not a string
+    print("LPmin:", call_fil_method("LPmin"),"\n") # changed method
 
-    print("LPmin, fc = Cheby2:", fil_factory.call_fil_method("LPmin", fc = "Cheby2"),"\n")
-    print("LPman, fc = Cheby1:", fil_factory.call_fil_method("LPman", fc = "Cheby1"))
-
-    # print("LPman, fc = cheby1:",
-    #       fil_factory.call_fil_method("LPman", fc = "cheby1"),"\n") # fails
+    print("LPmin, fc = Cheby2:", call_fil_method("LPmin", fc = "Cheby2"),"\n")
+    print("LPman, fc = Cheby1:", call_fil_method("LPman", fc = "Cheby1"))
+    print("fil_inst.ft = ", get_fil_inst().ft)

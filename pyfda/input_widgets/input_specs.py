@@ -16,7 +16,7 @@ import sys
 
 import pyfda.filterbroker as fb
 from pyfda.filterbroker import fb_get, fb_set
-import pyfda.filter_factory as ff
+from pyfda.filter_factory import call_fil_method
 from pyfda.tree_builder import Tree_Builder as TB
 from pyfda.input_widgets import (
     select_filter, amplitude_specs, freq_specs, freq_units, weight_specs, target_specs)
@@ -489,7 +489,7 @@ class Input_Specs(QWidget):
         # resulting in e.g. cheby1.LPman(fb.fil[0]) and writing back coefficients,
         # P/Z etc. back to fil[0].
 
-        err = ff.fil_factory.call_fil_method(fb_get('rt') + fb_get('fo'), fc=fb_get('fc'))
+        err = call_fil_method(fb_get('rt') + fb_get('fo'), fc=fb_get('fc'))
         # this is the same as e.g.
         # from pyfda.filter_design import ellip
         # inst = ellip.ellip()
