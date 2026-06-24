@@ -42,7 +42,7 @@ class Plot_Phi(QWidget):
         self.needs_draw = True  # plotting neccessary (e.g. log instead of  lin)
         self.tool_tip = "Phase frequency response"
         self.tab_label = "\u03C6(f)"  # phi(f)
-        self._construct_UI()
+        self._construct_ui()
 
     # -------------------------------------------------------------------------
     def emit(self, dict_sig):
@@ -83,7 +83,7 @@ class Plot_Phi(QWidget):
                 self.needs_draw = True
 
     # --------------------------------------------------------------------------
-    def _construct_UI(self):
+    def _construct_ui(self):
         """
         Intitialize the widget, consisting of:
         - Matplotlib widget with NavigationToolbar

@@ -5,6 +5,9 @@
 # Copyright © pyFDA Project Contributors
 # Licensed under the terms of the MIT License
 # (see file LICENSE in root directory for details)
+"""
+Tabbed container for all plot widgets
+"""
 import logging
 import importlib
 
@@ -31,7 +34,7 @@ class PlotTabWidgets(QWidget):
     def __init__(self, parent=None, objectName: str = "plot_tab_widgets_inst") -> None:
         super().__init__(parent)
         self.setObjectName(objectName)
-        self._construct_UI()
+        self._construct_ui()
 
     # -------------------------------------------------------------------------
     def emit(self, dict_sig: dict) -> None:
@@ -42,7 +45,7 @@ class PlotTabWidgets(QWidget):
         emit(self, dict_sig)
 
     # ------------------------------------------------------------------------------
-    def _construct_UI(self) -> None:
+    def _construct_ui(self) -> None:
         """
         Initialize UI with tabbed subwidgets: Instantiate dynamically each widget
         from the dict `CFP.PLOT_CLASSES_DICT` and try to
@@ -111,7 +114,7 @@ class PlotTabWidgets(QWidget):
         # ----------------------------------------------------------------------
         # GLOBAL SIGNALS & SLOTs
         # ---------------------------------------------------------------------
-        # self.sig_rx.connect(inst.sig_rx) # this happens in _construct_UI()
+        # self.sig_rx.connect(inst.sig_rx) # this happens in _construct_ui()
         # ----------------------------------------------------------------------
         # LOCAL SIGNALS & SLOTs
         # ----------------------------------------------------------------------

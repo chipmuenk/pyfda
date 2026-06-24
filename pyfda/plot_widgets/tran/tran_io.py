@@ -37,7 +37,7 @@ class QFileDialogPlus(QDialog):
 
     def __init__(self, parent):
         super().__init__(parent)  # Updated to Python 3 style
-        self._construct_UI()
+        self._construct_ui()
         qwindow_stay_on_top(self, True)
 
     # -----------------------
@@ -58,7 +58,7 @@ class QFileDialogPlus(QDialog):
         self.emit({'close_event': ''})
         event.accept()
 
-    def _construct_UI(self):
+    def _construct_ui(self):
         """ initialize the User Interface """
         self.setWindowTitle("CSV Options")
 
@@ -97,7 +97,7 @@ class Tran_IO(QWidget):
         self.nr_loops = self.ui.led_nr_loops_default
         self.f_s_wav = self.f_s_file = fb_get('f_S')
 
-        self._construct_UI()
+        self._construct_ui()
 
 # ------------------------------------------------------------------------------
     def process_sig_rx(self, dict_sig=None) -> None:
@@ -130,7 +130,7 @@ class Tran_IO(QWidget):
         emit(self, dict_sig)
 
     # ------------------------------------------------------------------------------
-    def _construct_UI(self) -> None:
+    def _construct_ui(self) -> None:
         """
         Instantiate the UI of the widget
         """

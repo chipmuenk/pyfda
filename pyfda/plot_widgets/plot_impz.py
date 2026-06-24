@@ -96,7 +96,7 @@ class Plot_Impz(QWidget):
         self.stim_wdg = Plot_Tran_Stim()
         self.tran_io_wdg = Tran_IO(self)
 
-        self._construct_UI()
+        self._construct_ui()
 
         # --------------------------------------------
         # initialize UI for fixpoint or float simulation
@@ -113,7 +113,7 @@ class Plot_Impz(QWidget):
         emit(self, dict_sig)
 
     # -----------------------------------------------------------------------
-    def _construct_UI(self) -> None:
+    def _construct_ui(self) -> None:
         """
         Create the top level UI of the widget, consisting of tabbed matplotlib widgets,
         tabbed stimuli and a control frame.
@@ -314,7 +314,7 @@ class Plot_Impz(QWidget):
         """
         Resize active tab of stimulus Tab widget to fit the height of the contained
         widget. This is triggered by:
-        - initialization in `_construct_UI()`
+        - initialization in `_construct_ui()`
         - changed tab in the stimulus tab widget (signal-slot)
         - an 'ui-changed' - signal (`process_signal_rx()`)
         """
@@ -560,7 +560,7 @@ class Plot_Impz(QWidget):
 
         Triggered by:
 
-            - `_construct_UI()` during initialization
+            - `_construct_ui()` during initialization
             - Pressing "Run" button, passing button state as a bool
             - `self.ui.cmb_sim_select` when changing between fixpoint and float mode
             - `self.calc_auto()` when activating "Autorun"

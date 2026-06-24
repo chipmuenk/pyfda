@@ -41,7 +41,7 @@ class TargetSpecs(QWidget):
         self.title = title
         self.setObjectName(objectName)
 
-        self._construct_UI()
+        self._construct_ui()
 
     # -------------------------------------------------------------------------
     def emit(self, dict_sig: dict, sig_name: str = ""):
@@ -69,7 +69,7 @@ class TargetSpecs(QWidget):
             return
 
     # --------------------------------------------------------------------------
-    def _construct_UI(self) -> None:
+    def _construct_ui(self) -> None:
         """
         Construct user interface
         """

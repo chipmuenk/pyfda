@@ -90,7 +90,7 @@ class Input_Fixpoint_Specs(QWidget):
             ]
         self.cmb_qfrmt_default = 'float64'
 
-        self._construct_UI()
+        self._construct_ui()
         inst_wdg_list = self._update_filter_cmb()
         if len(inst_wdg_list) == 0:
             logger.warning("No fixpoint filter found for this type of filter!")
@@ -308,7 +308,7 @@ class Input_Fixpoint_Specs(QWidget):
                 self.fx_specs_changed = True
 
     # -----------------------------------------------------------------------
-    def _construct_UI(self) -> None:
+    def _construct_ui(self) -> None:
         """
         Intitialize the main UI, consisting of:
 

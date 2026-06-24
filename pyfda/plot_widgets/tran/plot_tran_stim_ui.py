@@ -232,7 +232,7 @@ class Plot_Tran_Stim_UI(QWidget):
             'led_TW2': ('TW2', 't_scale')
         }
 
-        self._construct_UI()
+        self._construct_ui()
         self._enable_stim_widgets()
         self._update_noi()
 
@@ -245,7 +245,7 @@ class Plot_Tran_Stim_UI(QWidget):
         emit(self, dict_sig)
 
     # -----------------------
-    def _construct_UI(self) -> None:
+    def _construct_ui(self) -> None:
         """ Construct the user interface """
         # =====================================================================
         # Controls for stimuli

@@ -46,7 +46,7 @@ class Plot_Tran_Stim(QWidget):
         self.error = False
         self.x_file = None  # data mapped from file io in Plot_Impz.file_io()
 
-        self._construct_UI()
+        self._construct_ui()
 
     # -------------------------------------------------------------------------
     def emit(self, dict_sig: dict) -> None:
@@ -69,7 +69,7 @@ class Plot_Tran_Stim(QWidget):
                      self.needs_calc, self.isVisible(), pprint_log(dict_sig))
 
     # ------------------------------------------------------------------------------
-    def _construct_UI(self) -> None:
+    def _construct_ui(self) -> None:
         """
         Instantiate the UI of the widget.
         """

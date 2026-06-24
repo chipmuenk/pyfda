@@ -103,10 +103,10 @@ class Tran_IO_UI(QWidget):
         self.led_nr_loops_default = 1
 
         super().__init__()
-        self._construct_UI()
+        self._construct_ui()
 
     # -------------------------------------------------------------------------
-    def _construct_UI(self):
+    def _construct_ui(self):
         # =====================================================================
         # Controls
         # =====================================================================

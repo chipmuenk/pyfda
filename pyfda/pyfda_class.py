@@ -149,9 +149,9 @@ class pyFDA(QMainWindow):
         # create clipboard instance that can be accessed from other modules
         dirs.clipboard = QApplication.clipboard()
 
-        self._construct_UI()
+        self._construct_ui()
 
-    def _construct_UI(self) -> None:
+    def _construct_ui(self) -> None:
         """
         Construct the main GUI, consisting of:
             - Tabbed input widgets (left side)

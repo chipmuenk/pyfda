@@ -68,7 +68,7 @@ class IIR_DF1_pyfixp_UI(QWidget):
              "<span><b>Automatic</b> calculation from largest coefficient.</span>")
             ]
 
-        self._construct_UI()
+        self._construct_ui()
         # Construct an instance of the fixpoint filter using the settings from
         # the 'fxq' quantizer dict:
         self.fx_filt = IIR_DF1_pyfixp(fb_get('fxq'))
@@ -83,7 +83,7 @@ class IIR_DF1_pyfixp_UI(QWidget):
         emit(self, dict_sig)
 
     # --------------------------------------------------------------------------
-    def _construct_UI(self):
+    def _construct_ui(self):
         """
         Intitialize the UI with widgets for coefficient format and input and
         output quantization

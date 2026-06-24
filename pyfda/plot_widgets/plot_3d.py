@@ -69,7 +69,7 @@ class Plot_3D(QWidget):
         self.tool_tip = "3D magnitude response |H(z)|"
         self.tab_label = "3D"
 
-        self._construct_UI()
+        self._construct_ui()
 
 # ------------------------------------------------------------------------------
     def process_sig_rx(self, dict_sig=None):
@@ -91,7 +91,7 @@ class Plot_3D(QWidget):
                 self.data_changed = True
 
 # ------------------------------------------------------------------------------
-    def _construct_UI(self):
+    def _construct_ui(self):
         self.but_log = PushButton(self, "dB", objectName="but_log")
         self.but_log.setToolTip("Logarithmic scale")
 

@@ -55,7 +55,7 @@ class SelectFilter(QWidget):
 
         self.setObjectName(objectName)
         self.fc_last = ''  # previous filter class
-        self._construct_UI()
+        self._construct_ui()
         self._set_response_type()  # first time initialization
 
     # -------------------------------------------------------------------------
@@ -89,7 +89,7 @@ class SelectFilter(QWidget):
             self.load_dict()
 
     # -------------------------------------------------------------------------
-    def _construct_UI(self):
+    def _construct_ui(self):
         """
         Construct UI with comboboxes for selecting filter:
 

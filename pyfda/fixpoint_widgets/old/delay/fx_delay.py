@@ -40,12 +40,12 @@ class Delay_wdg(QWidget):
                  "simulation and HDL generation.")
         self.img_name = "delay.png"
 
-        self._construct_UI()
+        self._construct_ui()
         # Construct an instance of the HDL filter object
         self.construct_fixp_filter()
 #------------------------------------------------------------------------------
 
-    def _construct_UI(self):
+    def _construct_ui(self):
         """
         Intitialize the UI and instantiate hdl_filter class
         """

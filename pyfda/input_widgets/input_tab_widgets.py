@@ -39,7 +39,7 @@ class InputTabWidgets(QWidget):
     def __init__(self, parent=None, objectName='input_tab_widgets_inst'):
         super().__init__(parent)
         self.setObjectName(objectName)
-        self._construct_UI()
+        self._construct_ui()
 
     # -------------------------------------------------------------------------
     def emit(self, dict_sig):
@@ -50,7 +50,7 @@ class InputTabWidgets(QWidget):
         emit(self, dict_sig)
 
     # -------------------------------------------------------------------------
-    def _construct_UI(self):
+    def _construct_ui(self):
         """
         Initialize UI with tabbed subwidgets: Instantiate dynamically each widget
         from the dict `CFP.INPUT_CLASSES_DICT` and try to
@@ -121,7 +121,7 @@ class InputTabWidgets(QWidget):
         # ----------------------------------------------------------------------
         # GLOBAL SIGNALS & SLOTs
         # ----------------------------------------------------------------------
-        # self.sig_rx.connect(inst.sig_rx) # happens in _construct_UI()
+        # self.sig_rx.connect(inst.sig_rx) # happens in _construct_ui()
         # ----------------------------------------------------------------------
         # LOCAL SIGNALS & SLOTs
         # ----------------------------------------------------------------------

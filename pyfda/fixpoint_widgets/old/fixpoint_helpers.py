@@ -66,10 +66,10 @@ class UI_W(QWidget):
     def __init__(self, q_dict, **kwargs):
         super().__init__()
         self.q_dict = q_dict  # pass a dict with initial settings for construction
-        self._construct_UI(**kwargs)
+        self._construct_ui(**kwargs)
         self.ui2dict(s='init')  # initialize the class attributes
 
-    def _construct_UI(self, **kwargs):
+    def _construct_ui(self, **kwargs):
         """
         Construct widget from quantization dict, individual settings and
         the default dict below """
@@ -321,9 +321,9 @@ class UI_Q(QWidget):
         super().__init__()
 
         self.q_dict = q_dict
-        self._construct_UI(**kwargs)
+        self._construct_ui(**kwargs)
 
-    def _construct_UI(self, **kwargs):
+    def _construct_ui(self, **kwargs):
         """ Construct widget """
 
         # default widget settings:
@@ -506,9 +506,9 @@ class UI_WQ(QWidget):
         super().__init__()
 
         self.q_dict = q_dict
-        self._construct_UI(**kwargs)
+        self._construct_ui(**kwargs)
 
-    def _construct_UI(self, **kwargs):
+    def _construct_ui(self, **kwargs):
         """ Construct widget """
         cmb_q = ["Select the kind of quantization.",
                  ("round", "Round",

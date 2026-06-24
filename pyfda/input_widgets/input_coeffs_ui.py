@@ -66,7 +66,7 @@ class Input_Coeffs_UI(QWidget):
 
         self.load_save_clipboard = False  # load / save to clipboard or file
 
-        self._construct_UI()
+        self._construct_ui()
 
     # -------------------------------------------------------------------------
     def emit(self, dict_sig):
@@ -96,7 +96,7 @@ class Input_Coeffs_UI(QWidget):
             self.emit({'ui_global_changed': 'csv'})
 
     # ------------------------------------------------------------------------------
-    def _construct_UI(self) -> None:
+    def _construct_ui(self) -> None:
         """
         Intitialize the widget, consisting of:
         - top chkbox row

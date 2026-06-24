@@ -59,7 +59,7 @@ class FIR_DF_pyfixp_UI(QWidget):
             "and arbitrary coefficients.</span>")
             ]
 
-        self._construct_UI()
+        self._construct_ui()
         # Construct an instance of the fixpoint filter using the settings from
         # the 'fxq' quantizer dict
         self.fx_filt = FIR_DF_pyfixp(fb_get('fxq'))
@@ -74,7 +74,7 @@ class FIR_DF_pyfixp_UI(QWidget):
         emit(self, dict_sig)
 
     # --------------------------------------------------------------------------
-    def _construct_UI(self) -> None:
+    def _construct_ui(self) -> None:
         """
         Intitialize the UI with widgets for coefficient format and input and
         output quantization

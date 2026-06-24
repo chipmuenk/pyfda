@@ -58,7 +58,7 @@ class FIR_DF_amaranth_UI(QWidget):
             "and arbitrary coefficients.</span>")
             ]
 
-        self._construct_UI()
+        self._construct_ui()
 
         _cmp_ver = cmp_version("amaranth", "0.5")  # test for amaranth version > 0.5
         if _cmp_ver >= 0:
@@ -86,7 +86,7 @@ class FIR_DF_amaranth_UI(QWidget):
         emit(self, dict_sig)
 
     # --------------------------------------------------------------------------
-    def _construct_UI(self):
+    def _construct_ui(self):
         """
         Intitialize the UI with widgets for coefficient format and input and
         output quantization

@@ -38,7 +38,7 @@ class CSV_option_box(QDialog):
         self.cmb_orientation_default = "auto"
         self.cmb_header_default = "auto"
 
-        self._construct_UI()
+        self._construct_ui()
         qwindow_stay_on_top(self, True)
 
     # -------------------------------------------------------------------------
@@ -60,7 +60,7 @@ class CSV_option_box(QDialog):
         event.accept()
 
     # --------------------------------------------------------------------------
-    def _construct_UI(self):
+    def _construct_ui(self):
         """ initialize the User Interface """
         self.setWindowTitle("CSV Options")
 

@@ -81,7 +81,7 @@ class Input_Coeffs(QWidget):
         self.Q = [self.ui.wdg_wq_coeffs_b.Q,
                      self.ui.wdg_wq_coeffs_a.Q]
 
-        self._construct_UI()
+        self._construct_ui()
 
     # -------------------------------------------------------------------------
     def emit(self, dict_sig: dict) -> None:
@@ -132,7 +132,7 @@ class Input_Coeffs(QWidget):
                 self.fx_specs_changed = True
 
 # ------------------------------------------------------------------------------
-    def _construct_UI(self) -> None:
+    def _construct_ui(self) -> None:
         """
         Intitialize the widget, consisting of:
         - top chkbox row

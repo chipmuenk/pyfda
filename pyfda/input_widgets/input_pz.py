@@ -54,7 +54,7 @@ class Input_PZ(QWidget):
         self.tool_tip = "Display and edit filter poles and zeros."
 
         self.ui = Input_PZ_UI()  # create the UI control part
-        self._construct_UI()  # construct the rest of the UI
+        self._construct_ui()  # construct the rest of the UI
 
     # -------------------------------------------------------------------------
     def emit(self, dict_sig):
@@ -90,7 +90,7 @@ class Input_PZ(QWidget):
                 self.data_changed = True
 
     # ------------------------------------------------------------------------------
-    def _construct_UI(self) -> None:
+    def _construct_ui(self) -> None:
         """
         Construct the UI from the table widget and the control part (`self.ui`),
         initialize the widget and setup signal-slot connections and event filters

@@ -60,7 +60,7 @@ class Input_Info(QWidget):
             "<span>Display the achieved filter specifications"
             " and more info about the filter design algorithm.</span>")
 
-        self._construct_UI()
+        self._construct_ui()
         self.load_dict()
 
     # -------------------------------------------------------------------------
@@ -82,7 +82,7 @@ class Input_Info(QWidget):
             self.load_dict()
 
     # -------------------------------------------------------------------------
-    def _construct_UI(self):
+    def _construct_ui(self):
         """
         Intitialize the widget, consisting of:
         - Checkboxes for selecting the info to be displayed

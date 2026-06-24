@@ -56,7 +56,7 @@ class Plot_FFT_win(QDialog):
         String specifying the target application, 'fir' for windowed fir filter design,
         'spec' for general spectral analysis and 'stft' for short-time fourier transform
         windowing. The argument is passed to the constructor of `QFFTWinCmbBox()`
-        in `_construct_UI()`.
+        in `_construct_ui()`.
 
     sym : bool
         Passed to `calc_window()`:
@@ -140,7 +140,7 @@ class Plot_FFT_win(QDialog):
             objectName=self.objectName() + '_cmb')
         self.all_wins_dict = self.qfft_win_select.all_wins_dict
 
-        self._construct_UI()
+        self._construct_ui()
         self.calc_win_draw()
 
     # -------------------------------------------------------------------------
@@ -211,7 +211,7 @@ class Plot_FFT_win(QDialog):
             logger.error("Cannot process dict_sig: %s", dict_sig)
 
 # ------------------------------------------------------------------------------
-    def _construct_UI(self):
+    def _construct_ui(self):
         """
         Intitialize the widget, consisting of:
         - Matplotlib widget with NavigationToolbar

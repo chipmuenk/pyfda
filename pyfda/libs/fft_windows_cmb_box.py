@@ -5,6 +5,9 @@
 # Copyright © pyFDA Project Contributors
 # Licensed under the terms of the MIT License
 # (see file LICENSE in root directory for details)
+"""
+Widget for creating a combobox with all available FFT windows
+"""
 
 import copy
 import importlib
@@ -64,7 +67,7 @@ class QFFTWinCmbBox(QWidget):
 
         # self.win_fnct = None  # handle to window function
 
-        self._construct_UI()
+        self._construct_ui()
         self.set_window_name()  # initialize win_dict
         self.ui2win_dict()
 
@@ -97,7 +100,7 @@ class QFFTWinCmbBox(QWidget):
             self.dict2ui()
 
     # --------------------------------------------------------------------------
-    def _construct_UI(self) -> None:
+    def _construct_ui(self) -> None:
         """
         Create the FFT window selection widget, consisting of:
         - combobox for windows
@@ -291,7 +294,7 @@ class QFFTWinCmbBox(QWidget):
             else:
                 logger.error("%d parameters are not supported for windows at the moment!", n_par)
                 w = None
-        except Exception as e:
+        except (ValueError, TypeError) as e:
             logger.error('An error occurred calculating the window function "%s":\n%s',
                          fn_name, e)
             w = None

@@ -164,12 +164,12 @@ class PlotImpz_UI(QWidget):
             ("re_im", "Re. / Imag.", "<span>Real and imaginary part of spectrum.</span>")
         ]
 
-        self._construct_UI()
+        self._construct_ui()
 #        self._enable_stim_widgets()
         self.update_N(emit=False)  # also updates window function and win_dict
 #        self._update_noi()
 
-    def _construct_UI(self):
+    def _construct_ui(self):
         # ----------- ---------------------------------------------------
         # Run control widgets
         # ---------------------------------------------------------------

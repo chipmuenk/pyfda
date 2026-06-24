@@ -54,7 +54,7 @@ operations only when the widget is visible and store the need for a redraw in a 
             self.view_changed = True
             self.filt_changed = True
             self.sig_rx.connect(self.process_sig_rx)
-            # usually done in method ``_construct_UI()``
+            # usually done in method ``_construct_ui()``
 
         # -------------------------------------------------------------------------
         def emit(self, dict_sig, sig_name=""):

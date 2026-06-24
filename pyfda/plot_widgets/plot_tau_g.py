@@ -56,9 +56,9 @@ class Plot_tau_g(QWidget):
               "</span>")
              ]
 
-        self._construct_UI()
+        self._construct_ui()
 
-    def _construct_UI(self):
+    def _construct_ui(self):
         """
         Intitialize the widget, consisting of:
         - Matplotlib widget with NavigationToolbar

@@ -40,7 +40,7 @@ class WeightSpecs(QWidget):
 
         self.spec_edited = False  # flag whether QLineEdit field has been edited
 
-        self._construct_UI()
+        self._construct_ui()
 
     # -------------------------------------------------------------------------
     def emit(self, dict_sig: dict) -> None:
@@ -65,7 +65,7 @@ class WeightSpecs(QWidget):
                 self.load_dict()
 
     # ------------------------------------------------------------------------------
-    def _construct_UI(self) -> None:
+    def _construct_ui(self) -> None:
         """
         Construct User Interface
         """

@@ -45,7 +45,7 @@ class FreqSpecs(QWidget):
         self.spec_edited = False  # flag whether QLineEdit field has been edited
         self.setObjectName(objectName)
 
-        self._construct_UI()
+        self._construct_ui()
 
     # -------------------------------------------------------------------------
     def emit(self, dict_sig: dict, sig_name: str = "") -> None:
@@ -70,7 +70,7 @@ class FreqSpecs(QWidget):
             self.recalc_freqs()
 
     # -------------------------------------------------------------
-    def _construct_UI(self) -> None:
+    def _construct_ui(self) -> None:
         """
         Construct the User Interface
         """

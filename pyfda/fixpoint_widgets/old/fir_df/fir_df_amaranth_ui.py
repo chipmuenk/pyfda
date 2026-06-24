@@ -51,7 +51,7 @@ class FIR_DF_amaranth_UI(QWidget):
         self.description = "Standard FIR topology, suitable for most use cases."
         self.img_name = "fir_df.png"
 
-        self._construct_UI()
+        self._construct_ui()
         # Construct an instance of the fixpoint filter using the settings from
         # the 'fxq' quantizer dict
 
@@ -64,7 +64,7 @@ class FIR_DF_amaranth_UI(QWidget):
         emit(self, dict_sig, sig_name)
 
     # --------------------------------------------------------------------------
-    def _construct_UI(self):
+    def _construct_ui(self):
         """
         Intitialize the UI with widgets for coefficient format and input and
         output quantization

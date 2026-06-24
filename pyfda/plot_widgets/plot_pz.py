@@ -64,7 +64,7 @@ class Plot_PZ(QWidget):
         self.zmax = 2
         self.zmin_dB = -80
         self.zmax_dB = np.round(20 * np.log10(self.zmax), 2)
-        self._construct_UI()
+        self._construct_ui()
 
 # ------------------------------------------------------------------------------
     def process_sig_rx(self, dict_sig: dict = None) -> None:
@@ -98,7 +98,7 @@ class Plot_PZ(QWidget):
                 self.needs_draw = True
 
 # ------------------------------------------------------------------------------
-    def _construct_UI(self):
+    def _construct_ui(self):
         """
         Intitialize the widget, consisting of:
         - Matplotlib widget with NavigationToolbar
