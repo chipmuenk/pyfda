@@ -68,48 +68,49 @@ class PlotTabWidgets(QWidget):
            In order to prevent infinite loops, every widget needs to block in-
            coming signals with its own name!
         """
-        tabWidget = QTabWidget(self)
-        # tabWidget.setObjectName("plot_tabs")
+        tab_widget = QTabWidget(self)
+        # tab_widget.setObjectName("plot_tabs")
 
         n_wdg = 0  # number and ...
         inst_wdg_str = ""  # ... full names of successfully instantiated plot widgets
         #
-        for plot_class in CFP.PLOT_CLASSES_DICT:
+        for plot_class_name, plot_wdg_dict in CFP.PLOT_CLASSES_DICT.items():
             try:
-                mod_fq_name = CFP.PLOT_CLASSES_DICT[plot_class]['mod']  # FQN
+                mod_fq_name = plot_wdg_dict['mod']  # FQN
                 mod = importlib.import_module(mod_fq_name)  # import plot widget module
-                wdg_class = getattr(mod, plot_class)  # get plot widget class ...
+                wdg_class = getattr(mod, plot_class_name)  # get plot widget class ...
                 # and instantiate it
                 inst = wdg_class()
             except ImportError as e:
                 logger.warning(
-                    'Class "%s" could not be imported from %s:\n%s.', plot_class, mod_fq_name, e)
+                    'Class "%s" could not be imported from %s:\n%s.',
+                    plot_class_name, mod_fq_name, e)
                 continue  # unsuccessful, try next widget
 
             if hasattr(inst, 'tab_label'):
-                tabWidget.addTab(inst, inst.tab_label)
+                tab_widget.addTab(inst, inst.tab_label)
             else:
-                tabWidget.addTab(inst, "not set")
+                tab_widget.addTab(inst, "not set")
             if hasattr(inst, 'tool_tip'):
-                tabWidget.setTabToolTip(n_wdg, inst.tool_tip)
+                tab_widget.setTabToolTip(n_wdg, inst.tool_tip)
             if hasattr(inst, 'sig_tx'):
                 inst.sig_tx.connect(self.sig_tx)
             if hasattr(inst, 'sig_rx'):
                 self.sig_rx.connect(inst.sig_rx)
 
             n_wdg += 1  # successfully instantiated one more widget
-            inst_wdg_str += '\t' + mod_fq_name + "." + plot_class + '\n'
+            inst_wdg_str += '\t' + mod_fq_name + "." + plot_class_name + '\n'
 
         if len(inst_wdg_str) == 0:
             logger.warning("No plotting widgets found!")
         else:
             logger.debug("Imported %d plotting classes:\n%s", n_wdg, inst_wdg_str)
         # ----------------------------------------------------------------------
-        layVMain = QVBoxLayout()
-        layVMain.addWidget(tabWidget)
-        layVMain.setContentsMargins(*params['wdg_margins'])  # (left, top, right, bottom)
+        lay_v_main = QVBoxLayout()
+        lay_v_main.addWidget(tab_widget)
+        lay_v_main.setContentsMargins(*params['wdg_margins'])  # (left, top, right, bottom)
 
-        self.setLayout(layVMain)
+        self.setLayout(lay_v_main)
 
         # ----------------------------------------------------------------------
         # GLOBAL SIGNALS & SLOTs
@@ -127,49 +128,47 @@ class PlotTabWidgets(QWidget):
         # self.sig_rx.connect(self.log_rx) # enable for debugging
 
         # When user has selected a different tab, trigger a redraw of current tab
-        tabWidget.currentChanged.connect(self.current_tab_changed)
+        tab_widget.currentChanged.connect(self.current_tab_changed)
         # The following does not work: maybe current scope must be left?
-        # tabWidget.currentChanged.connect(tabWidget.currentWidget().redraw)
+        # tab_widget.currentChanged.connect(tab_widget.currentWidget().redraw)
 
-        tabWidget.installEventFilter(self)
+        tab_widget.installEventFilter(self)
 
-        """
-        https://stackoverflow.com/questions/29128936/qtabwidget-size-depending-on-current-tab
+        # https://stackoverflow.com/questions/29128936/qtabwidget-size-depending-on-current-tab
 
-        The QTabWidget won't select the biggest widget's height as its own height
-        unless you use layout on the QTabWidget. Therefore, if you want to change
-        the size of QTabWidget manually, remove the layout and call QTabWidget::resize
-        according to the currentChanged signal.
+        # The QTabWidget won't select the biggest widget's height as its own height
+        # unless you use layout on the QTabWidget. Therefore, if you want to change
+        # the size of QTabWidget manually, remove the layout and call QTabWidget::resize
+        # according to the currentChanged signal.
 
-        You can set the size policy of the widget that is displayed to
-        QSizePolicy::Preferred
-        and the other ones to
-        QSizePolicy::Ignored. After that call adjustSize to update the sizes.
+        # You can set the size policy of the widget that is displayed to
+        # QSizePolicy::Preferred
+        # and the other ones to
+        # QSizePolicy::Ignored. After that call adjustSize to update the sizes.
 
-        void MainWindow::updateSizes(int index)
-        {
-        for(int i=0;i<ui->tabWidget->count();i++)
-            if(i!=index)
-                ui->tabWidget->widget(i)->setSizePolicy(
-                                            QSizePolicy::Ignored, QSizePolicy::Ignored);
+        # void MainWindow::updateSizes(int index)
+        # {
+        # for(int i=0;i<ui->tab_widget->count();i++)
+        #     if(i!=index)
+        #         ui->tab_widget->widget(i)->setSizePolicy(
+        #                                     QSizePolicy::Ignored, QSizePolicy::Ignored);
 
-        ui->tabWidget->widget(index)->setSizePolicy(
-                                        QSizePolicy::Preferred, QSizePolicy::Preferred);
-        ui->tabWidget->widget(index)->resize(
-                                        ui->tabWidget->widget(index)->minimumSizeHint());
-        ui->tabWidget->widget(index)->adjustSize();
-        resize(minimumSizeHint());
-        adjustSize();
-        }
+        # ui->tab_widget->widget(index)->setSizePolicy(
+        #                                 QSizePolicy::Preferred, QSizePolicy::Preferred);
+        # ui->tab_widget->widget(index)->resize(
+        #                                 ui->tab_widget->widget(index)->minimumSizeHint());
+        # ui->tab_widget->widget(index)->adjustSize();
+        # resize(minimumSizeHint());
+        # adjustSize();
+        # }
 
-        adjustSize(): The last two lines resize the main window itself. You might want
-        to avoid it, depending on your application.
-        For example, if you set the rest of the widgets to expand into the space just
-        made available, it's not so nice if the window resizes itself instead.
-        """
+        # adjustSize(): The last two lines resize the main window itself. You might want
+        # to avoid it, depending on your application.
+        # For example, if you set the rest of the widgets to expand into the space just
+        # made available, it's not so nice if the window resizes itself instead.
 
-# ------------------------------------------------------------------------------
-    def log_rx(self, dict_sig: dict | None = None):
+    # ------------------------------------------------------------------------------
+    def log_rx(self, dict_sig: dict | None = None) -> None:
         """
         Enable `self.sig_rx.connect(self.log_rx)` above for debugging.
         """
@@ -178,15 +177,23 @@ class PlotTabWidgets(QWidget):
         else:
             logger.warning("empty dict")
 
-# ------------------------------------------------------------------------------
+    # ------------------------------------------------------------------------------
     def current_tab_changed(self) -> None:
+        """
+        Emit the signal 'ui_global_changed':'tab' to notify other widgets that the
+        current tab position has changed
+        """
         self.emit({'ui_global_changed': 'tab'})
 
-# ------------------------------------------------------------------------------
+    # ------------------------------------------------------------------------------
     def current_tab_redraw(self) -> None:
+        """
+        Emit the signal 'ui_global_changed':'resized' to notify other widgets that the
+        current widget size has changed
+        """
         self.emit({'ui_global_changed': 'resized'})
 
-# ------------------------------------------------------------------------------
+    # ------------------------------------------------------------------------------
     def eventFilter(self, source: QtCore.QObject, event: QEvent) -> bool:
         """
         Filter all events generated by the QTabWidget. Source and type of all
