@@ -5,21 +5,17 @@
 # Copyright © pyFDA Project Contributors
 # Licensed under the terms of the MIT License
 # (see file LICENSE in root directory for details)
-
+"""
+Library file for FFT windows applications, containing a reference dictionary, defining parameters,
+docstrings etc. Additional window functions blackmanharris() (higher order) and calc_cosine_window
+are defined.
+"""
 import numpy as np
 import scipy.signal as sig
-# import scipy
 
-# import logging
-# logger = logging.getLogger(__name__)
-
-"""
-Reference dictionary with available FFT windows, their function names and
-their properties.
-
-When the function name `fn_name` is just a string, it is taken from
-`scipy.signal.windows`, otherwise it has to be fully qualified name.
-"""
+# Reference dictionary with available FFT windows, their function names and their properties.
+# When the function name `fn_name` is just a string, it is taken from `scipy.signal.windows`,
+# otherwise it has to be fully qualified name.
 bartlett_info =\
     '''<span>
     The Bartlett and triangular windows are similar, except that the end
@@ -418,18 +414,22 @@ all_wins_dict_ref = {
 
 # -------------------------------------------------------------------------------------
 def blackmanharris(N: int, L: str, sym: bool) -> np.ndarray:
+    """
+    Define Blackmanharris window for orders 5, 7 and 9. Order 4 is covered by the function
+    with the same name from scipy.signal
+    """
     if L == '4':
         return sig.windows.blackmanharris(N, sym)
 
     if L == '5':
-        """ 5 Term Cosine, 125.427 dB, NBW 2.21535 bins, 9.81016 dB gain """
+        # 5 Term Cosine, 125.427 dB, NBW 2.21535 bins, 9.81016 dB gain
         a = [3.232153788877343e-001,
              -4.714921439576260e-001,
              1.755341299601972e-001,
              -2.849699010614994e-002,
              1.261357088292677e-003]
     elif L == '7':
-        """ 7 Term Cosine, 180.468 dB, NBW 2.63025 bins, 11.33355 dB gain"""
+        # 7 Term Cosine, 180.468 dB, NBW 2.63025 bins, 11.33355 dB gain
         a = [2.712203605850388e-001,
              -4.334446123274422e-001,
              2.180041228929303e-001,
@@ -438,7 +438,7 @@ def blackmanharris(N: int, L: str, sym: bool) -> np.ndarray:
              -7.700127105808265e-004,
              1.368088305992921e-005]
     elif L == '9':
-        """ 9 Term Cosine, 234.734 dB, NBW 2.98588 bins, 12.45267 dB gain"""
+        # 9 Term Cosine, 234.734 dB, NBW 2.98588 bins, 12.45267 dB gain
         a = [2.384331152777942e-001,
              -4.005545348643820e-001,
              2.358242530472107e-001,
@@ -449,8 +449,8 @@ def blackmanharris(N: int, L: str, sym: bool) -> np.ndarray:
              -1.384355593917030e-005,
              1.161808358932861e-007]
     else:
-        raise Exception(
-            f"Undefined parameter '{L}' for order L!"
+        raise ValueError(
+            f"Only orders L = 4, 5, 7 and 9 are defined for Blackmanharris window, not L = '{L}'"
             )
 
     return calc_cosine_window(N, sym, a)
@@ -508,17 +508,14 @@ def calc_cosine_window(N: int, sym: bool, a: list) -> np.ndarray:
 #     return w
 
 # -------------------------------------------------------------------------------------
-class UserWindows(object):
-    def __init__(self, parent):
-        super().__init__(parent)
-
-# =======
 # see also:
-# https://www.electronicdesign.com/technologies/analog/article/21798689/choose-the-right-fft-window-function-when-evaluating-precision-adcs
+# https://www.electronicdesign.com/technologies/analog/article/21798689/
+#     choose-the-right-fft-window-function-when-evaluating-precision-adcs
 # https://github.com/capitanov/blackman_harris_win
 # https://en.m.wikipedia.org/wiki/Window_function
 # https://www.dsprelated.com/freebooks/sasp/Blackman_Harris_Window_Family.html
-# https://www.mathworks.com/matlabcentral/mlc-downloads/downloads/submissions/46092/versions/3/previews/coswin.m/index.html
+# https://www.mathworks.com/matlabcentral/mlc-downloads/downloads/submissions/46092/
+#     versions/3/previews/coswin.m/index.html
 
 # Refs:
 #   "A Family of Cosine-Sum Windows for High-Resolution Measurements"
@@ -538,4 +535,3 @@ class UserWindows(object):
 # including a comprehensive list of window functions and some new flat-top windows",
 # February 15, 2002
 # https://holometer.fnal.gov/GH_FFT.pdf
-
