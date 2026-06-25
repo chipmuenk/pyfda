@@ -6,14 +6,21 @@
 # Licensed under the terms of the MIT License
 # (see file LICENSE in root directory for details)
 
+from __future__ import annotations
+
 """
 Widget for displaying and modifying filter Poles and Zeros
 """
+from typing import Any
+
 from pyfda.libs.compat import (
     QtCore, QLineEdit, QBrush, QColor, QSize, QStyledItemDelegate, Qt)
 from pyfda.libs.pyfda_qt_lib import qstyle_widget
 from pyfda.libs.pyfda_lib import frmt2cmplx
 from pyfda.pyfda_rc import params
+
+from PyQt5.QtCore import QModelIndex, QLocale
+from PyQt5.QtWidgets import QStyleOptionViewItem, QWidget
 
 class ItemDelegatePZ(QStyledItemDelegate):
     """
@@ -25,7 +32,7 @@ class ItemDelegatePZ(QStyledItemDelegate):
     - `setEditorData()` pass data with full precision and in selected format to editor
     - `setModelData()` pass edited data back to model (`self.zpk`)
     """
-    def __init__(self, parent):
+    def __init__(self, parent: Any) -> None:
         """
         Pass instance `parent` of parent class (Input_PZ)
         """
@@ -33,7 +40,7 @@ class ItemDelegatePZ(QStyledItemDelegate):
         self.parent = parent  # instance of the parent (not the base) class
 
     # --------------------------------------------------------------------------
-    def initStyleOption(self, option, index):
+    def initStyleOption(self, option: QStyleOptionViewItem, index: QModelIndex) -> None:
         """
         Initialize `option` with the values using the `index` index. All items are
         passed to the original `initStyleOption()` which then calls `displayText()`.
@@ -52,14 +59,14 @@ class ItemDelegatePZ(QStyledItemDelegate):
                 option.backgroundBrush.setColor(QColor(100, 0, 0, 80))
 
     # --------------------------------------------------------------------------
-    def text(self, item) -> str:
+    def text(self, item: Any) -> str:
         """
         Return item text as string transformed by self.displayText()
         """
         return self.displayText(item.text(), QtCore.QLocale())
 
     # --------------------------------------------------------------------------
-    def displayText(self, text: str, locale) -> str:
+    def displayText(self, text: str, locale: QLocale) -> str:
         """
         Display `text` with selected format (cartesian / polar)
         and number of places
@@ -70,7 +77,7 @@ class ItemDelegatePZ(QStyledItemDelegate):
         return self.parent.cmplx2frmt(text, places=params['FMT_pz'])
 
     # --------------------------------------------------------------------------
-    def createEditor(self, parent, options, index):
+    def createEditor(self, parent: QWidget, options: QStyleOptionViewItem, index: QModelIndex) -> QWidget:
         """
         Neet to set editor explicitly, otherwise QDoubleSpinBox instance is
         created when space is not sufficient?!
@@ -86,7 +93,7 @@ class ItemDelegatePZ(QStyledItemDelegate):
         return line_edit
 
     # --------------------------------------------------------------------------
-    def setEditorData(self, editor, index):
+    def setEditorData(self, editor: QLineEdit, index: QModelIndex) -> None:
         """
         Pass the data to be edited to the editor:
         - retrieve data with full accuracy (`places=-1`) from `zpk` (in float format)
@@ -100,7 +107,7 @@ class ItemDelegatePZ(QStyledItemDelegate):
         editor.setText(data_str)
 
     # --------------------------------------------------------------------------
-    def setModelData(self, editor, model, index):
+    def setModelData(self, editor: QLineEdit, model: Any, index: QModelIndex) -> None:
         """
         When editor has finished, read the updated data from the editor,
         convert it to complex format and store it in both the model

@@ -33,12 +33,19 @@ in the selected format (int, hex, ...). The quantizer is created in the
 `Input_Coeffs` class and passed to this class via the `parent` parameter as
 `self.Q = [self.parent.ui.wdg_wq_coeffs_b.Q, self.parent.ui.wdg_wq_coeffs_a.Q]`
 """
+from __future__ import annotations
+
+from typing import Any
+
 from pyfda.filterbroker import fb_get, get_fx
 
 from pyfda.libs.compat import Qt, QtCore, QLineEdit, QSize, QStyledItemDelegate, QColor, QBrush
 from pyfda.libs.pyfda_lib import safe_eval
 from pyfda.libs.pyfda_qt_lib import qstyle_widget
 from pyfda.pyfda_rc import params
+
+from PyQt5.QtCore import QModelIndex, QLocale
+from PyQt5.QtWidgets import QStyleOptionViewItem, QWidget
 
 # TODO: Fixpoint coefficients do not properly convert complex -> float when saving
 #       the filter?
@@ -52,11 +59,8 @@ class ItemDelegateCoeffs(QStyledItemDelegate):
     QTableWidget.
 
     - `displayText()` displays the data stored in the table in various number formats
-
     - `createEditor()` creates a line edit instance for editing table entries
-
     - `setEditorData()` pass data with full precision and in selected format to editor
-
     - `setModelData()` pass edited data back to model (`self.ba`)
 
     Editing the table triggers `setModelData()` but does not emit a signal outside
@@ -65,7 +69,7 @@ class ItemDelegateCoeffs(QStyledItemDelegate):
     class `Input_Coeffs`. Additionally, a signal is emitted with `'fx_sim': 'specs_changed'`
     """
 
-    def __init__(self, parent):
+    def __init__(self, parent: Any) -> None:
         """
         Pass instance `parent` of parent class (Input_Coeffs)
         """
@@ -107,7 +111,7 @@ class ItemDelegateCoeffs(QStyledItemDelegate):
 #
 # ==============================================================================
 
-    def initStyleOption(self, option, index):
+    def initStyleOption(self, option: QStyleOptionViewItem, index: QModelIndex) -> None:
         """
         Initialize `option` with the values using the `index` index. When the
         item (0,1) is processed, it is styled especially. All other items are
@@ -129,7 +133,7 @@ class ItemDelegateCoeffs(QStyledItemDelegate):
             super().initStyleOption(option, index)
 
     # -------------------------------------------------------------------------
-    def text(self, item) -> str:
+    def text(self, item: Any) -> str:
         """
         Return item text as string transformed by self.displayText()
 
@@ -139,7 +143,7 @@ class ItemDelegateCoeffs(QStyledItemDelegate):
         return str(self.displayText(item.text(), QtCore.QLocale()))
 
     # -------------------------------------------------------------------------
-    def displayText(self, text, locale) -> str:
+    def displayText(self, text: Any, locale: QLocale) -> str:
         """
         Display `text` with selected fixpoint base and number of places
 
@@ -166,7 +170,7 @@ class ItemDelegateCoeffs(QStyledItemDelegate):
 # http://stackoverflow.com/questions/30615090/pyqt-using-qtextedit-as-editor-in-a-qstyleditemdelegate
 
     # -------------------------------------------------------------------------
-    def createEditor(self, parent, options, index):
+    def createEditor(self, parent: QWidget, options: QStyleOptionViewItem, index: QModelIndex) -> QWidget:
         """
         Neet to set editor explicitly, otherwise QDoubleSpinBox instance is
         created when space is not sufficient?!
@@ -182,7 +186,7 @@ class ItemDelegateCoeffs(QStyledItemDelegate):
         return line_edit
 
     # -------------------------------------------------------------------------
-    def setEditorData(self, editor, index):
+    def setEditorData(self, editor: QLineEdit, index: QModelIndex) -> None:
         """
         Pass the data to be edited to the editor:
         - retrieve data with full accuracy from self.ba (in float format)
@@ -199,14 +203,13 @@ class ItemDelegateCoeffs(QStyledItemDelegate):
             # fixpoint format with base:
             # pass requantized data with required number of decimal places
             editor.setText(
-                "{0:>{1}}".format(self.Q[index.column()].float2frmt(data),
-                                  self.Q[index.column()].places))
+                f"{self.Q[index.column()].float2frmt(data):>{self.Q[index.column()].places}}")
         else:
             # floating point format: pass data with full resolution
             editor.setText(str(data))
 
     # -------------------------------------------------------------------------
-    def setModelData(self, editor, model, index) -> None:
+    def setModelData(self, editor: QLineEdit, model: Any, index: QModelIndex) -> None:
         """
         When editing has finished, read the updated data from the editor (= QTableWidget),
         and store it in `self.ba` as float / complex for `get_fx() == False`.
