@@ -36,13 +36,13 @@ class InputTabWidgets(QWidget):
     # outgoing, connected in receiver (pyfdax -> plot_tab_widgets)
     sig_tx = pyqtSignal(object)
 
-    def __init__(self, parent=None, objectName='input_tab_widgets_inst'):
+    def __init__(self, parent=None, objectName: str = 'input_tab_widgets_inst') -> None:
         super().__init__(parent)
         self.setObjectName(objectName)
         self._construct_ui()
 
     # -------------------------------------------------------------------------
-    def emit(self, dict_sig):
+    def emit(self, dict_sig: dict) -> None:
         """
         Access imported function `emit()` as instance method, passing `self`
         with its attributes
@@ -50,7 +50,7 @@ class InputTabWidgets(QWidget):
         emit(self, dict_sig)
 
     # -------------------------------------------------------------------------
-    def _construct_ui(self):
+    def _construct_ui(self) -> None:
         """
         Initialize UI with tabbed subwidgets: Instantiate dynamically each widget
         from the dict `CFP.INPUT_CLASSES_DICT` and try to
@@ -78,17 +78,18 @@ class InputTabWidgets(QWidget):
         n_wdg = 0  # number and ...
         inst_wdg_str = ""  # ... full names of successfully instantiated widgets
 
-        for input_class in CFP.INPUT_CLASSES_DICT:
+        for input_class_name, input_wdg_dict in CFP.INPUT_CLASSES_DICT.items():
             try:
                 # fully qualified module name:
-                mod_fq_name = CFP.INPUT_CLASSES_DICT[input_class]['mod']
+                mod_fq_name = input_wdg_dict['mod']
                 mod = importlib.import_module(mod_fq_name)
-                wdg_class = getattr(mod, input_class)
+                wdg_class = getattr(mod, input_class_name)
                 # and instantiate it
                 inst = wdg_class(self)
             except ImportError as e:
                 logger.warning(
-                    'Class "%s" could not be imported from %s:\n%s.', input_class, mod_fq_name, e)
+                    'Class "%s" could not be imported from %s:\n%s.',
+                    input_class_name, mod_fq_name, e)
                 continue  # unsuccessful, try next widget
 
             if hasattr(inst, "state") and inst.state == "deactivated":
@@ -107,7 +108,7 @@ class InputTabWidgets(QWidget):
                 self.sig_rx.connect(inst.sig_rx)
 
             n_wdg += 1  # successfully instantiated one more widget
-            inst_wdg_str += '\t' + mod_fq_name + "." + input_class + '\n'
+            inst_wdg_str += '\t' + mod_fq_name + "." + input_class_name + '\n'
 
         if len(inst_wdg_str) == 0:
             logger.critical("No input widgets found!")
@@ -115,8 +116,6 @@ class InputTabWidgets(QWidget):
         else:
             logger.debug("Imported %d input classes:\n%s", n_wdg, inst_wdg_str)
 
-        #
-        # TODO: document signal options
 
         # ----------------------------------------------------------------------
         # GLOBAL SIGNALS & SLOTs
@@ -129,8 +128,7 @@ class InputTabWidgets(QWidget):
         self.sig_tx.connect(self.sig_rx)
         # self.sig_rx.connect(self.log_rx) # enable for debugging
         # When user has selected a different tab, trigger a redraw of current tab
-        tab_widget.currentChanged.connect(lambda: self.emit({'ui_global_changed': 'tab'})
-)
+        tab_widget.currentChanged.connect(lambda: self.emit({'ui_global_changed': 'tab'}))
         # The following does not work: maybe current scope must be left?
         # tab_widget.currentChanged.connect(tab_widget.currentWidget().redraw)
 
@@ -152,7 +150,7 @@ class InputTabWidgets(QWidget):
         self.setLayout(lay_v_main)  # set the main layout of the window
 
     # ------------------------------------------------------------------------------
-    def log_rx(self, dict_sig=None):
+    def log_rx(self, dict_sig: dict = None) -> None:
         """
         Enable `self.sig_rx.connect(self.log_rx)` above for debugging.
         """
