@@ -36,7 +36,7 @@ from pyfda.pyfda_rc import params
 
 # when deltasigma module is present, add a corresponding entry to the combobox
 try:
-    import deltasigma  # noqa: F401
+    import deltasigma  # noqa: F401  # pylint: disable=unused-import
     HAS_DS = True
 except ImportError:
     HAS_DS = False
