@@ -32,8 +32,8 @@ class PlotTabWidgets(QWidget):
     # outgoing: emitted by process_sig_rx
     sig_tx = pyqtSignal(object)
 
-    def __init__(self, parent=None, objectName: str = "plot_tab_widgets_inst") -> None:
-        super().__init__(parent)
+    def __init__(self, objectName: str = "plot_tab_widgets_inst") -> None:
+        super().__init__()
         self.setObjectName(objectName)
         self._construct_ui()
 

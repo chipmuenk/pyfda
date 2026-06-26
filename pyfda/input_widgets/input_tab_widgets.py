@@ -36,8 +36,9 @@ class InputTabWidgets(QWidget):
     # outgoing, connected in receiver (pyfdax -> plot_tab_widgets)
     sig_tx = pyqtSignal(object)
 
-    def __init__(self, parent=None, objectName: str = 'input_tab_widgets_inst') -> None:
-        super().__init__(parent)
+    def __init__(self, wdg_classes_dict: dict,
+                 objectName: str = 'input_tab_widgets_inst') -> None:
+        super().__init__()
         self.setObjectName(objectName)
         self._construct_ui()
 
