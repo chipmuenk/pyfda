@@ -50,8 +50,8 @@ class SelectFilter(QWidget):
     sig_rx = pyqtSignal(object)  # incoming -> process_sig_rx
     sig_tx = pyqtSignal(object)  # outgoing
 
-    def __init__(self, parent=None, objectName="select_filter_inst"):
-        super().__init__(parent)
+    def __init__(self, objectName="select_filter_inst"):
+        super().__init__()
 
         self.setObjectName(objectName)
         self.fc_last = ''  # previous filter class

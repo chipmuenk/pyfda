@@ -33,9 +33,6 @@ class Input_PZ_UI(QWidget):
     sig_tx = pyqtSignal(object)  # outgoing
 
     def __init__(self):
-        """
-        Pass instance `parent` of parent class Input_PZ()
-        """
         super().__init__()
         self.eps = 1.e-4  # tolerance value for e.g. setting P/Z to zero
 

@@ -31,8 +31,8 @@ class WeightSpecs(QWidget):
     sig_rx = pyqtSignal(object)  # receive signals from higher hierarchies
     sig_tx = pyqtSignal(object)  # outgoing signals
 
-    def __init__(self, parent=None, objectName: str = "") -> None:
-        super().__init__(parent)
+    def __init__(self, objectName: str = "") -> None:
+        super().__init__()
 
         self.setObjectName(objectName)
         self.qlabels = []  # list with references to QLabel widgets

@@ -34,9 +34,9 @@ class FreqSpecs(QWidget):
     sig_tx = pyqtSignal(object)  # outgoing
     sig_rx = pyqtSignal(object)  # incoming
 
-    def __init__(self, parent=None, title: str = "Frequency Specs", objectName: str = "") -> None:
+    def __init__(self, title: str = "Frequency Specs", objectName: str = "") -> None:
 
-        super().__init__(parent)
+        super().__init__()
         self.title = title
 
         self.qlabels = []    # list with references to QLabel widgets

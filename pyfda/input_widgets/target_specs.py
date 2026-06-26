@@ -35,8 +35,8 @@ class TargetSpecs(QWidget):
     sig_tx = pyqtSignal(object)  # outgoing
     sig_tx_local = pyqtSignal(object)  # outgoing to lower hierarchies
 
-    def __init__(self, parent=None, title: str = "Target Specs", objectName: str = "") -> None:
-        super().__init__(parent)
+    def __init__(self, title: str = "Target Specs", objectName: str = "") -> None:
+        super().__init__()
 
         self.title = title
         self.setObjectName(objectName)
@@ -74,10 +74,10 @@ class TargetSpecs(QWidget):
         Construct user interface
         """
         # subwidget for Frequency Specs
-        self.f_specs = freq_specs.FreqSpecs(self, title="Frequency",
+        self.f_specs = freq_specs.FreqSpecs(title="Frequency",
                                             objectName="freq_specs_targ")
         # subwidget for Amplitude Specs
-        self.a_specs = amplitude_specs.AmplitudeSpecs(self, title="Ripple",
+        self.a_specs = amplitude_specs.AmplitudeSpecs(title="Ripple",
                                                       objectName="amplitude_specs_targ")
         self.a_specs.setVisible(True)
         ###########

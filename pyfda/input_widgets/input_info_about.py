@@ -31,8 +31,8 @@ class AboutWindow(QDialog):
     Create a pop-up widget for the About Window.
     """
 
-    def __init__(self, parent=None):
-        super().__init__(parent)
+    def __init__(self):
+        super().__init__()
         self.setWindowTitle("About pyFDA")
         self.collect_info()
         self._construct_ui()

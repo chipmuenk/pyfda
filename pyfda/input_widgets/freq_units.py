@@ -47,9 +47,9 @@ class FreqUnits(QWidget):
     # outgoing: from various and when normalized frequencies have been changed
     sig_tx = pyqtSignal(object)  # outgoing
 
-    def __init__(self, parent=None, title: str = "Frequency Units", objectName: str = ""):
+    def __init__(self, title: str = "Frequency Units", objectName: str = ""):
 
-        super().__init__(parent)
+        super().__init__()
         self.title = title
         self.setObjectName(objectName)
         self.spec_edited = False  # flag whether QLineEdit field has been edited

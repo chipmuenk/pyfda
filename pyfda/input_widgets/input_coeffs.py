@@ -65,7 +65,7 @@ class Input_Coeffs(QWidget):
     sig_rx = pyqtSignal(object)  # incoming from input_tab_widgets
 
     # -------------------------------------------------------------------------
-    def __init__(self, parent=None):
+    def __init__(self):
         super().__init__()
 
         self.opt_widget = None  # handle for pop-up options widget

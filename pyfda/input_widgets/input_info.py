@@ -52,7 +52,7 @@ class Input_Info(QWidget):
     sig_rx = pyqtSignal(object)  # incoming signals from input_tab_widgets
     sig_tx = pyqtSignal(object)
 
-    def __init__(self, parent=None):
+    def __init__(self):
         super().__init__()
 
         self.tab_label = 'Info'
