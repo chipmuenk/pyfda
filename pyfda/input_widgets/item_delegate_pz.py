@@ -77,7 +77,8 @@ class ItemDelegatePZ(QStyledItemDelegate):
         return self.parent.cmplx2frmt(text, places=params['FMT_pz'])
 
     # --------------------------------------------------------------------------
-    def createEditor(self, parent: QWidget, options: QStyleOptionViewItem, index: QModelIndex) -> QWidget:
+    def createEditor(self, parent: QWidget, options: QStyleOptionViewItem,
+                     index: QModelIndex) -> QWidget:
         """
         Neet to set editor explicitly, otherwise QDoubleSpinBox instance is
         created when space is not sufficient?!

@@ -170,7 +170,8 @@ class ItemDelegateCoeffs(QStyledItemDelegate):
 # http://stackoverflow.com/questions/30615090/pyqt-using-qtextedit-as-editor-in-a-qstyleditemdelegate
 
     # -------------------------------------------------------------------------
-    def createEditor(self, parent: QWidget, options: QStyleOptionViewItem, index: QModelIndex) -> QWidget:
+    def createEditor(self, parent: QWidget, options: QStyleOptionViewItem,
+                     index: QModelIndex) -> QWidget:
         """
         Neet to set editor explicitly, otherwise QDoubleSpinBox instance is
         created when space is not sufficient?!
