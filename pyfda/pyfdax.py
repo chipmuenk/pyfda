@@ -151,8 +151,8 @@ def main():
     rc.mpl_rc['font.size'] = fontsize
     rc.params['screen'] = {'ref_dpi': ref_dpi, 'scaling': scaling,
                            'height': height, 'width': width}
-    # initialize the Tree_Builder class:
-    # read config file and construct the dict `fil_tree` from it
+    # initialize / construct Tree_Builder class attribute `fil_tree`
+    # from config file
     Tree_Builder().build_fil_tree()
 
     mainw = pyFDA()

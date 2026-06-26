@@ -886,9 +886,8 @@ if __name__ == '__main__':
     app.setStyleSheet(rc.QSS_RC)
     # change initial settings to FIR
     # fb.fil[0].update({'ft': 'FIR', 'fc': 'Equiripple'})
-    # _ = Tree_Builder()  # TODO_ couldn't this be a function?
     fb.fil[0].update({'ft': 'IIR', 'fc': 'Ellip'})
-    _ = Tree_Builder()  # TODO_ couldn't this be a function?
+    Tree_Builder().build_fil_tree()  # initialize Tree_Builder class attribute `fil_tree`
     mainw = Input_Fixpoint_Specs()
     app.setActiveWindow(mainw)
     mainw.show()

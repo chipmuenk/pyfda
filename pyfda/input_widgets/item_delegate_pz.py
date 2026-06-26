@@ -5,12 +5,12 @@
 # Copyright © pyFDA Project Contributors
 # Licensed under the terms of the MIT License
 # (see file LICENSE in root directory for details)
-
-from __future__ import annotations
-
 """
 Widget for displaying and modifying filter Poles and Zeros
 """
+
+from __future__ import annotations
+
 from typing import Any
 
 from pyfda.libs.compat import (
