@@ -17,13 +17,14 @@ import sys
 from pyfda.libs.compat import (Qt, QtGui, QtCore, QMainWindow, QApplication, QSplitter,
                      QMessageBox, QPlainTextEdit, QMenu, pyqtSignal)
 import pyfda.libs.pyfda_dirs as dirs # initial import constructs file paths
+from pyfda.config_file_parser import ConfigFileParser as CFP
 from pyfda.libs.pyfda_lib import to_html
 from pyfda import pyfda_rc
 # edit pyfda.qrc, then
 # create with  pyrcc5 pyfda.qrc -o qrc_resources.py
 # and manually replace "from from PyQt5 import QtCore"
 #   by "from pyfda.libs.compat import QtCore" in qrc_resources.py
-from pyfda.input_widgets import input_tab_widgets
+from pyfda.tabbed_widget import TabbedWidget
 from pyfda.plot_widgets import plot_tab_widgets
 
 logger = logging.getLogger(__name__)
@@ -161,10 +162,12 @@ class pyFDA(QMainWindow):
 
         # ============== UI Layout with H and V-Splitter =====================
         # create tab widgets for input and plot widgets
-        inputTabWidgets = input_tab_widgets.InputTabWidgets(
-            self, objectName='input_tab_widgets_inst')
-        pltTabWidgets = plot_tab_widgets.PlotTabWidgets(
-            self, objectName='plot_tab_widgets_inst')
+        inputTabWidgets = TabbedWidget(
+            wdg_classes_dict=CFP.INPUT_CLASSES_DICT, objectName='input_tab_widgets_inst',
+            label='input')
+        pltTabWidgets = TabbedWidget(
+            wdg_classes_dict=CFP.PLOT_CLASSES_DICT, objectName='plot_tab_widgets_inst',
+            label='plot', use_timer=True)
         self.loggerWin = QPlainTextEdit(self)  # logger window
         self.loggerWin.setReadOnly(True)
         # set custom right-button context menu policy
