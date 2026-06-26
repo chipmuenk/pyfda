@@ -563,13 +563,14 @@ def fb_set(*keys_tuple: tuple, backup: bool = True, new_key: bool = False,
         if isinstance(d[set_key], dict):
             if not accept_dict:
                 logger.error(
-                    f"\n\tCannot assign '{set_key}' with sub-dict\n\t"
-                    f"{set_val}!\n\tThis would overwrite the old sub-dict\n\t{d[set_key]}.")
+                    "\n\tCannot assign '%s' with sub-dict\n\t%s!"
+                    "\n\tThis would overwrite the old sub-dict\n\t%s",
+                    set_key, set_val, d[set_key])
                 raise KeyError
 
         if set_key =='qfrmt':
             if len(keys_tuple) > 2:
-                logger.error(f"More than one value '{keys_tuple[1:]}' for setting 'qfrmt'!")
+                logger.error("More than one value '%s' for setting 'qfrmt'!", keys_tuple[1:])
                 raise KeyError
 
             # store current fixpoint / float format
