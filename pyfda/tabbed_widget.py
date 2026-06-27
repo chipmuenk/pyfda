@@ -169,8 +169,7 @@ class TabbedWidget(QWidget):
             self.timer_id = QtCore.QTimer()
             self.timer_id.setSingleShot(True)
             # redraw current widget at timeout (timer is triggered by resize event in event filter):
-            # self.timer_id.timeout.connect(lambda: self.emit({'ui_global_changed': 'resized'}))
-            self.timer_id.timeout.connect(self.current_tab_redraw)
+            self.timer_id.timeout.connect(lambda: self.emit({'ui_global_changed': 'resized'}))
             tab_widget.installEventFilter(self)
 
         # https://stackoverflow.com/questions/29128936/qtabwidget-size-depending-on-current-tab
@@ -231,22 +230,6 @@ class TabbedWidget(QWidget):
 
         # Call base class method to continue with normal event processing:
         return super().eventFilter(source, event)
-
-    # ------------------------------------------------------------------------------
-    def current_tab_changed(self) -> None:
-        """
-        Emit the signal 'ui_global_changed':'tab' to notify other widgets that the
-        current tab position has changed
-        """
-        self.emit({'ui_global_changed': 'tab'})
-
-    # ------------------------------------------------------------------------------
-    def current_tab_redraw(self) -> None:
-        """
-        Emit the signal 'ui_global_changed':'resized' to notify other widgets that the
-        current widget size has changed
-        """
-        self.emit({'ui_global_changed': 'resized'})
 
 # ------------------------------------------------------------------------
 if __name__ == "__main__":
