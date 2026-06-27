@@ -227,13 +227,10 @@ class pyFDA(QMainWindow):
         # are distributed. At the moment, only changes in the input widgets are
         # routed to the plot widgets:
         inputTabWidgets.sig_tx.connect(pltTabWidgets.sig_rx)
-        inputTabWidgets.sig_tx.connect(self.process_sig_rx)
+        inputTabWidgets.sig_tx.connect(self.process_sig_rx)  # only for catching close event
         pltTabWidgets.sig_tx.connect(inputTabWidgets.sig_rx)
         # open pop-up "about" window
         #aboutAction.triggered.connect(self.aboutWindow)
-
-        # trigger the close event in response to sigQuit generated in another subwidget:
-        # inputTabWidgets.input_filter_specs.sigQuit.connect(self.close)
 
         # when a message has been written, pass it via signal-slot mechanism and
         # print it to logger window
