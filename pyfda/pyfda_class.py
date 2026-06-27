@@ -14,6 +14,7 @@ import logging
 import logging.config
 import sys
 
+from pyfda.input_widgets import input_tab_widgets
 from pyfda.libs.compat import (Qt, QtGui, QtCore, QMainWindow, QApplication, QSplitter,
                      QMessageBox, QPlainTextEdit, QMenu, pyqtSignal)
 import pyfda.libs.pyfda_dirs as dirs # initial import constructs file paths
@@ -162,12 +163,13 @@ class pyFDA(QMainWindow):
 
         # ============== UI Layout with H and V-Splitter =====================
         # create tab widgets for input and plot widgets
-        inputTabWidgets = TabbedWidget(
-            wdg_classes_dict=CFP.INPUT_CLASSES_DICT, objectName='input_tab_widgets_inst',
-            label='input')
-        pltTabWidgets = TabbedWidget(
-            wdg_classes_dict=CFP.PLOT_CLASSES_DICT, objectName='plot_tab_widgets_inst',
-            label='plot', use_timer=True)
+        inputTabWidgets = TabbedWidget(wdg_classes_dict=CFP.INPUT_CLASSES_DICT, label='input',
+                                       objectName='input_tab_widgets_inst')
+        #inputTabWidgets = input_tab_widgets.InputTabWidgets()
+        pltTabWidgets = TabbedWidget(wdg_classes_dict=CFP.PLOT_CLASSES_DICT, label='plot',
+                                     objectName='plot_tab_widgets_inst', use_timer=True)
+        # pltTabWidgets = plot_tab_widgets.PlotTabWidgets()  # plot widgets
+
         self.loggerWin = QPlainTextEdit(self)  # logger window
         self.loggerWin.setReadOnly(True)
         # set custom right-button context menu policy
@@ -242,9 +244,8 @@ class pyFDA(QMainWindow):
         """
         Process signals coming from sig_rx:
             Trigger close event in response to 'close_event' emitted in another subwidget
-
         """
-        logger.debug("Processing %s: %s", type(dict_sig).__name__, dict_sig)
+        logger.warning("Processing %s: %s", type(dict_sig).__name__, dict_sig)
         if 'close_event' in dict_sig:
             self.close()
 

@@ -36,7 +36,7 @@ class InputTabWidgets(QWidget):
     # outgoing, connected in receiver (pyfdax -> plot_tab_widgets)
     sig_tx = pyqtSignal(object)
 
-    def __init__(self, wdg_classes_dict: dict,
+    def __init__(self,
                  objectName: str = 'input_tab_widgets_inst') -> None:
         super().__init__()
         self.setObjectName(objectName)
@@ -86,7 +86,7 @@ class InputTabWidgets(QWidget):
                 mod = importlib.import_module(mod_fq_name)
                 wdg_class = getattr(mod, input_class_name)
                 # and instantiate it
-                inst = wdg_class(self)
+                inst = wdg_class()
             except ImportError as e:
                 logger.warning(
                     'Class "%s" could not be imported from %s:\n%s.',
