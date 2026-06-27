@@ -211,10 +211,7 @@ class TabbedWidget(QWidget):
         """
         Enable `self.sig_rx.connect(self.log_rx)` above for debugging.
         """
-        if isinstance(dict_sig, dict):
-            logger.warning("SIG_RX\n%s", pprint_log(dict_sig))
-        else:
-            logger.warning("empty dict")
+        logger.debug("SIG_RX\n%s", pprint_log(dict_sig))
 
     # ------------------------------------------------------------------------------
     def eventFilter(self, source: QtCore.QObject, event: QEvent) -> bool:
