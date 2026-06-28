@@ -185,10 +185,10 @@ class Input_Info(QWidget):
         self.txt_filt_dict = QTextBrowser(self)
         self.txt_filt_tree = QTextBrowser(self)
 
-        layVMain = QVBoxLayout()
-        layVMain.addWidget(self.frmMain)
+        lay_v_main = QVBoxLayout()
+        lay_v_main.addWidget(self.frmMain)
 
-#        layVMain.addLayout(self.layHControls)
+#        lay_v_main.addLayout(self.layHControls)
         splitter = QSplitter(self)
         splitter.setOrientation(Qt.Vertical)
         splitter.addWidget(self.tbl_filt_perf)
@@ -199,11 +199,11 @@ class Input_Info(QWidget):
         # that are way too large: in this case, the space is distributed according
         # to the _ratio_ of the values:
         splitter.setSizes([3000, 10000, 1000, 1000])
-        layVMain.addWidget(splitter)
+        lay_v_main.addWidget(splitter)
 
-        layVMain.setContentsMargins(*params['wdg_margins'])
+        lay_v_main.setContentsMargins(*params['wdg_margins'])
 
-        self.setLayout(layVMain)
+        self.setLayout(lay_v_main)
 
         # ----------------------------------------------------------------------
         # GLOBAL SIGNALS & SLOTs

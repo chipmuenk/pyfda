@@ -149,11 +149,11 @@ class UI_W(QWidget):
         frmMain = QFrame(self)
         frmMain.setLayout(layH)
 
-        layVMain = QVBoxLayout()  # Widget main layout
-        layVMain.addWidget(frmMain)
-        layVMain.setContentsMargins(0, 5, 0, 0)  # *params['wdg_margins'])
+        lay_v_main = QVBoxLayout()  # Widget main layout
+        lay_v_main.addWidget(frmMain)
+        lay_v_main.setContentsMargins(0, 5, 0, 0)  # *params['wdg_margins'])
 
-        self.setLayout(layVMain)
+        self.setLayout(lay_v_main)
 
         # ----------------------------------------------------------------------
         # INITIAL SETTINGS
@@ -394,11 +394,11 @@ class UI_Q(QWidget):
         frmMain = QFrame(self)
         frmMain.setLayout(layG)
 
-        layVMain = QVBoxLayout()  # Widget main layout
-        layVMain.addWidget(frmMain)
-        layVMain.setContentsMargins(0, 0, 0, 0)  # *params['wdg_margins'])
+        lay_v_main = QVBoxLayout()  # Widget main layout
+        lay_v_main.addWidget(frmMain)
+        lay_v_main.setContentsMargins(0, 0, 0, 0)  # *params['wdg_margins'])
 
-        self.setLayout(layVMain)
+        self.setLayout(lay_v_main)
 
         # ----------------------------------------------------------------------
         # INITIAL SETTINGS
@@ -627,11 +627,11 @@ class UI_WQ(QWidget):
         frmMain = QFrame(self)
         frmMain.setLayout(layG)
 
-        layVMain = QVBoxLayout()  # Widget main layout
-        layVMain.addWidget(frmMain)
-        layVMain.setContentsMargins(0, 0, 0, 0)  # *params['wdg_margins'])
+        lay_v_main = QVBoxLayout()  # Widget main layout
+        lay_v_main.addWidget(frmMain)
+        lay_v_main.setContentsMargins(0, 0, 0, 0)  # *params['wdg_margins'])
 
-        self.setLayout(layVMain)
+        self.setLayout(lay_v_main)
 
         # ----------------------------------------------------------------------
         # INITIAL SETTINGS

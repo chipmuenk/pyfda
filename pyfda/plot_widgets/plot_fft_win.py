@@ -388,9 +388,9 @@ class Plot_FFT_win(QDialog):
         # is distributed according to the _ratio_ of the values:
         splitter.setSizes([3000, 800])
 
-        layVMain = QVBoxLayout()
-        layVMain.addWidget(splitter)
-        self.setLayout(layVMain)
+        lay_v_main = QVBoxLayout()
+        lay_v_main.addWidget(splitter)
+        self.setLayout(lay_v_main)
 
         # ----------------------------------------------------------------------
         #           Set subplots

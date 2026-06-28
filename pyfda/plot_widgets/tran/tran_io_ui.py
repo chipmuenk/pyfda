@@ -396,10 +396,10 @@ if __name__ == "__main__":
     app.setStyleSheet(rc.QSS_RC)
     mainw = Tran_IO_UI()
 
-    layVMain = QVBoxLayout()
-    layVMain.addWidget(mainw.wdg_top)
+    lay_v_main = QVBoxLayout()
+    lay_v_main.addWidget(mainw.wdg_top)
 
-    mainw.setLayout(layVMain)
+    mainw.setLayout(lay_v_main)
     app.setActiveWindow(mainw)
     mainw.show()
     sys.exit(app.exec_())

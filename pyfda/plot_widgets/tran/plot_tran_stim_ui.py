@@ -1059,12 +1059,12 @@ def main():
     app = QApplication(sys.argv)
 
     mainw = Plot_Tran_Stim_UI(None)
-    layVMain = QVBoxLayout()
-    layVMain.addWidget(mainw.wdg_stim)
+    lay_v_main = QVBoxLayout()
+    lay_v_main.addWidget(mainw.wdg_stim)
     # (left, top, right, bottom)
-    layVMain.setContentsMargins(*params['wdg_margins'])
+    lay_v_main.setContentsMargins(*params['wdg_margins'])
 
-    mainw.setLayout(layVMain)
+    mainw.setLayout(lay_v_main)
 
     app.setActiveWindow(mainw)
     mainw.show()
@@ -1081,10 +1081,10 @@ if __name__ == "__main__":
     app.setStyleSheet(rc.QSS_RC)
     mainw = Plot_Tran_Stim_UI()
 
-    layVMain = QVBoxLayout()
-    layVMain.addWidget(mainw.wdg_stim)
+    lay_v_main = QVBoxLayout()
+    lay_v_main.addWidget(mainw.wdg_stim)
 
-    mainw.setLayout(layVMain)
+    mainw.setLayout(lay_v_main)
     app.setActiveWindow(mainw)
     mainw.show()
     sys.exit(app.exec_())

@@ -65,12 +65,12 @@ class QFileDialogPlus(QDialog):
         butClose = QPushButton(self, text="Close")
         # butClose.setText("Close")
 
-        layVMain = QVBoxLayout()
-        # layVMain.setAlignment(Qt.AlignTop) # only affects first widget (intended here)
-        # layVMain.addLayout(lay_grid)
-        layVMain.addWidget(butClose)
-        layVMain.setContentsMargins(*params['wdg_margins'])
-        self.setLayout(layVMain)
+        lay_v_main = QVBoxLayout()
+        # lay_v_main.setAlignment(Qt.AlignTop) # only affects first widget (intended here)
+        # lay_v_main.addLayout(lay_grid)
+        lay_v_main.addWidget(butClose)
+        lay_v_main.setContentsMargins(*params['wdg_margins'])
+        self.setLayout(lay_v_main)
 
         # ============== Signals & Slots ================================
         butClose.clicked.connect(self.close)
@@ -135,9 +135,9 @@ class Tran_IO(QWidget):
         Instantiate the UI of the widget
         """
         self.main_wdg = QWidget()
-        layVMain = QVBoxLayout()
-        layVMain.addWidget(self.ui.wdg_top)
-        layVMain.setContentsMargins(*params['mpl_margins'])
+        lay_v_main = QVBoxLayout()
+        lay_v_main.addWidget(self.ui.wdg_top)
+        lay_v_main.setContentsMargins(*params['mpl_margins'])
 
         # ---------------------------------------------------------------------
         # UI SIGNALS & SLOTs
@@ -160,7 +160,7 @@ class Tran_IO(QWidget):
         # connect rx global events to process_sig_rx() and to listening subwidgets
         self.sig_rx.connect(self.process_sig_rx)
 
-        self.setLayout(layVMain)
+        self.setLayout(lay_v_main)
 
         self.set_f_s_wav(fb_get('f_S') * fb_get('f_s_scale'))
 

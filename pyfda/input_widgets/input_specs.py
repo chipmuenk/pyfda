@@ -238,22 +238,22 @@ class Input_Specs(QWidget):
         # ----------------------------------------------------------------------
         # LAYOUT for input specifications and buttons
         # ----------------------------------------------------------------------
-        layVMain = QVBoxLayout(self)
-        layVMain.addWidget(self.frm_buttons_load_save)  # <Load> & <Save> buttons
-        layVMain.addWidget(self.sel_fil)  # Design method (IIR - ellip, ...)
-        layVMain.addLayout(layHButtons2)  # <Design> & <Quit> buttons
-        layVMain.addWidget(self.f_units)  # Frequency units
-        layVMain.addWidget(self.t_specs)  # Target specs
-        layVMain.addWidget(self.f_specs)  # Freq. specifications
-        layVMain.addWidget(self.a_specs)  # Amplitude specs
-        layVMain.addWidget(self.w_specs)  # Weight specs
-        layVMain.addLayout(layVFrm)       # Text message
+        lay_v_main = QVBoxLayout(self)
+        lay_v_main.addWidget(self.frm_buttons_load_save)  # <Load> & <Save> buttons
+        lay_v_main.addWidget(self.sel_fil)  # Design method (IIR - ellip, ...)
+        lay_v_main.addLayout(layHButtons2)  # <Design> & <Quit> buttons
+        lay_v_main.addWidget(self.f_units)  # Frequency units
+        lay_v_main.addWidget(self.t_specs)  # Target specs
+        lay_v_main.addWidget(self.f_specs)  # Freq. specifications
+        lay_v_main.addWidget(self.a_specs)  # Amplitude specs
+        lay_v_main.addWidget(self.w_specs)  # Weight specs
+        lay_v_main.addLayout(layVFrm)       # Text message
 
-        layVMain.addStretch()
+        lay_v_main.addStretch()
 
-        layVMain.setContentsMargins(*params['wdg_margins'])
+        lay_v_main.setContentsMargins(*params['wdg_margins'])
 
-        self.setLayout(layVMain)  # main layout of widget
+        self.setLayout(lay_v_main)  # main layout of widget
         # Required to prevent shrinking of subwidgets
         self.setSizePolicy(QSizePolicy.Minimum, QSizePolicy.Minimum)
 
