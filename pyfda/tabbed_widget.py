@@ -125,7 +125,7 @@ class TabbedWidget(QWidget):
             logger.critical("No %s widgets found!", self.labels)
             sys.exit()
         else:
-            logger.debug("Imported %d %s classes:\n%s", self.n_wdg, self.label, inst_wdg_str)
+            logger.debug("Added %d %s widgets:\n%s", self.n_wdg, self.label, inst_wdg_str)
 
         # --------------------------------------
         # UI Layout
@@ -204,19 +204,21 @@ class TabbedWidget(QWidget):
         """
         Triggered by currentChanged signal which passes the index of the current tab.
 
+        Ignore the size policy of all hidden tabs so that only the size of the current
+        tab widget matters and determines the behaviour of QScrollArea.
 
         Emit the signal 'ui_global_changed':'tab' to notify other widgets that the
         current tab position has changed
+
+        This is inspired by
+        https://stackoverflow.com/questions/29128936/qtabwidget-size-depending-on-current-tab
+
+        The QTabWidget won't select the biggest widget's size as its own size
+        unless you use layout on the QTabWidget. Therefore, if you want to change
+        the size of QTabWidget manually, remove the layout and call QTabWidget.resize()
+        according to the currentChanged signal.
         """
-
-        logger.warning("current widget = %s", self.tab_widget.currentWidget().objectName())
-
-        # https://stackoverflow.com/questions/29128936/qtabwidget-size-depending-on-current-tab
-
-        # The QTabWidget won't select the biggest widget's size as its own size
-        # unless you use layout on the QTabWidget. Therefore, if you want to change
-        # the size of QTabWidget manually, remove the layout and call QTabWidget.resize()
-        # according to the currentChanged signal.
+        # logger.warning("current widget = %s", self.tab_widget.currentWidget().objectName())
 
         # Ignore the size of the unselected (not diplayed) widgets:
         for i in range(self.n_wdg):
