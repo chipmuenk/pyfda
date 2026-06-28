@@ -173,39 +173,6 @@ class TabbedWidget(QWidget):
             self.timer_id.timeout.connect(lambda: self.emit({'ui_global_changed': 'resized'}))
             self.tab_widget.installEventFilter(self)
 
-        # https://stackoverflow.com/questions/29128936/qtabwidget-size-depending-on-current-tab
-
-        # The QTabWidget won't select the biggest widget's height as its own height
-        # unless you use layout on the QTabWidget. Therefore, if you want to change
-        # the size of QTabWidget manually, remove the layout and call QTabWidget::resize
-        # according to the currentChanged signal.
-
-        # You can set the size policy of the widget that is displayed to
-        # QSizePolicy::Preferred
-        # and the other ones to
-        # QSizePolicy::Ignored. After that call adjustSize to update the sizes.
-
-        # void MainWindow::updateSizes(int index)
-        # {
-        # for(int i=0;i<ui->tab_widget->count();i++)
-        #     if(i!=index)
-        #         ui->tab_widget->widget(i)->setSizePolicy(
-        #                                     QSizePolicy::Ignored, QSizePolicy::Ignored);
-
-        # ui->tab_widget->widget(index)->setSizePolicy(
-        #                                 QSizePolicy::Preferred, QSizePolicy::Preferred);
-        # ui->tab_widget->widget(index)->resize(
-        #                                 ui->tab_widget->widget(index)->minimumSizeHint());
-        # ui->tab_widget->widget(index)->adjustSize();
-        # resize(minimumSizeHint());
-        # adjustSize();
-        # }
-
-        # adjustSize(): The last two lines resize the main window itself. You might want
-        # to avoid it, depending on your application.
-        # For example, if you set the rest of the widgets to expand into the space just
-        # made available, it's not so nice if the window resizes itself instead.
-
     # ------------------------------------------------------------------------------
     def log_rx(self, dict_sig: dict = None) -> None:
         """
@@ -246,26 +213,23 @@ class TabbedWidget(QWidget):
 
         # https://stackoverflow.com/questions/29128936/qtabwidget-size-depending-on-current-tab
 
-        # The QTabWidget won't select the biggest widget's height as its own height
+        # The QTabWidget won't select the biggest widget's size as its own size
         # unless you use layout on the QTabWidget. Therefore, if you want to change
         # the size of QTabWidget manually, remove the layout and call QTabWidget.resize()
         # according to the currentChanged signal.
 
-        # Set the size policy of the unselected (not diplayed) widgets to "ignored":
+        # Ignore the size of the unselected (not diplayed) widgets:
         for i in range(self.n_wdg):
             self.tab_widget.widget(i).setSizePolicy(QSizePolicy.Ignored,
                                                     QSizePolicy.Ignored)
-        # and the size policy of the current (displayed) widget to "preferred":
+        # Set the size policy of the current (displayed) widget to "preferred", allowing
+        # it to shrink and grow from the hinted size:
         self.tab_widget.widget(idx).setSizePolicy(QSizePolicy.Preferred,
                                                   QSizePolicy.Preferred)
-        # After that call adjustSize() to update the sizes.
-        # self.tab_widget.widget(idx).resize(
-        #                                 self.tab_widget.widget(idx).minimumSizeHint())
-        # ui->tab_widget->widget(cur_idx)->adjustSize();
-        # resize(minimumSizeHint());
-        # adjustSize();
-        # }
 
+        # After that, call adjustSize() to update the sizes.
+        # self.tab_widget.widget(idx).resize(self.tab_widget.widget(idx).minimumSizeHint())
+        # self.tab_widget.widget(idx).adjustSize()
 
         self.emit({'ui_global_changed': 'tab'})
 
