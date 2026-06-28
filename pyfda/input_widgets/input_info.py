@@ -94,52 +94,52 @@ class Input_Info(QWidget):
 
         # ============== UI Layout =====================================
         # widget / subwindow for filter infos
-        self.butFiltPerf = PushButton(self, text="H(f)", checked=True)
-        self.butFiltPerf.setToolTip("Display frequency response at test frequencies.")
+        self.but_filt_perf = PushButton(self, text="H(f)", checked=True)
+        self.but_filt_perf.setToolTip("Display frequency response at test frequencies.")
 
-        self.butDebug = PushButton(self, "Debug", checked=False)
-        self.butDebug.setToolTip("Show debugging options.")
+        self.but_debug = PushButton(self, "Debug", checked=False)
+        self.but_debug.setToolTip("Show debugging options.")
 
-        self.butAbout = PushButton(self, "About", checkable=False)  # pop-up "About" window
-        self.butAbout.setToolTip(
+        self.but_about = PushButton(self, "About", checkable=False)  # pop-up "About" window
+        self.but_about.setToolTip(
             "<span>Show included modules and their versions.</span>")
 
-        self.butSettings = PushButton(self, "Settings", checked=False)
-        self.butSettings.setToolTip("Display and set some settings")
+        self.but_settings = PushButton(self, "Settings", checked=False)
+        self.but_settings.setToolTip("Display and set some settings")
 
-        layHControls1 = QHBoxLayout()
-        layHControls1.addWidget(self.butFiltPerf)
-        layHControls1.addWidget(self.butAbout)
-        layHControls1.addWidget(self.butSettings)
-        layHControls1.addWidget(self.butDebug)
+        lay_h_controls = QHBoxLayout()
+        lay_h_controls.addWidget(self.but_filt_perf)
+        lay_h_controls.addWidget(self.but_about)
+        lay_h_controls.addWidget(self.but_settings)
+        lay_h_controls.addWidget(self.but_debug)
 
-        self.butDocstring = PushButton(self, "Doc$", checked=False)
-        self.butDocstring.setToolTip("Display docstring from python filter method.")
+        self.but_docstring = PushButton(self, "Doc$", checked=False)
+        self.but_docstring.setToolTip("Display docstring from python filter method.")
 
-        self.butRichText = PushButton(
+        self.but_rich_text = PushButton(
             self, "RTF", checkable=HAS_DOCUTILS, checked=HAS_DOCUTILS)
-        self.butRichText.setEnabled(HAS_DOCUTILS)
-        self.butRichText.setToolTip("Render documentation in Rich Text Format.")
+        self.but_rich_text.setEnabled(HAS_DOCUTILS)
+        self.but_rich_text.setToolTip("Render documentation in Rich Text Format.")
 
-        self.butFiltDict = PushButton(self, "FiltDict", checked=False)
-        self.butFiltDict.setToolTip("Show filter dictionary for debugging.")
+        self.but_filt_dict = PushButton(self, "FiltDict", checked=False)
+        self.but_filt_dict.setToolTip("Show filter dictionary for debugging.")
 
-        self.butFiltTree = PushButton(self, "FiltTree", checked=False)
-        self.butFiltTree.setToolTip("Show filter tree for debugging.")
+        self.but_filt_tree = PushButton(self, "FiltTree", checked=False)
+        self.but_filt_tree.setToolTip("Show filter tree for debugging.")
 
-        lay_h_debug_1 = QHBoxLayout()
-        lay_h_debug_1.addWidget(self.butDocstring)
-        lay_h_debug_1.addWidget(self.butRichText)
-        lay_h_debug_1.addWidget(self.butFiltDict)
-        lay_h_debug_1.addWidget(self.butFiltTree)
+        lay_h_debug = QHBoxLayout()
+        lay_h_debug.addWidget(self.but_docstring)
+        lay_h_debug.addWidget(self.but_rich_text)
+        lay_h_debug.addWidget(self.but_filt_dict)
+        lay_h_debug.addWidget(self.but_filt_tree)
 
         lay_v_debug = QVBoxLayout()
-        lay_v_debug.addLayout(lay_h_debug_1)
+        lay_v_debug.addLayout(lay_h_debug)
         lay_v_debug.setContentsMargins(0, 0, 0, 0)
 
         self.frm_debug = QFrame(self)
         self.frm_debug.setLayout(lay_v_debug)
-        self.frm_debug.setVisible(self.butDebug.checked)
+        self.frm_debug.setVisible(self.but_debug.checked)
         self.frm_debug.setContentsMargins(0, 0, 0, 0)
 
         lbl_settings_NFFT = QLabel(to_html("N_FFT =", frmt='bi'), self)
@@ -154,21 +154,21 @@ class Input_Info(QWidget):
             "<span>Set level for handling exceptions: "
             "0: quiet, 1: print error stack, 2: end pyfda.</span>")
 
-        layGSettings = QGridLayout()
-        layGSettings.addWidget(lbl_settings_NFFT, 1, 0)
-        layGSettings.addWidget(self.led_settings_NFFT, 1, 1)
-        layGSettings.addWidget(lbl_exception_handling, 2, 0)
-        layGSettings.addWidget(self.led_exception_handling, 2, 1)
+        lay_g_settings = QGridLayout()
+        lay_g_settings.addWidget(lbl_settings_NFFT, 1, 0)
+        lay_g_settings.addWidget(self.led_settings_NFFT, 1, 1)
+        lay_g_settings.addWidget(lbl_exception_handling, 2, 0)
+        lay_g_settings.addWidget(self.led_exception_handling, 2, 1)
 
-        self.frmSettings = QFrame(self)
-        self.frmSettings.setLayout(layGSettings)
-        self.frmSettings.setVisible(self.butSettings.checked)
-        self.frmSettings.setContentsMargins(0, 0, 0, 0)
+        self.frm_settings = QFrame(self)
+        self.frm_settings.setLayout(lay_g_settings)
+        self.frm_settings.setVisible(self.but_settings.checked)
+        self.frm_settings.setContentsMargins(0, 0, 0, 0)
 
         lay_v_controls = QVBoxLayout()
-        lay_v_controls.addLayout(layHControls1)
+        lay_v_controls.addLayout(lay_h_controls)
         lay_v_controls.addWidget(self.frm_debug)
-        lay_v_controls.addWidget(self.frmSettings)
+        lay_v_controls.addWidget(self.frm_settings)
 
         self.frmMain = QFrame(self)
         self.frmMain.setLayout(lay_v_controls)
@@ -212,18 +212,18 @@ class Input_Info(QWidget):
         # ----------------------------------------------------------------------
         # LOCAL SIGNALS & SLOTs
         # ----------------------------------------------------------------------
-        self.butFiltPerf.clicked.connect(self._show_filt_perf)
-        self.butAbout.clicked.connect(self._about_window)
-        self.butSettings.clicked.connect(self._show_settings)
+        self.but_filt_perf.clicked.connect(self._show_filt_perf)
+        self.but_about.clicked.connect(self._about_window)
+        self.but_settings.clicked.connect(self._show_settings)
         self.led_settings_NFFT.editingFinished.connect(self._update_settings_nfft)
         self.led_exception_handling.editingFinished.connect(self._set_exception_handling)
 
-        self.butDebug.clicked.connect(self._show_debug)
+        self.but_debug.clicked.connect(self._show_debug)
 
-        self.butFiltDict.clicked.connect(self._show_filt_dict)
-        self.butFiltTree.clicked.connect(self._show_filt_tree)
-        self.butDocstring.clicked.connect(self._show_doc)
-        self.butRichText.clicked.connect(self._show_doc)
+        self.but_filt_dict.clicked.connect(self._show_filt_dict)
+        self.but_filt_tree.clicked.connect(self._show_filt_tree)
+        self.but_docstring.clicked.connect(self._show_doc)
+        self.but_rich_text.clicked.connect(self._show_doc)
 
     # -------------------------------------------------------------------------
     def _about_window(self):
@@ -236,14 +236,14 @@ class Input_Info(QWidget):
         """
         Show / hide debug options depending on the state of the debug button
         """
-        self.frm_debug.setVisible(self.butDebug.checked)
+        self.frm_debug.setVisible(self.but_debug.checked)
 
     # ------------------------------------------------------------------------
     def _show_settings(self):
         """
         Show / hide settings options depending on the state of the settings button
         """
-        self.frmSettings.setVisible(self.butSettings.checked)
+        self.frm_settings.setVisible(self.but_settings.checked)
 
     # -------------------------------------------------------------------------
     def _update_settings_nfft(self):
@@ -278,7 +278,7 @@ class Input_Info(QWidget):
         Display info from filter design file and docstring
         """
         if hasattr(ff.fil_inst, 'info'):
-            if self.butRichText.checked:
+            if self.but_rich_text.checked:
                 self.txt_filt_info_box.setText(publish_string(
                     self._clean_doc(ff.fil_inst.info), writer_name='html',
                     settings_overrides={'output_encoding': 'unicode'}))
@@ -287,8 +287,8 @@ class Input_Info(QWidget):
         else:
             self.txt_filt_info_box.setText("")
 
-        if self.butDocstring.checked and hasattr(ff.fil_inst, 'info_doc'):
-            if self.butRichText.checked:
+        if self.but_docstring.checked and hasattr(ff.fil_inst, 'info_doc'):
+            if self.but_rich_text.checked:
                 self.txt_filt_info_box.append(
                     '<hr /><b>Python module docstring:</b>\n')
                 for doc in ff.fil_inst.info_doc:
@@ -346,8 +346,8 @@ class Input_Info(QWidget):
             return F_min, H_min, F_max, H_max
         # ------------------------------------------------------------------
 
-        self.tbl_filt_perf.setVisible(self.butFiltPerf.checked)
-        if self.butFiltPerf.checked:
+        self.tbl_filt_perf.setVisible(self.but_filt_perf.checked)
+        if self.but_filt_perf.checked:
 
             bb = fb_get('ba', 0)
             aa = fb_get('ba')[1]
@@ -436,7 +436,7 @@ class Input_Info(QWidget):
             a_targs_dB = np.append(a_targs_dB, [np.nan, np.nan])
             a_test = np.append(a_test, [H_min, H_max])
             # calculate response of test frequencies in dB
-            a_test_dB = -20*log10(abs(a_test))
+            a_test_db = -20*log10(abs(a_test))
 
             # get filter type ('IIR', 'FIR') for dB <-> lin conversion
             ft = fb_get('ft')
@@ -448,10 +448,10 @@ class Input_Info(QWidget):
             eps = 1e-3
             for i in range(len(f_lbls)):
                 if 'PB' in f_lbls[i]:
-                    a_targs_pass.append((a_test_dB[i] - a_targs_dB[i]) < eps)
+                    a_targs_pass.append((a_test_db[i] - a_targs_dB[i]) < eps)
                     a_test[i] = 1 - abs(a_test[i])
                 elif 'SB' in f_lbls[i]:
-                    a_targs_pass.append(a_test_dB[i] >= a_targs_dB[i])
+                    a_targs_pass.append(a_test_db[i] >= a_targs_dB[i])
                 else:
                     a_targs_pass.append(True)
 
@@ -463,7 +463,7 @@ class Input_Info(QWidget):
                 "H_test_dB = %s\n"
                 "F_test = %s\n"
                 "H_targ_pass = %s\n"
-                "passed: %s\n", a_targs,  a_test,  a_test_dB, f_vals,
+                "passed: %s\n", a_targs,  a_test,  a_test_db, f_vals,
                     a_targs_pass, self.targs_spec_passed)
 
             self.tbl_filt_perf.setRowCount(len(a_test))  # number of table rows
@@ -479,7 +479,7 @@ class Input_Info(QWidget):
                 self.tbl_filt_perf.setItem(
                     row, 1, QTableWidgetItem(str(f'{-a_targs_dB[row]:2.3g}')))
                 self.tbl_filt_perf.setItem(
-                    row, 2, QTableWidgetItem(str(f'{-a_test_dB[row]:2.3f}')))
+                    row, 2, QTableWidgetItem(str(f'{-a_test_db[row]:2.3f}')))
                 if a_targs[row] < 0.01:
                     self.tbl_filt_perf.setItem(
                         row, 3, QTableWidgetItem(str(f'{a_targs[row]:.3e}')))
@@ -505,7 +505,7 @@ class Input_Info(QWidget):
         """
         Print filter dict for debugging
         """
-        self.txt_filt_dict.setVisible(self.butFiltDict.checked)
+        self.txt_filt_dict.setVisible(self.but_filt_dict.checked)
 
         fb_sorted = [str(key) + ' : ' + str(fb_get(key))
                      for key in sorted(fb_get().keys())]
@@ -518,7 +518,7 @@ class Input_Info(QWidget):
         """
         Print filter tree for debugging
         """
-        self.txt_filt_tree.setVisible(self.butFiltTree.checked)
+        self.txt_filt_tree.setVisible(self.but_filt_tree.checked)
 
         ftree_sorted = ['<b>' + str(key) + ' : ' + '</b>' + str(TB.fil_tree[key])
                         for key in sorted(TB.fil_tree.keys())]
