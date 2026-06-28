@@ -30,8 +30,8 @@ class CSV_option_box(QDialog):
     """
     sig_tx = pyqtSignal(object)  # outgoing
 
-    def __init__(self, parent):
-        super().__init__(parent)
+    def __init__(self):
+        super().__init__()
 
         self.cmb_delimiter_default = "auto"
         self.cmb_terminator_default = "auto"
@@ -196,7 +196,7 @@ if __name__ == '__main__':
 
     app = QApplication(sys.argv)
     app.setStyleSheet(rc.QSS_RC)
-    mainw = CSV_option_box(parent=None)
+    mainw = CSV_option_box()
     app.setActiveWindow(mainw)
     mainw.show()
     sys.exit(app.exec_())

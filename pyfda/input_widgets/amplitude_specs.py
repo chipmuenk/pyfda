@@ -38,11 +38,11 @@ class AmplitudeSpecs(QWidget):
     sig_rx = pyqtSignal(object)  # receive signals from higher hierarchies
     sig_tx = pyqtSignal(object)  # emitted when amplitude unit or spec has been changed
 
-    def __init__(self, parent=None, title="Amplitude Specs", objectName=""):
+    def __init__(self, title="Amplitude Specs", objectName=""):
         """
         Initialize
         """
-        super().__init__(parent)
+        super().__init__()
         self.title = title
         self.setObjectName(objectName)
 

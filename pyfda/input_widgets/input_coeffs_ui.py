@@ -347,7 +347,7 @@ class Input_Coeffs_UI(QWidget):
                 # Important: Handle to window must be class attribute, otherwise it
                 # (and the attached window) is deleted immediately when it goes
                 # out of scope
-                dirs.csv_options_handle = CSV_option_box(self)
+                dirs.csv_options_handle = CSV_option_box()
                 dirs.csv_options_handle.sig_tx.connect(self.process_sig_rx)
                 dirs.csv_options_handle.show()  # modeless i.e. non-blocking popup window
                 self.emit({'ui_global_changed': 'csv'})
