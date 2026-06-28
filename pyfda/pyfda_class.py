@@ -238,7 +238,6 @@ class pyFDA(QMainWindow):
         Process signals coming from sig_rx:
             Trigger close event in response to 'close_event' emitted in another subwidget
         """
-        logger.warning("Processing %s: %s", type(dict_sig).__name__, dict_sig)
         if 'close_event' in dict_sig:
             self.close()
 

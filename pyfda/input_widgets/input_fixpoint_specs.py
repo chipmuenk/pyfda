@@ -595,8 +595,9 @@ class Input_Fixpoint_Specs(QWidget):
         # Module level test: Parent is QApplication which has no width:
         if self.parent is None:
             wdg_w = 300  # set fixed size for module level test
-        else:  # widget parent is InputTabWidget()
-            wdg_w = self.parent.width()
+        else:  # widget parent is TabbedWidget()
+            wdg_w = self.width()
+            # logger.warning("width = %d", wdg_w)
 
         # img_w, img_h = self.img_fixp.width(), self.img_fixp.height()
         # if img_w > 20:
