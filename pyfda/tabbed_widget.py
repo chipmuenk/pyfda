@@ -14,7 +14,8 @@ import logging
 import sys
 
 from pyfda.libs.compat import (
-    QTabWidget, QWidget, QVBoxLayout, QScrollArea, pyqtSignal, QEvent, QtCore)
+    QTabWidget, QWidget, QVBoxLayout, QScrollArea, pyqtSignal, QEvent, QtCore,
+    QSizePolicy)
 from pyfda.libs.pyfda_lib import pprint_log
 from pyfda.libs.pyfda_qt_lib import emit
 from pyfda.pyfda_rc import params
@@ -84,13 +85,12 @@ class TabbedWidget(QWidget):
            In order to prevent infinite loops, every widget needs to block in-
            coming signals with its own name!
         """
-        tab_widget = QTabWidget(self)
+        self.tab_widget = QTabWidget(self)
 
-        n_wdg = 0  # number and ...
+        self.n_wdg = 0  # number and ...
         inst_wdg_str = ""  # ... full names of successfully instantiated widgets
 
         for class_name, wdg_dict in self.wdg_classes_dict.items():
-            logger.warning("%s : %s", class_name, wdg_dict)
             try:
                 # fully qualified module name:
                 mod_fq_name = wdg_dict['mod']
@@ -106,11 +106,11 @@ class TabbedWidget(QWidget):
             if hasattr(inst, "state") and inst.state == "deactivated":
                 continue  # with next widget
             if hasattr(inst, 'tab_label'):
-                tab_widget.addTab(inst, inst.tab_label)
+                self.tab_widget.addTab(inst, inst.tab_label)
             else:
-                tab_widget.addTab(inst, "not set")
+                self.tab_widget.addTab(inst, "not set")
             if hasattr(inst, 'tool_tip'):
-                tab_widget.setTabToolTip(n_wdg, inst.tool_tip)
+                self.tab_widget.setTabToolTip(self.n_wdg, inst.tool_tip)
             # collect all instance tx signals in self.sig_tx
             if hasattr(inst, 'sig_tx'):
                 inst.sig_tx.connect(self.sig_tx)
@@ -118,14 +118,14 @@ class TabbedWidget(QWidget):
             if hasattr(inst, 'sig_rx'):
                 self.sig_rx.connect(inst.sig_rx)
 
-            n_wdg += 1  # successfully instantiated one more widget
+            self.n_wdg += 1  # successfully instantiated one more widget
             inst_wdg_str += '\t' + mod_fq_name + "." + class_name + '\n'
 
         if len(inst_wdg_str) == 0:
             logger.critical("No %s widgets found!", self.labels)
             sys.exit()
         else:
-            logger.debug("Imported %d %s classes:\n%s", n_wdg, self.label, inst_wdg_str)
+            logger.debug("Imported %d %s classes:\n%s", self.n_wdg, self.label, inst_wdg_str)
 
         # --------------------------------------
         # UI Layout
@@ -136,11 +136,11 @@ class TabbedWidget(QWidget):
 
         if self.use_timer:
             # add the tab_widget directly, is resized after waiting for timer
-            lay_v_main.addWidget(tab_widget)
+            lay_v_main.addWidget(self.tab_widget)
         else:
             # add the widget in a QScrollArea
             scroll = QScrollArea(self)
-            scroll.setWidget(tab_widget)
+            scroll.setWidget(self.tab_widget)
             scroll.setWidgetResizable(True)  # Size of monitored widget is allowed to grow
             lay_v_main.addWidget(scroll)
 
@@ -158,7 +158,8 @@ class TabbedWidget(QWidget):
         self.sig_tx.connect(self.sig_rx)
         self.sig_rx.connect(self.log_rx) # enable for debugging
         # When user has selected a different tab, trigger a redraw of current tab
-        tab_widget.currentChanged.connect(lambda: self.emit({'ui_global_changed': 'tab'}))
+        # self.tab_widget.currentChanged.connect(lambda: self.emit({'ui_global_changed': 'tab'}))
+        self.tab_widget.currentChanged.connect(self.current_tab_changed)
         # The following does not work: maybe current scope must be left?
         # tab_widget.currentChanged.connect(tab_widget.currentWidget().redraw)
 
@@ -170,7 +171,7 @@ class TabbedWidget(QWidget):
             self.timer_id.setSingleShot(True)
             # redraw current widget at timeout (timer is triggered by resize event in event filter):
             self.timer_id.timeout.connect(lambda: self.emit({'ui_global_changed': 'resized'}))
-            tab_widget.installEventFilter(self)
+            self.tab_widget.installEventFilter(self)
 
         # https://stackoverflow.com/questions/29128936/qtabwidget-size-depending-on-current-tab
 
@@ -230,6 +231,43 @@ class TabbedWidget(QWidget):
 
         # Call base class method to continue with normal event processing:
         return super().eventFilter(source, event)
+
+    # ------------------------------------------------------------------------------
+    def current_tab_changed(self, idx) -> None:
+        """
+        Triggered by currentChanged signal which passes the index of the current tab.
+
+
+        Emit the signal 'ui_global_changed':'tab' to notify other widgets that the
+        current tab position has changed
+        """
+
+        logger.warning("current widget = %s", self.tab_widget.currentWidget().objectName())
+
+        # https://stackoverflow.com/questions/29128936/qtabwidget-size-depending-on-current-tab
+
+        # The QTabWidget won't select the biggest widget's height as its own height
+        # unless you use layout on the QTabWidget. Therefore, if you want to change
+        # the size of QTabWidget manually, remove the layout and call QTabWidget.resize()
+        # according to the currentChanged signal.
+
+        # Set the size policy of the unselected (not diplayed) widgets to "ignored":
+        for i in range(self.n_wdg):
+            self.tab_widget.widget(i).setSizePolicy(QSizePolicy.Ignored,
+                                                    QSizePolicy.Ignored)
+        # and the size policy of the current (displayed) widget to "preferred":
+        self.tab_widget.widget(idx).setSizePolicy(QSizePolicy.Preferred,
+                                                  QSizePolicy.Preferred)
+        # After that call adjustSize() to update the sizes.
+        # self.tab_widget.widget(idx).resize(
+        #                                 self.tab_widget.widget(idx).minimumSizeHint())
+        # ui->tab_widget->widget(cur_idx)->adjustSize();
+        # resize(minimumSizeHint());
+        # adjustSize();
+        # }
+
+
+        self.emit({'ui_global_changed': 'tab'})
 
 # ------------------------------------------------------------------------
 if __name__ == "__main__":
