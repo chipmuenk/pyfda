@@ -162,11 +162,9 @@ class pyFDA(QMainWindow):
         # ============== UI Layout with H and V-Splitter =====================
         # create tab widgets for input and plot widgets
         inputTabWidgets = TabbedWidget(wdg_classes_dict=CFP.INPUT_CLASSES_DICT, label='input',
-                                       objectName='input_tab_widgets_inst')
-        #inputTabWidgets = input_tab_widgets.InputTabWidgets()
+                                       objectName='input_tab_widgets_inst', use_qscroll_area=True)
         pltTabWidgets = TabbedWidget(wdg_classes_dict=CFP.PLOT_CLASSES_DICT, label='plot',
-                                     objectName='plot_tab_widgets_inst', use_timer=True)
-        # pltTabWidgets = plot_tab_widgets.PlotTabWidgets()  # plot widgets
+                                     objectName='plot_tab_widgets_inst')
 
         self.loggerWin = QPlainTextEdit(self)  # logger window
         self.loggerWin.setReadOnly(True)

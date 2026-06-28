@@ -38,12 +38,12 @@ class TabbedWidget(QWidget):
     sig_tx = pyqtSignal(object)
 
     def __init__(self, wdg_classes_dict: dict, objectName: str = '', label: str = '',
-                 use_timer: bool = False) -> None:
+                 use_qscroll_area: bool = False) -> None:
         super().__init__()
         self.setObjectName(objectName)
         self.wdg_classes_dict = wdg_classes_dict
         self.label = label
-        self.use_timer = use_timer
+        self.use_qscroll_area = use_qscroll_area
         self._construct_ui()
 
     # -------------------------------------------------------------------------
@@ -134,16 +134,15 @@ class TabbedWidget(QWidget):
         # setContentsMargins -> number of pixels between frame window border
         lay_v_main.setContentsMargins(*params['wdg_margins'])  # (left, top, right, bottom)
 
-        if self.use_timer:
-            # add the tab_widget directly, is resized after waiting for timer
-            lay_v_main.addWidget(self.tab_widget)
-        else:
+        if self.use_qscroll_area:
             # add the widget in a QScrollArea
             scroll = QScrollArea(self)
             scroll.setWidget(self.tab_widget)
             scroll.setWidgetResizable(True)  # Size of monitored widget is allowed to grow
             lay_v_main.addWidget(scroll)
-
+        else:
+            # add the tab_widget directly, is resized after waiting for timer
+            lay_v_main.addWidget(self.tab_widget)
 
         self.setLayout(lay_v_main)  # set the main layout of the window
 
@@ -166,7 +165,7 @@ class TabbedWidget(QWidget):
         # ------------------------------------------------------------------------
         #            Resizing
         # ------------------------------------------------------------------------
-        if self.use_timer:
+        if not self.use_qscroll_area:
             self.timer_id = QtCore.QTimer()
             self.timer_id.setSingleShot(True)
             # redraw current widget at timeout (timer is triggered by resize event in event filter):
