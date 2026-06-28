@@ -55,14 +55,13 @@ class Input_Fixpoint_Specs(QWidget):
     sig_rx = pyqtSignal(object)  # incoming, connected to input_tab_widget.sig_rx
     sig_tx = pyqtSignal(object)  # outcgoing
 
-    def __init__(self, parent=None, objectName="input_fixpoint_spec_inst"):
+    def __init__(self, objectName="input_fixpoint_spec_inst"):
         super().__init__()
 
         self.setObjectName(objectName)
         self.tab_label = 'Fixpoint'
         self.tool_tip = ("<span>Select a fixpoint implementation for the filter,"
                          " simulate it or generate a Verilog netlist.</span>")
-        self.parent = parent
         self.fx_specs_changed = False
         self.fx_filt_changed = False
 
@@ -588,12 +587,17 @@ class Input_Fixpoint_Specs(QWidget):
         the image inside QLabel to completely fill the label while keeping
         the aspect ratio.
 
-        The parent `InputTabWidget` defines the available width (minus some offset
-        due to margins etc.), unfortunately `self.width()` cannot be used as a measure
-        as it expands with the parent but doesn't shrink.
+        The parent `TabbedWidget` defines the available width (minus some offset
+        due to margins etc.).
+
+        TODO: `self.width()` is a bad measure as it expands with the parent but
+        doesn't shrink. Maybe this is because the tab consists of multiple subwidgets
+        with individual size policies? Maybe minimumSizeHints are not set properly?
+        Changing the tab and back redraws everything nicely.
         """
-        # Module level test: Parent is QApplication which has no width:
-        if self.parent is None:
+        if __name__ == "__main__":
+            # Module level test: Parent is QApplication which has no width:
+            print("Setting fixed width = 300 ")
             wdg_w = 300  # set fixed size for module level test
         else:  # widget parent is TabbedWidget()
             wdg_w = self.width()
