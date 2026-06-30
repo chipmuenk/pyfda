@@ -17,8 +17,7 @@ if __name__ == "__main__":
     __cwd__ = os.path.dirname(os.path.abspath(__file__))
     sys.path.append(os.path.join('..',os.path.dirname(__cwd__)))
 
-import pyfda.libs.pyfda_lib as dsp
-#import my_dsp_lib_v6a as dsp
+import pyfda.libs.special_functions as dsp
 
 ## scalar inputs - IndexError with scipy implementation
 #vals = 1 # real root

@@ -23,8 +23,8 @@ from pyfda.libs.compat import (
     QFont, QVBoxLayout, QHBoxLayout, QGridLayout)
 
 from pyfda.filterbroker import fb_get, fb_set
-from pyfda.libs.pyfda_lib import(
-    to_html, lin2unit, unit2lin, safe_eval, pprint_log, first_item)
+from pyfda.libs.pyfda_lib import to_html, safe_eval, pprint_log, first_item
+from pyfda.libs.special_functions import lin2unit, unit2lin
 from pyfda.libs.pyfda_qt_lib import qstyle_widget, qget_cmb_box, emit
 from pyfda.pyfda_rc import params  # FMT string for QLineEdit fields, e.g. '{:.3g}'
 

@@ -35,7 +35,8 @@ except ImportError:
     xlsx = None
 
 from pyfda.libs.pyfda_lib import (
-    safe_eval, lin2unit, pprint_log, iter2ndarray, compare_dictionaries)
+    safe_eval, pprint_log, iter2ndarray, compare_dictionaries)
+from pyfda.libs.special_functions import lin2unit
 from pyfda.libs.pyfda_qt_lib import popup_warning
 
 import pyfda.libs.pyfda_fix_lib as fx
