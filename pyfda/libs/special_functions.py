@@ -481,3 +481,49 @@ def comb_bl(t: NDArray) -> NDArray:
         y += cos(h * t)
     y /= N
     return y
+
+# ------------------------------------------------------------------------------
+# Functions dealing with odd and even numbers
+# ------------------------------------------------------------------------------
+def round_odd(x) -> int:
+    """Return the nearest odd integer from x. x can be integer or float."""
+    return int(x-np.mod(x, 2)+1)
+
+
+# ------------------------------------------------------------------------------
+def round_even(x) -> int:
+    """Return the nearest even integer from x. x can be integer or float."""
+    return int(x-np.mod(x, 2))
+
+
+# ------------------------------------------------------------------------------
+def ceil_odd(x) -> int:
+    """
+    Return the smallest odd integer not less than x. x can be integer or float.
+    """
+    return round_odd(x+1)
+
+
+# ------------------------------------------------------------------------------
+def floor_odd(x) -> int:
+    """
+    Return the largest odd integer not larger than x. x can be integer or float.
+    """
+    return round_odd(x-1)
+
+
+# ------------------------------------------------------------------------------
+def ceil_even(x) -> int:
+    """
+    Return the smallest even integer not less than x. x can be integer or float.
+    """
+    return round_even(x+1)
+
+
+# ------------------------------------------------------------------------------
+def floor_even(x) -> int:
+    """
+    Return the largest even integer not larger than x. x can be integer or float.
+    """
+    return round_even(x-1)
+

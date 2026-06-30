@@ -41,7 +41,6 @@ else:
 __all__ = ['cmp_version', 'mod_version',
            'set_dict_defaults', 'clean_ascii', 'safe_eval',
            'expand_lim', 'format_ticks',
-           'round_odd', 'round_even', 'ceil_odd', 'floor_odd', 'ceil_even', 'floor_even',
            'to_html']
 
 logger = logging.getLogger(__name__)
@@ -1083,51 +1082,6 @@ def format_ticks(ax, xy: str, scale: float = 1., format: str = "%.1f") -> None:
         locy = ax.get_yticks()  # get location and content of xticks
         ax.set_yticks(locy)
         ax.set_yticklabels([format % y for y in locy*scale])
-
-
-# ------------------------------------------------------------------------------
-def round_odd(x) -> int:
-    """Return the nearest odd integer from x. x can be integer or float."""
-    return int(x-np.mod(x, 2)+1)
-
-
-# ------------------------------------------------------------------------------
-def round_even(x) -> int:
-    """Return the nearest even integer from x. x can be integer or float."""
-    return int(x-np.mod(x, 2))
-
-
-# ------------------------------------------------------------------------------
-def ceil_odd(x) -> int:
-    """
-    Return the smallest odd integer not less than x. x can be integer or float.
-    """
-    return round_odd(x+1)
-
-
-# ------------------------------------------------------------------------------
-def floor_odd(x) -> int:
-    """
-    Return the largest odd integer not larger than x. x can be integer or float.
-    """
-    return round_odd(x-1)
-
-
-# ------------------------------------------------------------------------------
-def ceil_even(x) -> int:
-    """
-    Return the smallest even integer not less than x. x can be integer or float.
-    """
-    return round_even(x+1)
-
-
-# ------------------------------------------------------------------------------
-def floor_even(x) -> int:
-    """
-    Return the largest even integer not larger than x. x can be integer or float.
-    """
-    return round_even(x-1)
-
 
 # ------------------------------------------------------------------------------
 if __name__ == '__main__':
