@@ -678,7 +678,7 @@ class Input_Coeffs(QWidget):
 
         Refresh QTableWidget
         """
-        self.ba = [np.asarray([1., 0.]), np.asarray([1., 0.])]
+        self.ba = np.asarray(([1., 0.], [1., 0.]))
         self.refresh_table()
         qstyle_widget(self.ui.but_apply, 'changed')
         qstyle_widget(self.ui.but_undo, 'changed')
