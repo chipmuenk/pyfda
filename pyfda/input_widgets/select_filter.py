@@ -56,6 +56,7 @@ class SelectFilter(QWidget):
         self.setObjectName(objectName)
         self.fc_last = ''  # previous filter class
         self._construct_ui()
+        self._create_layout()
         self._set_response_type()  # first time initialization
 
     # -------------------------------------------------------------------------
@@ -123,13 +124,13 @@ class SelectFilter(QWidget):
         self.cmb_filter_class.setSizeAdjustPolicy(QComboBox.AdjustToContents)
 
         # ----------------------------------------------------------------------
-        # Populate combo box with initial settings from TB.fil_tree
+        # Populate combo boxes from TB.fil_tree (has been filled by now)
         # ----------------------------------------------------------------------
-        # Translate short response type ("LP") to displayed names ("Lowpass")
-        # (correspondence is defined in pyfda_rc.py) and populate rt combo box
-        #
+        # start with response types (LP, HP, ...) and sort them alphabetically
         rt_list = sorted(TB.fil_tree.keys())
 
+        # Translate short response type ("LP") from fil_tree to displayed names ("Lowpass",
+        # correspondence is defined in pyfda_rc.py) and populate rt combo box
         for rt in rt_list:
             try:
                 self.cmb_response_type.addItem(rc.rt_names[rt], rt)
@@ -144,19 +145,58 @@ class SelectFilter(QWidget):
         self.cmb_response_type.setCurrentIndex(idx)  # set initial index
         rt = qget_cmb_box(self.cmb_response_type)
 
+        # next, populate the filter type combo (IIr, FIR)
         for ft in TB.fil_tree[rt]:
             self.cmb_filter_type.addItem(rc.ft_names[ft], ft)
         self.cmb_filter_type.setCurrentIndex(0)  # set initial index
         ft = qget_cmb_box(self.cmb_filter_type)
 
+        # Finally, populate the filter class combo (Butterworth, Chebyshev, ...)
         for fc in TB.fil_tree[rt][ft]:
             self.cmb_filter_class.addItem(CFP.FILTER_CLASSES_DICT[fc]['name'], fc)
         self.cmb_filter_class.setCurrentIndex(0)  # set initial index
 
+       # ----------------------------------------------------------------------
+        # Filter Order Subwidgets
+        # ----------------------------------------------------------------------
+        self.lbl_order = QLabel("<b>Order:</b>")
+        self._chk_min_order = QCheckBox("Minimum", self)
+        self._chk_min_order.setToolTip(
+            "<span>Minimum filter order / # of taps is determined automatically.</span>")
+        self._lbl_order_n = QLabel("<b><i>N =</i></b>")
+        self._led_order_n = QLineEdit(str(fb_get('N')), self)
+        self._led_order_n.setToolTip("Filter order (# of taps - 1).")
+
+        # ----------------------------------------------------------------------
+        # GLOBAL SIGNALS & SLOTs
+        # ----------------------------------------------------------------------
+        # connect incoming signals to process_sig_rx and other widgets?!
+        self.sig_rx.connect(self.process_sig_rx)
+
+        # ------------------------------------------------------------
+        # LOCAL SIGNALS & SLOTS
+        # ------------------------------------------------------------
+        # Connect comboBoxes and setters, propgate change events hierarchically
+        #  through all widget methods and emit 'filt_changed' in the end.
+        self.cmb_response_type.currentIndexChanged.connect(
+                lambda: self._set_response_type(enb_signal=True))  # 'LP'
+        self.cmb_filter_type.currentIndexChanged.connect(
+                lambda: self._set_filter_type(enb_signal=True))  # 'IIR'
+        self.cmb_filter_class.currentIndexChanged.connect(
+                lambda: self._set_design_method(enb_signal=True))  # 'cheby1'
+        self._chk_min_order.clicked.connect(
+                lambda: self._set_filter_order(enb_signal=True))  # Min. Order
+        self._led_order_n.editingFinished.connect(
+                lambda: self._set_filter_order(enb_signal=True))  # Manual Order
+
+    # --------------------------------------------------------------------------
+    def _create_layout(self) -> None:
+        """
+        Create the layout for the widget.
+        """
         # ----------------------------------------------------------------------
         # Layout for Filter Type Subwidgets
         # ----------------------------------------------------------------------
-
         lay_h_fil_wdg = QHBoxLayout()  # container for filter subwidgets
         lay_h_fil_wdg.addWidget(self.cmb_response_type)  # LP, HP, BP, etc.
         lay_h_fil_wdg.addStretch()
@@ -169,17 +209,6 @@ class SelectFilter(QWidget):
         # ----------------------------------------------------------------------
         # see Summerfield p. 278
         self.lay_h_dyn_wdg = QHBoxLayout()  # for additional dynamic subwidgets
-
-        # ----------------------------------------------------------------------
-        # Filter Order Subwidgets
-        # ----------------------------------------------------------------------
-        self.lbl_order = QLabel("<b>Order:</b>")
-        self._chk_min_order = QCheckBox("Minimum", self)
-        self._chk_min_order.setToolTip(
-            "<span>Minimum filter order / # of taps is determined automatically.</span>")
-        self._lbl_order_n = QLabel("<b><i>N =</i></b>")
-        self._led_order_n = QLineEdit(str(fb_get('N')), self)
-        self._led_order_n.setToolTip("Filter order (# of taps - 1).")
 
         # --------------------------------------------------
         #  Layout for filter order subwidgets
@@ -209,28 +238,6 @@ class SelectFilter(QWidget):
 
         self.setLayout(lay_h_main)
 
-        # ----------------------------------------------------------------------
-        # GLOBAL SIGNALS & SLOTs
-        # ----------------------------------------------------------------------
-        # connect incoming signals to process_sig_rx and other widgets?!
-        self.sig_rx.connect(self.process_sig_rx)
-
-        # ------------------------------------------------------------
-        # LOCAL SIGNALS & SLOTS
-        # ------------------------------------------------------------
-        # Connect comboBoxes and setters, propgate change events hierarchically
-        #  through all widget methods and emit 'filt_changed' in the end.
-        self.cmb_response_type.currentIndexChanged.connect(
-                lambda: self._set_response_type(enb_signal=True))  # 'LP'
-        self.cmb_filter_type.currentIndexChanged.connect(
-                lambda: self._set_filter_type(enb_signal=True))  # 'IIR'
-        self.cmb_filter_class.currentIndexChanged.connect(
-                lambda: self._set_design_method(enb_signal=True))  # 'cheby1'
-        self._chk_min_order.clicked.connect(
-                lambda: self._set_filter_order(enb_signal=True))  # Min. Order
-        self._led_order_n.editingFinished.connect(
-                lambda: self._set_filter_order(enb_signal=True))  # Manual Order
-
     # --------------------------------------------------------------------------
     def load_dict(self):
         """
@@ -259,7 +266,7 @@ class SelectFilter(QWidget):
         fb_set('rt', self.rt)
 
         # Get list of available filter types for new rt
-        ft_list = list(TB.fil_tree[self.rt].keys())  # explicit list() needed for Py3
+        ft_list = list(TB.fil_tree[self.rt].keys())  # conversion to list needed for Py3
         # ---------------------------------------------------------------
         # Rebuild filter type combobox entries for new rt setting
         self.cmb_filter_type.blockSignals(True)  # don't fire when changed programmatically
