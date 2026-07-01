@@ -55,7 +55,7 @@ class Butter():
     """
 
     FRMT = 'sos' # output format of filter design routines 'zpk' / 'ba' / 'sos'
-
+    has_ui = False #: Flag whether the filter class has a UI or not
     info = """
     **Butterworth filters**
 

@@ -61,7 +61,7 @@ class Bessel():
     for a Bessel filter).
     """
     FRMT = 'sos' # output format of filter design routines: 'sos', 'zpk' or 'ba'
-
+    has_ui = False #: Flag whether the filter class has a UI or not
     info = """
     **Bessel filters**
 

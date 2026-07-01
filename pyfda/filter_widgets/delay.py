@@ -35,7 +35,7 @@ class Delay(QWidget):
     """
 
     FRMT = 'zpk' # output format of delay filter widget
-
+    has_ui = True #: Flag whether the filter class has a UI or not
     info ="""
     **Delay widget**
 
@@ -68,6 +68,7 @@ class Delay(QWidget):
             }
 
         self.info_doc = []
+        self.construct_ui()  # create subwidgets for filter design
 
     # -------------------------------------------------------------------------
     def emit(self, dict_sig: dict) -> None:

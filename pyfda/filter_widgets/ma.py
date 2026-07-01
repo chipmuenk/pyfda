@@ -56,8 +56,7 @@ class MA(QWidget):
     """
 
     FRMT = ('zpk', 'ba') # output format(s) of filter design routines 'zpk' / 'ba' / 'sos'
-
-
+    has_ui = True #: Flag whether the filter class has a UI or not
     info = """
     **Moving average filters**
 

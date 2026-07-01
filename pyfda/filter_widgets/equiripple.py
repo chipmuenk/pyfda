@@ -58,7 +58,7 @@ class Equiripple(QWidget):
 
     FRMT = 'ba' # output format of filter design routines ('zpk' / 'ba' / 'sos')
             # currently, only 'ba' is supported for equiripple routines
-
+    has_ui = True #: Flag whether the filter class has a UI or not
     info = """
     **Equiripple filters**
 
@@ -486,7 +486,6 @@ if __name__ == '__main__':
 
     # instantiate filter widget
     filt = Equiripple()
-    filt.construct_ui()
 
     layVDynWdg = QVBoxLayout()
     layVDynWdg.addWidget(filt.wdg_fil, stretch = 1)

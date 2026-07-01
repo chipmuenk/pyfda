@@ -44,6 +44,7 @@ __version__ = "2.2"
 classes = {'Manual_FIR':'Manual', 'Manual_IIR':'Manual'}
 
 FRMT = 'ba' # default output format of filter design routines 'zpk' / 'ba' / 'sos'
+has_ui = False #: Flag whether the filter class has a UI or not
 
 msg_man = ('a', "Design the filter using the P/Z or the b/a widget. "
                 "The target specs are only used for entering and displaying spec limits.")
