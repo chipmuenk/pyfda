@@ -116,11 +116,11 @@ class AmplitudeSpecs(QWidget):
         self.layGSpecs.setAlignment(Qt.AlignTop)
 
         # This is the top level widget, encompassing the other widgets
-        self.frmMain = QFrame(self)
-        self.frmMain.setLayout(self.layGSpecs)
+        self.frm_main = QFrame(self)
+        self.frm_main.setLayout(self.layGSpecs)
 
         self.layVMain = QVBoxLayout()  # Widget main layout
-        self.layVMain.addWidget(self.frmMain)
+        self.layVMain.addWidget(self.frm_main)
         self.layVMain.setContentsMargins(*params['wdg_margins'])
 
         self.setLayout(self.layVMain)
