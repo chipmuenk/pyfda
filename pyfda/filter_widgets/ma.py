@@ -36,7 +36,8 @@ import numpy as np
 from pyfda.libs.compat import (QWidget, QLabel, QLineEdit, pyqtSignal, QCheckBox,
                       QVBoxLayout, QHBoxLayout)
 from pyfda.filterbroker import fb_get, fb_set
-from pyfda.libs.pyfda_lib import ceil_odd, safe_eval
+from pyfda.libs.pyfda_lib import safe_eval
+from pyfda.libs.special_functions import ceil_odd
 from pyfda.libs.pyfda_qt_lib import popup_warning, emit
 from pyfda.libs.pyfda_sig_lib import zeros_with_val, fil_save, fil_convert
 
