@@ -14,7 +14,9 @@ Attention:
 This class is re-instantiated dynamically every time the filter design method
 is selected, calling its __init__ method.
 
-API version info:
+API version info
+----------------
+
     1.0: initial working release
     1.1: - copy A_PB -> A_PB2 and A_SB -> A_SB2 for BS / BP designs
          - mark private methods as private
@@ -29,8 +31,8 @@ API version info:
          is read and merged with the first one.
     2.1: Remove empty methods construct_ui and destruct_ui and attributes
          self.wdg and self.hdl
-
-   :2.2: Rename `filter_classes` -> `classes`, remove Py2 compatibility
+    2.2: Rename `filter_classes` -> `classes`, remove Py2 compatibility
+    2.3: Add `has_ui` attribute to filter classes
 """
 from scipy.signal import cheby1, cheb1ord
 
@@ -41,7 +43,7 @@ from pyfda.filterbroker import fb_get, fb_set
 
 from .common import Common
 
-__version__ = "2.2"
+__version__ = "2.3"
 
 classes = {'Cheby1': 'Chebyshev 1'} #: Dict containing class name : display name
 

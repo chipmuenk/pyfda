@@ -14,12 +14,13 @@ Attention:
 This class is re-instantiated dynamically every time the filter design method
 is selected, calling its __init__ method.
 
-API version info:
+API version info
+----------------
+
     1.0: initial working release
     1.1: - copy A_PB -> A_PB2 and A_SB -> A_SB2 for BS / BP designs
          - mark private methods as private
     1.2: new API using fil_save (enable SOS features when available)
-    1.3: new public methods destruct_ui + construct_ui (no longer called by __init__)
     1.4: module attribute `filter_classes` contains class name and combo box name
          instead of class attribute `name`
          `FRMT` is now a class attribute
@@ -27,10 +28,8 @@ API version info:
          first element controls whether the widget is visible and / or enabled.
          This dict is now called self.rt_dict. When present, the dict self.rt_dict_add
          is read and merged with the first one.
-    2.1: Remove empty methods construct_ui and destruct_ui and attributes
-         self.wdg and self.hdl
-
-   :2.2: Rename `filter_classes` -> `classes`, remove Py2 compatibility
+    2.2: Rename `filter_classes` -> `classes`, remove Py2 compatibility
+    2.3: Add `has_ui` attribute to filter classes
 """
 from scipy.signal import ellip, ellipord
 
@@ -41,7 +40,7 @@ from pyfda.filterbroker import fb_get, fb_set
 
 from .common import Common
 
-__version__ = "2.2"
+__version__ = "2.3"
 
 classes = {'Ellip': 'Elliptic'} #: Dict containing class name : display name
 

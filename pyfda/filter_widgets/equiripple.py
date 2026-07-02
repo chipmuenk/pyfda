@@ -14,11 +14,12 @@ Attention:
 This class is re-instantiated dynamically every time the filter design method
 is selected, calling the __init__ method.
 
-API version info:
+API version info
+----------------
+
     1.0: initial working release
     1.1: mark private methods as private
     1.2: new API using fil_save
-    1.3: new public methods destruct_ui + construct_ui (no longer called by __init__)
     1.4: module attribute `filter_classes` contains class name and combo box name
          instead of class attribute `name`
          `FRMT` is now a class attribute
@@ -27,8 +28,8 @@ API version info:
          This dict is now called self.rt_dict. When present, the dict self.rt_dict_add
          is read and merged with the first one.
     2.1: Remove method destruct_ui and attributes self.wdg and self.hdl
-
-   :2.2: Rename `filter_classes` -> `classes`, remove Py2 compatibility
+    2.2: Rename `filter_classes` -> `classes`, remove Py2 compatibility
+    2.3: Add `has_ui` attribute to filter classes
 """
 import logging
 
@@ -45,7 +46,7 @@ from .common import remezord
 
 logger = logging.getLogger(__name__)
 
-__version__ = "2.2"
+__version__ = "2.3"
 
 classes = {'Equiripple':'Equiripple'} #: Dict containing class name : display name
 

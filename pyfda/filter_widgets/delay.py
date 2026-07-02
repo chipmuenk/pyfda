@@ -13,7 +13,9 @@ Attention:
 This class is re-instantiated dynamically every time the filter design method
 is selected, calling the __init__ method.
 
-API version info:
+API version info
+----------------
+
     1.0: initial working release
 """
 import numpy as np

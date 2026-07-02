@@ -14,7 +14,9 @@ Attention:
 This class is re-instantiated dynamically everytime the filter design method
 is selected, calling the __init__ method.
 
-API version info:
+API version info
+----------------
+
     1.0: initial working release
     1.1: mark private methods as private
     1.2: - new API using fil_save & fil_convert (allow multiple formats,
@@ -27,9 +29,9 @@ API version info:
          first element controls whether the widget is visible and / or enabled.
          This dict is now called self.rt_dict. When present, the dict self.rt_dict_add
          is read and merged with the first one.
-    2.1: Remove method destruct_ui and attributes self.wdg and self.hdl
+    2.2: Rename `filter_classes` -> `classes`, remove Py2 compatibility
+    2.3: Add `has_ui` attribute to filter classes
 
-   :2.2: Rename `filter_classes` -> `classes`, remove Py2 compatibility
 """
 import numpy as np
 
@@ -41,7 +43,7 @@ from pyfda.libs.special_functions import ceil_odd
 from pyfda.libs.pyfda_qt_lib import popup_warning, emit
 from pyfda.libs.pyfda_sig_lib import zeros_with_val, fil_save, fil_convert
 
-__version__ = "2.2"
+__version__ = "2.3"
 
 classes = {'MA':'Moving Average'} #: Dict containing class name : display name
 

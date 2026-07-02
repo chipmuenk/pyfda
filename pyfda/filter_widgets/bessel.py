@@ -13,32 +13,23 @@ the filter design in zeros, poles, gain (zpk) format
 This class is re-instantiated dynamically every time the filter design method
 is selected, reinitializing instance attributes.
 
-API version info:
-    :1.0: initial working release
+API version info
+----------------
 
-    :1.1: - copy ``A_PB`` -> ``A_PB2`` and ``A_SB -> ``A_SB2`` for BS / BP designs
+    1.0: initial working release
 
+    1.1: - copy ``A_PB`` -> ``A_PB2`` and ``A_SB -> ``A_SB2`` for BS / BP designs
           - mark private methods as private
-
-    :1.2: new API using fil_save (enable SOS features)
-
-    :1.3: new public methods ``destruct_ui`` and ``construct_ui`` (no longer
-         called by ``__init__``)
-
-    :1.4: - module attribute ``filter_classes`` contains class name and combo box
+    1.2: new API using fil_save (enable SOS features)
+    1.4: - module attribute ``filter_classes`` contains class name and combo box
             name instead of class attribute ``name``
-
         - ``FRMT`` is now a class attribute
-
-    :2.0: Specify the parameters for each subwidget as tuples in a dict where the
+    2.0: Specify the parameters for each subwidget as tuples in a dict where the
         first element controls whether the widget is visible and / or enabled.
         This dict is now called ``self.rt_dict``. When present, the dict
         ``self.rt_dict_add`` is read and merged with the first one.
-
-    :2.1: Remove empty methods ``construct_ui`` and ``destruct_ui`` and attributes
-         ``self.wdg`` and ``self.hdl``
-
-    :2.2: Rename `filter_classes` -> `classes`, remove Py2 compatibility
+    2.2: Rename `filter_classes` -> `classes`, remove Py2 compatibility
+    2.3: Add `has_ui` attribute to filter classes
 """
 from scipy.signal import bessel, buttord
 
@@ -48,7 +39,7 @@ from pyfda.libs.pyfda_qt_lib import popup_warning
 from pyfda.libs.pyfda_sig_lib import fil_save
 
 
-__version__ = "2.2"
+__version__ = "2.3"
 
 classes = {'Bessel': 'Bessel'} #: Dict containing class name : display name
 
@@ -95,7 +86,6 @@ class Bessel():
     def __init__(self):
 
         self.ft = 'IIR' #: filter type
-
         self.rt_dict =  {
             'COM':{'man':{'fo': ('a', 'N'),
                    'msg':('a', "Enter the filter order <b><i>N</i></b> and the critical "

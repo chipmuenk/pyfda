@@ -16,7 +16,9 @@ Attention:
 This class is re-instantiated dynamically everytime the filter design method
 is selected, calling the __init__ method.
 
-API version info:
+API version info
+----------------
+
     1.0: initial working release
     1.1: mark private methods as private
     1.2: new API using fil_save
@@ -28,10 +30,8 @@ API version info:
          first element controls whether the widget is visible and / or enabled.
          This dict is now called self.rt_dict. When present, the dict self.rt_dict_add
          is read and merged with the first one.
-
-    2.1: Remove method destruct_ui and attributes self.wdg and self.hdl
-
-   :2.2: Rename `filter_classes` -> `classes`, remove Py2 compatibility
+    2.2: Rename `filter_classes` -> `classes`, remove Py2 compatibility
+    2.3: Add `has_ui` attribute to filter classes
 """
 import logging
 
@@ -63,7 +63,7 @@ logger = logging.getLogger(__name__)
 #       Automatic switching to Kaiser / Hermann?
 # TODO: Parameters for windows are not stored in the filter dictionary
 
-__version__ = "2.2"
+__version__ = "2.3"
 
 classes = {'Firwin': 'Windowed FIR'}  #: Dict containing class name : display name
 
@@ -401,6 +401,7 @@ class Firwin(QWidget):
         -------
         h : (numtaps,) ndarray
             Coefficients of length `numtaps` FIR filter.
+
         Raises
         ------
         ValueError
@@ -408,6 +409,7 @@ class Firwin(QWidget):
             than or equal to `nyq`, if the values in `cutoff` are not strictly
             monotonically increasing, or if `numtaps` is even but a passband
             includes the Nyquist frequency.
+
         See also
         --------
         scipy.firwin
