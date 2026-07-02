@@ -146,11 +146,11 @@ class UI_W(QWidget):
         layH.addWidget(self.ledWF)
         layH.setContentsMargins(0, 0, 0, 0)
 
-        frmMain = QFrame(self)
-        frmMain.setLayout(layH)
+        frm_main = QFrame(self)
+        frm_main.setLayout(layH)
 
         lay_v_main = QVBoxLayout()  # Widget main layout
-        lay_v_main.addWidget(frmMain)
+        lay_v_main.addWidget(frm_main)
         lay_v_main.setContentsMargins(0, 5, 0, 0)  # *params['wdg_margins'])
 
         self.setLayout(lay_v_main)
@@ -161,8 +161,8 @@ class UI_W(QWidget):
         self.ledWI.setText(str(dict_ui['WI']))
         self.ledWF.setText(str(dict_ui['WF']))
 
-        frmMain.setEnabled(dict_ui['enabled'])
-        frmMain.setVisible(dict_ui['visible'])
+        frm_main.setEnabled(dict_ui['enabled'])
+        frm_main.setVisible(dict_ui['visible'])
 
         # ----------------------------------------------------------------------
         # LOCAL SIGNALS & SLOTs
@@ -391,11 +391,11 @@ class UI_Q(QWidget):
         layG.addWidget(self.cmbQuant, 1, 2)
         layG.setContentsMargins(0, 0, 0, 0)
 
-        frmMain = QFrame(self)
-        frmMain.setLayout(layG)
+        frm_main = QFrame(self)
+        frm_main.setLayout(layG)
 
         lay_v_main = QVBoxLayout()  # Widget main layout
-        lay_v_main.addWidget(frmMain)
+        lay_v_main.addWidget(frm_main)
         lay_v_main.setContentsMargins(0, 0, 0, 0)  # *params['wdg_margins'])
 
         self.setLayout(lay_v_main)
@@ -405,8 +405,8 @@ class UI_Q(QWidget):
         # ----------------------------------------------------------------------
         self.ovfl = qget_cmb_box(self.cmbOvfl, data=False)
         self.quant = qget_cmb_box(self.cmbQuant, data=False)
-        frmMain.setEnabled(dict_ui['enabled'])
-        frmMain.setVisible(dict_ui['visible'])
+        frm_main.setEnabled(dict_ui['enabled'])
+        frm_main.setVisible(dict_ui['visible'])
 
         # ----------------------------------------------------------------------
         # LOCAL SIGNALS & SLOTs
@@ -624,11 +624,11 @@ class UI_WQ(QWidget):
         layG.addWidget(self.cmbQuant, 1, 2)
         layG.setContentsMargins(0, 0, 0, 0)
 
-        frmMain = QFrame(self)
-        frmMain.setLayout(layG)
+        frm_main = QFrame(self)
+        frm_main.setLayout(layG)
 
         lay_v_main = QVBoxLayout()  # Widget main layout
-        lay_v_main.addWidget(frmMain)
+        lay_v_main.addWidget(frm_main)
         lay_v_main.setContentsMargins(0, 0, 0, 0)  # *params['wdg_margins'])
 
         self.setLayout(lay_v_main)
@@ -648,8 +648,8 @@ class UI_WQ(QWidget):
         # initialize button icon
         self.butLock_clicked(self.butLock.isChecked())
 
-        frmMain.setEnabled(dict_ui['enabled'])
-        frmMain.setVisible(dict_ui['visible'])
+        frm_main.setEnabled(dict_ui['enabled'])
+        frm_main.setVisible(dict_ui['visible'])
 
         # ----------------------------------------------------------------------
         # LOCAL SIGNALS & SLOTs

@@ -292,11 +292,11 @@ class FX_UI_WQ(QWidget):
         layG.addWidget(self.lbl_LSB, 2, 3, 1, 3, Qt.AlignRight)
         layG.setContentsMargins(5, 5, 5, 5)
 
-        frmMain = QFrame(self)
-        frmMain.setLayout(layG)
+        frm_main = QFrame(self)
+        frm_main.setLayout(layG)
 
         lay_v_main = QVBoxLayout()  # Widget main layout
-        lay_v_main.addWidget(frmMain)
+        lay_v_main.addWidget(frm_main)
         lay_v_main.setContentsMargins(0, 0, 0, 0)
 
         self.setLayout(lay_v_main)

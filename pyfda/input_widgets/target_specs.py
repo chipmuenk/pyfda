@@ -104,11 +104,11 @@ class TargetSpecs(QWidget):
         layVSpecs.setContentsMargins(0, 6, 0, 0)  # (left, top, right, bottom)
 
         # This is the top level widget, encompassing the other widgets
-        frmMain = QFrame(self)
-        frmMain.setLayout(layVSpecs)
+        frm_main = QFrame(self)
+        frm_main.setLayout(layVSpecs)
 
         self.layVMain = QVBoxLayout()  # Widget main layout
-        self.layVMain.addWidget(frmMain)
+        self.layVMain.addWidget(frm_main)
         self.layVMain.setContentsMargins(*params['wdg_margins'])
 
         self.setLayout(self.layVMain)

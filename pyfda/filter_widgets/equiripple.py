@@ -59,7 +59,7 @@ class Equiripple(QWidget):
 
     FRMT = 'ba' # output format of filter design routines ('zpk' / 'ba' / 'sos')
             # currently, only 'ba' is supported for equiripple routines
-
+    has_ui = True #: Flag whether the filter class has a UI or not
     info = """
     **Equiripple filters**
 
@@ -487,7 +487,6 @@ if __name__ == '__main__':
 
     # instantiate filter widget
     filt = Equiripple()
-    filt.construct_ui()
 
     layVDynWdg = QVBoxLayout()
     layVDynWdg.addWidget(filt.wdg_fil, stretch = 1)
@@ -495,11 +494,11 @@ if __name__ == '__main__':
     filt.LPman()  # design a low-pass with parameters from global dict
     print(fb_get(filt.FRMT)) # return results in default format
 
-    frmMain = QFrame()
-    frmMain.setFrameStyle(QFrame.StyledPanel|QFrame.Sunken)
-    frmMain.setLayout(layVDynWdg)
+    frm_main = QFrame()
+    frm_main.setFrameStyle(QFrame.StyledPanel|QFrame.Sunken)
+    frm_main.setLayout(layVDynWdg)
 
-    form = frmMain
+    form = frm_main
 
     form.show()
 

@@ -236,11 +236,11 @@ if __name__ == '__main__':
     filt.APman()  # design an all pass filter with parameters from global dict
     print(fb_get(filt.FRMT)) # return results in default format
 
-    frmMain = QFrame()
-    frmMain.setFrameStyle(QFrame.StyledPanel|QFrame.Sunken)
-    frmMain.setLayout(layVDynWdg)
+    frm_main = QFrame()
+    frm_main.setFrameStyle(QFrame.StyledPanel|QFrame.Sunken)
+    frm_main.setLayout(layVDynWdg)
 
-    form = frmMain
+    form = frm_main
 
     form.show()
 

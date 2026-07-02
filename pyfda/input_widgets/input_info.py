@@ -171,8 +171,8 @@ class Input_Info(QWidget):
         lay_v_controls.addWidget(self.frm_debug)
         lay_v_controls.addWidget(self.frm_settings)
 
-        self.frmMain = QFrame(self)
-        self.frmMain.setLayout(lay_v_controls)
+        self.frm_main = QFrame(self)
+        self.frm_main.setLayout(lay_v_controls)
 
         self.tbl_filt_perf = QTableWidget(self)
         self.tbl_filt_perf.setAlternatingRowColors(True)
@@ -187,7 +187,7 @@ class Input_Info(QWidget):
         self.txt_filt_tree = QTextBrowser(self)
 
         lay_v_main = QVBoxLayout()
-        lay_v_main.addWidget(self.frmMain)
+        lay_v_main.addWidget(self.frm_main)
 
 #        lay_v_main.addLayout(self.layHControls)
         splitter = QSplitter(self)

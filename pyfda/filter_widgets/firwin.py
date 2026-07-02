@@ -67,7 +67,6 @@ __version__ = "2.2"
 
 classes = {'Firwin': 'Windowed FIR'}  #: Dict containing class name : display name
 
-
 class Firwin(QWidget):
     """
     Create FIR filters  (LP, HP, BP, BS) using the window method with  with fixed or minimum
@@ -76,6 +75,7 @@ class Firwin(QWidget):
 
     FRMT = 'ba'     # output format(s) of filter design routines 'zpk' / 'ba' / 'sos'
                     # currently, only 'ba' is supported for firwin routines
+    has_ui = True #: Flag whether the filter class has a UI or not
 
     sig_tx = pyqtSignal(object)  # local signal between FFT widget and FFTWin_Selector
     sig_tx_local = pyqtSignal(object)
@@ -647,7 +647,6 @@ if __name__ == "__main__":
 
     # instantiate filter widget
     filt = Firwin()
-    filt.construct_ui()
 
     layVDynWdg = QVBoxLayout()
     layVDynWdg.addWidget(filt.wdg_fil, stretch=1)
@@ -656,11 +655,11 @@ if __name__ == "__main__":
     filt.LPman()  # design a low-pass with parameters from global dict
     print(fb_get(filt.FRMT))  # return results in default format
 
-    frmMain = QFrame()
-    frmMain.setFrameStyle(QFrame.StyledPanel | QFrame.Sunken)
-    frmMain.setLayout(layVDynWdg)
+    frm_main = QFrame()
+    frm_main.setFrameStyle(QFrame.StyledPanel | QFrame.Sunken)
+    frm_main.setLayout(layVDynWdg)
 
-    mainw = frmMain
+    mainw = frm_main
     mainw.show()
 
     app.exec_()

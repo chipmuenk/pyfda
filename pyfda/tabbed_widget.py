@@ -45,6 +45,7 @@ class TabbedWidget(QWidget):
         self.label = label
         self.use_qscroll_area = use_qscroll_area
         self._construct_ui()
+        self._create_layout()
 
     # -------------------------------------------------------------------------
     def emit(self, dict_sig: dict) -> None:
@@ -111,15 +112,29 @@ class TabbedWidget(QWidget):
                 self.tab_widget.addTab(inst, "not set")
             if hasattr(inst, 'tool_tip'):
                 self.tab_widget.setTabToolTip(self.n_wdg, inst.tool_tip)
-            # collect all instance tx signals in self.sig_tx
+            # ----------------------------------------------------------------------
+            # GLOBAL SIGNALS & SLOTs
+            # ---------------------------------------------------------------------
             if hasattr(inst, 'sig_tx'):
+                # collect all instance tx signals in self.sig_tx
                 inst.sig_tx.connect(self.sig_tx)
-            # distribute self.sig_rx signal to all instance rx signals
             if hasattr(inst, 'sig_rx'):
+                # distribute self.sig_rx signal to all instance rx signals
                 self.sig_rx.connect(inst.sig_rx)
 
             self.n_wdg += 1  # successfully instantiated one more widget
             inst_wdg_str += '\t' + mod_fq_name + "." + class_name + '\n'
+
+        # ----------------------------------------------------------------------
+        # LOCAL SIGNALS & SLOTs
+        # ----------------------------------------------------------------------
+        # connect collected tx signals to all local rx signal inputs
+        self.sig_tx.connect(self.sig_rx)
+        self.sig_rx.connect(self.log_rx) # enable for debugging
+        # When user has selected a different tab, trigger a redraw of current tab
+        self.tab_widget.currentChanged.connect(self.current_tab_changed)
+        # The following does not work: maybe current scope must be left?
+        # tab_widget.currentChanged.connect(tab_widget.currentWidget().redraw)
 
         if len(inst_wdg_str) == 0:
             logger.critical("No %s widgets found!", self.labels)
@@ -127,9 +142,18 @@ class TabbedWidget(QWidget):
         else:
             logger.debug("Added %d %s widgets:\n%s", self.n_wdg, self.label, inst_wdg_str)
 
-        # --------------------------------------
-        # UI Layout
-        #---------------------------------------
+    # ------------------------------------------------------------------------------
+    def _create_layout(self) -> None:
+        """
+        Create the layout for the tab_widget component. Depending on `use_qscroll_area`,
+        the widget is placed directly or inside a QScrollArea.
+
+        If it is placed directly, an event filter and a timer is created that is triggered by
+        each resize event of `tab_widget` in the eventFilter. The timer waits for 500 ms before
+        {'ui_global_changed': 'resized'} is emitted. This prevents too frequent resize operations
+        which can be very slow for complex plot widgets.
+        """
+
         lay_v_main = QVBoxLayout()
         # setContentsMargins -> number of pixels between frame window border
         lay_v_main.setContentsMargins(*params['wdg_margins'])  # (left, top, right, bottom)
@@ -146,24 +170,8 @@ class TabbedWidget(QWidget):
 
         self.setLayout(lay_v_main)  # set the main layout of the window
 
-        # ----------------------------------------------------------------------
-        # GLOBAL SIGNALS & SLOTs
-        # ---------------------------------------------------------------------
-        # self.sig_rx.connect(inst.sig_rx) # this happens in _construct_ui()
-        # ----------------------------------------------------------------------
-        # LOCAL SIGNALS & SLOTs
-        # ----------------------------------------------------------------------
-        # connect collected tx signals to all local rx signal inputs
-        self.sig_tx.connect(self.sig_rx)
-        self.sig_rx.connect(self.log_rx) # enable for debugging
-        # When user has selected a different tab, trigger a redraw of current tab
-        # self.tab_widget.currentChanged.connect(lambda: self.emit({'ui_global_changed': 'tab'}))
-        self.tab_widget.currentChanged.connect(self.current_tab_changed)
-        # The following does not work: maybe current scope must be left?
-        # tab_widget.currentChanged.connect(tab_widget.currentWidget().redraw)
-
         # ------------------------------------------------------------------------
-        #            Resizing
+        #            Resizing with timer
         # ------------------------------------------------------------------------
         if not self.use_qscroll_area:
             self.timer_id = QtCore.QTimer()
@@ -188,7 +196,7 @@ class TabbedWidget(QWidget):
 
         This filter stops and restarts a one-shot timer for every resize event.
         When the timer generates a timeout after 500 ms, ``{'ui_global_changed': 'resized'}``
-        is emitted by the timer.
+        is emitted by the timer. This prevents too frequent resize operations.
         """
         if isinstance(source, QTabWidget):
             if event.type() == QEvent.Resize:
