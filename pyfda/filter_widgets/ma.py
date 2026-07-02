@@ -34,7 +34,7 @@ API version info:
 import numpy as np
 
 from pyfda.libs.compat import (QWidget, QLabel, QLineEdit, pyqtSignal, QCheckBox,
-                      QVBoxLayout, QHBoxLayout)
+                      QVBoxLayout, QHBoxLayout, QSizePolicy)
 from pyfda.filterbroker import fb_get, fb_set
 from pyfda.libs.pyfda_lib import ceil_odd, safe_eval
 from pyfda.libs.pyfda_qt_lib import popup_warning, emit
@@ -169,6 +169,7 @@ class MA(QWidget):
             self.led_delays.setText(str(self.delays))
         self.led_delays.setObjectName('wdg_led_ma_0')
         self.led_delays.setToolTip("Set number of delays per stage")
+        self.led_delays.setSizePolicy(QSizePolicy.MinimumExpanding, QSizePolicy.Fixed)
 
         self.lbl_stages = QLabel("<b>Stages =</ b>", self)
         self.lbl_stages.setObjectName('wdg_lbl_ma_1')
