@@ -310,8 +310,8 @@ def angle_zero(X: np.ndarray, n_eps: float = 1e3, wrapped: bool = True) -> np.nd
     """
     if wrapped:
         return np.angle(np.where((np.abs(X) > n_eps * np.spacing(1)), X, 0))
-    else:
-        return np.unwrap(np.angle(np.where((np.abs(X) > n_eps * np.spacing(1)), X, 0)))
+
+    return np.unwrap(np.angle(np.where((np.abs(X) > n_eps * np.spacing(1)), X, 0)))
 
 
 # ------------------------------------------------------------------------------
@@ -446,8 +446,8 @@ def validate_sos(sos: np.ndarray) -> tuple[np.ndarray, int]:
 
 # ------------------------------------------------------------------------------
 def group_delay(b: np.ndarray, a: np.ndarray = 1, nfft: int = 512, whole: bool = False,
-                verbose: bool = True, fs: float = 2.*np.pi,
-                sos: bool = False, alg: str = "scipy", n_eps: int = 100) -> tuple[np.ndarray, np.ndarray]:
+                verbose: bool = True, fs: float = 2.*np.pi, sos: bool = False,
+                alg: str = "scipy", n_eps: int = 100) -> tuple[np.ndarray, np.ndarray]:
     r"""Calculate group delay of a discrete time filter, specified by
     numerator coefficients `b` and denominator coefficients `a` of the system
     function `H` ( `z`).
@@ -1259,7 +1259,7 @@ def fil_save(arg: np.ndarray, format_in: str, sender: str, convert: bool = True)
         fb_set('ba', np.asarray([np.array(b, dtype=complex), np.array(a, dtype=complex)]))
 
     else:
-        logger.error(f"\t'fil_save()':Unknown input format '{format_in}'!")
+        logger.error("\t'fil_save()':Unknown input format '%s'!", format_in)
         raise ValueError
 
     fb_set('creator', [format_in, sender])

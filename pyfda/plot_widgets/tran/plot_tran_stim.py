@@ -20,8 +20,8 @@ from pyfda.libs.compat import QWidget, pyqtSignal, QVBoxLayout
 from pyfda.libs.pyfda_qt_lib import qget_cmb_box, qstyle_widget, emit
 from pyfda.filterbroker import fb_get
 from pyfda.libs.pyfda_lib import (
-    pprint_log, rect_bl, sawtooth_bl, triang_bl, comb_bl, safe_numexpr_eval)
-
+    pprint_log, safe_numexpr_eval)
+from pyfda.libs.special_functions import rect_bl, sawtooth_bl, triang_bl, comb_bl
 from pyfda.pyfda_rc import params  # FMT string for QLineEdit fields, e.g. '{:.3g}'
 from pyfda.plot_widgets.tran.plot_tran_stim_ui import Plot_Tran_Stim_UI
 

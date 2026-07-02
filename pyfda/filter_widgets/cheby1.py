@@ -34,7 +34,7 @@ API version info:
 """
 from scipy.signal import cheby1, cheb1ord
 
-from pyfda.libs.pyfda_lib import lin2unit
+from pyfda.libs.special_functions import lin2unit
 from pyfda.libs.pyfda_qt_lib import popup_warning
 from pyfda.libs.pyfda_sig_lib import fil_save
 from pyfda.filterbroker import fb_get, fb_set
