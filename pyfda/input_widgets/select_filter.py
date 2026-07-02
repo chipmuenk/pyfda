@@ -498,7 +498,6 @@ class SelectFilter(QWidget):
         Create filter widget UI dynamically and
         connect its sig_tx signal to sig_tx in this scope.
         """
-        # get_fil_inst().construct_ui()
         if hasattr(get_fil_inst(), 'wdg_fil'):
             try:
                 self.dyn_wdg_fil = get_fil_inst().wdg_fil
