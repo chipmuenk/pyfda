@@ -126,7 +126,7 @@ class Firwin(QWidget):
 
         # ------------------- end of static info for filter tree ---------------
 
-        self.construct_ui()
+        self._construct_ui()
         # get initial / last setting from dictionary, updating self.all_wins_dict
         self.dict2filter_params()
 
@@ -167,7 +167,7 @@ class Firwin(QWidget):
                 self.emit(dict_sig, sig_name='sig_tx_local')
 
     # --------------------------------------------------------------------------
-    def construct_ui(self) -> None:
+    def _construct_ui(self) -> None:
         """
         Create additional subwidget(s) needed for filter design:
         These subwidgets are instantiated dynamically when needed in

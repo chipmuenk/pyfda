@@ -173,7 +173,7 @@ class Equiripple(QWidget):
         self.info_doc.append('remezord()\n==========')
         self.info_doc.append(remezord.__doc__)
 
-        self.construct_ui()
+        self._construct_ui()
 
     # -------------------------------------------------------------------------
     def emit(self, dict_sig):
@@ -184,7 +184,7 @@ class Equiripple(QWidget):
         emit(self, dict_sig)
 
     #--------------------------------------------------------------------------
-    def construct_ui(self):
+    def _construct_ui(self):
         """
         Create additional subwidget(s) needed for filter design:
         These subwidgets are instantiated dynamically when needed in
