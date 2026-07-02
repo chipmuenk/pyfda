@@ -469,13 +469,12 @@ class SelectFilter(QWidget):
         """
 
         if hasattr(get_fil_inst(), 'wdg_fil'):
-            # not needed, connection is destroyed automatically
-            # get_fil_inst().sig_tx.disconnect()
             if hasattr(self, 'dyn_wdg_fil'):
                 try:
                     # remove widget from layout
                     self.lay_h_dyn_wdg.removeWidget(self.dyn_wdg_fil)
-                    # delete UI widget when scope has been left
+                    # delete UI widget when scope has been left, also destroy
+                    # all signal-slot connections and child widgets
                     self.dyn_wdg_fil.deleteLater()
 
                 except AttributeError as e:
@@ -498,7 +497,6 @@ class SelectFilter(QWidget):
         Create filter widget UI dynamically and
         connect its sig_tx signal to sig_tx in this scope.
         """
-        # get_fil_inst().construct_ui()
         if hasattr(get_fil_inst(), 'wdg_fil'):
             try:
                 self.dyn_wdg_fil = get_fil_inst().wdg_fil
