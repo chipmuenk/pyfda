@@ -145,7 +145,7 @@ class Input_Specs(QWidget):
         elif 'data_changed' in dict_sig and dict_sig['data_changed'] == 'filter_loaded':
             # Update info string from filter dict & set button = "ok"
             # This is only triggered from global signals
-            self.load_dict()
+            self._load_info_text()
 
         if propagate:
             # local signals are propagated with the class name and id of this widget,
@@ -389,32 +389,32 @@ class Input_Specs(QWidget):
     # --------------------------------------------------------------------------
     def _load_filter(self) -> None:
         """
-        Load filter dict `fil[0]` either from file or from memory and update the
-        widgets via `load_dict()` and via sig_tx: {'data_changed':'filter_loaded'}.
+        Load filter dict `fil[0]` either from file or from memory and update the info text
+        via `_load_info_text()` and the widgets via sig_tx: {'data_changed':'filter_loaded'}.
         """
-        sel = qget_cmb_box(self.cmb_filter_load)
+        src = qget_cmb_box(self.cmb_filter_load)
         # 'File' or 'File (all)' selected, update fil[0] resp. fil[0] ... fil[9] from file
-        if sel in {"file", "file_all"}:
-            ret = load_filter(self, all_filters=sel == "file_all")
+        if src in {"file", "file_all"}:
+            ret = load_filter(self, all_filters=src == "file_all")
             if ret == -1:
                 return  # aborted or error occurred -> do nothing
             if ret != 0:
                 logger.error('Unknown return code "%s"!', ret)
                 return
 
-        elif sel == "def":  # restore default filter
+        elif src == "def":  # restore default filter
             fb.fil[0] = copy.deepcopy(fb.fil_ref)
 
-        elif sel == "def_all":  # Copy defaults to all memories
+        elif src == "def_all":  # Copy defaults to all memories
             for i in range(1, 10):
                 fb.fil[i] = copy.deepcopy(fb.fil_ref)
 
         # 'Mem <i>', copy fil[i] to fil[0]
         else:
-            fb.fil[0] = copy.deepcopy(fb.fil[int(sel)])
+            fb.fil[0] = copy.deepcopy(fb.fil[int(src)])
 
         # update info string
-        self.load_dict()
+        self._load_info_text()
         self.led_info.setText(str(fb_get('info')))
         self.cmb_filter_load.setCurrentIndex(0)
         self.emit({'data_changed': 'filter_loaded'})
@@ -424,32 +424,32 @@ class Input_Specs(QWidget):
         """
         Save current filter fb.fil[0] either to file or to one of the memories
         """
-        # sel contains the data field of the combo box which is either "file" / "file_all"
+        # `dest`` contains the data field of the combo box which is either "file" / "file_all"
         # or the number of the memory location (e.g. "2" for "Mem 2"). This is larger by 1
         # than the combobox index
-        sel = qget_cmb_box(self.cmb_filter_save)
+        dest = qget_cmb_box(self.cmb_filter_save)
 
-        if sel == "file":
+        if dest == "file":
             # save current filter to file
             save_filter(self)
-        elif sel == "file_all":
+        elif dest == "file_all":
             # save all filters
             save_all_filters(self)
-        elif sel == "0":
+        elif dest == "0":
             # filter 0 selected, don't do anything
             return
         else:
             # save fil[0] to selected location
-            fb.fil[int(sel)] = copy.deepcopy(fb.fil[0])
+            fb.fil[int(dest)] = copy.deepcopy(fb.fil[0])
             # insert info string into new tool tip
             self.cmb_filter_save.setItemData(
-                int(sel) + 1, f"Copy -> Mem {sel}: {self.led_info.text()}", Qt.ToolTipRole)
+                int(dest) + 1, f"Copy -> Mem {dest}: {self.led_info.text()}", Qt.ToolTipRole)
             self.cmb_filter_load.setItemData(
-                int(sel) + 1, f"Load <- Mem {sel}: {self.led_info.text()}", Qt.ToolTipRole)
+                int(dest) + 1, f"Load <- Mem {dest}: {self.led_info.text()}", Qt.ToolTipRole)
         self.cmb_filter_save.setCurrentIndex(0)
 
     # --------------------------------------------------------------------------
-    def load_dict(self) -> None:
+    def _load_info_text(self) -> None:
         """
         Reload info text from global dict `fb.fil[0]` and reset 'DESIGN' button
         """
