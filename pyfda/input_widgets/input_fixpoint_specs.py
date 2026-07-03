@@ -724,7 +724,7 @@ class Input_Fixpoint_Specs(QWidget):
         Triggered by by a change of index of the combo box `self.cmb_qfrmt`.
 
         - Update UI (fixpoint format, visibility of fixpoint widgets) from combobox
-          `self.cmb_qfrmt` to `fb.fil[0]['qfrmt']`.
+          `self.cmb_qfrmt` to `fil[0]['qfrmt']`.
         - Update fixpoint widget settings via `self.dict2ui()`
         - Emit {'fx_sim': 'specs_changed'}.
           """
@@ -739,8 +739,8 @@ class Input_Fixpoint_Specs(QWidget):
         """
         Called during `__init__()` and from `process_sig_rx()`.
 
-        Update UI from `fb.fil[0]['qfrmt']` and the fx filter
-        dict `fb.fil[0]['fxq']`. This affects the visibility and the fx settings of
+        Update UI from `fil[0]['qfrmt']` and the fx filter
+        dict `fil[0]['fxq']`. This affects the visibility and the fx settings of
         input, output and dyn. filter widget via their `dict2ui()` methods.
         The setting of the `self.cmb_qfrmt` combobox influencing float / fixpoint number
         format is updated as well.
@@ -763,7 +763,7 @@ class Input_Fixpoint_Specs(QWidget):
             # refresh image in case of switching from float to fix
             self.resize_img()
             # update fixpoint widgets from the global filter dict:
-            # when loading a filter, a new instance of fb.fil[0] is created, requiring
+            # when loading a filter, a new instance of fil[0] is created, requiring
             # passing a hard update of the filter dict
             self.wdg_wq_input.dict2ui(fb.fil[0]['fxq']['QI'])
             self.wdg_wq_output.dict2ui(fb.fil[0]['fxq']['QO'])

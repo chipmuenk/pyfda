@@ -485,11 +485,11 @@ def fb_get(*keys_tuple: tuple, fil_dict: dict = fil[0], verbose: bool = True)\
 def fb_set(*keys_tuple: tuple, backup: bool = True, new_key: bool = False,
            accept_dict: bool = False, fil_dict: dict = fil[0]) -> int:
     """
-    Use the items of `keys_tuple` to access a nested dict `fil_dict`
-    (default: `fil[0]`) and write the last item in `keys_tuple` to the dict.
+    Use the individual arguments that have been collected as `keys_tuple` to access a
+    nested dict `fil_dict` (default: `fil[0]`) and write the last item in `keys_tuple` to the dict.
 
-    In order to set the value of the returned nested dict, use the key for the lowest
-    nesting level on the returned dict `d`, i.e. `d[keys_tuple[-1]] = arg` .
+    Example:
+    fb_set('fxq', 'QCA', 'WF', 12) is equivalent to `fil[0]['fxq']['QCA']['WF'] = 12`
 
     Parameters
     ----------
@@ -547,6 +547,8 @@ def fb_set(*keys_tuple: tuple, backup: bool = True, new_key: bool = False,
         # traverse nested dict 'fil_dict' using tuple of keys and access subdictionary
         d = _traverse_dict(keys_tuple[:-1], fil_dict)
 
+        # Create a new key:value pair when flag `new_key` is True
+        # --------------------------------------------------------
         if new_key:
             if set_key in d:
                 logger.warning("Overwriting existing key '%s' in dictionary \n"
@@ -554,10 +556,13 @@ def fb_set(*keys_tuple: tuple, backup: bool = True, new_key: bool = False,
             d[set_key] = set_val  # set new key:value pair
             return 0
 
+        # Unknown key
+        # -----------
         if set_key not in d:
             logger.error("Key '%s' not found in filter dictionary!", set_key )
             raise KeyError
 
+        # Different types of old and new value, check if they are compatible
         # Test accessing the dictionary and whether the value to be written is a dict.
         # This could be dangerous because the keys in this sub-dictionary could be altered!
         if isinstance(d[set_key], dict):
@@ -583,6 +588,7 @@ def fb_set(*keys_tuple: tuple, backup: bool = True, new_key: bool = False,
             return 0
 
         if type(set_val) is not type(d[set_key]):
+        # -------------------------------------------------------------------
             # union of types of current and new value, e.g. {'float', 'float64'}
             types = {type(set_val).__name__, type(d[set_key]).__name__}
             # the following types are considered compatible
