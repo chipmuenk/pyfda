@@ -485,13 +485,15 @@ class SelectFilter(QWidget):
                 logger.error("Dynamic filter instance 'wdg_fil' does not exist, "
                              "you should not see this message!")
 
-            try:
-                get_fil_inst().deleteLater()  # delete QWidget when scope has been left
-            except RuntimeError as e:
-                logger.error(e)
-            else:
-                logger.error("Dynamic filter instance 'fil_inst' does not exist, "
-                             "you should not see this message!")
+            get_fil_inst().deleteLater()  # delete QWidget when scope has been left
+
+            # try:
+            #     get_fil_inst().deleteLater()  # delete QWidget when scope has been left
+            # except RuntimeError as e:
+            #     logger.error(e)
+            # else:
+            #     logger.error("Dynamic filter instance 'fil_inst' does not exist, "
+            #                  "you should not see this message!")
 
     # ------------------------------------------------------------------------------
     def _construct_dyn_widgets(self):

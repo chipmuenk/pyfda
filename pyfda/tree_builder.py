@@ -259,7 +259,7 @@ class Tree_Builder():
     # --------------------------------------------------------------------------
 
     def __init__(self):
-        logger.info("Instantiating TreeBuilder")
+        logger.info("This is TreeBuilder, not doing anything.")
 
     # --------------------------------------------------------------------------
     def build_fil_tree(self) -> None:

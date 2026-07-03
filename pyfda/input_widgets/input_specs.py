@@ -93,6 +93,9 @@ class Input_Specs(QWidget):
         self.cmb_filter_save_default = "0"
 
         self._construct_ui()
+        self._create_layout()
+        self._update_ui()  # first time initialization
+        self.start_design_filt()  # design first filter using default values
 
     # -------------------------------------------------------------------------
     def emit(self, dict_sig: dict) -> None:
@@ -168,32 +171,16 @@ class Input_Specs(QWidget):
                           self.cmb_filter_save_default)
         self.cmb_filter_save.insertSeparator(1)
         self.cmb_filter_save.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
-        lbl_info_1 = QLabel(to_html(">", frmt='b'))
-        lbl_info_2 = QLabel(to_html(">", frmt='b'))
+        self.lbl_info_1 = QLabel(to_html(">", frmt='b'))
+        self.lbl_info_2 = QLabel(to_html(">", frmt='b'))
         self.led_info = QLineEdit(fb_get('info'))
         self.led_info.setToolTip(self.led_info_tool_tip)
         # self.led_info.home(True)  # move cursor to beginning of line
-        lay_h_buttons_load_save_1 = QHBoxLayout()
-        lay_h_buttons_load_save_1.addWidget(self.cmb_filter_load) # Load from mem or file
-        lay_h_buttons_load_save_1.addWidget(lbl_info_1)
-        lay_h_buttons_load_save_1.addWidget(self.led_info)
-        lay_h_buttons_load_save_1.addWidget(lbl_info_2)
-        lay_h_buttons_load_save_1.addWidget(self.cmb_filter_save)  # <Save Filter> combo
-        lay_h_buttons_load_save_1.setContentsMargins(*params['wdg_margins_spc'])
-        lay_v_buttons_load_save = QVBoxLayout()
-        lay_v_buttons_load_save.addLayout(lay_h_buttons_load_save_1)
-        self.frm_buttons_load_save = QFrame()
-        self.frm_buttons_load_save.setLayout(lay_v_buttons_load_save)
-        self.frm_buttons_load_save.setContentsMargins(*params['wdg_margins'])
 
         self.butDesignFilt = QPushButton("DESIGN FILTER", self)
         self.butDesignFilt.setToolTip("Design filter with chosen specs")
         self.butQuit = QPushButton("Quit", self)
         self.butQuit.setToolTip("Exit pyfda tool")
-        layHButtons2 = QHBoxLayout()
-        layHButtons2.addWidget(self.butDesignFilt)  # <Design Filter> button
-        layHButtons2.addWidget(self.butQuit)        # <Quit> button
-        layHButtons2.setContentsMargins(*params['wdg_margins'])
 
         # Subwidget for selecting filter with response type rt (LP, ...),
         #    filter type ft (IIR, ...) and filter class fc (cheby1, ...)
@@ -226,36 +213,6 @@ class Input_Specs(QWidget):
         # Subwidget for displaying infos on the design method
         self.lblMsg = QLabel(self)
         self.lblMsg.setWordWrap(True)
-        layVMsg = QVBoxLayout()
-        layVMsg.addWidget(self.lblMsg)
-
-        self.frmMsg = QFrame(self)
-        self.frmMsg.setLayout(layVMsg)
-        layVFrm = QVBoxLayout()
-        layVFrm.addWidget(self.frmMsg)
-        layVFrm.setContentsMargins(*params['wdg_margins'])
-
-        # ----------------------------------------------------------------------
-        # LAYOUT for input specifications and buttons
-        # ----------------------------------------------------------------------
-        lay_v_main = QVBoxLayout(self)
-        lay_v_main.addWidget(self.frm_buttons_load_save)  # <Load> & <Save> buttons
-        lay_v_main.addWidget(self.sel_fil)  # Design method (IIR - ellip, ...)
-        lay_v_main.addLayout(layHButtons2)  # <Design> & <Quit> buttons
-        lay_v_main.addWidget(self.f_units)  # Frequency units
-        lay_v_main.addWidget(self.t_specs)  # Target specs
-        lay_v_main.addWidget(self.f_specs)  # Freq. specifications
-        lay_v_main.addWidget(self.a_specs)  # Amplitude specs
-        lay_v_main.addWidget(self.w_specs)  # Weight specs
-        lay_v_main.addLayout(layVFrm)       # Text message
-
-        lay_v_main.addStretch()
-
-        lay_v_main.setContentsMargins(*params['wdg_margins'])
-
-        self.setLayout(lay_v_main)  # main layout of widget
-        # Required to prevent shrinking of subwidgets
-        self.setSizePolicy(QSizePolicy.Minimum, QSizePolicy.Minimum)
 
         # ----------------------------------------------------------------------
         # GLOBAL SIGNALS & SLOTs
@@ -289,8 +246,63 @@ class Input_Specs(QWidget):
         self.butQuit.clicked.connect(self.quit_program)  # emit 'close_event'
         # ----------------------------------------------------------------------
 
-        self._update_ui()  # first time initialization
-        self.start_design_filt()  # design first filter using default values
+    # --------------------------------------------------------------------------
+    def _create_layout(self) -> None:
+        """
+        Create the layout for the widget.
+        """
+        # ----------------------------------------------------------------------
+        # LAYOUT for loading and saving filters
+        # ----------------------------------------------------------------------
+        lay_h_buttons_load_save = QHBoxLayout()
+        lay_h_buttons_load_save.addWidget(self.cmb_filter_load) # Load from mem or file
+        lay_h_buttons_load_save.addWidget(self.lbl_info_1)
+        lay_h_buttons_load_save.addWidget(self.led_info)
+        lay_h_buttons_load_save.addWidget(self.lbl_info_2)
+        lay_h_buttons_load_save.addWidget(self.cmb_filter_save)  # <Save Filter> combo
+        lay_h_buttons_load_save.setContentsMargins(*params['wdg_margins_spc'])
+        lay_v_buttons_load_save = QVBoxLayout()
+        lay_v_buttons_load_save.addLayout(lay_h_buttons_load_save)
+        self.frm_buttons_load_save = QFrame()
+        self.frm_buttons_load_save.setLayout(lay_v_buttons_load_save)
+        self.frm_buttons_load_save.setContentsMargins(*params['wdg_margins'])
+
+        # ----------------------------------------------------------------------
+        # LAYOUT for Design and Quit buttons
+        # ----------------------------------------------------------------------
+        lay_h_buttons_action = QHBoxLayout()
+        lay_h_buttons_action.addWidget(self.butDesignFilt)  # <Design Filter> button
+        lay_h_buttons_action.addWidget(self.butQuit)        # <Quit> button
+        lay_h_buttons_action.setContentsMargins(*params['wdg_margins'])
+
+        lay_v_msg = QVBoxLayout()
+        lay_v_msg.addWidget(self.lblMsg)
+
+        self.frm_msg = QFrame(self)
+        self.frm_msg.setLayout(lay_v_msg)
+        lay_v_frm = QVBoxLayout()
+        lay_v_frm.addWidget(self.frm_msg)
+        lay_v_frm.setContentsMargins(*params['wdg_margins'])
+
+       # ----------------------------------------------------------------------
+        # Main LAYOUT
+        # ----------------------------------------------------------------------
+        lay_v_main = QVBoxLayout(self)
+        lay_v_main.addWidget(self.frm_buttons_load_save)  # <Load> & <Save> buttons
+        lay_v_main.addWidget(self.sel_fil)  # Design method (IIR - ellip, ...)
+        lay_v_main.addLayout(lay_h_buttons_action)  # <Design> & <Quit> buttons
+        lay_v_main.addWidget(self.f_units)  # Frequency units
+        lay_v_main.addWidget(self.t_specs)  # Target specs
+        lay_v_main.addWidget(self.f_specs)  # Freq. specifications
+        lay_v_main.addWidget(self.a_specs)  # Amplitude specs
+        lay_v_main.addWidget(self.w_specs)  # Weight specs
+        lay_v_main.addLayout(lay_v_frm)       # Text message
+        lay_v_main.addStretch()
+        lay_v_main.setContentsMargins(*params['wdg_margins'])
+
+        self.setLayout(lay_v_main)  # main layout of widget
+        # Required to prevent shrinking of subwidgets
+        self.setSizePolicy(QSizePolicy.Minimum, QSizePolicy.Minimum)
 
     # --------------------------------------------------------------------------
     def _save_info2dict(self) -> None:
@@ -376,11 +388,11 @@ class Input_Specs(QWidget):
         # MESSAGE PANE
         if ('msg' in all_widgets and len(all_widgets['msg']) > 1 and
                 all_widgets['msg'][0] != 'i'):
-            self.frmMsg.setVisible(True)
-            self.frmMsg.setEnabled(all_widgets['msg'][0] != 'd')
+            self.frm_msg.setVisible(True)
+            self.frm_msg.setEnabled(all_widgets['msg'][0] != 'd')
             self.lblMsg.setText(all_widgets['msg'][1:][0])
         else:
-            self.frmMsg.hide()
+            self.frm_msg.hide()
 
         # Update state of "DESIGN FILTER" button
         # It is disabled for "Manual_IIR" and "Manual_FIR" filter classes
