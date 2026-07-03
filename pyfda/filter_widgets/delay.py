@@ -95,15 +95,15 @@ class Delay(QWidget):
         self.led_delay.setObjectName('wdg_led_delay')
         self.led_delay.setToolTip("Number of delays, N > 0 produces poles, N < 0 zeros.")
 
-        self.layHWin = QHBoxLayout()
-        self.layHWin.setObjectName('wdg_layGWin')
-        self.layHWin.addWidget(self.lbl_delay)
-        self.layHWin.addWidget(self.led_delay)
-        self.layHWin.setContentsMargins(0,0,0,0)
+        self.lay_h_win = QHBoxLayout()
+        self.lay_h_win.setObjectName('wdg_layGWin')
+        self.lay_h_win.addWidget(self.lbl_delay)
+        self.lay_h_win.addWidget(self.led_delay)
+        self.lay_h_win.setContentsMargins(0,0,0,0)
         # Widget containing all subwidgets (cmbBoxes, Labels, lineEdits)
         self.wdg_fil = QWidget(self)
         self.wdg_fil.setObjectName('wdg_fil')
-        self.wdg_fil.setLayout(self.layHWin)
+        self.wdg_fil.setLayout(self.lay_h_win)
 
         #----------------------------------------------------------------------
         # SIGNALS & SLOTs
