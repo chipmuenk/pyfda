@@ -285,14 +285,17 @@ class Equiripple(QWidget):
         # verify whether filter order is low enough
         if not self._test_n():
             return -1
-        try:
-            fil_save(arg, self.FRMT, __name__)
-        except Exception as e:
-            # catch exception due to malformatted coefficients:
-            logger.error("While saving the equiripple filter design, "
-                         "the following error occurred:\n%s", e)
-            debug_exception()
-            return -1
+
+        # try:
+        #     fil_save(arg, self.FRMT, __name__)
+        # except Exception as e:
+        #     # catch exception due to malformatted coefficients:
+        #     logger.error("While saving the equiripple filter design, "
+        #                  "the following error occurred:\n%s", e)
+        #     debug_exception()
+        #     return -1
+
+        fil_save(arg, self.FRMT, __name__)
 
         if fb_get('fo') == 'min':
             fb_set('N', self.N - 1)  # yes, update filterbroker
