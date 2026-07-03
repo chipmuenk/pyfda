@@ -21,7 +21,7 @@ from numpy import pi, ones, sin, cos, log10
 import scipy.signal as sig
 
 from pyfda.config_file_parser import ConfigFileParser as CFP
-import pyfda.filterbroker as fb
+from pyfda.filterbroker import fb_get
 from pyfda.libs.compat import (
     QWidget, QComboBox, QLabel, QLineEdit, QDial, QGridLayout, QFrame, pyqtSignal)
 from pyfda.libs.pyfda_lib import mod_version, safe_eval, to_html
@@ -34,12 +34,6 @@ from pyfda.pyfda_rc import params
 logger = logging.getLogger(__name__)
 
 classes = {'Plot_3D': '3D'}  #: Dict containing class name : display name
-
-if mod_version('mayavi'):
-    from mayavi import mlab
-    MLAB = True
-else:
-    MLAB = False
 
 # if mod_version('vispy'):
 #     from vispy import plot  # (?)
@@ -401,14 +395,12 @@ class Plot_3D(QWidget):
         """
         self.init_axes()
 
-        bb = fb.fil[0]['ba'][0]
-        aa = fb.fil[0]['ba'][1]
+        bb = fb_get('ba', 0)
+        aa = fb_get('ba', 1)
 
-        zz = np.array(fb.fil[0]['zpk'][0])
-        pp = np.array(fb.fil[0]['zpk'][1])
+        zz = np.array(fb_get('zpk', 0))
+        pp = np.array(fb_get('zpk', 1))
 
-        # wholeF = fb.fil[0]['freqSpecsRangeType'] != 'half'  # not used
-        # f_S = fb.fil[0]['f_S']
         N_FFT = CFP.conf_settings['N_FFT']
 
         alpha = self.diaAlpha.value()/10.
@@ -560,34 +552,23 @@ class Plot_3D(QWidget):
         # ---------------------------------------------------------------
         # http://stackoverflow.com/questions/28232879/phong-shading-for-shiny-python-3d-surface-plots
         elif self.cmbMode3D.currentText() == 'Surf':
-            if MLAB:
-                # Mayavi
-                surf = mlab.surf(
-                    self.x, self.y, H_mag, colormap='RdYlBu', warp_scale='auto')
-                # Change the visualization parameters.
-                surf.actor.property.interpolation = 'phong'
-                surf.actor.property.specular = 0.1
-                surf.actor.property.specular_power = 5
-#                s = mlab.contour_surf(self.x, self.y, Hmag, contour_z=0)
-                mlab.show()
 
+            if self.but_lighting.checked:
+                ls = LightSource(azdeg=0, altdeg=65)  # Create light source object
+                rgb = ls.shade(Hmag, cmap=cmap)  # Shade data, creating an rgb array
+                cmap_surf = None
             else:
-                if self.but_lighting.checked:
-                    ls = LightSource(azdeg=0, altdeg=65)  # Create light source object
-                    rgb = ls.shade(Hmag, cmap=cmap)  # Shade data, creating an rgb array
-                    cmap_surf = None
-                else:
-                    rgb = None
-                    cmap_surf = cmap
+                rgb = None
+                cmap_surf = cmap
 
-    #            s = self.ax3d.plot_surface(self.x, self.y, Hmag,
-    #                    alpha=OPT_3D_ALPHA, rstride=1, cstride=1, cmap=cmap,
-    #                    linewidth=0, antialiased=False, shade=True, facecolors = rgb)
-    #            s.set_edgecolor('gray')
-                s = self.ax3d.plot_surface(
-                    self.x, self.y, Hmag, alpha=alpha, rstride=1, cstride=1, linewidth=0,
-                    antialiased=False, facecolors=rgb, cmap=cmap_surf, shade=True)
-                s.set_edgecolor(None)
+#            s = self.ax3d.plot_surface(self.x, self.y, Hmag,
+#                    alpha=OPT_3D_ALPHA, rstride=1, cstride=1, cmap=cmap,
+#                    linewidth=0, antialiased=False, shade=True, facecolors = rgb)
+#            s.set_edgecolor('gray')
+            s = self.ax3d.plot_surface(
+                self.x, self.y, Hmag, alpha=alpha, rstride=1, cstride=1, linewidth=0,
+                antialiased=False, facecolors=rgb, cmap=cmap_surf, shade=True)
+            s.set_edgecolor(None)
         # ---------------------------------------------------------------
         # 3D-Contour plot
         # ---------------------------------------------------------------
