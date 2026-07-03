@@ -527,11 +527,10 @@ def fb_set(*keys_tuple: tuple, backup: bool = True, new_key: bool = False,
     the user. This will be done by prepending the dict name with an underscore
     `_fil[0]` once all direct accesses have been removed.
     """
-
     if not isinstance(keys_tuple, tuple):
         logger.error("A tuple of keys is needed for traversing the filter dict '%s', not a '%s'!",
                      keys_tuple, type(keys_tuple).__name__)
-        raise KeyError
+        raise TypeError
 
     if len(keys_tuple) < 2:
         logger.error("Not enough arguments for setting a dictionary value!")
@@ -563,30 +562,6 @@ def fb_set(*keys_tuple: tuple, backup: bool = True, new_key: bool = False,
             raise KeyError
 
         # Different types of old and new value, check if they are compatible
-        # Test accessing the dictionary and whether the value to be written is a dict.
-        # This could be dangerous because the keys in this sub-dictionary could be altered!
-        if isinstance(d[set_key], dict):
-            if not accept_dict:
-                logger.error(
-                    "\n\tCannot assign '%s' with sub-dict\n\t%s!"
-                    "\n\tThis would overwrite the old sub-dict\n\t%s",
-                    set_key, set_val, d[set_key])
-                raise KeyError
-
-        if set_key =='qfrmt':
-            if len(keys_tuple) > 2:
-                logger.error("More than one value '%s' for setting 'qfrmt'!", keys_tuple[1:])
-                raise KeyError
-
-            # store current fixpoint / float format
-            if get_fx():  # fixpoint mode, store old fixpoint format
-                fil_dict['qfrmt_fx_last'] = fil_dict['qfrmt']
-            else:  # float mode, store current float format
-                fil[0]['qfrmt_float_last'] = fil_dict['qfrmt']
-            # and set new format
-            fil_dict['qfrmt'] = set_val
-            return 0
-
         if type(set_val) is not type(d[set_key]):
         # -------------------------------------------------------------------
             # union of types of current and new value, e.g. {'float', 'float64'}
@@ -607,14 +582,50 @@ def fb_set(*keys_tuple: tuple, backup: bool = True, new_key: bool = False,
                     _print_dict(keys_tuple[:-1]), type(d[set_key]).__name__,
                     type(set_val).__name__)
                 raise KeyError
+
+        # Value to be written is a dict. Interate over the keys to avoid
+        # accidentally deleting keys.
+        # --------------------------------------------------------------
+        if isinstance(d[set_key], dict):
+            if accept_dict:
+                for k, v in set_val.items():
+                    d[set_key][k] = v  # update sub-dict with new values
+                return 0
+
+            logger.error(
+                "\n\tCannot assign '%s' with sub-dict\n\t%s!"
+                "\n\tThis would overwrite the old sub-dict\n\t%s",
+                set_key, set_val, d[set_key])
+            raise KeyError
+
+        # special case, setting the global quantization format 'qfrmt' can change fixpoint mode.
+        # store the last used fixpoint or float format
+        if set_key =='qfrmt':
+            if len(keys_tuple) > 2:
+                logger.error("More than one value '%s' for setting 'qfrmt'!", keys_tuple[1:])
+                raise KeyError
+
+            if get_fx():  # fixpoint mode, store current fixpoint format
+                fil_dict['qfrmt_fx_last'] = fil_dict['qfrmt']
+            else:  # float mode, store current float format
+                fil[0]['qfrmt_float_last'] = fil_dict['qfrmt']
+
         # ======== everything ok, finally update dictionary ========
         d[set_key] = set_val  # update key with new value
         # ==========================================================
+
+    except TypeError:
+        if backup:
+            # backup is not needed, nothing was changed
+            restore_fil()
+        logger.error("Type Error, '%s' needs to be a tuple.")
+        return -1
 
     except KeyError:
         if backup:
             # backup is not needed, nothing was changed
             restore_fil()
+        logger.error("Key Error")
         return -1
 
     return 0
