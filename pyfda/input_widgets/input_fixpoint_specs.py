@@ -147,7 +147,7 @@ class Input_Fixpoint_Specs(QWidget):
                 # input fixpoint word format to output word format. Do the same
                 # if butLock has been activated.
                 #
-                fb.fil[0]['fxq']['QI'].update(self.wdg_wq_input.Q.q_dict)
+                fb_set('fxq', 'QI', self.wdg_wq_input.Q.q_dict)
                 if dict_sig['ui_local_changed'] == 'butLock'\
                         and not self.wdg_wq_input.butLock.checked:
                     # butLock was deactivitated, don't do anything
@@ -155,19 +155,22 @@ class Input_Fixpoint_Specs(QWidget):
                 if self.wdg_wq_input.butLock.checked:
                     # button lock was activated or wordlength settings have been changed
                     # with active lock -> copy input settings to output
-                    fb.fil[0]['fxq']['QO']['WI'] = fb.fil[0]['fxq']['QI']['WI']
-                    fb.fil[0]['fxq']['QO']['WF'] = fb.fil[0]['fxq']['QI']['WF']
+                    fb_set('fxq', 'QO', 'WI', fb_get('fxq', 'QI', 'WI'))
+                    fb_set('fxq', 'QO', 'WF', fb_get('fxq', 'QI', 'WF'))
 
             elif dict_sig['sender_name'] == 'fx_ui_wq_output':
                 # Output fixpoint format has been changed: Update filter dict with the
                 # settings of the output quantizer dict. When I/O lock is active, copy
                 # output fixpoint word format to input word format.
                 #
-                fb.fil[0]['fxq']['QO'].update(self.wdg_wq_output.Q.q_dict)
+                fb_set('fxq', 'QO', self.wdg_wq_output.Q.q_dict)
 
                 if self.wdg_wq_input.butLock.checked:
-                    fb.fil[0]['fxq']['QI']['WI'] = fb.fil[0]['fxq']['QO']['WI']
-                    fb.fil[0]['fxq']['QI']['WF'] = fb.fil[0]['fxq']['QO']['WF']
+                    # button lock was activated or wordlength settings have been changed
+                    # with active lock -> copy output settings to input
+                    fb_set('fxq', 'QI', 'WI', fb_get('fxq', 'QO', 'WI'))
+                    fb_set('fxq', 'QI', 'WF', fb_get('fxq', 'QO', 'WF'))
+
             else:
                 logger.error("Unknown wdg_name / sender_name '%s' in dict_sig:\n%s",
                              dict_sig['sender_name'], pprint_log(dict_sig))
@@ -364,7 +367,7 @@ class Input_Fixpoint_Specs(QWidget):
         # -----------------------------------------------------------------
 
         self.wdg_wq_input = FX_UI_WQ(
-            fb.fil[0]['fxq']['QI'], objectName='fx_ui_wq_input',
+            fb_get('fxq', 'QI'), objectName='fx_ui_wq_input',
             label='<b>Input Quantizer <i>Q<sub>I&nbsp;</sub></i>:</b>',
             lock_vis='on', cmb_w_vis='off')
         if HAS_DS:
@@ -375,7 +378,7 @@ class Input_Fixpoint_Specs(QWidget):
         self.wdg_wq_input.sig_tx.connect(self.sig_rx_local)
 
         self.wdg_wq_output = FX_UI_WQ(
-            fb.fil[0]['fxq']['QO'], objectName='fx_ui_wq_output',
+            fb_get('fxq', 'QO'), objectName='fx_ui_wq_output',
             label='<b>Output Quantizer <i>Q<sub>O&nbsp;</sub></i>:</b>',
             cmb_w_vis='off')
         self.wdg_wq_output.sig_tx.connect(self.sig_rx_local)
@@ -765,8 +768,9 @@ class Input_Fixpoint_Specs(QWidget):
             # update fixpoint widgets from the global filter dict:
             # when loading a filter, a new instance of fil[0] is created, requiring
             # passing a hard update of the filter dict
-            self.wdg_wq_input.dict2ui(fb.fil[0]['fxq']['QI'])
-            self.wdg_wq_output.dict2ui(fb.fil[0]['fxq']['QO'])
+            # TODO: FX - is this still correct?
+            self.wdg_wq_input.dict2ui(fb_get('fxq', 'QI'))
+            self.wdg_wq_output.dict2ui(fb.get('fxq', 'QO'))
             try:
                 # this uses the global filter dict as well but it is reinstantiated
                 # when loading a filter, using the new instance
@@ -881,8 +885,8 @@ if __name__ == '__main__':
     #
     # Resizing the image does not work standalone as the {'ui_global_changed': 'resized'}
     # signal is issued from somewhere else
-    from pyfda.tree_builder import Tree_Builder
     from pyfda.libs.compat import QApplication
+    from pyfda.tree_builder import Tree_Builder
     from pyfda import pyfda_rc as rc
 
     logging.basicConfig()  # setup a basic logger
@@ -890,9 +894,10 @@ if __name__ == '__main__':
     app = QApplication(sys.argv)
     app.setStyleSheet(rc.QSS_RC)
     # change initial settings to FIR
-    # fb.fil[0].update({'ft': 'FIR', 'fc': 'Equiripple'})
-    fb.fil[0].update({'ft': 'IIR', 'fc': 'Ellip'})
-    Tree_Builder().build_fil_tree()  # initialize Tree_Builder class attribute `fil_tree`
+    # fb_set({'ft': 'FIR', 'fc': 'Equiripple'})
+    fb_set('ft', 'IIR')
+    fb_set('fc', 'Ellip')
+    Tree_Builder().build_fil_tree()
     mainw = Input_Fixpoint_Specs()
     app.setActiveWindow(mainw)
     mainw.show()
