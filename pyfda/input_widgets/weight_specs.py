@@ -62,7 +62,7 @@ class WeightSpecs(QWidget):
             return
         if 'data_changed' in dict_sig:
             if dict_sig['data_changed'] in {'filter_loaded', 'filter_designed'}:
-                self.load_dict()
+                self.dict2ui()
 
     # ------------------------------------------------------------------------------
     def _construct_ui(self) -> None:
@@ -121,7 +121,7 @@ class WeightSpecs(QWidget):
         #       ^ this also initializes the weight text fields
         # DYNAMIC EVENT MONITORING
         # Every time a field is edited, call self._store_entry and
-        # self.load_dict. This is achieved by dynamically installing and
+        # self.dict2ui. This is achieved by dynamically installing and
         # removing event filters when creating / deleting subwidgets.
         # The event filter monitors the focus of the input fields.
 
@@ -143,7 +143,7 @@ class WeightSpecs(QWidget):
         if isinstance(source, QLineEdit):  # could be extended for other widgets
             if event.type() == QEvent.FocusIn:
                 self.spec_edited = False
-                self.load_dict()
+                self.dict2ui()
                 # store current entry in case new value can't be evaluated:
                 self.data_prev = source.text()
             elif event.type() == QEvent.KeyPress:
@@ -153,7 +153,7 @@ class WeightSpecs(QWidget):
                     self._store_entry(source)
                 elif key == QtCore.Qt.Key_Escape:  # revert changes
                     self.spec_edited = False
-                    self.load_dict()
+                    self.dict2ui()
 
             elif event.type() == QEvent.FocusOut:
                 self._store_entry(source)
@@ -199,10 +199,10 @@ class WeightSpecs(QWidget):
             qstyle_widget(self.qlineedit[i], state)
 
         self.n_cur_labels = num_new_labels  # update number of currently visible labels
-        self.load_dict()  # display rounded filter dict entries
+        self.dict2ui()  # display rounded filter dict entries
 
     # ------------------------------------------------------------------------------
-    def load_dict(self) -> None:
+    def dict2ui(self) -> None:
         """
         Reload textfields from filter dictionary to update changed settings
         """
@@ -230,7 +230,7 @@ class WeightSpecs(QWidget):
             fb_set(w_label, w_value, new_key=w_label not in fb_get())
             self.emit({'specs_changed': 'w_specs'})
             self.spec_edited = False  # reset flag
-        self.load_dict()
+        self.dict2ui()
 
     # -------------------------------------------------------------
     def _hide_entries(self, num_new_labels: int) -> None:
@@ -285,7 +285,7 @@ class WeightSpecs(QWidget):
             w_label = str(qle.objectName())
             fb_set(w_label, 1.0)
 
-        self.load_dict()
+        self.dict2ui()
         self.emit({'specs_changed': 'w_specs'})
 
 

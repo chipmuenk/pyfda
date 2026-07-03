@@ -67,7 +67,7 @@ class FreqSpecs(QWidget):
         if ('view_changed' in dict_sig and dict_sig['view_changed'] == 'f_S')\
             or ('data_changed' in dict_sig
                 and dict_sig['data_changed'] in {'filter_loaded', 'filter_designed'}):
-            # update frequencies and unit and load_dict.
+            # update frequencies and unit and dict2ui.
             self.recalc_freqs()
 
     # -------------------------------------------------------------
@@ -247,7 +247,7 @@ class FreqSpecs(QWidget):
 
         # Always reload normalized frequencies from dict, check whether they are outside
         # the Nyquist range and display them in the selected unit.
-        self.load_dict()
+        self.dict2ui()
 
         # Always set label for frequency unit according to selected unit.
         unit = fb_get('plt_fUnit')
@@ -316,12 +316,12 @@ class FreqSpecs(QWidget):
                 logger.warning("Unsupported state '%s'!", state)
 
 # -------------------------------------------------------------
-    def load_dict(self) -> None:
+    def dict2ui(self) -> None:
         """
         Triggered by FocusIn, FocusOut and ESC-Key in LineEdit fields and by
         `sort_dict_freqs():
 
-        `load_dict()` is called during init and when the frequency unit or the
+        `dict2ui()` is called during init and when the frequency unit or the
           sampling frequency have been changed via
           `filter_specs.update_UI()` -> `self.update_UI()` -> `self.sort_dict_freqs()`
 
@@ -424,7 +424,7 @@ class FreqSpecs(QWidget):
         if ident:
             logger.warning("Frequencies must differ by at least %.4g",
                            MIN_FREQ_STEP * fb_get('f_S'))
-        self.load_dict()
+        self.dict2ui()
 # ------------------------------------------------------------------------------
 if __name__ == '__main__':
     # Run widget standalone with `python -m pyfda.input_widgets.freq_specs`

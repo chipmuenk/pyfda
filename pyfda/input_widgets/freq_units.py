@@ -437,11 +437,11 @@ class FreqUnits(QWidget):
             self.emit({'view_changed': 'f_range'})
 
     # -------------------------------------------------------------
-    def load_dict(self) -> None:
+    def dict2ui(self) -> None:
         """
         Reload comboBox settings and textfields from filter dictionary
         Block signals during update of combobox / lineedit widgets
-        This is called from `input_specs.load_dict()`
+        This is called via `input_specs.dict2ui()`
         """
         self.update_UI(emit_signal=False)
         # This updates the following widgets:

@@ -86,8 +86,8 @@ class SelectFilter(QWidget):
 
         if 'data_changed' in dict_sig and dict_sig['data_changed'] == 'filter_loaded':
             # Called when a new filter has been LOADED,
-            # updating UI and settings via load_dict()
-            self.load_dict()
+            # updating UI and settings via dict2ui()
+            self.dict2ui()
 
     # -------------------------------------------------------------------------
     def _construct_ui(self):
@@ -239,13 +239,15 @@ class SelectFilter(QWidget):
         self.setLayout(lay_h_main)
 
     # --------------------------------------------------------------------------
-    def load_dict(self):
+    def dict2ui(self):
         """
         Reload comboboxes from filter dictionary to update changed settings
         after loading a filter design from disk.
-        `load_dict` uses the automatism of _set_response_type etc.
+        `dict2ui` uses the automatism of _set_response_type etc.
         of checking whether the previously selected filter design method is
         also available for the new combination.
+
+        It is called directly from input_specs.py
         """
         # find index for response type:
         rt_idx = self.cmb_response_type.findData(fb_get('rt'))

@@ -35,7 +35,7 @@ classes = {'Input_Specs': 'Specs'}  #: Dict containing class name : display name
 # This is read by `tree_builder._build_widget_class_dicts()` into the dict
 #  `filterbroker.INPUT_CLASSES_DICT` and used to create the widgets in input_tab_widgets.
 
-
+# TODO: a lot of methods from other classes are called here, this is very intransparent
 class Input_Specs(QWidget):
     """
     Build widget for entering all filter specs
@@ -138,7 +138,7 @@ class Input_Specs(QWidget):
             # Changing the filter design requires updating UI because number or
             # kind of input fields changes -> reload filter parameters and _update_ui
             self._update_ui()
-            self.sel_fil.load_dict()
+            self.sel_fil.dict2ui()
             # Update state of "DESIGN FILTER" button
             # It is disabled for "Manual_IIR" and "Manual_FIR" filter classes
             self.color_design_button('changed')

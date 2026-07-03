@@ -219,7 +219,7 @@ class MA(QWidget):
     def dict2filter_params(self) -> None:
         """
         Reload parameter(s) from filter dictionary (if they exist) and set
-        corresponding UI elements. load_dict() is called upon initialization
+        corresponding UI elements. dict2filter_params() is called upon initialization
         and when the filter is loaded from disk.
         """
         if 'ma' in fb_get('filter_widgets'):

@@ -82,7 +82,7 @@ class Input_PZ(QWidget):
 
         if self.isVisible():
             if 'data_changed' in dict_sig or self.data_changed:
-                self.load_dict()
+                self.dict2ui()
                 self.data_changed = False
         else:
             # TODO: draw wouldn't be necessary for 'view_changed', only update view
@@ -118,7 +118,7 @@ class Input_PZ(QWidget):
 
         self.setLayout(lay_v_main)
 
-        self.load_dict()  # initialize table from filterbroker
+        self.dict2ui()  # initialize table from filterbroker
         self._refresh_table()  # initialize table with values
 
         # ----------------------------------------------------------------------
@@ -132,7 +132,7 @@ class Input_PZ(QWidget):
         # ----------------------------------------------------------------------
         self.ui.cmb_pz_frmt.activated.connect(self._refresh_table)
         self.ui.spn_digits.editingFinished.connect(self._refresh_table)
-        self.ui.but_undo.clicked.connect(self.load_dict)
+        self.ui.but_undo.clicked.connect(self.dict2ui)
 
         self.ui.but_apply.clicked.connect(self._save_entries)
         self.ui.chk_gain.toggled.connect(self._normalize_gain)
@@ -296,7 +296,7 @@ class Input_PZ(QWidget):
         TODO:
         - Update zpk[2][0]?
 
-        Called by: load_dict(), _clear_table(), _zero_PZ(), _delete_cells(),
+        Called by: dict2ui(), _clear_table(), _zero_PZ(), _delete_cells(),
                 add_row(), _import()
         """
 
@@ -321,7 +321,7 @@ class Input_PZ(QWidget):
         self.tblPZ.clearSelection()
 
     # ------------------------------------------------------------------------------
-    def load_dict(self) -> None:
+    def dict2ui(self) -> None:
         """
         Load all entries from filter dict fil[0]['zpk'] into the Zero/Pole/Gain list
         self.zpk and update the display via `self._refresh_table()`.
@@ -389,7 +389,7 @@ class Input_PZ(QWidget):
                 "While saving the poles / zeros, the following error occurred:\n%s", e)
 
         if __name__ == '__main__':
-            self.load_dict()  # only needed for stand-alone test
+            self.dict2ui()  # only needed for stand-alone test
 
         # Change filter type to "Manual" and update UI in Input_Specs() ...
         self.emit({'filt_changed': 'input_coeffs'})

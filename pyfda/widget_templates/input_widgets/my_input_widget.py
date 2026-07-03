@@ -35,7 +35,7 @@ class MyInputWidget(QWidget):
         self.tool_tip = "<span>This is my first pyFDA widget!</span>"
 
         self._construct_ui()
-        self.load_dict()
+        self.dict2ui()
 
     def process_sig_rx(self, dict_sig=None):
         """
@@ -43,7 +43,7 @@ class MyInputWidget(QWidget):
         """
         logger.debug("Processing %s: %s", type(dict_sig).__name__, dict_sig)
         if 'data_changed' in dict_sig or 'view_changed' in dict_sig or 'specs_changed' in dict_sig:
-            self.load_dict()
+            self.dict2ui()
 
     def _construct_ui(self):
         """
@@ -86,7 +86,7 @@ class MyInputWidget(QWidget):
         self.chk_filt_dict.clicked.connect(self._show_filt_dict)
 
 #------------------------------------------------------------------------------
-    def load_dict(self):
+    def dict2ui(self):
         """
         update docs and filter performance
         """
