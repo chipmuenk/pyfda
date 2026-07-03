@@ -770,7 +770,7 @@ class Input_Fixpoint_Specs(QWidget):
             # passing a hard update of the filter dict
             # TODO: FX - is this still correct?
             self.wdg_wq_input.dict2ui(fb_get('fxq', 'QI'))
-            self.wdg_wq_output.dict2ui(fb.get('fxq', 'QO'))
+            self.wdg_wq_output.dict2ui(fb_get('fxq', 'QO'))
             try:
                 # this uses the global filter dict as well but it is reinstantiated
                 # when loading a filter, using the new instance
