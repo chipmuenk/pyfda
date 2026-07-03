@@ -551,8 +551,8 @@ def fb_set(*keys_tuple: tuple, backup: bool = True, new_key: bool = False,
         # --------------------------------------------------------
         if new_key:
             if set_key in d:
-                logger.warning("Overwriting existing key '%s' in dictionary \n"
-                               "\twith '%s'!", d[set_key], set_key)
+                logger.warning("Overwriting value '%s' for existing key '%s' in dictionary \n"
+                               "\twith new value '%s'!", d[set_key], set_key, set_val)
             d[set_key] = set_val  # set new key:value pair
             return 0
 
@@ -607,7 +607,9 @@ def fb_set(*keys_tuple: tuple, backup: bool = True, new_key: bool = False,
                     _print_dict(keys_tuple[:-1]), type(d[set_key]).__name__,
                     type(set_val).__name__)
                 raise KeyError
+        # ======== everything ok, finally update dictionary ========
         d[set_key] = set_val  # update key with new value
+        # ==========================================================
 
     except KeyError:
         if backup:
