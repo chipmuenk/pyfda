@@ -40,7 +40,7 @@ from pyfda.libs.compat import (QWidget, QLabel, QLineEdit, pyqtSignal, QCheckBox
 from pyfda.filterbroker import fb_get, fb_set
 from pyfda.libs.pyfda_lib import safe_eval
 from pyfda.libs.special_functions import ceil_odd
-from pyfda.libs.pyfda_qt_lib import popup_warning, emit
+from pyfda.libs.pyfda_qt_lib import popup_warning, qtext_width, emit
 from pyfda.libs.pyfda_sig_lib import zeros_with_val, fil_save, fil_convert
 
 __version__ = "2.3"
@@ -166,6 +166,7 @@ class MA(QWidget):
         self.lbl_delays = QLabel("<b><i>M =</ i></ b>", self)
         self.lbl_delays.setObjectName('wdg_lbl_ma_0')
         self.led_delays = QLineEdit(self)
+        self.led_delays.setMaximumWidth(qtext_width(N_x=8))
         try:
             self.led_delays.setText(str(fb_get('N')))
         except KeyError:
@@ -177,6 +178,7 @@ class MA(QWidget):
         self.lbl_stages.setObjectName('wdg_lbl_ma_1')
         self.led_stages = QLineEdit(self)
         self.led_stages.setText(str(self.stages))
+        self.led_stages.setMaximumWidth(qtext_width(N_x=8))
 
         self.led_stages.setObjectName('wdg_led_ma_1')
         self.led_stages.setToolTip("Set number of stages ")
