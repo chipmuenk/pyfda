@@ -253,17 +253,17 @@ class FrozenDict(frozenset):
     def __iter__(self) -> Iterator[Any]:
         """Iterate over the keys of the FrozenDict."""
         items = frozenset.__iter__(self)
-        return map(lambda i: i.key, items)
+        return (i.key for i in items)
 
     def keys(self) -> Iterator[Any]:
         """Return an iterator over the mapping keys."""
         items = frozenset.__iter__(self)
-        return map(lambda i: i.key, items)
+        return (i.key for i in items)
 
     def values(self) -> Iterator[Any]:
         """Return an iterator over the mapping values."""
         items = frozenset.__iter__(self)
-        return map(lambda i: i.value, items)
+        return (i.value for i in items)
 
     def items(self) -> Iterator[tuple[Any, Any]]:
         """Return an iterator over the mapping's key/value pairs."""
