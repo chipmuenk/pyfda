@@ -624,12 +624,12 @@ class Plot_Hf(QWidget):
         PB = [k for k in param_list if 'A_PB' in k]
 
         if SB:
-            A_min = min([fb_get(k) for k in SB])
+            A_min = min(fb_get(k) for k in SB)
         else:
             A_min = 5e-4
 
         if PB:
-            A_max = max([fb_get(k) for k in PB])
+            A_max = max(fb_get(k) for k in PB)
         else:
             A_max = 1
 
