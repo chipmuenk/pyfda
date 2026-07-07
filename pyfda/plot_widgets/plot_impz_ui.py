@@ -166,7 +166,7 @@ class PlotImpz_UI(QWidget):
 
         self._construct_ui()
 #        self._enable_stim_widgets()
-        self.update_N(emit=False)  # also updates window function and win_dict
+        self.update_N(emit_signal=False)  # also updates window function and win_dict
 #        self._update_noi()
 
     def _construct_ui(self):
@@ -638,17 +638,17 @@ class PlotImpz_UI(QWidget):
         self.update_N()
 
     # -------------------------------------------------------------------------
-    def update_N(self, emit=True, N_end=0):
+    def update_N(self, emit_signal=True, N_end=0):
         """
         Update values for `self.N`, `self.N_start` and `self.N_end` from the
         corresponding QLineEditWidgets.
 
         Parameters
         ==========
-        emit: bool
-            When `emit==True` (default), fire `{'ui_local_changed': 'N'}` to update the
-            FFT window and the `plot_impz` widgets. In contrast to `view_changed`,
-             this also forces a calculation of the transient response.
+        emit_signal: bool
+            When `emit_signal==True` (default), fire `{'ui_local_changed': 'N'}` to update
+            the FFT window and the `plot_impz` widgets. In contrast to `view_changed`,
+            this also forces a calculation of the transient response.
 
         N_end: int
             When `N_end` is specified, use the passed value for the total number of data
@@ -656,14 +656,14 @@ class PlotImpz_UI(QWidget):
 
         This method is called by:
 
-        - `self._construct_ui()` with `emit==False`
-        - `plot_impz()` with `emit==False` when the automatic calculation
+        - `self._construct_ui()` with `emit_signal==False`
+        - `plot_impz()` with `emit_signal==False` when the automatic calculation
                 of N has to be updated (e.g. order of FIR filter) has changed
         - signal-slot connection when `N_start` or `N_end` QLineEdit widgets have
-                been changed (`emit==True`)
+                been changed (`emit_signal==True`)
         """
-        if not isinstance(emit, bool):
-            logger.error("update N: wrong data type emit: '%s'", emit)
+        if not isinstance(emit_signal, bool):
+            logger.error("update N: wrong data type emit_signal: '%s'", emit_signal)
 
         # Read value for first data point to be plotted from UI
         self.N_start = safe_eval(self.led_N_start.text(), self.N_start,
@@ -705,7 +705,7 @@ class PlotImpz_UI(QWidget):
             self.N_frame = self.N_frame_user
             self.led_N_frame.setText(str(self.N_frame))  # update widget
 
-        if emit:
+        if emit_signal:
             # use `'ui_local_changed'` as this triggers recalculation of the
             #  transient response
             self.emit({'ui_local_changed': 'N'})
