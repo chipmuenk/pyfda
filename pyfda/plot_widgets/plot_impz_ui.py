@@ -23,7 +23,7 @@ from pyfda.libs.pyfda_sig_lib import impz_len
 from pyfda.libs.pyfda_qt_lib import emit, qcmb_box_populate, qstyle_widget, qtext_width
 from pyfda.libs.pyfda_qt_classes import QVLine, PushButton, PushButtonRT
 # FMT string for QLineEdit fields, e.g. '{:.3g}'
-from pyfda.pyfda_rc import params
+# from pyfda.pyfda_rc import params
 
 from pyfda.plot_widgets.plot_fft_win import Plot_FFT_win
 
