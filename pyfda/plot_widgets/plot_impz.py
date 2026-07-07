@@ -1654,6 +1654,7 @@ class Plot_Impz(QWidget):
                 "'<i>k</i>' specifies frequencies w.r.t. " + to_html("f_S", frmt = 'i') +
                 " but plots graphs over the frequency index <i>k</i>.</span>",
                 """
+                # k is checked: specify frequencies as indices of the FFT, f_k = k * f_S / N_FFT
                 # By default, k = CFP.conf_settings['N_FFT'] which is used for the calculation
                 # of the non-transient tabs and for F_id / H_id here.
                 # Here, the frequency axes must be scaled to fit the number of
@@ -1669,14 +1670,15 @@ class Plot_Impz(QWidget):
 
             # frequency vector for FFT-based frequency plots:
             F = np.fft.fftfreq(self.ui.N, d=1. / f_max)
-        # -----------------------------------------------------------------
-        # Scale frequency response and calculate power
-        # -----------------------------------------------------------------
-        # - Scale signals
-        # - Calculate total power P from FFT, corrected by window correlated gain
-        #   bandwidth and fixpoint scaling (scale_i / scale_o)
-        # - Correct scale for single-sided spectrum
-        # - Scale impulse response with N_FFT to calculate frequency response if requested
+
+            # -----------------------------------------------------------------
+            # Scale frequency response and calculate power
+            # -----------------------------------------------------------------
+            # - Scale signals
+            # - Calculate total power P from FFT, corrected by window correlated gain
+            #   bandwidth and fixpoint scaling (scale_i / scale_o)
+            # - Correct scale for single-sided spectrum
+            # - Scale impulse response with N_FFT to calculate frequency response if requested
             if self.ui.but_freq_norm_impz.isVisible()\
                 and self.ui.but_freq_norm_impz.isEnabled()\
                     and self.ui.but_freq_norm_impz.checked:
