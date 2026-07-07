@@ -228,7 +228,7 @@ class Input_Info(QWidget):
 
     # -------------------------------------------------------------------------
     def _about_window(self):
-        self.about_widget = AboutWindow(self)  # important: Handle must be class attribute
+        self.about_widget = AboutWindow()  # important: Handle must be class attribute
         # self.opt_widget.show() # modeless dialog, i.e. non-blocking
         self.about_widget.exec_()  # modal dialog (blocking)
 
