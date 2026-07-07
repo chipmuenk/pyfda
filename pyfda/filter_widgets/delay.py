@@ -195,7 +195,6 @@ if __name__ == '__main__':
 
     # instantiate filter widget
     filt = Delay()
-    filt._construct_ui()
 
     layVDynWdg = QVBoxLayout()
     layVDynWdg.addWidget(filt.wdg_fil, stretch = 1)
