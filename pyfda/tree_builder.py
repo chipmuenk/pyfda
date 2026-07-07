@@ -17,7 +17,7 @@ from typing import ClassVar
 from pyfda.filter_factory import get_fil_inst, create_fil_inst
 from pyfda.config_file_parser import ConfigFileParser as CFP
 
-import pyfda.libs.frozendict as frozendict
+from pyfda.libs import frozendict
 
 logger = logging.getLogger(__name__)
 
@@ -124,7 +124,6 @@ class ParseError(Exception):
     configuration data for a filter tree cannot be interpreted or
     merged correctly.
     """
-    pass
 
 
 class Tree_Builder():

@@ -11,7 +11,7 @@ User plotting widget
 """
 import logging
 
-from pyfda.libs.compat import (QWidget, pyqtSignal)
+from pyfda.libs.compat import QWidget, pyqtSignal
 from pyfda.pyfda_rc import params
 from pyfda.plot_widgets.mpl_widget import MplWidget
 
