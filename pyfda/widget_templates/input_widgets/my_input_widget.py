@@ -16,7 +16,7 @@ import logging
 from pyfda.libs.compat import (QWidget, QFont, QCheckBox, QFrame,
                       QTextBrowser, QVBoxLayout, QHBoxLayout, pyqtSignal)
 
-import pyfda.filterbroker as fb # importing filterbroker initializes all its globals
+import pyfda.filterbroker as fb
 from pyfda.pyfda_rc import params
 
 logger = logging.getLogger(__name__)
