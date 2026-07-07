@@ -282,7 +282,7 @@ fil_undo = [None] * UNDO_LEN
 # in fil.
 # for f in fil:
 #   f = copy.deepcopy(fil_ref)
-for i in range(len(fil)):
+for i, _ in enumerate(fil):
     fil[i] = copy.deepcopy(fil_ref)
 
 # -------------------------
