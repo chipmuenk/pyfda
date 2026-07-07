@@ -357,11 +357,6 @@ class Plot_Hf(QWidget):
             if A_lim_lor.any():
                 ax.fill_between(F_lim_lor, min(A_lim_lor), A_lim_lor, **hatch)
 
-        if self.unitA == 'V':
-            exp = 1.
-        elif self.unitA == 'W':
-            exp = 2.
-
         if self.unitA == 'dB':
             if fb_get('ft') == "FIR":
                 A_PB_max  = dB(1 + self.A_PB)
@@ -377,7 +372,12 @@ class Plot_Hf(QWidget):
             A_SB  = dB(self.A_SB)
             A_SB2 = dB(self.A_SB2)
             A_SB_maxx = max(A_SB, A_SB2) + 10
+
         else: # 'V' or 'W'
+            if self.unitA == 'V':
+                exp = 1.
+            else: # self.unitA == 'W':
+                exp = 2.
             if fb_get('ft') == "FIR":
                 A_PB_max  = (1 + self.A_PB)**exp
                 A_PB2_max = (1 + self.A_PB2)**exp
