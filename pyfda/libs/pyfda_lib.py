@@ -240,8 +240,9 @@ def mod_version(mod: str = "") -> str:
         return ""
 
     v_md = ""
-    # open and read `module_versions.md` with module version infos
-    with open(os.path.join(dirs.INSTALL_DIR, "module_versions.md"), 'r') as f:
+    # open and read `module_infos.md` with module infos
+    with open(os.path.join(dirs.INSTALL_DIR, "module_infos.md"), 'r',
+              encoding="utf-8") as f:
         # return a list, split at linebreaks while keeping linebreaks
         v = f.read().splitlines(True)
 
