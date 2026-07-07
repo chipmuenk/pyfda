@@ -569,7 +569,7 @@ def pprint_log(d, N: int = 10, tab: str = "\t", debug: bool = False) -> str:
                     s += ' ...'
                 first = False
             if rows > N-1:
-                    s += cr + tab + ' ...'
+                s += cr + tab + ' ...'
         else:
             logger.warning("pprint_log(): Object with ndim = %s cannot be processed.", np.ndim(d))
             return ""
