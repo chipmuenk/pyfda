@@ -254,7 +254,7 @@ class Plot_Hf(QWidget):
             """
         ax1_ylims = ax1.get_ybound()
         # collect only visible ticks
-        ax1_yticks = [t for t in ax1.get_yticks() if t >= ax1_ylims[0] and t <= ax1_ylims[1]]
+        ax1_yticks = [t for t in ax1.get_yticks() if ax1_ylims[1] >= t >= ax1_ylims[0]]
         ax1_nticks = len(ax1_yticks)
         ax1_ydelta_lim = ax1_ylims[1] - ax1_ylims[0]  # span of limits
         ax1_ydelta_vis = ax1_yticks[-1] - ax1_yticks[0]  # delta of max. and min tick
