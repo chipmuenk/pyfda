@@ -25,7 +25,7 @@ import pyfda.filterbroker as fb
 from pyfda.filterbroker import get_fx, set_fx, fb_get, fb_set
 import pyfda.libs.pyfda_fix_lib as fx
 from pyfda.libs.pyfda_sig_lib import angle_zero, calc_ssb_spectrum
-from pyfda.libs.pyfda_lib import safe_eval
+from pyfda.libs.pyfda_lib import safe_eval, first_item
 from pyfda.libs.pyfda_qt_lib import (
     emit, qget_cmb_box, qset_cmb_box, qstyle_widget, qcmb_box_add_item,
     qcmb_box_del_item)
@@ -368,14 +368,14 @@ class Plot_Impz(QWidget):
 
     # -----------------------------------------------------------------------
     def process_sig_rx(self, dict_sig: dict | None = None) -> None:
-        # logger.warning(
-        #     f"SIG_RX - needs_calc: {self.needs_calc} | vis: {self.isVisible()}\n"
-        #     f"\t{first_item(dict_sig)}")
         # Process signals coming from
         # - the navigation toolbars (time and freq.)
         # - local widgets (impz_ui) and
         # - plot_tab_widgets() (global signals)
 
+        logger.debug(
+            "SIG_RX - needs_calc: %s | vis: %s\n%s\t ",
+            self.needs_calc, self.isVisible(), first_item(dict_sig))
 
         if dict_sig['id'] == id(self):
             # logger.warning(f'Stopped infinite loop: "{first_item(dict_sig)}"')
