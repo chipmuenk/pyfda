@@ -368,15 +368,14 @@ class Plot_Impz(QWidget):
 
     # -----------------------------------------------------------------------
     def process_sig_rx(self, dict_sig: dict | None = None) -> None:
-        """
-        Process signals coming from
-        - the navigation toolbars (time and freq.)
-        - local widgets (impz_ui) and
-        - plot_tab_widgets() (global signals)
-        """
         # logger.warning(
         #     f"SIG_RX - needs_calc: {self.needs_calc} | vis: {self.isVisible()}\n"
         #     f"\t{first_item(dict_sig)}")
+        # Process signals coming from
+        # - the navigation toolbars (time and freq.)
+        # - local widgets (impz_ui) and
+        # - plot_tab_widgets() (global signals)
+
 
         if dict_sig['id'] == id(self):
             # logger.warning(f'Stopped infinite loop: "{first_item(dict_sig)}"')
@@ -385,17 +384,15 @@ class Plot_Impz(QWidget):
         if 'fx_sim' in dict_sig:
             # --------------- specs changed ------------
             if dict_sig['fx_sim'] == 'specs_changed':
-                """
-                Fixpoint widget specs have been updated.
-                If fixpoint mode is active:
-                - set `self.needs_calc_fx = True`.
-                - Reset error flag
-                - Force recalculation (`self.needs_calc = True`)
-                - Update run button style to 'changed'
-                - If widget is visible and autorun is selected,
-                    initialize fixpoint widget and
-                    start simulation via `calc_auto` -> `self.impz_init()`
-                """
+                # Fixpoint widget specs have been updated.
+                # If fixpoint mode is active:
+                # - set `self.needs_calc_fx = True`.
+                # - reset error flag
+                # - force recalculation (`self.needs_calc = True`)
+                # - update run button style to 'changed'
+                # - if widget is visible and autorun is selected,
+                #     initialize fixpoint widget and
+                #     start simulation via `calc_auto` -> `self.impz_init()`
                 self.needs_calc = True  # force recalculation
                 self.error = False      # reset error flag
                 # set cmb box for fixpoint / float simulation and update ui:
@@ -410,17 +407,15 @@ class Plot_Impz(QWidget):
 
             # --------------- 'start_fx_response_calculation' ---------
             elif dict_sig['fx_sim'] == 'start_fx_response_calculation':
-                """
-                The fixpoint widget has been initialized and starts the fx simulation
-                when the widget is visible via `self.impz()` and the handle to the
-                fixpoint simulation method handle passed in `dict_sig['fxfilter_func']`
-                """
+                # The fixpoint widget has been initialized and starts the fx simulation
+                # via `self.impz()` if the widget is visible. The handle to the fixpoint
+                # simulation method has been passed via `dict_sig['fxfilter_func']`
                 self.fxfilter = dict_sig['fxfilter_func']
                 if self.isVisible():
                     self.impz()
                 return
 
-            # --------------- ERROR -------------------
+            # --------------- ERROR in fixpoint simulation ------------
             elif dict_sig['fx_sim'] == 'error':
                 self.needs_calc = True
                 self.error = True
@@ -430,7 +425,7 @@ class Plot_Impz(QWidget):
                     logger.error(dict_sig['err_msg'])
                 return
 
-            # ---------------
+            # --------------- MISSING VALUE for 'fx_sim' key ----------
             elif not dict_sig['fx_sim']:
                 logger.error("Missing value for key 'fx_sim'.")
 
