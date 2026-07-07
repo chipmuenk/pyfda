@@ -45,8 +45,7 @@ if dirs.OS.lower() == "windows":
 
 logger = logging.getLogger(__name__)
 
-# initialize the FilterTreeBuilder class and read config file
-tree_builder = Tree_Builder()
+# read and parse the config file
 config_file_parser = ConfigFileParser()
 config_file_parser.parse_conf_file()
 config_file_parser.build_widget_tree()
