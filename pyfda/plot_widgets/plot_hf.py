@@ -297,13 +297,15 @@ class Plot_Hf(QWidget):
     # =============================================================================
 
     # http://stackoverflow.com/questions/28692608/align-grid-lines-on-two-plots
-    # http://stackoverflow.com/questions/3654619/matplotlib-multiple-y-axes-grid-lines-applied-to-both
+    # http://stackoverflow.com/questions/3654619/
+    #    matplotlib-multiple-y-axes-grid-lines-applied-to-both
     # http://stackoverflow.com/questions/20243683/matplotlib-align-twinx-tick-marks
     # manual setting:
-    #self.ax_p.set_yticks( np.linspace(self.ax_p.get_ylim()[0],self.ax_p.get_ylim()[1],nbins) )
-    #ax1.set_yticks(np.linspace(ax1.get_ybound()[0], ax1.get_ybound()[1], 5))
-    #ax2.set_yticks(np.linspace(ax2.get_ybound()[0], ax2.get_ybound()[1], 5))
-    #http://stackoverflow.com/questions/3654619/matplotlib-multiple-y-axes-grid-lines-applied-to-both
+    # self.ax_p.set_yticks( np.linspace(self.ax_p.get_ylim()[0],self.ax_p.get_ylim()[1],nbins) )
+    # ax1.set_yticks(np.linspace(ax1.get_ybound()[0], ax1.get_ybound()[1], 5))
+    # ax2.set_yticks(np.linspace(ax2.get_ybound()[0], ax2.get_ybound()[1], 5))
+    # http://stackoverflow.com/questions/3654619/
+    #    matplotlib-multiple-y-axes-grid-lines-applied-to-both
 
     # use helper functions from matplotlib.ticker:
     #   MaxNLocator: set no more than nbins + 1 ticks
