@@ -732,30 +732,7 @@ class PlotImpz_UI(QWidget):
         self.win_viewer.hide()
 
 
-
 # ------------------------------------------------------------------------------
-def main():
-    import sys
-    from pyfda.libs.compat import QApplication
-
-    app = QApplication(sys.argv)
-
-    mainw = PlotImpz_UI(None)
-    lay_v_main = QVBoxLayout()
-    lay_v_main.addWidget(mainw.wdg_ctrl_time)
-    lay_v_main.addWidget(mainw.wdg_ctrl_freq)
-    # lay_v_main.addWidget(mainw.wdg_ctrl_stim)
-    lay_v_main.addWidget(mainw.wdg_ctrl_run)
-    # (left, top, right, bottom)
-    lay_v_main.setContentsMargins(*params['wdg_margins'])
-
-    mainw.setLayout(lay_v_main)
-
-    app.setActiveWindow(mainw)
-    mainw.show()
-    sys.exit(app.exec_())
-
-
 if __name__ == "__main__":
     # Run widget standalone with `python -m pyfda.plot_widgets.plot_impz_ui`
     import sys
