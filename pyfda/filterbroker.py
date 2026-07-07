@@ -618,14 +618,12 @@ def fb_set(*keys_tuple: tuple, backup: bool = True, new_key: bool = False,
         if backup:
             # backup is not needed, nothing was changed
             restore_fil()
-        logger.error("Type Error, '%s' needs to be a tuple.")
         return -1
 
     except KeyError:
         if backup:
             # backup is not needed, nothing was changed
             restore_fil()
-        logger.error("Key Error")
         return -1
 
     return 0
