@@ -19,6 +19,7 @@ import os
 # from pprint import pformat
 import re
 import sys
+import traceback
 from typing import ClassVar
 
 from pyfda.libs.frozendict import freeze_hierarchical
@@ -527,8 +528,11 @@ class ConfigFileParser():
                 except ImportError:
                     mod_fq_name = None
                     continue  # module not found, try next package
-                except Exception as e:
-                    logger.warning('Error during import of "%s":\n%s', mod_fq_name, e)
+
+                except Exception as e:  # pylint: broad-exception-caught
+                    # Any error can occur while importing a module, requiring a broad exception
+                    logger.warning('Error during import of "%s":\n%s\n\n%s',
+                                   mod_fq_name, e, traceback.format_exc(limit=2))
                     mod_fq_name = None
                     continue  # Some other error ocurred during import, try next package
 
