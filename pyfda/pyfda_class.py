@@ -29,9 +29,61 @@ from pyfda.tabbed_widget import TabbedWidget
 logger = logging.getLogger(__name__)
 
 #========================= Setup the loggers ==================================
+BLACK, RED, GREEN, YELLOW, BLUE, MAGENTA, CYAN, WHITE = range(8)
+
+COLORS = {
+    'WARNING'  : YELLOW,
+    'INFO'     : WHITE,
+    'DEBUG'    : BLUE,
+    'CRITICAL' : YELLOW,
+    'ERROR'    : RED,
+    'RED'      : RED,
+    'GREEN'    : GREEN,
+    'YELLOW'   : YELLOW,
+    'BLUE'     : BLUE,
+    'MAGENTA'  : MAGENTA,
+    'CYAN'     : CYAN,
+    'WHITE'    : WHITE,
+}
+
+RESET_SEQ = "\033[0m"
+COLOR_SEQ = "\033[1;%dm"
+BOLD_SEQ  = "\033[1m"
+
+class ColorFormatter(logging.Formatter):
+    """
+    Subclass Formatter to add colors to the log messages in the console.
+
+    To set the background just use $BG-BLACK - $BG-WHITE.
+
+    Todo: This works on Linux and should work on MacOS as well. On Windows, put os.system('color')
+    somewhere in the code - just once, and almost anywhere between the console being created
+    and the output being sent to it.
+
+    Written by camillobruni, Mar 28, 2010
+    https://stackoverflow.com/questions/384076/how-can-i-color-python-logging-output
+    """
+
+    def __init__(self, *args, **kwargs):
+        logging.Formatter.__init__(self, *args, **kwargs)
+
+    def format(self, record):
+        levelname = record.levelname
+        color     = COLOR_SEQ % (30 + COLORS[levelname])
+        message   = logging.Formatter.format(self, record)
+        message   = message.replace("$RESET", RESET_SEQ)\
+                           .replace("$BOLD",  BOLD_SEQ)\
+                           .replace("$COLOR", color)
+        for k,v in COLORS.items():
+            message = message.replace("$" + k,    COLOR_SEQ % (v+30))\
+                             .replace("$BG" + k,  COLOR_SEQ % (v+40))\
+                             .replace("$BG-" + k, COLOR_SEQ % (v+40))
+        return message + RESET_SEQ
+
+# ------------------------------------------------------------------------------
 class DynFileHandler(logging.FileHandler):
     """
-    subclass FileHandler with a customized handler for dynamic definition of
+    Subclass FileHandler with a customized handler for dynamic definition of
     the logging filepath and -name
     """
     def __init__(self, *args):
@@ -122,11 +174,13 @@ class QEditHandler(logging.Handler):
         if msg:
             XStream.stdout().write(f'{msg}')
 
-# "register" custom class DynFileHandler as an attribute for the logging module
-# to use it inside the logging config file and pass file name / path and mode
-# as parameters:
+# register custom classes DynFileHandler, QEditHandler and ColorFormatter as attributes
+# for the logging module module to use it inside the logging config file.
+# Pass file name / path and mode as parameters:
 logging.DynFileHandler = DynFileHandler
 logging.QEditHandler = QEditHandler
+logging.ColorFormatter = ColorFormatter
+
 logging.config.fileConfig(dirs.USER_LOG_CONF_DIR_FILE)#, disable_existing_loggers=True)
 #==============================================================================
 
