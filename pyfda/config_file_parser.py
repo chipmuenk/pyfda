@@ -529,12 +529,13 @@ class ConfigFileParser():
                     mod_fq_name = None
                     continue  # module not found, try next package
 
-                except Exception as e:  # pylint: broad-exception-caught
-                    # Any error can occur while importing a module, requiring a broad exception
+                # Any error can occur while importing a module. Catch the error
+                # and print a stack trace
+                except Exception as e:  # pylint: disable=broad-exception-caught
                     logger.warning('Error during import of "%s":\n%s\n\n%s',
                                    mod_fq_name, e, traceback.format_exc(limit=2))
                     mod_fq_name = None
-                    continue  # Some other error ocurred during import, try next package
+                    continue  # An error ocurred during import, try next package
 
             if not mod_fq_name:
                 logger.warning('Module "%s" could not be imported.', mod_name)
