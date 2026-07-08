@@ -10,7 +10,6 @@
 Mainwindow for the pyFDA app
 """
 import logging
-import logging.config
 import sys
 
 import numpy as np
