@@ -65,7 +65,7 @@ class ColorFormatter(logging.Formatter):
     """
 
     def __init__(self, *args, **kwargs):
-        logging.Formatter.__init__(self, *args, **kwargs)
+        super().__init__(*args, **kwargs)
 
     def format(self, record):
         levelname = record.levelname
