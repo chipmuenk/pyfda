@@ -505,14 +505,16 @@ class ConfigFileParser():
         classes_dict = {}
         num_imports = 0        # number of successful module imports
         imported_classes = ""  # names of successful module imports
-        pckg_names = ['pyfda.' +subpackage + '.', '', subpackage+'.']  # search in that order
+        # list of package names to be prepended to the module name, yielding e.g. for 'plot_hf.py'
+        # 'pyfda.plot_widgets.plot_hf' or 'plot_hf' or 'plot_widgets.plot_hf', search in that order
+        pckg_names = ['pyfda.' + subpackage + '.', '', subpackage + '.']  # search in that order
 
         section_conf_dict = self._parse_conf_section(section)
 
         # iterate over module names found in config file:
         for mod_name in section_conf_dict:
-            # Try to import the module from different packages, e.g. 
-            # pyfda.filter_design or filter_design:
+            # Try to import the module from different packages, e.g.
+            # 'pyfda.filter_design' or 'filter_design':
             for p in pckg_names:
                 try:
                     mod_fq_name = p + mod_name  # fully qualified module name (fqn)
@@ -522,8 +524,7 @@ class ConfigFileParser():
                     mod = importlib.import_module(mod_fq_name)
                     ################################################
                     break  # -> successful import, break out of pckg_names loop
-                except ImportError as e:
-                    logger.warning('Import error for "%s":\n%s', mod_fq_name, e)
+                except ImportError:
                     mod_fq_name = None
                     continue  # module not found, try next package
                 except Exception as e:
@@ -533,7 +534,7 @@ class ConfigFileParser():
 
             if not mod_fq_name:
                 logger.warning('Module "%s" could not be imported.', mod_name)
-                continue
+                continue  # with next entry / module in section_conf_dict
 
             if hasattr(mod, 'classes'):
                 # check type of module attribute 'classes', try to convert to dict
