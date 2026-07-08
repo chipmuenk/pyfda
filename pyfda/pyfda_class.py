@@ -82,7 +82,7 @@ class XStream(QtCore.QObject):
         """
         Write a message to the stream.
 
-        The message is converted to HTML (for the logger widget) and
+        The message is converted to HTML for the logger widget and
         emitted via the `messageWritten` Qt signal unless signals are
         currently blocked.
 
@@ -92,7 +92,7 @@ class XStream(QtCore.QObject):
             The text message to write to the stream.
         """
         if not self.signalsBlocked():
-            msg = to_html(msg,frmt='log')
+            msg = to_html(msg, frmt='log')
 
             self.messageWritten.emit(msg)
 
@@ -111,7 +111,7 @@ class XStream(QtCore.QObject):
 
 class QEditHandler(logging.Handler):
     """
-    Subclass QEditHandler to also log messages to textWidget on main display
+    Subclass QEditHandler to also log messages to QPlainTextEdit in UI.
     Overrides stdout to print messages to textWidget (XStream)
     """
     def __init__(self):
