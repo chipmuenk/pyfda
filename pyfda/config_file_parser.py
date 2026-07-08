@@ -505,13 +505,16 @@ class ConfigFileParser():
         classes_dict = {}
         num_imports = 0        # number of successful module imports
         imported_classes = ""  # names of successful module imports
-        pckg_names = ['pyfda.'+subpackage+'.', '', subpackage+'.']  # search in that order
+        pckg_names = ['pyfda.' +subpackage + '.', '', subpackage+'.']  # search in that order
 
         section_conf_dict = self._parse_conf_section(section)
 
-        for mod_name in section_conf_dict:  # iterate over dict keys found in config file
+        # iterate over module names found in config file:
+        for mod_name in section_conf_dict:
+            # Try to import the module from different packages, e.g. 
+            # pyfda.filter_design or filter_design:
             for p in pckg_names:
-                try:  # Try to import the module from the package list above
+                try:
                     mod_fq_name = p + mod_name  # fully qualified module name (fqn)
                     # Try to import the module from the  package and get a handle:
                     logger.debug(mod_fq_name)
@@ -548,7 +551,7 @@ class ConfigFileParser():
                 # no `classes` attribute - skip entry
                 logger.warning(
                     'Skipping module "%s" due to missing attribute "classes".', mod_name)
-                continue
+                continue # with next entry in section_conf_dict
 
             # Now, check whether class `c` is part of module `mod`
             for c in mod_dict:

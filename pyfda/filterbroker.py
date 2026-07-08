@@ -401,7 +401,7 @@ def _traverse_dict(keys_tuple: tuple, fil_dict: dict) -> dict:
     return d
 
 # -------------------------
-def get_fx()-> bool:
+def get_fx() -> bool:
     """
     Check if a fixpoint mode is active globally by checking the current
 
@@ -418,12 +418,12 @@ def get_fx()-> bool:
     """
     qfrmt = fb_get('qfrmt')
     if qfrmt not in ['qint', 'qfrac', 'float32', 'float64']:
-        raise KeyError("Invalid value for qfrmt!")
+        raise KeyError("Invalid value for 'qfrmt', assuming floating-point!")
 
     return qfrmt in ['qint', 'qfrac']
 
 # -------------------------
-def set_fx(fx: bool)-> None:
+def set_fx(fx: bool) -> None:
     """
     Set fixpoint mode by restoring previous fixpoint format
     when `fx == True`, otherwise restore previous float format.
@@ -566,11 +566,10 @@ def fb_set(*keys_tuple: tuple, backup: bool = True, new_key: bool = False,
         # -------------------------------------------------------------------
             # union of types of current and new value, e.g. {'float', 'float64'}
             types = {type(set_val).__name__, type(d[set_key]).__name__}
-            # the following types are considered compatible
+            # the following types are considered fully compatible
             if types.issubset({'float', 'float64'}):
                 pass
-            # the following types are considered compatible but a warning is issued because
-            # the conversion might lead to problems later on.
+            # the following types are considered mostlycompatible, just issue a warning
             elif types.issubset({'list', 'tuple', 'ndarray'}):
                 logger.warning("Possible type mismatch: Setting\n\t'%s' of type '%s' with value "
                                 "of similar type '%s'",
