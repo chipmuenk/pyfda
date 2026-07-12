@@ -126,7 +126,7 @@ class ParseError(Exception):
     """
 
 
-class Tree_Builder():
+class FilterTreeBuilder():
     """
     Read the config file and construct the fil_tree dictionary as a class attribute with
 
@@ -304,7 +304,7 @@ class Tree_Builder():
                 merge_dicts_hierarchically(fil_tree, fil_tree_add, mode='add1')
 
         # Make the dictionary and all sub-dictionaries read-only ("FrozenDict"):
-        Tree_Builder.fil_tree = frozendict.freeze_hierarchical(fil_tree)
+        FilterTreeBuilder.fil_tree = frozendict.freeze_hierarchical(fil_tree)
 
     # --------------------------------------------------------------------------
     def _build_fil_tree_fc(self, fc: str, rt_dict: dict[str, dict], fil_tree: dict = None) -> dict:
@@ -434,10 +434,10 @@ if __name__ == "__main__":
     app = QApplication(sys.argv)
     logging.basicConfig(level=logging.INFO)
 
-    # Initialize Tree_Builder class attribute 'fil_tree'
-    Tree_Builder().build_fil_tree()
+    # Initialize FilterTreeBuilder class attribute 'fil_tree'
+    FilterTreeBuilder().build_fil_tree()
 
-    fil_tree_ref = Tree_Builder.fil_tree['LP']['FIR']['Equiripple']['min']
+    fil_tree_ref = FilterTreeBuilder.fil_tree['LP']['FIR']['Equiripple']['min']
     # Test Immutability - the following lines should all raise an exception
     try:
         fil_tree_ref.update({'msg':("hallo",)}) # this would change 'fil_tree'
@@ -445,10 +445,10 @@ if __name__ == "__main__":
         print(f"\nExpected AttributeError on update(): {e}\n")
 
     try:
-        Tree_Builder.fil_tree['LP']['FIR']['Equiripple']['min']['par'] = ("A_1","F_1")
+        FilterTreeBuilder.fil_tree['LP']['FIR']['Equiripple']['min']['par'] = ("A_1","F_1")
     except TypeError as e:
         print(f"\nExpected TypeError on item assignment: {e}\n")
 
-    print(f"\nDict type: {type(Tree_Builder.fil_tree['LP']['FIR']['Equiripple']).__name__}\n")
+    print(f"\nDict type: {type(FilterTreeBuilder.fil_tree['LP']['FIR']['Equiripple']).__name__}\n")
 
-    print('Tree_Builder.fil_tree["BP"] = ', pprint_log(Tree_Builder.fil_tree["BP"]))
+    print('FilterTreeBuilder.fil_tree["BP"] = ', pprint_log(FilterTreeBuilder.fil_tree["BP"]))

@@ -14,7 +14,7 @@ import sys
 import logging
 
 from pyfda.filterbroker import fb_get
-from pyfda.tree_builder import Tree_Builder as TB
+from pyfda.tree_builder import FilterTreeBuilder as FTB
 from pyfda.libs.compat import (
     QWidget, QLabel, QFont, QFrame, pyqtSignal, Qt, QHBoxLayout, QVBoxLayout)
 from pyfda.libs.pyfda_lib import first_item
@@ -172,10 +172,10 @@ if __name__ == '__main__':
     ft = fb_get('ft')
     fc = 'Cheby1'  # fb_get('fc')
 
-    if 'min' in TB.fil_tree[rt][ft][fc]:
+    if 'min' in FTB.fil_tree[rt][ft][fc]:
         # extract target parameters from filter tree
-        print(TB.fil_tree[rt][ft][fc]['min']['tspecs'])
-        target_params = TB.fil_tree[rt][ft][fc]['min']['tspecs'][1]
+        print(FTB.fil_tree[rt][ft][fc]['min']['tspecs'])
+        target_params = FTB.fil_tree[rt][ft][fc]['min']['tspecs'][1]
     else:
         target_params = {}
 

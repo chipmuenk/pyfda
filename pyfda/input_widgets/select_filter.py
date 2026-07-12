@@ -21,7 +21,7 @@ from pyfda.libs.compat import (
 
 from pyfda.filterbroker import fb_get, fb_set
 from pyfda.filter_factory import create_fil_inst, get_fil_inst
-from pyfda.tree_builder import Tree_Builder as TB
+from pyfda.tree_builder import FilterTreeBuilder as FTB
 from pyfda.config_file_parser import ConfigFileParser as CFP
 from pyfda.libs.pyfda_lib import safe_eval
 from pyfda.libs.pyfda_qt_lib import qget_cmb_box, emit
@@ -124,10 +124,10 @@ class SelectFilter(QWidget):
         self.cmb_filter_class.setSizeAdjustPolicy(QComboBox.AdjustToContents)
 
         # ----------------------------------------------------------------------
-        # Populate combo boxes from TB.fil_tree (has been filled by now)
+        # Populate combo boxes from FTB.fil_tree (has been filled by now)
         # ----------------------------------------------------------------------
         # start with response types (LP, HP, ...) and sort them alphabetically
-        rt_list = sorted(TB.fil_tree.keys())
+        rt_list = sorted(FTB.fil_tree.keys())
 
         # Translate short response type ("LP") from fil_tree to displayed names ("Lowpass",
         # correspondence is defined in pyfda_rc.py) and populate rt combo box
@@ -146,13 +146,13 @@ class SelectFilter(QWidget):
         rt = qget_cmb_box(self.cmb_response_type)
 
         # next, populate the filter type combo (IIr, FIR)
-        for ft in TB.fil_tree[rt]:
+        for ft in FTB.fil_tree[rt]:
             self.cmb_filter_type.addItem(rc.ft_names[ft], ft)
         self.cmb_filter_type.setCurrentIndex(0)  # set initial index
         ft = qget_cmb_box(self.cmb_filter_type)
 
         # Finally, populate the filter class combo (Butterworth, Chebyshev, ...)
-        for fc in TB.fil_tree[rt][ft]:
+        for fc in FTB.fil_tree[rt][ft]:
             self.cmb_filter_class.addItem(CFP.FILTER_CLASSES_DICT[fc]['name'], fc)
         self.cmb_filter_class.setCurrentIndex(0)  # set initial index
 
@@ -268,12 +268,12 @@ class SelectFilter(QWidget):
         fb_set('rt', self.rt)
 
         # Get list of available filter types for new rt
-        ft_list = list(TB.fil_tree[self.rt].keys())  # conversion to list needed for Py3
+        ft_list = list(FTB.fil_tree[self.rt].keys())  # conversion to list needed for Py3
         # ---------------------------------------------------------------
         # Rebuild filter type combobox entries for new rt setting
         self.cmb_filter_type.blockSignals(True)  # don't fire when changed programmatically
         self.cmb_filter_type.clear()
-        for ft in TB.fil_tree[self.rt]:
+        for ft in FTB.fil_tree[self.rt]:
             self.cmb_filter_type.addItem(rc.ft_names[ft], ft)
 
         # Is current filter type (e.g. IIR) in list for new rt?
@@ -312,7 +312,7 @@ class SelectFilter(QWidget):
         self.cmb_filter_class.clear()
         fc_list = []
 
-        for fc in sorted(TB.fil_tree[self.rt][self.ft]):
+        for fc in sorted(FTB.fil_tree[self.rt][self.ft]):
             self.cmb_filter_class.addItem(CFP.FILTER_CLASSES_DICT[fc]['name'], fc)
             fc_list.append(fc)
 
@@ -361,16 +361,16 @@ class SelectFilter(QWidget):
 
             # Check whether new design method also provides the old filter order method.
             # If yes, don't change it, else set first available filter order method.
-            if fb_get('fo') not in TB.fil_tree[self.rt][self.ft][fc].keys():
+            if fb_get('fo') not in FTB.fil_tree[self.rt][self.ft][fc].keys():
                 # explicit list(dict.keys()) needed for Python 3
-                fb_set('fo', list(TB.fil_tree[self.rt][self.ft][fc].keys())[0])
+                fb_set('fo', list(FTB.fil_tree[self.rt][self.ft][fc].keys())[0])
 
             # ===================================================================
             # logger.debug("selFilter = %s"
             #        "filterTree[fc] = %s"
             #        "filterTree[fc].keys() = %s"
-            #       %(fil[0], TB.fil_tree[self.rt][self.ft][fc],\
-            #         TB.fil_tree[self.rt][self.ft][fc].keys()
+            #       %(fil[0], FTB.fil_tree[self.rt][self.ft][fc],\
+            #         FTB.fil_tree[self.rt][self.ft][fc].keys()
             #         ))
             # ===================================================================
             # construct dyn. subwidgets if available
@@ -389,7 +389,7 @@ class SelectFilter(QWidget):
         """
         # collect dict_keys of available filter order [fo] methods for selected
         # design method [fc] from fil_tree (explicit list() needed for Python 3)
-        fo_dict = TB.fil_tree[fb_get('rt')][fb_get('ft')][fb_get('fc')]
+        fo_dict = FTB.fil_tree[fb_get('rt')][fb_get('ft')][fb_get('fc')]
         fo_list = list(fo_dict.keys())
 
         # is currently selected fo setting available for (new) fc ?

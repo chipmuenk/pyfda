@@ -21,7 +21,7 @@ import scipy.signal as sig
 from pyfda.config_file_parser import ConfigFileParser as CFP
 from pyfda.filterbroker import fb_get
 import pyfda.filter_factory as ff
-from pyfda.tree_builder import Tree_Builder as TB
+from pyfda.tree_builder import FilterTreeBuilder as FTB
 from pyfda.input_widgets.input_info_about import AboutWindow
 from pyfda.libs.compat import (
     QtGui, QWidget, QFont, QFrame, QLabel, QTableWidget, QTableWidgetItem,
@@ -521,8 +521,8 @@ class Input_Info(QWidget):
         """
         self.txt_filt_tree.setVisible(self.but_filt_tree.checked)
 
-        ftree_sorted = ['<b>' + str(key) + ' : ' + '</b>' + str(TB.fil_tree[key])
-                        for key in sorted(TB.fil_tree.keys())]
+        ftree_sorted = ['<b>' + str(key) + ' : ' + '</b>' + str(FTB.fil_tree[key])
+                        for key in sorted(FTB.fil_tree.keys())]
         dictstr = pprint.pformat(ftree_sorted, indent=4)
 #        dictstr = pprint.pformat(fb_get())
         self.txt_filt_tree.setText(dictstr)

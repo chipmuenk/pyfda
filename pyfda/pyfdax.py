@@ -18,7 +18,7 @@ import matplotlib
 from pyfda.libs.compat import Qt, QApplication, QIcon
 # from pyfda.libs.pyfda_lib import ANSIcolors as ACol
 import pyfda.libs.pyfda_dirs as dirs # initial import constructs file paths
-from pyfda.tree_builder import Tree_Builder
+from pyfda.tree_builder import FilterTreeBuilder
 from pyfda.config_file_parser import ConfigFileParser
 import pyfda.pyfda_rc as rc
 
@@ -149,9 +149,9 @@ def main():
     rc.mpl_rc['font.size'] = fontsize
     rc.params['screen'] = {'ref_dpi': ref_dpi, 'scaling': scaling,
                            'height': height, 'width': width}
-    # initialize / construct Tree_Builder class attribute `fil_tree`
+    # initialize / construct FilterTreeBuilder class attribute `fil_tree`
     # from config file
-    Tree_Builder().build_fil_tree()
+    FilterTreeBuilder().build_fil_tree()
 
     mainw = pyFDA()
     logger.info("Logging to '%s'", dirs.LOG_DIR_FILE)

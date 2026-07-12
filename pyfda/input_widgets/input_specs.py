@@ -17,7 +17,7 @@ import sys
 import pyfda.filterbroker as fb
 from pyfda.filterbroker import fb_get, fb_set
 from pyfda.filter_factory import call_fil_method
-from pyfda.tree_builder import Tree_Builder as TB
+from pyfda.tree_builder import FilterTreeBuilder as FTB
 from pyfda.input_widgets import (
     select_filter, amplitude_specs, freq_specs, freq_units, weight_specs, target_specs)
 from pyfda.libs.compat import (
@@ -328,7 +328,7 @@ class Input_Specs(QWidget):
 
         The dict fil[0] with the current filter info is read, then general information
         for the selected filter type and order (min/man) is gathered from
-        the filter tree [TB.fil_tree], i.e. which parameters are needed, which
+        the filter tree [FTB.fil_tree], i.e. which parameters are needed, which
         widgets are visible and which message shall be displayed.
 
         Then, the UIs of all subwidgets are updated using their `update_UI()` methods.
@@ -340,10 +340,10 @@ class Input_Specs(QWidget):
 
         # the keys of the all_widgets dict are the names of the subwidgets,
         # the values are a tuple with the corresponding parameters
-        all_widgets = TB.fil_tree[rt][ft][fc][fo]
+        all_widgets = FTB.fil_tree[rt][ft][fc][fo]
 
         # logger.debug("rt: '%s' - ft: '%s' - fc: '%s' - fo: '%s'", rt, ft, fc, fo)
-        # logger.debug("fil_tree[rt][ft][fc][fo]:\n\t%s", TB.fil_tree[rt][ft][fc][fo])
+        # logger.debug("fil_tree[rt][ft][fc][fo]:\n\t%s", FTB.fil_tree[rt][ft][fc][fo])
 
         # update filter order subwidget, called by select_filter:
         # self.sel_fil.load_filter_order()
