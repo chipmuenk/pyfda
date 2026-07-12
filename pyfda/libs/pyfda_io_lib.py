@@ -655,7 +655,7 @@ def read_csv_info_large(filename):
 
     sniffer = csv.Sniffer()
 
-    with open(filename) as f:
+    with open(filename, 'r', encoding='utf-8') as f:
         first_line = f.readline()
         sample = first_line + f.readline()
         # pattern search returns true when only allowed characters are found
@@ -1655,7 +1655,7 @@ def load_filter(self, all_filters: bool = False) -> int:
 
     elif file_type == 'json':
         try:
-            with io.open(file_name, 'r') as f:  # open in text mode for json files
+            with io.open(file_name, 'r', encoding='utf-8') as f:  # open in text mode (json files)
                 fb_temp = json.load(f)
 
         except (IOError, json.JSONDecodeError) as e:
@@ -1868,7 +1868,7 @@ def save_filter(self) -> int:
 
     elif file_type == 'json':
         try:
-            with io.open(file_name, 'w') as f:  # open in text mode
+            with io.open(file_name, 'w', encoding='utf-8') as f:  # open in text mode
                 # first, convert dict containing numpy arrays to a pure json string
                 fb_fil_clean_json = json.dumps(fil_clean, cls=NumpyEncoder, indent=2,
                                         ensure_ascii=False, sort_keys=True )
