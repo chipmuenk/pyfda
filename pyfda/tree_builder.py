@@ -7,8 +7,8 @@
 # (see file LICENSE in root directory for details)
 
 """
-Create the tree dictionaries containing information about filters,
-filter implementations, widgets etc. in hierarchical form
+Read the class dictionaries from ConfigFileParser and create a hierarchical filter_tree
+dict with all filter response types as top level keys.
 """
 import logging
 import sys

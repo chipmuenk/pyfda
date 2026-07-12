@@ -7,8 +7,9 @@
 # (see file LICENSE in root directory for details)
 
 """
-Create the tree dictionaries containing information about filters,
-filter implementations, widgets etc. in hierarchical form
+Parse the config file and create dictionaries containing available classes for
+input_widgets, plot_widgets,filters, fixpoint_filters, filters and a dict for
+general configuration settings. These dictionaries are available as class variables.
 """
 import ast
 from collections import OrderedDict
