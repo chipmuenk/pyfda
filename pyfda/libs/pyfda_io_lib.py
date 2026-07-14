@@ -1352,7 +1352,7 @@ def coe_header(title: str) -> str:
     if unit in {'f_S', 'f_Ny'}:
         f_S = ""
     else:
-        f_S = fb_get('f_S')
+        f_S = int(fb_get('f_S'))
     header = (
         "-" * 85 + "\n\n"
         f"{title}\n"
