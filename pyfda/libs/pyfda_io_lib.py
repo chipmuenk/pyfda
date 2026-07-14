@@ -1094,13 +1094,13 @@ def write_wav_frame(parent: object, file_name: str, data: np.ndarray, f_S: int =
             audio = data.T  # transpose data
             n_chan = np.shape(data)[1]
             # audio = np.array([left_channel, right_channel]).T
-        with wave.open(file_name, "w") as f:
+        with wave.open(file_name, "wb") as wf:
             # 2 Channels.
-            f.setnchannels(n_chan)
+            wf.setnchannels(n_chan)  # undefined?
             # 2 bytes per sample.
-            f.setsampwidth(2)
-            f.setframerate(f_S)
-            f.writeframes(audio.tobytes())
+            wf.setsampwidth(2)  # undefined?
+            wf.setframerate(f_S)  # undefined?
+            wf.writeframes(audio.tobytes())  # undefined?
 
         logger.info('Data saved as\n\t"%s"', file_name)
 
