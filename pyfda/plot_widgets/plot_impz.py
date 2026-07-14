@@ -446,7 +446,7 @@ class Plot_Impz(QWidget):
                 # update number of data points in impz_ui and FFT window
                 # needed when e.g. FIR filter order has been changed, requiring
                 # a different number of data points for simulation. Don't emit a signal.
-                self.ui.update_N(emit=False)
+                self.ui.update_N(emit_signal=False)
                 self.needs_calc = True
                 # Highlight "RUN" button
                 self.ui.but_run.setIcon(QIcon(":/play.svg"))
