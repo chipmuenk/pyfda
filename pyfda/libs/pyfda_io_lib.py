@@ -1101,8 +1101,6 @@ def write_wav_frame(parent: object, file_name: str, data: np.ndarray, f_S: int =
             f.setsampwidth(2)
             f.setframerate(f_S)
             f.writeframes(audio.tobytes())
-        with open(file_name, 'w', encoding="utf8", newline='') as f:
-            f.write(data)
 
         logger.info('Data saved as\n\t"%s"', file_name)
 
