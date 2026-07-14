@@ -1076,7 +1076,7 @@ def write_wav_frame(parent: object, file_name: str, data: np.ndarray, f_S: int =
     -------
     None
     """
-    file_name, _ = select_file(parent, title=title, mode='wb', file_types='wav',)
+    file_name, _ = select_file(parent, title=title, mode='wb', file_types=('wav',))
     if file_name is None:
         return  # file operation cancelled or other error
 
