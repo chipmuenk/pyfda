@@ -917,7 +917,7 @@ def file2array(file_name: str, file_type: str, fkey: str = "",
         logger.info("Importing data from file '%s'.", file_name)
         try:
             if file_type == 'wav':
-                f_S, data_arr = wavfile.read(file_name, mmap=False)
+                _, data_arr = wavfile.read(file_name, mmap=False)
                 # data_arr is 1D for single channel (mono) files and
                 # 2D otherwise (n_chans, n_samples)
 
@@ -1076,7 +1076,7 @@ def write_wav_frame(parent: object, file_name: str, data: np.ndarray, f_S: int =
     -------
     None
     """
-    file_name, file_type = select_file(parent, title=title, mode='wb', file_types='wav')
+    file_name, _ = select_file(parent, title=title, mode='wb', file_types='wav',)
     if file_name is None:
         return  # file operation cancelled or other error
 
