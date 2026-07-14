@@ -1055,6 +1055,8 @@ def write_wav_frame(parent: object, file_name: str, data: np.ndarray, f_S: int =
     Export a frame of data in wav format
 
     TODO: Currently unused!
+    TODO: Remove pylint: disable=no-member once bug
+          https://github.com/pylint-dev/pylint/issues/10316 is fixed
 
     Parameters
     ----------
@@ -1096,11 +1098,12 @@ def write_wav_frame(parent: object, file_name: str, data: np.ndarray, f_S: int =
             # audio = np.array([left_channel, right_channel]).T
         with wave.open(file_name, "wb") as wf:
             # 2 Channels.
-            wf.setnchannels(n_chan)  # undefined?
+            wf.setnchannels(n_chan)  # pylint: disable=no-member
             # 2 bytes per sample.
-            wf.setsampwidth(2)  # undefined?
-            wf.setframerate(f_S)  # undefined?
-            wf.writeframes(audio.tobytes())  # undefined?
+            wf.setsampwidth(2)  # pylint: disable=no-member
+            wf.setframerate(f_S)  # pylint: disable=no-member
+            # get the raw bytes from the numpy array:
+            wf.writeframes(audio.tobytes())  # pylint: disable=no-member
 
         logger.info('Data saved as\n\t"%s"', file_name)
 
