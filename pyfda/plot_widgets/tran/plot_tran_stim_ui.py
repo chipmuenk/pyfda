@@ -18,6 +18,7 @@ from pyfda.libs.compat import (
 
 from pyfda.libs.pyfda_lib import to_html, safe_eval, pprint_log
 import pyfda.filterbroker as fb
+from pyfda.filterbroker import fb_get
 from pyfda.libs.pyfda_qt_lib import (
     qcmb_box_populate, qget_cmb_box, qtext_width, qstyle_widget, emit)
 from pyfda.libs.pyfda_qt_classes import QVLine, PushButton, PushButtonRT
@@ -635,9 +636,9 @@ class Plot_Tran_Stim_UI(QWidget):
             self.lblFreq1.setText(self.txtFreq1_k)
             self.lblFreq2.setText(self.txtFreq2_k)
         else:
-            f_unit = fb.fil[0]['plt_fUnit']
-            t_unit = fb.fil[0]['plt_tUnit'].replace(r"$\mu$", "&mu;")
-            if fb.fil[0]['freq_specs_unit'] in {'f_S', 'f_Ny'}:
+            f_unit = fb_get('plt_fUnit')
+            t_unit = fb_get('plt_tUnit').replace(r"$\mu$", "&mu;")
+            if fb_get('freq_specs_unit') in {'f_S', 'f_Ny'}:
                 # Normalized frequency labels with capital F
                 self.lblFreq1.setText(self.txtFreq1_F)
                 self.lblFreq2.setText(self.txtFreq2_F)
@@ -759,8 +760,8 @@ class Plot_Tran_Stim_UI(QWidget):
         """
 
         f_corr = 1
-        if fb.fil[0]['freq_locked']:
-            f_corr = fb.fil[0]['f_S_prev'] / fb.fil[0]['f_S']
+        if fb_get('freq_locked'):
+            f_corr = fb_get('f_S_prev') / fb_get('f_S')
             self.f1 *= f_corr
             self.f2 *= f_corr
             self.T1 /= f_corr
@@ -775,8 +776,8 @@ class Plot_Tran_Stim_UI(QWidget):
             # doesn't work yet, frequencies are scaled wrongly
             self.f_scale = self.N_FFT
         else:
-            self.f_scale = fb.fil[0]['f_S']
-        self.t_scale = fb.fil[0]['T_S']
+            self.f_scale = fb_get('f_S')
+        self.t_scale = fb_get('T_S')
 
         # logger.warning("f_S = %s, prev = %s\nf_scale = %s, f_1 = %s, f_corr = %s",
         #               fb.fil[0]['f_S'], fb.fil[0]['f_S_prev'], self.f_scale, self.f1, f_corr)

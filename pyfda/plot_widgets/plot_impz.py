@@ -21,8 +21,7 @@ from matplotlib.ticker import AutoMinorLocator
 from pyfda.libs.compat import (
     QWidget, pyqtSignal, QTabWidget, QVBoxLayout, QIcon, QSize, QSizePolicy)
 from pyfda.config_file_parser import ConfigFileParser as CFP
-import pyfda.filterbroker as fb
-from pyfda.filterbroker import get_fx, set_fx, fb_get, fb_set
+from pyfda.filterbroker import get_fx, set_fx, fb_get, fb_set, fx_results
 import pyfda.libs.pyfda_fix_lib as fx
 from pyfda.libs.pyfda_sig_lib import angle_zero, calc_ssb_spectrum
 from pyfda.libs.pyfda_lib import safe_eval, first_item
@@ -619,7 +618,7 @@ class Plot_Impz(QWidget):
                     and isinstance(self.stim_wdg.ui.A1, complex))\
                 or (self.stim_wdg.ui.ledAmp2.isVisible
                     and isinstance(self.stim_wdg.ui.A2, complex))\
-                or np.any(np.iscomplex(np.asarray(fb.fil[0]['ba'])))\
+                or np.any(np.iscomplex(np.asarray(fb_get('ba'))))\
                 or (self.tran_io_wdg.ui.but_load.property("state") == 'ok'
                     and np.iscomplexobj(self.tran_io_wdg.x))\
                 or np.any(np.iscomplex(x_test)))
@@ -729,7 +728,7 @@ class Plot_Impz(QWidget):
                         logger.error("Fixpoint simulation returned empty results!")
                     else:
                         logger.error("Simulator error %s", e)
-                        fb.fx_results = None
+                        fx_results = None
                     self.error = True
 
                 if self.error:
@@ -954,25 +953,25 @@ class Plot_Impz(QWidget):
                 if fb_get('qfrmt') == 'qint':
                     # display stimulus and response as integer values
                     # in the range +/- 2 ** (WI + WF)
-                    self.scale_i = 1 << fb.fil[0]['fxq']['QI']['WF']
+                    self.scale_i = 1 << fb_get('fxq', 'QI', 'WF')
                     self.scale_iq = 1
-                    self.scale_o = 1 << fb.fil[0]['fxq']['QO']['WF']
+                    self.scale_o = 1 << fb_get('fxq', 'QO', 'WF')
 
-                    self.fx_min_x = - (1 << (fb.fil[0]['fxq']['QI']['WI']
-                                     + fb.fil[0]['fxq']['QI']['WF']))
+                    self.fx_min_x = - (1 << (fb_get('fxq', 'QI', 'WI')
+                                     + fb_get('fxq', 'QI', 'WF')))
                     self.fx_max_x = -self.fx_min_x - 1
-                    self.fx_min_y = - (1 << (fb.fil[0]['fxq']['QO']['WI']
-                                     + fb.fil[0]['fxq']['QO']['WF']))
+                    self.fx_min_y = - (1 << (fb_get('fxq', 'QO', 'WI')
+                                     + fb_get('fxq', 'QO', 'WF')))
                     self.fx_max_y = -self.fx_min_y - 1
                 elif fb_get('qfrmt') == 'qfrac':
                     # display values scaled as "real world (float) values"
                     self.scale_i = self.scale_iq = self.scale_o = 1
-                    self.fx_min_x = -(1 << fb.fil[0]['fxq']['QI']['WI'])
+                    self.fx_min_x = -(1 << fb_get('fxq', 'QI', 'WI'))
                     self.fx_max_x = -self.fx_min_x\
-                        - 1. / (1 << fb.fil[0]['fxq']['QI']['WF'])
-                    self.fx_min_y = -(1 << fb.fil[0]['fxq']['QO']['WI'])
+                        - 1. / (1 << fb_get('fxq', 'QI', 'WF'))
+                    self.fx_min_y = -(1 << fb_get('fxq', 'QO', 'WI'))
                     self.fx_max_y = -self.fx_min_y -\
-                        1. / (1 << fb.fil[0]['fxq']['QO']['WF'])
+                        1. / (1 << fb_get('fxq', 'QO', 'WF'))
                 else:
                     logger.error("Undefined qfrmt = '%s'!", fb_get('qfrmt'))
 
@@ -1134,7 +1133,7 @@ class Plot_Impz(QWidget):
         Clear and initialize the axes of the time domain matplotlib widgets
         """
         # calculate time vector from index n and T_S
-        self.t = self.n * fb.fil[0]['T_S']
+        self.t = self.n * fb_get('T_S')
 
         # Read out combo boxes with plotting styles and remove the '*' for markers
         self.plt_time_resp = qget_cmb_box(self.ui.cmb_plt_time_resp).replace("*", "")
@@ -1234,7 +1233,7 @@ class Plot_Impz(QWidget):
                 padtype='line', cval=None)[N_start * I_x: N_end * I_x]
             self.t_interp = np.linspace(
                 self.n[0], self.n[-1] + 1, len(self.n) * I_x,
-                endpoint=False)[N_start * I_x: N_end * I_x] * fb.fil[0]['T_S']
+                endpoint=False)[N_start * I_x: N_end * I_x] * fb_get('T_S')
 
 
         t = self.t[N_start:N_end]
@@ -1341,8 +1340,8 @@ class Plot_Impz(QWidget):
                 win = self.ui.qfft_win_select.calc_window(self.ui.N)
             h_r.append(self.ax_r.plot(
                 t, win, c="gray",
-                label=fb.fil[0]['tran_freq_win']['disp_name'])[0])
-            l_r += [fb.fil[0]['tran_freq_win']['disp_name']]
+                label=fb_get('tran_freq_win', 'disp_name'))[0])
+            l_r += [fb_get('tran_freq_win', 'disp_name')]
         # --------------- LEGEND (real part) ----------------------------------
         if self.plt_time_enabled:
             self.ax_r.legend(h_r, l_r, loc='best', fontsize='small', fancybox=True,
@@ -1408,10 +1407,10 @@ class Plot_Impz(QWidget):
             else:
                 s = None
                 sig_lbl = 'None'
-            spgr_args = r"$({0}, {1})$".format(fb.fil[0]['plt_tLabel'][1],
-                                               fb.fil[0]['plt_fLabel'][1])
+            spgr_args = r"$({0}, {1})$".format(fb_get('plt_tLabel')[1],
+                                               fb_get('plt_fLabel')[1])
             # ------ onesided / twosided ------------
-            if fb.fil[0]['freqSpecsRangeType'] == 'half':
+            if fb_get('freqSpecsRangeType') == 'half':
                 sides = 'onesided'
             else:
                 sides = 'twosided'
@@ -1475,7 +1474,7 @@ class Plot_Impz(QWidget):
             win = self.ui.qfft_win_select.calc_window(self.ui.time_nfft_spgr)
             if USE_SPECGRAM:
                 Sxx, f, t, im = self.ax_s.specgram(
-                    s, Fs=fb.fil[0]['f_S'], NFFT=self.ui.time_nfft_spgr,
+                    s, Fs=fb_get('f_S'), NFFT=self.ui.time_nfft_spgr,
                     noverlap=self.ui.time_ovlp_spgr, pad_to=None, xextent=t_range,
                     sides=sides, scale_by_freq=self.ui.chk_byfs_spgr_time.isChecked(),
                     mode=mode, scale=scale, vmin=bottom_spgr, cmap=None)
@@ -1490,12 +1489,12 @@ class Plot_Impz(QWidget):
                                                      pad=0.005)
                 cbar.ax.set_ylabel(spgr_pre + spgr_symb + spgr_args + spgr_unit)
 
-                self.ax_s.set_ylabel(fb.fil[0]['plt_fLabel'])
+                self.ax_s.set_ylabel(fb_get('plt_fLabel'))
             else:
                 f, t, Sxx = sig.spectrogram(
-                    s, fb.fil[0]['f_S'], window=win,  # ('tukey', 0.25),
+                    s, fb_get('f_S'), window=win,  # ('tukey', 0.25),
                     nperseg=self.ui.time_nfft_spgr, noverlap=self.ui.time_ovlp_spgr,
-                    nfft=None, return_onesided=fb.fil[0]['freqSpecsRangeType'] == 'half',
+                    nfft=None, return_onesided=fb_get('freqSpecsRangeType') == 'half',
                     scaling=scaling, mode=mode, detrend='constant')
                 # Fs : sampling frequency for scaling
                 # window: callable or ndarray, default window_hanning
@@ -1520,7 +1519,7 @@ class Plot_Impz(QWidget):
                                                      pad=0.005)
                 cbar.ax.set_ylabel(spgr_pre + spgr_symb + spgr_args + spgr_unit)
 
-                self.ax_s.set_ylabel(fb.fil[0]['plt_fLabel'])
+                self.ax_s.set_ylabel(fb_get('plt_fLabel'))
 
         # --------------- 3D Complex  -----------------------------------------
         if False:  # not implemented / tested yet: complex data as 3D plot
@@ -1539,7 +1538,7 @@ class Plot_Impz(QWidget):
             self.ax3d.set_zlabel('z')
 
         # --------------- Title and common labels ---------------------------
-        self.axes_time[-1].set_xlabel(fb.fil[0]['plt_tLabel'])
+        self.axes_time[-1].set_xlabel(fb_get('plt_tLabel'))
         self.axes_time[0].set_title(self.title_str)
         self.ax_r.set_xlim([self.t[self.ui.N_start], self.t[self.ui.N_end-1]])
         # expand_lim(self.ax_r, 0.02)
@@ -1649,7 +1648,7 @@ class Plot_Impz(QWidget):
                 H_F_str += r'$H_{id}$, '
             H_F_str = H_F_str.rstrip(', ') + ejO_str
 
-            F_range = fb.fil[0]['freqSpecsRange']
+            F_range = fb_get('freqSpecsRange')
 
             if self.ui.but_freq_index_k.checked:
                 """
@@ -1661,10 +1660,10 @@ class Plot_Impz(QWidget):
                 # of the non-transient tabs and for F_id / H_id here.
                 # Here, the frequency axes must be scaled to fit the number of
                 # frequency points self.ui.N
-                F_range = [f * self.ui.N / fb.fil[0]['f_max'] for f in F_range]
+                F_range = [f * self.ui.N / fb_get('f_max') for f in F_range]
                 f_max = self.ui.N
             else:
-                f_max = fb.fil[0]['f_max']
+                f_max = fb_get('f_max')
 
             # freqz-based ideal frequency response:
             F_id, H_id = sig.freqz(fb_get('ba', 0), fb_get('ba', 1),
@@ -1687,19 +1686,20 @@ class Plot_Impz(QWidget):
                 freq_resp = True  # calculate frequency response from impulse response
                 scale_impz = self.ui.N * self.ui.all_wins_dict['cgain']\
                     * self.stim_wdg.ui.scale_impz
-                if fb.fil[0]['tran_freq_win']['id'] not in\
+                if fb_get('tran_freq_win', 'id') not in\
                         {'boxcar', 'rectangular'}:
                     logger.warning("Use a Boxcar (Rectangular) window for a correctly scaled\n"
                                    "\tFFT of an impulse instead of a %s window!",
-                                   fb.fil[0]['tran_freq_win']['disp_name'])
+                                   fb_get('tran_freq_win', 'disp_name'))
             else:
                 freq_resp = False
                 scale_impz = 1.
 
             # scale with window NENBW for correct power calculation
             P_scale = scale_impz / nenbw
+            onesided = fb_get('freqSpecsRangeType') == 'half'
             if plt_stimulus:
-                if fb.fil[0]['freqSpecsRangeType'] == 'half' and self.cmplx and not freq_resp:
+                if onesided and self.cmplx and not freq_resp:
                     logger.warning(
                         "For complex-valued time signals, only the magnitude of the "
                         "single-sided spectrum can be shown. You should display both "
@@ -1707,14 +1707,14 @@ class Plot_Impz(QWidget):
                 # scale display of stimulus: `self.x` is unscaled, hence X needs
                 # to be multiplied by self.scale_i
                 Px = np.sum(np.square(np.abs(self.X))) * P_scale
-                if fb.fil[0]['freqSpecsRangeType'] == 'half' and not freq_resp:
+                if onesided and not freq_resp:
                     X = calc_ssb_spectrum(self.X, mag=self.cmplx) * scale_impz
                 else:
                     X = self.X * scale_impz
 
             if plt_stimulus_q:
                 Pxq = np.sum(np.square(np.abs(self.X_q))) * P_scale
-                if fb.fil[0]['freqSpecsRangeType'] == 'half' and not freq_resp:
+                if onesided and not freq_resp:
                     X_q = calc_ssb_spectrum(
                         self.X_q, mag=self.cmplx) / self.scale_iq * scale_impz
                 else:
@@ -1722,7 +1722,7 @@ class Plot_Impz(QWidget):
 
             if plt_response:
                 Py = np.sum(np.square(np.abs(self.Y * self.scale_o))) * P_scale
-                if fb.fil[0]['freqSpecsRangeType'] == 'half' and not freq_resp:
+                if onesided and not freq_resp:
                     Y = calc_ssb_spectrum(
                         self.Y, mag=self.cmplx) / self.scale_o * scale_impz
                 else:
@@ -1731,7 +1731,7 @@ class Plot_Impz(QWidget):
             # ----------------------------------------------------------------
             # Scale and shift frequency range
             # ----------------------------------------------------------------
-            if fb.fil[0]['freqSpecsRangeType'] == 'sym':
+            if fb_get('freqSpecsRangeType') == 'sym':
                 # display -f_S/2 ... f_S/2 ->  shift X, Y and F using fftshift()
                 if plt_response:
                     Y = np.fft.fftshift(Y)
@@ -1750,7 +1750,7 @@ class Plot_Impz(QWidget):
                 if not freq_resp:
                     H_id /= 2
 
-            elif fb.fil[0]['freqSpecsRangeType'] == 'half':
+            elif onesided:
                 # display 0 ... f_S/2 -> only use the first half of X, Y and F
                 if plt_response:
                     Y = Y[0:self.ui.N//2]
@@ -1763,7 +1763,7 @@ class Plot_Impz(QWidget):
                 F_id = F_id[0:CFP.conf_settings['N_FFT']//2]
                 H_id = H_id[0:CFP.conf_settings['N_FFT']//2]
 
-            else:  # fb.fil[0]['freqSpecsRangeType'] == 'whole'
+            else:  # fb_get('freqSpecsRangeType') == 'whole'
                 # display 0 ... f_S -> shift frequency axis
                 F = np.fft.fftshift(F) + f_max/2.
                 if not freq_resp:
@@ -2034,9 +2034,9 @@ class Plot_Impz(QWidget):
             if self.ui.but_freq_index_k.checked:
                 self.axes_f[-1].set_xlabel(r'$k \; \rightarrow$')
             else:
-                self.axes_f[-1].set_xlabel(fb.fil[0]['plt_fLabel'])
+                self.axes_f[-1].set_xlabel(fb_get('plt_fLabel'))
             self.ax_f1.set_ylabel(H_Fr_str)
-            # self.ax_f1.set_xlim(fb.fil[0]['freqSpecsRange'])
+            # self.ax_f1.set_xlim(fb_get('freqSpecsRange'))
             self.ax_f1.set_xlim(F_range)
             self.ax_f1.set_title("Spectrum of " + self.title_str)
 

@@ -16,6 +16,7 @@ import logging
 import re
 
 import numpy as np
+from numpy.typing import NDArray
 
 try:
     import deltasigma as ds  # noqa: F401
@@ -382,7 +383,7 @@ class Fixed():
         total number of overflows (should be considered as read-only
         except for when an external quantizer is used)
 
-    Additionally, the following keys from global dict `fb.fil[0]` define the
+    Additionally, the following keys from global dict `fil[0]` define the
     number base and quantization/overflow behaviour for fixpoint numbers:
 
     * **`'fx_base'`** : Display format for fixpoint number base; default = 'dec'
@@ -596,7 +597,7 @@ class Fixed():
         Saturation / two's complement wrapping happens outside the range +/- MSB,
         requantization (round, floor, fix, ...) is applied on the ratio `y / LSB`.
 
-        **Fractional number format WI.WF** (`fb.fil[0]['qfrmt'] = 'qfrac'`):
+        **Fractional number format WI.WF** (`fb_get('qfrmt') == 'qfrac'`):
         `LSB =  2 ** -WF`
 
         - Multiply float input by `1 / self.LSB = 2**WF`, obtaining integer scale
@@ -605,7 +606,7 @@ class Fixed():
         - Find pos. and neg. overflows and replace them by wrapped or saturated
           values
 
-        **Integer number format W = 1 + WI + WF** (`fb.fil[0]['qfrmt'] = 'qint'`):
+        **Integer number format W = 1 + WI + WF** (`fb_get('qfrmt') == 'qint'`):
         `LSB = 1`
 
         - Multiply float input by `2 ** WF` to obtain integer scale
@@ -947,14 +948,14 @@ class Fixed():
             logger.error("Non-fixpoint format '%s'!", fb_get('qfrmt'))
 
         # Quantize and saturate / overflow based on fractional output format and return
-        # either fractional or integer format, depending on `fb.fil[0]['qfrmt']`.
+        # either fractional or integer format, depending on `fb_get('qfrmt')`.
         return self.fixp(x_i_frac, out_frmt=fb_get('qfrmt'))
 
     # --------------------------------------------------------------------------
     def frmt2float(self, y):
         """
         Return floating point representation for fixpoint `y` (scalar or array)
-        given in format `fb.fil[0]['fx_base']`.
+        given in format `fb_get('fx_base')`.
 
         When input format is float, return unchanged.
 
@@ -971,7 +972,7 @@ class Fixed():
         Parameters
         ----------
         y: scalar or string or array of scalars or strings in number format float or
-            `fb.fil[0]['fx_base']` ('dec', 'hex', 'oct', 'bin' or 'csd')
+            `fb_get('fx_base')` -> 'dec', 'hex', 'oct', 'bin' or 'csd'
 
         Returns
         -------
@@ -1021,12 +1022,12 @@ class Fixed():
         Convert a string in 'dec', 'bin', 'oct', 'hex', 'csd' numeric format
         to float.
 
-        - format is taken from the global `fb.fil[0]['fx_base']`
+        - format is taken from the global `fb_get('fx_base')`
         - maximum wordlength is determined from the local quantization dict keys
           `self.q_dict['WI']` and `self.q_dict['WF']`
         - negative numbers can be represented by a '-' sign or in two's complement
         - represented numbers may be fractional and / or complex.
-        - the result is divided by 2**WF for `fb.fil[0]['qfrmt'] == 'qint'` in `fixp()`
+        - the result is divided by 2**WF for `fb_get('qfrmt') == 'qint'` in `fixp()`
 
         Parameters
         ----------
@@ -1243,7 +1244,7 @@ class Fixed():
         return 0.0
 
     # --------------------------------------------------------------------------
-    def float2frmt(self, y) -> str:
+    def float2frmt(self, y) -> str | float | NDArray:
         """
         Convert an array or single value of float / complex / string to a quantized
         representation in one of the formats float / int / bin / hex / csd.
@@ -1265,7 +1266,7 @@ class Fixed():
         Returns
         -------
         str, float or an ndarray of float or string
-            The numeric format is set in `fb.fil[0]['fx_base'])`. It has the same shape as `y`.
+            The numeric format is set in `fb_get('fx_base')`. It has the same shape as `y`.
             For all formats except `float` a fixpoint representation with
             a total number of W = WI + WF + 1 binary digits is returned.
         """
@@ -1402,7 +1403,7 @@ def quant_coeffs(coeffs: np.iterable, Q: object, recursive: bool = False, out_fr
     """
     Quantize the coefficients, scale and convert them to a list of integers,
     using the quantization settings of `Fixed()` instance `Q` and global setting
-    `fb.fil[0]['qfrmt']` (`'qfrac'` or `'qint'`) and `get_fx()`
+    `fb_get('qfrmt')` (`'qfrac'` or `'qint'`) and `get_fx()`
 
     Parameters
     ----------
@@ -1418,7 +1419,7 @@ def quant_coeffs(coeffs: np.iterable, Q: object, recursive: bool = False, out_fr
 
     out_frmt: str
         Output quantization format ("qint" or "qfrac"). When nothing is specified,
-        use the global setting from `fb.fil[0]['qfrmt']`.
+        use the global setting from `fb_get('qfrmt')`.
 
     Returns
     -------

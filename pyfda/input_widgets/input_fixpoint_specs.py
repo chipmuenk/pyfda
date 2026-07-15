@@ -24,7 +24,7 @@ from pyfda.libs.compat import (
     QVBoxLayout, QHBoxLayout, pyqtSignal, QFrame, QSizePolicy)
 
 import pyfda.filterbroker as fb  # importing filterbroker initializes all its globals
-from pyfda.filterbroker import get_fx, fb_get, fb_set
+from pyfda.filterbroker import get_fx, fb_get, fb_set, fx_results
 from pyfda.config_file_parser import ConfigFileParser as CFP
 
 import pyfda.libs.pyfda_dirs as dirs

@@ -15,7 +15,7 @@ import sys
 import numpy as np
 
 import pyfda.filterbroker as fb
-from pyfda.filterbroker import set_fx, fb_get
+from pyfda.filterbroker import set_fx, fb_get, fb_set
 from pyfda.libs.compat import QWidget, QVBoxLayout, pyqtSignal
 from pyfda.libs.pyfda_lib import (
     mod_version, set_dict_defaults, first_item, pprint_log, cmp_version)
@@ -230,13 +230,13 @@ class FIR_DF_amaranth_UI(QWidget):
 
         # calculate required accumulator word format and update filter dict
         if qget_cmb_box(self.wdg_wq_accu.cmbW) in {'f', 'a'}:
-            fb.fil[0]['fxq']['QACC']['WF'] = fb.fil[0]['fxq']['QI']['WF']\
-                + fb.fil[0]['fxq']['QCB']['WF']
-            fb.fil[0]['fxq']['QACC']['WI'] = fb.fil[0]['fxq']['QI']['WI']\
-                + fb.fil[0]['fxq']['QCB']['WI'] + A_coeff
+            fb_set('fxq', 'QACC', 'WF', fb_get('fxq', 'QI', 'WF')\
+                + fb_get('fxq', 'QCB', 'WF'))
+            fb_set('fxq', 'QACC', 'WI', fb_get('fxq', 'QI', 'WI')\
+                + fb_get('fxq', 'QCB', 'WI') + A_coeff)
 
         # update UI and Q.q_dict (quantization settings) from filter dict
-        self.wdg_wq_accu.dict2ui(fb.fil[0]['fxq']['QACC'])
+        self.wdg_wq_accu.dict2ui(fb_get('fxq')['QACC'])
 
     # --------------------------------------------------------------------------
     def dict2ui(self) -> None:
