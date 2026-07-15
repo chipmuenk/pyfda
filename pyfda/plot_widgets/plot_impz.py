@@ -42,6 +42,8 @@ logger = logging.getLogger(__name__)
 
 classes = {'Plot_Impz': 'y[n] / Y(f)'}  #: Dict containing class name : display name
 
+USE_SPECGRAM = False  # use matplotlib specgram instead of signal.spectrogram
+
 
 class Plot_Impz(QWidget):
     """
@@ -1471,7 +1473,7 @@ class Plot_Impz(QWidget):
 
 # =============================================================================
             win = self.ui.qfft_win_select.calc_window(self.ui.time_nfft_spgr)
-            if False:
+            if USE_SPECGRAM:
                 Sxx, f, t, im = self.ax_s.specgram(
                     s, Fs=fb.fil[0]['f_S'], NFFT=self.ui.time_nfft_spgr,
                     noverlap=self.ui.time_ovlp_spgr, pad_to=None, xextent=t_range,
