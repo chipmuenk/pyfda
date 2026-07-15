@@ -449,8 +449,9 @@ class Tran_IO(QWidget):
         file_type = (qget_cmb_box(self.ui.cmb_file_format),)  # str -> tuple
 
         self.file_name, self.file_type = io.select_file(
-            self, title="Select file for data export", mode="wb",
+            self, title="Select file name for data export", mode="wb",
             file_types=file_type)
+        # TODO: This should be separate for csv ('w') and wav ('wb')
 
         if self.file_name is None:  # operation cancelled
             return -1

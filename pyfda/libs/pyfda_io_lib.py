@@ -1009,8 +1009,6 @@ def save_data_np(file_name: str, file_type: str, data: np.ndarray,
     -------
     0 for success, -1 for file cancel or error
     """
-    # file_name, file_type = select_file(parent, title=title, mode='wb', file_types=('wav'))
-
     if file_name is None:  # error or operation cancelled
         return -1
     if np.ndim(data) < 1 or np.ndim(data) > 2:
@@ -1106,6 +1104,10 @@ def write_wav_frame(parent: object, file_name: str, data: np.ndarray, f_S: int =
             wf.writeframes(audio.tobytes())  # pylint: disable=no-member
 
         logger.info('Data saved as\n\t"%s"', file_name)
+
+        # # Interleave the stereo data: [L1, R1, L2, R2, ...]
+        # # Stacks arrays into columns and then flattens them
+        # interleaved_data = np.stack((left_channel, right_channel), axis=1).flatten()
 
     except IOError as e:
         logger.error('Failed saving "%s"!\n%s\n', file_name, e)
@@ -1594,7 +1596,6 @@ def export_coe_cmsis_sos(f: TextIO, file_type: str, formatted: bool = False) -> 
     f.write(text)
 
     return False
-
 
 # ==============================================================================
 if __name__ == '__main__':
