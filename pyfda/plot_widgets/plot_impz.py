@@ -41,7 +41,7 @@ logger = logging.getLogger(__name__)
 
 classes = {'Plot_Impz': 'y[n] / Y(f)'}  #: Dict containing class name : display name
 
-USE_SPECGRAM = False  # use matplotlib specgram instead of signal.spectrogram
+USE_3D_CMPLX = False  # Plot complex responses as 3D (not yet implemented)
 
 
 class Plot_Impz(QWidget):
@@ -1409,11 +1409,6 @@ class Plot_Impz(QWidget):
                 sig_lbl = 'None'
             spgr_args = r"$({0}, {1})$".format(fb_get('plt_tLabel')[1],
                                                fb_get('plt_fLabel')[1])
-            # ------ onesided / twosided ------------
-            if fb_get('freqSpecsRangeType') == 'half':
-                sides = 'onesided'
-            else:
-                sides = 'twosided'
 
             # ------- Unit / Mode ----------------------
             mode = qget_cmb_box(self.ui.cmb_mode_spgr_time, data=True)
@@ -1458,71 +1453,41 @@ class Plot_Impz(QWidget):
                 logger.warning("Unknown spectrogram mode '%s', falling back to 'psd'", mode)
                 mode = "psd"
 
-            # ------- lin / log ----------------------
-            if self.ui.but_log_spgr_time.checked:
-                scale = 'dB'
-                # 10 log10 for 'psd', otherwise 20 log10
-                bottom_spgr = self.ui.bottom_t
-            else:
-                scale = 'linear'
-                bottom_spgr = 0
-
-            t_range = (self.t[self.ui.N_start], self.t[-1])
-            # hidden images: https://scipython.com/blog/hidden-images-in-spectrograms/
-
 # =============================================================================
             win = self.ui.qfft_win_select.calc_window(self.ui.time_nfft_spgr)
-            if USE_SPECGRAM:
-                Sxx, f, t, im = self.ax_s.specgram(
-                    s, Fs=fb_get('f_S'), NFFT=self.ui.time_nfft_spgr,
-                    noverlap=self.ui.time_ovlp_spgr, pad_to=None, xextent=t_range,
-                    sides=sides, scale_by_freq=self.ui.chk_byfs_spgr_time.isChecked(),
-                    mode=mode, scale=scale, vmin=bottom_spgr, cmap=None)
-                # Fs : sampling frequency for scaling
-                # window: callable or ndarray, default window_hanning
-                # NFFT : data points for each block
-                # pad_to: create zero-padding
-                # xextent: image extent along x-axis; None or (xmin, xmax)
-                # scale_by_freq: True scales power spectral density by f_S
 
-                cbar = self.mplwidget_t.fig.colorbar(im, ax=self.ax_s, aspect=30,
-                                                     pad=0.005)
-                cbar.ax.set_ylabel(spgr_pre + spgr_symb + spgr_args + spgr_unit)
+            f, t, Sxx = sig.spectrogram(
+                s, fb_get('f_S'), window=win,  # ('tukey', 0.25),
+                nperseg=self.ui.time_nfft_spgr, noverlap=self.ui.time_ovlp_spgr,
+                nfft=None, return_onesided=fb_get('freqSpecsRangeType') == 'half',
+                scaling=scaling, mode=mode, detrend='constant')
+            # Fs : sampling frequency for scaling
+            # window: callable or ndarray, default window_hanning
+            # nperseg : data points for each segment
+            # noverlap : number of overlapping points between segments
+            # nfft: = nperseg by default, can be larger to create zero-padding
+            # return_onesided : For complex data, a two-sided spectrum is
+            #                   returned always
+            # scaling: 'density' scales power spectral density by f_S,
+            #          'spectrum' returns power spectrum in V**2
+            # mode: 'psd', 'complex','magnitude','angle', 'phase' (no unwrapping)
 
-                self.ax_s.set_ylabel(fb_get('plt_fLabel'))
-            else:
-                f, t, Sxx = sig.spectrogram(
-                    s, fb_get('f_S'), window=win,  # ('tukey', 0.25),
-                    nperseg=self.ui.time_nfft_spgr, noverlap=self.ui.time_ovlp_spgr,
-                    nfft=None, return_onesided=fb_get('freqSpecsRangeType') == 'half',
-                    scaling=scaling, mode=mode, detrend='constant')
-                # Fs : sampling frequency for scaling
-                # window: callable or ndarray, default window_hanning
-                # nperseg : data points for each segment
-                # noverlap : number of overlapping points between segments
-                # nfft: = nperseg by default, can be larger to create zero-padding
-                # return_onesided : For complex data, a two-sided spectrum is
-                #                   returned always
-                # scaling: 'density' scales power spectral density by f_S,
-                #          'spectrum' returns power spectrum in V**2
-                # mode: 'psd', 'complex','magnitude','angle', 'phase' (no unwrapping)
+#            col_mesh = self.ax_s.pcolormesh(t, np.fft.fftshift(f),
+#                           np.fft.fftshift(Sxx, axes=0), shading='gouraud')
+            # self.ax_s.colorbar(col_mesh)
 
-    #            col_mesh = self.ax_s.pcolormesh(t, np.fft.fftshift(f),
-    #                           np.fft.fftshift(Sxx, axes=0), shading='gouraud')
-                # self.ax_s.colorbar(col_mesh)
+            if self.ui.but_log_spgr_time.checked:
+                Sxx = np.maximum(dB_scale * np.log10(np.abs(Sxx)), self.ui.bottom_t)
+            # shading: 'auto', 'gouraud', 'nearest'
+            col_mesh = self.ax_s.pcolormesh(t, f, Sxx, shading='auto')
+            cbar = self.mplwidget_t.fig.colorbar(col_mesh, ax=self.ax_s, aspect=30,
+                                                    pad=0.005)
+            cbar.ax.set_ylabel(spgr_pre + spgr_symb + spgr_args + spgr_unit)
 
-                if self.ui.but_log_spgr_time.checked:
-                    Sxx = np.maximum(dB_scale * np.log10(np.abs(Sxx)), self.ui.bottom_t)
-                # shading: 'auto', 'gouraud', 'nearest'
-                col_mesh = self.ax_s.pcolormesh(t, f, Sxx, shading='auto')
-                cbar = self.mplwidget_t.fig.colorbar(col_mesh, ax=self.ax_s, aspect=30,
-                                                     pad=0.005)
-                cbar.ax.set_ylabel(spgr_pre + spgr_symb + spgr_args + spgr_unit)
-
-                self.ax_s.set_ylabel(fb_get('plt_fLabel'))
+            self.ax_s.set_ylabel(fb_get('plt_fLabel'))
 
         # --------------- 3D Complex  -----------------------------------------
-        if False:  # not implemented / tested yet: complex data as 3D plot
+        if USE_3D_CMPLX:  # not implemented / tested yet: complex data as 3D plot
             # plotting the stems
             for i in range(self.ui.N_start, self.ui.N_end):
                 self.ax3d.plot([self.t[i], self.t[i]], [y_r[i], y_r[i]], [0, y_i[i]],
