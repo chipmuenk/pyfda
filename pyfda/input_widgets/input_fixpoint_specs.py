@@ -859,14 +859,14 @@ class Input_Fixpoint_Specs(QWidget):
         """
         try:
             # Run fixpoint simulation and store the results as integer values:
-            fb.fx_results = self.fx_filt_ui.fxfilter(dict_sig['fx_stimulus'])
+            fx_results = self.fx_filt_ui.fxfilter(dict_sig['fx_stimulus'])
 
-            if len(fb.fx_results) == 0:
+            if len(fx_results) == 0:
                 logger.error("Fixpoint simulation returned empty results!")
 
         except ValueError as e:
             logger.error("Simulator error %s", e)
-            fb.fx_results = None
+            fx_results = None
 
         except AssertionError as e:
             logger.error(
@@ -875,8 +875,8 @@ class Input_Fixpoint_Specs(QWidget):
                 '\n\tResponse: Shape %s of type "%s"',
                 pprint_log(dict_sig), e,
                 np.shape(dict_sig["fx_stimulus"]), dict_sig["fx_stimulus"].dtype,
-                np.shape(fb.fx_results), type(fb.fx_results))
-            fb.fx_results = None
+                np.shape(fx_results), type(fx_results))
+            fx_results = None
 
 
 ###############################################################################

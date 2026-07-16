@@ -45,11 +45,16 @@ from typing import Iterable
 import numpy as np
 
 logger = logging.getLogger(__name__)
-
-base_dir = ""  #: Project base directory
-
+# ==========================================================
+# Variables that can be accessed from all modules
+#
+# Exchange fixpoint simulation results between modules as a
+# numpy array
+fx_results = None
+#
 # State of filter design: 'ok', 'changed', 'error', 'active'
 design_filt_state = 'changed'
+# ===========================================================
 
 UNDO_LEN = 20  # depth of circular undo buffer
 undo_step = 0  # number of undo steps, limited to UNDO_LEN
@@ -543,7 +548,8 @@ def fb_set(*keys_tuple: tuple, backup: bool = True, new_key: bool = False,
         if backup:
             store_fil()  # backup old setting
 
-        # traverse nested dict 'fil_dict' using tuple of keys and access subdictionary
+        # traverse nested dict 'fil_dict' (without `set_val` using tuple of keys
+        # and access subdictionary:
         d = _traverse_dict(keys_tuple[:-1], fil_dict)
 
         # Create a new key:value pair when flag `new_key` is True
