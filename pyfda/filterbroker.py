@@ -495,12 +495,14 @@ def fb_set(*keys_tuple: tuple, backup: bool = True, new_key: bool = False,
 
     Example:
     fb_set('fxq', 'QCA', 'WF', 12) is equivalent to `fil[0]['fxq']['QCA']['WF'] = 12`
-
+    fb_set('fxq', 'QCA', {'WF': 15, 'WI': 0}) is equivalent to
+            `fil[0]['fxq']['QCA']['WF'] = 15` and `fil[0]['fxq']['QCA']['WI'] = 0`
     Parameters
     ----------
     keys_tuple : tuple
-        Tuple of keys for traversing the (nested) dictionary, the last element
-        is the value to be set. Hence, this element is not used for traversing the dictionary.
+        Collect arguments into a tuple of keys for traversing the (nested) dictionary, the
+        last element is the value to be set. Hence, this element is not used for traversing
+        the dictionary.
     backup : bool
         Whether the previous state of the filter dict should be backed up (default: True)
     new_key : bool
@@ -510,8 +512,8 @@ def fb_set(*keys_tuple: tuple, backup: bool = True, new_key: bool = False,
         value is overwritten (default: False).
     accept_dict : bool
         Allow a dictionary to be stored as a value in the filter dict, this speeds up storing
-        complex data but is dangerous because the keys of the new dict might be different from the
-        old dict (default: False).
+        complex data but is dangerous because the keys of the new dict might be different from
+        the old dict (default: False).
     fil_dict : dict
         The dictionary to traverse.
 
@@ -532,6 +534,7 @@ def fb_set(*keys_tuple: tuple, backup: bool = True, new_key: bool = False,
     the user. This will be done by prepending the dict name with an underscore
     `_fil[0]` once all direct accesses have been removed.
     """
+    logger.debug("tuple_keys: %s", keys_tuple)
     if not isinstance(keys_tuple, tuple):
         logger.error("A tuple of keys is needed for traversing the filter dict '%s', not a '%s'!",
                      keys_tuple, type(keys_tuple).__name__)
@@ -588,8 +591,10 @@ def fb_set(*keys_tuple: tuple, backup: bool = True, new_key: bool = False,
                     type(set_val).__name__)
                 raise KeyError
 
-        # Value to be written is a dict. Interate over the keys to avoid
-        # accidentally deleting keys.
+        # Value to be set, `set_val == keys_tuple[-1]`, is a dict. When `accept_dict == True`,
+        # assign this dict directly to `set_key = keys_tuple[-2]`.
+        # This is fast, but risky as this could delete or create new keys within the old dict.
+        # When `accept_dict == False`, iterate over the keys of `set_val`.
         # --------------------------------------------------------------
         if isinstance(d[set_key], dict):
             if accept_dict:
@@ -597,11 +602,6 @@ def fb_set(*keys_tuple: tuple, backup: bool = True, new_key: bool = False,
                     d[set_key][k] = v  # update sub-dict with new values
                 return 0
 
-            logger.error(
-                "\n\tCannot assign '%s' with sub-dict\n\t%s!"
-                "\n\tThis would overwrite the old sub-dict\n\t%s",
-                set_key, set_val, d[set_key])
-            raise KeyError
 
         # special case, setting the global quantization format 'qfrmt' can change fixpoint mode.
         # store the last used fixpoint or float format
@@ -617,6 +617,8 @@ def fb_set(*keys_tuple: tuple, backup: bool = True, new_key: bool = False,
 
         # ======== everything ok, finally update dictionary ========
         d[set_key] = set_val  # update key with new value
+        logger.debug("Setting '%s' with value '%s'", _print_dict(keys_tuple[:-1]), set_val)
+
         # ==========================================================
 
     except TypeError:
