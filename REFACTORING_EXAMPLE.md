@@ -341,7 +341,7 @@ from pyfda import filterbroker as fb
 # Direct global access
 order = fb.fb_get('N')
 fb.fb_set('N', 8)
-fb.store_fil()  # manual undo management
+fb.backup_fil()  # manual undo management
 fb.restore_fil()
 ```
 

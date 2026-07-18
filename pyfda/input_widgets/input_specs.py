@@ -21,7 +21,7 @@ import sys
 import numpy as np
 
 import pyfda.filterbroker as fb
-from pyfda.filterbroker import fb_get, fb_set
+from pyfda.filterbroker import fb_get, fb_set, backup_fil, restore_fil
 from pyfda.filter_factory import call_fil_method
 from pyfda.tree_builder import FilterTreeBuilder as FTB
 from pyfda.input_widgets import (
@@ -678,7 +678,7 @@ def load_filter(self, all_filters: bool = False) -> int:
         fb.fil[0] = fb_temp  # only assign one slice
 
     # --- Sanitize keys by comparing to reference dict -----------------------
-    fb.store_fil()  # backup current filter fb.fil[0]
+    backup_fil()  # backup current filter fb.fil[0]
     try:
         key_errs = compare_dictionaries(fb.fil_ref, fb.fil[0])
         key_errs[0].sort()  # keys missing in the loaded dict
@@ -713,7 +713,7 @@ def load_filter(self, all_filters: bool = False) -> int:
         if 'ba' not in fb.fil[0]:
             logger.error(
                 "Missing key 'ba, cancelling file operation.")
-            fb.restore_fil()
+            restore_fil()
             return -1
         if isinstance(fb_get('ba'), np.ndarray):
             pass
@@ -726,12 +726,12 @@ def load_filter(self, all_filters: bool = False) -> int:
             logger.error(
                 "Unsuitable shape %s of 'ba' data, cancelling file operation.",
                 np.shape(fb_get('ba')))
-            fb.restore_fil()
+            restore_fil()
             return -1
 
         if 'zpk' not in fb.fil[0]:
             logger.error("Missing key 'zpk', cancelling file operation.")
-            fb.restore_fil()
+            restore_fil()
             return -1
         if isinstance(fb_get('zpk'), np.ndarray):
             pass
@@ -744,7 +744,7 @@ def load_filter(self, all_filters: bool = False) -> int:
             logger.error(
                 "Unsuitable shape %s of 'zpk' data, cancelling file operation.",
                 np.shape(fb_get('zpk')))
-            fb.restore_fil()
+            restore_fil()
             return -1
 
         if 'sos' not in fb.fil[0]:
@@ -771,7 +771,7 @@ def load_filter(self, all_filters: bool = False) -> int:
 
     except Exception as e:
         logger.error("Unexpected error:\n%s", e)
-        fb.restore_fil()
+        restore_fil()
         return -1
 
 

@@ -290,44 +290,64 @@ fil_undo = [None] * UNDO_LEN
 for i, _ in enumerate(fil):
     fil[i] = copy.deepcopy(fil_ref)
 
-# -------------------------
-def restore_fil() -> int:
+class _BackupFilterDict():
     """
-    Restore current global dict `fil[0]` from undo memory `fil_undo`
+    Back up and restore the global filter dict `fil[0]`.
 
-    Returns
-    -------
-    int
-        -1: undo buffer empty, nothing restored
-         0: successful restore
     """
-    global undo_step
-    global undo_ptr
+    def __init__(self):
+        # undo step, limited to 0 ... UNDO_LEN. This prevents exceeding the available
+        # UNDO_LEN memories and trying to restore more than the stored copies
+        self.undo_stp = 0
+        self.undo_ptr = 0  # pointer to current undo memory % UNDO_LEN
 
-    # undo buffer is empty, don't copy anything
-    if undo_step < 1:
-        undo_step = 0
-        return -1
+    def restore_fil(self) -> int:
+        """
+        Restore current global dict `fil[0]` from undo memory `fil_undo`
 
-    fil[0] = copy.deepcopy(fil_undo[undo_ptr])
-    undo_step -= 1
-    undo_ptr = (undo_ptr + UNDO_LEN - 1) % UNDO_LEN
-    return 0
+        Returns
+        -------
+        int
+            -1: undo buffer empty, nothing restored
+            0: successful restore
+        """
 
-# -------------------------
-def store_fil():
-    """
-    Store current global dict `fb.fil[0]` to undo memory `fil_undo`
-    """
-    global undo_step
-    global undo_ptr
+        # undo buffer is empty, don't restore anything
+        if self.undo_stp < 1:
+            self.undo_stp = 0
+            return -1
 
-    # prevent buffer overflow
-    undo_step += 1
-    undo_step = min(undo_step, UNDO_LEN)
-    # increase buffer pointer, allowing for circular wrap around
-    undo_ptr = (undo_ptr + 1) % UNDO_LEN
-    fil_undo[undo_ptr] = copy.deepcopy(fil[0])
+        fil[0] = copy.deepcopy(fil_undo[undo_ptr])
+        self.undo_stp -= 1
+        self.undo_ptr = (self.undo_ptr + UNDO_LEN - 1) % UNDO_LEN
+        return 0
+
+    # -------------------------
+    def backup_fil(self) -> int:
+        """
+        Store current global dict `fb.fil[0]` to undo memory `fil_undo`
+
+        Returns
+        -------
+        int
+            undo step, limited to 0 ... UNDO_LEN
+        """
+
+        # prevent buffer overflow
+        self.undo_stp += 1
+        self.undo_stp = min(self.undo_stp, UNDO_LEN)
+        # increase buffer pointer, allowing for circular wrap around
+        self.undo_ptr = (self.undo_ptr + 1) % UNDO_LEN
+        fil_undo[self.undo_ptr] = copy.deepcopy(fil[0])
+        logger.debug("Undo ptr = %s", self.undo_ptr)
+        return self.undo_stp
+
+# -------------------------------------------------
+_backup_filter_dict = _BackupFilterDict()
+# import this from other modules
+backup_fil = _backup_filter_dict.backup_fil
+restore_fil = _backup_filter_dict.restore_fil
+# -------------------------------------------------
 
 # -------------------------
 def _print_dict(keys_tuple: tuple, top_dict_str = "fil[0]") -> str:
@@ -548,7 +568,7 @@ def fb_set(*keys_tuple: tuple, backup: bool = True, new_key: bool = False,
     set_key = keys_tuple[-2]  # second last element is the key for setting
 
     if backup:
-        store_fil()  # backup old settin
+        backup_fil()  # backup old settin
 
     try:
         # traverse nested dict 'fil_dict' using `keys_tuple` (without `set_val`)

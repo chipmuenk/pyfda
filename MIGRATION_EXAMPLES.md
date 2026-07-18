@@ -104,7 +104,7 @@ class OldFilterDesigner:
         
         # Store results in global dict
         fb.fb_set('ba', ba)
-        fb.store_fil()  # Manual backup
+        fb.backup_fil()  # Manual backup
     
     def undo_design(self):
         fb.restore_fil()
@@ -355,7 +355,7 @@ STEP 3: Replace fb_get/fb_set calls
   NEW: broker.set('N', 5)
 
 STEP 4: Replace undo/redo calls
-  OLD: fb.store_fil() / fb.restore_fil()
+  OLD: fb.backup_fil() / fb.restore_fil()
   NEW: (automatic, or broker.undo() / broker.redo())
 
 STEP 5: Add dependency injection where possible
