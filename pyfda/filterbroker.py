@@ -571,8 +571,8 @@ def fb_set(*keys_tuple: tuple, backup: bool = True, new_key: bool = False,
             raise KeyError
 
         # Different types of old and new value, check if they are compatible
-        if type(set_val) is not type(d[set_key]):
         # -------------------------------------------------------------------
+        if type(set_val) is not type(d[set_key]):
             # union of types of current and new value, e.g. {'float', 'float64'}
             types = {type(set_val).__name__, type(d[set_key]).__name__}
             # the following types are considered fully compatible
@@ -607,10 +607,9 @@ def fb_set(*keys_tuple: tuple, backup: bool = True, new_key: bool = False,
                         accept_dict=False, fil_dict=fil_dict)
                 return 0
 
-
         # special case, setting the global quantization format 'qfrmt' can change fixpoint mode.
         # store the last used fixpoint or float format
-        if set_key =='qfrmt':
+        elif set_key =='qfrmt':
             if len(keys_tuple) > 2:
                 logger.error("More than one value '%s' for setting 'qfrmt'!", keys_tuple[1:])
                 raise KeyError
