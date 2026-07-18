@@ -547,11 +547,11 @@ def fb_set(*keys_tuple: tuple, backup: bool = True, new_key: bool = False,
     set_val = keys_tuple[-1]  # last element is the value to be set
     set_key = keys_tuple[-2]  # second last element is the key for setting
 
-    try:
-        if backup:
-            store_fil()  # backup old setting
+    if backup:
+        store_fil()  # backup old settin
 
-        # traverse nested dict 'fil_dict' (without `set_val` using tuple of keys
+    try:
+        # traverse nested dict 'fil_dict' using `keys_tuple` (without `set_val`)
         # and access subdictionary:
         d = _traverse_dict(keys_tuple[:-1], fil_dict)
 
