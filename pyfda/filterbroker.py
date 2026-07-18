@@ -641,3 +641,29 @@ def fb_set(*keys_tuple: tuple, backup: bool = True, new_key: bool = False,
 
 # Comparing nested dicts
 # https://stackoverflow.com/questions/27265939/comparing-python-dictionaries-and-nested-dictionaries
+
+if __name__ == '__main__':
+    # Run widget standalone with `python -m pyfda.filterbroker`
+    logging.basicConfig()  # setup a basic logger
+
+    print('zpk: ' + str(fb_get('zpk', 0)))
+    print('fxq QACC WF: ' + str(fb_get('fxq', 'QACC', 'WF')))
+    print('fxq QI WF: ' + str(fb_get('fxq', 'QI', 'WF')))
+    fb_set('ft', 'CIC')
+    print('ft: ' + str(fb_get('ft')))
+    fb_set('ft', 23)  # wrong type, should be str
+    fb_set('xxx', 13)  # key does not exist
+    fb_set('xxx', 13, new_key=True)  # create new key
+    print('xxx: ' + str(fb_get('xxx')))  # ... and read it back
+    fb_set('fxq', 'QACC', 'WF', 12)  # set a key within a sub-dict
+    print('fxq QACC WF: ' + str(fb_get('fxq', 'QACC', 'WF')))  # ... and read it back
+    print('fxq QACC 1: ' + str(fb_get('fxq', 'QACC')))  # ... and read the whole sub-dict
+    fb_set('fxq', 'QACC', {'WF': 1, 'WI': 2})  # set a sub-dict
+    print('fxq QACC 2: ' + str(fb_get('fxq', 'QACC')))  # ... and read it back
+    fb_set('fxq', 'QACC', {'WF': 1, 'WA': 2, 'quant': 'well...'})  # set a sub-dict with wrong key
+    print('fxq QACC 3: ' + str(fb_get('fxq', 'QACC')))  # ... and read it back
+
+    fb_set('fxq', {'QACC': {'WF': 49, 'WI': 50}})  # set a nested sub-dict
+    print('fxq QACC 4: ' + str(fb_get('fxq', 'QACC')))  # ... and read it back
+    fb_set('fxq', 'QACC', {'WF': 'a', 'WI': 5, 'N_over': 7})  # wrong type for WF
+    print('fxq QACC 5: ' + str(fb_get('fxq', 'QACC')))  # ... and read it back
