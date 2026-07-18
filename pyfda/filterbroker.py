@@ -596,10 +596,15 @@ def fb_set(*keys_tuple: tuple, backup: bool = True, new_key: bool = False,
         # This is fast, but risky as this could delete or create new keys within the old dict.
         # When `accept_dict == False`, iterate over the keys of `set_val`.
         # --------------------------------------------------------------
-        if isinstance(d[set_key], dict):
-            if accept_dict:
+        if isinstance(set_val, dict):
+            if not accept_dict:
+                logger.debug(
+                    "Setting '%s' with a sub-dict\n\t%s\n", set_key, set_val)
                 for k, v in set_val.items():
-                    d[set_key][k] = v  # update sub-dict with new values
+                    # remove the sub-dict as last key from `keys_tuple`, add a key and value from
+                    # the sub-dict and call `fb_set()` recursively to set the sub-dict values
+                    fb_set(*keys_tuple[:-1], k, v, backup=False, new_key=False,
+                        accept_dict=False, fil_dict=fil_dict)
                 return 0
 
 
