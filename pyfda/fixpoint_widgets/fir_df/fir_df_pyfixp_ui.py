@@ -14,10 +14,9 @@ import logging
 
 import numpy as np
 
-import pyfda.filterbroker as fb
-from pyfda.filterbroker import fb_get
+from pyfda.filterbroker import fb_get, fb_set
 from pyfda.filterbroker import set_fx
-from pyfda.libs.pyfda_lib import set_dict_defaults, pprint_log, first_item
+from pyfda.libs.pyfda_lib import pprint_log, first_item
 from pyfda.libs.pyfda_qt_lib import qget_cmb_box, emit
 from pyfda.libs.compat import QWidget, QVBoxLayout, pyqtSignal
 
@@ -82,7 +81,7 @@ class FIR_DF_pyfixp_UI(QWidget):
         # widget for quantization of coefficients 'b'
         # Attention: fil[0]['fxq']['QCB'] is self.wdg_wq_coeffs.q_dict
         if 'QCB' not in fb_get('fxq'):
-            fb.fil[0]['fxq'].update({'QCB': {}})  # no coefficient settings in dict yet
+            fb_set('fxq', 'QCB', {}, new_key=True, backup=False)
             logger.warning("QCB key missing")
         self.wdg_wq_coeffs = FX_UI_WQ(
             fb_get('fxq', 'QCB'), objectName='fx_ui_wq_fir_df_coeffs_b',
@@ -93,13 +92,8 @@ class FIR_DF_pyfixp_UI(QWidget):
 
         # widget for accumulator quantization
         # Attention: fil[0]['fxq']['QACC'] is self.wdg_wq_accu.q_dict
-        if 'QACC' not in fb_get('fxq'):
-            fb.fil[0]['fxq']['QACC'] = {}
-        set_dict_defaults(fb.fil[0]['fxq']['QACC'],
-            {'WI': 0, 'WF': 31, 'ovfl': 'wrap', 'quant': 'floor', 'w_a_m': 'a',
-             'N_over': 0})
         self.wdg_wq_accu = FX_UI_WQ(
-            fb.fil[0]['fxq']['QACC'], objectName='fx_ui_wq_fir_df_accu',
+            fb_get('fxq', 'QACC'), objectName='fx_ui_wq_fir_df_accu',
             cmb_w_vis='on', cmb_w_items=self.cmb_wq_accu_items,
             label='<b>Accu Format <i>Q<sub>ACC&nbsp;</sub></i>:</b>')
         lay_v_wq_accu = QVBoxLayout()
@@ -197,10 +191,10 @@ class FIR_DF_pyfixp_UI(QWidget):
 
         # calculate required accumulator word format and update filter dict
         if qget_cmb_box(self.wdg_wq_accu.cmbW) in {'f', 'a'}:
-            fb.fil[0]['fxq']['QACC']['WF'] = fb_get('fxq', 'QI', 'WF')\
-                + fb_get('fxq', 'QCB', 'WF')
-            fb.fil[0]['fxq']['QACC']['WI'] = fb_get('fxq', 'QI', 'WI')\
-                + fb_get('fxq', 'QCB', 'WI') + A_coeff
+            fb_set('fxq', 'QACC', 'WF',\
+                   fb_get('fxq', 'QI', 'WF') + fb_get('fxq', 'QCB', 'WF'))
+            fb_set('fxq', 'QACC', 'WI',\
+                   fb_get('fxq', 'QI', 'WI') + fb_get('fxq', 'QCB', 'WI') + A_coeff)
 
         # update UI and Q.q_dict (quantization settings) from filter dict
         self.wdg_wq_accu.dict2ui(fb_get('fxq', 'QACC'))
