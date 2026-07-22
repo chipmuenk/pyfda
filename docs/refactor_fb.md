@@ -135,7 +135,7 @@ Production-ready refactored code with:
 - **FilterConfig**: Type-safe dataclass with all 50+ parameters
 - **FilterBroker**: Singleton class with:
   - `get(key)` / `set(key, value)` — Type-safe access
-  - `undo()` / `redo()` — Automatic undo/redo (no more manual `store_fil()`)
+  - `undo()` / `redo()` — Automatic undo/redo (no more manual `backup_fil()`)
   - `batch_set(dict)` — Multiple changes = single undo entry
   - `subscribe(callback)` — Event-driven change notifications
   - `to_dict()` / `from_dict()` — Serialization built-in
