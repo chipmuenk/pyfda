@@ -100,7 +100,7 @@ class FX_UI_WQ(QWidget):
 
     All labels support HTML formatting.
 
-    When instantiating the widget, these settings can be modified by setting keyword
+    When instantiating the widget, these settings can be modified with keyword
     parameters, e.g.:
 
     ```
@@ -120,7 +120,7 @@ class FX_UI_WQ(QWidget):
         if not q_dict:
             raise ValueError("FX_UI_WQ: No quantization dictionary passed!")
 
-        # TODO: Is passing q_dict by reference a bug od?
+        # TODO: Is passing q_dict by reference a bug or not?
 
         # default settings for q_dict
         # q_dict_default = {'WI': 0, 'WF': 15, 'w_a_m': 'm', 'quant': 'round',

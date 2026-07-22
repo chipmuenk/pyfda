@@ -534,7 +534,7 @@ def fb_set(*keys_tuple: tuple, backup: bool = True, new_key: bool = False,
     the user. This will be done by prepending the dict name with an underscore
     `_fil[0]` once all direct accesses have been removed.
     """
-    logger.debug("tuple_keys: %s", keys_tuple)
+    logger.debug("tuple_keys = %s", keys_tuple)
     if not isinstance(keys_tuple, tuple):
         logger.error("A tuple of keys is needed for traversing the filter dict '%s', not a '%s'!",
                      keys_tuple, type(keys_tuple).__name__)
@@ -597,9 +597,8 @@ def fb_set(*keys_tuple: tuple, backup: bool = True, new_key: bool = False,
         # When `accept_dict == False`, iterate over the keys of `set_val`.
         # --------------------------------------------------------------
         if isinstance(set_val, dict):
-            if not accept_dict:
-                logger.debug(
-                    "Setting '%s' with a sub-dict\n\t%s\n", set_key, set_val)
+            logger.debug("Setting '%s' with a sub-dict\n\t%s\n", set_key, set_val)
+            if not accept_dict:  # set
                 for k, v in set_val.items():
                     # remove the sub-dict as last key from `keys_tuple`, add a key and value from
                     # the sub-dict and call `fb_set()` recursively to set the sub-dict values
@@ -638,6 +637,7 @@ def fb_set(*keys_tuple: tuple, backup: bool = True, new_key: bool = False,
         return -1
 
     return 0
+
 
 # Comparing nested dicts
 # https://stackoverflow.com/questions/27265939/comparing-python-dictionaries-and-nested-dictionaries
