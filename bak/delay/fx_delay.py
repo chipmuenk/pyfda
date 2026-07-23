@@ -7,22 +7,21 @@
 # (see file LICENSE in root directory for details)
 
 """
-Widget for specifying the parameters of a direct-form 1 (DF1) filter
+Widget for specifying the parameters of a simple delay line
 """
 import sys
 import logging
-logger = logging.getLogger(__name__)
-
-import pyfda.filterbroker as fb
-
-from pyfda.libs.compat import QWidget#, QLabel, QVBoxLayout, QHBoxLayout
-
-from .fixpoint_helpers import requant
-
 from math import cos, pi
 
-from migen import Signal, Module, run_simulation
-from migen.fhdl import verilog
+logger = logging.getLogger(__name__)
+
+from pyfda.filterbroker import fb_get
+from pyfda.libs.compat import QWidget #, QLabel, QVBoxLayout, QHBoxLayout
+from pyfda.libs.pyfda_fix_lib_amaranth import requant
+
+from amaranth import Signal, Module, run_simulation
+from amaranth.sim import Simulator, Tick
+from amaranth.back import verilog
 ################################
 
 
@@ -140,12 +139,11 @@ class Delay_wdg(QWidget):
 # A delay with quantization and parametrizable length
 class Delay(Module):
     def __init__(self):
-        p = fb.fil[0]['fxq']
-        # ------------- Define I/Os -------------------------------------------
-        self.WI = p['QI']['WI'] + p['QI']['WF'] + 1
-        self.WO = p['QO']['WI'] + p['QO']['WF'] + 1
+        # ------------- Define I/O wordlengths --------------------------------
+        self.WI = fb_get('fxq', 'QI', 'WI') + fb_get('fxq', 'QI', 'WF') + 1
+        self.WO = fb_get('fxq', 'QO', 'WI') + fb_get('fxq', 'QO', 'WF') + 1
         N = len(p['b']) - 1 # number of coefficients = Order + 1
-        # ------------- Define I/Os -------------------------------------------
+        # ------------- Define I/Os for amaranth ------------------------------
         self.i = Signal((self.WI, True)) # input signal
         self.o = Signal((self.WO, True)) # output signal
 
