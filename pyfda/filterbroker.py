@@ -554,7 +554,70 @@ def fb_set(*keys_tuple: tuple, backup: bool = True, new_key: bool = False,
     the user. This will be done by prepending the dict name with an underscore
     `_fil[0]` once all direct accesses have been removed.
     """
+    # -------------
+    def _set_new_key(d: dict, set_key: str, set_val: any) -> int:
+        """ Create a new key:value pair when flag `new_key` is True """
+        if set_key in d:
+            logger.warning("Overwriting value '%s' for existing key '%s' in dictionary \n"
+                            "\twith new value '%s'!", d[set_key], set_key, set_val)
+        d[set_key] = set_val  # set new key:value pair
+        return 0
+
+    # --------------
+    def _ensure_type_compatible(d: dict, set_key: str, set_val, keys_tuple: tuple[str]) -> None:
+        """ check if two types are similar enough """
+        # union of types of current and new value, e.g. {'float', 'float64'}
+        types = {type(set_val).__name__, type(d[set_key]).__name__}
+        # the following types are considered fully compatible
+        if types.issubset({'float', 'float64'}):
+            pass
+        # the following types are considered mostlycompatible, just issue a warning
+        elif types.issubset({'list', 'tuple', 'ndarray'}):
+            logger.warning("Possible type mismatch: Setting\n\t'%s' of type '%s' with value "
+                            "of similar type '%s'",
+                            _print_dict(keys_tuple[:-1]), type(d[set_key]).__name__,
+                            type(set_val).__name__)
+        else:
+            logger.error("Type mismatch: Refusing to set\n\t'%s' of type '%s' "
+                "with value of type '%s'",
+                _print_dict(keys_tuple[:-1]), type(d[set_key]).__name__,
+                type(set_val).__name__)
+            raise KeyError
+
+    # --------------
+    def _set_dict_subvalues(keys_tuple, set_key: str, set_val: dict, fil_dict: dict):
+        """
+        Value to be set, `set_val == keys_tuple[-1]`, is a dict, iterate over its keys
+        to set the values.
+        """
+        logger.debug(
+            "Setting '%s' with a sub-dict\n\t%s\n", set_key, set_val)
+        for k, v in set_val.items():
+            # Call `fb_set()` recursively to set keys:values of the sub-dict `set_val == keys_tuple[-1]`
+            # Remove the sub-dict `set_val` as last key from `keys_tuple`
+            fb_set(*keys_tuple[:-1], k, v, backup=False, new_key=False,
+                accept_dict=False, fil_dict=fil_dict)
+        return 0
+
+    # --------------
+    def _handle_qfrmt_change(fil_dict: dict) -> None:
+        """
+        Setting the global quantization format 'qfrmt' can change fixpoint mode, so
+        store the last used fixpoint or float format.
+        """
+        if len(keys_tuple) > 2:
+            logger.error("More than one value '%s' for setting 'qfrmt'!", keys_tuple[1:])
+            raise KeyError
+
+        if get_fx():  # fixpoint mode, store current fixpoint format
+            fil_dict['qfrmt_fx_last'] = fil_dict['qfrmt']
+        else:  # float mode, store current float format
+            fil[0]['qfrmt_float_last'] = fil_dict['qfrmt']
+    # --------------
+
     logger.debug("tuple_keys: %s", keys_tuple)
+
+    # Ensure that the tuple consisting of the passed keys is valid
     if not isinstance(keys_tuple, tuple):
         logger.error("A tuple of keys is needed for traversing the filter dict '%s', not a '%s'!",
                      keys_tuple, type(keys_tuple).__name__)
@@ -568,7 +631,7 @@ def fb_set(*keys_tuple: tuple, backup: bool = True, new_key: bool = False,
     set_key = keys_tuple[-2]  # second last element is the key for setting
 
     if backup:
-        backup_fil()  # backup old settin
+        backup_fil()  # backup old settings
 
     try:
         # traverse nested dict 'fil_dict' using `keys_tuple` (without `set_val`)
@@ -578,11 +641,7 @@ def fb_set(*keys_tuple: tuple, backup: bool = True, new_key: bool = False,
         # Create a new key:value pair when flag `new_key` is True
         # --------------------------------------------------------
         if new_key:
-            if set_key in d:
-                logger.warning("Overwriting value '%s' for existing key '%s' in dictionary \n"
-                               "\twith new value '%s'!", d[set_key], set_key, set_val)
-            d[set_key] = set_val  # set new key:value pair
-            return 0
+            return _set_new_key(d, set_key, set_val)
 
         # Unknown key
         # -----------
@@ -593,67 +652,33 @@ def fb_set(*keys_tuple: tuple, backup: bool = True, new_key: bool = False,
         # Different types of old and new value, check if they are compatible
         # -------------------------------------------------------------------
         if type(set_val) is not type(d[set_key]):
-            # union of types of current and new value, e.g. {'float', 'float64'}
-            types = {type(set_val).__name__, type(d[set_key]).__name__}
-            # the following types are considered fully compatible
-            if types.issubset({'float', 'float64'}):
-                pass
-            # the following types are considered mostlycompatible, just issue a warning
-            elif types.issubset({'list', 'tuple', 'ndarray'}):
-                logger.warning("Possible type mismatch: Setting\n\t'%s' of type '%s' with value "
-                                "of similar type '%s'",
-                                _print_dict(keys_tuple[:-1]), type(d[set_key]).__name__,
-                                type(set_val).__name__)
-            else:
-                logger.error("Type mismatch: Refusing to set\n\t'%s' of type '%s' "
-                    "with value of type '%s'",
-                    _print_dict(keys_tuple[:-1]), type(d[set_key]).__name__,
-                    type(set_val).__name__)
-                raise KeyError
+            _ensure_type_compatible(d, set_key, set_val, keys_tuple)
 
-        # Value to be set, `set_val == keys_tuple[-1]`, is a dict. When `accept_dict == True`,
-        # assign this dict directly to `set_key = keys_tuple[-2]`.
-        # This is fast, but risky as this could delete or create new keys within the old dict.
-        # When `accept_dict == False`, iterate over the keys of `set_val`.
+        # Value to be set is a dict. When `accept_dict == True`, assign this dict
+        # directly to `set_key` which is fast, but risky.
         # --------------------------------------------------------------
-        if isinstance(set_val, dict):
-            if not accept_dict:
-                logger.debug(
-                    "Setting '%s' with a sub-dict\n\t%s\n", set_key, set_val)
-                for k, v in set_val.items():
-                    # remove the sub-dict as last key from `keys_tuple`, add a key and value from
-                    # the sub-dict and call `fb_set()` recursively to set the sub-dict values
-                    fb_set(*keys_tuple[:-1], k, v, backup=False, new_key=False,
-                        accept_dict=False, fil_dict=fil_dict)
-                return 0
+        if isinstance(set_val, dict) and not accept_dict:
+            return _set_dict_subvalues(keys_tuple, set_key, set_val, fil_dict)
 
-        # special case, setting the global quantization format 'qfrmt' can change fixpoint mode.
-        # store the last used fixpoint or float format
-        elif set_key =='qfrmt':
-            if len(keys_tuple) > 2:
-                logger.error("More than one value '%s' for setting 'qfrmt'!", keys_tuple[1:])
-                raise KeyError
-
-            if get_fx():  # fixpoint mode, store current fixpoint format
-                fil_dict['qfrmt_fx_last'] = fil_dict['qfrmt']
-            else:  # float mode, store current float format
-                fil[0]['qfrmt_float_last'] = fil_dict['qfrmt']
+        # Set the global quantization format 'qfrmt'.
+        # -------------------------------------------------------------------
+        if set_key =='qfrmt':
+            _handle_qfrmt_change(fil_dict)
 
         # ======== everything ok, finally update dictionary ========
         d[set_key] = set_val  # update key with new value
         logger.debug("Setting '%s' with value '%s'", _print_dict(keys_tuple[:-1]), set_val)
-
         # ==========================================================
 
     except TypeError:
         if backup:
-            # backup is not needed, nothing was changed
+            # Error, undo backup.
             restore_fil()
         return -1
 
     except KeyError:
         if backup:
-            # backup is not needed, nothing was changed
+            # Error, undo backup.
             restore_fil()
         return -1
 
