@@ -231,11 +231,10 @@ class FIR_DF_amaranth():
 
 # ------------------------------------------------------------------------------
 if __name__ == '__main__':
-    """
-    Run widget standalone with
-    `python -m pyfda.fixpoint_widgets.fir_df.fir_df_amaranth`
-    `python -m pyfda.fixpoint_widgets.fir_df.fir_df_amaranth.FIR_DF_amaranth_mod`
-    """
+    # Run widget standalone with
+    # `python -m pyfda.fixpoint_widgets.fir_df.fir_df_amaranth`
+    # `python -m pyfda.fixpoint_widgets.fir_df.fir_df_amaranth.FIR_DF_amaranth_mod`
+
     fb_set('qfrmt', 'qint')  # set fixpoint mode
 
     p = {'QCB': {'WI': 2, 'WF': 5, 'w_a_m': 'a',

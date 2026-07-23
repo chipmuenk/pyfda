@@ -168,10 +168,8 @@ class FIR_DF_amaranth_mod(Elaboratable):
 
 # ------------------------------------------------------------------------------
 if __name__ == '__main__':
-    """
-    Run widget standalone with
-    `python -m pyfda.fixpoint_widgets.fir_df.fir_df_amaranth_mod`
-    """
+    # Run widget standalone with `python -m pyfda.fixpoint_widgets.fir_df.fir_df_amaranth_mod`
+
     set_fx(True)  # enable fixpoint mode
 
     p = {'QCB': {'WI': 2, 'WF': 5, 'w_a_m': 'a',
@@ -184,6 +182,7 @@ if __name__ == '__main__':
     Q_b = fx.Fixed(p['QCB'])  # quantizer for transversal coeffs
     b_q = fx.quant_coeffs([1, 2, 3, 2, 1], Q_b, out_frmt="qint")
     p.update({'ba': b_q})
+
     Q_I = fx.Fixed(p['QI'])
     Q_O = fx.Fixed(p['QO'])
 
@@ -208,6 +207,6 @@ if __name__ == '__main__':
     sim.add_process(process)
     # sim.run()
     # This remembers sreg from last run!
-    stimulus = np.zeros(20)
+    stimulus = np.zeros(20)  # this overwrites previous stimulus
     sim.add_process(process)
     sim.run()
