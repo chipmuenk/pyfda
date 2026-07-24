@@ -566,9 +566,9 @@ def fb_set(*keys_tuple: tuple, backup: bool = True, new_key: bool = False,
     if len(keys_tuple) < 2:
         if isinstance(keys_tuple[0], dict):  # top-level dict
             return _set_dict_subvalues(keys_tuple, fil_dict)
-        else:
-            logger.error("Only one parameter '%s', key and value need to be given", keys_tuple)
-            raise KeyError
+
+        logger.error("Only one parameter '%s'; key *and* value need to be given", keys_tuple)
+        raise KeyError
 
     set_val = keys_tuple[-1]  # last element is the value to be set
     set_key = keys_tuple[-2]  # second last element is the key for setting
@@ -630,7 +630,7 @@ def fb_set(*keys_tuple: tuple, backup: bool = True, new_key: bool = False,
             restore_fil()
         return -1
 
-    except KeyError as e:
+    except KeyError:
         if backup:
             # Error, undo backup.
             restore_fil()
