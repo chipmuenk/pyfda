@@ -170,6 +170,9 @@ class FIR_DF_amaranth_mod(Elaboratable):
 if __name__ == '__main__':
     # Run widget standalone with `python -m pyfda.fixpoint_widgets.fir_df.fir_df_amaranth_mod`
 
+    # https://www.heise.de/hintergrund/async-await-in-Python-Nebenlaeufigkeit-leicht-gemacht-6193925.html
+    # https://amaranth-lang.org/docs/amaranth/latest/simulator.html
+
     set_fx(True)  # enable fixpoint mode
 
     p = {'QCB': {'WI': 2, 'WF': 5, 'w_a_m': 'a',
