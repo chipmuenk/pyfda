@@ -606,18 +606,9 @@ def fb_set(*keys_tuple: tuple, backup: bool = True, new_key: bool = False,
         # Set the global quantization format 'qfrmt'.
         # -------------------------------------------------------------------
         if set_key =='qfrmt':
-            """
-            Setting the global quantization format 'qfrmt' can change fixpoint mode, so
-            store the last used fixpoint or float format.
-            """
-            if len(keys_tuple) > 2:
-                logger.error("More than one value '%s' for setting 'qfrmt'!", keys_tuple[1:])
-                raise KeyError
-
-            if get_fx():  # fixpoint mode, store current fixpoint format
-                fil_dict['qfrmt_fx_last'] = fil_dict['qfrmt']
-            else:  # float mode, store current float format
-                fil[0]['qfrmt_float_last'] = fil_dict['qfrmt']
+            # Setting the global quantization format 'qfrmt' can change fixpoint mode, so
+            # store the last used fixpoint or float format.
+            _handle_qfrmt_change(keys_tuple: tuple, fil_dict: dict)
 
             # ======== everything ok, finally update dictionary ========
         d[set_key] = set_val  # update key with new value
@@ -684,7 +675,20 @@ def _set_dict_subvalues(keys_tuple: tuple, fil_dict: dict):
         fb_set(*keys_tuple[:-1], k, v, backup=False, new_key=False,
             accept_dict=False, fil_dict=fil_dict)
     return 0
+# --------------
+def _handle_qfrmt_change(keys_tuple: tuple, fil_dict: dict) -> None:
+    """
+    Setting the global quantization format 'qfrmt' can change fixpoint mode, so
+    store the last used fixpoint or float format.
+    """
+    if len(keys_tuple) > 2:
+        logger.error("More than one value '%s' for setting 'qfrmt'!", keys_tuple[1:])
+        raise KeyError
 
+    if get_fx():  # fixpoint mode, store current fixpoint format
+        fil_dict['qfrmt_fx_last'] = fil_dict['qfrmt']
+    else:  # float mode, store current float format
+        fil_dict['qfrmt_float_last'] = fil_dict['qfrmt']
 
 # Comparing nested dicts
 # https://stackoverflow.com/questions/27265939/comparing-python-dictionaries-and-nested-dictionaries
