@@ -601,7 +601,7 @@ def fb_set(*keys_tuple: tuple, backup: bool = True, new_key: bool = False,
         # directly to `set_key` which is fast, but risky.
         # --------------------------------------------------------------
         if isinstance(set_val, dict) and not accept_dict:
-            return _set_dict_subvalues(keys_tuple, set_key, set_val, fil_dict)
+            return _set_dict_subvalues(keys_tuple, fil_dict)
 
         # Set the global quantization format 'qfrmt'.
         # -------------------------------------------------------------------
