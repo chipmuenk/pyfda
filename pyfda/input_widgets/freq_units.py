@@ -279,18 +279,19 @@ class FreqUnits(QWidget):
         self.butLock.setVisible(not is_normalized_freq)
 
         if is_normalized_freq:
+            f_s_norm_factor = 1.  # default: normalize w.r.t. f_S
+            f_label = r"$F = f\, /\, f_S = \Omega \, /\,  2 \mathrm{\pi} \; \rightarrow$"
+            t_label = r"$n = t\, /\, T_S \; \rightarrow$"
+
             # store current sampling frequency to restore it when returning to
             # absolute (not normalized) frequencies
             if f_unit == "f_S":  # normalized to f_S
-                f_s_norm_factor = 1.
-                f_label = r"$F = f\, /\, f_S = \Omega \, /\,  2 \mathrm{\pi} \; \rightarrow$"
+                pass
             elif f_unit == "f_Ny":  # normalized to f_nyq = f_S / 2
                 f_s_norm_factor = 2.
                 f_label = r"$F = 2f \, / \, f_S = \Omega \, / \, \mathrm{\pi} \; \rightarrow$"
             else: # frequency index k,
                 logger.error("Unknown f_unit '%s'", f_unit)
-
-            t_label = r"$n = t\, /\, T_S \; \rightarrow$"
 
             fb_set({
                 'f_S': f_s_norm_factor,
@@ -300,6 +301,7 @@ class FreqUnits(QWidget):
                 })
             self.butLock.setIcon(QIcon(':/lock-unlocked.svg'))
 
+        # -------------------------------------------------------------------
         else:  # Hz, kHz, ...
             # Restore sampling frequency when selecting absolute instead of
             # normalized frequencies
