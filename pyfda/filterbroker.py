@@ -48,10 +48,6 @@ logger = logging.getLogger(__name__)
 # ==========================================================
 # Variables that can be accessed from all modules
 #
-# Exchange fixpoint simulation results between modules as a
-# numpy array
-fx_results = None
-#
 # State of filter design: 'ok', 'changed', 'error', 'active'
 design_filt_state = 'changed'
 # ===========================================================

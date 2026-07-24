@@ -23,8 +23,7 @@ from pyfda.libs.compat import (
     Qt, QWidget, QPushButton, QComboBox, QFileDialog, QLabel, QPixmap,
     QVBoxLayout, QHBoxLayout, pyqtSignal, QFrame, QSizePolicy)
 
-import pyfda.filterbroker as fb  # importing filterbroker initializes all its globals
-from pyfda.filterbroker import get_fx, fb_get, fb_set, fx_results
+from pyfda.filterbroker import get_fx, fb_get, fb_set
 from pyfda.config_file_parser import ConfigFileParser as CFP
 
 import pyfda.libs.pyfda_dirs as dirs
@@ -846,37 +845,37 @@ class Input_Fixpoint_Specs(QWidget):
             return -1
 
     # --------------------------------------------------------------------------
-    def fx_sim_calc_response(self, dict_sig) -> None:
-        """
-        - Read fixpoint stimulus from `dict_sig` in integer format
-        - Pass it to the fixpoint filter which calculates the fixpoint response
-        - Store the result in `fb.fx_results` and return. In case of an error,
-          `fb.fx_results == None`
+    # def fx_sim_calc_response(self, dict_sig) -> None:
+    #     """
+    #     - Read fixpoint stimulus from `dict_sig` in integer format
+    #     - Pass it to the fixpoint filter which calculates the fixpoint response
+    #     - Store the result in `fx_results` and return. In case of an error,
+    #       `fx_results == None`
 
-        Returns
-        -------
-        None
-        """
-        try:
-            # Run fixpoint simulation and store the results as integer values:
-            fx_results = self.fx_filt_ui.fxfilter(dict_sig['fx_stimulus'])
+    #     Returns
+    #     -------
+    #     None
+    #     """
+    #     try:
+    #         # Run fixpoint simulation and store the results as integer values:
+    #         fx_results = self.fx_filt_ui.fxfilter(dict_sig['fx_stimulus'])
 
-            if len(fx_results) == 0:
-                logger.error("Fixpoint simulation returned empty results!")
+    #         if len(fx_results) == 0:
+    #             logger.error("Fixpoint simulation returned empty results!")
 
-        except ValueError as e:
-            logger.error("Simulator error %s", e)
-            fx_results = None
+    #     except ValueError as e:
+    #         logger.error("Simulator error %s", e)
+    #         fx_results = None
 
-        except AssertionError as e:
-            logger.error(
-                'Fixpoint simulation failed for dict\n%s\n\twith msg. " %s "' \
-                '\n\tStimuli: Shape %s of type %s'
-                '\n\tResponse: Shape %s of type "%s"',
-                pprint_log(dict_sig), e,
-                np.shape(dict_sig["fx_stimulus"]), dict_sig["fx_stimulus"].dtype,
-                np.shape(fx_results), type(fx_results))
-            fx_results = None
+    #     except AssertionError as e:
+    #         logger.error(
+    #             'Fixpoint simulation failed for dict\n%s\n\twith msg. " %s "' \
+    #             '\n\tStimuli: Shape %s of type %s'
+    #             '\n\tResponse: Shape %s of type "%s"',
+    #             pprint_log(dict_sig), e,
+    #             np.shape(dict_sig["fx_stimulus"]), dict_sig["fx_stimulus"].dtype,
+    #             np.shape(fx_results), type(fx_results))
+    #         fx_results = None
 
 
 ###############################################################################

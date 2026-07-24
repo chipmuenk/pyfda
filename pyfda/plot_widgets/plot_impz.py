@@ -21,7 +21,7 @@ from matplotlib.ticker import AutoMinorLocator
 from pyfda.libs.compat import (
     QWidget, pyqtSignal, QTabWidget, QVBoxLayout, QIcon, QSize, QSizePolicy)
 from pyfda.config_file_parser import ConfigFileParser as CFP
-from pyfda.filterbroker import get_fx, set_fx, fb_get, fb_set, fx_results
+from pyfda.filterbroker import get_fx, set_fx, fb_get, fb_set
 import pyfda.libs.pyfda_fix_lib as fx
 from pyfda.libs.pyfda_sig_lib import angle_zero, calc_ssb_spectrum
 from pyfda.libs.pyfda_lib import safe_eval, first_item
@@ -728,7 +728,6 @@ class Plot_Impz(QWidget):
                         logger.error("Fixpoint simulation returned empty results!")
                     else:
                         logger.error("Simulator error %s", e)
-                        fx_results = None
                     self.error = True
 
                 if self.error:
