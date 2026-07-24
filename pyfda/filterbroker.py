@@ -608,7 +608,7 @@ def fb_set(*keys_tuple: tuple, backup: bool = True, new_key: bool = False,
         if set_key =='qfrmt':
             # Setting the global quantization format 'qfrmt' can change fixpoint mode, so
             # store the last used fixpoint or float format.
-            _handle_qfrmt_change(keys_tuple: tuple, fil_dict: dict)
+            _handle_qfrmt_change(keys_tuple, fil_dict)
 
             # ======== everything ok, finally update dictionary ========
         d[set_key] = set_val  # update key with new value

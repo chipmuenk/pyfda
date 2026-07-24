@@ -282,22 +282,22 @@ class FreqUnits(QWidget):
             # store current sampling frequency to restore it when returning to
             # absolute (not normalized) frequencies
             if f_unit == "f_S":  # normalized to f_S
-                fb_set('f_S', 1.)
-                fb_set('f_max', 1.)
+                f_s_norm_factor = 1.
                 f_label = r"$F = f\, /\, f_S = \Omega \, /\,  2 \mathrm{\pi} \; \rightarrow$"
             elif f_unit == "f_Ny":  # normalized to f_nyq = f_S / 2
-                fb_set('f_S', 2.)
-                fb_set('f_max', 2.)
+                f_s_norm_factor = 2.
                 f_label = r"$F = 2f \, / \, f_S = \Omega \, / \, \mathrm{\pi} \; \rightarrow$"
             else: # frequency index k,
-                logger.error("Unit k is no longer supported!")
+                logger.error("Unknown f_unit '%s'", f_unit)
 
-            # always use T_S = 1 for normalized frequencies
-            fb_set('T_S', 1.)
             t_label = r"$n = t\, /\, T_S \; \rightarrow$"
 
-            # Don't lock frequency scaling with normalized frequencies
-            fb_set('freq_locked', False)
+            fb_set({
+                'f_S': f_s_norm_factor,
+                'f_max': f_s_norm_factor,
+                'T_S': 1.,            # always use T_S = 1 for normalized frequencies
+                'freq_locked': False  # Don't lock frequency scaling with normalized frequencies
+                })
             self.butLock.setIcon(QIcon(':/lock-unlocked.svg'))
 
         else:  # Hz, kHz, ...
@@ -305,9 +305,12 @@ class FreqUnits(QWidget):
             # normalized frequencies
 
             if fb_get('freq_specs_unit') in {"f_S", "f_Ny"}:  # previous setting normalized?
-                fb_set('f_S', self.f_s_old)
-                fb_set('f_max', self.f_s_old) # yes, restore prev. f_S
-                fb_set('T_S', self.T_s_old)  # yes, restore prev. T_S
+                # yes, restore prev. f_S and T_S
+                fb_set(
+                    {'f_S': self.f_s_old,
+                     'f_max': self.f_s_old,
+                     'T_S': self.T_s_old}
+                )
 
             # --- try to pick the most suitable unit for f_S --------------
             f_S = fb_get('f_S') * f_s_scale
@@ -338,23 +341,14 @@ class FreqUnits(QWidget):
             f_label = r"$f$ in " + f_unit + r"$\; \rightarrow$"
             t_label = r"$t$ in " + self.t_units[idx] + r"$\; \rightarrow$"
 
-        # fb_set('f_s_scale', f_s_scale)  # scale factor for f_S (Hz, kHz, ...)
-        # fb_set('freq_specs_unit', f_unit)  # frequency unit
-        # # time and frequency unit as string e.g. for plot axis labeling
-        # fb_set('plt_fUnit', f_unit)
-        # fb_set('plt_tUnit', self.t_units[idx])
-        # # complete plot axis labels including unit and arrow
-        # fb_set('plt_fLabel', f_label)
-        # fb_set('plt_tLabel', t_label)
-
-        fb_set(
-            {'f_s_scale': f_s_scale,  # scale factor for f_S (Hz, kHz, ...)
+        fb_set({
+            'f_s_scale': f_s_scale,  # scale factor for f_S (Hz, kHz, ...)
             'freq_specs_unit': f_unit,  # frequency unit
             'plt_fUnit': f_unit,  # time and frequency unit as string, e.g.
             'plt_tUnit': self.t_units[idx],  #  for plot axis labeling
             'plt_fLabel': f_label,  # plot axis labels including unit and arrow
-            'plt_tLabel': t_label}
-            )
+            'plt_tLabel': t_label
+            })
 
         self._freq_range(emit_signal=False)  # update f_lim setting without emit_signalting signal
         if emit_signal:  # UI was updated by user or a rescaling of f_S
@@ -387,9 +381,11 @@ class FreqUnits(QWidget):
             """
             if self.spec_edited:
                 f_S_tmp = safe_eval(source.text(), fb_get('f_S'), sign='pos')
-                fb_set('f_S', f_S_tmp)
-                fb_set('T_S', 1./f_S_tmp)
-                fb_set('f_max', f_S_tmp)
+                fb_set({
+                    'f_S': f_S_tmp,
+                    'T_S': 1./f_S_tmp,
+                    'f_max': f_S_tmp
+                    })
 
                 self._freq_range(emit_signal=False)  # update plotting range
                 self.emit({'view_changed': 'f_S'})
