@@ -557,6 +557,9 @@ def fb_set(*keys_tuple: tuple, backup: bool = True, new_key: bool = False,
 
     logger.debug("tuple_keys: %s", keys_tuple)
 
+    if backup:
+        backup_fil()  # backup old settings
+
     # Ensure that the tuple consisting of the passed keys is valid
     if not isinstance(keys_tuple, tuple):
         logger.error("A tuple of keys is needed for traversing the filter dict '%s', not a '%s'!",
@@ -572,9 +575,6 @@ def fb_set(*keys_tuple: tuple, backup: bool = True, new_key: bool = False,
 
     set_val = keys_tuple[-1]  # last element is the value to be set
     set_key = keys_tuple[-2]  # second last element is the key for setting
-
-    if backup:
-        backup_fil()  # backup old settings
 
     try:
         # traverse nested dict 'fil_dict' using `keys_tuple` (without `set_val`)
@@ -667,7 +667,8 @@ def _set_dict_subvalues(keys_tuple: tuple, fil_dict: dict):
     `set_val == keys_tuple[-1]` is a dict, iterate over its keys
     to set the key-value pairs.
     """
-    d = keys_tuple[-1]  # "extract" dict from tuple
+    # get dict to be set from tuple, it's either the last or the only item
+    d = keys_tuple[-1]
 
     for k, v in d.items():
         # Call `fb_set()` recursively to set k:v of the sub-dict `set_val`
