@@ -338,14 +338,23 @@ class FreqUnits(QWidget):
             f_label = r"$f$ in " + f_unit + r"$\; \rightarrow$"
             t_label = r"$t$ in " + self.t_units[idx] + r"$\; \rightarrow$"
 
-        fb_set('f_s_scale', f_s_scale)  # scale factor for f_S (Hz, kHz, ...)
-        fb_set('freq_specs_unit', f_unit)  # frequency unit
-        # time and frequency unit as string e.g. for plot axis labeling
-        fb_set('plt_fUnit', f_unit)
-        fb_set('plt_tUnit', self.t_units[idx])
-        # complete plot axis labels including unit and arrow
-        fb_set('plt_fLabel', f_label)
-        fb_set('plt_tLabel', t_label)
+        # fb_set('f_s_scale', f_s_scale)  # scale factor for f_S (Hz, kHz, ...)
+        # fb_set('freq_specs_unit', f_unit)  # frequency unit
+        # # time and frequency unit as string e.g. for plot axis labeling
+        # fb_set('plt_fUnit', f_unit)
+        # fb_set('plt_tUnit', self.t_units[idx])
+        # # complete plot axis labels including unit and arrow
+        # fb_set('plt_fLabel', f_label)
+        # fb_set('plt_tLabel', t_label)
+
+        fb_set(
+            {'f_s_scale': f_s_scale,  # scale factor for f_S (Hz, kHz, ...)
+            'freq_specs_unit': f_unit,  # frequency unit
+            'plt_fUnit': f_unit,  # time and frequency unit as string, e.g.
+            'plt_tUnit': self.t_units[idx],  #  for plot axis labeling
+            'plt_fLabel': f_label,  # plot axis labels including unit and arrow
+            'plt_tLabel': t_label}
+            )
 
         self._freq_range(emit_signal=False)  # update f_lim setting without emit_signalting signal
         if emit_signal:  # UI was updated by user or a rescaling of f_S
