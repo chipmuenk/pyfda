@@ -367,7 +367,7 @@ class Input_Specs(QWidget):
             self.t_specs.setVisible(True)
             # disable all subwidgets with marker 'd':
             self.t_specs.setEnabled(all_widgets['tspecs'][0] != 'd')
-            self.t_specs.update_UI(new_labels=all_widgets['tspecs'][1])
+            self.t_specs.update_ui(new_labels=all_widgets['tspecs'][1])
         else:
             self.t_specs.hide()
 
@@ -376,7 +376,7 @@ class Input_Specs(QWidget):
                 all_widgets['fspecs'][0] != 'i'):
             self.f_specs.setVisible(True)
             self.f_specs.setEnabled(all_widgets['fspecs'][0] != 'd')
-            self.f_specs.update_UI(new_labels=all_widgets['fspecs'])
+            self.f_specs.update_ui(new_labels=all_widgets['fspecs'])
         else:
             self.f_specs.hide()
 
@@ -385,7 +385,7 @@ class Input_Specs(QWidget):
                 all_widgets['aspecs'][0] != 'i'):
             self.a_specs.setVisible(True)
             self.a_specs.setEnabled(all_widgets['aspecs'][0] != 'd')
-            self.a_specs.update_UI(new_labels=all_widgets['aspecs'])
+            self.a_specs.update_ui(new_labels=all_widgets['aspecs'])
         else:
             self.a_specs.hide()
 

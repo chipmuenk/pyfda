@@ -129,9 +129,9 @@ class AmplitudeSpecs(QWidget):
 
         # - Build a list from all entries in the fil_dict dictionary starting
         #   with "A" (= amplitude specifications of the current filter)
-        # - Pass the list to update_UI which recreates the widget
+        # - Pass the list to update_ui which recreates the widget
         new_labels = [str(lbl) for lbl in fb_get() if lbl[0] == 'A']
-        self.update_UI(new_labels=new_labels)
+        self.update_ui(new_labels=new_labels)
 
         # ----------------------------------------------------------------------
         # GLOBAL SIGNALS & SLOTs
@@ -185,9 +185,9 @@ class AmplitudeSpecs(QWidget):
         return super().eventFilter(source, event)
 
     # -------------------------------------------------------------
-    def update_UI(self, new_labels: list[str]) -> None:
+    def update_ui(self, new_labels: list[str]) -> None:
         """
-        Called from filter_specs.update_UI() and target_specs.update_UI().
+        Called from input_specs.update_ui() and target_specs.update_ui().
         The first entry is the state of the widget, 'a', 'u', 'd'.
         Set labels and get corresponding values from filter dictionary.
         When number of entries has changed, the layout of subwidget is rebuilt,
@@ -344,8 +344,8 @@ if __name__ == '__main__':
     app = QApplication(sys.argv)
     app.setStyleSheet(rc.QSS_RC)
     mainw = AmplitudeSpecs()
-    mainw.update_UI(new_labels=['a', 'A_SB', 'A_SB2', 'A_PB', 'A_PB2'])
-    mainw.update_UI(new_labels=['u', 'A_PB', 'A_SB'])
+    mainw.update_ui(new_labels=['a', 'A_SB', 'A_SB2', 'A_PB', 'A_PB2'])
+    mainw.update_ui(new_labels=['u', 'A_PB', 'A_SB'])
 
     app.setActiveWindow(mainw)
     mainw.show()

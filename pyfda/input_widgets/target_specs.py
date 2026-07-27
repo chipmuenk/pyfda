@@ -125,10 +125,10 @@ class TargetSpecs(QWidget):
         self.sig_tx_local.connect(self.f_specs.sig_rx)
         self.sig_tx_local.connect(self.a_specs.sig_rx)
 
-        self.update_UI()  # first time initialization
+        self.update_ui()  # first time initialization
 
     # --------------------------------------------------------------------------
-    def update_UI(self, new_labels: list[str] | None = None) -> None:
+    def update_ui(self, new_labels: list[str] | None = None) -> None:
         """
         Called when a new filter design algorithm has been selected
         - Pass new frequency and amplitude labels to the amplitude and frequency
@@ -146,7 +146,7 @@ class TargetSpecs(QWidget):
                 new_labels['frq'][0] != 'i'):
             self.f_specs.show()
             self.f_specs.setEnabled(new_labels['frq'][0] != 'd')
-            self.f_specs.update_UI(new_labels=new_labels['frq'])
+            self.f_specs.update_ui(new_labels=new_labels['frq'])
         else:
             self.f_specs.hide()
 
@@ -154,7 +154,7 @@ class TargetSpecs(QWidget):
                 new_labels['amp'][0] != 'i'):
             self.a_specs.show()
             self.a_specs.setEnabled(new_labels['amp'][0] != 'd')
-            self.a_specs.update_UI(new_labels=new_labels['amp'])
+            self.a_specs.update_ui(new_labels=new_labels['amp'])
         else:
             self.a_specs.hide()
 
@@ -180,7 +180,7 @@ if __name__ == '__main__':
         target_params = {}
 
     mainw = TargetSpecs(title="Test Specs")
-    mainw.update_UI(target_params)
+    mainw.update_ui(target_params)
 
     app.setActiveWindow(mainw)
     mainw.show()

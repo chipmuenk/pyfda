@@ -178,9 +178,9 @@ class FreqSpecs(QWidget):
             self.update_f_display(event_source)  # just update / restore display
 
     # --------------------------------------------------------------------------
-    def update_UI(self, new_labels: list[str]) -> None:
+    def update_ui(self, new_labels: list[str]) -> None:
         """
-        Called by `input_specs.update_UI()` and `target_specs.update_UI()`
+        Called by `input_specs.update_ui()` and `target_specs.update_ui()`
         Set labels and get corresponding values from filter dictionary.
         When number of entries has changed, the layout of subwidget is rebuilt,
         using
@@ -201,7 +201,7 @@ class FreqSpecs(QWidget):
 #        W_lbl = max([self.qfm.width(l) for l in new_labels]) # max. label width in pixel
 
         # ---------------------------- logging -----------------------------
-        logger.debug("update_UI: %s-%s-%s", fb_get('rt'), fb_get('fc'), fb_get('fo'))
+        logger.debug("update_ui: %s-%s-%s", fb_get('rt'), fb_get('fc'), fb_get('fo'))
 
         f_range = " (0 &lt; <i>f</i> &lt; <i>f<sub>S </sub></i>/2)"
         for i in range(num_new_labels):
@@ -323,7 +323,7 @@ class FreqSpecs(QWidget):
 
         `dict2ui()` is called during init and when the frequency unit or the
           sampling frequency have been changed via
-          `filter_specs.update_UI()` -> `self.update_UI()` -> `self.sort_dict_freqs()`
+          `input_specs.update_ui()` -> `self.update_ui()` -> `self.sort_dict_freqs()`
 
         - Reload textfields from filter dictionary
 
@@ -353,7 +353,7 @@ class FreqSpecs(QWidget):
 # ------------------------------------------------------------------------
     def _show_entries(self, num_new_labels: int) -> None:
         """
-        Called by `update_UI()` when filter has changed
+        Called by `update_ui()` when filter has changed
         - check whether subwidgets need to be shown or hidden
         - check whether enough subwidgets (QLabel und QLineEdit) exist for the
           the required number of `num_new_labels`:
@@ -401,7 +401,7 @@ class FreqSpecs(QWidget):
         - Update the visible QLineEdit frequency widgets
 
         The method is called when:
-        - update_UI has been called after changing the filter design algorithm
+        - update_ui has been called after changing the filter design algorithm
           that the response type has been changed
           eg. from LP -> HP, requiring a different order of frequency entries
         - a frequency spec field has been edited
@@ -434,8 +434,8 @@ if __name__ == '__main__':
     app = QApplication(sys.argv)
     app.setStyleSheet(rc.QSS_RC)
     mainw = FreqSpecs()
-    mainw.update_UI(new_labels=['F_SB', 'F_SB2', 'F_PB', 'F_PB2'])
-#    mainw.update_UI(new_labels = ['F_PB','F_PB2'])
+    mainw.update_ui(new_labels=['F_SB', 'F_SB2', 'F_PB', 'F_PB2'])
+#    mainw.update_ui(new_labels = ['F_PB','F_PB2'])
 
     app.setActiveWindow(mainw)
     mainw.show()
