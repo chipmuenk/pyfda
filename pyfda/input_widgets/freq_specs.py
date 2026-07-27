@@ -78,33 +78,33 @@ class FreqSpecs(QWidget):
         bfont = QFont()
         bfont.setBold(True)
 
-        lblTitle = QLabel(str(self.title), self)  # field for widget title
-        lblTitle.setFont(bfont)
-        lblTitle.setWordWrap(True)
-        self.lblUnit = QLabel(self)
-        self.lblUnit.setText("in " + to_html(fb_get('freq_specs_unit'), frmt='bi'))
+        lbl_title = QLabel(str(self.title), self)  # field for widget title
+        lbl_title.setFont(bfont)
+        lbl_title.setWordWrap(True)
+        self.lbl_unit = QLabel(self)
+        self.lbl_unit.setText("in " + to_html(fb_get('freq_specs_unit'), frmt='bi'))
 
-        layHTitle = QHBoxLayout()
-        layHTitle.addWidget(lblTitle)
-        layHTitle.addWidget(self.lblUnit)
-        layHTitle.addStretch(1)
+        lay_h_title = QHBoxLayout()
+        lay_h_title.addWidget(lbl_title)
+        lay_h_title.addWidget(self.lbl_unit)
+        lay_h_title.addStretch(1)
 
         # Create a gridLayout consisting of QLabel and QLineEdit fields
         # for the frequency specs:
-        self.layGSpecs = QGridLayout()  # sublayout for spec fields
+        self.lay_g_specs = QGridLayout()  # sublayout for spec fields
         # set the title as the first (fixed) entry in grid layout. The other
         # fields are added and hidden dynamically in _show_entries and _hide_entries()
-        self.layGSpecs.addLayout(layHTitle, 0, 0, 1, 2)
-        self.layGSpecs.setAlignment(Qt.AlignLeft)
-        # self.layGSpecs.setAlignment(Qt.AlignTop)
+        self.lay_g_specs.addLayout(lay_h_title, 0, 0, 1, 2)
+        self.lay_g_specs.setAlignment(Qt.AlignLeft)
+        # self.lay_g_specs.setAlignment(Qt.AlignTop)
 
         self.frm_main = QFrame(self)
-        self.frm_main.setLayout(self.layGSpecs)
+        self.frm_main.setLayout(self.lay_g_specs)
 
-        self.layVMain = QVBoxLayout()  # Widget main layout
-        self.layVMain.addWidget(self.frm_main)  # , Qt.AlignLeft)
-        self.layVMain.setContentsMargins(*params['wdg_margins'])
-        self.setLayout(self.layVMain)
+        self.lay_v_main = QVBoxLayout()  # Widget main layout
+        self.lay_v_main.addWidget(self.frm_main)  # , Qt.AlignLeft)
+        self.lay_v_main.setContentsMargins(*params['wdg_margins'])
+        self.setLayout(self.lay_v_main)
 
         self.n_cur_labels = 0  # number of currently visible labels / qlineedits
 
@@ -255,7 +255,7 @@ class FreqSpecs(QWidget):
             unit_frmt = 'bi'
         else:
             unit_frmt = 'b'
-        self.lblUnit.setText(" in " + to_html(unit, frmt=unit_frmt))
+        self.lbl_unit.setText(" in " + to_html(unit, frmt=unit_frmt))
 
 # -------------------------------------------------------------
     def update_f_display(self, source) -> None:
@@ -390,8 +390,8 @@ class FreqSpecs(QWidget):
                 self.qlineedit[i].installEventFilter(self)  # filter events
 
                 # first entry is the title
-                self.layGSpecs.addWidget(self.qlabels[i], i+1, 0)
-                self.layGSpecs.addWidget(self.qlineedit[i], i+1, 1)
+                self.lay_g_specs.addWidget(self.qlabels[i], i+1, 0)
+                self.lay_g_specs.addWidget(self.qlineedit[i], i+1, 1)
 
 # ------------------------------------------------------------------------------
     def sort_dict_freqs(self) -> None:
