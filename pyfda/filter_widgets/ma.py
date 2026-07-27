@@ -21,7 +21,7 @@ API version info
     1.1: mark private methods as private
     1.2: - new API using fil_save & fil_convert (allow multiple formats,
                 save 'ba' _and_ 'zpk' precisely)
-         - include method _store_entries in _update_ui
+         - include method _store_entries in _dict2ui
     1.4: module attribute `filter_classes` contains class name and combo box name
          instead of class attribute `name`
         `FRMT` is now a class attribute
@@ -213,11 +213,9 @@ class MA(QWidget):
         self.chk_norm.clicked.connect(self._ui2dict)
         #----------------------------------------------------------------------
 
-        self.dict2filter_params() # get initial / last setting from dictionary
-        self._update_ui()
+        self._dict2ui() # get initial / last setting from dictionary
 
-
-    def dict2filter_params(self) -> None:
+    def _dict2ui(self) -> None:
         """
         Reload parameter(s) from filter dictionary (if they exist) and set
         corresponding UI elements. dict2filter_params() is called upon initialization
