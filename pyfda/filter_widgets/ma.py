@@ -207,10 +207,10 @@ class MA(QWidget):
         #----------------------------------------------------------------------
         # SIGNALS & SLOTs
         #----------------------------------------------------------------------
-        self.led_delays.editingFinished.connect(self._update_ui)
-        self.led_stages.editingFinished.connect(self._update_ui)
+        self.led_delays.editingFinished.connect(self._ui2dict)
+        self.led_stages.editingFinished.connect(self._ui2dict)
         # fires when edited line looses focus or when RETURN is pressed
-        self.chk_norm.clicked.connect(self._update_ui)
+        self.chk_norm.clicked.connect(self._ui2dict)
         #----------------------------------------------------------------------
 
         self.dict2filter_params() # get initial / last setting from dictionary
@@ -235,10 +235,10 @@ class MA(QWidget):
                 self.chk_norm.setChecked(wdg_fil_par['normalize'])
 
 
-    def _update_ui(self) -> None:
+    def _ui2dict(self) -> None:
         """
-        Update UI when line edit field is changed (here, only the text is read
-        and converted to integer) and resize the textfields according to content.
+        When line edit field is changed, read the text and convert it to integer.
+        Store the values in the corresponding attributes.
         """
         self.delays = safe_eval(self.led_delays.text(), self.delays, return_type='int', sign='pos')
         self.led_delays.setText(str(self.delays))
@@ -249,7 +249,7 @@ class MA(QWidget):
 
     def _store_entries(self) -> None:
         """
-        Store parameter settings in filter dictionary. Called from _update_ui()
+        Store parameter settings in filter dictionary. Called from _ui2dict()
         and _save()
         """
         fb_set('filter_widgets', 'ma', {'delays': self.delays,

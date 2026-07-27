@@ -108,18 +108,17 @@ class Delay(QWidget):
         #----------------------------------------------------------------------
         # SIGNALS & SLOTs
         #----------------------------------------------------------------------
-        self.led_delay.editingFinished.connect(self._update_UI)
+        self.led_delay.editingFinished.connect(self._ui2dict)
         # fires when edited line looses focus or when RETURN is pressed
         #----------------------------------------------------------------------
 
         self.dict2filter_params() # get initial / last setting from dictionary
-        self._update_UI()
+        self._ui2dict()
 
-    def _update_UI(self) -> None:
+    def _ui2dict(self) -> None:
         """
-        Update UI when line edit field is changed (here, only the text is read
-        and converted to integer) and store parameter settings in filter
-        dictionary
+        When line edit field is changed, read the text and convert it to integer.
+        Store parameter settings in filter dictionary.
         """
         self.N = safe_eval(self.led_delay.text(), self.N,
                                       sign="poszero", return_type='int')
