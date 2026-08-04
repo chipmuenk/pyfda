@@ -741,9 +741,9 @@ class Input_Fixpoint_Specs(QWidget):
         """
         Called during `__init__()` and from `process_sig_rx()`.
 
-        Update UI from `fil[0]['qfrmt']` and the fx filter
-        dict `fil[0]['fxq']`. This affects the visibility and the fx settings of
-        input, output and dyn. filter widget via their `dict2ui()` methods.
+        Update UI from `fil[0]['qfrmt']` and the fx filter dict `fil[0]['fxq']`.
+        This affects the visibility and the fx settings of input, output and dyn.
+        filter widget via their `dict2ui()` methods.
         The setting of the `self.cmb_qfrmt` combobox influencing float / fixpoint number
         format is updated as well.
         """
