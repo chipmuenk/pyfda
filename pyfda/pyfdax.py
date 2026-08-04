@@ -60,13 +60,13 @@ def main():
     Since the QApplication object does so much initialization, it must be created
     *before* any other objects related to the user interface are created."
 
-    Environment variables controlling Qt behaviour need to be set even before initializing
-    the QApplication object
+    Environment variables controlling Qt behaviour need to be set even before
+    initializing the QApplication object
 
     Scaling
     -------
-    - DPI: The resolution number of dots per inch in a digital print
-    - PPI: Pixel density of an electronic image device (e.g. computer monitor)
+    - DPI: The resolution number of *Dots Per Inch* in a digital print
+    - PPI: *Pixel Per Inch* of an electronic image device (e.g. computer monitor)
     - Point: 1/72 Inch = 0.3582 mm, physical measure in typography
     - em: Equal to font height. For e.g. a 12 pt font, 1 em = 12 pt
 
@@ -85,17 +85,18 @@ def main():
 
     Windows
     ~~~~~~~
-      A 72-point font is defined to be one logical inch = 96 pixels tall.
-    12 pt = 12/72 = 1/6 logical inch = 96/6 pixels = 16 pixels @ 96 dpi
+        A 72-point font is defined to be one logical inch = 96 pixels tall.
+        12 pt = 12/72 = 1/6 logical inch = 96/6 pixels = 16 pixels @ 96 dpi
 
 
 
-    # Enable automatic scaling based on the monitor's pixel density. This doesn't change the
-    # size of point based fonts!
-    # os.environ["QT_ENABLE_HIGHDPI_SCALING"]   = "1"
+    Enable automatic scaling based on the monitor's pixel density.
+    This doesn't change the size of point based fonts:
+    `os.environ["QT_ENABLE_HIGHDPI_SCALING"]   = "1"`
     # os.environ["QT_AUTO_SCREEN_SCALE_FACTOR"] = "1"  # replaced by QT_ENABLE_HIGHDPI_SCALING
-    # Define global scale factor for the whole application, including point-sized fonts:
-    # os.environ["QT_SCALE_FACTOR"]             = "1"
+
+    Define global scale factor for the whole application, including point-sized fonts:
+    `os.environ["QT_SCALE_FACTOR"] = "1"`
     """
     # Enable High DPI display with PyQt5
     if hasattr(Qt, 'AA_EnableHighDpiScaling'):
