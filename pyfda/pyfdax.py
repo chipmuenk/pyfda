@@ -45,9 +45,11 @@ if dirs.OS.lower() == "windows":
 logger = logging.getLogger(__name__)
 
 # read and parse the config file
-config_file_parser = ConfigFileParser()
-config_file_parser.parse_conf_file()
-config_file_parser.build_widget_tree()
+# config_file_parser =
+print("instantiating CFP")
+# ConfigFileParser()
+# config_file_parser.parse_conf_file()
+# config_file_parser.build_widget_tree()
 
 def main():
     """
@@ -103,6 +105,7 @@ def main():
         Qt.AA_EnableHighDpiScaling = True
     else:
         logger.warning("No Qt attribute 'AA_EnableHighDpiScaling'.")
+
     # Instantiate QApplication object, passing command line arguments
     app = QApplication(sys.argv)
     app.setStyle('Fusion')  # set a platform independent base style
@@ -130,8 +133,8 @@ def main():
 #    ldpix = app.primaryScreen().logicalDotsPerInchX()
 #    ldpiy = app.primaryScreen().logicalDotsPerInchY()
     pdpi = app.primaryScreen().physicalDotsPerInch()
-    pdpix = app.primaryScreen().physicalDotsPerInchX()
-    pdpiy = app.primaryScreen().physicalDotsPerInchY()
+    # pdpix = app.primaryScreen().physicalDotsPerInchX()
+    # pdpiy = app.primaryScreen().physicalDotsPerInchY()
     # scr_size = app.primaryScreen().size()  # pixel resolution, type QSize()
     screen_resolution = app.desktop().screenGeometry()
     avail_geometry = app.desktop().availableGeometry()
@@ -144,12 +147,13 @@ def main():
     # fm = QFontMetrics(font)
     # try to find a good value for matplotlib font size depending on screen resolution
 
-    fontsize = int(round(9.5 * np.sqrt(pdpiy / ref_dpi) * scaling))
+    fontsize = int(round(9.5 * np.sqrt(pdpi / ref_dpi) * scaling))
     # fontsize = round(font.pointSizeF() * 1.5 * ldpi / 96)
 
-    rc.mpl_rc['font.size'] = fontsize
-    rc.params['screen'] = {'ref_dpi': ref_dpi, 'scaling': scaling,
-                           'height': height, 'width': width}
+    # rc.mpl_rc['font.size'] = fontsize
+    rc.params['screen'] = {
+        'ref_dpi': ref_dpi, 'ldpi': ldpi, 'pdpi': pdpi, 'scaling': scaling,
+        'height': height, 'width': width}
     # initialize / construct FilterTreeBuilder class attribute `fil_tree`
     # from config file
     FilterTreeBuilder().build_fil_tree()
@@ -159,8 +163,8 @@ def main():
     logger.info("Starting pyfda with screen resolution %d x %d, avail: %d x %d",
                 width, height, avail_geometry.width(), avail_geometry.height())
     logger.info("with %s and matplotlib fontsize %d.", style, fontsize)
-    logger.info("lDPI = %.2f, pDPI = %.2f (%.2f x %.2f), pix.ratio = %f",
-                ldpi, pdpi, pdpix, pdpiy, pixel_ratio)
+    logger.info("lDPI = %.2f, pDPI = %.2f, pix.ratio = %f",
+                ldpi, pdpi, pixel_ratio)
 
     # Available signals:
     # - logicalDotsPerInchChanged(qreal dpi)
