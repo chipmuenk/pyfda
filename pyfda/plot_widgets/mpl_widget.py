@@ -135,7 +135,8 @@ class MplWidget(QWidget):
         # Construct the canvas with the figure:
         self.plt_lim = []  # define variable for x,y plot limits
 
-        self.fig = Figure(constrained_layout=True)
+        self.fig = Figure(constrained_layout=True,
+                          dpi=pyfda_rc.params['screen']['ldpi'])
 
         self.canvas = FigureCanvas(self.fig)
         self.canvas.setSizePolicy(QSizePolicy.Expanding,

@@ -45,9 +45,11 @@ if dirs.OS.lower() == "windows":
 logger = logging.getLogger(__name__)
 
 # read and parse the config file
-config_file_parser = ConfigFileParser()
-config_file_parser.parse_conf_file()
-config_file_parser.build_widget_tree()
+# config_file_parser =
+print("instantiating CFP")
+# ConfigFileParser()
+# config_file_parser.parse_conf_file()
+# config_file_parser.build_widget_tree()
 
 def main():
     """
@@ -60,13 +62,13 @@ def main():
     Since the QApplication object does so much initialization, it must be created
     *before* any other objects related to the user interface are created."
 
-    Environment variables controlling Qt behaviour need to be set even before initializing
-    the QApplication object
+    Environment variables controlling Qt behaviour need to be set even before
+    initializing the QApplication object
 
     Scaling
     -------
-    - DPI: The resolution number of dots per inch in a digital print
-    - PPI: Pixel density of an electronic image device (e.g. computer monitor)
+    - DPI: The resolution number of *Dots Per Inch* in a digital print
+    - PPI: *Pixel Per Inch* of an electronic image device (e.g. computer monitor)
     - Point: 1/72 Inch = 0.3582 mm, physical measure in typography
     - em: Equal to font height. For e.g. a 12 pt font, 1 em = 12 pt
 
@@ -85,23 +87,25 @@ def main():
 
     Windows
     ~~~~~~~
-      A 72-point font is defined to be one logical inch = 96 pixels tall.
-    12 pt = 12/72 = 1/6 logical inch = 96/6 pixels = 16 pixels @ 96 dpi
+        A 72-point font is defined to be one logical inch = 96 pixels tall.
+        12 pt = 12/72 = 1/6 logical inch = 96/6 pixels = 16 pixels @ 96 dpi
 
 
 
-    # Enable automatic scaling based on the monitor's pixel density. This doesn't change the
-    # size of point based fonts!
-    # os.environ["QT_ENABLE_HIGHDPI_SCALING"]   = "1"
+    Enable automatic scaling based on the monitor's pixel density.
+    This doesn't change the size of point based fonts:
+    `os.environ["QT_ENABLE_HIGHDPI_SCALING"]   = "1"`
     # os.environ["QT_AUTO_SCREEN_SCALE_FACTOR"] = "1"  # replaced by QT_ENABLE_HIGHDPI_SCALING
-    # Define global scale factor for the whole application, including point-sized fonts:
-    # os.environ["QT_SCALE_FACTOR"]             = "1"
+
+    Define global scale factor for the whole application, including point-sized fonts:
+    `os.environ["QT_SCALE_FACTOR"] = "1"`
     """
     # Enable High DPI display with PyQt5
     if hasattr(Qt, 'AA_EnableHighDpiScaling'):
         Qt.AA_EnableHighDpiScaling = True
     else:
         logger.warning("No Qt attribute 'AA_EnableHighDpiScaling'.")
+
     # Instantiate QApplication object, passing command line arguments
     app = QApplication(sys.argv)
     app.setStyle('Fusion')  # set a platform independent base style
@@ -129,8 +133,8 @@ def main():
 #    ldpix = app.primaryScreen().logicalDotsPerInchX()
 #    ldpiy = app.primaryScreen().logicalDotsPerInchY()
     pdpi = app.primaryScreen().physicalDotsPerInch()
-    pdpix = app.primaryScreen().physicalDotsPerInchX()
-    pdpiy = app.primaryScreen().physicalDotsPerInchY()
+    # pdpix = app.primaryScreen().physicalDotsPerInchX()
+    # pdpiy = app.primaryScreen().physicalDotsPerInchY()
     # scr_size = app.primaryScreen().size()  # pixel resolution, type QSize()
     screen_resolution = app.desktop().screenGeometry()
     avail_geometry = app.desktop().availableGeometry()
@@ -143,12 +147,13 @@ def main():
     # fm = QFontMetrics(font)
     # try to find a good value for matplotlib font size depending on screen resolution
 
-    fontsize = int(round(9.5 * np.sqrt(pdpiy / ref_dpi) * scaling))
+    fontsize = int(round(9.5 * np.sqrt(pdpi / ref_dpi) * scaling))
     # fontsize = round(font.pointSizeF() * 1.5 * ldpi / 96)
 
-    rc.mpl_rc['font.size'] = fontsize
-    rc.params['screen'] = {'ref_dpi': ref_dpi, 'scaling': scaling,
-                           'height': height, 'width': width}
+    # rc.mpl_rc['font.size'] = fontsize
+    rc.params['screen'] = {
+        'ref_dpi': ref_dpi, 'ldpi': ldpi, 'pdpi': pdpi, 'scaling': scaling,
+        'height': height, 'width': width}
     # initialize / construct FilterTreeBuilder class attribute `fil_tree`
     # from config file
     FilterTreeBuilder().build_fil_tree()
@@ -158,8 +163,8 @@ def main():
     logger.info("Starting pyfda with screen resolution %d x %d, avail: %d x %d",
                 width, height, avail_geometry.width(), avail_geometry.height())
     logger.info("with %s and matplotlib fontsize %d.", style, fontsize)
-    logger.info("lDPI = %.2f, pDPI = %.2f (%.2f x %.2f), pix.ratio = %f",
-                ldpi, pdpi, pdpix, pdpiy, pixel_ratio)
+    logger.info("lDPI = %.2f, pDPI = %.2f, pix.ratio = %f",
+                ldpi, pdpi, pixel_ratio)
 
     # Available signals:
     # - logicalDotsPerInchChanged(qreal dpi)

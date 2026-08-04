@@ -601,7 +601,7 @@ class ConfigFileParser():
 
 # ==============================================================================
 if __name__ == "__main__":
-    # Run widget standalone with `python -m pyfda.libs.config_file_parser`
+    # Run widget standalone with `python -m pyfda.config_file_parser`
     # The test information is taken from the dicts in filterbroker.py
     #
     logging.basicConfig(level=logging.INFO)
