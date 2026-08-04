@@ -31,7 +31,7 @@ logger = logging.getLogger(__name__)
 # #############################################################################
 
 MPL_MS = 8  # base size for matplotlib markers
-FONT_SIZE_WIDGETS = 13
+FONT_SIZE_WIDGETS = 13 # base size for *all* fonts (Qt and matplotlib)
 FONT_SIZE_BASE = str(FONT_SIZE_WIDGETS) + "pt"  # base font size of widgets in pt
 FONT_SIZE_MEDIUM = str(FONT_SIZE_WIDGETS * 1.1) + "pt"
 FONT_SIZE_LARGE = str(FONT_SIZE_WIDGETS * 1.2) + "pt"
@@ -123,7 +123,7 @@ mpl_rc = {'lines.linewidth'           : 1.5,
           'mathtext.fontset'          : 'stixsans',  # 'stix',
           'mathtext.default'          : 'it',
           'mathtext.fallback'         : 'cm',
-          'font.size'                 : FONT_SIZE_MPL, # TODO: set this depending on resolution
+          'font.size'                 : FONT_SIZE_MPL,
           'legend.fontsize'           : 'medium',
           'axes.labelsize'            : 'medium',
           'axes.titlesize'            : 'large',
@@ -163,8 +163,8 @@ mpl_rc_dark = {
 mpl_rc_light = {
             'axes.facecolor'    : 'white',
             'axes.labelcolor'   : 'black',
-            'axes.edgecolor'    : 'black',
-            'figure.facecolor'  : 'D0D0D0',
+            'axes.edgecolor'    : 'black',  # figure edge
+            'figure.facecolor'  : '#D0D0D0', # canvas background
             'figure.edgecolor'  : '#808080',
             'savefig.facecolor' : 'white',
             'savefig.edgecolor' : 'white',
@@ -231,10 +231,15 @@ QSS_DARK = """
     QTabWidget {background-color: #303030;} /* Background for tabs except input tabs */
     /* background for input tabs, here QTabWidget is encompassed by QScrollArea */
     QScrollArea{color:white; background-color:#303030;}
-    QTabWidget::pane{background-color: #707070;} /* background of tab widget content */
-    /* NavigationToolbar needs to have the same color as above */
+
+    /* background of tab widget content */
+    QTabWidget::pane{background-color: #707070;}
+    /* Background of Tabs, normally defined by pane */
+    /* QTabBar {background-color: pink;} */
+
+    /* NavigationToolbar needs to have the same color as pane */
     NavigationToolbar2QT{background-color:#707070;}
-    /* QTabBar {background-color: pink;} */ /* background of Tabs, normally defined by pane */
+    NavigationToolbar2QT::separator{background-color: white;}
 
     QTextEdit{background-color: #505050;}
     QLineEdit{background-color: #505050; border-color: #A0A0A0;}
@@ -320,9 +325,13 @@ QSS_LIGHT = """
     /* background for input tabs, here QTabWidget is encompassed by QScrollArea */
     QScrollArea{color:black; background-color:#F0F0F0;} /* background of input tabs */
     QTabWidget::pane{background-color: #E0E0E0;} /* background of tab widget content */
-    /* NavigationToolbar needs to have the same color as above */
-    NavigationToolbar2QT{background-color:#E0E0E0;}
-    /* QTabBar {background-color: pink;} */ /* background of Tabs, normally defined by pane */
+
+    /* NavigationToolbar needs to have the same color as pane */
+    NavigationToolbar2QT{background-color: #E0E0E0;}
+    NavigationToolbar2QT::separator{background-color: black;}
+
+    /* background of Tabs, normally defined by pane */
+    /* QTabBar {background-color: pink;} */
 
     QTextEdit{background-color: #F0F0F0;}
     QLineEdit{background-color: white; border-color: #303030;}
@@ -434,6 +443,10 @@ QSS_COMMON = """
         margin: 0;
         }
     */
+    /* Toolbar for Matplotlib canvas */
+    /* separator height / width is for horizontal / vertical toolbars */
+    NavigationToolbar2QT::separator{width: 1px; height: 1px;
+            margin-left: 6px; margin-right: 6px;}
 
     QWidget#transparent{background-color:none}
 
