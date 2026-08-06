@@ -21,6 +21,7 @@ import pyfda.libs.pyfda_dirs as dirs # initial import constructs file paths
 from pyfda.tree_builder import FilterTreeBuilder
 from pyfda.config_file_parser import ConfigFileParser as CFP
 import pyfda.pyfda_rc as rc
+from pyfda.pyfda_rc import QSS
 
 from pyfda.pyfda_class import pyFDA
 
@@ -46,6 +47,11 @@ logger = logging.getLogger(__name__)
 # read and parse the config file
 cfp = CFP()
 cfp.parse_conf_file()
+
+# apply QSS and matplotlib styling
+qss = QSS()
+qss.set_qss()
+
 
 def main():
     """
@@ -105,15 +111,15 @@ def main():
     # Instantiate QApplication object, passing command line arguments
     app = QApplication(sys.argv)
     app.setStyle('Fusion')  # set a platform independent base style
-    if len(rc.QSS_RC) > 20:
-        app.setStyleSheet(rc.QSS_RC) # this is a proper style sheet
+    if len(QSS.QSS_RC) > 20:
+        app.setStyleSheet(QSS.QSS_RC) # this is a proper style sheet
         style = "'pyfda' style sheet"
     else:
-        qstyle = QApplication.setStyle(rc.QSS_RC) # this is just a name for a system stylesheet
+        qstyle = QApplication.setStyle(QSS.QSS_RC) # this is just a name for a system stylesheet
         if qstyle:
-            style = f"system style sheet '{rc.QSS_RC}'"
+            style = f"system style sheet '{QSS.QSS_RC}'"
         else:
-            style = f"default style sheet ('{rc.QSS_RC}' not found)"
+            style = f"default style sheet ('{QSS.QSS_RC}' not found)"
 
     if dirs.OS.lower() == "darwin":  # Mac OS
         ref_dpi = 72
@@ -158,9 +164,10 @@ def main():
     logger.info("Logging to '%s'", dirs.LOG_DIR_FILE)
     logger.info("Starting pyfda with screen resolution %d x %d, avail: %d x %d",
                 width, height, avail_geometry.width(), avail_geometry.height())
-    logger.info("with %s and matplotlib fontsize %d.", style, fontsize)
+    logger.info("with %s (%s) and matplotlib fontsize %d.", style, CFP.conf_settings['THEME'], fontsize)
     logger.info("lDPI = %.2f, pDPI = %.2f, pix.ratio = %f",
                 ldpi, pdpi, pixel_ratio)
+    # logger.info(rc.QSS_RC)
 
     # Available signals:
     # - logicalDotsPerInchChanged(qreal dpi)
