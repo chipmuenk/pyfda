@@ -24,8 +24,7 @@ import pyfda.pyfda_rc as rc
 
 from pyfda.pyfda_class import pyFDA
 
-# specify matplotlib backend for systems that have both PyQt4 and PyQt5 installed
-# to avoid
+# specify matplotlib backend for systems that have both PyQt4 and PyQt5 installed to avoid
 # "RuntimeError: the PyQt4.QtCore and PyQt5.QtCore modules both wrap the QObject class"
 matplotlib.use("Qt5Agg")
 # turn off matplotlib debug messages by elevating the level to "Warning"

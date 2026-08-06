@@ -143,7 +143,7 @@ class ConfigFileParser():
             `dirs.USER_DIRS` and `sys.path`
 
         :[Config Settings]
-            Store settings in class attribute `ConfigFileParser.conf_settings`
+            Store settings in class variable `ConfigFileParser.conf_settings`
 
         The other sections are processed in :func:`build_widget_tree()`.
 

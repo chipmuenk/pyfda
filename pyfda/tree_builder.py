@@ -128,13 +128,14 @@ class ParseError(Exception):
 
 class FilterTreeBuilder():
     """
-    Read the config file and construct the fil_tree dictionary as a class attribute with
+    Read the config file and construct the `fil_tree` dictionary as a class attribute with
 
     - all filter combinations
     - valid combinations of filter widgets and fixpoint implementations
     """
     # --------------------------------------------------------------------------
-    # Filter tree dict as a class attribute:
+    # Filter tree dict as a class variable: Assigning this in an instance
+    # shadows the class variable!
     # Example for dict with available combinations of response types (rt),
     # filter types (ft), filter class (fc) and filter order (fo).
     # This default dictionary is overwritten and frozen during initialization.
