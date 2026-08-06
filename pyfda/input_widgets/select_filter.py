@@ -133,10 +133,10 @@ class SelectFilter(QWidget):
         # correspondence is defined in pyfda_rc.py) and populate rt combo box
         for rt in rt_list:
             try:
-                self.cmb_response_type.addItem(rc.rt_names[rt], rt)
+                self.cmb_response_type.addItem(rc.RT_NAMES[rt], rt)
             except KeyError as e:
                 logger.warning(
-                  "KeyError: %s has no corresponding full name in rc.rt_names:\n%s", rt, e)
+                  "KeyError: %s has no corresponding full name in rc.RT_NAMES:\n%s", rt, e)
         idx = self.cmb_response_type.findData('LP')  # find index for 'LP'
 
         if idx == -1:  # Key 'LP' does not exist, use first entry instead
@@ -147,7 +147,7 @@ class SelectFilter(QWidget):
 
         # next, populate the filter type combo (IIr, FIR)
         for ft in FTB.fil_tree[rt]:
-            self.cmb_filter_type.addItem(rc.ft_names[ft], ft)
+            self.cmb_filter_type.addItem(rc.FT_NAMES[ft], ft)
         self.cmb_filter_type.setCurrentIndex(0)  # set initial index
         ft = qget_cmb_box(self.cmb_filter_type)
 
@@ -274,7 +274,7 @@ class SelectFilter(QWidget):
         self.cmb_filter_type.blockSignals(True)  # don't fire when changed programmatically
         self.cmb_filter_type.clear()
         for ft in FTB.fil_tree[self.rt]:
-            self.cmb_filter_type.addItem(rc.ft_names[ft], ft)
+            self.cmb_filter_type.addItem(rc.FT_NAMES[ft], ft)
 
         # Is current filter type (e.g. IIR) in list for new rt?
         if fb_get('ft') in ft_list:
