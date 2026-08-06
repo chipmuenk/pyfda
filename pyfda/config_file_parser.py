@@ -244,20 +244,19 @@ class ConfigFileParser():
             # ------------------------------------------------------------------
             # Parsing [Config Settings]
             # ------------------------------------------------------------------
-            conf_settings = self._parse_conf_section("Config Settings")
+            _conf_settings = self._parse_conf_section("Config Settings")
             i = 0
-            if conf_settings:
-                # logger.info(conf_settings)
-                for k in conf_settings:
-                    if k in ConfigFileParser.conf_settings:
-                        # TODO: why are the values lists?
+            if _conf_settings:
+                # logger.info(_conf_settings)
+                for k in _conf_settings:
+                    if k in ConfigFileParser.conf_settings:  # check if key exists
                         try:
                             # try to convert to a numeric type
                             ConfigFileParser.conf_settings[k]\
-                                = ast.literal_eval(conf_settings[k][0])
+                                = ast.literal_eval(_conf_settings[k][0])
                         except ValueError:
                             # unsuccessful, store entry as string
-                            ConfigFileParser.conf_settings[k] = conf_settings[k][0]
+                            ConfigFileParser.conf_settings[k] = _conf_settings[k][0]
                         i += 1
                     else:
                         logger.warning(
@@ -279,8 +278,10 @@ class ConfigFileParser():
             logger.critical('%s in config file "%s".', e, dirs.USER_CONF_DIR_FILE)
             sys.exit()
 
+        self._build_widget_tree()
+
     # --------------------------------------------------------------------------
-    def build_widget_tree(self) -> None:
+    def _build_widget_tree(self) -> None:
         """
         This is only called once during the start from `pyfdax.py`.
 
@@ -606,10 +607,9 @@ if __name__ == "__main__":
     #
     logging.basicConfig(level=logging.INFO)
     from pyfda.libs.pyfda_lib import pprint_log
-    cfp = ConfigFileParser()
 
+    cfp = ConfigFileParser()
     cfp.parse_conf_file()
-    cfp.build_widget_tree()  # needs a working config file
 
     print('\nINPUT_CLASSES_DICT =\n', pprint_log(ConfigFileParser().INPUT_CLASSES_DICT))
     print('\nfPLOT_CLASSES_DICT =\n', pprint_log(ConfigFileParser().PLOT_CLASSES_DICT))

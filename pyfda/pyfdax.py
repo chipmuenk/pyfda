@@ -19,7 +19,7 @@ from pyfda.libs.compat import Qt, QApplication, QIcon
 # from pyfda.libs.pyfda_lib import ANSIcolors as ACol
 import pyfda.libs.pyfda_dirs as dirs # initial import constructs file paths
 from pyfda.tree_builder import FilterTreeBuilder
-from pyfda.config_file_parser import ConfigFileParser
+from pyfda.config_file_parser import ConfigFileParser as CFP
 import pyfda.pyfda_rc as rc
 
 from pyfda.pyfda_class import pyFDA
@@ -44,11 +44,8 @@ if dirs.OS.lower() == "windows":
 logger = logging.getLogger(__name__)
 
 # read and parse the config file
-# config_file_parser =
-print("instantiating CFP")
-# ConfigFileParser()
-# config_file_parser.parse_conf_file()
-# config_file_parser.build_widget_tree()
+cfp = CFP()
+cfp.parse_conf_file()
 
 def main():
     """
