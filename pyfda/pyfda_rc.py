@@ -7,14 +7,11 @@
 # (see file LICENSE in root directory for details)
 
 """
-This file contains layout definitions for Qt and matplotlib widgets
-A dark and a light theme can be selected via a constant but this more a demonstration
-on how to set things than a finished layout yet.
+This file defines the style for Qt and matplotlib widgets.
+A dark and a light theme can be selected via the `pyfda.conf` config file.
 
-Default parameters, paths etc. are also defined at the end of the file.
+Default parameters, paths etc. are defined in the params dict.
 
-Importing pyfda_rc runs the module once, defining all module variables
-which are global (similar to class variables).
 """
 import logging
 
@@ -107,9 +104,6 @@ rt_names = {"LP": "Lowpass", "HP": "Highpass", "BP": "Bandpass",
 # Dictionary with translations between short method names and long names for
 # response types
 ft_names = {"IIR": "IIR", "FIR": "FIR"}
-
-# Dictionary dm_names is created dynamically by FilterTreeBuilder and stored
-# in filterbroker.py
 
 # #############################################################################
 # Matplotlib layout settings
