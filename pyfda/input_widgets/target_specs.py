@@ -14,7 +14,7 @@ import sys
 import logging
 
 from pyfda.filterbroker import fb_get
-from pyfda.tree_builder import FilterTreeBuilder as FTB
+from pyfda.filter_tree_builder import FilterTreeBuilder as FTB
 from pyfda.libs.compat import (
     QWidget, QLabel, QFont, QFrame, pyqtSignal, Qt, QHBoxLayout, QVBoxLayout)
 from pyfda.libs.pyfda_lib import first_item

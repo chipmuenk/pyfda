@@ -21,7 +21,7 @@ import scipy.signal as sig
 from pyfda.config_file_parser import ConfigFileParser as CFP
 from pyfda.filterbroker import fb_get
 import pyfda.filter_factory as ff
-from pyfda.tree_builder import FilterTreeBuilder as FTB
+from pyfda.filter_tree_builder import FilterTreeBuilder as FTB
 from pyfda.input_widgets.input_info_about import AboutWindow
 from pyfda.libs.compat import (
     QtGui, QWidget, QFont, QFrame, QLabel, QTableWidget, QTableWidgetItem,

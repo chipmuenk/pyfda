@@ -21,7 +21,7 @@ from pyfda.libs.compat import (
 
 from pyfda.filterbroker import fb_get, fb_set
 from pyfda.filter_factory import create_fil_inst, get_fil_inst
-from pyfda.tree_builder import FilterTreeBuilder as FTB
+from pyfda.filter_tree_builder import FilterTreeBuilder as FTB
 from pyfda.config_file_parser import ConfigFileParser as CFP
 from pyfda.libs.pyfda_lib import safe_eval
 from pyfda.libs.pyfda_qt_lib import qget_cmb_box, emit

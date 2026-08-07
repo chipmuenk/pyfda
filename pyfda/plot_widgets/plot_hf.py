@@ -25,7 +25,7 @@ from pyfda.libs.compat import (QCheckBox, QWidget, QComboBox, QLabel, QLineEdit,
                                QFrame, QHBoxLayout, QGridLayout, pyqtSignal,
                                QPushButton)
 from pyfda.config_file_parser import ConfigFileParser as CFP
-from pyfda.tree_builder import FilterTreeBuilder as FTB
+from pyfda.filter_tree_builder import FilterTreeBuilder as FTB
 from pyfda.filterbroker import fb_get
 from pyfda.pyfda_rc import params
 from pyfda.plot_widgets.mpl_widget import MplWidget

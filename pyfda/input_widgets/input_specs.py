@@ -23,7 +23,7 @@ import numpy as np
 import pyfda.filterbroker as fb
 from pyfda.filterbroker import fb_get, fb_set, backup_fil, restore_fil
 from pyfda.filter_factory import call_fil_method
-from pyfda.tree_builder import FilterTreeBuilder as FTB
+from pyfda.filter_tree_builder import FilterTreeBuilder as FTB
 from pyfda.input_widgets import (
     select_filter, amplitude_specs, freq_specs, freq_units, weight_specs, target_specs)
 from pyfda.libs.compat import (
