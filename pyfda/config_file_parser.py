@@ -278,18 +278,13 @@ class ConfigFileParser():
             logger.critical('%s in config file "%s".', e, dirs.USER_CONF_DIR_FILE)
             sys.exit()
 
-        self._build_widget_tree()
-
     # --------------------------------------------------------------------------
-    def _build_widget_tree(self) -> None:
+    def build_widget_tree(self) -> None:
         """
-        This is only called once during the start from `pyfdax.py`.
-
-        This part needs a running application as Qt widgets are instantiated to ensure
-        they exist and run without error.
-
-        The following sections are processed here, creating dicts with
-        widget class names as keys and dictionaries with options as values.
+        This is only called once during the start from `pyfdax.py`. QSS and matplotlib
+        settings must have been set _before_ `build_widget_tree()` has been called as
+        all Qt widgets are instantiated here to ensure they exist and run without error.
+        Due to this, a running QApplication is needed for this as well.
 
         This is performed using :func:`_build_widget_class_dict()` which calls
         :func:`_parse_conf_section()`:
@@ -302,7 +297,8 @@ class ConfigFileParser():
 
         - Information for each  section is stored in dicts like `FILTER_CLASSES_DICT`.
 
-        The following sections are processed here:
+        The following sections are processed here, creating dicts with
+        widget class names as keys and dictionaries with options as values.
 
         :[Input Widgets]:
             Store (user) input widget classes in `INPUT_CLASSES_DICT`
@@ -610,6 +606,7 @@ if __name__ == "__main__":
 
     cfp = ConfigFileParser()
     cfp.parse_conf_file()
+    cfp.build_widget_tree()
 
     print('\nINPUT_CLASSES_DICT =\n', pprint_log(ConfigFileParser().INPUT_CLASSES_DICT))
     print('\nfPLOT_CLASSES_DICT =\n', pprint_log(ConfigFileParser().PLOT_CLASSES_DICT))

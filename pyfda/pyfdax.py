@@ -52,6 +52,8 @@ cfp.parse_conf_file()
 qss = QSS()
 qss.set_qss()
 
+cfp.build_widget_tree()
+
 
 def main():
     """
