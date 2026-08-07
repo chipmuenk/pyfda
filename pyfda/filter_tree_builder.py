@@ -140,6 +140,17 @@ class FilterTreeBuilder():
     # filter types (ft), filter class (fc) and filter order (fo).
     # This default dictionary is overwritten and frozen during initialization.
 
+    # Dictionary with translations between short method names and long names for
+    # response types - the long name can be changed as you like, but don't change
+    # the short name - it is used to construct the filter design method names
+    RT_NAMES = {"LP": "Lowpass", "HP": "Highpass", "BP": "Bandpass",
+                "BS": "Bandstop", "AP": "Allpass", "MB": "Multiband",
+                "HIL": "Hilbert", "DIFF": "Differentiator"}
+
+    # Dictionary with translations between short method names and long names for
+    # response types
+    FT_NAMES = {"IIR": "IIR", "FIR": "FIR"}
+
     fil_tree: ClassVar[dict[str, object]] =\
         {
         'LP': {
