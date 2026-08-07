@@ -37,7 +37,7 @@ from pyfda import qrc_resources  # noqa: F401 # pylint: disable=unused-import
 logger = logging.getLogger(__name__)
 
 # read user settings for linewidth, font size etc. and apply them to matplotlib
-for key, value in pyfda_rc.mpl_rc.items():
+for key, value in pyfda_rc.QSS.mpl_rc.items():
     rcParams[key] = value
 
 # ------------------------------------------------------------------------------

@@ -109,8 +109,44 @@ FT_NAMES = {"IIR": "IIR", "FIR": "FIR"}
 # Matplotlib layout settings
 # #############################################################################
 
+# dark theme for matplotlib widgets
+MPL_RC_DARK = {
+            'axes.facecolor'    : 'black',
+            'axes.labelcolor'   : 'white',
+            'axes.edgecolor'    : 'white',
+            'figure.facecolor'  : '#303030',
+            'figure.edgecolor'  : '#808080',
+            'savefig.facecolor' : 'black',
+            'savefig.edgecolor' : 'black',
+            'xtick.color'       : 'white',
+            'ytick.color'       : 'white',
+            'text.color'        : 'white',
+            'grid.color'        : '#CCCCCC',
+            'axes.prop_cycle'   : cycler('color', ['r', 'g', 'c', 'm', 'y', 'w'])
+            }
+
+# light theme for matplotlib widgets
+MPL_RC_LIGHT = {
+            'axes.facecolor'    : 'white',
+            'axes.labelcolor'   : 'black',
+            'axes.edgecolor'    : 'black',  # figure edge
+            'figure.facecolor'  : '#D0D0D0', # canvas background
+            'figure.edgecolor'  : '#808080',
+            'savefig.facecolor' : 'white',
+            'savefig.edgecolor' : 'white',
+            'xtick.color'       : 'black',
+            'ytick.color'       : 'black',
+            'text.color'        : 'black',
+            'grid.color'        : '#202020',
+            'axes.prop_cycle'   : cycler('color', ['r', 'b', 'c', 'm', 'k'])
+            }
+
+
+class QSS():
+
 # common matplotlib widget settings
-mpl_rc = {'lines.linewidth'           : 1.5,
+    mpl_rc =\
+        { 'lines.linewidth'           : 1.5,
           'lines.markersize'          : MPL_MS,         # markersize, in points
           'font.family'               : 'sans-serif',  # 'serif',
           'font.style'                : 'normal',
@@ -135,70 +171,9 @@ mpl_rc = {'lines.linewidth'           : 1.5,
           'figure.dpi'                : 100,
           'hatch.color'               : '#808080',
           'hatch.linewidth'           : 0.5
-          }
+        }
 
-# dark theme for matplotlib widgets
-mpl_rc_dark = {
-            'axes.facecolor'    : 'black',
-            'axes.labelcolor'   : 'white',
-            'axes.edgecolor'    : 'white',
-            'figure.facecolor'  : '#303030',
-            'figure.edgecolor'  : '#808080',
-            'savefig.facecolor' : 'black',
-            'savefig.edgecolor' : 'black',
-            'xtick.color'       : 'white',
-            'ytick.color'       : 'white',
-            'text.color'        : 'white',
-            'grid.color'        : '#CCCCCC',
-            'axes.prop_cycle'   : cycler('color', ['r', 'g', 'c', 'm', 'y', 'w'])
-            }
 
-# light theme for matplotlib widgets
-mpl_rc_light = {
-            'axes.facecolor'    : 'white',
-            'axes.labelcolor'   : 'black',
-            'axes.edgecolor'    : 'black',  # figure edge
-            'figure.facecolor'  : '#D0D0D0', # canvas background
-            'figure.edgecolor'  : '#808080',
-            'savefig.facecolor' : 'white',
-            'savefig.edgecolor' : 'white',
-            'xtick.color'       : 'black',
-            'ytick.color'       : 'black',
-            'text.color'        : 'black',
-            'grid.color'        : '#202020',
-            'axes.prop_cycle'   : cycler('color', ['r', 'b', 'c', 'm', 'k'])
-            }
-
-# --------------------- Matplotlib Fonts --------------------------------------
-afm_fonts = sorted({f.name for f in matplotlib.font_manager.fontManager.afmlist})
-ttf_fonts = sorted({f.name for f in matplotlib.font_manager.fontManager.ttflist})
-
-if 'DejaVu Sans' in ttf_fonts:
-    logger.info("Using 'DejaVu Sans' font.")
-    mpl_rc.update({
-                   'mathtext.fontset': 'custom',
-                   'mathtext.rm': 'DejaVu Sans',
-                   'mathtext.it': 'DejaVu Sans:italic',
-                   'mathtext.bf': 'DejaVu Sans:bold'
-                  })
-elif 'Bitstream Vera Sans' in ttf_fonts:
-    logger.info("Using 'Bitstream Vera Sans' font.")
-    mpl_rc.update({
-                   'mathtext.fontset': 'custom',
-                   'mathtext.rm': 'Bitstream Vera Sans',
-                   'mathtext.it': 'Bitstream Vera Sans:italic',
-                   'mathtext.bf': 'Bitstream Vera Sans:bold'
-                  })
-else:
-    logger.info("Found neither 'DejaVu Sans' nor 'Bitstream Vera Sans' font, "
-                "falling back to 'sans-serif' and 'stix-sans'.")
-# else: use sans-serif and stix-sans
-
-# set all text to Stix font
-# matplotlib.rcParams['mathtext.fontset'] = 'stixsans'
-# matplotlib.rcParams['font.family'] = 'STIXGeneral'
-
-class QSS():
     # #############################################################################
     # QWidget style sheets (QSS)
     # #############################################################################
@@ -641,28 +616,63 @@ class QSS():
 
     def set_qss(self):
         """
-        Collate QSS string from common settings, special settings for the tab bar and a 
+        Collate QSS string from common settings, special settings for the tab bar and a
         color scheme that depends on the theme selected in `pyfda.conf`.
         """
         QSS.THEME = CFP.conf_settings['THEME']
         if QSS.THEME == 'dark':
-            mpl_rc.update(mpl_rc_dark)
+            QSS.mpl_rc.update(MPL_RC_DARK)
             params.update(MPL_PARAMS_DARK)
             params['link_color'] = 'lightblue'
             QSS.QSS_RC = '\n/* Dark QSS Mode */\n' + QSS._COMMON + QSS._TAB_BAR + QSS._DARK
 
         elif QSS.THEME == 'light':
-            mpl_rc.update(mpl_rc_light)
+            QSS.mpl_rc.update(MPL_RC_LIGHT)
             params.update(MPL_PARAMS_LIGHT)
             params['link_color'] = 'blue'
             QSS.QSS_RC = '\n/* Light QSS Mode */\n' + QSS._COMMON + QSS._TAB_BAR + QSS._LIGHT
 
         elif QSS.THEME == 'none':
-            mpl_rc.update(mpl_rc_light)
+            QSS.mpl_rc.update(MPL_RC_LIGHT)
             params.update(MPL_PARAMS_LIGHT)
             QSS.QSS_RC = '\n/* Default QSS Mode */\n' + QSS._COMMON
 
         else:  # use the THEME name as the QStyle name
-            mpl_rc.update(mpl_rc_light)
+            QSS.mpl_rc.update(MPL_RC_LIGHT)
             params.update(MPL_PARAMS_LIGHT)
             QSS.QSS_RC = QSS.THEME
+
+        # --------------------- Matplotlib Fonts --------------------------------------
+        afm_fonts = sorted({f.name for f in matplotlib.font_manager.fontManager.afmlist})
+        ttf_fonts = sorted({f.name for f in matplotlib.font_manager.fontManager.ttflist})
+
+        if 'DejaVu Sans' in ttf_fonts:
+            logger.info("Using 'DejaVu Sans' font.")
+            QSS.mpl_rc.update({
+                        'mathtext.fontset': 'custom',
+                        'mathtext.rm': 'DejaVu Sans',
+                        'mathtext.it': 'DejaVu Sans:italic',
+                        'mathtext.bf': 'DejaVu Sans:bold'
+                        })
+        elif 'Bitstream Vera Sans' in ttf_fonts:
+            logger.info("Using 'Bitstream Vera Sans' font.")
+            QSS.mpl_rc.update({
+                        'mathtext.fontset': 'custom',
+                        'mathtext.rm': 'Bitstream Vera Sans',
+                        'mathtext.it': 'Bitstream Vera Sans:italic',
+                        'mathtext.bf': 'Bitstream Vera Sans:bold'
+                        })
+        else:
+            logger.info("Found neither 'DejaVu Sans' nor 'Bitstream Vera Sans' font, "
+                        "falling back to 'sans-serif' and 'stix-sans'.")
+        # else: use sans-serif and stix-sans
+
+        # set all text to Stix font
+        # matplotlib.rcParams['mathtext.fontset'] = 'stixsans'
+        # matplotlib.rcParams['font.family'] = 'STIXGeneral'
+
+    def set_mpl_style(self):
+        """
+        Collate QSS string from common settings, special settings for the tab bar and a
+        color scheme that depends on the theme selected in `pyfda.conf`.
+        """
