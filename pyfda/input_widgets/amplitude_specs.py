@@ -339,10 +339,10 @@ class AmplitudeSpecs(QWidget):
 if __name__ == '__main__':
     # Run widget standalone with `python -m pyfda.input_widgets.amplitude_specs`
     from pyfda.libs.compat import QApplication
-    from pyfda import pyfda_rc as rc
+    from pyfda.pyfda_rc import QSS
 
     app = QApplication(sys.argv)
-    app.setStyleSheet(rc.QSS_RC)
+    app.setStyleSheet(QSS.QSS_RC)
     mainw = AmplitudeSpecs()
     mainw.update_ui(new_labels=['a', 'A_SB', 'A_SB2', 'A_PB', 'A_PB2'])
     mainw.update_ui(new_labels=['u', 'A_PB', 'A_SB'])

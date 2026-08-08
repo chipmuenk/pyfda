@@ -516,9 +516,10 @@ class SelectFilter(QWidget):
 if __name__ == '__main__':
     # Run widget standalone with `python -m pyfda.input_widgets.select_filter`
     from pyfda.libs.compat import QApplication
+    from pyfda.pyfda_rc import QSS
 
     app = QApplication(sys.argv)
-    app.setStyleSheet(rc.QSS_RC)
+    app.setStyleSheet(QSS.QSS_RC)
     mainw = SelectFilter()
     app.setActiveWindow(mainw)
     mainw.show()
