@@ -11,6 +11,7 @@ Mainwindow for the pyFDA app
 """
 import logging
 import sys
+import os
 
 import numpy as np
 import matplotlib
@@ -109,6 +110,9 @@ def main():
         Qt.AA_EnableHighDpiScaling = True
     else:
         logger.warning("No Qt attribute 'AA_EnableHighDpiScaling'.")
+
+    os.environ["QT_ENABLE_HIGHDPI_SCALING"]   = "1"
+
 
     # Instantiate QApplication object, passing command line arguments
     app = QApplication(sys.argv)
