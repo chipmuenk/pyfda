@@ -766,7 +766,7 @@ class Fixed():
         elif self.q_dict['quant'] == 'round':
             yq = np.round(y)  # rounding, also = binary rounding
         elif self.q_dict['quant'] == 'fix':
-            yq = np.fix(y)  # round to nearest integer towards zero ("Betragsschneiden")
+            yq = np.trunc(y)  # round to nearest integer towards zero ("Betragsschneiden")
         elif self.q_dict['quant'] == 'ceil':
             yq = np.ceil(y)  # smallest integer i, such that i >= x
         elif self.q_dict['quant'] == 'rint':
@@ -824,7 +824,7 @@ class Fixed():
             # Replace overflows by two's complement wraparound (wrap)
             elif self.q_dict['ovfl'] == 'wrap':
                 yq = np.where(
-                    over_pos | over_neg, yq - 4. * MSB * np.fix(
+                    over_pos | over_neg, yq - 4. * MSB * np.trunc(
                         (np.sign(yq) * 2 * MSB + yq) / (4 * MSB)), yq)
             else:
                 raise Exception(
