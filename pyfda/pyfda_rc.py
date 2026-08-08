@@ -20,6 +20,9 @@ import matplotlib.font_manager
 
 from pyfda.libs.pyfda_lib import CRLF
 from pyfda.config_file_parser import ConfigFileParser as CFP
+# Register resources like icons, this also gets rid of "unused import" warnings
+# during module test
+from pyfda import qrc_resources  # noqa: F401 # pylint: disable=unused-import
 
 logger = logging.getLogger(__name__)
 
@@ -599,6 +602,9 @@ class QSS():
     # Mac only:         macintosh
 
     # QApplication.setStyle(QStyleFactory.create('Cleanlooks')) re-create default styles
+
+    # provide a default value for testing
+    QSS_RC = '\n/* Light QSS Mode */\n' + _COMMON + _TAB_BAR + _LIGHT
 
     def __init__(self):
         pass
