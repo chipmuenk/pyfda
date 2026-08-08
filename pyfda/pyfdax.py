@@ -166,7 +166,8 @@ def main():
     logger.info("Logging to '%s'", dirs.LOG_DIR_FILE)
     logger.info("Starting pyfda with screen resolution %d x %d, avail: %d x %d",
                 width, height, avail_geometry.width(), avail_geometry.height())
-    logger.info("with %s (%s) and matplotlib fontsize %d.", style, CFP.conf_settings['THEME'], fontsize)
+    logger.info("with %s (%s) and matplotlib fontsize %d.",
+                style, CFP.conf_settings['THEME'], fontsize)
     logger.info("lDPI = %.2f, pDPI = %.2f, pix.ratio = %f",
                 ldpi, pdpi, pixel_ratio)
 
