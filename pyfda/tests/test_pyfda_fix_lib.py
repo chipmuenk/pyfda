@@ -375,7 +375,7 @@ class TestSequenceFunctions(unittest.TestCase):
         """
         # return floats as float, no quantization options are regarded here
         fb_set('qfrmt', 'float64')
-        fb_set('fx_base', 'dec'})  # set to fractional format
+        fb_set('fx_base', 'dec')  # set to fractional format
         q_dict = {'WI':3, 'WF':0, 'ovfl':'wrap', 'quant':'round'}
         self.myQ.set_qdict(q_dict)
         # scalar format
