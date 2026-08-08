@@ -27,7 +27,7 @@ from pyfda.pyfda_class import pyFDA
 
 # specify matplotlib backend for systems that have both PyQt4 and PyQt5 installed to avoid
 # "RuntimeError: the PyQt4.QtCore and PyQt5.QtCore modules both wrap the QObject class"
-matplotlib.use("Qt5Agg")
+matplotlib.use("QtAgg")
 # turn off matplotlib debug messages by elevating the level to "Warning"
 mpl_logger = logging.getLogger('matplotlib')
 mpl_logger.setLevel(logging.WARNING)
@@ -169,7 +169,6 @@ def main():
     logger.info("with %s (%s) and matplotlib fontsize %d.", style, CFP.conf_settings['THEME'], fontsize)
     logger.info("lDPI = %.2f, pDPI = %.2f, pix.ratio = %f",
                 ldpi, pdpi, pixel_ratio)
-    # logger.info(rc.QSS_RC)
 
     # Available signals:
     # - logicalDotsPerInchChanged(qreal dpi)
