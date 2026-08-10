@@ -31,13 +31,13 @@ logger = logging.getLogger(__name__)
 # #############################################################################
 
 MPL_MS = 8  # base size for matplotlib markers
-FONT_SIZE_WIDGETS = 13 # base size for *all* fonts (Qt and matplotlib)
-FONT_SIZE_BASE = str(FONT_SIZE_WIDGETS) + "pt"  # base font size of widgets in pt
-FONT_SIZE_MEDIUM = str(FONT_SIZE_WIDGETS * 1.1) + "pt"
-FONT_SIZE_LARGE = str(FONT_SIZE_WIDGETS * 1.2) + "pt"
-FONT_SIZE_XLARGE = str(FONT_SIZE_WIDGETS * 1.4) + "pt"
+FONT_SIZE_QT = 12 # * CFP.conf_settings['SCALE_QT']  # base size for Qt fonts
+FONT_SIZE_BASE = str(FONT_SIZE_QT) + "pt"  # base font size of widgets in pt
+FONT_SIZE_MEDIUM = str(FONT_SIZE_QT * 1.1) + "pt"
+FONT_SIZE_LARGE = str(FONT_SIZE_QT * 1.2) + "pt"
+FONT_SIZE_XLARGE = str(FONT_SIZE_QT * 1.4) + "pt"
 
-FONT_SIZE_MPL = FONT_SIZE_WIDGETS
+FONT_SIZE_MPL = 12 # * CFP.conf_settings['SCALE_MPL']
 
 # Various parameters for calculation, plotting and UI
 params = {
@@ -574,6 +574,7 @@ class QSS():
         QTabBar::tab::left:!selected {
             margin-left: 0.2em;}
         """ % (FONT_SIZE_MEDIUM, FONT_SIZE_MEDIUM)  # noqa UP031
+    #--------------------------------------------------------------------------------
 
     # Overlap effects for QTabWidget, currently not used
     qss_tab_bar_ovlp = """
@@ -638,7 +639,7 @@ class QSS():
             QSS.QSS_RC = QSS.THEME
 
         # --------------------- Matplotlib Fonts --------------------------------------
-        afm_fonts = sorted({f.name for f in matplotlib.font_manager.fontManager.afmlist})
+        # afm_fonts = sorted({f.name for f in matplotlib.font_manager.fontManager.afmlist})
         ttf_fonts = sorted({f.name for f in matplotlib.font_manager.fontManager.ttflist})
 
         if 'DejaVu Sans' in ttf_fonts:
