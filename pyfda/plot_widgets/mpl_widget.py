@@ -163,9 +163,9 @@ class MplWidget(QWidget):
 
         # self.mplToolbar.sig_rx.connect(self.sig_rx)  # TODO: Doesn't exist yet
 
-        layHToolbar = QHBoxLayout()
-        layHToolbar.addWidget(self.mplToolbar)
-        layHToolbar.addStretch(1)
+        lay_h_toolbar = QHBoxLayout()
+        lay_h_toolbar.addWidget(self.mplToolbar)
+        lay_h_toolbar.addStretch(1)
 
         # =============================================
         # Main plot widget layout
