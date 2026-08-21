@@ -246,10 +246,10 @@ class TabbedWidget(QWidget):
 if __name__ == "__main__":
     # Run widget standalone with `python -m pyfda.tabbed_widget`
     from pyfda.libs.compat import QApplication
-    from pyfda import pyfda_rc as rc
+    from pyfda.pyfda_rc import QSS
     from pyfda.config_file_parser import ConfigFileParser as CFP
     app = QApplication(sys.argv)
-    app.setStyleSheet(rc.QSS_RC)
+    app.setStyleSheet(QSS.QSS_RC)
 
     mainw = TabbedWidget(CFP.INPUT_CLASSES_DICT, objectName='tst_widget', label = 'test')
     app.setActiveWindow(mainw)

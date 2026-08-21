@@ -787,10 +787,10 @@ if __name__ == '__main__':
     # Run widget standalone with `python -m pyfda.fixpoint_widgets.fixpoint_helpers`
 
     from pyfda.libs.compat import QApplication
-    from pyfda import pyfda_rc as rc
+    from pyfda.pyfda_rc import QSS
 
     app = QApplication(sys.argv)
-    app.setStyleSheet(rc.QSS_RC)
+    app.setStyleSheet(QSS.QSS_RC)
 
     mainw = UI_WQ({}, label='demo')
     app.setActiveWindow(mainw)

@@ -143,7 +143,7 @@ class ConfigFileParser():
             `dirs.USER_DIRS` and `sys.path`
 
         :[Config Settings]
-            Store settings in class attribute `ConfigFileParser.conf_settings`
+            Store settings in class variable `ConfigFileParser.conf_settings`
 
         The other sections are processed in :func:`build_widget_tree()`.
 
@@ -244,20 +244,19 @@ class ConfigFileParser():
             # ------------------------------------------------------------------
             # Parsing [Config Settings]
             # ------------------------------------------------------------------
-            conf_settings = self._parse_conf_section("Config Settings")
+            _conf_settings = self._parse_conf_section("Config Settings")
             i = 0
-            if conf_settings:
-                # logger.info(conf_settings)
-                for k in conf_settings:
-                    if k in ConfigFileParser.conf_settings:
-                        # TODO: why are the values lists?
+            if _conf_settings:
+                # logger.info(_conf_settings)
+                for k in _conf_settings:
+                    if k in ConfigFileParser.conf_settings:  # check if key exists
                         try:
                             # try to convert to a numeric type
                             ConfigFileParser.conf_settings[k]\
-                                = ast.literal_eval(conf_settings[k][0])
+                                = ast.literal_eval(_conf_settings[k][0])
                         except ValueError:
                             # unsuccessful, store entry as string
-                            ConfigFileParser.conf_settings[k] = conf_settings[k][0]
+                            ConfigFileParser.conf_settings[k] = _conf_settings[k][0]
                         i += 1
                     else:
                         logger.warning(
@@ -282,13 +281,10 @@ class ConfigFileParser():
     # --------------------------------------------------------------------------
     def build_widget_tree(self) -> None:
         """
-        This is only called once during the start from `pyfdax.py`.
-
-        This part needs a running application as Qt widgets are instantiated to ensure
-        they exist and run without error.
-
-        The following sections are processed here, creating dicts with
-        widget class names as keys and dictionaries with options as values.
+        This is only called once during the start from `pyfdax.py`. QSS and matplotlib
+        settings must have been set _before_ `build_widget_tree()` has been called as
+        all Qt widgets are instantiated here to ensure they exist and run without error.
+        Due to this, a running QApplication is needed for this as well.
 
         This is performed using :func:`_build_widget_class_dict()` which calls
         :func:`_parse_conf_section()`:
@@ -301,7 +297,8 @@ class ConfigFileParser():
 
         - Information for each  section is stored in dicts like `FILTER_CLASSES_DICT`.
 
-        The following sections are processed here:
+        The following sections are processed here, creating dicts with
+        widget class names as keys and dictionaries with options as values.
 
         :[Input Widgets]:
             Store (user) input widget classes in `INPUT_CLASSES_DICT`
@@ -606,10 +603,10 @@ if __name__ == "__main__":
     #
     logging.basicConfig(level=logging.INFO)
     from pyfda.libs.pyfda_lib import pprint_log
-    cfp = ConfigFileParser()
 
+    cfp = ConfigFileParser()
     cfp.parse_conf_file()
-    cfp.build_widget_tree()  # needs a working config file
+    cfp.build_widget_tree()
 
     print('\nINPUT_CLASSES_DICT =\n', pprint_log(ConfigFileParser().INPUT_CLASSES_DICT))
     print('\nfPLOT_CLASSES_DICT =\n', pprint_log(ConfigFileParser().PLOT_CLASSES_DICT))

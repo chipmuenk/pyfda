@@ -239,10 +239,10 @@ class FIR_DF_pyfixp_UI(QWidget):
 if __name__ == '__main__':
     # Run widget standalone with `python -m pyfda.fixpoint_widgets.fir_df.fir_df_pyfixp_ui`
     from pyfda.libs.compat import QApplication
-    from pyfda import pyfda_rc as rc
+    from pyfda.pyfda_rc import QSS
 
     app = QApplication(sys.argv)
-    app.setStyleSheet(rc.QSS_RC)
+    app.setStyleSheet(QSS.QSS_RC)
     set_fx(True)  # enable fixpoint mode
 
     mainw = FIR_DF_pyfixp_UI()

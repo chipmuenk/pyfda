@@ -25,7 +25,7 @@ from pyfda.libs.compat import (QCheckBox, QWidget, QComboBox, QLabel, QLineEdit,
                                QFrame, QHBoxLayout, QGridLayout, pyqtSignal,
                                QPushButton)
 from pyfda.config_file_parser import ConfigFileParser as CFP
-from pyfda.tree_builder import FilterTreeBuilder as FTB
+from pyfda.filter_tree_builder import FilterTreeBuilder as FTB
 from pyfda.filterbroker import fb_get
 from pyfda.pyfda_rc import params
 from pyfda.plot_widgets.mpl_widget import MplWidget
@@ -803,10 +803,10 @@ if __name__ == "__main__":
     # Run widget standalone with `python -m pyfda.plot_widgets.plot_hf`
     import sys
     from pyfda.libs.compat import QApplication
-    from pyfda import pyfda_rc as rc
+    from pyfda.pyfda_rc import QSS
 
     app = QApplication(sys.argv)
-    app.setStyleSheet(rc.QSS_RC)
+    app.setStyleSheet(QSS.QSS_RC)
     mainw = Plot_Hf()
     app.setActiveWindow(mainw)
     mainw.show()

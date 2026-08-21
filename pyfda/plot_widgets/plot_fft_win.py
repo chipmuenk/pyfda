@@ -820,10 +820,10 @@ if __name__ == '__main__':
     # Run widget standalone with `python -m pyfda.plot_widgets.plot_fft_win`
     import sys
     from pyfda.libs.compat import QApplication
-    from pyfda import pyfda_rc as rc
+    from pyfda.pyfda_rc import QSS
 
     app = QApplication(sys.argv)
-    app.setStyleSheet(rc.QSS_RC)
+    app.setStyleSheet(QSS.QSS_RC)
     dirs.clipboard = QApplication.clipboard()  # create clipboard instance
 
     mainw = Plot_FFT_win(app='spec', cur_win_dict=fb.fil[0]['tran_freq_win'],

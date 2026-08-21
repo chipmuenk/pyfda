@@ -14,7 +14,7 @@ import sys
 import logging
 
 from pyfda.filterbroker import fb_get
-from pyfda.tree_builder import FilterTreeBuilder as FTB
+from pyfda.filter_tree_builder import FilterTreeBuilder as FTB
 from pyfda.libs.compat import (
     QWidget, QLabel, QFont, QFrame, pyqtSignal, Qt, QHBoxLayout, QVBoxLayout)
 from pyfda.libs.pyfda_lib import first_item
@@ -162,10 +162,10 @@ class TargetSpecs(QWidget):
 if __name__ == '__main__':
     # Run widget standalone with `python -m pyfda.input_widgets.target_specs`
     from pyfda.libs.compat import QApplication
-    from pyfda import pyfda_rc as rc
+    from pyfda.pyfda_rc import QSS
 
     app = QApplication(sys.argv)
-    app.setStyleSheet(rc.QSS_RC)
+    app.setStyleSheet(QSS.QSS_RC)
 
     # Read freq / amp / weight labels for current filter design
     rt = fb_get('rt')

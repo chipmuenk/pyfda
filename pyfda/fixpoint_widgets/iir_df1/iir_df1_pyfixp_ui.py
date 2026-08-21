@@ -363,10 +363,10 @@ if __name__ == '__main__':
     # `python -m pyfda.fixpoint_widgets.iir_df1.iir_df1_pyfixp_ui`
 
     from pyfda.libs.compat import QApplication
-    from pyfda import pyfda_rc as rc
+    from pyfda.pyfda_rc import QSS
 
     app = QApplication(sys.argv)
-    app.setStyleSheet(rc.QSS_RC)
+    app.setStyleSheet(QSS.QSS_RC)
     fb_set('qfrmt', 'qint')  # enable fixpoint mode
 
     mainw = IIR_DF1_pyfixp_UI()

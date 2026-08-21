@@ -21,7 +21,7 @@ from pyfda.libs.compat import (
 
 from pyfda.filterbroker import fb_get, fb_set
 from pyfda.filter_factory import create_fil_inst, get_fil_inst
-from pyfda.tree_builder import FilterTreeBuilder as FTB
+from pyfda.filter_tree_builder import FilterTreeBuilder as FTB
 from pyfda.config_file_parser import ConfigFileParser as CFP
 from pyfda.libs.pyfda_lib import safe_eval
 from pyfda.libs.pyfda_qt_lib import qget_cmb_box, emit
@@ -133,10 +133,10 @@ class SelectFilter(QWidget):
         # correspondence is defined in pyfda_rc.py) and populate rt combo box
         for rt in rt_list:
             try:
-                self.cmb_response_type.addItem(rc.rt_names[rt], rt)
+                self.cmb_response_type.addItem(FTB.RT_NAMES[rt], rt)
             except KeyError as e:
                 logger.warning(
-                  "KeyError: %s has no corresponding full name in rc.rt_names:\n%s", rt, e)
+                  "KeyError: %s has no corresponding full name in FTB.RT_NAMES:\n%s", rt, e)
         idx = self.cmb_response_type.findData('LP')  # find index for 'LP'
 
         if idx == -1:  # Key 'LP' does not exist, use first entry instead
@@ -147,7 +147,7 @@ class SelectFilter(QWidget):
 
         # next, populate the filter type combo (IIr, FIR)
         for ft in FTB.fil_tree[rt]:
-            self.cmb_filter_type.addItem(rc.ft_names[ft], ft)
+            self.cmb_filter_type.addItem(FTB.FT_NAMES[ft], ft)
         self.cmb_filter_type.setCurrentIndex(0)  # set initial index
         ft = qget_cmb_box(self.cmb_filter_type)
 
@@ -274,7 +274,7 @@ class SelectFilter(QWidget):
         self.cmb_filter_type.blockSignals(True)  # don't fire when changed programmatically
         self.cmb_filter_type.clear()
         for ft in FTB.fil_tree[self.rt]:
-            self.cmb_filter_type.addItem(rc.ft_names[ft], ft)
+            self.cmb_filter_type.addItem(FTB.FT_NAMES[ft], ft)
 
         # Is current filter type (e.g. IIR) in list for new rt?
         if fb_get('ft') in ft_list:
@@ -516,9 +516,10 @@ class SelectFilter(QWidget):
 if __name__ == '__main__':
     # Run widget standalone with `python -m pyfda.input_widgets.select_filter`
     from pyfda.libs.compat import QApplication
+    from pyfda.pyfda_rc import QSS
 
     app = QApplication(sys.argv)
-    app.setStyleSheet(rc.QSS_RC)
+    app.setStyleSheet(QSS.QSS_RC)
     mainw = SelectFilter()
     app.setActiveWindow(mainw)
     mainw.show()

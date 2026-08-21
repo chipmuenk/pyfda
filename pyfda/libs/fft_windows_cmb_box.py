@@ -482,10 +482,10 @@ if __name__ == "__main__":
     # Run widget standalone with `python -m pyfda.libs.fft_windows_cmb_box`
     import sys
     from pyfda.libs.compat import QApplication
-    from pyfda import pyfda_rc as rc
+    from pyfda.pyfda_rc import QSS
 
     app = QApplication(sys.argv)
-    app.setStyleSheet(rc.QSS_RC)
+    app.setStyleSheet(QSS.QSS_RC)
     mainw = QFFTWinCmbBox(app='spec', objectName='TestName')
     app.setActiveWindow(mainw)
     mainw.show()

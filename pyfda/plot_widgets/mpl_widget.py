@@ -31,13 +31,11 @@ from pyfda.libs.compat import (
 from pyfda.libs.pyfda_qt_lib import emit
 from pyfda.libs.pyfda_qt_classes import EventTypes
 from pyfda import pyfda_rc
-# Disallow "unused import" warning - needed to register resources like icons
-from pyfda import qrc_resources  # noqa: F401 # pylint: disable=unused-import
 
 logger = logging.getLogger(__name__)
 
 # read user settings for linewidth, font size etc. and apply them to matplotlib
-for key, value in pyfda_rc.mpl_rc.items():
+for key, value in pyfda_rc.QSS.mpl_rc.items():
     rcParams[key] = value
 
 # ------------------------------------------------------------------------------

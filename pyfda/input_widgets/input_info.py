@@ -21,7 +21,7 @@ import scipy.signal as sig
 from pyfda.config_file_parser import ConfigFileParser as CFP
 from pyfda.filterbroker import fb_get
 import pyfda.filter_factory as ff
-from pyfda.tree_builder import FilterTreeBuilder as FTB
+from pyfda.filter_tree_builder import FilterTreeBuilder as FTB
 from pyfda.input_widgets.input_info_about import AboutWindow
 from pyfda.libs.compat import (
     QtGui, QWidget, QFont, QFrame, QLabel, QTableWidget, QTableWidgetItem,
@@ -532,10 +532,10 @@ class Input_Info(QWidget):
 if __name__ == '__main__':
     # Run widget standalone with `python -m pyfda.input_widgets.input_info`
     from pyfda.libs.compat import QApplication
-    from pyfda import pyfda_rc as rc
+    from pyfda.pyfda_rc import QSS
 
     app = QApplication(sys.argv)
-    app.setStyleSheet(rc.QSS_RC)
+    app.setStyleSheet(QSS.QSS_RC)
     mainw = Input_Info()
     app.setActiveWindow(mainw)
     mainw.show()

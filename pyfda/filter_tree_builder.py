@@ -128,16 +128,28 @@ class ParseError(Exception):
 
 class FilterTreeBuilder():
     """
-    Read the config file and construct the fil_tree dictionary as a class attribute with
+    Read the config file and construct the `fil_tree` dictionary as a class attribute with
 
     - all filter combinations
     - valid combinations of filter widgets and fixpoint implementations
     """
     # --------------------------------------------------------------------------
-    # Filter tree dict as a class attribute:
+    # Filter tree dict as a class variable: Assigning this in an instance
+    # shadows the class variable!
     # Example for dict with available combinations of response types (rt),
     # filter types (ft), filter class (fc) and filter order (fo).
     # This default dictionary is overwritten and frozen during initialization.
+
+    # Dictionary with translations between short method names and long names for
+    # response types - the long name can be changed as you like, but don't change
+    # the short name - it is used to construct the filter design method names
+    RT_NAMES = {"LP": "Lowpass", "HP": "Highpass", "BP": "Bandpass",
+                "BS": "Bandstop", "AP": "Allpass", "MB": "Multiband",
+                "HIL": "Hilbert", "DIFF": "Differentiator"}
+
+    # Dictionary with translations between short method names and long names for
+    # response types
+    FT_NAMES = {"IIR": "IIR", "FIR": "FIR"}
 
     fil_tree: ClassVar[dict[str, object]] =\
         {

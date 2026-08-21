@@ -23,7 +23,7 @@ import numpy as np
 import pyfda.filterbroker as fb
 from pyfda.filterbroker import fb_get, fb_set, backup_fil, restore_fil
 from pyfda.filter_factory import call_fil_method
-from pyfda.tree_builder import FilterTreeBuilder as FTB
+from pyfda.filter_tree_builder import FilterTreeBuilder as FTB
 from pyfda.input_widgets import (
     select_filter, amplitude_specs, freq_specs, freq_units, weight_specs, target_specs)
 from pyfda.libs.compat import (
@@ -943,10 +943,10 @@ class NumpyEncoder(json.JSONEncoder):
 if __name__ == '__main__':
     # Run widget standalone with `python -m pyfda.input_widgets.input_specs`
     from pyfda.libs.compat import QApplication
-    from pyfda import pyfda_rc as rc
+    from pyfda.pyfda_rc import QSS
 
     app = QApplication(sys.argv)
-    app.setStyleSheet(rc.QSS_RC)
+    app.setStyleSheet(QSS.QSS_RC)
     mainw = Input_Specs()
     app.setActiveWindow(mainw)
     mainw.show()

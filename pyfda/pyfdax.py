@@ -11,6 +11,7 @@ Mainwindow for the pyFDA app
 """
 import logging
 import sys
+import os
 
 import numpy as np
 import matplotlib
@@ -18,16 +19,16 @@ import matplotlib
 from pyfda.libs.compat import Qt, QApplication, QIcon
 # from pyfda.libs.pyfda_lib import ANSIcolors as ACol
 import pyfda.libs.pyfda_dirs as dirs # initial import constructs file paths
-from pyfda.tree_builder import FilterTreeBuilder
-from pyfda.config_file_parser import ConfigFileParser
+from pyfda.filter_tree_builder import FilterTreeBuilder
+from pyfda.config_file_parser import ConfigFileParser as CFP
 import pyfda.pyfda_rc as rc
+from pyfda.pyfda_rc import QSS
 
 from pyfda.pyfda_class import pyFDA
 
-# specify matplotlib backend for systems that have both PyQt4 and PyQt5 installed
-# to avoid
+# specify matplotlib backend for systems that have both PyQt4 and PyQt5 installed to avoid
 # "RuntimeError: the PyQt4.QtCore and PyQt5.QtCore modules both wrap the QObject class"
-matplotlib.use("Qt5Agg")
+matplotlib.use("QtAgg")
 # turn off matplotlib debug messages by elevating the level to "Warning"
 mpl_logger = logging.getLogger('matplotlib')
 mpl_logger.setLevel(logging.WARNING)
@@ -45,11 +46,15 @@ if dirs.OS.lower() == "windows":
 logger = logging.getLogger(__name__)
 
 # read and parse the config file
-# config_file_parser =
-print("instantiating CFP")
-# ConfigFileParser()
-# config_file_parser.parse_conf_file()
-# config_file_parser.build_widget_tree()
+cfp = CFP()
+cfp.parse_conf_file()
+
+# apply QSS and matplotlib styling
+qss = QSS()
+qss.set_qss()
+
+cfp.build_widget_tree()
+
 
 def main():
     """
@@ -106,18 +111,21 @@ def main():
     else:
         logger.warning("No Qt attribute 'AA_EnableHighDpiScaling'.")
 
+    os.environ["QT_ENABLE_HIGHDPI_SCALING"]   = "1"
+
+
     # Instantiate QApplication object, passing command line arguments
     app = QApplication(sys.argv)
     app.setStyle('Fusion')  # set a platform independent base style
-    if len(rc.QSS_RC) > 20:
-        app.setStyleSheet(rc.QSS_RC) # this is a proper style sheet
+    if len(QSS.QSS_RC) > 20:
+        app.setStyleSheet(QSS.QSS_RC) # this is a proper style sheet
         style = "'pyfda' style sheet"
     else:
-        qstyle = QApplication.setStyle(rc.QSS_RC) # this is just a name for a system stylesheet
+        qstyle = QApplication.setStyle(QSS.QSS_RC) # this is just a name for a system stylesheet
         if qstyle:
-            style = f"system style sheet '{rc.QSS_RC}'"
+            style = f"system style sheet '{QSS.QSS_RC}'"
         else:
-            style = f"default style sheet ('{rc.QSS_RC}' not found)"
+            style = f"default style sheet ('{QSS.QSS_RC}' not found)"
 
     if dirs.OS.lower() == "darwin":  # Mac OS
         ref_dpi = 72
@@ -147,8 +155,8 @@ def main():
     # fm = QFontMetrics(font)
     # try to find a good value for matplotlib font size depending on screen resolution
 
-    fontsize = int(round(9.5 * np.sqrt(pdpi / ref_dpi) * scaling))
-    # fontsize = round(font.pointSizeF() * 1.5 * ldpi / 96)
+    fontsize = int(round(10 * scaling))  # for matplotlib (not used yet)
+    # logical dpi is set in mpl_widget for all matplotlib figure canvasses
 
     # rc.mpl_rc['font.size'] = fontsize
     rc.params['screen'] = {
@@ -162,7 +170,8 @@ def main():
     logger.info("Logging to '%s'", dirs.LOG_DIR_FILE)
     logger.info("Starting pyfda with screen resolution %d x %d, avail: %d x %d",
                 width, height, avail_geometry.width(), avail_geometry.height())
-    logger.info("with %s and matplotlib fontsize %d.", style, fontsize)
+    logger.info("with %s (%s) and matplotlib fontsize %d.",
+                style, CFP.conf_settings['THEME'], fontsize)
     logger.info("lDPI = %.2f, pDPI = %.2f, pix.ratio = %f",
                 ldpi, pdpi, pixel_ratio)
 

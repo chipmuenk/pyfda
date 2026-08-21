@@ -885,13 +885,13 @@ if __name__ == '__main__':
     # Resizing the image does not work standalone as the {'ui_global_changed': 'resized'}
     # signal is issued from somewhere else
     from pyfda.libs.compat import QApplication
-    from pyfda.tree_builder import FilterTreeBuilder
-    from pyfda import pyfda_rc as rc
+    from pyfda.filter_tree_builder import FilterTreeBuilder
+    from pyfda.pyfda_rc import QSS
 
     logging.basicConfig()  # setup a basic logger
 
     app = QApplication(sys.argv)
-    app.setStyleSheet(rc.QSS_RC)
+    app.setStyleSheet(QSS.QSS_RC)
     # change initial settings to FIR
     # fb_set({'ft': 'FIR', 'fc': 'Equiripple'})
     fb_set('ft', 'IIR')
