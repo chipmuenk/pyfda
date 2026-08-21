@@ -205,12 +205,12 @@ class Plot_3D(QWidget):
         # ----------------------------------------------------------------------
         # This is the plot pane widget, encompassing the other widgets
         self.mplwidget = MplWidget(self)
-        self.mplwidget.layVMainMpl.addWidget(self.frmControls)
-        self.mplwidget.layVMainMpl.setContentsMargins(*params['mpl_margins'])
+        self.mplwidget.lay_v_main_mpl.addWidget(self.frmControls)
+        self.mplwidget.lay_v_main_mpl.setContentsMargins(*params['mpl_margins'])
         self.mplwidget.mplToolbar.a_he.setEnabled(True)
         self.mplwidget.mplToolbar.a_he.info = "manual/plot_3d.html"
         self.mplwidget.mplToolbar.a_ui_num_levels = 2
-        self.setLayout(self.mplwidget.layVMainMpl)
+        self.setLayout(self.mplwidget.lay_v_main_mpl)
 
         self._init_grid()  # initialize grid and do initial plot
 

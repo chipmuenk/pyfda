@@ -324,13 +324,13 @@ class Plot_FFT_win(QDialog):
         # ----------------------------------------------------------------------
         #               ### mplwidget ###
         #
-        # Layout layVMainMpl (VBox) is defined within MplWidget, additional
+        # Layout lay_v_main_mpl (VBox) is defined within MplWidget, additional
         # widgets can be added below the matplotlib widget (here: self.frm_controls)
         #
         # ----------------------------------------------------------------------
         self.mplwidget = MplWidget(self)
-        self.mplwidget.layVMainMpl.addWidget(self.frm_controls)
-        self.mplwidget.layVMainMpl.setContentsMargins(0, 0, 0, 0)
+        self.mplwidget.lay_v_main_mpl.addWidget(self.frm_controls)
+        self.mplwidget.lay_v_main_mpl.setContentsMargins(0, 0, 0, 0)
 
         # self.mplwidget.mplToolbar.a_he.setEnabled(False)  # enable help menu
         self.mplwidget.mplToolbar.a_he.info = "manual/plot_fft_win.html"  # TODO: missing!

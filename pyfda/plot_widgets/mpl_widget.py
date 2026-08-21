@@ -170,11 +170,11 @@ class MplWidget(QWidget):
         # =============================================
         # Main plot widget layout
         # =============================================
-        self.layVMainMpl = QVBoxLayout()
-        self.layVMainMpl.addLayout(layHToolbar)
-        self.layVMainMpl.addWidget(self.canvas)
+        self.lay_v_main_mpl = QVBoxLayout()
+        self.lay_v_main_mpl.addLayout(lay_h_toolbar)
+        self.lay_v_main_mpl.addWidget(self.canvas)
 
-        self.setLayout(self.layVMainMpl)
+        self.setLayout(self.lay_v_main_mpl)
 
     # ------------------------------------------------------------------------------
     def eventFilter(self, source: QtCore.QObject, event: QEvent) -> bool:
