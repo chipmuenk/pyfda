@@ -95,16 +95,16 @@ class Plot_3D(QWidget):
         self.but_plot_in_UC.setToolTip("Only plot H(z) within the unit circle")
 
         self.lblBottom = QLabel(to_html("Bottom =", frmt='bi'), self)
-        self.ledBottom = QLineEdit(self, objectName="ledBottom")
-        self.ledBottom.setText(str(self.zmin))
-        self.ledBottom.setToolTip("Minimum display value.")
+        self.led_bottom = QLineEdit(self, objectName="led_bottom")
+        self.led_bottom.setText(str(self.zmin))
+        self.led_bottom.setToolTip("Minimum display value.")
         self.lblBottomdB = QLabel("dB", self)
         self.lblBottomdB.setVisible(self.but_log.checked)
 
         self.lblTop = QLabel(to_html("Top =", frmt='bi'), self)
-        self.ledTop = QLineEdit(self, objectName="ledTop")
-        self.ledTop.setText(str(self.zmax))
-        self.ledTop.setToolTip("Maximum display value.")
+        self.led_top = QLineEdit(self, objectName="led_top")
+        self.led_top.setText(str(self.zmax))
+        self.led_top.setToolTip("Maximum display value.")
         self.lblTopdB = QLabel("dB", self)
         self.lblTopdB.setVisible(self.but_log.checked)
 
@@ -171,10 +171,10 @@ class Plot_3D(QWidget):
         layGControls.addWidget(self.but_log, 0, 0)
         layGControls.addWidget(self.but_plot_in_UC, 1, 0)
         layGControls.addWidget(self.lblTop, 0, 2)
-        layGControls.addWidget(self.ledTop, 0, 4)
+        layGControls.addWidget(self.led_top, 0, 4)
         layGControls.addWidget(self.lblTopdB, 0, 5)
         layGControls.addWidget(self.lblBottom, 1, 2)
-        layGControls.addWidget(self.ledBottom, 1, 4)
+        layGControls.addWidget(self.led_bottom, 1, 4)
         layGControls.addWidget(self.lblBottomdB, 1, 5)
         layGControls.setColumnStretch(5,1)
 
@@ -222,8 +222,8 @@ class Plot_3D(QWidget):
         # LOCAL SIGNALS & SLOTs
         # ----------------------------------------------------------------------
         self.but_log.clicked.connect(self._log_clicked)
-        self.ledBottom.editingFinished.connect(self._log_clicked)
-        self.ledTop.editingFinished.connect(self._log_clicked)
+        self.led_bottom.editingFinished.connect(self._log_clicked)
+        self.led_top.editingFinished.connect(self._log_clicked)
 
         self.but_plot_in_UC.clicked.connect(self._init_grid)
         self.plt_UC.clicked.connect(self.draw)
@@ -352,32 +352,32 @@ class Plot_3D(QWidget):
         """
         if self.sender().objectName() == 'but_log':  # clicking but_log triggered the slot
             if self.but_log.checked:
-                self.ledBottom.setText(str(self.zmin_dB))
+                self.led_bottom.setText(str(self.zmin_dB))
                 self.zmax_dB = np.round(20 * log10(self.zmax), 2)
-                self.ledTop.setText(str(self.zmax_dB))
+                self.led_top.setText(str(self.zmax_dB))
                 self.lblTopdB.setVisible(True)
                 self.lblBottomdB.setVisible(True)
             else:
-                self.ledBottom.setText(str(self.zmin))
+                self.led_bottom.setText(str(self.zmin))
                 self.zmax = np.round(10**(self.zmax_dB / 20), 2)
-                self.ledTop.setText(str(self.zmax))
+                self.led_top.setText(str(self.zmax))
                 self.lblTopdB.setVisible(False)
                 self.lblBottomdB.setVisible(False)
 
         else:  # finishing a lineEdit field triggered the slot
             if self.but_log.checked:
                 self.zmin_dB = safe_eval(
-                    self.ledBottom.text(), self.zmin_dB, return_type='float')
-                self.ledBottom.setText(str(self.zmin_dB))
+                    self.led_bottom.text(), self.zmin_dB, return_type='float')
+                self.led_bottom.setText(str(self.zmin_dB))
                 self.zmax_dB = safe_eval(
-                    self.ledTop.text(), self.zmax_dB, return_type='float')
-                self.ledTop.setText(str(self.zmax_dB))
+                    self.led_top.text(), self.zmax_dB, return_type='float')
+                self.led_top.setText(str(self.zmax_dB))
             else:
                 self.zmin = safe_eval(
-                    self.ledBottom.text(), self.zmin, return_type='float')
-                self.ledBottom.setText(str(self.zmin))
-                self.zmax = safe_eval(self.ledTop.text(), self.zmax, return_type='float')
-                self.ledTop.setText(str(self.zmax))
+                    self.led_bottom.text(), self.zmin, return_type='float')
+                self.led_bottom.setText(str(self.zmin))
+                self.zmax = safe_eval(self.led_top.text(), self.zmax, return_type='float')
+                self.led_top.setText(str(self.zmax))
 
         self.draw()
 

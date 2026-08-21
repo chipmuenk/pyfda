@@ -126,18 +126,18 @@ class Plot_PZ(QWidget):
         self.lblRad_Hf = QLabel("Radius", self)
 
         self.lblBottom = QLabel(to_html("Bottom =", frmt='bi'), self)
-        self.ledBottom = QLineEdit(self, objectName="ledBottom")
-        self.ledBottom.setText(str(self.zmin))
-        self.ledBottom.setMaximumWidth(qtext_width(N_x=8))
-        self.ledBottom.setToolTip("Minimum display value.")
+        self.led_bottom = QLineEdit(self, objectName="led_bottom")
+        self.led_bottom.setText(str(self.zmin))
+        self.led_bottom.setMaximumWidth(qtext_width(N_x=8))
+        self.led_bottom.setToolTip("Minimum display value.")
         self.lblBottomdB = QLabel("dB", self)
         self.lblBottomdB.setVisible(self.but_log.checked)
 
         self.lblTop = QLabel(to_html("Top =", frmt='bi'), self)
-        self.ledTop = QLineEdit(self, objectName="ledTop")
-        self.ledTop.setText(str(self.zmax))
-        self.ledTop.setToolTip("Maximum display value.")
-        self.ledTop.setMaximumWidth(qtext_width(N_x=8))
+        self.led_top = QLineEdit(self, objectName="led_top")
+        self.led_top.setText(str(self.zmax))
+        self.led_top.setToolTip("Maximum display value.")
+        self.led_top.setMaximumWidth(qtext_width(N_x=8))
         self.lblTopdB = QLabel("dB", self)
         self.lblTopdB.setVisible(self.but_log.checked)
 
@@ -152,10 +152,10 @@ class Plot_PZ(QWidget):
         layHControls.addWidget(self.diaRad_Hf)
         layHControls.addWidget(self.lblRad_Hf)
         layHControls.addWidget(self.lblTop)
-        layHControls.addWidget(self.ledTop)
+        layHControls.addWidget(self.led_top)
         layHControls.addWidget(self.lblTopdB)
         layHControls.addWidget(self.lblBottom)
-        layHControls.addWidget(self.ledBottom)
+        layHControls.addWidget(self.led_bottom)
         layHControls.addWidget(self.lblBottomdB)
         layHControls.addStretch(10)
         layHControls.addWidget(self.but_fir_poles)
@@ -195,8 +195,8 @@ class Plot_PZ(QWidget):
         self.mplwidget.mpl_toolbar.sig_tx.connect(self.process_sig_rx)
         self.cmb_overlay.currentIndexChanged.connect(self.draw)
         self.but_log.clicked.connect(self._log_clicked)
-        self.ledBottom.editingFinished.connect(self._log_clicked)
-        self.ledTop.editingFinished.connect(self._log_clicked)
+        self.led_bottom.editingFinished.connect(self._log_clicked)
+        self.led_top.editingFinished.connect(self._log_clicked)
         self.diaRad_Hf.valueChanged.connect(self.draw)
         self.but_fir_poles.clicked.connect(self.draw)
 
@@ -209,28 +209,28 @@ class Plot_PZ(QWidget):
         # clicking but_log triggered the slot or initialization
         if self.sender() is None or self.sender().objectName() == 'but_log':
             if self.but_log.checked:
-                self.ledBottom.setText(str(self.zmin_dB))
+                self.led_bottom.setText(str(self.zmin_dB))
                 self.zmax_dB = np.round(20 * np.log10(self.zmax), 2)
-                self.ledTop.setText(str(self.zmax_dB))
+                self.led_top.setText(str(self.zmax_dB))
             else:
-                self.ledBottom.setText(str(self.zmin))
+                self.led_bottom.setText(str(self.zmin))
                 self.zmax = np.round(10**(self.zmax_dB / 20), 2)
-                self.ledTop.setText(str(self.zmax))
+                self.led_top.setText(str(self.zmax))
 
         else:  # finishing a lineEdit field triggered the slot
             if self.but_log.checked:
                 self.zmin_dB = safe_eval(
-                    self.ledBottom.text(), self.zmin_dB, return_type='float')
-                self.ledBottom.setText(str(self.zmin_dB))
+                    self.led_bottom.text(), self.zmin_dB, return_type='float')
+                self.led_bottom.setText(str(self.zmin_dB))
                 self.zmax_dB = safe_eval(
-                    self.ledTop.text(), self.zmax_dB, return_type='float')
-                self.ledTop.setText(str(self.zmax_dB))
+                    self.led_top.text(), self.zmax_dB, return_type='float')
+                self.led_top.setText(str(self.zmax_dB))
             else:
                 self.zmin = safe_eval(
-                    self.ledBottom.text(), self.zmin, return_type='float')
-                self.ledBottom.setText(str(self.zmin))
-                self.zmax = safe_eval(self.ledTop.text(), self.zmax, return_type='float')
-                self.ledTop.setText(str(self.zmax))
+                    self.led_bottom.text(), self.zmin, return_type='float')
+                self.led_bottom.setText(str(self.zmin))
+                self.zmax = safe_eval(self.led_top.text(), self.zmax, return_type='float')
+                self.led_top.setText(str(self.zmax))
 
         self.draw()
 
@@ -259,10 +259,10 @@ class Plot_PZ(QWidget):
     def draw(self):
         self.but_fir_poles.setVisible(fb.fil[0]['ft'] == 'FIR')
         contour = qget_cmb_box(self.cmb_overlay) in {"contour", "contourf"}
-        self.ledBottom.setVisible(contour)
+        self.led_bottom.setVisible(contour)
         self.lblBottom.setVisible(contour)
         self.lblBottomdB.setVisible(contour and self.but_log.checked)
-        self.ledTop.setVisible(contour)
+        self.led_top.setVisible(contour)
         self.lblTop.setVisible(contour)
         self.lblTopdB.setVisible(contour and self.but_log.checked)
 
