@@ -416,7 +416,7 @@ QSS_COMMON = """
     #xlarge{font-size: %s; font-weight: bold;}
 
     /* Frame with control elements of all plot widgets */
-    #frmControls{
+    #frm_controls{
         border-top: solid #303030;
         border-width: 0.1em;
         margin: 0;

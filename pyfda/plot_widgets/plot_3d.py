@@ -79,7 +79,7 @@ class Plot_3D(QWidget):
                 self.draw()
                 self.data_changed = False
             elif 'mpl_toolbar' in dict_sig and dict_sig['mpl_toolbar'] == 'ui_level':
-                self.frmControls.setVisible(self.mplwidget.mpl_toolbar.a_ui_level == 0)
+                self.frm_controls.setVisible(self.mplwidget.mpl_toolbar.a_ui_level == 0)
 
         else:
             if 'data_changed' in dict_sig:
@@ -112,28 +112,28 @@ class Plot_3D(QWidget):
         self.plt_uc.setChecked(True)
         self.plt_uc.setToolTip("Plot unit circle")
 
-        self.but_PZ = PushButton(self, "P/Z ", objectName="but_PZ")
-        self.but_PZ.setChecked(True)
-        self.but_PZ.setToolTip("Plot poles and zeros")
+        self.but_pz = PushButton(self, "P/Z ", objectName="but_pz")
+        self.but_pz.setChecked(True)
+        self.but_pz.setToolTip("Plot poles and zeros")
 
         self.but_Hf = PushButton(self, "H(f) ", objectName="but_Hf")
         self.but_Hf.setChecked(True)
         self.but_Hf.setToolTip("Plot H(f) along the unit circle")
 
         modes = ['None', 'Mesh', 'Surf', 'Contour']
-        self.cmbMode3D = QComboBox(self, objectName="cmbShow3D")
-        self.cmbMode3D.addItems(modes)
-        self.cmbMode3D.setToolTip("Select 3D-plot mode.")
-        self.cmbMode3D.setCurrentIndex(0)
-        self.cmbMode3D.setSizeAdjustPolicy(QComboBox.AdjustToContents)
+        self.cmb_mode_3d = QComboBox(self, objectName="cmbShow3D")
+        self.cmb_mode_3d.addItems(modes)
+        self.cmb_mode_3d.setToolTip("Select 3D-plot mode.")
+        self.cmb_mode_3d.setCurrentIndex(0)
+        self.cmb_mode_3d.setSizeAdjustPolicy(QComboBox.AdjustToContents)
 
         self.but_colormap_r = PushButton(self, "reverse", objectName="but_colormap_r")
         self.but_colormap_r.setChecked(True)
         self.but_colormap_r.setToolTip("reverse colormap")
 
-        self.cmbColormap = QComboBox(self)
+        self.cmb_colormap = QComboBox(self)
         self._init_cmb_colormap(cmap_init=self.cmap_default)
-        self.cmbColormap.setToolTip("Select colormap")
+        self.cmb_colormap.setToolTip("Select colormap")
 
         self.but_colbar = PushButton(self, "Colorbar ", objectName="chkColBar")
         self.but_colbar.setToolTip("Show colorbar")
@@ -141,25 +141,25 @@ class Plot_3D(QWidget):
         self.but_lighting = PushButton(self, "Lighting", objectName="but_lighting")
         self.but_lighting.setToolTip("Enable light source")
 
-        self.lblAlpha = QLabel(to_html("Alpha", frmt='bi'), self)
-        self.diaAlpha = QDial(self)
-        self.diaAlpha.setRange(0, 10)
-        self.diaAlpha.setValue(5)
-        self.diaAlpha.setTracking(False)  # produce less events when turning
-        self.diaAlpha.setFixedHeight(30)
-        self.diaAlpha.setFixedWidth(30)
-        self.diaAlpha.setWrapping(False)
-        self.diaAlpha.setToolTip("<span>Set transparency for surf and contour plots.</span>")
+        self.lbl_alpha = QLabel(to_html("Alpha", frmt='bi'), self)
+        self.dia_alpha = QDial(self)
+        self.dia_alpha.setRange(0, 10)
+        self.dia_alpha.setValue(5)
+        self.dia_alpha.setTracking(False)  # produce less events when turning
+        self.dia_alpha.setFixedHeight(30)
+        self.dia_alpha.setFixedWidth(30)
+        self.dia_alpha.setWrapping(False)
+        self.dia_alpha.setToolTip("<span>Set transparency for surf and contour plots.</span>")
 
-        self.lblHatch = QLabel(to_html("Stride", frmt='bi'), self)
-        self.diaHatch = QDial(self)
-        self.diaHatch.setRange(0, 9)
-        self.diaHatch.setValue(5)
-        self.diaHatch.setTracking(False)  # produce less events when turning
-        self.diaHatch.setFixedHeight(30)
-        self.diaHatch.setFixedWidth(30)
-        self.diaHatch.setWrapping(False)
-        self.diaHatch.setToolTip("Set line density for various plots.")
+        self.lbl_hatch = QLabel(to_html("Stride", frmt='bi'), self)
+        self.dia_hatch = QDial(self)
+        self.dia_hatch.setRange(0, 9)
+        self.dia_hatch.setValue(5)
+        self.dia_hatch.setTracking(False)  # produce less events when turning
+        self.dia_hatch.setFixedHeight(30)
+        self.dia_hatch.setFixedWidth(30)
+        self.dia_hatch.setWrapping(False)
+        self.dia_hatch.setToolTip("Set line density for various plots.")
 
         self.but_contour_2d = PushButton(self, "Contour2D ", objectName="chkContour2D")
         self.but_contour_2d.setToolTip("Plot 2D-contours at z =0")
@@ -180,32 +180,32 @@ class Plot_3D(QWidget):
 
         lay_g_controls.addWidget(self.plt_uc, 0, 6)
         lay_g_controls.addWidget(self.but_Hf, 1, 6)
-        lay_g_controls.addWidget(self.but_PZ, 0, 8)
+        lay_g_controls.addWidget(self.but_pz, 0, 8)
 
-        lay_g_controls.addWidget(self.cmbMode3D, 0, 10)
+        lay_g_controls.addWidget(self.cmb_mode_3d, 0, 10)
         lay_g_controls.addWidget(self.but_contour_2d, 1, 10)
-        lay_g_controls.addWidget(self.cmbColormap, 0, 12, 1, 1)
+        lay_g_controls.addWidget(self.cmb_colormap, 0, 12, 1, 1)
         lay_g_controls.addWidget(self.but_colormap_r, 1, 12)
 
         lay_g_controls.addWidget(self.but_lighting, 0, 14)
         lay_g_controls.addWidget(self.but_colbar, 1, 14)
 
-        lay_g_controls.addWidget(self.lblAlpha, 0, 15)
-        lay_g_controls.addWidget(self.diaAlpha, 0, 16)
+        lay_g_controls.addWidget(self.lbl_alpha, 0, 15)
+        lay_g_controls.addWidget(self.dia_alpha, 0, 16)
 
-        lay_g_controls.addWidget(self.lblHatch, 1, 15)
-        lay_g_controls.addWidget(self.diaHatch, 1, 16)
+        lay_g_controls.addWidget(self.lbl_hatch, 1, 15)
+        lay_g_controls.addWidget(self.dia_hatch, 1, 16)
 
         # This widget encompasses all control subwidgets
-        self.frmControls = QFrame(self, objectName="frmControls")
-        self.frmControls.setLayout(lay_g_controls)
+        self.frm_controls = QFrame(self, objectName="frm_controls")
+        self.frm_controls.setLayout(lay_g_controls)
 
         # ----------------------------------------------------------------------
         # mplwidget
         # ----------------------------------------------------------------------
         # This is the plot pane widget, encompassing the other widgets
         self.mplwidget = MplWidget(self)
-        self.mplwidget.lay_v_main_mpl.addWidget(self.frmControls)
+        self.mplwidget.lay_v_main_mpl.addWidget(self.frm_controls)
         self.mplwidget.lay_v_main_mpl.setContentsMargins(*params['mpl_margins'])
         self.mplwidget.mpl_toolbar.a_he.setEnabled(True)
         self.mplwidget.mpl_toolbar.a_he.info = "manual/plot_3d.html"
@@ -228,16 +228,16 @@ class Plot_3D(QWidget):
         self.but_plot_in_UC.clicked.connect(self._init_grid)
         self.plt_uc.clicked.connect(self.draw)
         self.but_Hf.clicked.connect(self.draw)
-        self.but_PZ.clicked.connect(self.draw)
-        self.cmbMode3D.currentIndexChanged.connect(self.draw)
+        self.but_pz.clicked.connect(self.draw)
+        self.cmb_mode_3d.currentIndexChanged.connect(self.draw)
         self.but_colbar.clicked.connect(self.draw)
 
-        self.cmbColormap.currentIndexChanged.connect(self.draw)
+        self.cmb_colormap.currentIndexChanged.connect(self.draw)
         self.but_colormap_r.clicked.connect(self.draw)
 
         self.but_lighting.clicked.connect(self.draw)
-        self.diaAlpha.valueChanged.connect(self.draw)
-        self.diaHatch.valueChanged.connect(self.draw)
+        self.dia_alpha.valueChanged.connect(self.draw)
+        self.dia_hatch.valueChanged.connect(self.draw)
         self.but_contour_2d.clicked.connect(self.draw)
 
         self.mplwidget.mpl_toolbar.sig_tx.connect(self.process_sig_rx)
@@ -248,12 +248,12 @@ class Plot_3D(QWidget):
         """
         Initialize combobox with available colormaps and try to set it to `cmap_init`
         """
-        self.cmbColormap.addItems([m for m in colormaps() if not m.endswith("_r")])
+        self.cmb_colormap.addItems([m for m in colormaps() if not m.endswith("_r")])
 
-        idx = self.cmbColormap.findText(cmap_init)
+        idx = self.cmb_colormap.findText(cmap_init)
         if idx == -1:
             idx = 0
-        self.cmbColormap.setCurrentIndex(idx)
+        self.cmb_colormap.setCurrentIndex(idx)
 
 # ------------------------------------------------------------------------------
     def _init_grid(self):
@@ -403,23 +403,23 @@ class Plot_3D(QWidget):
 
         N_FFT = CFP.conf_settings['N_FFT']
 
-        alpha = self.diaAlpha.value()/10.
+        alpha = self.dia_alpha.value()/10.
 
-        cmap = colormaps[str(self.cmbColormap.currentText())]
+        cmap = colormaps[str(self.cmb_colormap.currentText())]
         if self.but_colormap_r.checked:
             cmap = cmap.reversed()  # use reversed colormap
 
         # Number of Lines /step size for H(f) stride, mesh, contour3d:
-        stride = 10 - self.diaHatch.value()
-        NL = 3 * self.diaHatch.value() + 5
+        stride = 10 - self.dia_hatch.value()
+        NL = 3 * self.dia_hatch.value() + 5
 
-        surf_enabled = qget_cmb_box(self.cmbMode3D, data=False) in {'Surf', 'Contour'}\
+        surf_enabled = qget_cmb_box(self.cmb_mode_3d, data=False) in {'Surf', 'Contour'}\
             or self.but_contour_2d.checked
-        self.cmbColormap.setEnabled(surf_enabled)
+        self.cmb_colormap.setEnabled(surf_enabled)
         self.but_colormap_r.setEnabled(surf_enabled)
         self.but_lighting.setEnabled(surf_enabled)
         self.but_colbar.setEnabled(surf_enabled)
-        self.diaAlpha.setEnabled(surf_enabled or self.but_contour_2d.checked)
+        self.dia_alpha.setEnabled(surf_enabled or self.but_contour_2d.checked)
 
         # cNorm  = colors.Normalize(vmin=0, vmax=values[-1])
         # scalarMap = cmx.ScalarMappable(norm=cNorm, cmap=jet)
@@ -452,7 +452,7 @@ class Plot_3D(QWidget):
 
             zlevel = bottom - top_bottom * zlevel_rel
 
-            if self.cmbMode3D.currentText() == 'None':  # "Poleposition": H(f) plot only
+            if self.cmb_mode_3d.currentText() == 'None':  # "Poleposition": H(f) plot only
                 plevel_top = 2 * bottom - zlevel  # height of displayed pole position
                 plevel_btm = bottom
             else:
@@ -469,7 +469,7 @@ class Plot_3D(QWidget):
 
             zlevel = bottom + top_bottom * zlevel_rel  # height of displayed zero position
 
-            if self.cmbMode3D.currentText() == 'None':  # "Poleposition": H(f) plot only
+            if self.cmb_mode_3d.currentText() == 'None':  # "Poleposition": H(f) plot only
                 # H_max = np.clip(max(H_abs), 0, self.zmax)
                 # make height of displayed poles same to zeros
                 plevel_top = bottom + top_bottom * zlevel_rel
@@ -511,7 +511,7 @@ class Plot_3D(QWidget):
         # ===============================================================
         # Plot Poles and Zeros
         # ===============================================================
-        if self.but_PZ.checked:
+        if self.but_pz.checked:
 
             PN_SIZE = 8  # size of P/N symbols
 
@@ -540,7 +540,7 @@ class Plot_3D(QWidget):
         # ---------------------------------------------------------------
         # 3D-mesh plot
         # ---------------------------------------------------------------
-        if self.cmbMode3D.currentText() == 'Mesh':
+        if self.cmb_mode_3d.currentText() == 'Mesh':
             # fig_mlab = mlab.figure(fgcolor=(0., 0., 0.), bgcolor=(1, 1, 1))
             # self.ax3d.set_zlim(0,2)
             self.ax3d.plot_wireframe(
@@ -551,7 +551,7 @@ class Plot_3D(QWidget):
         # 3D-surface plot
         # ---------------------------------------------------------------
         # http://stackoverflow.com/questions/28232879/phong-shading-for-shiny-python-3d-surface-plots
-        elif self.cmbMode3D.currentText() == 'Surf':
+        elif self.cmb_mode_3d.currentText() == 'Surf':
 
             if self.but_lighting.checked:
                 ls = LightSource(azdeg=0, altdeg=65)  # Create light source object
@@ -572,7 +572,7 @@ class Plot_3D(QWidget):
         # ---------------------------------------------------------------
         # 3D-Contour plot
         # ---------------------------------------------------------------
-        elif self.cmbMode3D.currentText() == 'Contour':
+        elif self.cmb_mode_3d.currentText() == 'Contour':
             s = self.ax3d.contourf3D(self.x, self.y, Hmag, NL, alpha=alpha, cmap=cmap)
 
         # ---------------------------------------------------------------
@@ -592,7 +592,7 @@ class Plot_3D(QWidget):
 
         # plot colorbar for suitable plot modes
         if self.but_colbar.checked and (self.but_contour_2d.checked or
-                                            str(self.cmbMode3D.currentText())
+                                            str(self.cmb_mode_3d.currentText())
                                             in {'Contour', 'Surf'}):
             self.colb = self.mplwidget.fig.colorbar(m_cb, ax=self.ax3d, shrink=0.8,
                                                     aspect=20, pad=0.02, fraction=0.08)

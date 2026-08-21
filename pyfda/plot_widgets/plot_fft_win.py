@@ -318,7 +318,7 @@ class Plot_FFT_win(QDialog):
         layVControls.addWidget(hline)
         layVControls.addLayout(layHControls)
 
-        self.frm_controls = QFrame(self, objectName="frmControls")
+        self.frm_controls = QFrame(self, objectName="frm_controls")
         self.frm_controls.setLayout(layVControls)
 
         # ----------------------------------------------------------------------

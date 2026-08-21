@@ -86,7 +86,7 @@ class Plot_Hf(QWidget):
                 self.update_view()
                 self.needs_draw = False
             elif 'mpl_toolbar' in dict_sig and dict_sig['mpl_toolbar'] == 'ui_level':
-                self.frmControls.setVisible(self.mplwidget.mpl_toolbar.a_ui_level == 0)
+                self.frm_controls.setVisible(self.mplwidget.mpl_toolbar.a_ui_level == 0)
 
         else:
             if 'data_changed' in dict_sig or 'specs_changed' in dict_sig\
@@ -164,7 +164,7 @@ class Plot_Hf(QWidget):
         self.but_align.setVisible(self.but_phase.checked)
 
         # ----------------------------------------------------------------------
-        #               ### frmControls ###
+        #               ### frm_controls ###
         #
         # This widget encompasses all control subwidgets
         # ----------------------------------------------------------------------
@@ -188,8 +188,8 @@ class Plot_Hf(QWidget):
         layHControls.addWidget(self.but_align)
         layHControls.addStretch(10)
 
-        self.frmControls = QFrame(self, objectName="frmControls")
-        self.frmControls.setLayout(layHControls)
+        self.frm_controls = QFrame(self, objectName="frm_controls")
+        self.frm_controls.setLayout(layHControls)
 
         # ----------------------------------------------------------------------
         #               ### mplwidget ###
@@ -197,7 +197,7 @@ class Plot_Hf(QWidget):
         # main widget, encompassing the other widgets
         # ----------------------------------------------------------------------
         self.mplwidget = MplWidget(self)
-        self.mplwidget.lay_v_main_mpl.addWidget(self.frmControls)
+        self.mplwidget.lay_v_main_mpl.addWidget(self.frm_controls)
         self.mplwidget.lay_v_main_mpl.setContentsMargins(*params['mpl_margins'])
         self.mplwidget.mpl_toolbar.a_he.setEnabled(True)
         self.mplwidget.mpl_toolbar.a_he.info = "manual/plot_hf.html"
