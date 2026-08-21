@@ -70,14 +70,14 @@ class Plot_tau_g(QWidget):
             "<span>Print messages about singular group delay and calculation times."
             "</span>"))
 
-        self.cmbAlgorithm = QComboBox(self)
-        qcmb_box_populate(self.cmbAlgorithm, self.cmb_algorithm_items, self.algorithm)
+        self.cmb_algorithm = QComboBox(self)
+        qcmb_box_populate(self.cmb_algorithm, self.cmb_algorithm_items, self.algorithm)
 
         layHControls = QHBoxLayout()
         layHControls.addStretch(10)
         layHControls.addWidget(self.chkWarnings)
         # layHControls.addWidget(self.chkScipy)
-        layHControls.addWidget(self.cmbAlgorithm)
+        layHControls.addWidget(self.cmb_algorithm)
 
         # This widget encompasses all control subwidgets:
         self.frmControls = QFrame(self, objectName="frmControls")
@@ -102,7 +102,7 @@ class Plot_tau_g(QWidget):
         # LOCAL SIGNALS & SLOTs
         # ----------------------------------------------------------------------
         self.mplwidget.mpl_toolbar.sig_tx.connect(self.process_sig_rx)
-        self.cmbAlgorithm.currentIndexChanged.connect(self.draw)
+        self.cmb_algorithm.currentIndexChanged.connect(self.draw)
 
 # ------------------------------------------------------------------------------
     def process_sig_rx(self, dict_sig=None):
@@ -156,12 +156,12 @@ class Plot_tau_g(QWidget):
             self.W, self.tau_g = group_delay(
                 fb_get('sos'), nfft=CFP.conf_settings['N_FFT'],
                 sos=True, whole=True, verbose=self.chkWarnings.isChecked(),
-                alg=self.cmbAlgorithm.currentData())
+                alg=self.cmb_algorithm.currentData())
         else:
             self.W, self.tau_g = group_delay(
                 bb, aa, nfft=CFP.conf_settings['N_FFT'], whole=True,
                 verbose=self.chkWarnings.isChecked(),
-                alg=self.cmbAlgorithm.currentData())
+                alg=self.cmb_algorithm.currentData())
             #                                   self.chkWarnings.isChecked())
 
 # ------------------------------------------------------------------------------
