@@ -178,7 +178,7 @@ disallow_untyped_defs = false
 # --disable=W".
 "messages control".disable = [
   "duplicate-code",
-  "invalid-name",
+  # "invalid-name",
   "attribute-defined-outside-init",
   "raw-checker-failed",
   "bad-inline-option",
