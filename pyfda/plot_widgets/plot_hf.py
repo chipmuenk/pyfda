@@ -86,7 +86,7 @@ class Plot_Hf(QWidget):
                 self.update_view()
                 self.needs_draw = False
             elif 'mpl_toolbar' in dict_sig and dict_sig['mpl_toolbar'] == 'ui_level':
-                self.frmControls.setVisible(self.mplwidget.mplToolbar.a_ui_level == 0)
+                self.frmControls.setVisible(self.mplwidget.mpl_toolbar.a_ui_level == 0)
 
         else:
             if 'data_changed' in dict_sig or 'specs_changed' in dict_sig\
@@ -199,10 +199,10 @@ class Plot_Hf(QWidget):
         self.mplwidget = MplWidget(self)
         self.mplwidget.lay_v_main_mpl.addWidget(self.frmControls)
         self.mplwidget.lay_v_main_mpl.setContentsMargins(*params['mpl_margins'])
-        self.mplwidget.mplToolbar.a_he.setEnabled(True)
-        self.mplwidget.mplToolbar.a_he.info = "manual/plot_hf.html"
-        self.mplwidget.mplToolbar.a_ui.setEnabled(True)
-        self.mplwidget.mplToolbar.a_ui_num_levels = 2
+        self.mplwidget.mpl_toolbar.a_he.setEnabled(True)
+        self.mplwidget.mpl_toolbar.a_he.info = "manual/plot_hf.html"
+        self.mplwidget.mpl_toolbar.a_ui.setEnabled(True)
+        self.mplwidget.mpl_toolbar.a_ui_num_levels = 2
         self.setLayout(self.mplwidget.lay_v_main_mpl)
 
         self.init_axes()
@@ -229,7 +229,7 @@ class Plot_Hf(QWidget):
         self.but_phase.clicked.connect(self.draw)
         self.but_align.clicked.connect(self.draw)
 
-        self.mplwidget.mplToolbar.sig_tx.connect(self.process_sig_rx)
+        self.mplwidget.mpl_toolbar.sig_tx.connect(self.process_sig_rx)
 
     # ------------------------------------------------------------------------------
     def init_axes(self):

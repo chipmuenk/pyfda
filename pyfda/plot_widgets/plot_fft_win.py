@@ -204,9 +204,9 @@ class Plot_FFT_win(QDialog):
             elif dict_sig['mpl_toolbar'] == 'ui_level':
                 # info frame is only visible for maximum detail level
                 self.frm_info.setVisible(
-                    self.mplwidget.mplToolbar.a_ui_level < 1)
+                    self.mplwidget.mpl_toolbar.a_ui_level < 1)
                 # Window and control widget only becomes invisible for minimum detail level
-                self.frm_controls.setVisible(self.mplwidget.mplToolbar.a_ui_level < 2)
+                self.frm_controls.setVisible(self.mplwidget.mpl_toolbar.a_ui_level < 2)
         else:
             logger.error("Cannot process dict_sig: %s", dict_sig)
 
@@ -332,9 +332,9 @@ class Plot_FFT_win(QDialog):
         self.mplwidget.lay_v_main_mpl.addWidget(self.frm_controls)
         self.mplwidget.lay_v_main_mpl.setContentsMargins(0, 0, 0, 0)
 
-        # self.mplwidget.mplToolbar.a_he.setEnabled(False)  # enable help menu
-        self.mplwidget.mplToolbar.a_he.info = "manual/plot_fft_win.html"  # TODO: missing!
-        self.mplwidget.mplToolbar.a_ui_num_levels = 3 # number of ui levels
+        # self.mplwidget.mpl_toolbar.a_he.setEnabled(False)  # enable help menu
+        self.mplwidget.mpl_toolbar.a_he.info = "manual/plot_fft_win.html"  # TODO: missing!
+        self.mplwidget.mpl_toolbar.a_ui_num_levels = 3 # number of ui levels
 
         # ----------------------------------------------------------------------
         #               ### frm_info ###
@@ -420,7 +420,7 @@ class Plot_FFT_win(QDialog):
         self.but_norm_f.clicked.connect(self.calc_win_draw)
         self.but_half_f.clicked.connect(self.update_view)
 
-        self.mplwidget.mplToolbar.sig_tx.connect(self.process_sig_rx)
+        self.mplwidget.mpl_toolbar.sig_tx.connect(self.process_sig_rx)
         self.tbl_win_props.itemClicked.connect(self._handle_item_clicked)
 
         self.qfft_win_select.sig_tx.connect(self.update_fft_win)

@@ -156,15 +156,15 @@ class MplWidget(QWidget):
         # Create a custom navigation toolbar, tied to the canvas and
         # initialize toolbar settings. Send events through event filter
         #
-        self.mplToolbar = MplToolbar(self.canvas, self)
-        self.mplToolbar.a_zo_locked = False
-        self.mplToolbar.plot_enabled = True
-        self.mplToolbar.save_button_states()  # store initial setting of buttons
+        self.mpl_toolbar = MplToolbar(self.canvas, self)
+        self.mpl_toolbar.a_zo_locked = False
+        self.mpl_toolbar.plot_enabled = True
+        self.mpl_toolbar.save_button_states()  # store initial setting of buttons
 
-        # self.mplToolbar.sig_rx.connect(self.sig_rx)  # TODO: Doesn't exist yet
+        # self.mpl_toolbar.sig_rx.connect(self.sig_rx)  # TODO: Doesn't exist yet
 
         lay_h_toolbar = QHBoxLayout()
-        lay_h_toolbar.addWidget(self.mplToolbar)
+        lay_h_toolbar.addWidget(self.mpl_toolbar)
         lay_h_toolbar.addStretch(1)
 
         # =============================================
@@ -212,7 +212,7 @@ class MplWidget(QWidget):
 
                 # logger.warning(f"Key = {key}, meta = {meta}, ctrl = {ctrl}, shift = {shift}")
                 if key == 67 and ctrl:  # "ctrl-c"
-                    self.mplToolbar.mpl2clip(key_event=True)
+                    self.mpl_toolbar.mpl2clip(key_event=True)
 
         # elif event.type() == QtGui.QMouseEvent.MouseButtonPress:
         #     logger.warning("Mouse Event")
@@ -231,7 +231,7 @@ class MplWidget(QWidget):
         """
         Save x- and y-limits of all axes in self.limits when zoom is unlocked
         """
-        if not self.mplToolbar.a_zo_locked:
+        if not self.mpl_toolbar.a_zo_locked:
             for ax in self.fig.axes:
                 self.limits = ax.axis()  # save old limits
 
@@ -245,10 +245,10 @@ class MplWidget(QWidget):
         you need to call redraw()
         """
         if self.fig.axes:
-            self.mplToolbar.cycle_draw_grid(cycle=False, axes=self.fig.axes)
+            self.mpl_toolbar.cycle_draw_grid(cycle=False, axes=self.fig.axes)
             # self.fig.axes is a list of one or more axes, e.g. for subplots
             for ax in self.fig.axes:  # pylint: disable=not-an-iterable
-                if self.mplToolbar.a_zo_locked:
+                if self.mpl_toolbar.a_zo_locked:
                     ax.axis(self.limits)  # restore old limits
                 else:
                     self.limits = ax.axis()  # save old limits
@@ -263,7 +263,7 @@ class MplWidget(QWidget):
 
         Add current view limits to view history to enable "back to previous view"
         """
-        self.mplToolbar.push_current()
+        self.mpl_toolbar.push_current()
         # self.fig.axes is a list of one or more axes, e.g. for subplots
         for ax in self.fig.axes:  # pylint: disable=not-an-iterable
             if ax.get_navigate():
@@ -323,7 +323,7 @@ class MplWidget(QWidget):
         """
         Update the tracking cursors
         """
-        if self.mplToolbar.a_cr.isChecked():
+        if self.mpl_toolbar.a_cr.isChecked():
             if hasattr(self, "cursors"):  # dangling references to old cursors?
                 for c in self.cursors:
                     c.remove()         # yes, remove them!

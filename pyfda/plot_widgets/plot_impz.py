@@ -127,10 +127,10 @@ class Plot_Impz(QWidget):
         self.mplwidget_t.setObjectName("mplwidget_t1")
         self.mplwidget_t.lay_v_main_mpl.addWidget(self.ui.wdg_ctrl_time)
         self.mplwidget_t.lay_v_main_mpl.setContentsMargins(*params['mpl_margins'])
-        self.mplwidget_t.mplToolbar.a_en.setVisible(True)
-        self.mplwidget_t.mplToolbar.a_he.setEnabled(True)
-        self.mplwidget_t.mplToolbar.a_he.info = "manual/plot_impz.html"
-        self.mplwidget_t.mplToolbar.a_ui_num_levels = 4
+        self.mplwidget_t.mpl_toolbar.a_en.setVisible(True)
+        self.mplwidget_t.mpl_toolbar.a_he.setEnabled(True)
+        self.mplwidget_t.mpl_toolbar.a_he.info = "manual/plot_impz.html"
+        self.mplwidget_t.mpl_toolbar.a_ui_num_levels = 4
         self.mplwidget_t.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
 
         # ---------- MplWidget for FREQUENCY domain plots ----------------------
@@ -138,10 +138,10 @@ class Plot_Impz(QWidget):
         self.mplwidget_f.setObjectName("mplwidget_f1")
         self.mplwidget_f.lay_v_main_mpl.addWidget(self.ui.wdg_ctrl_freq)
         self.mplwidget_f.lay_v_main_mpl.setContentsMargins(*params['mpl_margins'])
-        self.mplwidget_f.mplToolbar.a_en.setVisible(True)
-        self.mplwidget_f.mplToolbar.a_he.setEnabled(True)
-        self.mplwidget_f.mplToolbar.a_he.info = "manual/plot_impz.html"
-        self.mplwidget_f.mplToolbar.a_ui_num_levels = 4
+        self.mplwidget_f.mpl_toolbar.a_en.setVisible(True)
+        self.mplwidget_f.mpl_toolbar.a_he.setEnabled(True)
+        self.mplwidget_f.mpl_toolbar.a_he.info = "manual/plot_impz.html"
+        self.mplwidget_f.mpl_toolbar.a_ui_num_levels = 4
         self.mplwidget_f.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
 
         # ----------- Construct TabWidget with time and frequency plot widgets
@@ -214,9 +214,9 @@ class Plot_Impz(QWidget):
         self.ui.sig_tx.connect(self.process_sig_rx)
         self.stim_wdg.sig_tx.connect(self.process_sig_rx)
         self.tran_io_wdg.sig_tx.connect(self.process_sig_rx)
-        self.mplwidget_t.mplToolbar.sig_tx.connect(self.process_sig_rx_t)
-        self.mplwidget_f.mplToolbar.sig_tx.connect(self.process_sig_rx_f)
-        # self.mplwidget.mplToolbar.enable_plot(state = False) # disable initially
+        self.mplwidget_t.mpl_toolbar.sig_tx.connect(self.process_sig_rx_t)
+        self.mplwidget_f.mpl_toolbar.sig_tx.connect(self.process_sig_rx_f)
+        # self.mplwidget.mpl_toolbar.enable_plot(state = False) # disable initially
 
         # When user has selected a different local tab, trigger a redraw of current tab
         self.tab_mpl_w.currentChanged.connect(self.draw)  # passes # of active tab
@@ -285,8 +285,8 @@ class Plot_Impz(QWidget):
         """
         Sync time and frequency subwidget and set their ui display level
         """
-        self.mplwidget_f.mplToolbar.cycle_ui_level(ui_level)
-        self.mplwidget_t.mplToolbar.cycle_ui_level(ui_level)
+        self.mplwidget_f.mpl_toolbar.cycle_ui_level(ui_level)
+        self.mplwidget_t.mpl_toolbar.cycle_ui_level(ui_level)
         if ui_level == 0:
             self.ui.wdg_ctrl_time.setVisible(True)
             self.ui.wdg_ctrl_freq.setVisible(True)
@@ -343,10 +343,10 @@ class Plot_Impz(QWidget):
         # cycle ui level
         if 'mpl_toolbar' in dict_sig and dict_sig['mpl_toolbar'] == 'ui_level':
             # read out ui level directly
-            self.set_ui_level(self.mplwidget_t.mplToolbar.a_ui_level)
+            self.set_ui_level(self.mplwidget_t.mpl_toolbar.a_ui_level)
         # redraw plot when it has become enabled
         elif dict_sig['mpl_toolbar'] == 'enable_plot'\
-                and self.mplwidget_t.mplToolbar.plot_enabled:
+                and self.mplwidget_t.mpl_toolbar.plot_enabled:
             self.draw()
         else:
             self.process_sig_rx(dict_sig)
@@ -359,10 +359,10 @@ class Plot_Impz(QWidget):
         # cycle ui level
         if 'mpl_toolbar' in dict_sig and dict_sig['mpl_toolbar'] == 'ui_level':
             # read out ui level directly
-            self.set_ui_level(self.mplwidget_f.mplToolbar.a_ui_level)
+            self.set_ui_level(self.mplwidget_f.mpl_toolbar.a_ui_level)
         # redraw plot when it has become enabled
         elif dict_sig['mpl_toolbar'] == 'enable_plot'\
-                and self.mplwidget_f.mplToolbar.plot_enabled:
+                and self.mplwidget_f.mpl_toolbar.plot_enabled:
             self.draw()
         else:
             self.process_sig_rx(dict_sig)
@@ -984,10 +984,10 @@ class Plot_Impz(QWidget):
         idx = self.tab_mpl_w.currentIndex()
 
         if idx == 0 and self.needs_redraw[0]\
-                and self.mplwidget_t.mplToolbar.plot_enabled:
+                and self.mplwidget_t.mpl_toolbar.plot_enabled:
             self.draw_time(N_start=self.ui.N_start, N_end=self.ui.N_end)
         elif idx == 1 and self.needs_redraw[1]\
-                and self.mplwidget_f.mplToolbar.plot_enabled:
+                and self.mplwidget_f.mpl_toolbar.plot_enabled:
             self.draw_freq()
 
     # ----------------------------------------------------------------------
