@@ -94,23 +94,23 @@ class Plot_3D(QWidget):
                                          objectName="but_plot_in_UC")
         self.but_plot_in_UC.setToolTip("Only plot H(z) within the unit circle")
 
-        self.lblBottom = QLabel(to_html("Bottom =", frmt='bi'), self)
+        self.lbl_bottom = QLabel(to_html("Bottom =", frmt='bi'), self)
         self.led_bottom = QLineEdit(self, objectName="led_bottom")
         self.led_bottom.setText(str(self.zmin))
         self.led_bottom.setToolTip("Minimum display value.")
-        self.lblBottomdB = QLabel("dB", self)
-        self.lblBottomdB.setVisible(self.but_log.checked)
+        self.lbl_bottom_db = QLabel("dB", self)
+        self.lbl_bottom_db.setVisible(self.but_log.checked)
 
-        self.lblTop = QLabel(to_html("Top =", frmt='bi'), self)
+        self.lbl_top = QLabel(to_html("Top =", frmt='bi'), self)
         self.led_top = QLineEdit(self, objectName="led_top")
         self.led_top.setText(str(self.zmax))
         self.led_top.setToolTip("Maximum display value.")
-        self.lblTopdB = QLabel("dB", self)
-        self.lblTopdB.setVisible(self.but_log.checked)
+        self.lbl_top_db = QLabel("dB", self)
+        self.lbl_top_db.setVisible(self.but_log.checked)
 
-        self.plt_UC = PushButton(self, "UC", objectName="plt_UC")
-        self.plt_UC.setChecked(True)
-        self.plt_UC.setToolTip("Plot unit circle")
+        self.plt_uc = PushButton(self, "UC", objectName="plt_uc")
+        self.plt_uc.setChecked(True)
+        self.plt_uc.setToolTip("Plot unit circle")
 
         self.but_PZ = PushButton(self, "P/Z ", objectName="but_PZ")
         self.but_PZ.setChecked(True)
@@ -167,38 +167,38 @@ class Plot_3D(QWidget):
         # ----------------------------------------------------------------------
         # LAYOUT for UI widgets
         # ----------------------------------------------------------------------
-        layGControls = QGridLayout()
-        layGControls.addWidget(self.but_log, 0, 0)
-        layGControls.addWidget(self.but_plot_in_UC, 1, 0)
-        layGControls.addWidget(self.lblTop, 0, 2)
-        layGControls.addWidget(self.led_top, 0, 4)
-        layGControls.addWidget(self.lblTopdB, 0, 5)
-        layGControls.addWidget(self.lblBottom, 1, 2)
-        layGControls.addWidget(self.led_bottom, 1, 4)
-        layGControls.addWidget(self.lblBottomdB, 1, 5)
-        layGControls.setColumnStretch(5,1)
+        lay_g_controls = QGridLayout()
+        lay_g_controls.addWidget(self.but_log, 0, 0)
+        lay_g_controls.addWidget(self.but_plot_in_UC, 1, 0)
+        lay_g_controls.addWidget(self.lbl_top, 0, 2)
+        lay_g_controls.addWidget(self.led_top, 0, 4)
+        lay_g_controls.addWidget(self.lbl_top_db, 0, 5)
+        lay_g_controls.addWidget(self.lbl_bottom, 1, 2)
+        lay_g_controls.addWidget(self.led_bottom, 1, 4)
+        lay_g_controls.addWidget(self.lbl_bottom_db, 1, 5)
+        lay_g_controls.setColumnStretch(5,1)
 
-        layGControls.addWidget(self.plt_UC, 0, 6)
-        layGControls.addWidget(self.but_Hf, 1, 6)
-        layGControls.addWidget(self.but_PZ, 0, 8)
+        lay_g_controls.addWidget(self.plt_uc, 0, 6)
+        lay_g_controls.addWidget(self.but_Hf, 1, 6)
+        lay_g_controls.addWidget(self.but_PZ, 0, 8)
 
-        layGControls.addWidget(self.cmbMode3D, 0, 10)
-        layGControls.addWidget(self.but_contour_2d, 1, 10)
-        layGControls.addWidget(self.cmbColormap, 0, 12, 1, 1)
-        layGControls.addWidget(self.but_colormap_r, 1, 12)
+        lay_g_controls.addWidget(self.cmbMode3D, 0, 10)
+        lay_g_controls.addWidget(self.but_contour_2d, 1, 10)
+        lay_g_controls.addWidget(self.cmbColormap, 0, 12, 1, 1)
+        lay_g_controls.addWidget(self.but_colormap_r, 1, 12)
 
-        layGControls.addWidget(self.but_lighting, 0, 14)
-        layGControls.addWidget(self.but_colbar, 1, 14)
+        lay_g_controls.addWidget(self.but_lighting, 0, 14)
+        lay_g_controls.addWidget(self.but_colbar, 1, 14)
 
-        layGControls.addWidget(self.lblAlpha, 0, 15)
-        layGControls.addWidget(self.diaAlpha, 0, 16)
+        lay_g_controls.addWidget(self.lblAlpha, 0, 15)
+        lay_g_controls.addWidget(self.diaAlpha, 0, 16)
 
-        layGControls.addWidget(self.lblHatch, 1, 15)
-        layGControls.addWidget(self.diaHatch, 1, 16)
+        lay_g_controls.addWidget(self.lblHatch, 1, 15)
+        lay_g_controls.addWidget(self.diaHatch, 1, 16)
 
         # This widget encompasses all control subwidgets
         self.frmControls = QFrame(self, objectName="frmControls")
-        self.frmControls.setLayout(layGControls)
+        self.frmControls.setLayout(lay_g_controls)
 
         # ----------------------------------------------------------------------
         # mplwidget
@@ -226,7 +226,7 @@ class Plot_3D(QWidget):
         self.led_top.editingFinished.connect(self._log_clicked)
 
         self.but_plot_in_UC.clicked.connect(self._init_grid)
-        self.plt_UC.clicked.connect(self.draw)
+        self.plt_uc.clicked.connect(self.draw)
         self.but_Hf.clicked.connect(self.draw)
         self.but_PZ.clicked.connect(self.draw)
         self.cmbMode3D.currentIndexChanged.connect(self.draw)
@@ -258,8 +258,8 @@ class Plot_3D(QWidget):
 # ------------------------------------------------------------------------------
     def _init_grid(self):
         """ Initialize (x,y,z) coordinate grid + (re)draw plot."""
-        phi_UC = np.linspace(0, 2*pi, 400, endpoint=True)  # angles for unit circle
-        self.xy_UC = np.exp(1j * phi_UC)  # x,y coordinates of unity circle
+        phi_uc = np.linspace(0, 2*pi, 400, endpoint=True)  # angles for unit circle
+        self.xy_uc = np.exp(1j * phi_uc)  # x,y coordinates of unity circle
 
         steps = 100              # number of steps for x, y, r, phi
         # cartesian range limits
@@ -355,14 +355,14 @@ class Plot_3D(QWidget):
                 self.led_bottom.setText(str(self.zmin_dB))
                 self.zmax_dB = np.round(20 * log10(self.zmax), 2)
                 self.led_top.setText(str(self.zmax_dB))
-                self.lblTopdB.setVisible(True)
-                self.lblBottomdB.setVisible(True)
+                self.lbl_top_db.setVisible(True)
+                self.lbl_bottom_db.setVisible(True)
             else:
                 self.led_bottom.setText(str(self.zmin))
                 self.zmax = np.round(10**(self.zmax_dB / 20), 2)
                 self.led_top.setText(str(self.zmax))
-                self.lblTopdB.setVisible(False)
-                self.lblBottomdB.setVisible(False)
+                self.lbl_top_db.setVisible(False)
+                self.lbl_bottom_db.setVisible(False)
 
         else:  # finishing a lineEdit field triggered the slot
             if self.but_log.checked:
@@ -480,32 +480,32 @@ class Plot_3D(QWidget):
 
         # calculate H(jw)| along the unity circle and |H(z)|, each clipped
         # between bottom and top
-        H_UC = H_mag(bb, aa, self.xy_UC, top, H_min=bottom, log=self.but_log.checked)
+        H_UC = H_mag(bb, aa, self.xy_uc, top, H_min=bottom, log=self.but_log.checked)
         Hmag = H_mag(bb, aa, self.z, top, H_min=bottom, log=self.but_log.checked)
 
         # ===============================================================
         # Plot Unit Circle (UC)
         # ===============================================================
-        if self.plt_UC.checked:
+        if self.plt_uc.checked:
             #  Plot unit circle and marker at (1,0):
-            self.ax3d.plot(self.xy_UC.real, self.xy_UC.imag,
-                           ones(len(self.xy_UC)) * bottom, lw=2, color='k')
+            self.ax3d.plot(self.xy_uc.real, self.xy_uc.imag,
+                           ones(len(self.xy_uc)) * bottom, lw=2, color='k')
             self.ax3d.plot([0.97, 1.03], [0, 0], [bottom, bottom], lw=2, color='k')
 
         # ===============================================================
         # Plot ||H(f)| along unit circle as 3D-lineplot
         # ===============================================================
         if self.but_Hf.checked:
-            self.ax3d.plot(self.xy_UC.real, self.xy_UC.imag, H_UC, alpha=0.8, lw=4)
+            self.ax3d.plot(self.xy_uc.real, self.xy_uc.imag, H_UC, alpha=0.8, lw=4)
             # draw once more as dashed white line to improve visibility
-            self.ax3d.plot(self.xy_UC.real, self.xy_UC.imag, H_UC, 'w--', lw=4)
+            self.ax3d.plot(self.xy_uc.real, self.xy_uc.imag, H_UC, 'w--', lw=4)
 
             if stride < 10:  # plot thin vertical line every stride points on the UC
-                for k in range(len(self.xy_UC[::stride])):
+                for k in range(len(self.xy_uc[::stride])):
                     self.ax3d.plot(
-                        [self.xy_UC.real[::stride][k], self.xy_UC.real[::stride][k]],
-                        [self.xy_UC.imag[::stride][k], self.xy_UC.imag[::stride][k]],
-                        [np.ones(len(self.xy_UC[::stride]))[k]*bottom, H_UC[::stride][k]],
+                        [self.xy_uc.real[::stride][k], self.xy_uc.real[::stride][k]],
+                        [self.xy_uc.imag[::stride][k], self.xy_uc.imag[::stride][k]],
+                        [np.ones(len(self.xy_uc[::stride]))[k]*bottom, H_UC[::stride][k]],
                         linewidth=1, color=(0.5, 0.5, 0.5))
 
         # ===============================================================
