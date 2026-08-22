@@ -85,33 +85,33 @@ class TargetSpecs(QWidget):
         ###########
         bfont = QFont()
         bfont.setBold(True)
-        lblTitle = QLabel(self)  # field for widget title
-        lblTitle.setText(self.title)
-        lblTitle.setFont(bfont)
-#        lblTitle.setContentsMargins(2,2,2,2)
+        lbl_title = QLabel(self)  # field for widget title
+        lbl_title.setText(self.title)
+        lbl_title.setFont(bfont)
+    #        lbl_title.setContentsMargins(2,2,2,2)
 
-        layHTitle = QHBoxLayout()
-        layHTitle.addWidget(lblTitle)
-        layHTitle.setAlignment(Qt.AlignHCenter)
-        layHSpecs = QHBoxLayout()
-        layHSpecs.setAlignment(Qt.AlignTop)
-        layHSpecs.addWidget(self.f_specs)  # frequency specs
-        layHSpecs.addWidget(self.a_specs)  # ampltitude specs
+        lay_h_title = QHBoxLayout()
+        lay_h_title.addWidget(lbl_title)
+        lay_h_title.setAlignment(Qt.AlignHCenter)
+        lay_h_specs = QHBoxLayout()
+        lay_h_specs.setAlignment(Qt.AlignTop)
+        lay_h_specs.addWidget(self.f_specs)  # frequency specs
+        lay_h_specs.addWidget(self.a_specs)  # ampltitude specs
 
-        layVSpecs = QVBoxLayout()
-        layVSpecs.addLayout(layHTitle)
-        layVSpecs.addLayout(layHSpecs)
-        layVSpecs.setContentsMargins(0, 6, 0, 0)  # (left, top, right, bottom)
+        lay_v_specs = QVBoxLayout()
+        lay_v_specs.addLayout(lay_h_title)
+        lay_v_specs.addLayout(lay_h_specs)
+        lay_v_specs.setContentsMargins(0, 6, 0, 0)  # (left, top, right, bottom)
 
         # This is the top level widget, encompassing the other widgets
         frm_main = QFrame(self)
-        frm_main.setLayout(layVSpecs)
+        frm_main.setLayout(lay_v_specs)
 
-        self.layVMain = QVBoxLayout()  # Widget main layout
-        self.layVMain.addWidget(frm_main)
-        self.layVMain.setContentsMargins(*params['wdg_margins'])
+        self.lay_v_main = QVBoxLayout()  # Widget main layout
+        self.lay_v_main.addWidget(frm_main)
+        self.lay_v_main.setContentsMargins(*params['wdg_margins'])
 
-        self.setLayout(self.layVMain)
+        self.setLayout(self.lay_v_main)
 
         # ----------------------------------------------------------------------
         # GLOBAL SIGNALS & SLOTs

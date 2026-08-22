@@ -308,15 +308,15 @@ class Plot_FFT_win(QDialog):
         layHControls_f.addWidget(self.but_bin_f)
         layHControls_f.addStretch(5)
 
-        layHControls = QHBoxLayout()
-        layHControls.addLayout(layHControls_t, stretch=10)
-        layHControls.addWidget(QVLine(width=4), stretch=1)
-        layHControls.addLayout(layHControls_f, stretch=10)
+        lay_h_controls = QHBoxLayout()
+        lay_h_controls.addLayout(layHControls_t, stretch=10)
+        lay_h_controls.addWidget(QVLine(width=4), stretch=1)
+        lay_h_controls.addLayout(layHControls_f, stretch=10)
 
         layVControls = QVBoxLayout()
         layVControls.addWidget(self.frmQFFT)
         layVControls.addWidget(hline)
-        layVControls.addLayout(layHControls)
+        layVControls.addLayout(lay_h_controls)
 
         self.frm_controls = QFrame(self, objectName="frm_controls")
         self.frm_controls.setLayout(layVControls)

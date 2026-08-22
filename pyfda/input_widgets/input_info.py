@@ -189,7 +189,7 @@ class Input_Info(QWidget):
         lay_v_main = QVBoxLayout()
         lay_v_main.addWidget(self.frm_main)
 
-#        lay_v_main.addLayout(self.layHControls)
+#        lay_v_main.addLayout(self.lay_h_controls)
         splitter = QSplitter(self)
         splitter.setOrientation(Qt.Vertical)
         splitter.addWidget(self.tbl_filt_perf)

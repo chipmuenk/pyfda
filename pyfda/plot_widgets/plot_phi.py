@@ -102,10 +102,10 @@ class Plot_Phi(QWidget):
         self.but_wrap = PushButton(self, "wrapped")
         self.but_wrap.setToolTip("Plot phase wrapped to +/- pi")
 
-        layHControls = QHBoxLayout()
-        layHControls.addWidget(self.cmbUnitsPhi)
-        layHControls.addWidget(self.but_wrap)
-        layHControls.addStretch(10)
+        lay_h_controls = QHBoxLayout()
+        lay_h_controls.addWidget(self.cmbUnitsPhi)
+        lay_h_controls.addWidget(self.but_wrap)
+        lay_h_controls.addStretch(10)
 
         # ----------------------------------------------------------------------
         #               ### frm_controls ###
@@ -113,7 +113,7 @@ class Plot_Phi(QWidget):
         # This widget encompasses all control subwidgets
         # ----------------------------------------------------------------------
         self.frm_controls = QFrame(self, objectName="frm_controls")
-        self.frm_controls.setLayout(layHControls)
+        self.frm_controls.setLayout(lay_h_controls)
 
         # ----------------------------------------------------------------------
         #               ### mplwidget ###

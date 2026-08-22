@@ -73,15 +73,15 @@ class Plot_tau_g(QWidget):
         self.cmb_algorithm = QComboBox(self)
         qcmb_box_populate(self.cmb_algorithm, self.cmb_algorithm_items, self.algorithm)
 
-        layHControls = QHBoxLayout()
-        layHControls.addStretch(10)
-        layHControls.addWidget(self.chkWarnings)
-        # layHControls.addWidget(self.chkScipy)
-        layHControls.addWidget(self.cmb_algorithm)
+        lay_h_controls = QHBoxLayout()
+        lay_h_controls.addStretch(10)
+        lay_h_controls.addWidget(self.chkWarnings)
+        # lay_h_controls.addWidget(self.chkScipy)
+        lay_h_controls.addWidget(self.cmb_algorithm)
 
         # This widget encompasses all control subwidgets:
         self.frm_controls = QFrame(self, objectName="frm_controls")
-        self.frm_controls.setLayout(layHControls)
+        self.frm_controls.setLayout(lay_h_controls)
 
         self.mplwidget = MplWidget(self)
         self.mplwidget.lay_v_main_mpl.addWidget(self.frm_controls)

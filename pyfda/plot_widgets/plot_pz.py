@@ -145,20 +145,20 @@ class Plot_PZ(QWidget):
         self.but_fir_poles.setChecked(True)
         self.but_fir_poles.setToolTip("<span>Show FIR poles at the origin.</span>")
 
-        layHControls = QHBoxLayout()
-        layHControls.addWidget(self.lbl_overlay)
-        layHControls.addWidget(self.cmb_overlay)
-        layHControls.addWidget(self.but_log)
-        layHControls.addWidget(self.diaRad_Hf)
-        layHControls.addWidget(self.lblRad_Hf)
-        layHControls.addWidget(self.lbl_top)
-        layHControls.addWidget(self.led_top)
-        layHControls.addWidget(self.lbl_top_db)
-        layHControls.addWidget(self.lbl_bottom)
-        layHControls.addWidget(self.led_bottom)
-        layHControls.addWidget(self.lbl_bottom_db)
-        layHControls.addStretch(10)
-        layHControls.addWidget(self.but_fir_poles)
+        lay_h_controls = QHBoxLayout()
+        lay_h_controls.addWidget(self.lbl_overlay)
+        lay_h_controls.addWidget(self.cmb_overlay)
+        lay_h_controls.addWidget(self.but_log)
+        lay_h_controls.addWidget(self.diaRad_Hf)
+        lay_h_controls.addWidget(self.lblRad_Hf)
+        lay_h_controls.addWidget(self.lbl_top)
+        lay_h_controls.addWidget(self.led_top)
+        lay_h_controls.addWidget(self.lbl_top_db)
+        lay_h_controls.addWidget(self.lbl_bottom)
+        lay_h_controls.addWidget(self.led_bottom)
+        lay_h_controls.addWidget(self.lbl_bottom_db)
+        lay_h_controls.addStretch(10)
+        lay_h_controls.addWidget(self.but_fir_poles)
 
         # ----------------------------------------------------------------------
         #               ### frm_controls ###
@@ -166,7 +166,7 @@ class Plot_PZ(QWidget):
         # This widget encompasses all control subwidgets
         # ----------------------------------------------------------------------
         self.frm_controls = QFrame(self, objectName="frm_controls")
-        self.frm_controls.setLayout(layHControls)
+        self.frm_controls.setLayout(lay_h_controls)
 
         # ----------------------------------------------------------------------
         #               ### mplwidget ###
