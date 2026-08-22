@@ -81,7 +81,7 @@ class FilterConfig:
 
     amp_specs_unit: str = 'dB'
     f_S: float = 1.0  # sampling frequency
-    f_S_prev: float = 1.0  # previous sampling frequency
+    f_s_prev: float = 1.0  # previous sampling frequency
     f_max: float = 1.0
     f_s_scale: float = 1.0
     fc: str = 'Ellip'  # filter class

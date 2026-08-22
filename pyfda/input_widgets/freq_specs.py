@@ -237,10 +237,10 @@ class FreqSpecs(QWidget):
             for qle in self.qlineedit:
                 f_name = str(qle.objectName()).split(":", 1)
                 f_label = f_name[0]
-                f_value = fb_get(f_label) * fb_get('f_S_prev') / fb_get('f_S')
+                f_value = fb_get(f_label) * fb_get('f_s_prev') / fb_get('f_S')
                 # logger.warning(
-                #     "Updating freq_specs: f_S = %s, f_S_prev = %s\n\t%s: %s",
-                #     fb_get('f_S'), fb_get('f_S_prev'), f_label, f_value)
+                #     "Updating freq_specs: f_S = %s, f_s_prev = %s\n\t%s: %s",
+                #     fb_get('f_S'), fb_get('f_s_prev'), f_label, f_value)
 
                 fb_set(f_label, f_value)
             self.emit({'specs_changed': 'f_specs'})

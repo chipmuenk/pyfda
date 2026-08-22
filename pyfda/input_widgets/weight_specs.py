@@ -35,8 +35,8 @@ class WeightSpecs(QWidget):
         super().__init__()
 
         self.setObjectName(objectName)
-        self.qlabels = []  # list with references to QLabel widgets
-        self.qlineedit = []  # list with references to QLineEdit widgets
+        self.q_labels = []  # list with references to QLabel widgets
+        self.q_line_edits = []  # list with references to QLineEdit widgets
 
         self.spec_edited = False  # flag whether QLineEdit field has been edited
 
@@ -69,45 +69,45 @@ class WeightSpecs(QWidget):
         """
         Construct User Interface
         """
-        self.layGSpecs = QGridLayout()  # Sublayout for spec fields, populated
-                                        # dynamically in _show_entries()
+        self.lay_g_specs = QGridLayout()  # Sublayout for spec fields, populated
+                        # dynamically in _show_entries()
         title = "Weight Specifications"
         bfont = QFont()
         bfont.setBold(True)
 
-        lblTitle = QLabel(self)  # field for widget title
-        lblTitle.setText(str(title))
-        lblTitle.setFont(bfont)
-        lblTitle.setWordWrap(True)
+        lbl_title = QLabel(self)  # field for widget title
+        lbl_title.setText(str(title))
+        lbl_title.setFont(bfont)
+        lbl_title.setWordWrap(True)
 
-        self.butReset = PushButton(self, text="Reset", checkable=False)
-        # self.butReset.setText("Reset")
-        self.butReset.setToolTip("Reset weights to 1")
+        self.but_reset = PushButton(self, text="Reset", checkable=False)
+        # self.but_reset.setText("Reset")
+        self.but_reset.setToolTip("Reset weights to 1")
 
-        layHTitle = QHBoxLayout()       # Layout for title and reset button
-        layHTitle.addWidget(lblTitle)
-        layHTitle.addWidget(self.butReset)
+        lay_h_title = QHBoxLayout()       # Layout for title and reset button
+        lay_h_title.addWidget(lbl_title)
+        lay_h_title.addWidget(self.but_reset)
 
         # set the title as the first (fixed) entry in grid layout. The other
         # fields are added and hidden dynamically in _show_entries and _hide_entries()
-        self.layGSpecs.addLayout(layHTitle, 0, 0, 1, 2)
+        self.lay_g_specs.addLayout(lay_h_title, 0, 0, 1, 2)
 
         # This is the top level widget, encompassing the other widgets
         frm_main = QFrame(self)
-        frm_main.setLayout(self.layGSpecs)
+        frm_main.setLayout(self.lay_g_specs)
 
-        self.layVMain = QVBoxLayout()   # Widget main vertical layout
-        self.layVMain.addWidget(frm_main)
-        self.layVMain.setContentsMargins(*params['wdg_margins'])
+        self.lay_v_main = QVBoxLayout()   # Widget main vertical layout
+        self.lay_v_main.addWidget(frm_main)
+        self.lay_v_main.setContentsMargins(*params['wdg_margins'])
 
-        self.setLayout(self.layVMain)
+        self.setLayout(self.lay_v_main)
 
         # - Build a list from all entries in the filter dictionary starting
         #   with "W" (= weight specifications of the current filter)
         # - Pass the list to setEntries which recreates the widget
         self.n_cur_labels = 0  # number of currently visible labels / qlineedits
         new_labels = [str(lbl) for lbl in fb_get() if lbl[0] == 'W']
-        self.update_UI(new_labels=new_labels)
+        self.update_ui(new_labels=new_labels)
 
         # ----------------------------------------------------------------------
         # GLOBAL SIGNALS & SLOTs
@@ -117,7 +117,7 @@ class WeightSpecs(QWidget):
         # ----------------------------------------------------------------------
         # LOCAL SIGNALS & SLOTs / EVENT FILTER
         # ----------------------------------------------------------------------
-        self.butReset.clicked.connect(self._reset_weights)
+        self.but_reset.clicked.connect(self._reset_weights)
         #       ^ this also initializes the weight text fields
         # DYNAMIC EVENT MONITORING
         # Every time a field is edited, call self._store_entry and
@@ -161,9 +161,9 @@ class WeightSpecs(QWidget):
         return super().eventFilter(source, event)
 
     # -------------------------------------------------------------
-    def update_UI(self, new_labels: list[str]) -> None:
+    def update_ui(self, new_labels: list[str]) -> None:
         """
-        Called from filter_specs.update_UI()
+        Called from filter_specs.update_ui()
         Set labels and get corresponding values from filter dictionary.
         When number of entries has changed, the layout of subwidget is rebuilt,
         using
@@ -190,13 +190,13 @@ class WeightSpecs(QWidget):
 
         for i in range(num_new_labels):
             # Update ALL labels and corresponding values
-            self.qlabels[i].setText(to_html(new_labels[i], frmt='bi'))
+            self.q_labels[i].setText(to_html(new_labels[i], frmt='bi'))
 
-            self.qlineedit[i].setText(str(fb_get(new_labels[i])))
-            self.qlineedit[i].setObjectName(new_labels[i])  # update ID
-            self.qlineedit[i].setToolTip(
+            self.q_line_edits[i].setText(str(fb_get(new_labels[i])))
+            self.q_line_edits[i].setObjectName(new_labels[i])  # update ID
+            self.q_line_edits[i].setToolTip(
                 "<span>Relative weight (importance) for approximating this band.</span>")
-            qstyle_widget(self.qlineedit[i], state)
+            qstyle_widget(self.q_line_edits[i], state)
 
         self.n_cur_labels = num_new_labels  # update number of currently visible labels
         self.dict2ui()  # display rounded filter dict entries
@@ -206,7 +206,7 @@ class WeightSpecs(QWidget):
         """
         Reload textfields from filter dictionary to update changed settings
         """
-        for qle in self.qlineedit:
+        for qle in self.q_line_edits:
             weight_value = fb_get(str(qle.objectName()))
 
             if not qle.hasFocus():
@@ -237,9 +237,9 @@ class WeightSpecs(QWidget):
         """
         Hide subwidgets so that only `len_new_labels` subwidgets are visible
         """
-        for i in range(num_new_labels, len(self.qlabels)):
-            self.qlabels[i].hide()
-            self.qlineedit[i].hide()
+        for i in range(num_new_labels, len(self.q_labels)):
+            self.q_labels[i].hide()
+            self.q_line_edits[i].hide()
 
     # ------------------------------------------------------------------------
     def _show_entries(self, num_new_labels: int) -> None:
@@ -254,32 +254,32 @@ class WeightSpecs(QWidget):
         - if enough subwidgets exist already, make enough of them visible to
           show all spec fields
         """
-        num_tot_labels = len(self.qlabels)  # number of existing labels / qlineedit fields
+        num_tot_labels = len(self.q_labels)  # number of existing labels / qlineedit fields
 
         if num_tot_labels < num_new_labels:  # new widgets need to be generated
             for i in range(num_tot_labels, num_new_labels):
-                self.qlabels.append(QLabel(self))
-                self.qlabels[i].setText(to_html("dummy", frmt='bi'))
+                self.q_labels.append(QLabel(self))
+                self.q_labels[i].setText(to_html("dummy", frmt='bi'))
 
-                self.qlineedit.append(QLineEdit(""))
-                self.qlineedit[i].setObjectName("dummy")
-                self.qlineedit[i].installEventFilter(self)  # filter events
+                self.q_line_edits.append(QLineEdit(""))
+                self.q_line_edits[i].setObjectName("dummy")
+                self.q_line_edits[i].installEventFilter(self)  # filter events
 
                 # first entry is title and reset button
-                self.layGSpecs.addWidget(self.qlabels[i], i+1, 0)
-                self.layGSpecs.addWidget(self.qlineedit[i], i+1, 1)
+                self.lay_g_specs.addWidget(self.q_labels[i], i+1, 0)
+                self.lay_g_specs.addWidget(self.q_line_edits[i], i+1, 1)
 
         else:  # make the right number of widgets visible
             for i in range(self.n_cur_labels, num_new_labels):
-                self.qlabels[i].show()
-                self.qlineedit[i].show()
+                self.q_labels[i].show()
+                self.q_line_edits[i].show()
 
     # ------------------------------------------------------------------------------
     def _reset_weights(self) -> None:
         """
         Reset all entries to "1.0" and store them in the filter dictionary
         """
-        for qle in self.qlineedit:
+        for qle in self.q_line_edits:
             qle.setText("1")
 
             w_label = str(qle.objectName())
@@ -300,8 +300,8 @@ if __name__ == '__main__':
     app.setStyleSheet(QSS.QSS_RC)
     mainw = WeightSpecs()
 
-    mainw.update_UI(new_labels=['W_SB', 'W_SB2', 'W_PB', 'W_PB2'])
-    mainw.update_UI(new_labels=['W_PB', 'W_PB2'])
+    mainw.update_ui(new_labels=['W_SB', 'W_SB2', 'W_PB', 'W_PB2'])
+    mainw.update_ui(new_labels=['W_PB', 'W_PB2'])
 
     app.setActiveWindow(mainw)
     mainw.show()

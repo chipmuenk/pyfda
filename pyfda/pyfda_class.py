@@ -110,7 +110,7 @@ class XStream(QtCore.QObject):
     Overrides stdout to print messages to textWidget
     """
     _stdout = None
-    messageWritten = pyqtSignal(str) # pass str to slot
+    message_written = pyqtSignal(str) # pass str to slot
 
     def flush( self ) -> None:
         """
@@ -146,7 +146,7 @@ class XStream(QtCore.QObject):
         if not self.signalsBlocked():
             msg = to_html(msg, frmt='log')
 
-            self.messageWritten.emit(msg)
+            self.message_written.emit(msg)
 
     @staticmethod
     def stdout() -> 'XStream':
@@ -215,55 +215,55 @@ class pyFDA(QMainWindow):
 
         # ============== UI Layout with H and V-Splitter =====================
         # create tab widgets for input and plot widgets
-        inputTabWidgets = TabbedWidget(wdg_classes_dict=CFP.INPUT_CLASSES_DICT, label='input',
-                                       objectName='input_tab_widgets_inst', use_qscroll_area=True)
-        pltTabWidgets = TabbedWidget(wdg_classes_dict=CFP.PLOT_CLASSES_DICT, label='plot',
-                                     objectName='plot_tab_widgets_inst')
+        input_tab_widgets = TabbedWidget(wdg_classes_dict=CFP.INPUT_CLASSES_DICT, label='input',
+                           objectName='input_tab_widgets_inst', use_qscroll_area=True)
+        plt_tab_widgets = TabbedWidget(wdg_classes_dict=CFP.PLOT_CLASSES_DICT, label='plot',
+                         objectName='plot_tab_widgets_inst')
 
-        self.loggerWin = QPlainTextEdit(self)  # logger window
-        self.loggerWin.setReadOnly(True)
+        self.logger_win = QPlainTextEdit(self)  # logger window
+        self.logger_win.setReadOnly(True)
         # set custom right-button context menu policy
-        self.loggerWin.setContextMenuPolicy(Qt.CustomContextMenu)
-        self.loggerWin.customContextMenuRequested.connect(self.logger_win_context_menu)
+        self.logger_win.setContextMenuPolicy(Qt.CustomContextMenu)
+        self.logger_win.customContextMenuRequested.connect(self.logger_win_context_menu)
         # create context menu and define actions and shortcuts
-        self.popMenu = QMenu(self)
-        self.popMenu.addAction('Select &All', self.loggerWin.selectAll, "Ctrl+A")
-        self.popMenu.addAction('&Copy Selected', self.loggerWin.copy)
-        self.popMenu.addSeparator()
-        self.popMenu.addAction('Clear &Window', self.loggerWin.clear)
+        self.pop_menu = QMenu(self)
+        self.pop_menu.addAction('Select &All', self.logger_win.selectAll, "Ctrl+A")
+        self.pop_menu.addAction('&Copy Selected', self.logger_win.copy)
+        self.pop_menu.addSeparator()
+        self.pop_menu.addAction('Clear &Window', self.logger_win.clear)
 
 # =============================================================================
 
         # add logger window underneath plot Tab Widgets
-        spltVPltLogger = QSplitter(QtCore.Qt.Vertical)
-        spltVPltLogger.addWidget(pltTabWidgets)
-        spltVPltLogger.addWidget(self.loggerWin)
+        splt_v_plt_logger = QSplitter(QtCore.Qt.Vertical)
+        splt_v_plt_logger.addWidget(plt_tab_widgets)
+        splt_v_plt_logger.addWidget(self.logger_win)
 
         # create horizontal splitter that contains all subwidget groups
-        spltHMain = QSplitter(QtCore.Qt.Horizontal)
-        spltHMain.addWidget(inputTabWidgets)
-        spltHMain.addWidget(spltVPltLogger)
-        spltHMain.setStretchFactor(1, 4)  # relative initial sizes of subwidgets
-        spltHMain.setContentsMargins(*pyfda_rc.params['wdg_margins'])
-        spltHMain.setFocus()
-        # make spltHMain occupy the main area of QMainWindow and make QMainWindow its parent !!!
-        self.setCentralWidget(spltHMain)
-        spltVPltLoggerH = spltVPltLogger.size().height()
-        spltVPltLogger.setSizes([int(spltVPltLoggerH*0.95), int(spltVPltLoggerH*0.05 - 8)])
+        splt_h_main = QSplitter(QtCore.Qt.Horizontal)
+        splt_h_main.addWidget(input_tab_widgets)
+        splt_h_main.addWidget(splt_v_plt_logger)
+        splt_h_main.setStretchFactor(1, 4)  # relative initial sizes of subwidgets
+        splt_h_main.setContentsMargins(*pyfda_rc.params['wdg_margins'])
+        splt_h_main.setFocus()
+        # make splt_h_main occupy the main area of QMainWindow and make QMainWindow its parent !!!
+        self.setCentralWidget(splt_h_main)
+        splt_v_plt_logger_h = splt_v_plt_logger.size().height()
+        splt_v_plt_logger.setSizes([int(splt_v_plt_logger_h*0.95), int(splt_v_plt_logger_h*0.05 - 8)])
 
         self.setWindowTitle('pyFDA - Python Filter Design and Analysis')
 
         #=============== Menubar =======================================
 
-#        aboutAction = QAction('&About', self)
-#        aboutAction.setShortcut('Ctrl+A')
-#        aboutAction.setStatusTip('Info about pyFDA')
+#        about_action = QAction('&About', self)
+#        about_action.setShortcut('Ctrl+A')
+#        about_action.setStatusTip('Info about pyFDA')
 #
 #        menubar = self.menuBar()
-#        fileMenu = menubar.addMenu('&About')
-#        fileMenu.addAction(aboutAction)
-
-#        self.statusMessage("Application is initialized.")
+#        file_menu = menubar.addMenu('&About')
+#        file_menu.addAction(about_action)
+#
+#        self.status_message("Application is initialized.")
 
         #----------------------------------------------------------------------
         # GLOBAL SIGNALS & SLOTs
@@ -276,15 +276,15 @@ class pyFDA(QMainWindow):
         # Here, signals about spec and design changes from lower hierarchies
         # are distributed. At the moment, only changes in the input widgets are
         # routed to the plot widgets:
-        inputTabWidgets.sig_tx.connect(pltTabWidgets.sig_rx)
-        inputTabWidgets.sig_tx.connect(self.process_sig_rx)  # only for catching close event
-        pltTabWidgets.sig_tx.connect(inputTabWidgets.sig_rx)
+        input_tab_widgets.sig_tx.connect(plt_tab_widgets.sig_rx)
+        input_tab_widgets.sig_tx.connect(self.process_sig_rx)  # only for catching close event
+        plt_tab_widgets.sig_tx.connect(input_tab_widgets.sig_rx)
         # open pop-up "about" window
-        #aboutAction.triggered.connect(self.aboutWindow)
+        #about_action.triggered.connect(self.about_window)
 
         # when a message has been written, pass it via signal-slot mechanism and
         # print it to logger window
-        XStream.stdout().messageWritten.connect(self.loggerWin.appendHtml)
+        XStream.stdout().message_written.connect(self.logger_win.appendHtml)
 
 #------------------------------------------------------------------------------
     def process_sig_rx(self, dict_sig: dict=None) -> None:
@@ -296,7 +296,7 @@ class pyFDA(QMainWindow):
             self.close()
 
 #==============================================================================
-#     def statusMessage(self, message):
+#     def status_message(self, message):
 #         """
 #         Display a message in the statusbar.
 #         """
@@ -307,7 +307,7 @@ class pyFDA(QMainWindow):
 
     def logger_win_context_menu(self, point: QtCore.QPoint) -> None:
         """ Show right mouse button context  menu """
-        self.popMenu.exec_(self.loggerWin.mapToGlobal(point))
+        self.pop_menu.exec_(self.logger_win.mapToGlobal(point))
 
 # =============================================================================
     def closeEvent(self, event: QtGui.QCloseEvent) -> None:

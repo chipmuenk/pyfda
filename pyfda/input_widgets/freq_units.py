@@ -110,7 +110,7 @@ class FreqUnits(QWidget):
             return
         if ('view_changed' in dict_sig and dict_sig['view_changed'] == 'f_S')\
             or 'data_changed' in dict_sig:
-            self.update_UI(emit_signal=False)
+            self.update_ui(emit_signal=False)
 
 # ------------------------------------------------------------------------------
     def _construct_ui(self) -> None:
@@ -196,13 +196,13 @@ class FreqUnits(QWidget):
         # LOCAL SIGNALS & SLOTs
         #----------------------------------------------------------------------
         # swallow index passed by "IndexChanged":
-        self.cmb_f_units.currentIndexChanged.connect(lambda: self.update_UI(self))
+        self.cmb_f_units.currentIndexChanged.connect(lambda: self.update_ui(self))
         self.butLock.clicked.connect(self._lock_freqs)
         self.cmb_f_range.currentIndexChanged.connect(self._freq_range)
         self.but_sort.clicked.connect(self._store_sort_flag)
         # ----------------------------------------------------------------------
 
-        self.update_UI()  # first-time initialization
+        self.update_ui()  # first-time initialization
 
 # -------------------------------------------------------------
     def _lock_freqs(self) -> None:
@@ -218,7 +218,7 @@ class FreqUnits(QWidget):
         When the effect of varying the sampling frequency is to be analyzed, the
         displayed values in the widgets can be locked by pressing the Lock button.
         After changing the sampling frequency, normalized frequencies have to be
-        rescaled like `f_a *= fil[0]['f_S_prev'] / fil[0]['f_S']` to maintain
+        rescaled like `f_a *= fil[0]['f_s_prev'] / fil[0]['f_S']` to maintain
         the displayed value `f_a * f_S`.
 
         This has to be accomplished by each frequency widget (currently, these are
@@ -239,9 +239,9 @@ class FreqUnits(QWidget):
             self.butLock.setIcon(QIcon(':/lock-unlocked.svg'))
 
 # -------------------------------------------------------------
-    def update_UI(self, emit_signal: bool = True) -> None:
+    def update_ui(self, emit_signal: bool = True) -> None:
         """
-        update_UI is called
+        update_ui is called
         - during init (direct call)
         - when the unit combobox is changed (signal-slot)
         - when a signal {'view_changed': 'f_S'} or {'data_changed': ...} has been
@@ -373,7 +373,7 @@ class FreqUnits(QWidget):
           display the stored value in selected format. Emit 'view_changed':'f_S'
         - When f_S has been changed, update `fil[0]['f_S']`,
           emit `{'view_changed': 'f_S'}` to update other widgets and only *then*
-          update {'f_S_prev': fil[0]['f_S']} to allow correction of normalized
+          update {'f_s_prev': fil[0]['f_S']} to allow correction of normalized
           frequency with the old value of f_S.
         """
         def _store_entry() -> None:
@@ -391,8 +391,8 @@ class FreqUnits(QWidget):
 
                 self._freq_range(emit_signal=False)  # update plotting range
                 self.emit({'view_changed': 'f_S'})
-                # Now store current f_S as f_S_prev
-                fb_set('f_S_prev', fb_get('f_S'))
+                # Now store current f_S as f_s_prev
+                fb_set('f_s_prev', fb_get('f_S'))
 
                 self.spec_edited = False  # reset flag, changed entry has been saved
         # ----------------------
@@ -450,7 +450,7 @@ class FreqUnits(QWidget):
         Block signals during update of combobox / lineedit widgets
         This is called via `input_specs.dict2ui()`
         """
-        self.update_UI(emit_signal=False)
+        self.update_ui(emit_signal=False)
         # This updates the following widgets:
         # - `self.led_f_s` from `fb_get('f_S')`
         # - `self.cmb_f_units` with `fb_get('freq_specs_unit')`
@@ -477,7 +477,7 @@ if __name__ == '__main__':
     app.setStyleSheet(QSS.QSS_RC)
     mainw = FreqUnits()
     app.setActiveWindow(mainw)
-    mainw.update_UI()
+    mainw.update_ui()
 #    mainw.updateUI(newLabels = ['F_PB','F_PB2'])
 
     mainw.show()

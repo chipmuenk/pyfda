@@ -761,7 +761,7 @@ class Plot_Tran_Stim_UI(QWidget):
 
         f_corr = 1
         if fb_get('freq_locked'):
-            f_corr = fb_get('f_S_prev') / fb_get('f_S')
+            f_corr = fb_get('f_s_prev') / fb_get('f_S')
             self.f1 *= f_corr
             self.f2 *= f_corr
             self.T1 /= f_corr
@@ -780,7 +780,7 @@ class Plot_Tran_Stim_UI(QWidget):
         self.t_scale = fb_get('T_S')
 
         # logger.warning("f_S = %s, prev = %s\nf_scale = %s, f_1 = %s, f_corr = %s",
-        #               fb.fil[0]['f_S'], fb.fil[0]['f_S_prev'], self.f_scale, self.f1, f_corr)
+        #               fb.fil[0]['f_S'], fb.fil[0]['f_s_prev'], self.f_scale, self.f1, f_corr)
 
         # update and round the display
         for w in self.dict_filtered_widgets:

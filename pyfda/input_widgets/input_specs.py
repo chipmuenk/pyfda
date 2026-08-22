@@ -344,7 +344,7 @@ class Input_Specs(QWidget):
         the filter tree [FTB.fil_tree], i.e. which parameters are needed, which
         widgets are visible and which message shall be displayed.
 
-        Then, the UIs of all subwidgets are updated using their `update_UI()` methods.
+        Then, the UIs of all subwidgets are updated using their `update_ui()` methods.
         """
         rt = fb_get('rt')  # e.g. 'LP'
         ft = fb_get('ft')  # e.g. 'FIR'
@@ -394,7 +394,7 @@ class Input_Specs(QWidget):
                 all_widgets['wspecs'][0] != 'i'):
             self.w_specs.setVisible(True)
             self.w_specs.setEnabled(all_widgets['wspecs'][0] != 'd')
-            self.w_specs.update_UI(new_labels=all_widgets['wspecs'])
+            self.w_specs.update_ui(new_labels=all_widgets['wspecs'])
         else:
             self.w_specs.hide()
 
