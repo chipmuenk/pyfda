@@ -24,7 +24,7 @@ import pyfda.filterbroker as fb
 from pyfda.libs.compat import (
     QWidget, QLabel, QFrame, QDial, QHBoxLayout, pyqtSignal, QComboBox, QLineEdit)
 from pyfda.libs.pyfda_lib import to_html, safe_eval
-from pyfda.libs.special_functions import H_mag, unique_roots
+from pyfda.libs.special_functions import h_mag, unique_roots
 from pyfda.libs.pyfda_qt_lib import qcmb_box_populate, qget_cmb_box, qtext_width
 from pyfda.libs.pyfda_qt_classes import PushButton
 from pyfda.pyfda_rc import params
@@ -536,12 +536,12 @@ class Plot_PZ(QWidget):
         z = x + 1j*y  # create coordinate grid for complex plane
 
         if self.but_log.checked:
-            H_max = self.zmax_dB
-            H_min = self.zmin_dB
+            h_max = self.zmax_dB
+            h_min = self.zmin_dB
         else:
-            H_max = self.zmax
-            H_min = self.zmin
-        Hmag = H_mag(fb.fil[0]['ba'][0], fb.fil[0]['ba'][1], z, H_max, H_min=H_min,
+            h_max = self.zmax
+            h_min = self.zmin
+        Hmag = h_mag(fb.fil[0]['ba'][0], fb.fil[0]['ba'][1], z, h_max, h_min=h_min,
                      log=self.but_log.checked)
 
         if overlay == "contour":
@@ -585,7 +585,7 @@ class Plot_PZ(QWidget):
         H = np.abs(H)
         if self.but_log.checked:
             H = np.clip(np.log10(H), -6, None)  # clip to -120 dB
-            H = H - np.max(H)  # shift scale to H_min ... 0
+            H = H - np.max(H)  # shift scale to h_min ... 0
             H = 1 + (r-1) * (1 + H / abs(np.min(H)))  # scale to 1 ... r
         else:
             H = 1 + (r-1) * H / np.max(H)  # map |H(f)| to a range 1 ... r

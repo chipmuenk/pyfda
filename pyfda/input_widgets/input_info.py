@@ -337,14 +337,14 @@ class Input_Info(QWidget):
 
             f = w / (2.0 * pi)  # frequency normalized to f_S
             H_abs = abs(H)
-            H_max = max(H_abs)
-            H_min = min(H_abs)
+            h_max = max(H_abs)
+            h_min = min(H_abs)
             F_max = f[np.argmax(H_abs)]  # find the frequency where H_abs
             F_min = f[np.argmin(H_abs)]  # becomes max resp. min
             if unit == 'dB':
-                H_max = 20*log10(H_max)
-                H_min = 20*log10(H_min)
-            return F_min, H_min, F_max, H_max
+                h_max = 20*log10(h_max)
+                h_min = 20*log10(h_min)
+            return F_min, h_min, F_max, h_max
         # ------------------------------------------------------------------
 
         self.tbl_filt_perf.setVisible(self.but_filt_perf.checked)
@@ -425,7 +425,7 @@ class Input_Info(QWidget):
                 # Calculate frequency response at test frequencies
                 [w_test, a_test] = sig.freqz(bb, aa, 2.0 * pi * f_vals.astype(float))
 
-            (F_min, H_min, F_max, H_max) = _find_min_max(self, 0, 1, unit='V')
+            (F_min, h_min, F_max, h_max) = _find_min_max(self, 0, 1, unit='V')
             # append frequencies and values for min. and max. filter reponse to
             # test vector
 
@@ -435,7 +435,7 @@ class Input_Info(QWidget):
             f_vals = np.append(f_vals, [F_min, F_max])
             a_targs = np.append(a_targs, [np.nan, np.nan])
             a_targs_dB = np.append(a_targs_dB, [np.nan, np.nan])
-            a_test = np.append(a_test, [H_min, H_max])
+            a_test = np.append(a_test, [h_min, h_max])
             # calculate response of test frequencies in dB
             a_test_db = -20*log10(abs(a_test))
 

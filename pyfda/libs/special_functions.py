@@ -8,7 +8,7 @@ from numpy import pi, sin, cos, log10
 from numpy.typing import NDArray
 
 __all__ =  ['dB', 'lin2unit', 'unit2lin',
-           'cround', 'H_mag']
+           'cround', 'h_mag']
 
 logger = logging.getLogger(__name__)
 
@@ -165,14 +165,14 @@ def cround(x: NDArray | complex | float, n_dig: int = 0) -> NDArray | complex | 
     return x
 
 # ------------------------------------------------------------------------------
-def H_mag(num: NDArray, den: NDArray, z: NDArray, H_max: float, H_min: float | None = None,
+def h_mag(num: NDArray, den: NDArray, z: NDArray, h_max: float, h_min: float | None = None,
           log: bool = False, div_by_0: str = 'ignore') -> NDArray:
     r"""
     Calculate `\|H(z)\|` at the complex frequency(ies) `z` (scalar or
     array-like).  The function `H(z)` is given in polynomial form with numerator and
     denominator. When ``log == True``, :math:`20 \log_{10} (|H(z)|)` is returned.
 
-    The result is clipped at H_min, H_max; clipping can be disabled by passing
+    The result is clipped at h_min, h_max; clipping can be disabled by passing
     None as the argument.
 
     Parameters
@@ -183,9 +183,9 @@ def H_mag(num: NDArray, den: NDArray, z: NDArray, H_max: float, H_min: float | N
         The denominator polynome of H(z).
     z : float or array-like (1D)
         The complex frequency(ies) where `H(z)` is to be evaluated
-    H_max : float
+    h_max : float
         The maximum value to which the result is clipped
-    H_min : float, optional
+    h_min : float, optional
         The minimum value to which the result is clipped (default: None)
     log : boolean, optional
         When true, return 20 * log10 (\|H(z)\|). The clipping limits have to
@@ -198,7 +198,7 @@ def H_mag(num: NDArray, den: NDArray, z: NDArray, H_max: float, H_min: float | N
 
     Returns
     -------
-    H_mag : array-like
+    h_mag : array-like
         The magnitude `\|H(z)\|` for each value of `z`.
     """
     den_val = abs(np.polyval(den, z))  # evaluate denominator at z
@@ -213,8 +213,8 @@ def H_mag(num: NDArray, den: NDArray, z: NDArray, H_max: float, H_min: float | N
 
     np.seterr(**olderr)  # restore previous floating point error behaviour
 
-    # clip result to H_min / H_max
-    return np.clip(H_val, H_min, H_max)
+    # clip result to h_min / h_max
+    return np.clip(H_val, h_min, h_max)
 
 # ------------------------------------------------------------------------------
 def unique_roots(p, tol: float = 1e-3, magsort: bool = False,

@@ -319,21 +319,21 @@ class Plot_Impz(QWidget):
         - changed tab in the stimulus tab widget (signal-slot)
         - an 'ui-changed' - signal (`process_signal_rx()`)
         """
-        # logger.warning(f"w = {self.tab_stim_w.tabBar().width()}, "
-        #                f"h = {self.tab_stim_w.tabBar().height()}")
+        # logger.warning(f"width = {self.tab_stim_w.tabBar().width()}, "
+        #                f"height = {self.tab_stim_w.tabBar().height()}")
         # logger.warning(f"w = {self.tab_mpl_w.tabBar().width()}, "
-        #                f"h = {self.tab_mpl_w.tabBar().height()}")
+        #                f"height = {self.tab_mpl_w.tabBar().height()}")
         # tabBar height is also the width / hight of the tab icons
 
-        h_min = self.tab_stim_w.tabBar().height()
-        # logger.warning(f"min hint = {self.stim_wdg.minimumSizeHint()}, h_min = {h_min}")
+        min_height = self.tab_stim_w.tabBar().height()
+        # logger.warning(f"min hint = {self.stim_wdg.minimumSizeHint()}, min_height = {min_height}")
         if self.tab_stim_w.currentWidget() is None:
             logger.warning("no embedded widget!")
-            h = 0
+            height = 0
         else:
-            h = self.tab_stim_w.currentWidget().minimumSizeHint().height()
-        self.tab_stim_w.setMaximumHeight(max(h, h_min))
-        self.tab_stim_w.setMinimumHeight(max(h, h_min))
+            height = self.tab_stim_w.currentWidget().minimumSizeHint().height()
+        self.tab_stim_w.setMaximumHeight(max(height, min_height))
+        self.tab_stim_w.setMinimumHeight(max(height, min_height))
 
     # -----------------------------------------------------------------------
     def process_sig_rx_t(self, dict_sig: dict | None = None) -> None:

@@ -25,7 +25,7 @@ from pyfda.filterbroker import fb_get
 from pyfda.libs.compat import (
     QWidget, QComboBox, QLabel, QLineEdit, QDial, QGridLayout, QFrame, pyqtSignal)
 from pyfda.libs.pyfda_lib import mod_version, safe_eval, to_html
-from pyfda.libs.special_functions import H_mag
+from pyfda.libs.special_functions import h_mag
 from pyfda.libs.pyfda_qt_lib import qget_cmb_box
 from pyfda.libs.pyfda_qt_classes import PushButton
 from pyfda.plot_widgets.mpl_widget import MplWidget
@@ -433,8 +433,8 @@ class Plot_3D(QWidget):
         H = np.nan_to_num(H)  # replace nans and inf by finite numbers
 
         H_abs = abs(H)
-        # H_max = max(H_abs)
-        H_min = min(H_abs)
+        # h_max = max(H_abs)
+        h_min = min(H_abs)
         # f = w / (2 * pi) * f_S                  # translate w to absolute frequencies
         # F_min = f[np.argmin(H_abs)]
 
@@ -446,7 +446,7 @@ class Plot_3D(QWidget):
             old_settings_seterr = np.seterr()
             np.seterr(divide='ignore')
 
-            bottom = np.floor(max(self.zmin_dB, 20*log10(H_min)) / 10) * 10
+            bottom = np.floor(max(self.zmin_dB, 20*log10(h_min)) / 10) * 10
             top = self.zmax_dB
             top_bottom = top - bottom
 
@@ -462,15 +462,15 @@ class Plot_3D(QWidget):
             np.seterr(**old_settings_seterr)
 
         else:  # linear scale
-            bottom = max(self.zmin, H_min)  # min. display value
+            bottom = max(self.zmin, h_min)  # min. display value
             top = self.zmax                 # max. display value
             top_bottom = top - bottom
-        #   top = zmax_rel * H_max # calculate display top from max. of H(f)
+        #   top = zmax_rel * h_max # calculate display top from max. of H(f)
 
             zlevel = bottom + top_bottom * zlevel_rel  # height of displayed zero position
 
             if self.cmb_mode_3d.currentText() == 'None':  # "Poleposition": H(f) plot only
-                # H_max = np.clip(max(H_abs), 0, self.zmax)
+                # h_max = np.clip(max(H_abs), 0, self.zmax)
                 # make height of displayed poles same to zeros
                 plevel_top = bottom + top_bottom * zlevel_rel
                 plevel_btm = bottom
@@ -480,8 +480,8 @@ class Plot_3D(QWidget):
 
         # calculate H(jw)| along the unity circle and |H(z)|, each clipped
         # between bottom and top
-        H_UC = H_mag(bb, aa, self.xy_uc, top, H_min=bottom, log=self.but_log.checked)
-        Hmag = H_mag(bb, aa, self.z, top, H_min=bottom, log=self.but_log.checked)
+        H_UC = h_mag(bb, aa, self.xy_uc, top, h_min=bottom, log=self.but_log.checked)
+        Hmag = h_mag(bb, aa, self.z, top, h_min=bottom, log=self.but_log.checked)
 
         # ===============================================================
         # Plot Unit Circle (UC)

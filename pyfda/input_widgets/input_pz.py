@@ -267,7 +267,7 @@ class Input_PZ(QWidget):
             logger.warning("Casting complex to real for gain k!")
             self.zpk[2][0] = np.abs(self.zpk[2][0])
 
-        if not use_gain:  # calculate necessary gain to achieve H_max
+        if not use_gain:  # calculate necessary gain to achieve h_max
             self.h_max = safe_eval(self.ui.led_h_max.text(), alt_expr=self.h_max, sign='pos')
             self.zpk = normalize_zpk_gain(self.zpk, self.h_max)
 

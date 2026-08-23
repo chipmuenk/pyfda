@@ -352,7 +352,7 @@ class MA(QWidget):
             b = np.convolve(b0, b)
         z = np.repeat(z0, self.stages)
 
-        # normalize filter to |H_max| = 1 if checked:
+        # normalize filter to |h_max| = 1 if checked:
         if self.chk_norm.isChecked():
             b = b / (norm ** self.stages)
             k = 1./norm ** self.stages

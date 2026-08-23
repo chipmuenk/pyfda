@@ -24,7 +24,7 @@
 - Fix scaling of loaded data in y[n] tab, int2float and scale_to buttons were disfunct
   (regression error)
 - Make loading of zpk data in P,Z tab more robust against different file formats,
-  normalize filter to H_max = 1 if no gain is given
+  normalize filter to h_max = 1 if no gain is given
 - Use dynamic mesh grid size instead of constant value for contour plots in P/Z tab. For
   poles or zeros far outside the unit circle this caused errors.
 - Start fixing wrong plot limits for contour plots in P/Z tab.
