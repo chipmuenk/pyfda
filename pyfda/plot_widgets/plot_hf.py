@@ -393,7 +393,7 @@ class Plot_Hf(QWidget):
             A_SB2 = self.A_SB2 ** exp
             A_SB_maxx = A_PB_min / 10.
 
-        F_max = self.f_max/2
+        f_max_2 = self.f_max/2
         F_PB  = self.F_PB
         F_SB  = fb_get('F_SB') * self.f_max
         F_SB2 = fb_get('F_SB2') * self.f_max
@@ -420,14 +420,14 @@ class Plot_Hf(QWidget):
             F_lim_lol = F_lim_upl
             A_lim_lol = np.array([A_PB_min, A_PB_min, A_PB_minx])
 
-            F_lim_upr = np.array([F_SB,     F_SB, F_max])
+            F_lim_upr = np.array([F_SB,     F_SB, f_max_2])
             A_lim_upr = np.array([A_SB_maxx, A_SB, A_SB])
 
         if fb_get('rt') == 'HP':
             F_lim_upl = np.array([0,    F_SB, F_SB])
             A_lim_upl = np.array([A_SB, A_SB, A_SB_maxx])
 
-            F_lim_upr = np.array([F_PB,      F_PB,     F_max])
+            F_lim_upr = np.array([F_PB,      F_PB,     f_max_2])
             A_lim_upr = np.array([A_PB_maxx, A_PB_max, A_PB_max])
             F_lim_lor = F_lim_upr
             A_lim_lor = np.array([A_PB_minx, A_PB_min, A_PB_min])
@@ -441,7 +441,7 @@ class Plot_Hf(QWidget):
             F_lim_upc = np.array([F_SB, F_SB, F_SB2, F_SB2])
             A_lim_upc = np.array([A_SB_maxx, A_SB, A_SB,  A_SB_maxx])
 
-            F_lim_upr = np.array([F_PB2, F_PB2, F_max])
+            F_lim_upr = np.array([F_PB2, F_PB2, f_max_2])
             A_lim_upr = np.array([A_PB_maxx, A_PB2_max, A_PB2_max])
             F_lim_lor = np.array(F_lim_upr)
             A_lim_lor = np.array([A_PB_minx, A_PB2_min, A_PB2_min])
@@ -455,7 +455,7 @@ class Plot_Hf(QWidget):
             F_lim_loc = F_lim_upc
             A_lim_loc = np.array([A_PB_minx, A_PB_min, A_PB_min, A_PB_minx])
 
-            F_lim_upr = np.array([F_SB2,    F_SB2, F_max])
+            F_lim_upr = np.array([F_SB2,    F_SB2, f_max_2])
             A_lim_upr = np.array([A_SB_maxx, A_SB2, A_SB2])
 
         if fb_get('rt') == 'HIL':

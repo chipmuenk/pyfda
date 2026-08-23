@@ -63,8 +63,8 @@ class Plot_PZ(QWidget):
 
         self.zmin = 0
         self.zmax = 2
-        self.zmin_dB = -80
-        self.zmax_dB = np.round(20 * np.log10(self.zmax), 2)
+        self.zmin_db = -80
+        self.zmax_db = np.round(20 * np.log10(self.zmax), 2)
         self._construct_ui()
 
 # ------------------------------------------------------------------------------
@@ -209,22 +209,22 @@ class Plot_PZ(QWidget):
         # clicking but_log triggered the slot or initialization
         if self.sender() is None or self.sender().objectName() == 'but_log':
             if self.but_log.checked:
-                self.led_bottom.setText(str(self.zmin_dB))
-                self.zmax_dB = np.round(20 * np.log10(self.zmax), 2)
-                self.led_top.setText(str(self.zmax_dB))
+                self.led_bottom.setText(str(self.zmin_db))
+                self.zmax_db = np.round(20 * np.log10(self.zmax), 2)
+                self.led_top.setText(str(self.zmax_db))
             else:
                 self.led_bottom.setText(str(self.zmin))
-                self.zmax = np.round(10**(self.zmax_dB / 20), 2)
+                self.zmax = np.round(10**(self.zmax_db / 20), 2)
                 self.led_top.setText(str(self.zmax))
 
         else:  # finishing a lineEdit field triggered the slot
             if self.but_log.checked:
-                self.zmin_dB = safe_eval(
-                    self.led_bottom.text(), self.zmin_dB, return_type='float')
-                self.led_bottom.setText(str(self.zmin_dB))
-                self.zmax_dB = safe_eval(
-                    self.led_top.text(), self.zmax_dB, return_type='float')
-                self.led_top.setText(str(self.zmax_dB))
+                self.zmin_db = safe_eval(
+                    self.led_bottom.text(), self.zmin_db, return_type='float')
+                self.led_bottom.setText(str(self.zmin_db))
+                self.zmax_db = safe_eval(
+                    self.led_top.text(), self.zmax_db, return_type='float')
+                self.led_top.setText(str(self.zmax_db))
             else:
                 self.zmin = safe_eval(
                     self.led_bottom.text(), self.zmin, return_type='float')
@@ -536,8 +536,8 @@ class Plot_PZ(QWidget):
         z = x + 1j*y  # create coordinate grid for complex plane
 
         if self.but_log.checked:
-            h_max = self.zmax_dB
-            h_min = self.zmin_dB
+            h_max = self.zmax_db
+            h_min = self.zmin_db
         else:
             h_max = self.zmax
             h_min = self.zmin

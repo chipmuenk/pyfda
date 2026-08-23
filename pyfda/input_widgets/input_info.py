@@ -336,15 +336,15 @@ class Input_Info(QWidget):
             [w, H] = sig.freqz(bb, aa, worN=w)
 
             f = w / (2.0 * pi)  # frequency normalized to f_S
-            H_abs = abs(H)
-            h_max = max(H_abs)
-            h_min = min(H_abs)
-            F_max = f[np.argmax(H_abs)]  # find the frequency where H_abs
-            F_min = f[np.argmin(H_abs)]  # becomes max resp. min
+            h_abs = abs(H)
+            h_max = max(h_abs)
+            h_min = min(h_abs)
+            f_max = f[np.argmax(h_abs)]  # find the frequency where h_abs
+            f_min = f[np.argmin(h_abs)]  # becomes max resp. min
             if unit == 'dB':
                 h_max = 20*log10(h_max)
                 h_min = 20*log10(h_min)
-            return F_min, h_min, F_max, h_max
+            return f_min, h_min, f_max, h_max
         # ------------------------------------------------------------------
 
         self.tbl_filt_perf.setVisible(self.but_filt_perf.checked)
@@ -425,14 +425,14 @@ class Input_Info(QWidget):
                 # Calculate frequency response at test frequencies
                 [w_test, a_test] = sig.freqz(bb, aa, 2.0 * pi * f_vals.astype(float))
 
-            (F_min, h_min, F_max, h_max) = _find_min_max(self, 0, 1, unit='V')
+            (f_min, h_min, f_max, h_max) = _find_min_max(self, 0, 1, unit='V')
             # append frequencies and values for min. and max. filter reponse to
             # test vector
 
             f_lbls += ['Min.', 'Max.']
             # QTableView does not support direct formatting, use QLabel
 
-            f_vals = np.append(f_vals, [F_min, F_max])
+            f_vals = np.append(f_vals, [f_min, f_max])
             a_targs = np.append(a_targs, [np.nan, np.nan])
             a_targs_dB = np.append(a_targs_dB, [np.nan, np.nan])
             a_test = np.append(a_test, [h_min, h_max])

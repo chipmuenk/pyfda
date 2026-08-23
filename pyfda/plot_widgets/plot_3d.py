@@ -58,7 +58,7 @@ class Plot_3D(QWidget):
         super().__init__()
         self.zmin = 0
         self.zmax = 4
-        self.zmin_dB = -80
+        self.zmin_db = -80
         self.cmap_default = 'RdYlBu'
         self.data_changed = True  # flag whether data has changed
         self.tool_tip = "3D magnitude response |H(z)|"
@@ -116,9 +116,9 @@ class Plot_3D(QWidget):
         self.but_pz.setChecked(True)
         self.but_pz.setToolTip("Plot poles and zeros")
 
-        self.but_Hf = PushButton(self, "H(f) ", objectName="but_Hf")
-        self.but_Hf.setChecked(True)
-        self.but_Hf.setToolTip("Plot H(f) along the unit circle")
+        self.but_hf = PushButton(self, "H(f) ", objectName="but_hf")
+        self.but_hf.setChecked(True)
+        self.but_hf.setToolTip("Plot H(f) along the unit circle")
 
         modes = ['None', 'Mesh', 'Surf', 'Contour']
         self.cmb_mode_3d = QComboBox(self, objectName="cmbShow3D")
@@ -179,7 +179,7 @@ class Plot_3D(QWidget):
         lay_g_controls.setColumnStretch(5,1)
 
         lay_g_controls.addWidget(self.plt_uc, 0, 6)
-        lay_g_controls.addWidget(self.but_Hf, 1, 6)
+        lay_g_controls.addWidget(self.but_hf, 1, 6)
         lay_g_controls.addWidget(self.but_pz, 0, 8)
 
         lay_g_controls.addWidget(self.cmb_mode_3d, 0, 10)
@@ -227,7 +227,7 @@ class Plot_3D(QWidget):
 
         self.but_plot_in_UC.clicked.connect(self._init_grid)
         self.plt_uc.clicked.connect(self.draw)
-        self.but_Hf.clicked.connect(self.draw)
+        self.but_hf.clicked.connect(self.draw)
         self.but_pz.clicked.connect(self.draw)
         self.cmb_mode_3d.currentIndexChanged.connect(self.draw)
         self.but_colbar.clicked.connect(self.draw)
@@ -352,26 +352,26 @@ class Plot_3D(QWidget):
         """
         if self.sender().objectName() == 'but_log':  # clicking but_log triggered the slot
             if self.but_log.checked:
-                self.led_bottom.setText(str(self.zmin_dB))
-                self.zmax_dB = np.round(20 * log10(self.zmax), 2)
-                self.led_top.setText(str(self.zmax_dB))
+                self.led_bottom.setText(str(self.zmin_db))
+                self.zmax_db = np.round(20 * log10(self.zmax), 2)
+                self.led_top.setText(str(self.zmax_db))
                 self.lbl_top_db.setVisible(True)
                 self.lbl_bottom_db.setVisible(True)
             else:
                 self.led_bottom.setText(str(self.zmin))
-                self.zmax = np.round(10**(self.zmax_dB / 20), 2)
+                self.zmax = np.round(10**(self.zmax_db / 20), 2)
                 self.led_top.setText(str(self.zmax))
                 self.lbl_top_db.setVisible(False)
                 self.lbl_bottom_db.setVisible(False)
 
         else:  # finishing a lineEdit field triggered the slot
             if self.but_log.checked:
-                self.zmin_dB = safe_eval(
-                    self.led_bottom.text(), self.zmin_dB, return_type='float')
-                self.led_bottom.setText(str(self.zmin_dB))
-                self.zmax_dB = safe_eval(
-                    self.led_top.text(), self.zmax_dB, return_type='float')
-                self.led_top.setText(str(self.zmax_dB))
+                self.zmin_db = safe_eval(
+                    self.led_bottom.text(), self.zmin_db, return_type='float')
+                self.led_bottom.setText(str(self.zmin_db))
+                self.zmax_db = safe_eval(
+                    self.led_top.text(), self.zmax_db, return_type='float')
+                self.led_top.setText(str(self.zmax_db))
             else:
                 self.zmin = safe_eval(
                     self.led_bottom.text(), self.zmin, return_type='float')
@@ -432,11 +432,11 @@ class Plot_3D(QWidget):
         [w, H] = sig.freqz(bb, aa, worN=N_FFT, whole=True)
         H = np.nan_to_num(H)  # replace nans and inf by finite numbers
 
-        H_abs = abs(H)
-        # h_max = max(H_abs)
-        h_min = min(H_abs)
+        h_abs = abs(H)
+        # h_max = max(h_abs)
+        h_min = min(h_abs)
         # f = w / (2 * pi) * f_S                  # translate w to absolute frequencies
-        # F_min = f[np.argmin(H_abs)]
+        # f_min = f[np.argmin(h_abs)]
 
         plevel_rel = 1.05  # height of plotted pole position relative to zmax
         zlevel_rel = 0.1  # height of plotted zero position relative to zmax
@@ -446,8 +446,8 @@ class Plot_3D(QWidget):
             old_settings_seterr = np.seterr()
             np.seterr(divide='ignore')
 
-            bottom = np.floor(max(self.zmin_dB, 20*log10(h_min)) / 10) * 10
-            top = self.zmax_dB
+            bottom = np.floor(max(self.zmin_db, 20*log10(h_min)) / 10) * 10
+            top = self.zmax_db
             top_bottom = top - bottom
 
             zlevel = bottom - top_bottom * zlevel_rel
@@ -470,7 +470,7 @@ class Plot_3D(QWidget):
             zlevel = bottom + top_bottom * zlevel_rel  # height of displayed zero position
 
             if self.cmb_mode_3d.currentText() == 'None':  # "Poleposition": H(f) plot only
-                # h_max = np.clip(max(H_abs), 0, self.zmax)
+                # h_max = np.clip(max(h_abs), 0, self.zmax)
                 # make height of displayed poles same to zeros
                 plevel_top = bottom + top_bottom * zlevel_rel
                 plevel_btm = bottom
@@ -495,7 +495,7 @@ class Plot_3D(QWidget):
         # ===============================================================
         # Plot ||H(f)| along unit circle as 3D-lineplot
         # ===============================================================
-        if self.but_Hf.checked:
+        if self.but_hf.checked:
             self.ax3d.plot(self.xy_uc.real, self.xy_uc.imag, H_UC, alpha=0.8, lw=4)
             # draw once more as dashed white line to improve visibility
             self.ax3d.plot(self.xy_uc.real, self.xy_uc.imag, H_UC, 'w--', lw=4)

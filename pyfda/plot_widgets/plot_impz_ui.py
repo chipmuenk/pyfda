@@ -33,7 +33,7 @@ class PlotImpz_UI(QWidget):
     """
     Create the UI for the PlotImpz class
     """
-    # incoming: not implemented at the moment, update_N is triggered directly
+    # incoming: not implemented at the moment, update_n is triggered directly
     # by plot_impz
     # sig_rx = pyqtSignal(object)
     # outgoing: from various UI elements to PlotImpz ('ui_local_changed':'xxx')
@@ -166,7 +166,7 @@ class PlotImpz_UI(QWidget):
 
         self._construct_ui()
 #        self._enable_stim_widgets()
-        self.update_N(emit_signal=False)  # also updates window function and win_dict
+        self.update_n(emit_signal=False)  # also updates window function and win_dict
 #        self._update_noi()
 
     def _construct_ui(self):
@@ -531,8 +531,8 @@ class PlotImpz_UI(QWidget):
         qcmb_box_populate(self.cmb_freq_display, self.cmb_freq_display_items,
                           self.cmb_freq_display_item)
 
-        self.but_Hf = PushButtonRT(self, to_html("H_id", frmt="bi"), objectName="but_Hf")
-        self.but_Hf.setToolTip("<span>Show ideal frequency response, calculated "
+        self.but_hf = PushButtonRT(self, to_html("H_id", frmt="bi"), objectName="but_hf")
+        self.but_hf.setToolTip("<span>Show ideal frequency response, calculated "
                                "from the filter coefficients.</span>")
 
         self.but_freq_norm_impz = PushButtonRT(
@@ -568,7 +568,7 @@ class PlotImpz_UI(QWidget):
         layH_ctrl_freq_1.addWidget(self.cmb_plt_freq_resp)
         #
         layH_ctrl_freq_1.addSpacing(5)
-        layH_ctrl_freq_1.addWidget(self.but_Hf)
+        layH_ctrl_freq_1.addWidget(self.but_hf)
         layH_ctrl_freq_1.addSpacing(5)
         #
         layH_ctrl_freq_1.addWidget(self.lbl_log_bottom_freq)
@@ -617,14 +617,14 @@ class PlotImpz_UI(QWidget):
         # LOCAL SIGNALS & SLOTs
         # ----------------------------------------------------------------------
         # --- run control ---
-        self.led_N_start.editingFinished.connect(self.update_N)
-        self.but_N_auto.clicked.connect(self.update_N_auto)
-        self.led_N_points.editingFinished.connect(self.update_N)
-        self.led_N_frame.editingFinished.connect(self.update_N)
+        self.led_N_start.editingFinished.connect(self.update_n)
+        self.but_N_auto.clicked.connect(self.update_n_auto)
+        self.led_N_points.editingFinished.connect(self.update_n)
+        self.led_N_frame.editingFinished.connect(self.update_n)
         self.but_fft_wdg.clicked.connect(self.toggle_fft_wdg)
 
     # -------------------------------------------------------------------------
-    def update_N_auto(self):
+    def update_n_auto(self):
         """
         Update the number of data points to be plotted when the "N_auto" button is clicked.
         """
@@ -635,10 +635,10 @@ class PlotImpz_UI(QWidget):
 
         # automatic calculation of number of data points, disable data entry
         self.led_N_points.setEnabled(False)
-        self.update_N()
+        self.update_n()
 
     # -------------------------------------------------------------------------
-    def update_N(self, emit_signal=True, N_end=0):
+    def update_n(self, emit_signal=True, N_end=0):
         """
         Update values for `self.N`, `self.N_start` and `self.N_end` from the
         corresponding QLineEditWidgets.
