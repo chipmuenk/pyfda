@@ -119,11 +119,11 @@ class AmplitudeSpecs(QWidget):
         self.frm_main = QFrame(self)
         self.frm_main.setLayout(self.layGSpecs)
 
-        self.layVMain = QVBoxLayout()  # Widget main layout
-        self.layVMain.addWidget(self.frm_main)
-        self.layVMain.setContentsMargins(*params['wdg_margins'])
+        self.lay_v_main = QVBoxLayout()  # Widget main layout
+        self.lay_v_main.addWidget(self.frm_main)
+        self.lay_v_main.setContentsMargins(*params['wdg_margins'])
 
-        self.setLayout(self.layVMain)
+        self.setLayout(self.lay_v_main)
 
         self.n_cur_labels = 0  # number of currently visible labels / qlineedits
 

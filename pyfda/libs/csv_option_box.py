@@ -137,7 +137,7 @@ class CSV_option_box(QDialog):
         lay_grid.addWidget(self.cmb_header, 4, 2)
 
         lay_v_main = QVBoxLayout()
-        # layVMain.setAlignment(Qt.AlignTop) # only affects first widget (intended here)
+        # lay_v_main.setAlignment(Qt.AlignTop) # only affects first widget (intended here)
         lay_v_main.addLayout(lay_grid)
         lay_v_main.addWidget(butClose)
         lay_v_main.setContentsMargins(*params['wdg_margins'])

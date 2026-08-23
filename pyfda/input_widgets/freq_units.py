@@ -117,7 +117,7 @@ class FreqUnits(QWidget):
         """
         Construct the User Interface
         """
-        self.layVMain = QVBoxLayout() # Widget main layout
+        self.lay_v_main = QVBoxLayout() # Widget main layout
 
         bfont = QFont()
         bfont.setBold(True)
@@ -182,10 +182,10 @@ class FreqUnits(QWidget):
         frm_main = QFrame(self)
         frm_main.setLayout(self.layGSpecWdg)
 
-        self.layVMain.addWidget(frm_main)
-        self.layVMain.setContentsMargins(*params['wdg_margins'])
+        self.lay_v_main.addWidget(frm_main)
+        self.lay_v_main.setContentsMargins(*params['wdg_margins'])
 
-        self.setLayout(self.layVMain)
+        self.setLayout(self.lay_v_main)
 
         #----------------------------------------------------------------------
         # GLOBAL SIGNALS & SLOTs
