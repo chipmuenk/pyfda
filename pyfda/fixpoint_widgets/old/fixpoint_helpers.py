@@ -114,11 +114,11 @@ class UI_W(QWidget):
         self.cmbW.setToolTip(dict_ui['tip_combo'])
         self.cmbW.setObjectName("cmbW")
 
-        self.butLock = QPushButton(self)
-        self.butLock.setCheckable(True)
-        self.butLock.setChecked(False)
-        self.butLock.setVisible(dict_ui['lock_visible'])
-        self.butLock.setToolTip(dict_ui['tip_lock'])
+        self.but_lock = QPushButton(self)
+        self.but_lock.setCheckable(True)
+        self.but_lock.setChecked(False)
+        self.but_lock.setVisible(dict_ui['lock_visible'])
+        self.but_lock.setToolTip(dict_ui['tip_lock'])
 
         self.ledWI = QLineEdit(self)
         self.ledWI.setToolTip(dict_ui['tip_WI'])
@@ -140,7 +140,7 @@ class UI_W(QWidget):
         layH.addWidget(lblW)
         layH.addStretch()
         layH.addWidget(self.cmbW)
-        layH.addWidget(self.butLock)
+        layH.addWidget(self.but_lock)
         layH.addWidget(self.ledWI)
         layH.addWidget(lbl_sep)
         layH.addWidget(self.ledWF)
@@ -169,10 +169,10 @@ class UI_W(QWidget):
         # ----------------------------------------------------------------------
         self.ledWI.editingFinished.connect(self.ui2dict)
         self.ledWF.editingFinished.connect(self.ui2dict)
-        self.butLock.clicked.connect(self.butLock_clicked)
+        self.but_lock.clicked.connect(self.butLock_clicked)
         self.cmbW.currentIndexChanged.connect(self.ui2dict)
         # initialize button icon
-        self.butLock_clicked(self.butLock.isChecked())
+        self.butLock_clicked(self.but_lock.isChecked())
 
     def quant_coeffs(self, q_dict: dict, coeffs: iterable, to_int: bool = False) -> list:
         """
@@ -217,14 +217,14 @@ class UI_W(QWidget):
         Update the icon of the push button depending on its state
         """
         if clicked:
-            self.butLock.setIcon(QIcon(':/lock-locked.svg'))
+            self.but_lock.setIcon(QIcon(':/lock-locked.svg'))
         else:
-            self.butLock.setIcon(QIcon(':/lock-unlocked.svg'))
+            self.but_lock.setIcon(QIcon(':/lock-unlocked.svg'))
 
-        q_icon_size = self.butLock.iconSize()  # <- uncomment this for manual sizing
-        self.butLock.setIconSize(q_icon_size)
+        q_icon_size = self.but_lock.iconSize()  # <- uncomment this for manual sizing
+        self.but_lock.setIconSize(q_icon_size)
 
-        dict_sig = {'wdg_name': self.wdg_name, 'ui': 'butLock'}
+        dict_sig = {'wdg_name': self.wdg_name, 'ui': 'but_lock'}
         self.emit(dict_sig)
 
     # --------------------------------------------------------------------------
@@ -581,11 +581,11 @@ class UI_WQ(QWidget):
         self.cmbW.setVisible(dict_ui['cmb_w_vis'] == 'on')
         self.cmbW.setObjectName("cmbW")
 
-        self.butLock = QPushButton(self)
-        self.butLock.setCheckable(True)
-        self.butLock.setChecked(False)
-        self.butLock.setVisible(dict_ui['lock_visible'])
-        self.butLock.setToolTip(dict_ui['tip_lock'])
+        self.but_lock = QPushButton(self)
+        self.but_lock.setCheckable(True)
+        self.but_lock.setChecked(False)
+        self.but_lock.setVisible(dict_ui['lock_visible'])
+        self.but_lock.setToolTip(dict_ui['tip_lock'])
 
         self.ledWI = QLineEdit(self)
         self.ledWI.setToolTip(dict_ui['tip_WI'])
@@ -608,7 +608,7 @@ class UI_WQ(QWidget):
         lay_W.addWidget(lbl_W)
         # lay_W.addStretch()
         lay_W.addWidget(self.cmbW)
-        lay_W.addWidget(self.butLock)
+        lay_W.addWidget(self.but_lock)
         lay_W.addWidget(self.ledWI)
         lay_W.addWidget(lbl_sep)
         lay_W.addWidget(self.ledWF)
@@ -646,7 +646,7 @@ class UI_WQ(QWidget):
         self.ledWF.setText(str(self.WF))
 
         # initialize button icon
-        self.butLock_clicked(self.butLock.isChecked())
+        self.butLock_clicked(self.but_lock.isChecked())
 
         frm_main.setEnabled(dict_ui['enabled'])
         frm_main.setVisible(dict_ui['visible'])
@@ -659,7 +659,7 @@ class UI_WQ(QWidget):
 
         self.ledWI.editingFinished.connect(self.ui2dict)
         self.ledWF.editingFinished.connect(self.ui2dict)
-        self.butLock.clicked.connect(self.butLock_clicked)
+        self.but_lock.clicked.connect(self.butLock_clicked)
         self.cmbW.currentIndexChanged.connect(self.ui2dict)
 
     # --------------------------------------------------------------------------
@@ -706,15 +706,15 @@ class UI_WQ(QWidget):
         Update the icon of the push button depending on its state
         """
         if clicked:
-            self.butLock.setIcon(QIcon(':/lock-locked.svg'))
+            self.but_lock.setIcon(QIcon(':/lock-locked.svg'))
         else:
-            self.butLock.setIcon(QIcon(':/lock-unlocked.svg'))
+            self.but_lock.setIcon(QIcon(':/lock-unlocked.svg'))
 
         # TODO: WTF?!
-        q_icon_size = self.butLock.iconSize()  # <- uncomment this for manual sizing
-        self.butLock.setIconSize(q_icon_size)
+        q_icon_size = self.but_lock.iconSize()  # <- uncomment this for manual sizing
+        self.but_lock.setIconSize(q_icon_size)
 
-        dict_sig = {'wdg_name': self.wdg_name, 'ui': 'butLock'}
+        dict_sig = {'wdg_name': self.wdg_name, 'ui': 'but_lock'}
         self.emit(dict_sig)
 
     # --------------------------------------------------------------------------

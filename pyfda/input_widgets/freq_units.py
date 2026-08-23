@@ -136,8 +136,8 @@ class FreqUnits(QWidget):
         self.led_f_s.setText(str(fb_get('f_S')))
         self.led_f_s.installEventFilter(self)  # filter events
 
-        self.butLock = PushButton(self, icon=QIcon(':/lock-unlocked.svg'))
-        self.butLock.setToolTip(
+        self.but_lock = PushButton(self, icon=QIcon(':/lock-unlocked.svg'))
+        self.but_lock.setToolTip(
             "<span><b>Unlocked:</b> When <i>f<sub>S</sub></i> is changed, all frequency "
             "related widgets are updated, normalized frequencies stay the same.<br />"
             "<b>Locked:</b> When <i>f<sub>S</sub></i> is changed, displayed absolute "
@@ -145,7 +145,7 @@ class FreqUnits(QWidget):
 
         lay_h_f_s = QHBoxLayout()
         lay_h_f_s.addWidget(self.led_f_s)
-        lay_h_f_s.addWidget(self.butLock)
+        lay_h_f_s.addWidget(self.but_lock)
 
         self.cmb_f_units = QComboBox(self, objectName="cmb_f_units")
         qcmb_box_populate(self.cmb_f_units, self.cmb_f_unit_items, self.cmb_f_unit_init)
@@ -197,7 +197,7 @@ class FreqUnits(QWidget):
         #----------------------------------------------------------------------
         # swallow index passed by "IndexChanged":
         self.cmb_f_units.currentIndexChanged.connect(lambda: self.update_ui(self))
-        self.butLock.clicked.connect(self._lock_freqs)
+        self.but_lock.clicked.connect(self._lock_freqs)
         self.cmb_f_range.currentIndexChanged.connect(self._freq_range)
         self.but_sort.clicked.connect(self._store_sort_flag)
         # ----------------------------------------------------------------------
@@ -229,14 +229,14 @@ class FreqUnits(QWidget):
         remain unchanged.
         """
 
-        if self.butLock.checked:
+        if self.but_lock.checked:
             # Lock has been activated, keep displayed frequencies locked
             fb_set('freq_locked', True)
-            self.butLock.setIcon(QIcon(':/lock-locked.svg'))
+            self.but_lock.setIcon(QIcon(':/lock-locked.svg'))
         else:
             # Lock has been unlocked, scale displayed frequencies with f_S
             fb_set('freq_locked', False)
-            self.butLock.setIcon(QIcon(':/lock-unlocked.svg'))
+            self.but_lock.setIcon(QIcon(':/lock-unlocked.svg'))
 
 # -------------------------------------------------------------
     def update_ui(self, emit_signal: bool = True) -> None:
@@ -276,7 +276,7 @@ class FreqUnits(QWidget):
 
         self.led_f_s.setVisible(not is_normalized_freq)  # only vis. when
         self.lbl_f_s.setVisible(not is_normalized_freq)  # not normalized
-        self.butLock.setVisible(not is_normalized_freq)
+        self.but_lock.setVisible(not is_normalized_freq)
 
         if is_normalized_freq:
             f_s_norm_factor = 1.  # default: normalize w.r.t. f_S
@@ -299,7 +299,7 @@ class FreqUnits(QWidget):
                 'T_S': 1.,            # always use T_S = 1 for normalized frequencies
                 'freq_locked': False  # Don't lock frequency scaling with normalized frequencies
                 })
-            self.butLock.setIcon(QIcon(':/lock-unlocked.svg'))
+            self.but_lock.setIcon(QIcon(':/lock-unlocked.svg'))
 
         # -------------------------------------------------------------------
         else:  # Hz, kHz, ...

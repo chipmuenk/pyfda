@@ -229,14 +229,14 @@ class FX_UI_WQ(QWidget):
             )
         self.cmbW.setVisible(ui_dict['cmb_w_vis'] == 'on')
 
-        self.butLock = PushButton(self, icon=QIcon(':/lock-locked.svg'))
-        self.butLock.setVisible(ui_dict['lock_vis'] == 'on')
-        self.butLock.setToolTip(ui_dict['tip_lock'])
-        self.butLock.setFixedWidth(self.butLock.height())
+        self.but_lock = PushButton(self, icon=QIcon(':/lock-locked.svg'))
+        self.but_lock.setVisible(ui_dict['lock_vis'] == 'on')
+        self.but_lock.setToolTip(ui_dict['tip_lock'])
+        self.but_lock.setFixedWidth(self.but_lock.height())
         # retain size of lock widget even when hidden
-        sp_retain = self.butLock.sizePolicy()
+        sp_retain = self.but_lock.sizePolicy()
         sp_retain.setRetainSizeWhenHidden(True)
-        self.butLock.setSizePolicy(sp_retain)
+        self.but_lock.setSizePolicy(sp_retain)
 
         self.ledWI = QLineEdit(self, objectName="WI")
         self.ledWI.setToolTip(ui_dict['tip_WI'])
@@ -280,7 +280,7 @@ class FX_UI_WQ(QWidget):
         layG.setColumnStretch(1, 10)
         # first row
         layG.addWidget(lbl_wdg, 0, 0)
-        layG.addWidget(self.butLock, 0, 3)
+        layG.addWidget(self.but_lock, 0, 3)
         layG.addWidget(self.cmbW, 0, 4)
         layG.addLayout(layH_W, 0, 5)
         # second row
@@ -315,7 +315,7 @@ class FX_UI_WQ(QWidget):
         # use only self.Q.q_dict from here on!!
 
         # initialize button icon
-        self.but_lock_update_icon(self.butLock.checked)
+        self.but_lock_update_icon(self.but_lock.checked)
 
         # ----------------------------------------------------------------------
         # GLOBAL SIGNALS
@@ -330,7 +330,7 @@ class FX_UI_WQ(QWidget):
         self.ledWF.editingFinished.connect(self.ui2dict)
         self.cmbW.currentIndexChanged.connect(self.ui2dict)
 
-        self.butLock.clicked.connect(self.but_lock_checked)
+        self.but_lock.clicked.connect(self.but_lock_checked)
 
         # initialize the UI from the global dictionary
         self.dict2ui()
@@ -341,10 +341,10 @@ class FX_UI_WQ(QWidget):
     def but_lock_checked(self) -> None:
         """
         Update the icon of the push button depending on its state (checked or not)
-        and fire the signal {'ui_local_changed': 'butLock'}
+        and fire the signal {'ui_local_changed': 'but_lock'}
         """
-        self.but_lock_update_icon(self.butLock.checked)
-        self.emit({'sender_name': self.objectName(), 'ui_local_changed': 'butLock'})
+        self.but_lock_update_icon(self.but_lock.checked)
+        self.emit({'sender_name': self.objectName(), 'ui_local_changed': 'but_lock'})
 
     # --------------------------------------------------------------------------
     def but_lock_update_icon(self, checked: bool) -> None:
@@ -352,9 +352,9 @@ class FX_UI_WQ(QWidget):
         Update the icon of the push button depending on its state
         """
         if checked:
-            self.butLock.setIcon(QIcon(':/lock-locked.svg'))
+            self.but_lock.setIcon(QIcon(':/lock-locked.svg'))
         else:
-            self.butLock.setIcon(QIcon(':/lock-unlocked.svg'))
+            self.but_lock.setIcon(QIcon(':/lock-unlocked.svg'))
 
     # --------------------------------------------------------------------------
     def update_ovfl_cnt(self) -> None:
