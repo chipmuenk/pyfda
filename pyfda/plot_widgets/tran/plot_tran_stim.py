@@ -327,9 +327,9 @@ class Plot_Tran_Stim(QWidget):
                 self.ui.a2 * sig.gausspulse((n - self.ui.t2), fc=f2, bw=self.ui.bw2)
         # ----------------------------------------------------------------------
         elif self.ui.stim == "rect":
-            n_rise = int(self.T1_idx - np.floor(self.ui.tw1/2))  # pos. of rising edge
+            n_rise = int(self.T1_idx - np.floor(self.ui.tw_1/2))  # pos. of rising edge
             n_min = max(n_rise, 0)
-            n_max = min(n_rise + self.ui.tw1, N_end)
+            n_max = min(n_rise + self.ui.tw_1, N_end)
             x[frm_slc] = self.ui.a1 * np.where((n >= n_min) & (n < n_max), 1, 0)
         # ----------------------------------------------------------------------
         elif self.ui.stim == "step":
@@ -447,7 +447,7 @@ class Plot_Tran_Stim(QWidget):
                 "phi1": self.ui.phi1, "phi2": self.ui.phi2,
                 "T1": self.ui.t1, "T2": self.ui.t2, "N1": self.ui.n1, "N2": self.ui.n2,
                 "BW1": self.ui.bw1, "BW2": self.ui.bw2, "f_S": fb_get('f_S'),
-                "n": n, "t": t, "j": 1j}
+                "n": n, "t": t, "j": 1j, "pi": np.pi, "e": np.e}
 
             x[frm_slc] = safe_numexpr_eval(self.ui.stim_formula, (N_frame,), param_dict)
             if safe_numexpr_eval.err > 0:
