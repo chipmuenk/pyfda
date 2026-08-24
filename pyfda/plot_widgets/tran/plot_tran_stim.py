@@ -169,7 +169,7 @@ class Plot_Tran_Stim(QWidget):
         elif self.ui.noise == "brownian":
             self.title_str += r' + Brownian Noise'
         # ==================================================================
-        if self.ui.ledDC.isVisible and self.ui.DC != 0:
+        if self.ui.led_dc.isVisible() and self.ui.dc != 0:
             self.title_str += r' + DC'
         # ==================================================================
         if self.ui.cmb_file_io.isEnabled():  # File is loaded, data is available
@@ -267,8 +267,8 @@ class Plot_Tran_Stim(QWidget):
         # Initialization for all frames
         # -------------------------------------------------------------------
         if N_first == 0:
-            # calculate index for T1, only needed for dirac, step and rect
-            self.T1_idx = int(np.round(self.ui.T1))
+            # calculate index for t1, only needed for dirac, step and rect
+            self.T1_idx = int(np.round(self.ui.t1))
             self.rad_phi1 = self.ui.phi1 / 180 * pi
             self.rad_phi2 = self.ui.phi2 / 180 * pi
         # -------------------------------------------------------------------
@@ -306,63 +306,63 @@ class Plot_Tran_Stim(QWidget):
         # ----------------------------------------------------------------------
         elif self.ui.stim == "dirac":
             if N_first <= self.T1_idx < N_last:
-                x[self.T1_idx - N_first] = self.ui.A1
+                x[self.T1_idx - N_first] = self.ui.a1
         # ----------------------------------------------------------------------
         elif self.ui.stim == "sinc":
-            x[frm_slc] = self.ui.A1 * sinc(2 * (n - self.ui.T1) * self.ui.f1)\
-                + self.ui.A2 * sinc(2 * (n - self.ui.T2) * self.ui.f2)
+            x[frm_slc] = self.ui.a1 * sinc(2 * (n - self.ui.t1) * self.ui.f1)\
+                + self.ui.a2 * sinc(2 * (n - self.ui.t2) * self.ui.f2)
         # ----------------------------------------------------------------------
         elif self.ui.stim == "gauss":
             f1 = self.ui.f1
             f2 = self.ui.f2
-            if (self.ui.A1 != 0 and f1 < 0) or (self.ui.A2 != 0 and f2 < 0):
+            if (self.ui.a1 != 0 and f1 < 0) or (self.ui.a2 != 0 and f2 < 0):
                 logger.warning("Center frequencies f1, f2 need to be >= 0!")
                 return
             if f1 < 0:
-                f1 = 0.1  # dummy value, A1 == 0
+                f1 = 0.1  # dummy value, a1 == 0
             if f2 < 0:
-                f2 = 0.1  # dummy value, A2 == 0
+                f2 = 0.1  # dummy value, a2 == 0
             x[frm_slc] =\
-                self.ui.A1 * sig.gausspulse((n - self.ui.T1), fc=f1, bw=self.ui.BW1) +\
-                self.ui.A2 * sig.gausspulse((n - self.ui.T2), fc=f2, bw=self.ui.BW2)
+                self.ui.a1 * sig.gausspulse((n - self.ui.t1), fc=f1, bw=self.ui.bw1) +\
+                self.ui.a2 * sig.gausspulse((n - self.ui.t2), fc=f2, bw=self.ui.bw2)
         # ----------------------------------------------------------------------
         elif self.ui.stim == "rect":
-            n_rise = int(self.T1_idx - np.floor(self.ui.TW1/2))  # pos. of rising edge
+            n_rise = int(self.T1_idx - np.floor(self.ui.tw1/2))  # pos. of rising edge
             n_min = max(n_rise, 0)
-            n_max = min(n_rise + self.ui.TW1, N_end)
-            x[frm_slc] = self.ui.A1 * np.where((n >= n_min) & (n < n_max), 1, 0)
+            n_max = min(n_rise + self.ui.tw1, N_end)
+            x[frm_slc] = self.ui.a1 * np.where((n >= n_min) & (n < n_max), 1, 0)
         # ----------------------------------------------------------------------
         elif self.ui.stim == "step":
             if self.T1_idx < N_first:   # step before current frame
-                x[frm_slc].fill(self.ui.A1)
+                x[frm_slc].fill(self.ui.a1)
             if N_first <= self.T1_idx < N_last:  # step in current frame
                 x[frm_slc][0:self.T1_idx - N_first].fill(0)
-                x[frm_slc][self.T1_idx - N_first:N_last].fill(self.ui.A1)
+                x[frm_slc][self.T1_idx - N_first:N_last].fill(self.ui.a1)
             elif self.T1_idx >= N_last:  # step after current frame
                 x[frm_slc].fill(0)
         # ----------------------------------------------------------------------
         elif self.ui.stim == "cos":
             x[frm_slc] =\
-                self.ui.A1 * np.cos(2 * pi * n * self.ui.f1 + self.rad_phi1) +\
-                self.ui.A2 * np.cos(2 * pi * n * self.ui.f2 + self.rad_phi2)
+                self.ui.a1 * np.cos(2 * pi * n * self.ui.f1 + self.rad_phi1) +\
+                self.ui.a2 * np.cos(2 * pi * n * self.ui.f2 + self.rad_phi2)
         # ----------------------------------------------------------------------
         elif self.ui.stim == "sine":
             x[frm_slc] =\
-                self.ui.A1 * np.sin(2 * pi * n * self.ui.f1 + self.rad_phi1) +\
-                self.ui.A2 * np.sin(2 * pi * n * self.ui.f2 + self.rad_phi2)
+                self.ui.a1 * np.sin(2 * pi * n * self.ui.f1 + self.rad_phi1) +\
+                self.ui.a2 * np.sin(2 * pi * n * self.ui.f2 + self.rad_phi2)
         # ----------------------------------------------------------------------
         elif self.ui.stim == "exp":
             x[frm_slc] =\
-                self.ui.A1 * np.exp(1j * (2 * pi * n * self.ui.f1 + self.rad_phi1)) +\
-                self.ui.A2 * np.exp(1j * (2 * pi * n * self.ui.f2 + self.rad_phi2))
+                self.ui.a1 * np.exp(1j * (2 * pi * n * self.ui.f1 + self.rad_phi1)) +\
+                self.ui.a2 * np.exp(1j * (2 * pi * n * self.ui.f2 + self.rad_phi2))
         # ----------------------------------------------------------------------
         elif self.ui.stim == "diric":
             # scipy:  diric(x, N) = sin(Nx/2) / N*sin(x/2)
             # we use: x = 2 pi t = 2 pi f_1 n
             # diric(x, N) = sin(Nx/2) / N*sin(x/2) with x = 2 pi f_1 n
-            x[frm_slc] = self.ui.A1 * diric(
-                (2 * pi * (n - self.ui.T1) * self.ui.f1),
-                self.ui.N1)
+            x[frm_slc] = self.ui.a1 * diric(
+                (2 * pi * (n - self.ui.t1) * self.ui.f1),
+                self.ui.n1)
 
         # ----------------------------------------------------------------------
         elif self.ui.stim == "chirp":
@@ -373,11 +373,11 @@ class Plot_Tran_Stim(QWidget):
                 logger.warning(
                     "Frequencies f1 and f2 need to be != 0 and have the same sign!")
                 return
-            if self.ui.T2 == 0:  # sig.chirp is buggy, T_sim cannot be larger than T_end
+            if self.ui.t2 == 0:  # sig.chirp is buggy, T_sim cannot be larger than T_end
                 T_end = N_end  # frequency sweep over complete interval
             else:
-                T_end = self.ui.T2  # frequency sweep till T2
-            x[frm_slc] = self.ui.A1 * sig.chirp(
+                T_end = self.ui.t2  # frequency sweep till t2
+            x[frm_slc] = self.ui.a1 * sig.chirp(
                 n, self.ui.f1, T_end, self.ui.f2,
                 method=self.ui.chirp_type, phi=self.rad_phi1)
         # ----------------------------------------------------------------------
@@ -386,9 +386,9 @@ class Plot_Tran_Stim(QWidget):
                 if self.ui.f1 <= 0:
                     logger.warning("Frequency f1 needs to be > 0!")
                     return
-                x[frm_slc] = self.ui.A1 * triang_bl(2*pi * n * self.ui.f1 + self.rad_phi1)
+                x[frm_slc] = self.ui.a1 * triang_bl(2*pi * n * self.ui.f1 + self.rad_phi1)
             else:
-                x[frm_slc] = self.ui.A1 * sig.sawtooth(
+                x[frm_slc] = self.ui.a1 * sig.sawtooth(
                     2*pi * n * self.ui.f1 + self.rad_phi1, width=0.5)
         # ----------------------------------------------------------------------
         elif self.ui.stim == "saw":
@@ -396,64 +396,64 @@ class Plot_Tran_Stim(QWidget):
                 if self.ui.f1 <= 0:
                     logger.warning("Frequency f1 needs to be > 0!")
                     return
-                x[frm_slc] = self.ui.A1 * sawtooth_bl(2*pi * n * self.ui.f1 + self.rad_phi1)
+                x[frm_slc] = self.ui.a1 * sawtooth_bl(2*pi * n * self.ui.f1 + self.rad_phi1)
             else:
-                x[frm_slc] = self.ui.A1 * sig.sawtooth(2*pi * n * self.ui.f1 + self.rad_phi1)
+                x[frm_slc] = self.ui.a1 * sig.sawtooth(2*pi * n * self.ui.f1 + self.rad_phi1)
         # ----------------------------------------------------------------------
         elif self.ui.stim == "rect_per":
             if self.ui.but_stim_bl.checked:
                 if self.ui.f1 <= 0:
                     logger.warning("Frequency f1 needs to be > 0!")
                     return
-                x[frm_slc] = self.ui.A1 * rect_bl(
+                x[frm_slc] = self.ui.a1 * rect_bl(
                     2 * pi * n * self.ui.f1 + self.rad_phi1, duty=self.ui.stim_par1)
             else:
-                x[frm_slc] = self.ui.A1 * sig.square(
+                x[frm_slc] = self.ui.a1 * sig.square(
                     2 * pi * n * self.ui.f1 + self.rad_phi1, duty=self.ui.stim_par1)
         # ----------------------------------------------------------------------
         elif self.ui.stim == "comb":
             if self.ui.f1 <= 0:
                 logger.warning("Frequency f1 needs to be > 0!")
                 return
-            x[frm_slc] = self.ui.A1 * comb_bl(2 * pi * n * self.ui.f1 + self.rad_phi1)
+            x[frm_slc] = self.ui.a1 * comb_bl(2 * pi * n * self.ui.f1 + self.rad_phi1)
         # ----------------------------------------------------------------------
         elif self.ui.stim == "am":
-            x[frm_slc] = self.ui.A1 * np.sin(2*pi * n * self.ui.f1 + self.rad_phi1)\
-                * self.ui.A2 * np.sin(2*pi * n * self.ui.f2 + self.rad_phi2)
+            x[frm_slc] = self.ui.a1 * np.sin(2*pi * n * self.ui.f1 + self.rad_phi1)\
+                * self.ui.a2 * np.sin(2*pi * n * self.ui.f2 + self.rad_phi2)
         # ----------------------------------------------------------------------
         elif self.ui.stim == "pmfm":
-            x[frm_slc] = self.ui.A1 * np.sin(
+            x[frm_slc] = self.ui.a1 * np.sin(
                 2 * pi * n * self.ui.f1 + self.rad_phi1 +
-                self.ui.A2 * np.sin(2*pi * n * self.ui.f2 + self.rad_phi2))
+                self.ui.a2 * np.sin(2*pi * n * self.ui.f2 + self.rad_phi2))
         # ----------------------------------------------------------------------
         elif self.ui.stim == "pwm":
             if self.ui.but_stim_bl.checked:
                 if self.ui.f1 <= 0:
                     logger.warning("Frequency f1 needs to be > 0!")
                     return
-                x[frm_slc] = self.ui.A1 * rect_bl(
+                x[frm_slc] = self.ui.a1 * rect_bl(
                     2 * np.pi * n * self.ui.f1 + self.rad_phi1,
-                    duty=(1/2 + self.ui.A2 / 2 *
+                    duty=(1/2 + self.ui.a2 / 2 *
                           np.sin(2*pi * n * self.ui.f2 + self.rad_phi2)))
             else:
-                x[frm_slc] = self.ui.A1 * sig.square(
+                x[frm_slc] = self.ui.a1 * sig.square(
                     2 * np.pi * n * self.ui.f1 + self.rad_phi1,
-                    duty=(1/2 + self.ui.A2 / 2 *
+                    duty=(1/2 + self.ui.a2 / 2 *
                           np.sin(2*pi * n * self.ui.f2 + self.rad_phi2)))
         # ----------------------------------------------------------------------
         elif self.ui.stim == "formula":
             param_dict = {
-                "A1": self.ui.A1, "A2": self.ui.A2, "f1": self.ui.f1, "f2": self.ui.f2,
+                "A1": self.ui.a1, "A2": self.ui.a2, "f1": self.ui.f1, "f2": self.ui.f2,
                 "phi1": self.ui.phi1, "phi2": self.ui.phi2,
-                "T1": self.ui.T1, "T2": self.ui.T2, "N1": self.ui.N1, "N2": self.ui.N2,
-                "BW1": self.ui.BW1, "BW2": self.ui.BW2, "f_S": fb_get('f_S'),
+                "T1": self.ui.t1, "T2": self.ui.t2, "N1": self.ui.n1, "N2": self.ui.n2,
+                "BW1": self.ui.bw1, "BW2": self.ui.bw2, "f_S": fb_get('f_S'),
                 "n": n, "t": t, "j": 1j}
 
             x[frm_slc] = safe_numexpr_eval(self.ui.stim_formula, (N_frame,), param_dict)
             if safe_numexpr_eval.err > 0:
-                qstyle_widget(self.ui.ledStimFormula, "error")
+                qstyle_widget(self.ui.led_stim_formula, "error")
             else:
-                qstyle_widget(self.ui.ledStimFormula, 'normal')
+                qstyle_widget(self.ui.led_stim_formula, 'normal')
         else:
             logger.error('Unknown stimulus format "%s"', self.ui.stim)
             return
@@ -533,8 +533,8 @@ class Plot_Tran_Stim(QWidget):
             x[frm_slc] = add_signal(x[frm_slc], noi)
 
         # Add DC to stimulus when visible / enabled
-        if self.ui.ledDC.isVisible and self.ui.DC != 0:
-            x[frm_slc] = add_signal(x[frm_slc], self.ui.DC)
+        if self.ui.led_dc.isVisible() and self.ui.dc != 0:
+            x[frm_slc] = add_signal(x[frm_slc], self.ui.dc)
 
         # Add file data to stimulus for combobox setting "add"
         if self.ui.cmb_file_io.isEnabled() and qget_cmb_box(self.ui.cmb_file_io) == "add":

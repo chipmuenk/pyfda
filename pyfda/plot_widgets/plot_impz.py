@@ -581,7 +581,7 @@ class Plot_Impz(QWidget):
         self.ui.but_freq_norm_impz.setEnabled(
             (self.stim_wdg.ui.noi == 0 or
              self.stim_wdg.ui.cmb_stim_noise.currentText() == 'None')
-            and self.stim_wdg.ui.DC == 0
+            and self.stim_wdg.ui.dc == 0
             and self.stim_wdg.ui.cmb_stim == "impulse"
             and self.tran_io_wdg.ui.but_load.property("state") != "ok"
             )
@@ -613,11 +613,11 @@ class Plot_Impz(QWidget):
             # convert from np.bool to bool to avoid deprecation warning concerning
             # 'np.bool_' scalars to be interpreted as an index.
             self.cmplx = bool(\
-                (self.stim_wdg.ui.ledDC.isVisible and isinstance(self.stim_wdg.ui.DC, complex))\
-                or (self.stim_wdg.ui.ledAmp1.isVisible
-                    and isinstance(self.stim_wdg.ui.A1, complex))\
-                or (self.stim_wdg.ui.ledAmp2.isVisible
-                    and isinstance(self.stim_wdg.ui.A2, complex))\
+                (self.stim_wdg.ui.led_dc.isVisible() and isinstance(self.stim_wdg.ui.dc, complex))\
+                or (self.stim_wdg.ui.led_amp_1.isVisible()
+                    and isinstance(self.stim_wdg.ui.a1, complex))\
+                or (self.stim_wdg.ui.led_amp_2.isVisible()
+                    and isinstance(self.stim_wdg.ui.a2, complex))\
                 or np.any(np.iscomplex(np.asarray(fb_get('ba'))))\
                 or (self.tran_io_wdg.ui.but_load.property("state") == 'ok'
                     and np.iscomplexobj(self.tran_io_wdg.x))\
