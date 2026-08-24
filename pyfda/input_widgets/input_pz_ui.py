@@ -312,7 +312,7 @@ class Input_PZ_UI(QWidget):
         """
         if dirs.csv_options_handle is None:
             # no handle to the window? Create a new instance!
-            if self.but_csv_options.checked:
+            if self.but_csv_options.isChecked():
                 # Important: Handle to window must be class attribute otherwise it (and
                 # the attached window) is deleted immediately when it goes out of scope
                 dirs.csv_options_handle = CSV_option_box()

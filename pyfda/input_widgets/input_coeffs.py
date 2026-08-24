@@ -476,7 +476,7 @@ class Input_Coeffs(QWidget):
         CSV format.
         """
         text = qtable2csv(
-            self.tblCoeff, self.ba, formatted=self.ui.but_format.checked)
+            self.tblCoeff, self.ba, formatted=self.ui.but_format.isChecked())
         if self.ui.load_save_clipboard:
             # clipboard is selected as export target
             dirs.clipboard.setText(text)
@@ -484,7 +484,7 @@ class Input_Coeffs(QWidget):
             # pass csv formatted text, key for accessing data in ``*.npz`` file or
             # Matlab workspace (``*.mat``) and a title for the file export dialog
             export_fil_data(self, text, 'ba', title="Export Filter Coefficients",
-                            formatted=self.ui.but_format.checked)
+                            formatted=self.ui.but_format.isChecked())
 
     # --------------------------------------------------------------------------
     def _import(self) -> None:
@@ -495,14 +495,14 @@ class Input_Coeffs(QWidget):
 
         TODO: More checks for swapped row <-> col, single values, wrong data type ...
         """
-        formatted_import = self.ui.but_format.checked
+        formatted_import = self.ui.but_format.isChecked()
 
         # Get data as ndarray of str:
 
         if self.ui.load_save_clipboard:  # data from clipboard
             data_str = file2array(
                 None, None, 'ba', from_clipboard=True,
-                as_str = self.ui.but_format.checked)
+                as_str = self.ui.but_format.isChecked())
         else:  # data from file
             file_name, file_type = select_file(self, title="Import Filter Coefficients",
                                                mode="r", file_types=('csv', 'mat', 'npy', 'npz'))
@@ -512,7 +512,7 @@ class Input_Coeffs(QWidget):
             data_str = file2array(
                 file_name, file_type, 'ba',
                 from_clipboard=False,
-                as_str = self.ui.but_format.checked)
+                as_str = self.ui.but_format.isChecked())
 
         if data_str is None:  # file operation has been aborted or some other error
             logger.info("Data was not imported.")

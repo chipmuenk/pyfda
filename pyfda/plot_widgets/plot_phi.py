@@ -227,7 +227,7 @@ class Plot_Phi(QWidget):
         fb_set('plt_phiLabel', y_str)
         fb_set('plt_phiUnit', self.unitPhi)
 
-        if self.but_wrap.checked:
+        if self.but_wrap.isChecked():
             phi_plt = np.angle(H) * scale
         else:
             phi_plt = np.unwrap(np.angle(H)) * scale

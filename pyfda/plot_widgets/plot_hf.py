@@ -161,7 +161,7 @@ class Plot_Hf(QWidget):
         self.but_align.setToolTip(
             "<span>Try to align gridlines for magnitude and phase "
             "(doesn't work in all cases).</span>")
-        self.but_align.setVisible(self.but_phase.checked)
+        self.but_align.setVisible(self.but_phase.isChecked())
 
         # ----------------------------------------------------------------------
         #               ### frm_controls ###
@@ -531,7 +531,7 @@ class Plot_Hf(QWidget):
             if self.cmbInset.currentIndex() == 1: # edit / navigate inset
                 self.ax_i.set_navigate(True)
                 self.ax.set_navigate(False)
-                if self.but_specs.checked:
+                if self.but_specs.isChecked():
                     self.plot_spec_limits(self.ax_i)
             else: # edit / navigate main plot
                 self.ax_i.set_navigate(False)
@@ -560,7 +560,7 @@ class Plot_Hf(QWidget):
         # except (KeyError, AttributeError):
         #     pass
 
-        if self.but_phase.checked:
+        if self.but_phase.isChecked():
             self.ax_p = ax.twinx()  # second axes system with same x-axis for phase
             self.ax_p.is_twin = True  # mark this as 'twin' to suppress second grid in mpl_widget
 #
@@ -599,7 +599,7 @@ class Plot_Hf(QWidget):
         r"""
         Re-calculate \|H(f)\| and draw the figure
         """
-        self.but_align.setVisible(self.but_phase.checked)
+        self.but_align.setVisible(self.but_phase.isChecked())
         self.calc_hf()
         self.update_view()
 
@@ -651,7 +651,7 @@ class Plot_Hf(QWidget):
         self.but_zerophase.setCheckable(self.unitA == 'V')
         self.but_zerophase.setEnabled(self.unitA == 'V')
 
-        self.specs = self.but_specs.checked
+        self.specs = self.but_specs.isChecked()
 
         self.f_max = fb_get('f_max')
 
@@ -748,7 +748,7 @@ class Plot_Hf(QWidget):
             #-----------------------------------------------------------
 
             #============= Set Limits and draw specs =========================
-            if self.but_specs.checked:
+            if self.but_specs.isChecked():
                 self.plot_spec_limits(self.ax)
 
             #     self.ax_bounds = [self.ax.get_ybound()[0], self.ax.get_ybound()[1]]#, self.ax.get]
@@ -762,7 +762,7 @@ class Plot_Hf(QWidget):
                 title_str = "Magnitude "
             elif self.chk_show_H_re.isChecked() or self.chk_show_H_im.isChecked():
                 title_str = "Amplitude "
-            if self.but_phase.checked:
+            if self.but_phase.isChecked():
                 if title_str != "":
                     title_str += "and Phase "
                 else:
@@ -792,7 +792,7 @@ class Plot_Hf(QWidget):
         """
         Redraw the canvas when e.g. the canvas size has changed
         """
-        if hasattr(self, 'ax_p') and self.but_align.checked:
+        if hasattr(self, 'ax_p') and self.but_align.isChecked():
             # Align gridlines between H(f) and phi nicely
             self.align_y_axes(self.ax, self.ax_p)
         self.mplwidget.redraw()

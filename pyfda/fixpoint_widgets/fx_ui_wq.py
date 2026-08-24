@@ -315,7 +315,7 @@ class FX_UI_WQ(QWidget):
         # use only self.Q.q_dict from here on!!
 
         # initialize button icon
-        self.but_lock_update_icon(self.but_lock.checked)
+        self.but_lock_update_icon(self.but_lock.isChecked())
 
         # ----------------------------------------------------------------------
         # GLOBAL SIGNALS
@@ -343,7 +343,7 @@ class FX_UI_WQ(QWidget):
         Update the icon of the push button depending on its state (checked or not)
         and fire the signal {'ui_local_changed': 'but_lock'}
         """
-        self.but_lock_update_icon(self.but_lock.checked)
+        self.but_lock_update_icon(self.but_lock.isChecked())
         self.emit({'sender_name': self.objectName(), 'ui_local_changed': 'but_lock'})
 
     # --------------------------------------------------------------------------

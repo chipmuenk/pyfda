@@ -155,14 +155,25 @@ class PushButton(QPushButton):
         self._checkable = checkable
         if self._checkable:
             self.setChecked(checked)
-            self.checked = checked
+            self._checked = checked
         else:
             self.setChecked(False)
-            self.checked = False
+            self._checked = False
 
         self.style_button()
 
         self.installEventFilter(self)
+
+    def isChecked(self) -> bool:
+        """
+        Get the checked state of the button.
+
+        Returns
+        -------
+        bool
+            The current checked state of the button from attribute `checked`.
+        """
+        return self._checked
 
     def setChecked(self, checked: bool) -> None:
         """
@@ -174,7 +185,7 @@ class PushButton(QPushButton):
             New checked state. Ignored when the button is not checkable.
         """
         if self._checkable:
-            self.checked = checked
+            self._checked = checked
             self.style_button()
 
     def setCheckable(self, checkable: bool) -> None:
@@ -190,7 +201,7 @@ class PushButton(QPushButton):
         self._checkable = checkable
         if not self._checkable:
             self.setChecked(False)
-            self.checked = False
+            self._checked = False
             self.style_button()
 
     def eventFilter(self, source: QtCore.QObject, event: QEvent) -> bool:
@@ -213,7 +224,7 @@ class PushButton(QPushButton):
         if event.type() == QEvent.MouseButtonPress:
             if self.isEnabled() and self._checkable and event.button() == Qt.LeftButton:
                 # signal is passed to base class where "self.toggle()" is performed
-                self.checked = not self.checked
+                self._checked = not self._checked
                 self.style_button()
         # Call base class method to continue normal event processing:
         return super().eventFilter(source, event)
@@ -225,7 +236,7 @@ class PushButton(QPushButton):
         Uses `qstyle_widget` with the properties defined in the application's
         stylesheet to reflect states like 'highlight' or 'normal'.
         """
-        if self.checked:
+        if self._checked:
             qstyle_widget(self, "highlight")
         else:
             qstyle_widget(self, "normal")

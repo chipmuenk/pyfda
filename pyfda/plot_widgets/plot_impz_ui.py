@@ -218,7 +218,7 @@ class PlotImpz_UI(QWidget):
             "Disable <b><i>N</i> =</b> for manual entry.</span>")
         self.led_N_points.setMaximumWidth(qtext_width(N_x=8))
         # Enable entry field only for manual mode
-        self.led_N_points.setEnabled(not self.but_N_auto.checked)
+        self.led_N_points.setEnabled(not self.but_N_auto.isChecked())
 
         self.lbl_N_frame = QLabel(to_html("N_Frame", frmt='bi') + " =", self)
         self.lbl_N_frame.setVisible(False)
@@ -399,8 +399,8 @@ class PlotImpz_UI(QWidget):
             "<span>Minimum display value for time and spectrogram plots with log. scale."
             "</span>")
         self.lbl_log_bottom_time.setVisible(
-            self.but_log_time.checked or
-            ((self.plt_time_spgr != "none") and self.but_log_spgr_time.checked))
+            self.but_log_time.isChecked() or
+            ((self.plt_time_spgr != "none") and self.but_log_spgr_time.isChecked()))
         self.led_log_bottom_time.setVisible(
             self.lbl_log_bottom_time.isVisible())
 
@@ -515,16 +515,16 @@ class PlotImpz_UI(QWidget):
             "<span>Logarithmic scale for y-axis.</span>")
 
         self.lbl_log_bottom_freq = QLabel(to_html("min =", frmt='bi'), self)
-        self.lbl_log_bottom_freq.setVisible(self.but_log_freq.checked)
+        self.lbl_log_bottom_freq.setVisible(self.but_log_freq.isChecked())
 
         self.led_log_bottom_freq = QLineEdit(self)
         self.led_log_bottom_freq.setText(str(self.bottom_f))
         self.led_log_bottom_freq.setMaximumWidth(qtext_width(N_x=8))
         self.led_log_bottom_freq.setToolTip(
             "<span>Minimum display value for log. scale.</span>")
-        self.led_log_bottom_freq.setVisible(self.but_log_freq.checked)
+        self.led_log_bottom_freq.setVisible(self.but_log_freq.isChecked())
 
-        if not self.but_log_freq.checked:
+        if not self.but_log_freq.isChecked():
             self.bottom_f = 0
 
         self.cmb_freq_display = QComboBox(self, objectName="cmb_freq_display")
@@ -628,7 +628,7 @@ class PlotImpz_UI(QWidget):
         """
         Update the number of data points to be plotted when the "N_auto" button is clicked.
         """
-        if not self.but_N_auto.checked:
+        if not self.but_N_auto.isChecked():
             # manual entry of number of data points, enable data entry and return
             self.led_N_points.setEnabled(True)
             return
@@ -685,7 +685,7 @@ class PlotImpz_UI(QWidget):
             # calculate number of data points to be plotted
             self.N = self.N_end - self.N_start
         else:
-            if self.but_N_auto.checked:  # automatic calculation
+            if self.but_N_auto.isChecked():  # automatic calculation
                 self.N = impz_len(fb_get('ba'), level=-40)
 
             # total number of points to be calculated: N_end = N + N_start
@@ -716,7 +716,7 @@ class PlotImpz_UI(QWidget):
         Show / hide FFT widget depending on the state of the corresponding button
         When widget is shown, trigger an update of the window function.
         """
-        if self.but_fft_wdg.checked:
+        if self.but_fft_wdg.isChecked():
             self.win_viewer.show()
             self.emit({'view_changed': 'fft_win_type'}, sig_name='sig_tx_fft')
         else:

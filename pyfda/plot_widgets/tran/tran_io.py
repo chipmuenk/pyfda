@@ -173,7 +173,7 @@ class Tran_IO(QWidget):
 
         The sampling frequency needs to be integer and at least 1.
         """
-        if not self.ui.but_f_s_wav_auto.checked or f_s_wav is None:
+        if not self.ui.but_f_s_wav_auto.isChecked() or f_s_wav is None:
             f_s_wav = self.ui.led_f_s_wav.text()
 
         self.f_s_wav = max(safe_eval(f_s_wav, alt_expr=self.f_s_wav,
@@ -364,7 +364,7 @@ class Tran_IO(QWidget):
             scale_int = 1
             offset_int = 0
 
-            if self.ui.but_int_as_float.checked:
+            if self.ui.but_int_as_float.isChecked():
                 if io.read_wav_info.sample_format == "int16":
                     scale_int = (1 << 15) - 1
                 elif io.read_wav_info.sample_format == "int24":
@@ -377,7 +377,7 @@ class Tran_IO(QWidget):
 
             data = (data - offset_int) / scale_int
 
-        if self.ui.but_scale_to.checked:
+        if self.ui.but_scale_to.isChecked():
             self.norm = safe_eval(self.ui.led_scale_to.text(), self.norm, return_type='float')
             self.ui.led_scale_to.setText(str(self.norm))
             self.x_file = data * self.norm / np.max(np.abs(data))
@@ -385,7 +385,7 @@ class Tran_IO(QWidget):
             self.x_file = data
 
         self.emit({'data_changed': 'file_io'})
-        if self.ui.but_f_s_wav_auto.checked:
+        if self.ui.but_f_s_wav_auto.isChecked():
             fb_set('f_S', self.f_s_file)
             fb_set('freq_specs_unit', 'Hz')
             self.emit({'view_changed': 'f_S'})
@@ -398,7 +398,7 @@ class Tran_IO(QWidget):
         """
         if dirs.csv_options_handle is None:
             # no handle to the window? Create a new instance!
-            if self.ui.but_csv_options.checked:
+            if self.ui.but_csv_options.isChecked():
                 # Important: Handle to window must be class attribute otherwise it (and
                 # the attached window) is deleted immediately when it goes out of scope
                 dirs.csv_options_handle = CSV_option_box()
@@ -485,14 +485,14 @@ class Tran_IO(QWidget):
                 # create 2D-array from 1D arrays and transpose them to row based form
                 data = np.vstack((data, data_r))
 
-        if self.ui.but_scale_to.checked:
+        if self.ui.but_scale_to.isChecked():
             # normalize data to 'self.norm' before saving
             data = data * self.norm / np.max(np.abs(data))
 
         if self.file_type == 'wav':
             # convert to selected data format
             frmt = qget_cmb_box(self.ui.cmb_data_format)
-            scale_int = self.ui.but_int_as_float.checked
+            scale_int = self.ui.but_int_as_float.isChecked()
             if frmt not in {'uint8', 'int16', 'int32', 'float32', 'float64'}:
                 logger.error("Unsupported format %s for data export.", frmt)
                 return -1

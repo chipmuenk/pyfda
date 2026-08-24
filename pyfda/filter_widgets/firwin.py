@@ -623,7 +623,7 @@ class Firwin(QWidget):
         Show / hide FFT widget depending on the state of the corresponding button
         When widget is shown, trigger an update of the window function.
         """
-        if self.but_fft_wdg.checked:
+        if self.but_fft_wdg.isChecked():
             self.win_viewer.show()
             self.emit({'view_changed': 'fft_win_type'}, sig_name='sig_tx_local')
         else:

@@ -104,7 +104,7 @@ class Plot_Tran_Stim(QWidget):
             self.title_str = r'Rect Impulse'
         # ------------------------------------------------------------------
         elif self.ui.stim == "step":
-            if self.ui.but_step_err.checked:
+            if self.ui.but_step_err.isChecked():
                 self.title_str = r'Settling Error $\epsilon$'
                 self.H_str = r'$h_{\epsilon, \infty} - h_{\epsilon}[n]$'
             else:
@@ -124,17 +124,17 @@ class Plot_Tran_Stim(QWidget):
             self.title_str = self.ui.chirp_type.capitalize() + ' Chirp Stimulus'
         # ------------------------------------------------------------------
         elif self.ui.stim == "triang":
-            if self.ui.but_stim_bl.checked:
+            if self.ui.but_stim_bl.isChecked():
                 self.title_str = r'Bandlim. Triangular Stimulus'
             else:
                 self.title_str = r'Triangular Stimulus'
         elif self.ui.stim == "saw":
-            if self.ui.but_stim_bl.checked:
+            if self.ui.but_stim_bl.isChecked():
                 self.title_str = r'Bandlim. Sawtooth Stimulus'
             else:
                 self.title_str = r'Sawtooth Stimulus'
         elif self.ui.stim == "rect_per":
-            if self.ui.but_stim_bl.checked:
+            if self.ui.but_stim_bl.isChecked():
                 self.title_str = r'Bandlimited Rect. Stimulus'
             else:
                 self.title_str = r'Rect. Stimulus'
@@ -382,7 +382,7 @@ class Plot_Tran_Stim(QWidget):
                 method=self.ui.chirp_type, phi=self.rad_phi1)
         # ----------------------------------------------------------------------
         elif self.ui.stim == "triang":
-            if self.ui.but_stim_bl.checked:
+            if self.ui.but_stim_bl.isChecked():
                 if self.ui.f1 <= 0:
                     logger.warning("Frequency f1 needs to be > 0!")
                     return
@@ -392,7 +392,7 @@ class Plot_Tran_Stim(QWidget):
                     2*pi * n * self.ui.f1 + self.rad_phi1, width=0.5)
         # ----------------------------------------------------------------------
         elif self.ui.stim == "saw":
-            if self.ui.but_stim_bl.checked:
+            if self.ui.but_stim_bl.isChecked():
                 if self.ui.f1 <= 0:
                     logger.warning("Frequency f1 needs to be > 0!")
                     return
@@ -401,7 +401,7 @@ class Plot_Tran_Stim(QWidget):
                 x[frm_slc] = self.ui.a1 * sig.sawtooth(2*pi * n * self.ui.f1 + self.rad_phi1)
         # ----------------------------------------------------------------------
         elif self.ui.stim == "rect_per":
-            if self.ui.but_stim_bl.checked:
+            if self.ui.but_stim_bl.isChecked():
                 if self.ui.f1 <= 0:
                     logger.warning("Frequency f1 needs to be > 0!")
                     return
@@ -427,7 +427,7 @@ class Plot_Tran_Stim(QWidget):
                 self.ui.a2 * np.sin(2*pi * n * self.ui.f2 + self.rad_phi2))
         # ----------------------------------------------------------------------
         elif self.ui.stim == "pwm":
-            if self.ui.but_stim_bl.checked:
+            if self.ui.but_stim_bl.isChecked():
                 if self.ui.f1 <= 0:
                     logger.warning("Frequency f1 needs to be > 0!")
                     return

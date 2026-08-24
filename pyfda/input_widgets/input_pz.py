@@ -630,14 +630,14 @@ class Input_PZ(QWidget):
         or to file using a selected format
         """
         text = qtable2csv(
-            self.tblPZ, self.zpk, zpk=True, formatted=self.ui.but_format.checked)
+            self.tblPZ, self.zpk, zpk=True, formatted=self.ui.but_format.isChecked())
         if self.ui.load_save_clipboard:  # data to clipboard:
             dirs.clipboard.setText(text)
         else:
             # pass csv formatted text, key for accessing data in ``*.npz`` file or
             # Matlab workspace (``*.mat``) and a title for the file export dialog
             export_fil_data(self, text, 'zpk', title="Export Poles / Zeros",
-                            formatted=self.ui.but_format.checked)
+                            formatted=self.ui.but_format.isChecked())
     # --------------------------------------------------------------------------
     def _import(self) -> None:
         """
@@ -649,7 +649,7 @@ class Input_PZ(QWidget):
         if self.ui.load_save_clipboard:  # data from clipboard
             data_str = file2array(
                 "", "", 'zpk', from_clipboard=True,
-                as_str = self.ui.but_format.checked)
+                as_str = self.ui.but_format.isChecked())
         else:  # data from file
             file_name, file_type = select_file(self, title="Import Poles / Zeros", mode="r",
                                     file_types=('csv', 'mat', 'npy', 'npz'))
@@ -659,7 +659,7 @@ class Input_PZ(QWidget):
             data_str = file2array(
                 file_name, file_type, 'zpk',
                 from_clipboard=False,
-                as_str = self.ui.but_format.checked)
+                as_str = self.ui.but_format.isChecked())
 
         if data_str is None:  # file operation has been aborted
             return

@@ -229,7 +229,7 @@ class FreqUnits(QWidget):
         remain unchanged.
         """
 
-        if self.but_lock.checked:
+        if self.but_lock.isChecked():
             # Lock has been activated, keep displayed frequencies locked
             fb_set('freq_locked', True)
             self.but_lock.setIcon(QIcon(':/lock-locked.svg'))
@@ -463,8 +463,8 @@ class FreqUnits(QWidget):
         Store sort flag in filter dict and emit 'specs_changed':'f_sort'
         when sort button is checked.
         """
-        fb_set('freq_specs_sort', self.but_sort.checked)
-        if self.but_sort.checked:
+        fb_set('freq_specs_sort', self.but_sort.isChecked())
+        if self.but_sort.isChecked():
             self.emit({'specs_changed': 'f_sort'})
 
 # ------------------------------------------------------------------------------
