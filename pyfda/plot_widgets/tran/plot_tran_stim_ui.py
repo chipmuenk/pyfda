@@ -319,26 +319,26 @@ class Plot_Tran_Stim_UI(QWidget):
         self.layH_file_io.setContentsMargins(0, 0, 0, 0)
         # -------------------------------------
 
-        layHCmbStim = QHBoxLayout()
-        layHCmbStim.addWidget(self.cmb_stimulus)
-        layHCmbStim.addWidget(self.cmb_impulse_type)
-        layHCmbStim.addWidget(self.cmb_sinusoid_type)
-        layHCmbStim.addWidget(self.cmb_chirp_type)
-        layHCmbStim.addWidget(self.cmb_periodic_type)
-        layHCmbStim.addWidget(self.cmb_modulation_type)
-        layHCmbStim.addWidget(self.but_stim_bl)
-        layHCmbStim.addWidget(self.lbl_stim_par_1)
-        layHCmbStim.addWidget(self.led_stim_par_1)
-        layHCmbStim.addWidget(self.but_step_err)
+        lay_h_cmb_stim = QHBoxLayout()
+        lay_h_cmb_stim.addWidget(self.cmb_stimulus)
+        lay_h_cmb_stim.addWidget(self.cmb_impulse_type)
+        lay_h_cmb_stim.addWidget(self.cmb_sinusoid_type)
+        lay_h_cmb_stim.addWidget(self.cmb_chirp_type)
+        lay_h_cmb_stim.addWidget(self.cmb_periodic_type)
+        lay_h_cmb_stim.addWidget(self.cmb_modulation_type)
+        lay_h_cmb_stim.addWidget(self.but_stim_bl)
+        lay_h_cmb_stim.addWidget(self.lbl_stim_par_1)
+        lay_h_cmb_stim.addWidget(self.led_stim_par_1)
+        lay_h_cmb_stim.addWidget(self.but_step_err)
 
         self.lbl_dc = QLabel(to_html("DC =", frmt='bi'), self)
         self.led_dc = QLineEdit(self, objectName="stim_dc")
         self.led_dc.setText(str(self.dc))
         self.led_dc.setToolTip("DC Level")
 
-        layHStimDC = QHBoxLayout()
-        layHStimDC.addWidget(self.lbl_dc)
-        layHStimDC.addWidget(self.led_dc)
+        lay_h_stim_dc = QHBoxLayout()
+        lay_h_stim_dc.addWidget(self.lbl_dc)
+        lay_h_stim_dc.addWidget(self.led_dc)
 
         # ======================================================================
         self.lbl_amp_1 = QLabel(to_html("&nbsp;A_1", frmt='bi') + " =", self)
@@ -402,19 +402,19 @@ class Plot_Tran_Stim_UI(QWidget):
         self.led_tw_2.setToolTip("Time width 2")
         self.lbl_twu_2 = QLabel(to_html("T_S", frmt='i'), self)
         # ----------------------------------------------
-        self.txtFreq1_f = to_html("&nbsp;f_1", frmt='bi') + " ="
-        self.txtFreq1_F = to_html("&nbsp;F_1", frmt='bi') + " ="
-        self.txtFreq1_k = to_html("&nbsp;k_1", frmt='bi') + " ="
-        self.lbl_freq_1 = QLabel(self.txtFreq1_f, self)
+        self.txt_freq_1_f = to_html("&nbsp;f_1", frmt='bi') + " ="
+        self.txt_freq_1_f_cap = to_html("&nbsp;F_1", frmt='bi') + " ="
+        self.txt_freq_1_k = to_html("&nbsp;k_1", frmt='bi') + " ="
+        self.lbl_freq_1 = QLabel(self.txt_freq_1_f, self)
         self.led_f1 = QLineEdit(self, objectName="led_f1")
         self.led_f1.setText(str(self.f1))
         self.led_f1.setToolTip("Stimulus frequency")
         self.lbl_freq_unit_1 = QLabel(to_html("f_S", frmt='i'), self)
 
-        self.txtFreq2_f = to_html("&nbsp;f_2", frmt='bi') + " ="
-        self.txtFreq2_F = to_html("&nbsp;F_2", frmt='bi') + " ="
-        self.txtFreq2_k = to_html("&nbsp;k_2", frmt='bi') + " ="
-        self.lbl_freq_2 = QLabel(self.txtFreq2_f, self)
+        self.txt_freq_2_f = to_html("&nbsp;f_2", frmt='bi') + " ="
+        self.txt_freq_2_f_cap = to_html("&nbsp;F_2", frmt='bi') + " ="
+        self.txt_freq_2_k = to_html("&nbsp;k_2", frmt='bi') + " ="
+        self.lbl_freq_2 = QLabel(self.txt_freq_2_f, self)
         self.led_f2 = QLineEdit(self, objectName="led_f2")
         self.led_f2.setText(str(self.f2))
         self.led_f2.setToolTip("Stimulus frequency 2")
@@ -470,100 +470,100 @@ class Plot_Tran_Stim_UI(QWidget):
         self.wdg_formula_stim.setContentsMargins(0, 0, 0, 0)
 
         # Main grid layout for all control elements
-        layG_ctrl_stim = QGridLayout()
+        lay_g_ctrl_stim = QGridLayout()
         i = 0
-        layG_ctrl_stim.addLayout(layHCmbStim, 0, i)
-        layG_ctrl_stim.addLayout(layHStimDC, 1, i)
+        lay_g_ctrl_stim.addLayout(lay_h_cmb_stim, 0, i)
+        lay_g_ctrl_stim.addLayout(lay_h_stim_dc, 1, i)
         i += 1
-        layG_ctrl_stim.addWidget(self.lbl_amp_1, 0, i)
-        layG_ctrl_stim.addWidget(self.lbl_amp_2, 1, i)
+        lay_g_ctrl_stim.addWidget(self.lbl_amp_1, 0, i)
+        lay_g_ctrl_stim.addWidget(self.lbl_amp_2, 1, i)
         i += 1
-        layG_ctrl_stim.addWidget(self.led_amp_1, 0, i)
-        layG_ctrl_stim.addWidget(self.led_amp_2, 1, i)
+        lay_g_ctrl_stim.addWidget(self.led_amp_1, 0, i)
+        lay_g_ctrl_stim.addWidget(self.led_amp_2, 1, i)
         i += 1
-        layG_ctrl_stim.addWidget(self.lbl_freq_1, 0, i)
-        layG_ctrl_stim.addWidget(self.lbl_freq_2, 1, i)
+        lay_g_ctrl_stim.addWidget(self.lbl_freq_1, 0, i)
+        lay_g_ctrl_stim.addWidget(self.lbl_freq_2, 1, i)
         i += 1
-        layG_ctrl_stim.addWidget(self.led_f1, 0, i)
-        layG_ctrl_stim.addWidget(self.led_f2, 1, i)
+        lay_g_ctrl_stim.addWidget(self.led_f1, 0, i)
+        lay_g_ctrl_stim.addWidget(self.led_f2, 1, i)
         i += 1
-        layG_ctrl_stim.addWidget(self.lbl_freq_unit_1, 0, i)
-        layG_ctrl_stim.addWidget(self.lbl_freq_unit_2, 1, i)
+        lay_g_ctrl_stim.addWidget(self.lbl_freq_unit_1, 0, i)
+        lay_g_ctrl_stim.addWidget(self.lbl_freq_unit_2, 1, i)
         i += 1
-        layG_ctrl_stim.addWidget(self.lbl_phi_1, 0, i)
-        layG_ctrl_stim.addWidget(self.lbl_phi_2, 1, i)
+        lay_g_ctrl_stim.addWidget(self.lbl_phi_1, 0, i)
+        lay_g_ctrl_stim.addWidget(self.lbl_phi_2, 1, i)
         i += 1
-        layG_ctrl_stim.addWidget(self.led_phi_1, 0, i)
-        layG_ctrl_stim.addWidget(self.led_phi_2, 1, i)
+        lay_g_ctrl_stim.addWidget(self.led_phi_1, 0, i)
+        lay_g_ctrl_stim.addWidget(self.led_phi_2, 1, i)
         i += 1
-        layG_ctrl_stim.addWidget(self.lbl_ph_u_1, 0, i)
-        layG_ctrl_stim.addWidget(self.lbl_ph_u_2, 1, i)
+        lay_g_ctrl_stim.addWidget(self.lbl_ph_u_1, 0, i)
+        lay_g_ctrl_stim.addWidget(self.lbl_ph_u_2, 1, i)
         i += 1
-        layG_ctrl_stim.addWidget(self.lbl_bw_1, 0, i)
-        layG_ctrl_stim.addWidget(self.lbl_bw_2, 1, i)
+        lay_g_ctrl_stim.addWidget(self.lbl_bw_1, 0, i)
+        lay_g_ctrl_stim.addWidget(self.lbl_bw_2, 1, i)
         i += 1
-        layG_ctrl_stim.addWidget(self.led_bw_1, 0, i)
-        layG_ctrl_stim.addWidget(self.led_bw_2, 1, i)
+        lay_g_ctrl_stim.addWidget(self.led_bw_1, 0, i)
+        lay_g_ctrl_stim.addWidget(self.led_bw_2, 1, i)
         i += 1
-        layG_ctrl_stim.addWidget(self.lbl_t_1, 0, i)
-        layG_ctrl_stim.addWidget(self.lbl_t_2, 1, i)
+        lay_g_ctrl_stim.addWidget(self.lbl_t_1, 0, i)
+        lay_g_ctrl_stim.addWidget(self.lbl_t_2, 1, i)
         i += 1
-        layG_ctrl_stim.addWidget(self.led_t_1, 0, i)
-        layG_ctrl_stim.addWidget(self.led_t_2, 1, i)
+        lay_g_ctrl_stim.addWidget(self.led_t_1, 0, i)
+        lay_g_ctrl_stim.addWidget(self.led_t_2, 1, i)
         i += 1
-        layG_ctrl_stim.addWidget(self.lbl_t_u_1, 0, i)
-        layG_ctrl_stim.addWidget(self.lbl_t_u_2, 1, i)
+        lay_g_ctrl_stim.addWidget(self.lbl_t_u_1, 0, i)
+        lay_g_ctrl_stim.addWidget(self.lbl_t_u_2, 1, i)
         i += 1
-        layG_ctrl_stim.addWidget(self.lbl_n_1, 0, i)
-        layG_ctrl_stim.addWidget(self.lbl_n_2, 1, i)
+        lay_g_ctrl_stim.addWidget(self.lbl_n_1, 0, i)
+        lay_g_ctrl_stim.addWidget(self.lbl_n_2, 1, i)
         i += 1
-        layG_ctrl_stim.addWidget(self.led_n_1, 0, i)
-        layG_ctrl_stim.addWidget(self.led_n_2, 1, i)
+        lay_g_ctrl_stim.addWidget(self.led_n_1, 0, i)
+        lay_g_ctrl_stim.addWidget(self.led_n_2, 1, i)
         i += 1
-        layG_ctrl_stim.addWidget(self.lbl_tw_1, 0, i)
-        layG_ctrl_stim.addWidget(self.lbl_tw_2, 1, i)
+        lay_g_ctrl_stim.addWidget(self.lbl_tw_1, 0, i)
+        lay_g_ctrl_stim.addWidget(self.lbl_tw_2, 1, i)
         i += 1
-        layG_ctrl_stim.addWidget(self.led_tw_1, 0, i)
-        layG_ctrl_stim.addWidget(self.led_tw_2, 1, i)
+        lay_g_ctrl_stim.addWidget(self.led_tw_1, 0, i)
+        lay_g_ctrl_stim.addWidget(self.led_tw_2, 1, i)
         i += 1
-        layG_ctrl_stim.addWidget(self.lbl_twu_1, 0, i)
-        layG_ctrl_stim.addWidget(self.lbl_twu_2, 1, i)
+        lay_g_ctrl_stim.addWidget(self.lbl_twu_1, 0, i)
+        lay_g_ctrl_stim.addWidget(self.lbl_twu_2, 1, i)
         i += 1
-        layG_ctrl_stim.addWidget(line2, 0, i, 2, 1)
+        lay_g_ctrl_stim.addWidget(line2, 0, i, 2, 1)
         i += 1
-        layG_ctrl_stim.addWidget(self.lbl_noise, 0, i)
-        layG_ctrl_stim.addWidget(self.lbl_noi, 1, i)
+        lay_g_ctrl_stim.addWidget(self.lbl_noise, 0, i)
+        lay_g_ctrl_stim.addWidget(self.lbl_noi, 1, i)
         i += 1
-        layG_ctrl_stim.addWidget(self.cmb_stim_noise, 0, i)
-        layG_ctrl_stim.addLayout(layH_noi_params, 1, i)
+        lay_g_ctrl_stim.addWidget(self.cmb_stim_noise, 0, i)
+        lay_g_ctrl_stim.addLayout(layH_noi_params, 1, i)
         i += 1
-        layG_ctrl_stim.setColumnStretch(i, 1)
+        lay_g_ctrl_stim.setColumnStretch(i, 1)
         i += 1
         # place formula widget in row 2, stretching over i columns
-        layG_ctrl_stim.addWidget(self.wdg_formula_stim, 2, 0, 1, i)
+        lay_g_ctrl_stim.addWidget(self.wdg_formula_stim, 2, 0, 1, i)
 
         # ----------------------------------------------------------------------
         # Main Widget
         # ----------------------------------------------------------------------
 
         # Widget with the text block "Stim:"
-        layH_title_stim = QHBoxLayout()
-        layH_title_stim.addWidget(self.lbl_title_stim)
+        lay_h_title_stim = QHBoxLayout()
+        lay_h_title_stim.addWidget(self.lbl_title_stim)
         self.wdg_title_stim = QWidget(self)
-        self.wdg_title_stim.setLayout(layH_title_stim)
+        self.wdg_title_stim.setLayout(lay_h_title_stim)
         self.wdg_title_stim.setContentsMargins(0, 0, 0, 0)
 
         # Widget containing all control elements for stimuli
         self.wdg_ctrl_stim = QWidget(self)
-        self.wdg_ctrl_stim.setLayout(layG_ctrl_stim)
+        self.wdg_ctrl_stim.setLayout(lay_g_ctrl_stim)
 
-        layH_stim = QHBoxLayout()
-        layH_stim.addWidget(self.wdg_title_stim)
-        layH_stim.addWidget(self.wdg_ctrl_stim)
-        layH_stim.setContentsMargins(0, 0, 0, 0)
+        lay_h_stim = QHBoxLayout()
+        lay_h_stim.addWidget(self.wdg_title_stim)
+        lay_h_stim.addWidget(self.wdg_ctrl_stim)
+        lay_h_stim.setContentsMargins(0, 0, 0, 0)
 
         self.wdg_stim = QWidget(self, objectName="transparent")
-        self.wdg_stim.setLayout(layH_stim)
+        self.wdg_stim.setLayout(lay_h_stim)
         self.wdg_stim.setContentsMargins(0, 0, 0, 0)
 
         # ----------------------------------------------------------------------
@@ -633,20 +633,20 @@ class Plot_Tran_Stim_UI(QWidget):
             unit_frmt = None
             f_unit = ''
             t_unit = ''
-            self.lbl_freq_1.setText(self.txtFreq1_k)
-            self.lbl_freq_2.setText(self.txtFreq2_k)
+            self.lbl_freq_1.setText(self.txt_freq_1_k)
+            self.lbl_freq_2.setText(self.txt_freq_2_k)
         else:
             f_unit = fb_get('plt_fUnit')
             t_unit = fb_get('plt_tUnit').replace(r"$\mu$", "&mu;")
             if fb_get('freq_specs_unit') in {'f_S', 'f_Ny'}:
                 # Normalized frequency labels with capital F
-                self.lbl_freq_1.setText(self.txtFreq1_F)
-                self.lbl_freq_2.setText(self.txtFreq2_F)
+                self.lbl_freq_1.setText(self.txt_freq_1_f_cap)
+                self.lbl_freq_2.setText(self.txt_freq_2_f_cap)
                 unit_frmt = "i"  # print 'f_S' and 'f_Ny' in italic
             else:
                 # absolute frequencies with lower case f
-                self.lbl_freq_1.setText(self.txtFreq1_f)
-                self.lbl_freq_2.setText(self.txtFreq2_f)
+                self.lbl_freq_1.setText(self.txt_freq_1_f)
+                self.lbl_freq_2.setText(self.txt_freq_2_f)
                 unit_frmt = None  # don't print units like kHz in italic
 
         self.lbl_freq_unit_1.setText(to_html(f_unit, frmt=unit_frmt))
