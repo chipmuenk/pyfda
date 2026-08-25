@@ -311,12 +311,12 @@ class Plot_Tran_Stim_UI(QWidget):
         qcmb_box_populate(
             self.cmb_file_io, self.cmb_file_io_items, self.cmb_file_io_default)
 
-        # TODO: layH_file_io is instantiated in plot_impz, this is very hacky
-        self.layH_file_io = QHBoxLayout()
-        self.layH_file_io.addWidget(self.but_file_io)
-        self.layH_file_io.addWidget(self.lbl_file_io)
-        self.layH_file_io.addWidget(self.cmb_file_io)
-        self.layH_file_io.setContentsMargins(0, 0, 0, 0)
+        # TODO: lay_h_file_io is instantiated in plot_impz, this is very hacky
+        self.lay_h_file_io = QHBoxLayout()
+        self.lay_h_file_io.addWidget(self.but_file_io)
+        self.lay_h_file_io.addWidget(self.lbl_file_io)
+        self.lay_h_file_io.addWidget(self.cmb_file_io)
+        self.lay_h_file_io.setContentsMargins(0, 0, 0, 0)
         # -------------------------------------
 
         lay_h_cmb_stim = QHBoxLayout()
@@ -432,23 +432,23 @@ class Plot_Tran_Stim_UI(QWidget):
         self.led_bw_2.setText(str(self.bw2))
         self.led_bw_2.setToolTip(self.tr("Relative bandwidth 2"))
         # ----------------------------------------------
-        self.lbl_noise = QLabel(to_html("&nbsp;Noise", frmt='bi'), self)
+        self.lbl_noi = QLabel(to_html("&nbsp;Noise", frmt='bi'), self)
         self.cmb_stim_noise = QComboBox(self)
         qcmb_box_populate(self.cmb_stim_noise, self.cmb_stim_noise_items, self.noise)
 
         line2 = QVLine()
-        self.lbl_noi = QLabel("not initialized", self)
+        self.lbl_noi_par_1 = QLabel("not initialized", self)
         self.led_noi = QLineEdit(self, objectName="stim_noi")
         self.led_noi.setMaximumWidth(self.cmb_stim_noise.width())
         self.led_noi.setText(str(self.noi))
         self.led_noi.setToolTip("not initialized")
-        self.lbl_noi_par = QLabel("not initialized", self)
+        self.lbl_noi_par_2 = QLabel("not initialized", self)
         self.led_noi_par = QLineEdit(self, objectName="stim_noi_par")
         self.led_noi_par.setMaximumWidth(qtext_width(N_x=4))
-        layH_noi_params = QHBoxLayout()
-        layH_noi_params.addWidget(self.led_noi)
-        layH_noi_params.addWidget(self.lbl_noi_par)
-        layH_noi_params.addWidget(self.led_noi_par)
+        lay_h_noi_params = QHBoxLayout()
+        lay_h_noi_params.addWidget(self.led_noi)
+        lay_h_noi_params.addWidget(self.lbl_noi_par_2)
+        lay_h_noi_params.addWidget(self.led_noi_par)
 
         # ----------------------------------------------
         # Widget and Layout containing formula editor
@@ -461,12 +461,12 @@ class Plot_Tran_Stim_UI(QWidget):
             + to_html("A_1, A_2, phi_1, phi_2, f_1, f_2, T_1, T_2, BW_1, BW_2",
                       frmt='i') + ".</span>")
 
-        layH_formula_stim = QHBoxLayout()
-        layH_formula_stim.addWidget(self.lbl_stim_formula)
-        layH_formula_stim.addWidget(self.led_stim_formula)
-        layH_formula_stim.setContentsMargins(0, 0, 0, 0)
+        lay_h_formula_stim = QHBoxLayout()
+        lay_h_formula_stim.addWidget(self.lbl_stim_formula)
+        lay_h_formula_stim.addWidget(self.led_stim_formula)
+        lay_h_formula_stim.setContentsMargins(0, 0, 0, 0)
         self.wdg_formula_stim = QWidget(self)
-        self.wdg_formula_stim.setLayout(layH_formula_stim)
+        self.wdg_formula_stim.setLayout(lay_h_formula_stim)
         self.wdg_formula_stim.setContentsMargins(0, 0, 0, 0)
 
         # Main grid layout for all control elements
@@ -531,11 +531,11 @@ class Plot_Tran_Stim_UI(QWidget):
         i += 1
         lay_g_ctrl_stim.addWidget(line2, 0, i, 2, 1)
         i += 1
-        lay_g_ctrl_stim.addWidget(self.lbl_noise, 0, i)
-        lay_g_ctrl_stim.addWidget(self.lbl_noi, 1, i)
+        lay_g_ctrl_stim.addWidget(self.lbl_noi, 0, i)
+        lay_g_ctrl_stim.addWidget(self.lbl_noi_par_1, 1, i)
         i += 1
         lay_g_ctrl_stim.addWidget(self.cmb_stim_noise, 0, i)
-        lay_g_ctrl_stim.addLayout(layH_noi_params, 1, i)
+        lay_g_ctrl_stim.addLayout(lay_h_noi_params, 1, i)
         i += 1
         lay_g_ctrl_stim.setColumnStretch(i, 1)
         i += 1
@@ -759,7 +759,7 @@ class Plot_Tran_Stim_UI(QWidget):
           the widget fields are kept constant, and the normalized freqs are updated.
         """
 
-        f_corr = 1
+        f_corr = 1.
         if fb_get('freq_locked'):
             f_corr = fb_get('f_s_prev') / fb_get('f_S')
             self.f1 *= f_corr
@@ -986,35 +986,35 @@ class Plot_Tran_Stim_UI(QWidget):
     def _update_noi(self) -> None:
         """ Update type + value + label for self.noi for noise"""
         self.noise = qget_cmb_box(self.cmb_stim_noise)
-        self.lbl_noi.setVisible(self.noise != 'none')
+        self.lbl_noi_par_1.setVisible(self.noise != 'none')
         self.led_noi.setVisible(self.noise != 'none')
-        self.lbl_noi_par.setVisible(self.noise == 'mls')
+        self.lbl_noi_par_2.setVisible(self.noise == 'mls')
         self.led_noi_par.setVisible(self.noise == 'mls')
         if self.noise != 'none':
             self.noi = safe_eval(self.led_noi.text(), 0, return_type='cmplx')
             self.led_noi.setText(str(self.noi))
             if self.noise == 'gauss':
-                self.lbl_noi.setText(to_html("&nbsp;&sigma; =", frmt='bi'))
+                self.lbl_noi_par_1.setText(to_html("&nbsp;&sigma; =", frmt='bi'))
                 self.led_noi.setToolTip(
                     "<span>Standard deviation, "
                     "noise power is <i>P</i> = &sigma;<sup>2</sup></span>")
             elif self.noise == 'uniform':
-                self.lbl_noi.setText(to_html("&nbsp;&Delta; =", frmt='bi'))
+                self.lbl_noi_par_1.setText(to_html("&nbsp;&Delta; =", frmt='bi'))
                 self.led_noi.setToolTip(
                     "<span>Interval size for uniformly distributed process (e.g. "
                     "quantization step size for quantization noise), centered around 0. "
                     "Noise power is <i>P</i> = &Delta;<sup>2</sup>/12.</span>")
             elif self.noise == 'randint':
-                self.lbl_noi.setText(to_html("&nbsp;I =", frmt='bi'))
+                self.lbl_noi_par_1.setText(to_html("&nbsp;I =", frmt='bi'))
                 self.led_noi.setToolTip(
                     "<span>Max. integer value <i>I</i> of random integer process."
                     "</span>")
             elif self.noise == 'mls':
-                self.lbl_noi.setText(to_html("&nbsp;A =", frmt='bi'))
+                self.lbl_noi_par_1.setText(to_html("&nbsp;A =", frmt='bi'))
                 self.led_noi.setToolTip(
                     "<span>Amplitude of Maximum Length Sequence. "
                     "Noise power is <i>P</i> = A<sup>2</sup>/2.</span>")
-                self.lbl_noi_par.setText(to_html("&nbsp;b =", frmt='bi'))
+                self.lbl_noi_par_2.setText(to_html("&nbsp;b =", frmt='bi'))
                 self.mls_b = safe_eval(
                     self.led_noi_par.text(), self.mls_b, return_type='int', sign='pos')
                 if self.mls_b < 2:
@@ -1026,7 +1026,7 @@ class Plot_Tran_Stim_UI(QWidget):
                                            "2<sup><i>b</i></sup> - 1 with <i>b</i> "
                                            "in the range 2 ... 32./span>")
             elif self.noise == 'brownian':
-                self.lbl_noi.setText(to_html("&nbsp;&sigma; =", frmt='bi'))
+                self.lbl_noi_par_1.setText(to_html("&nbsp;&sigma; =", frmt='bi'))
                 self.led_noi.setToolTip("<span>Standard deviation of the Gaussian process "
                                        "that is cumulated.</span>")
 

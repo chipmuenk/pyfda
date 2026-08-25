@@ -168,7 +168,7 @@ class Plot_Impz(QWidget):
 
         # This places the combo box for adding / using file data to the
         # run control toolbar:
-        self.ui.frm_file_io.setLayout(self.stim_wdg.ui.layH_file_io)
+        self.ui.frm_file_io.setLayout(self.stim_wdg.ui.lay_h_file_io)
 
         self.tab_stim_w = QTabWidget(self)
         self.tab_stim_w.setObjectName("tab_stim_w")
