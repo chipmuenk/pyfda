@@ -26,7 +26,32 @@ from pyfda.libs.pyfda_qt_classes import QVLine, PushButton, PushButtonRT
 from pyfda.pyfda_rc import params
 
 logger = logging.getLogger(__name__)
+# ------------------------------------------------------------------------------
+# Define the data / text / tooltip for the comboboxes in the UI
+# ------------------------------------------------------------------------------
+# combobox tooltip + data / text / tooltip for file I/O usage
+CMB_FILE_IO_ITEMS = [
+    ("<span>Select data from File I/O widget (file needs to be loaded)</span>"),
+    ("use", "Use",
+        "<span><b>Use</b> "
+        "file I/O data as stimuli (file needs to be loaded).</span>"),
+    ("add", "Add", "<span><b>Add</b> "
+        "file I/O data to other stimuli (file needs to be loaded).</span>")
+]
 
+        # combobox tooltip + data / text / tooltip for stimulus category items
+CMB_STIM_ITEMS = [
+    ("<span>Stimulus category.</span>"),
+    ("none", "None", "<span>Only noise and DC can be selected.</span>"),
+    ("impulse", "Impulse", "<span>Different impulses</span>"),
+    ("step", "Step", "<span>Calculate step response and its error.</span>"),
+    ("sinusoid", "Sinusoid", "<span>Sinusoidal waveforms</span>"),
+    ("chirp", "Chirp", "<span>Different frequency sweeps.</span>"),
+    ("periodic", "Periodic", "<span>Periodic functions with discontinuities, "
+        "either band-limited or with aliasing.</span>"),
+    ("modulation", "Modulat.", "<span>Modulated waveforms.</span>"),
+    ("formula", "Formula", "<span>Formula defined stimulus.</span>")
+]
 
 class Plot_Tran_Stim_UI(QWidget):
     """
@@ -128,30 +153,6 @@ class Plot_Tran_Stim_UI(QWidget):
             "formula": {"dc", "a1", "a2", "phi1", "phi2", "f1", "f2", "N1", "N2",
                         "t1", "t2", "bw1", "bw2", "noise"}
         })
-
-        # combobox tooltip + data / text / tooltip for stimulus category items
-        self.cmb_stim_items = [
-            ("<span>Stimulus category.</span>"),
-            ("none", "None", "<span>Only noise and DC can be selected.</span>"),
-            ("impulse", "Impulse", "<span>Different impulses</span>"),
-            ("step", "Step", "<span>Calculate step response and its error.</span>"),
-            ("sinusoid", "Sinusoid", "<span>Sinusoidal waveforms</span>"),
-            ("chirp", "Chirp", "<span>Different frequency sweeps.</span>"),
-            ("periodic", "Periodic", "<span>Periodic functions with discontinuities, "
-             "either band-limited or with aliasing.</span>"),
-            ("modulation", "Modulat.", "<span>Modulated waveforms.</span>"),
-            ("formula", "Formula", "<span>Formula defined stimulus.</span>")
-        ]
-
-        # combobox tooltip + data / text / tooltip for file I/O usage
-        self.cmb_file_io_items = [
-            ("<span>Select data from File I/O widget (file needs to be loaded)</span>"),
-            ("use", "Use",
-             "<span><b>Use</b> "
-                "file I/O data as stimuli (file needs to be loaded).</span>"),
-            ("add", "Add", "<span><b>Add</b> "
-                "file I/O data to other stimuli (file needs to be loaded).</span>")
-        ]
 
         # combobox tooltip + data / text / tooltip for periodic signals items
         self.cmb_stim_periodic_items = [
@@ -256,7 +257,7 @@ class Plot_Tran_Stim_UI(QWidget):
         #
         self.cmb_stimulus = QComboBox(self)
         qcmb_box_populate(self.cmb_stimulus,
-                          self.cmb_stim_items, self.cmb_stim_item)
+                          CMB_STIM_ITEMS, self.cmb_stim_item)
 
         self.lbl_stim_par_1 = QLabel(to_html("&alpha; =", frmt='b'), self)
         self.led_stim_par_1 = QLineEdit(self, objectName="led_stim_par_1")
@@ -309,7 +310,7 @@ class Plot_Tran_Stim_UI(QWidget):
         self.lbl_file_io = QLabel(to_html("&nbsp;File IO", frmt='bi'))
         self.cmb_file_io = QComboBox(self, objectName="cmb_file_io")
         qcmb_box_populate(
-            self.cmb_file_io, self.cmb_file_io_items, self.cmb_file_io_default)
+            self.cmb_file_io, CMB_FILE_IO_ITEMS, self.cmb_file_io_default)
 
         # TODO: lay_h_file_io is instantiated in plot_impz, this is very hacky
         self.lay_h_file_io = QHBoxLayout()
