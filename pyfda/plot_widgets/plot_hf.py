@@ -137,7 +137,7 @@ class Plot_Hf(QWidget):
 
         self.cmb_units_a.setSizeAdjustPolicy(QComboBox.AdjustToContents)
 
-        self.but_zerophase = QPushButton(self)
+        self.but_zerophase = PushButton(self)
         self.but_zerophase.setText("Zero Phase")
         self.but_zerophase.setToolTip(
             "<span>Subtract linear phase as calculated from filter order. "
@@ -648,8 +648,8 @@ class Plot_Hf(QWidget):
 
         # Linphase settings only makes sense for amplitude plot and
         # for plottin real/imag. part of H, not its magnitude
-        self.but_zerophase.setCheckable(self.unitA == 'V')
-        self.but_zerophase.setEnabled(self.unitA == 'V')
+        self.but_zerophase.setCheckable(self.unitA == 'V' and fb_get('ft') == 'FIR')
+        self.but_zerophase.setEnabled(self.unitA == 'V' and fb_get('ft') == 'FIR')
 
         self.specs = self.but_specs.isChecked()
 
