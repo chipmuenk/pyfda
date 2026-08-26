@@ -7,9 +7,8 @@
 # (see file LICENSE in root directory for details)
 
 """
-Create the UI for the Plot_Tran_Impz class
+Create the UI for the PlotTranStim class
 """
-import collections
 import logging
 import sys
 
@@ -126,10 +125,49 @@ CMB_STIM_SINUSOID_ITEMS = [
         "diric(x, N) = sin(Nx/2) / N*sin(x/2) with x = 2 pi f_1 n</span>")
 ]
 
+# Dict with objectNames as keys and tuples with normalized variables and scaling factors
+# as values. When the corresponding widget is changed (detected by an EventFilter), these
+# variables are normalized with the scaling factor and the signal is emitted to the
+# PlotTranStim class.
+DICT_FILTERED_WIDGETS = {
+    'led_f1': ('f1', 'f_scale'),
+    'led_f2': ('f2', 'f_scale'),
+    'led_t_1': ('t1', 't_scale'),
+    'led_t_2': ('t2', 't_scale'),
+    'led_tw_1': ('tw_1', 't_scale'),
+    'led_tw_2': ('tw_2', 't_scale')
+}
+
+# dictionaries with widgets needed for the various stimuli
+STIM_WDG_DICT = {
+    "none":    {"dc", "noise"},
+    "dirac":   {"dc", "a1", "t1", "norm", "noise"},
+    "sinc":    {"dc", "a1", "a2", "t1", "t2", "f1", "f2", "norm", "noise"},
+    "gauss":   {"dc", "a1", "a2", "t1", "t2", "f1", "f2", "bw1", "bw2",
+                "norm", "noise"},
+    "rect":    {"dc", "a1", "t1", "tw_1", "norm", "noise"},
+    "step":    {"a1", "t1", "noise"},
+    "cos":     {"dc", "a1", "a2", "phi1", "phi2", "f1", "f2", "noise"},
+    "sine":    {"dc", "a1", "a2", "phi1", "phi2", "f1", "f2", "noise"},
+    "exp":     {"dc", "a1", "a2", "phi1", "phi2", "f1", "f2", "noise"},
+    "diric":   {"dc", "a1", "t1", "N1", "f1", "noise"},
+
+    "chirp":   {"dc", "a1", "phi1", "f1", "f2", "t2", "noise"},
+    "triang":  {"dc", "a1", "phi1", "f1", "noise", "bl"},
+    "saw":     {"dc", "a1", "phi1", "f1", "noise", "bl"},
+    "rect_per": {"dc", "a1", "phi1", "f1", "noise", "bl", "par1"},
+    "comb":    {"dc", "a1", "phi1", "f1", "noise"},
+    "am":      {"dc", "a1", "a2", "phi1", "phi2", "f1", "f2", "noise"},
+    "pmfm":    {"dc", "a1", "a2", "phi1", "phi2", "f1", "f2", "noise"},
+    "pwm":     {"dc", "a1", "a2", "phi1", "phi2", "f1", "f2", "noise", "bl"},
+    "formula": {"dc", "a1", "a2", "phi1", "phi2", "f1", "f2", "N1", "N2",
+                "t1", "t2", "bw1", "bw2", "noise"}
+                }
+
 # =====================================================================================
 class PlotTranStimUI(QWidget):
     """
-    Create the UI for the PlotImpz class
+    Create the UI for the PlotTranStim class
     """
     # incoming:
     sig_rx = pyqtSignal(object)
@@ -200,44 +238,6 @@ class PlotTranStimUI(QWidget):
 
         # self.bottom_f = -120  # initial value for log. scale
         # self.param = None
-
-        # dictionaries with widgets needed for the various stimuli
-        self.stim_wdg_dict = collections.OrderedDict()
-        self.stim_wdg_dict.update({
-            "none":    {"dc", "noise"},
-            "dirac":   {"dc", "a1", "t1", "norm", "noise"},
-            "sinc":    {"dc", "a1", "a2", "t1", "t2", "f1", "f2", "norm", "noise"},
-            "gauss":   {"dc", "a1", "a2", "t1", "t2", "f1", "f2", "bw1", "bw2",
-                        "norm", "noise"},
-            "rect":    {"dc", "a1", "t1", "tw_1", "norm", "noise"},
-            "step":    {"a1", "t1", "noise"},
-            "cos":     {"dc", "a1", "a2", "phi1", "phi2", "f1", "f2", "noise"},
-            "sine":    {"dc", "a1", "a2", "phi1", "phi2", "f1", "f2", "noise"},
-            "exp":     {"dc", "a1", "a2", "phi1", "phi2", "f1", "f2", "noise"},
-            "diric":   {"dc", "a1", "t1", "N1", "f1", "noise"},
-
-            "chirp":   {"dc", "a1", "phi1", "f1", "f2", "t2", "noise"},
-            "triang":  {"dc", "a1", "phi1", "f1", "noise", "bl"},
-            "saw":     {"dc", "a1", "phi1", "f1", "noise", "bl"},
-            "rect_per": {"dc", "a1", "phi1", "f1", "noise", "bl", "par1"},
-            "comb":    {"dc", "a1", "phi1", "f1", "noise"},
-            "am":      {"dc", "a1", "a2", "phi1", "phi2", "f1", "f2", "noise"},
-            "pmfm":    {"dc", "a1", "a2", "phi1", "phi2", "f1", "f2", "noise"},
-            "pwm":     {"dc", "a1", "a2", "phi1", "phi2", "f1", "f2", "noise", "bl"},
-            "formula": {"dc", "a1", "a2", "phi1", "phi2", "f1", "f2", "N1", "N2",
-                        "t1", "t2", "bw1", "bw2", "noise"}
-        })
-
-        # Dict with objectNames as keys and tuples with normalized variables
-        # and scaling factors as values, e.g. {'led_f1': (self.f1, self.f_scale)}
-        self.dict_filtered_widgets = {
-            'led_f1': ('f1', 'f_scale'),
-            'led_f2': ('f2', 'f_scale'),
-            'led_t_1': ('t1', 't_scale'),
-            'led_t_2': ('t2', 't_scale'),
-            'led_tw_1': ('tw_1', 't_scale'),
-            'led_tw_2': ('tw_2', 't_scale')
-        }
 
         self._construct_ui()
         self._enable_stim_widgets()
@@ -619,9 +619,8 @@ class PlotTranStimUI(QWidget):
         # ----------------------------------------------------------------------
         # Event Filter
         # ----------------------------------------------------------------------
-        # time / frequency related widgets have to be scaled with f_s, this
-        # special handling is performed in an EventFilter (hence no regular
-        # signal-slot connection).
+        # time / frequency related widgets have to be scaled with f_s, this special
+        # handling is performed in an EventFilter (hence no regular signal-slot connection).
         self.led_f1.installEventFilter(self)
         self.led_f2.installEventFilter(self)
         self.led_t_1.installEventFilter(self)
@@ -683,7 +682,7 @@ class PlotTranStimUI(QWidget):
             either with full precision (`full_prec == True`) or rounded.
             """
             try:
-                var_name, param_name = self.dict_filtered_widgets[source.objectName()]
+                var_name, param_name = DICT_FILTERED_WIDGETS[source.objectName()]
                 var = getattr(self, var_name)
                 scale = getattr(self, param_name)
                 if full_prec:
@@ -698,7 +697,7 @@ class PlotTranStimUI(QWidget):
             """ Store transformed frequency / time values """
             if self.spec_edited:
                 try:
-                    var_name, param_name = self.dict_filtered_widgets[source.objectName()]
+                    var_name, param_name = DICT_FILTERED_WIDGETS[source.objectName()]
                     scale = getattr(self, param_name)  # get scale value
                     var_old = getattr(self, var_name)  # get old var value
                     # assign var with either content of text field or fallback value:
@@ -789,8 +788,8 @@ class PlotTranStimUI(QWidget):
         #               fb.fil[0]['f_S'], fb.fil[0]['f_s_prev'], self.f_scale, self.f1, f_corr)
 
         # update and round the display
-        for w in self.dict_filtered_widgets:
-            var_name, param_name = self.dict_filtered_widgets[w]
+        for w in DICT_FILTERED_WIDGETS:
+            var_name, param_name = DICT_FILTERED_WIDGETS[w]
             # read value and scale of normalized frequency / time value
             var = getattr(self, var_name)
             scale = getattr(self, param_name)
@@ -837,7 +836,7 @@ class PlotTranStimUI(QWidget):
             self.stim = self.cmb_stim
 
         # read out which stimulus widgets are enabled
-        stim_wdg = self.stim_wdg_dict[self.stim]
+        stim_wdg = STIM_WDG_DICT[self.stim]
 
         self.lbl_dc.setVisible("dc" in stim_wdg)
         self.led_dc.setVisible("dc" in stim_wdg)
