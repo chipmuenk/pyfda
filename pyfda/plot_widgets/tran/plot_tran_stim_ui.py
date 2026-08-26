@@ -1055,25 +1055,6 @@ class PlotTranStimUI(QWidget):
 
 
 # ------------------------------------------------------------------------------
-def main():
-    import sys
-    from pyfda.libs.compat import QApplication
-
-    app = QApplication(sys.argv)
-
-    mainw = Plot_Tran_Stim_UI(None)
-    lay_v_main = QVBoxLayout()
-    lay_v_main.addWidget(mainw.wdg_stim)
-    # (left, top, right, bottom)
-    lay_v_main.setContentsMargins(*params['wdg_margins'])
-
-    mainw.setLayout(lay_v_main)
-
-    app.setActiveWindow(mainw)
-    mainw.show()
-    sys.exit(app.exec_())
-
-
 if __name__ == "__main__":
     # Run widget standalone with `python -m pyfda.plot_widgets.tran.plot_tran_stim_ui`
     import sys
