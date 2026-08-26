@@ -29,7 +29,7 @@ from pyfda.libs.pyfda_qt_lib import (
     emit, qget_cmb_box, qset_cmb_box, qstyle_widget, qcmb_box_add_item,
     qcmb_box_del_item)
 from pyfda.plot_widgets.mpl_widget import MplWidget, stems, scatter
-from pyfda.plot_widgets.tran.plot_tran_stim import Plot_Tran_Stim
+from pyfda.plot_widgets.tran.plot_tran_stim import PlotTranStim
 from pyfda.plot_widgets.tran.tran_io import Tran_IO
 from pyfda.plot_widgets.plot_impz_ui import PlotImpz_UI
 from pyfda.pyfda_rc import params  # FMT string for QLineEdit fields, e.g. '{:.3g}'
@@ -94,7 +94,7 @@ class Plot_Impz(QWidget):
 
         # create the UI part with buttons etc.
         self.ui = PlotImpz_UI()
-        self.stim_wdg = Plot_Tran_Stim()
+        self.stim_wdg = PlotTranStim()
         self.tran_io_wdg = Tran_IO(self)
 
         self._construct_ui()

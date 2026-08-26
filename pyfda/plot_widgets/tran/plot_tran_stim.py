@@ -28,7 +28,7 @@ from pyfda.plot_widgets.tran.plot_tran_stim_ui import PlotTranStimUI
 logger = logging.getLogger(__name__)
 
 
-class Plot_Tran_Stim(QWidget):
+class PlotTranStim(QWidget):
     """
     Construct a widget for defining transient signals
     """
@@ -562,7 +562,7 @@ if __name__ == "__main__":
 
     app = QApplication(sys.argv)
     app.setStyleSheet(QSS.QSS_RC)
-    mainw = Plot_Tran_Stim()
+    mainw = PlotTranStim()
     app.setActiveWindow(mainw)
     mainw.show()
     sys.exit(app.exec_())
