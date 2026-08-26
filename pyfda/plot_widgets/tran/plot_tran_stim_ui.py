@@ -11,9 +11,10 @@ Create the UI for the Plot_Tran_Impz class
 """
 import collections
 import logging
+import sys
 
 from pyfda.libs.compat import (
-    Qt, QtCore, QWidget, QComboBox, QLineEdit, QLabel,
+    Qt, QtCore, QWidget, QComboBox, QLineEdit, QLabel, QApplication,
     pyqtSignal, QEvent, QHBoxLayout, QVBoxLayout, QGridLayout)
 
 from pyfda.libs.pyfda_lib import to_html, safe_eval, pprint_log
@@ -1060,8 +1061,6 @@ class PlotTranStimUI(QWidget):
 # ------------------------------------------------------------------------------
 if __name__ == "__main__":
     # Run widget standalone with `python -m pyfda.plot_widgets.tran.plot_tran_stim_ui`
-    import sys
-    from pyfda.libs.compat import QApplication
     from pyfda.pyfda_rc import QSS
 
     app = QApplication(sys.argv)
