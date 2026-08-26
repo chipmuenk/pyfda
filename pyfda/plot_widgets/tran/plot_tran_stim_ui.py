@@ -53,7 +53,8 @@ CMB_STIM_ITEMS = [
     ("formula", "Formula", "<span>Formula defined stimulus.</span>")
 ]
 
-class Plot_Tran_Stim_UI(QWidget):
+# =====================================================================================
+class PlotTranStimUI(QWidget):
     """
     Create the UI for the PlotImpz class
     """
@@ -1081,7 +1082,7 @@ if __name__ == "__main__":
 
     app = QApplication(sys.argv)
     app.setStyleSheet(QSS.QSS_RC)
-    mainw = Plot_Tran_Stim_UI()
+    mainw = PlotTranStimUI()
 
     lay_v_main = QVBoxLayout()
     lay_v_main.addWidget(mainw.wdg_stim)

@@ -23,7 +23,7 @@ from pyfda.libs.pyfda_lib import (
     pprint_log, safe_numexpr_eval)
 from pyfda.libs.special_functions import rect_bl, sawtooth_bl, triang_bl, comb_bl
 from pyfda.pyfda_rc import params  # FMT string for QLineEdit fields, e.g. '{:.3g}'
-from pyfda.plot_widgets.tran.plot_tran_stim_ui import Plot_Tran_Stim_UI
+from pyfda.plot_widgets.tran.plot_tran_stim_ui import PlotTranStimUI
 
 logger = logging.getLogger(__name__)
 
@@ -38,7 +38,7 @@ class Plot_Tran_Stim(QWidget):
     def __init__(self):
         super().__init__()
         # create the UI part with buttons etc.
-        self.ui = Plot_Tran_Stim_UI(objectName='plot_tran_stim_ui_inst')
+        self.ui = PlotTranStimUI(objectName='plot_tran_stim_ui_inst')
 
         # initial settings
         self.needs_calc = True   # flag whether plots need to be recalculated
