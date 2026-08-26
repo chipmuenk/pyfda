@@ -39,7 +39,7 @@ CMB_FILE_IO_ITEMS = [
         "file I/O data to other stimuli (file needs to be loaded).</span>")
 ]
 
-        # combobox tooltip + data / text / tooltip for stimulus category items
+# combobox tooltip + data / text / tooltip for stimulus category items
 CMB_STIM_ITEMS = [
     ("<span>Stimulus category.</span>"),
     ("none", "None", "<span>Only noise and DC can be selected.</span>"),
@@ -51,6 +51,78 @@ CMB_STIM_ITEMS = [
         "either band-limited or with aliasing.</span>"),
     ("modulation", "Modulat.", "<span>Modulated waveforms.</span>"),
     ("formula", "Formula", "<span>Formula defined stimulus.</span>")
+]
+
+# combobox tooltip + data / text / tooltip for chirp signals items
+CMB_STIM_CHIRP_ITEMS = [
+    "<span>Type of frequency sweep from <i>f</i><sub>1</sub> @ <i>t</i> = 0 to "
+    "<i>f</i><sub>2</sub> @ t = <i>T</i><sub>2</sub>.</span>",
+    ("linear", "Lin", "Linear frequency sweep"),
+    ("quadratic", "Square", "Quadratic frequency sweep"),
+    ("logarithmic", "Log", "Logarithmic frequency sweep"),
+    ("hyperbolic", "Hyper",  "Hyperbolic frequency sweep")
+]
+
+# combobox tooltip + data / text / tooltip for pulse shaped signal items
+CMB_STIM_IMPULSE_ITEMS = [
+    "<span>Different aperiodic impulse forms</span>",
+    ("dirac", "Dirac",
+        "<span>Discrete-time dirac impulse for simulating impulse and "
+        "frequency response.</span>"),
+    ("gauss", "Gauss",
+        "<span>Gaussian pulse with bandpass spectrum and controllable "
+        "relative -6 dB bandwidth.</span>"),
+    ("sinc", "Sinc",
+        "<span>Sinc pulse with rectangular baseband spectrum</span>"),
+    ("rect", "Rect", "<span>Rectangular pulse with sinc-shaped spectrum</span>")
+]
+
+# combobox tooltip + data / text / tooltip for various modulation signal items
+CMB_STIM_MODULATION_ITEMS = [
+    "Modulated signals",
+    ("am", "AM", "<span>Sinusoidal amplitude modulation of a sine</span>"),
+    ("pmfm", "PM / FM", "<span>Sinusoidal phase or frequency modulation "
+        "of a sine</span>"),
+    ("pwm", "PWM", "sinusoidal pulse width modulation")
+]
+
+# combobox tooltip + data / text / tooltip for noise signal items
+CMB_STIM_NOISE_ITEMS = [
+    "Type of additive noise.",
+    ("none", "None", ""),
+    ("gauss", "Gauss",
+        "<span>Normal- or Gauss-distributed process with std. deviation &sigma;."
+        "</span>"),
+    ("uniform", "Uniform",
+        "<span>Uniformly distributed process in the range &plusmn; &Delta;/2."
+        "</span>"),
+    ("randint", "RandInt",
+        "<span>Random integer sequence in the interval [0, <i>I</i>]</span>"),
+    ("mls", "MLS",
+        "<span>Maximum Length Sequence with amplitude <i>A</i> and maximum length "
+        "2<sup><i>b</i></sup> - 1 after which the sequence is repeated.</span>"),
+    ("brownian", "Brownian",
+        "<span>Brownian (cumulated sum) process based on Gaussian noise with"
+        " std. deviation &sigma;.</span>")
+        ]
+
+# combobox tooltip + data / text / tooltip for periodic signals items
+CMB_STIM_PERIODIC_ITEMS = [
+    "<span>Periodic functions with discontinuities.</span>",
+    ("rect_per", "Rect", "<span>Rectangular signal with duty cycle &alpha;</span>"),
+    ("saw", "Saw", "Sawtooth signal"),
+    ("triang", "Triang", "Triangular signal"),
+    ("comb", "Comb", "Comb signal")
+]
+
+# combobox tooltip + data / text / tooltip for sinusoidal signal items
+CMB_STIM_SINUSOID_ITEMS = [
+    "Sinusoidal or similar signals",
+    ("sine", "Sine", "Sine signal"),
+    ("cos", "Cos", "Cosine signal"),
+    ("exp", "Exp", "Complex exponential"),
+    ("diric", "Diric", "<span>Periodic sinc (Dirichlet) function, "
+        "diric(x, N) = sin(Nx/2) / N*sin(x/2) with x = 2 pi f_1 n</span>")
 ]
 
 # =====================================================================================
@@ -155,75 +227,6 @@ class PlotTranStimUI(QWidget):
                         "t1", "t2", "bw1", "bw2", "noise"}
         })
 
-        # combobox tooltip + data / text / tooltip for periodic signals items
-        self.cmb_stim_periodic_items = [
-            "<span>Periodic functions with discontinuities.</span>",
-            ("rect_per", "Rect", "<span>Rectangular signal with duty cycle &alpha;</span>"),
-            ("saw", "Saw", "Sawtooth signal"),
-            ("triang", "Triang", "Triangular signal"),
-            ("comb", "Comb", "Comb signal")
-        ]
-
-        # combobox tooltip + data / text / tooltip for chirp signals items
-        self.cmb_stim_chirp_items = [
-            "<span>Type of frequency sweep from <i>f</i><sub>1</sub> @ <i>t</i> = 0 to "
-            "<i>f</i><sub>2</sub> @ t = <i>T</i><sub>2</sub>.</span>",
-            ("linear", "Lin", "Linear frequency sweep"),
-            ("quadratic", "Square", "Quadratic frequency sweep"),
-            ("logarithmic", "Log", "Logarithmic frequency sweep"),
-            ("hyperbolic", "Hyper",  "Hyperbolic frequency sweep")
-        ]
-
-        self.cmb_stim_impulse_items = [
-            "<span>Different aperiodic impulse forms</span>",
-            ("dirac", "Dirac",
-             "<span>Discrete-time dirac impulse for simulating impulse and "
-             "frequency response.</span>"),
-            ("gauss", "Gauss",
-             "<span>Gaussian pulse with bandpass spectrum and controllable "
-             "relative -6 dB bandwidth.</span>"),
-            ("sinc", "Sinc",
-             "<span>Sinc pulse with rectangular baseband spectrum</span>"),
-            ("rect", "Rect", "<span>Rectangular pulse with sinc-shaped spectrum</span>")
-        ]
-
-        self.cmb_stim_sinusoid_items = [
-            "Sinusoidal or similar signals",
-            ("sine", "Sine", "Sine signal"),
-            ("cos", "Cos", "Cosine signal"),
-            ("exp", "Exp", "Complex exponential"),
-            ("diric", "Diric", "<span>Periodic sinc (Dirichlet) function, "
-             "diric(x, N) = sin(Nx/2) / N*sin(x/2) with x = 2 pi f_1 n</span>")
-        ]
-
-        self.cmb_stim_modulation_items = [
-            "Modulated signals",
-            ("am", "AM", "<span>Sinusoidal amplitude modulation of a sine</span>"),
-            ("pmfm", "PM / FM", "<span>Sinusoidal phase or frequency modulation "
-             "of a sine</span>"),
-            ("pwm", "PWM", "sinusoidal pulse width modulation")
-        ]
-
-        # data / text / tooltip for noise stimulus combobox.
-        self.cmb_stim_noise_items = [
-            "Type of additive noise.",
-            ("none", "None", ""),
-            ("gauss", "Gauss",
-             "<span>Normal- or Gauss-distributed process with std. deviation &sigma;."
-             "</span>"),
-            ("uniform", "Uniform",
-             "<span>Uniformly distributed process in the range &plusmn; &Delta;/2."
-             "</span>"),
-            ("randint", "RandInt",
-             "<span>Random integer sequence in the interval [0, <i>I</i>]</span>"),
-            ("mls", "MLS",
-             "<span>Maximum Length Sequence with amplitude <i>A</i> and maximum length "
-             "2<sup><i>b</i></sup> - 1 after which the sequence is repeated.</span>"),
-            ("brownian", "Brownian",
-             "<span>Brownian (cumulated sum) process based on Gaussian noise with"
-             " std. deviation &sigma;.</span>")
-        ]
-
         # Dict with objectNames as keys and tuples with normalized variables
         # and scaling factors as values, e.g. {'led_f1': (self.f1, self.f_scale)}
         self.dict_filtered_widgets = {
@@ -277,23 +280,23 @@ class PlotTranStimUI(QWidget):
         # -------------------------------------
         self.cmb_chirp_type = QComboBox(self)
         qcmb_box_populate(self.cmb_chirp_type,
-                          self.cmb_stim_chirp_items, self.chirp_type)
+                          CMB_STIM_CHIRP_ITEMS, self.chirp_type)
 
         self.cmb_impulse_type = QComboBox(self)
         qcmb_box_populate(
-            self.cmb_impulse_type, self.cmb_stim_impulse_items, self.impulse_type)
+            self.cmb_impulse_type, CMB_STIM_IMPULSE_ITEMS, self.impulse_type)
 
         self.cmb_sinusoid_type = QComboBox(self)
         qcmb_box_populate(
-            self.cmb_sinusoid_type, self.cmb_stim_sinusoid_items, self.sinusoid_type)
+            self.cmb_sinusoid_type, CMB_STIM_SINUSOID_ITEMS, self.sinusoid_type)
 
         self.cmb_periodic_type = QComboBox(self)
-        qcmb_box_populate(self.cmb_periodic_type, self.cmb_stim_periodic_items,
+        qcmb_box_populate(self.cmb_periodic_type, CMB_STIM_PERIODIC_ITEMS,
                           self.cmb_stim_periodic_item)
 
         self.cmb_modulation_type = QComboBox(self)
         qcmb_box_populate(
-            self.cmb_modulation_type, self.cmb_stim_modulation_items,
+            self.cmb_modulation_type, CMB_STIM_MODULATION_ITEMS,
             self.cmb_stim_modulation_item)
 
         # -------------------------------------
@@ -436,7 +439,7 @@ class PlotTranStimUI(QWidget):
         # ----------------------------------------------
         self.lbl_noi = QLabel(to_html("&nbsp;Noise", frmt='bi'), self)
         self.cmb_stim_noise = QComboBox(self)
-        qcmb_box_populate(self.cmb_stim_noise, self.cmb_stim_noise_items, self.noise)
+        qcmb_box_populate(self.cmb_stim_noise, CMB_STIM_NOISE_ITEMS, self.noise)
 
         line2 = QVLine()
         self.lbl_noi_par_1 = QLabel("not initialized", self)
