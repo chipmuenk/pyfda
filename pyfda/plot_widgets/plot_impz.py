@@ -249,7 +249,7 @@ class Plot_Impz(QWidget):
         self.ui.cmb_plt_freq_resp.currentIndexChanged.connect(self.draw)
         self.ui.cmb_plt_freq_stim.currentIndexChanged.connect(self.draw)
         self.ui.cmb_plt_freq_stmq.currentIndexChanged.connect(self.draw)
-        self.ui.but_hf.clicked.connect(self.draw)
+        self.ui.but_hf_id.clicked.connect(self.draw)
         self.ui.cmb_freq_display.currentIndexChanged.connect(self.draw)
         self.ui.but_log_freq.clicked.connect(self.draw)
         self.ui.led_log_bottom_freq.editingFinished.connect(self.draw)
@@ -1601,14 +1601,14 @@ class Plot_Impz(QWidget):
 
         h_f_str = ""
         ejO_str = r"$(\mathrm{e}^{\mathrm{j} \Omega})$"
-        if self.plt_freq_enabled or self.ui.but_hf.isChecked():
+        if self.plt_freq_enabled or self.ui.but_hf_id.isChecked():
             if plt_stimulus:
                 h_f_str += r'$X$, '
             if plt_stimulus_q:
                 h_f_str += r'$X_Q$, '
             if plt_response:
                 h_f_str += r'$Y$, '
-            if self.ui.but_hf.isChecked():
+            if self.ui.but_hf_id.isChecked():
                 h_f_str += r'$H_{id}$, '
             h_f_str = h_f_str.rstrip(', ') + ejO_str
 
@@ -1776,7 +1776,7 @@ class Plot_Impz(QWidget):
                         if self.en_mag_phi_f:
                             Y_i = angle_zero(Y)
 
-                if self.ui.but_hf.isChecked():
+                if self.ui.but_hf_id.isChecked():
                     if self.en_re_im_f:
                         h_id_r = np.maximum(20 * np.log10(np.abs(h_id.real)),
                                             self.ui.bottom_f)
@@ -1817,7 +1817,7 @@ class Plot_Impz(QWidget):
                         if self.en_mag_phi_f:
                             Y_i = angle_zero(Y)
 
-                if self.ui.but_hf.isChecked():
+                if self.ui.but_hf_id.isChecked():
                     if self.en_re_im_f:
                         h_id_r = h_id.real
                         h_id_i = h_id.imag
@@ -1858,7 +1858,7 @@ class Plot_Impz(QWidget):
             lbl_empty = "        "
 
             # -------------------- Plot h_id ----------------------------------
-            if self.ui.but_hf.isChecked():
+            if self.ui.but_hf_id.isChecked():
                 label_re = "$|H_{id}$" + ejO_str + "|"
                 if self.en_re_im_f:
                     label_re = "$H_{id,r}$" + ejO_str
@@ -1961,7 +1961,7 @@ class Plot_Impz(QWidget):
 
             # --------------- LEGEND (real part) ----------------------------------
             # The legend will fill the first column, then the next from top to bottom etc.
-            if self.plt_freq_enabled or self.ui.but_hf.isChecked():
+            if self.plt_freq_enabled or self.ui.but_hf_id.isChecked():
 
                 # labels = np.concatenate([labels, [r"$NENBW$:"], ["{0:.4g} {1}"\
                 # .format(nenbw, unit_nenbw)], [r"$CGAIN$:", "{0:.4g} {1}".format(nenbw,
