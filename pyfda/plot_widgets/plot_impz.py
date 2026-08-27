@@ -30,7 +30,7 @@ from pyfda.libs.pyfda_qt_lib import (
     qcmb_box_del_item)
 from pyfda.plot_widgets.mpl_widget import MplWidget, stems, scatter
 from pyfda.plot_widgets.tran.plot_tran_stim import PlotTranStim
-from pyfda.plot_widgets.tran.tran_io import Tran_IO
+from pyfda.plot_widgets.tran.tran_io import TranIO
 from pyfda.plot_widgets.plot_impz_ui import PlotImpz_UI
 from pyfda.pyfda_rc import params  # FMT string for QLineEdit fields, e.g. '{:.3g}'
 
@@ -95,7 +95,7 @@ class Plot_Impz(QWidget):
         # create the UI part with buttons etc.
         self.ui = PlotImpz_UI()
         self.stim_wdg = PlotTranStim()
-        self.tran_io_wdg = Tran_IO(self)
+        self.tran_io_wdg = TranIO(self)
 
         self._construct_ui()
 
@@ -800,7 +800,7 @@ class Plot_Impz(QWidget):
         qstyle_widget(self.ui.but_run, "normal")
         self.ui.but_run.setIcon(QIcon(":/play.svg"))
         qstyle_widget(self.ui.but_run, "normal")
-        # update Tran_IO ui, depending on complex and fixpoint status
+        # update TranIO ui, depending on complex and fixpoint status
         self.tran_io_wdg.ui.update_ui(cmplx=self.cmplx, fx=get_fx())
 
         if get_fx():

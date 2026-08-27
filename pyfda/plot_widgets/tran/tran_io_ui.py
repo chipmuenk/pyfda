@@ -7,7 +7,7 @@
 # (see file LICENSE in root directory for details)
 
 """
-Create the UI for the Tran_IO class
+Create the UI for the TranIO class
 """
 import logging
 
@@ -25,9 +25,9 @@ from pyfda.libs.pyfda_qt_classes import QVLine, PushButton, PushButtonRT
 logger = logging.getLogger(__name__)
 
 
-class Tran_IO_UI(QWidget):
+class TranIOUI(QWidget):
     """
-    Create the UI for the Tran_IO class
+    Create the UI for the TranIO class
     """
     def __init__(self):
 
@@ -394,7 +394,7 @@ if __name__ == "__main__":
 
     app = QApplication(sys.argv)
     app.setStyleSheet(QSS.QSS_RC)
-    mainw = Tran_IO_UI()
+    mainw = TranIOUI()
 
     lay_v_main = QVBoxLayout()
     lay_v_main.addWidget(mainw.wdg_top)
