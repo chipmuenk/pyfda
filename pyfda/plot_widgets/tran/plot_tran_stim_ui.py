@@ -634,7 +634,7 @@ class PlotTranStimUI(QWidget):
         Update labels for time / frequency related specs
         """
         if False: # fb_get("tab_yn", "display_index_k"): # button 'index_k' is checked
-            # doesn't work yet, frequencies are scaled wrongly
+            # doesn't work yet, n_fft is not available here. Labels need to be enabled as well.
             unit_frmt = None
             f_unit = ''
             t_unit = ''
@@ -748,7 +748,7 @@ class PlotTranStimUI(QWidget):
     def normalize_freqs(self) -> None:
         # TODO: move this to plot_tran_stim and update N_FFT
         """
-        Update normalized frequencies and periods if required.
+        Update widget with normalized frequencies and periods if required.
 
         `normalize_freqs()` is called when sampling frequency has been changed
         via signal ['view_changed':'f_S'] from plot_impz.process_sig_rx
@@ -777,9 +777,8 @@ class PlotTranStimUI(QWidget):
         self._update_energy_scaling_impz()
 
         # recalculate displayed freq spec values for (maybe) changed f_S
-        logger.error(fb_get('tab_yn', 'display_index_k'))
-        if False: # fb_get('tab_yn', 'display_index_k'):
-            # doesn't work yet, frequencies are scaled wrongly
+        if False:  # fb_get('tab_yn', 'display_index_k'):
+            # doesn't work yet, n_fft is not available in this scope.
             self.f_scale = self.n_fft
         else:
             self.f_scale = fb_get('f_S')
