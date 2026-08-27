@@ -1621,20 +1621,20 @@ class Plot_Impz(QWidget):
                 """
                 # k is checked: specify frequencies as indices of the FFT, f_k = k * f_S / N_FFT
                 # By default, k = CFP.conf_settings['N_FFT'] which is used for the calculation
-                # of the non-transient tabs and for F_id / H_id here.
+                # of the non-transient tabs and for f_id / h_id here.
                 # Here, the frequency axes must be scaled to fit the number of
                 # frequency points self.ui.N
-                F_range = [f * self.ui.N / fb_get('f_max') for f in F_range]
+                F_range = [frq * self.ui.N / fb_get('f_max') for frq in F_range]
                 f_max = self.ui.N
             else:
                 f_max = fb_get('f_max')
 
             # freqz-based ideal frequency response:
-            F_id, H_id = sig.freqz(fb_get('ba', 0), fb_get('ba', 1),
+            f_id, h_id = sig.freqz(fb_get('ba', 0), fb_get('ba', 1),
                                    worN=CFP.conf_settings['N_FFT'], whole=True, fs=f_max)
 
             # frequency vector for FFT-based frequency plots:
-            F = np.fft.fftfreq(self.ui.N, d=1. / f_max)
+            f = np.fft.fftfreq(self.ui.N, d=1. / f_max)
 
             # -----------------------------------------------------------------
             # Scale frequency response and calculate power
@@ -1696,7 +1696,7 @@ class Plot_Impz(QWidget):
             # Scale and shift frequency range
             # ----------------------------------------------------------------
             if fb_get('freqSpecsRangeType') == 'sym':
-                # display -f_S/2 ... f_S/2 ->  shift X, Y and F using fftshift()
+                # display -f_S/2 ... f_S/2 ->  shift X, Y and f using fftshift()
                 if plt_response:
                     Y = np.fft.fftshift(Y)
 
@@ -1706,16 +1706,16 @@ class Plot_Impz(QWidget):
                 if plt_stimulus_q:
                     X_q = np.fft.fftshift(X_q)
 
-                F = np.fft.fftshift(F)
+                f = np.fft.fftshift(f)
 
-                # shift H_id and F_id by f_S/2
-                F_id -= f_max/2
-                H_id = np.fft.fftshift(H_id)
+                # shift h_id and f_id by f_S/2
+                f_id -= f_max/2
+                h_id = np.fft.fftshift(h_id)
                 if not freq_resp:
-                    H_id /= 2
+                    h_id /= 2
 
             elif onesided:
-                # display 0 ... f_S/2 -> only use the first half of X, Y and F
+                # display 0 ... f_S/2 -> only use the first half of X, Y and f
                 if plt_response:
                     Y = Y[0:self.ui.N//2]
                 if plt_stimulus:
@@ -1723,15 +1723,15 @@ class Plot_Impz(QWidget):
                 if plt_stimulus_q:
                     X_q = X_q[0:self.ui.N//2]
 
-                F = F[0:self.ui.N//2]
-                F_id = F_id[0:CFP.conf_settings['N_FFT']//2]
-                H_id = H_id[0:CFP.conf_settings['N_FFT']//2]
+                f = f[0:self.ui.N//2]
+                f_id = f_id[0:CFP.conf_settings['N_FFT']//2]
+                h_id = h_id[0:CFP.conf_settings['N_FFT']//2]
 
             else:  # fb_get('freqSpecsRangeType') == 'whole'
                 # display 0 ... f_S -> shift frequency axis
-                F = np.fft.fftshift(F) + f_max/2.
+                f = np.fft.fftshift(f) + f_max/2.
                 if not freq_resp:
-                    H_id /= 2
+                    h_id /= 2
 
             # -----------------------------------------------------------------
             # Calculate log FFT and power if selected, set units
@@ -1779,14 +1779,14 @@ class Plot_Impz(QWidget):
 
                 if self.ui.but_hf.isChecked():
                     if self.en_re_im_f:
-                        H_id_r = np.maximum(20 * np.log10(np.abs(H_id.real)),
+                        h_id_r = np.maximum(20 * np.log10(np.abs(h_id.real)),
                                             self.ui.bottom_f)
-                        H_id_i = np.maximum(20 * np.log10(np.abs(H_id.imag)),
+                        h_id_i = np.maximum(20 * np.log10(np.abs(h_id.imag)),
                                             self.ui.bottom_f)
                     else:
-                        H_id_r = np.maximum(20 * np.log10(np.abs(H_id)), self.ui.bottom_f)
+                        h_id_r = np.maximum(20 * np.log10(np.abs(h_id)), self.ui.bottom_f)
                         if self.en_mag_phi_f:
-                            H_id_i = angle_zero(H_id)
+                            h_id_i = angle_zero(h_id)
 
             else:  # non log
                 H_F_pre = ""
@@ -1820,12 +1820,12 @@ class Plot_Impz(QWidget):
 
                 if self.ui.but_hf.isChecked():
                     if self.en_re_im_f:
-                        H_id_r = H_id.real
-                        H_id_i = H_id.imag
+                        h_id_r = h_id.real
+                        h_id_i = h_id.imag
                     else:
-                        H_id_r = np.abs(H_id)
+                        h_id_r = np.abs(h_id)
                         if self.en_mag_phi_f:
-                            H_id_i = angle_zero(H_id)
+                            h_id_i = angle_zero(h_id)
 
                 unit = " in V"
                 unit_P = "W"
@@ -1858,18 +1858,18 @@ class Plot_Impz(QWidget):
                                                 ec=None, lw=0)  # ec = 'blue', alpha=0.5
             lbl_empty = "        "
 
-            # -------------------- Plot H_id ----------------------------------
+            # -------------------- Plot h_id ----------------------------------
             if self.ui.but_hf.isChecked():
                 label_re = "$|H_{id}$" + ejO_str + "|"
                 if self.en_re_im_f:
                     label_re = "$H_{id,r}$" + ejO_str
                     label_im = "$H_{id,i}$" + ejO_str
-                    h_i.append(self.ax_f2.plot(F_id, H_id_i, c="gray", label=label_im)[0])
+                    h_i.append(self.ax_f2.plot(f_id, h_id_i, c="gray", label=label_im)[0])
                     l_i += [label_im]
                 elif self.en_mag_phi_f:
                     label_im = r"$\angle H_{id}$" + ejO_str
-                    h_i.append(self.ax_f2.plot(F_id, H_id_i, c="gray", label=label_im)[0])
-                h_r.append(self.ax_f1.plot(F_id, H_id_r, c="gray", label=label_re)[0])
+                    h_i.append(self.ax_f2.plot(f_id, h_id_i, c="gray", label=label_im)[0])
+                h_r.append(self.ax_f1.plot(f_id, h_id_r, c="gray", label=label_re)[0])
                 if show_info:
                     l_r += [lbl_empty, label_re, lbl_empty]
                     h_r += [patch_trans, patch_trans]
@@ -1883,19 +1883,19 @@ class Plot_Impz(QWidget):
                     label_re = "$X_r$" + ejO_str
                     label_im = "$X_i$" + ejO_str
                     h_i.append(self.draw_data(
-                        self.plt_freq_stim, self.ax_f2, F, X_i, label=label_im,
+                        self.plt_freq_stim, self.ax_f2, f, X_i, label=label_im,
                         bottom=self.ui.bottom_f, plt_fmt=self.fmt_plot_stim,
                         mkr_fmt=fmt_mkr_stim))
                     l_i.append(label_im)
                 elif self.en_mag_phi_f:
                     label_im = r"$\angle X$" + ejO_str
                     h_i.append(self.draw_data(
-                        self.plt_freq_stim, self.ax_f2, F, X_i, label=label_im,
+                        self.plt_freq_stim, self.ax_f2, f, X_i, label=label_im,
                         plt_fmt=self.fmt_plot_stim, mkr_fmt=fmt_mkr_stim))
                     l_i.append(label_im)
 
                 h_r.append(
-                    self.draw_data(self.plt_freq_stim, self.ax_f1, F, X_r, label=label_re,
+                    self.draw_data(self.plt_freq_stim, self.ax_f1, f, X_r, label=label_re,
                                    bottom=self.ui.bottom_f, plt_fmt=self.fmt_plot_stim,
                                    mkr_fmt=fmt_mkr_stim))
                 if show_info:
@@ -1911,19 +1911,19 @@ class Plot_Impz(QWidget):
                     label_re = "$X_{Q,r}$" + ejO_str
                     label_im = "$X_{Q,i}$" + ejO_str
                     h_i.append(self.draw_data(
-                        self.plt_freq_stmq, self.ax_f2, F, X_q_i, label=label_im,
+                        self.plt_freq_stmq, self.ax_f2, f, X_q_i, label=label_im,
                         bottom=self.ui.bottom_f, plt_fmt=self.fmt_plot_stmq,
                         mkr_fmt=fmt_mkr_stmq))
                     l_i.append(label_im)
                 elif self.en_mag_phi_f:
                     label_im = r"$\angle X_Q$" + ejO_str
                     h_i.append(self.draw_data(
-                        self.plt_freq_stmq, self.ax_f2, F, X_q_i, label=label_im,
+                        self.plt_freq_stmq, self.ax_f2, f, X_q_i, label=label_im,
                         plt_fmt=self.fmt_plot_stmq, mkr_fmt=fmt_mkr_stmq))
                     l_i.append(label_im)
 
                 h_r.append(self.draw_data(
-                    self.plt_freq_stmq, self.ax_f1, F, X_q_r, label=label_re,
+                    self.plt_freq_stmq, self.ax_f1, f, X_q_r, label=label_re,
                     bottom=self.ui.bottom_f, plt_fmt=self.fmt_plot_stmq,
                     mkr_fmt=fmt_mkr_stmq))
                 if show_info:
@@ -1939,19 +1939,19 @@ class Plot_Impz(QWidget):
                     label_re = "$Y_r$" + ejO_str
                     label_im = "$Y_i$" + ejO_str
                     h_i.append(self.draw_data(
-                        self.plt_freq_resp, self.ax_f2, F, Y_i, label=label_im,
+                        self.plt_freq_resp, self.ax_f2, f, Y_i, label=label_im,
                         bottom=self.ui.bottom_f, plt_fmt=self.fmt_plot_resp,
                         mkr_fmt=fmt_mkr_resp))
                     l_i.append(label_im)
                 elif self.en_mag_phi_f:
                     label_im = r"$\angle Y$" + ejO_str
                     h_i.append(self.draw_data(
-                        self.plt_freq_resp, self.ax_f2, F, Y_i, label=label_im,
+                        self.plt_freq_resp, self.ax_f2, f, Y_i, label=label_im,
                         plt_fmt=self.fmt_plot_resp, mkr_fmt=fmt_mkr_resp))
                     l_i.append(label_im)
 
                 h_r.append(self.draw_data(
-                    self.plt_freq_resp, self.ax_f1, F, Y_r, label=label_re,
+                    self.plt_freq_resp, self.ax_f1, f, Y_r, label=label_re,
                     bottom=self.ui.bottom_f, plt_fmt=self.fmt_plot_resp,
                     mkr_fmt=fmt_mkr_resp))
                 if show_info:
