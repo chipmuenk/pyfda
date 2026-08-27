@@ -26,10 +26,10 @@ from pyfda.pyfda_rc import params
 
 logger = logging.getLogger(__name__)
 
-classes = {'Plot_Phi': '\u03C6(f)'}  #: Dict containing class name : display name
+classes = {'PlotPhi': '\u03C6(f)'}  #: Dict containing class name : display name
 
 
-class Plot_Phi(QWidget):
+class PlotPhi(QWidget):
     """ Widget for plotting the phase frequency response phi(f) """
     # incoming, connected in sender widget (locally connected to self.process_sig_rx() )
     sig_rx = pyqtSignal(object)
@@ -262,7 +262,7 @@ if __name__ == "__main__":
 
     app = QApplication(sys.argv)
     app.setStyleSheet(QSS.QSS_RC)
-    mainw = Plot_Phi()
+    mainw = PlotPhi()
     app.setActiveWindow(mainw)
     mainw.show()
     sys.exit(app.exec_())
