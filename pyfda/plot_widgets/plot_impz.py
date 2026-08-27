@@ -937,7 +937,7 @@ class Plot_Impz(QWidget):
         integer representing the state of the widget. In this case,
         `needs_redraw` is set to True.
         """
-        if type(arg) is not None:
+        if arg is not None:
             self.needs_redraw = [True] * 2
 
         if not hasattr(self, 'cmplx'):  # has response been calculated yet?
