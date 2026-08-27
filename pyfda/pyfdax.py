@@ -13,7 +13,6 @@ import logging
 import sys
 import os
 
-import numpy as np
 import matplotlib
 
 from pyfda.libs.compat import Qt, QApplication, QIcon
@@ -40,8 +39,8 @@ if dirs.OS.lower() == "windows":
     # for Pythonw.exe, sometimes the icon is just blank. The following
     # instructions tell Windows that pythonw is merely hosting other applications.
     import ctypes
-    myappid = 'chipmuenk.pyfda.v0.9'
-    ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID(myappid)
+    MYAPPID = 'chipmuenk.pyfda.v0.9'
+    ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID(MYAPPID)
 
 logger = logging.getLogger(__name__)
 
