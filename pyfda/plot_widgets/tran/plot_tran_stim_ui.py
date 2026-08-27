@@ -633,7 +633,7 @@ class PlotTranStimUI(QWidget):
         """
         Update labels for time / frequency related specs
         """
-        if False: # fb.fil[0]["tab_yn"]["display_index_k"]: # button 'index_k' is set
+        if False: # fb_get("tab_yn", "display_index_k"): # button 'index_k' is checked
             # doesn't work yet, frequencies are scaled wrongly
             unit_frmt = None
             f_unit = ''

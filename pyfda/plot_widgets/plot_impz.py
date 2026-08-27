@@ -254,18 +254,18 @@ class Plot_Impz(QWidget):
         self.ui.but_log_freq.clicked.connect(self.draw)
         self.ui.led_log_bottom_freq.editingFinished.connect(self.draw)
         self.ui.but_freq_norm_impz.clicked.connect(self.draw)
-        self.ui.but_freq_index_k.clicked.connect(self.toggle_index_k)
+        self.ui.but_freq_index_k.clicked.connect(self._update_index_k)
         self.ui.but_freq_show_info.clicked.connect(self.draw)
         # --- subwidgets
 
     # -----------------------------------------------------------------------
-    def toggle_index_k(self) -> None:
+    def _update_index_k(self, arg) -> None:
         """
-        Toggle setting of index_k button in filterbroker, update frequency scaling and call `draw()`
+        Update state of index_k button in filterbroker, update frequency scaling and call `draw()`
         """
         fb_set("tab_yn", "display_index_k", self.ui.but_freq_index_k.isChecked())
         self.stim_wdg.ui.normalize_freqs()
-        self.draw()
+        self.draw(arg)  # pass button state to draw()
 
     # -----------------------------------------------------------------------
     def toggle_stim_options(self) -> None:
