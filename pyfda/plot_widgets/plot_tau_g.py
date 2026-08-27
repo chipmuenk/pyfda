@@ -26,10 +26,20 @@ from pyfda.libs.compat import (QCheckBox, QWidget, QFrame, QComboBox,
 logger = logging.getLogger(__name__)
 
 # Dict containing class name : display name
-classes = {'Plot_tau_g': 'tau_g'}
+classes = {'PlotTauG': 'tau_g'}
 
+CMB_ALGORITHM_ITEMS =\
+    ["<span>Select algorithm for calculating the group delay.</span>",
+        ("auto", "Auto", "<span>Try to find best-suited algorithm.</span>"),
+        ("scipy", "Scipy", "<span>Scipy algorithm.</span>"),
+        ("jos", "JOS", "<span>J.O. Smith's algorithm.</span>"),
+        ("shpak", "Shpak", "<span>Shpak's algorithm for SOS and other IIR"
+        "filters.</span>"),
+        ("diff", "Diff", "<span>Textbook-style, differentiate the phase."
+        "</span>")
+        ]
 
-class Plot_tau_g(QWidget):
+class PlotTauG(QWidget):
     """
     Widget for plotting the group delay
     """
@@ -45,17 +55,6 @@ class Plot_tau_g(QWidget):
         self.tool_tip = self.tr("Group delay")
         self.tab_label = "\U0001D70F(f)"  # "tau_g" \u03C4
 
-        self.cmb_algorithm_items =\
-            ["<span>Select algorithm for calculating the group delay.</span>",
-             ("auto", "Auto", "<span>Try to find best-suited algorithm.</span>"),
-             ("scipy", "Scipy", "<span>Scipy algorithm.</span>"),
-             ("jos", "JOS", "<span>J.O. Smith's algorithm.</span>"),
-             ("shpak", "Shpak", "<span>Shpak's algorithm for SOS and other IIR"
-              "filters.</span>"),
-             ("diff", "Diff", "<span>Textbook-style, differentiate the phase."
-              "</span>")
-             ]
-
         self._construct_ui()
 
     def _construct_ui(self):
@@ -64,18 +63,18 @@ class Plot_tau_g(QWidget):
         - Matplotlib widget with NavigationToolbar
         - Frame with control elements
         """
-        self.chkWarnings = QCheckBox(self.tr("Verbose"), self)
-        self.chkWarnings.setChecked(self.verbose)
-        self.chkWarnings.setToolTip(self.tr(
+        self.chk_warnings = QCheckBox(self.tr("Verbose"), self)
+        self.chk_warnings.setChecked(self.verbose)
+        self.chk_warnings.setToolTip(self.tr(
             "<span>Print messages about singular group delay and calculation times."
             "</span>"))
 
         self.cmb_algorithm = QComboBox(self)
-        qcmb_box_populate(self.cmb_algorithm, self.cmb_algorithm_items, self.algorithm)
+        qcmb_box_populate(self.cmb_algorithm, CMB_ALGORITHM_ITEMS, self.algorithm)
 
         lay_h_controls = QHBoxLayout()
         lay_h_controls.addStretch(10)
-        lay_h_controls.addWidget(self.chkWarnings)
+        lay_h_controls.addWidget(self.chk_warnings)
         # lay_h_controls.addWidget(self.chkScipy)
         lay_h_controls.addWidget(self.cmb_algorithm)
 
@@ -148,21 +147,21 @@ class Plot_tau_g(QWidget):
         bb = fb_get('ba', 0)
         aa = fb_get('ba', 1)
 
-        # calculate H_cmplx(W) (complex) for W = 0 ... 2 pi:
-        # scipy: self.W, self.tau_g = group_delay((bb, aa), w=CFP.conf_settings['N_FFT'],
+        # calculate H_cmplx(w) (complex) for w = 0 ... 2 pi:
+        # scipy: self.w, self.tau_g = group_delay((bb, aa), w=CFP.conf_settings['N_FFT'],
         #                                           whole = True)
 
         if fb_get('creator', 0) == 'sos':  # one of 'sos', 'zpk', 'ba'
-            self.W, self.tau_g = group_delay(
+            self.w, self.tau_g = group_delay(
                 fb_get('sos'), nfft=CFP.conf_settings['N_FFT'],
-                sos=True, whole=True, verbose=self.chkWarnings.isChecked(),
+                sos=True, whole=True, verbose=self.chk_warnings.isChecked(),
                 alg=self.cmb_algorithm.currentData())
         else:
-            self.W, self.tau_g = group_delay(
+            self.w, self.tau_g = group_delay(
                 bb, aa, nfft=CFP.conf_settings['N_FFT'], whole=True,
-                verbose=self.chkWarnings.isChecked(),
+                verbose=self.chk_warnings.isChecked(),
                 alg=self.cmb_algorithm.currentData())
-            #                                   self.chkWarnings.isChecked())
+            #                                   self.chk_warnings.isChecked())
 
 # ------------------------------------------------------------------------------
     def draw(self):
@@ -178,20 +177,20 @@ class Plot_tau_g(QWidget):
         Draw the figure with new limits, scale etc without recalculating H(f)
         """
         # ========= select frequency range to be displayed =====================
-        # === shift, scale and select: W -> F, H_cplx -> H_c
+        # === shift, scale and select: w -> f, H_cplx -> H_c
         f_max_2 = fb_get('f_max') / 2.
-        F = self.W * f_max_2 / np.pi
+        f = self.w * f_max_2 / np.pi
 
         if fb_get('freqSpecsRangeType') == 'sym':
-            # shift tau_g and F by f_S/2
+            # shift tau_g and f by f_S/2
             tau_g = np.fft.fftshift(self.tau_g)
-            F -= f_max_2
+            f -= f_max_2
         elif fb_get('freqSpecsRangeType') == 'half':
-            # only use the first half of H and F
+            # only use the first half of H and f
             tau_g = self.tau_g[0:CFP.conf_settings['N_FFT']//2]
-            F = F[0:CFP.conf_settings['N_FFT']//2]
+            f = f[0:CFP.conf_settings['N_FFT']//2]
         else:  # fb_get('freqSpecsRangeType') == 'whole'
-            # use H and F as calculated
+            # use H and f as calculated
             tau_g = self.tau_g
 
         # ================ Main Plotting Routine =========================
@@ -206,7 +205,7 @@ class Plot_tau_g(QWidget):
 
         # ---------------------------------------------------------
         self.ax.clear()  # need to clear, doesn't overwrite
-        self.ax.plot(F, tau_g, label=r"$\tau_g$")
+        self.ax.plot(f, tau_g, label=r"$\tau_g$")
         # ---------------------------------------------------------
 
         self.ax.xaxis.set_minor_locator(
@@ -241,7 +240,7 @@ if __name__ == "__main__":
 
     app = QApplication(sys.argv)
     app.setStyleSheet(QSS.QSS_RC)
-    mainw = Plot_tau_g()
+    mainw = PlotTauG()
     app.setActiveWindow(mainw)
     mainw.show()
     sys.exit(app.exec_())

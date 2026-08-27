@@ -139,14 +139,14 @@ class TranIOUI(QWidget):
         lbl_f_s = QLabel(to_html("f_S =", frmt="bi"))
         self.lbl_f_s_value = QLabel("None")
         lbl_f_s_unit = QLabel("Hz")
-        layH_f_s = QHBoxLayout()
-        layH_f_s.addWidget(lbl_f_s)
-        layH_f_s.addWidget(self.lbl_f_s_value)
-        layH_f_s.addWidget(lbl_f_s_unit)
-        layH_f_s.addStretch()
-        layH_f_s.setContentsMargins(0, 0, 0, 0)
+        lay_h_f_s = QHBoxLayout()
+        lay_h_f_s.addWidget(lbl_f_s)
+        lay_h_f_s.addWidget(self.lbl_f_s_value)
+        lay_h_f_s.addWidget(lbl_f_s_unit)
+        lay_h_f_s.addStretch()
+        lay_h_f_s.setContentsMargins(0, 0, 0, 0)
         self.frm_f_s = QFrame(self)
-        self.frm_f_s.setLayout(layH_f_s)
+        self.frm_f_s.setLayout(lay_h_f_s)
         self.frm_f_s.setContentsMargins(0, 0, 0, 0)
         self.frm_f_s.setVisible(False)
 
@@ -187,9 +187,9 @@ class TranIOUI(QWidget):
         self.but_int_as_float.setToolTip(
             "<span>Represent <i>W</i> bit integer WAV formats as float when importing "
             "and exporting so that 1.0 is equivalent to 2<sup>W</sup>.</span>")
-        layH_file_fmt_options = QHBoxLayout()
-        layH_file_fmt_options.addWidget(self.but_csv_options)
-        layH_file_fmt_options.addWidget(self.but_int_as_float)
+        lay_h_file_fmt_options = QHBoxLayout()
+        lay_h_file_fmt_options.addWidget(self.but_csv_options)
+        lay_h_file_fmt_options.addWidget(self.but_int_as_float)
 
         self.but_f_s_wav_auto = PushButtonRT(
             self, text="<b>Auto <i>f<sub>S</sub></i></b>", checked=True)
@@ -202,9 +202,9 @@ class TranIOUI(QWidget):
         self.led_f_s_wav.setToolTip(
             "<span>Manual f_S for import / export of WAV file (must be integer).</span>")
 
-        layH_lbl_led_f_s_wav = QHBoxLayout()
-        layH_lbl_led_f_s_wav.addWidget(self.lbl_f_s_wav)
-        layH_lbl_led_f_s_wav.addWidget(self.led_f_s_wav)
+        lay_h_lbl_led_f_s_wav = QHBoxLayout()
+        lay_h_lbl_led_f_s_wav.addWidget(self.lbl_f_s_wav)
+        lay_h_lbl_led_f_s_wav.addWidget(self.led_f_s_wav)
 
         line2 = QVLine(width=1)
         # ----------- SCALE ------------------------------------------------------------
@@ -247,79 +247,79 @@ class TranIOUI(QWidget):
         self.led_nr_loops.setMaximumWidth(qtext_width(N_x=8))
 
         #-------------------------------
-        layG_io_file = QGridLayout()
+        lay_g_io_file = QGridLayout()
         i = 0
         # ---- LOAD FILE
-        layG_io_file.addWidget(self.but_select, 0, i)
-        layG_io_file.addWidget(self.but_load, 1, i)
+        lay_g_io_file.addWidget(self.but_select, 0, i)
+        lay_g_io_file.addWidget(self.but_load, 1, i)
         i += 1
-        layG_io_file.addWidget(self.lbl_file, 0, i)
-        layG_io_file.addWidget(self.lbl_shape, 1, i)
+        lay_g_io_file.addWidget(self.lbl_file, 0, i)
+        lay_g_io_file.addWidget(self.lbl_shape, 1, i)
         i += 1
-        layG_io_file.addWidget(self.lbl_filename, 0, i, 1, 2)
-        layG_io_file.addWidget(self.lbl_shape_actual, 1, i)
+        lay_g_io_file.addWidget(self.lbl_filename, 0, i, 1, 2)
+        lay_g_io_file.addWidget(self.lbl_shape_actual, 1, i)
         i += 1
         # row 0 is used by the file name
-        layG_io_file.addWidget(self.frm_f_s, 1, i)
+        lay_g_io_file.addWidget(self.frm_f_s, 1, i)
         i += 1
-        layG_io_file.addWidget(self.line0, 0, i, 2, 1)
+        lay_g_io_file.addWidget(self.line0, 0, i, 2, 1)
         i+=1
-        layG_io_file.addWidget(self.lbl_chan_import, 0, i)
-        layG_io_file.addWidget(self.cmb_chan_import, 1, i)
+        lay_g_io_file.addWidget(self.lbl_chan_import, 0, i)
+        lay_g_io_file.addWidget(self.cmb_chan_import, 1, i)
         i += 1
-        layG_io_file.addWidget(line1, 0, i, 2, 1)
+        lay_g_io_file.addWidget(line1, 0, i, 2, 1)
         # ---- FILE FORMAT
         i += 1
-        layG_io_file.addWidget(self.cmb_file_format, 0, i)
-        # layG_io_file.addWidget(self.but_csv_options, 1, i)
-        layG_io_file.addLayout(layH_file_fmt_options, 1, i)
+        lay_g_io_file.addWidget(self.cmb_file_format, 0, i)
+        # lay_g_io_file.addWidget(self.but_csv_options, 1, i)
+        lay_g_io_file.addLayout(lay_h_file_fmt_options, 1, i)
         i += 1
-        layG_io_file.addWidget(self.but_f_s_wav_auto, 0, i)
-        layG_io_file.addLayout(layH_lbl_led_f_s_wav, 1, i)
+        lay_g_io_file.addWidget(self.but_f_s_wav_auto, 0, i)
+        lay_g_io_file.addLayout(lay_h_lbl_led_f_s_wav, 1, i)
         # ---- SCALE TO
         i += 1
-        layG_io_file.addWidget(line2, 0, i, 2, 1)
+        lay_g_io_file.addWidget(line2, 0, i, 2, 1)
         i += 1
-        layG_io_file.addWidget(self.but_scale_to, 0, i)
-        layG_io_file.addWidget(self.led_scale_to, 1, i)
+        lay_g_io_file.addWidget(self.but_scale_to, 0, i)
+        lay_g_io_file.addWidget(self.led_scale_to, 1, i)
         # ---- SAVE FILE
         i += 1
-        layG_io_file.addWidget(line3, 0, i, 2, 1)
+        lay_g_io_file.addWidget(line3, 0, i, 2, 1)
         i += 1
-        layG_io_file.addWidget(self.but_save, 0, i, 2, 1)
+        lay_g_io_file.addWidget(self.but_save, 0, i, 2, 1)
         i += 1
-        layG_io_file.addWidget(self.lbl_chan_export_l, 0, i)
-        layG_io_file.addWidget(self.lbl_chan_export_r, 1, i)
+        lay_g_io_file.addWidget(self.lbl_chan_export_l, 0, i)
+        lay_g_io_file.addWidget(self.lbl_chan_export_r, 1, i)
         i += 1
-        layG_io_file.addWidget(self.cmb_chan_export_l, 0, i)
-        layG_io_file.addWidget(self.cmb_chan_export_r, 1, i)
+        lay_g_io_file.addWidget(self.cmb_chan_export_l, 0, i)
+        lay_g_io_file.addWidget(self.cmb_chan_export_r, 1, i)
         i += 1
-        layG_io_file.addWidget(self.lbl_data_format, 0, i)
-        layG_io_file.addWidget(self.cmb_data_format, 1, i)
+        lay_g_io_file.addWidget(self.lbl_data_format, 0, i)
+        lay_g_io_file.addWidget(self.cmb_data_format, 1, i)
         i+= 1
-        layG_io_file.addWidget(self.lbl_nr_loops, 0, i)
-        layG_io_file.addWidget(self.led_nr_loops, 1, i)
+        lay_g_io_file.addWidget(self.lbl_nr_loops, 0, i)
+        lay_g_io_file.addWidget(self.led_nr_loops, 1, i)
         #
-        layG_io_file.setColumnStretch(i+1, 1)
+        lay_g_io_file.setColumnStretch(i+1, 1)
         # --------
 
-        layH_title_io_file = QHBoxLayout()
-        layH_title_io_file.addWidget(self.lbl_title_io_file)
+        lay_h_title_io_file = QHBoxLayout()
+        lay_h_title_io_file.addWidget(self.lbl_title_io_file)
         self.wdg_title_io_file = QWidget(self)
-        self.wdg_title_io_file.setLayout(layH_title_io_file)
+        self.wdg_title_io_file.setLayout(lay_h_title_io_file)
         self.wdg_title_io_file.setContentsMargins(0, 0, 0, 0)
 
         self.wdg_ctrl_io_file = QWidget(self)
-        self.wdg_ctrl_io_file.setLayout(layG_io_file)
+        self.wdg_ctrl_io_file.setLayout(lay_g_io_file)
         self.wdg_ctrl_io_file.setContentsMargins(0, 0, 0, 0)
 
-        layH_io = QHBoxLayout()
-        layH_io.addWidget(self.wdg_title_io_file)
-        layH_io.addWidget(self.wdg_ctrl_io_file)
-        layH_io.setContentsMargins(0, 0, 0, 0)
+        lay_h_io = QHBoxLayout()
+        lay_h_io.addWidget(self.wdg_title_io_file)
+        lay_h_io.addWidget(self.wdg_ctrl_io_file)
+        lay_h_io.setContentsMargins(0, 0, 0, 0)
 
         self.wdg_top = QWidget(self, objectName="transparent")
-        self.wdg_top.setLayout(layH_io)
+        self.wdg_top.setLayout(lay_h_io)
         self.wdg_top.setContentsMargins(0, 0, 0, 0)
         self.wdg_top.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Minimum)
         # ------ Local signal-slot-connections

@@ -228,7 +228,7 @@ class TranIO(QWidget):
 
         self.N = None
         self.nchans = None
-        self.WL = None
+        self.wl = None
 
         info_str = ""
         err = False
@@ -242,7 +242,7 @@ class TranIO(QWidget):
                 err = True
             else:
                 self.f_s_file = io.read_wav_info.f_S
-                self.WL = io.read_wav_info.WL
+                self.wl = io.read_wav_info.wl
                 info_str = f" x {io.read_wav_info.sample_format},"
                 self.ui.lbl_f_s_value.setText(str(self.f_s_file))
 
