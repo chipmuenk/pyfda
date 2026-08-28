@@ -1,0 +1,11 @@
+Several problems exist when saving / loading filters:
+
+- [ ]: When saving filters, it seems as if coefficients are only saved with an accuracy of 8 digits. This would be due to `pyfda_io_lib.save_data_np()` and its default option `fmt=%f`.
+
+- [ ]: When reading back a fixpoint filter, selecting the b,a tab can crash the software with
+
+        File "d:\daten\design\python\git\pyfda\pyfda\input_widgets\input_coeffs.py", line 548, in _refresh_table_item
+          if self.ba_q[col + 2][row] > 0:
+        TypeError: 'int' object is not subscriptable
+
+    This can be avoided by running a fixpoint simulation, but it seems the ba_q[][] array is not loaded / updated / created. Coefficient formats between the fixpoint tab and b,a can also be out of sync.
