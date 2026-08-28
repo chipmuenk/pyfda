@@ -180,11 +180,11 @@ def qcmb_box_populate(cmb_box: QComboBox, items_list: list, item_init: str) -> i
     for i, item in enumerate(items_list):
         if isinstance(item[1], QtGui.QIcon):
             cmb_box.addItem("", item[0])
-            cmb_box.setItemIcon(i-1, item[1])
+            cmb_box.setItemIcon(i, item[1])
         else:
             cmb_box.addItem(cmb_box.tr(item[1]), item[0])
         if len(item) == 3:  # add item tool tip (optional)
-            cmb_box.setItemData(i-1, cmb_box.tr(item[2]), Qt.ToolTipRole)
+            cmb_box.setItemData(i, cmb_box.tr(item[2]), Qt.ToolTipRole)
     cmb_box.sizeAdjustPolicy = QComboBox.AdjustToContents
 
     return qset_cmb_box(cmb_box, item_init, data=True)
