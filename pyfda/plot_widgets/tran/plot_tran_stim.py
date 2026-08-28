@@ -181,24 +181,24 @@ class PlotTranStim(QWidget):
 
 
     # ------------------------------------------------------------------------------
-    def calc_stimulus_frame(self, x: np.ndarray, N_first: int = 0,
-                            N_frame: int = 10, N_end: int = 10) -> None:
+    def calc_stimulus_frame(self, x: np.ndarray, n_first: int = 0,
+                            n_frame: int = 10, n_end: int = 10) -> None:
         """
-        Calculate a data frame of stimulus `x` with a length of `N_frame` samples,
-        starting with index `N_first`
+        Calculate a data frame of stimulus `x` with a length of `n_frame` samples,
+        starting with index `n_first`
 
         Parameters
         ----------
         x: ndarray of float or complex
             empty array, passed by reference, that is filled in place frame by frame
 
-        N_first: int
+        n_first: int
             index of first data point of the current frame
 
-        N_frame: int
+        n_frame: int
             current frame length; the last frame can be shorter than the rest
 
-        N_end: int
+        n_end: int
             last sample of total stimulus to be generated (needed for scaling for some stimuli)
 
         Returns
@@ -266,7 +266,7 @@ class PlotTranStim(QWidget):
         # ====================================================================
         # Initialization for all frames
         # -------------------------------------------------------------------
-        if N_first == 0:
+        if n_first == 0:
             # calculate index for t1, only needed for dirac, step and rect
             self.T1_idx = int(np.round(self.ui.t1))
             self.rad_phi1 = self.ui.phi1 / 180 * pi
@@ -274,9 +274,9 @@ class PlotTranStim(QWidget):
         # -------------------------------------------------------------------
         # Initialization for current frame
         # -------------------------------------------------------------------
-        N_last = N_first + N_frame  # calculate last element index
-        frm_slc = slice(N_first, N_last)  # current slice
-        n = np.arange(N_first, N_last)  #  create frame index vector
+        N_last = n_first + n_frame  # calculate last element index
+        frm_slc = slice(n_first, N_last)  # current slice
+        n = np.arange(n_first, N_last)  #  create frame index vector
         t = n * fb_get('T_S')  # create time vector
         noi = 0  # fallback when no noise is selected
         # ====================================================================
@@ -293,9 +293,9 @@ class PlotTranStim(QWidget):
             elif len(self.x_file) >= N_last:
                 x[frm_slc] = self.x_file[frm_slc]
             # file data is shorter than frame, pad with zeros
-            elif len(self.x_file) > N_first:
+            elif len(self.x_file) > n_first:
                 x[frm_slc] = np.concatenate(
-                    (self.x_file[N_first:], np.zeros(N_last - len(self.x_file))))
+                    (self.x_file[n_first:], np.zeros(N_last - len(self.x_file))))
             else:
                 # file data has been consumed, nothing left to be added
                 pass
@@ -305,8 +305,8 @@ class PlotTranStim(QWidget):
             pass
         # ----------------------------------------------------------------------
         elif self.ui.stim == "dirac":
-            if N_first <= self.T1_idx < N_last:
-                x[self.T1_idx - N_first] = self.ui.a1
+            if n_first <= self.T1_idx < N_last:
+                x[self.T1_idx - n_first] = self.ui.a1
         # ----------------------------------------------------------------------
         elif self.ui.stim == "sinc":
             x[frm_slc] = self.ui.a1 * sinc(2 * (n - self.ui.t1) * self.ui.f1)\
@@ -329,15 +329,15 @@ class PlotTranStim(QWidget):
         elif self.ui.stim == "rect":
             n_rise = int(self.T1_idx - np.floor(self.ui.tw_1/2))  # pos. of rising edge
             n_min = max(n_rise, 0)
-            n_max = min(n_rise + self.ui.tw_1, N_end)
+            n_max = min(n_rise + self.ui.tw_1, n_end)
             x[frm_slc] = self.ui.a1 * np.where((n >= n_min) & (n < n_max), 1, 0)
         # ----------------------------------------------------------------------
         elif self.ui.stim == "step":
-            if self.T1_idx < N_first:   # step before current frame
+            if self.T1_idx < n_first:   # step before current frame
                 x[frm_slc].fill(self.ui.a1)
-            if N_first <= self.T1_idx < N_last:  # step in current frame
-                x[frm_slc][0:self.T1_idx - N_first].fill(0)
-                x[frm_slc][self.T1_idx - N_first:N_last].fill(self.ui.a1)
+            if n_first <= self.T1_idx < N_last:  # step in current frame
+                x[frm_slc][0:self.T1_idx - n_first].fill(0)
+                x[frm_slc][self.T1_idx - n_first:N_last].fill(self.ui.a1)
             elif self.T1_idx >= N_last:  # step after current frame
                 x[frm_slc].fill(0)
         # ----------------------------------------------------------------------
@@ -374,7 +374,7 @@ class PlotTranStim(QWidget):
                     "Frequencies f1 and f2 need to be != 0 and have the same sign!")
                 return
             if self.ui.t2 == 0:  # sig.chirp is buggy, T_sim cannot be larger than T_end
-                T_end = N_end  # frequency sweep over complete interval
+                T_end = n_end  # frequency sweep over complete interval
             else:
                 T_end = self.ui.t2  # frequency sweep till t2
             x[frm_slc] = self.ui.a1 * sig.chirp(
@@ -449,7 +449,7 @@ class PlotTranStim(QWidget):
                 "BW1": self.ui.bw1, "BW2": self.ui.bw2, "f_S": fb_get('f_S'),
                 "n": n, "t": t, "j": 1j, "pi": np.pi, "e": np.e}
 
-            x[frm_slc] = safe_numexpr_eval(self.ui.stim_formula, (N_frame,), param_dict)
+            x[frm_slc] = safe_numexpr_eval(self.ui.stim_formula, (n_frame,), param_dict)
             if safe_numexpr_eval.err > 0:
                 qstyle_widget(self.ui.led_stim_formula, "error")
             else:
@@ -465,33 +465,33 @@ class PlotTranStim(QWidget):
         elif self.ui.noise == "gauss":
             # Gaussian noise is uncorrelated, no information from last frame needed
             if np.iscomplexobj(self.ui.noi):
-                noi = self.ui.noi.real * np.random.randn(N_frame)\
-                    + 1j * self.ui.noi.imag * np.random.randn(N_frame)
+                noi = self.ui.noi.real * np.random.randn(n_frame)\
+                    + 1j * self.ui.noi.imag * np.random.randn(n_frame)
             else:
-                noi = self.ui.noi * np.random.randn(N_frame)
+                noi = self.ui.noi * np.random.randn(n_frame)
         # ---
         elif self.ui.noise == "uniform":
             # Uniform noise is uncorrelated, no information from last frame needed
             if np.iscomplexobj(self.ui.noi):
-                noi = self.ui.noi.real * (np.random.rand(N_frame) - 0.5)\
-                    + 1j * self.ui.noi.imag * (np.random.rand(N_frame) - 0.5)
+                noi = self.ui.noi.real * (np.random.rand(n_frame) - 0.5)\
+                    + 1j * self.ui.noi.imag * (np.random.rand(n_frame) - 0.5)
             else:
-                noi = self.ui.noi * (np.random.rand(N_frame) - 0.5)
+                noi = self.ui.noi * (np.random.rand(n_frame) - 0.5)
         # ---
         elif self.ui.noise == "randint":
             # Random integers are uncorrelated, no information from last frame needed
             if np.iscomplexobj(self.ui.noi):
                 noi = np.random.randint(
-                    int(np.abs(self.ui.noi.real)) + 1, size=N_frame) +\
+                    int(np.abs(self.ui.noi.real)) + 1, size=n_frame) +\
                         1j * np.random.randint(
-                            int(np.abs(self.ui.noi.imag)) + 1, size=N_frame)
+                            int(np.abs(self.ui.noi.imag)) + 1, size=n_frame)
             else:
-                noi = np.random.randint(int(np.abs(self.ui.noi)) + 1, size=N_frame)
+                noi = np.random.randint(int(np.abs(self.ui.noi)) + 1, size=n_frame)
         # ---
         elif self.ui.noise == "mls":
             # Maximum Length Sequences have a fixed length of 2 ** self.ui.mls_b,
             # use seed of last sequence element to seed new sequence
-            if N_first == 0:
+            if n_first == 0:
                 # initialize sequence(s) with fixed seeds, creating an identical
                 # sequence at every run
                 self.seed_r = [1, 0, 0, 1, 0, 0, 1, 1, 1, 0, 1, 0, 0, 0, 1, 1,
@@ -499,10 +499,10 @@ class PlotTranStim(QWidget):
                 self.seed_i = np.roll(self.seed_r, 1)
 
             noi_r, self.seed_r = sig.max_len_seq(
-                self.ui.mls_b, length=N_frame, state=self.seed_r)
+                self.ui.mls_b, length=n_frame, state=self.seed_r)
             if np.iscomplexobj(self.ui.noi):
                 noi_i, self.seed_i = sig.max_len_seq(
-                    self.ui.mls_b, length=N_frame, state=self.seed_i)
+                    self.ui.mls_b, length=n_frame, state=self.seed_i)
                 noi = self.ui.noi.real * noi_r + 1j * self.ui.noi.imag * noi_i
             else:
                 noi = noi_r * self.ui.noi
@@ -510,13 +510,13 @@ class PlotTranStim(QWidget):
         elif self.ui.noise == "brownian":  # brownian noise
             # Brownian noise in cumulative, add last value of last frame to
             # current frame
-            if N_first == 0:
+            if n_first == 0:
                 self.noi_last = 0  # initialize for first frame
             if np.iscomplexobj(self.ui.noi):
-                noi = np.cumsum(self.ui.noi.real * np.random.randn(N_frame))\
-                    + 1j * np.cumsum(self.ui.noi.imag * np.random.randn(N_frame))
+                noi = np.cumsum(self.ui.noi.real * np.random.randn(n_frame))\
+                    + 1j * np.cumsum(self.ui.noi.imag * np.random.randn(n_frame))
             else:
-                noi = np.cumsum(self.ui.noi * np.random.randn(N_frame))
+                noi = np.cumsum(self.ui.noi * np.random.randn(n_frame))
             noi += self.noi_last
             self.noi_last = noi[-1]
         else:
@@ -544,9 +544,9 @@ class PlotTranStim(QWidget):
             elif len(self.x_file) >= N_last:
                 x[frm_slc] = add_signal(x[frm_slc], self.x_file[frm_slc])
             # file data is shorter than frame, pad with zeros
-            elif len(self.x_file) > N_first:
+            elif len(self.x_file) > n_first:
                 x[frm_slc] = add_signal(x[frm_slc], np.concatenate(
-                    (self.x_file[N_first:], np.zeros(N_last - len(self.x_file)))))
+                    (self.x_file[n_first:], np.zeros(N_last - len(self.x_file)))))
             # file data has been consumed, nothing left to be added
             else:
                 return

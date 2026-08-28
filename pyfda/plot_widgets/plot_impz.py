@@ -31,7 +31,7 @@ from pyfda.libs.pyfda_qt_lib import (
 from pyfda.plot_widgets.mpl_widget import MplWidget, stems, scatter
 from pyfda.plot_widgets.tran.plot_tran_stim import PlotTranStim
 from pyfda.plot_widgets.tran.tran_io import TranIO
-from pyfda.plot_widgets.plot_impz_ui import PlotImpz_UI
+from pyfda.plot_widgets.plot_impz_ui import PlotImpzUI
 from pyfda.pyfda_rc import params  # FMT string for QLineEdit fields, e.g. '{:.3g}'
 
 logger = logging.getLogger(__name__)
@@ -93,7 +93,7 @@ class Plot_Impz(QWidget):
         # ########################################################################
 
         # create the UI part with buttons etc.
-        self.ui = PlotImpz_UI()
+        self.ui = PlotImpzUI()
         self.stim_wdg = PlotTranStim()
         self.tran_io_wdg = TranIO(self)
 
@@ -608,7 +608,7 @@ class Plot_Impz(QWidget):
             #       the test fails
             # TODO: np.iscomplexobj() returns true for an array with dtype complex
             #       although each item is real.
-            self.stim_wdg.calc_stimulus_frame(x_test, N_frame = min(10, self.ui.N_end))
+            self.stim_wdg.calc_stimulus_frame(x_test, n_frame = min(10, self.ui.N_end))
 
             # convert from np.bool to bool to avoid deprecation warning concerning
             # 'np.bool_' scalars to be interpreted as an index.
@@ -698,16 +698,16 @@ class Plot_Impz(QWidget):
             #             f"{int(np.ceil(self.N_first / self.ui.N_frame)) + 1} of "
             #             f"{int(np.ceil(self.ui.N_end / self.ui.N_frame))}")
             # The last frame could be shorter than self.ui.N_frame:
-            L_frame = min(self.ui.N_frame, self.ui.N_end - self.N_first)
+            len_frame = min(self.ui.N_frame, self.ui.N_end - self.N_first)
             # Define slicing expression for the current frame
-            frame = slice(self.N_first, self.N_first + L_frame)
+            frame = slice(self.N_first, self.N_first + len_frame)
 
             # ------------------------------------------------------------------
             # ---- calculate stimuli for current frame inplace -----------------
             # ------------------------------------------------------------------
             # self.x[frame] = self.stim_wdg.calc_stimulus_frame(
             self.stim_wdg.calc_stimulus_frame(
-                self.x, N_first=self.N_first, N_frame=L_frame, N_end=self.ui.N_end)
+                self.x, n_first=self.N_first, n_frame=len_frame, n_end=self.ui.N_end)
 
             # ------------------------------------------------------------------
             # ---- calculate fixpoint or floating point response for current frame
