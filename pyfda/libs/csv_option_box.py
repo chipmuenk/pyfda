@@ -99,8 +99,8 @@ class CSV_option_box(QDialog):
         qcmb_box_populate(self.cmb_terminator, cmb_terminator_items,
                           self.cmb_terminator_default)
 
-        butClose = QPushButton(self)
-        butClose.setText("Close")
+        but_close = QPushButton(self)
+        but_close.setText("Close")
 
         lbl_orientation = QLabel(to_html("Table orientation", frmt='b'), self)
         cmb_orientation_items = [
@@ -139,14 +139,14 @@ class CSV_option_box(QDialog):
         lay_v_main = QVBoxLayout()
         # lay_v_main.setAlignment(Qt.AlignTop) # only affects first widget (intended here)
         lay_v_main.addLayout(lay_grid)
-        lay_v_main.addWidget(butClose)
+        lay_v_main.addWidget(but_close)
         lay_v_main.setContentsMargins(*params['wdg_margins'])
         self.setLayout(lay_v_main)
 
         self.load_settings()
 
         # ============== Signals & Slots ================================
-        butClose.clicked.connect(self.close)
+        but_close.clicked.connect(self.close)
         self.cmb_orientation.currentIndexChanged.connect(self.store_settings)
         self.cmb_delimiter.currentIndexChanged.connect(self.store_settings)
         self.cmb_terminator.currentIndexChanged.connect(self.store_settings)

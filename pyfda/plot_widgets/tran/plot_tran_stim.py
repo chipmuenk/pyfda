@@ -87,15 +87,15 @@ class PlotTranStim(QWidget):
     def init_labels_stim(self) -> None:
         '''intialize title string, y-axis label and some variables'''
         # use radians for angle internally
-        self.H_str = r'$y[n]$'  # default
+        self.h_str = r'$y[n]$'  # default
         self.title_str = ""
         if self.ui.stim == "none":
             self.title_str = r'Zero Input'
-            self.H_str = r'$h_0[n]$'
+            self.h_str = r'$h_0[n]$'
         # ------------------------------------------------------------------
         elif self.ui.stim == "dirac":
             self.title_str = r'Impulse Response'
-            self.H_str = r'$h[n]$'
+            self.h_str = r'$h[n]$'
         elif self.ui.stim == "sinc":
             self.title_str = r'Sinc Impulse'
         elif self.ui.stim == "gauss":
@@ -106,10 +106,10 @@ class PlotTranStim(QWidget):
         elif self.ui.stim == "step":
             if self.ui.but_step_err.isChecked():
                 self.title_str = r'Settling Error $\epsilon$'
-                self.H_str = r'$h_{\epsilon, \infty} - h_{\epsilon}[n]$'
+                self.h_str = r'$h_{\epsilon, \infty} - h_{\epsilon}[n]$'
             else:
                 self.title_str = r'Step Response'
-                self.H_str = r'$h_{\epsilon}[n]$'
+                self.h_str = r'$h_{\epsilon}[n]$'
         # ------------------------------------------------------------------
         elif self.ui.stim == "cos":
             self.title_str = r'Cosine Stimulus'

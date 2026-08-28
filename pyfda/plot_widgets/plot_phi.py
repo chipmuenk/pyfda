@@ -26,10 +26,10 @@ from pyfda.pyfda_rc import params
 
 logger = logging.getLogger(__name__)
 
-classes = {'Plot_Phi': '\u03C6(f)'}  #: Dict containing class name : display name
+classes = {'PlotPhi': '\u03C6(f)'}  #: Dict containing class name : display name
 
 
-class Plot_Phi(QWidget):
+class PlotPhi(QWidget):
     """ Widget for plotting the phase frequency response phi(f) """
     # incoming, connected in sender widget (locally connected to self.process_sig_rx() )
     sig_rx = pyqtSignal(object)
@@ -90,20 +90,20 @@ class Plot_Phi(QWidget):
         - Frame with control elements
         """
 
-        self.cmbUnitsPhi = QComboBox(self, objectName="cmbUnitsA")
+        self.cmb_units_phi = QComboBox(self, objectName="cmbUnitsA")
         units = ["rad", "rad/pi",  "deg"]
         scales = [1.,   1. / np.pi, 180./np.pi]
         for unit, scale in zip(units, scales, strict=True):
-            self.cmbUnitsPhi.addItem(unit, scale)
-        self.cmbUnitsPhi.setToolTip("Set unit for phase.")
-        self.cmbUnitsPhi.setCurrentIndex(0)
-        self.cmbUnitsPhi.setSizeAdjustPolicy(QComboBox.AdjustToContents)
+            self.cmb_units_phi.addItem(unit, scale)
+        self.cmb_units_phi.setToolTip("Set unit for phase.")
+        self.cmb_units_phi.setCurrentIndex(0)
+        self.cmb_units_phi.setSizeAdjustPolicy(QComboBox.AdjustToContents)
 
         self.but_wrap = PushButton(self, "wrapped")
         self.but_wrap.setToolTip("Plot phase wrapped to +/- pi")
 
         lay_h_controls = QHBoxLayout()
-        lay_h_controls.addWidget(self.cmbUnitsPhi)
+        lay_h_controls.addWidget(self.cmb_units_phi)
         lay_h_controls.addWidget(self.but_wrap)
         lay_h_controls.addStretch(10)
 
@@ -141,7 +141,7 @@ class Plot_Phi(QWidget):
         # LOCAL SIGNALS & SLOTs
         # ----------------------------------------------------------------------
         self.but_wrap.clicked.connect(self.draw)
-        self.cmbUnitsPhi.currentIndexChanged.connect(self.unit_changed)
+        self.cmb_units_phi.currentIndexChanged.connect(self.unit_changed)
         self.mplwidget.mpl_toolbar.sig_tx.connect(self.process_sig_rx)
 
     # --------------------------------------------------------------------------
@@ -171,13 +171,13 @@ class Plot_Phi(QWidget):
         """
         (Re-)Calculate the complex frequency response H(f)
         """
-        # calculate H_cplx(W) (complex) for W = 0 ... 2 pi:
-        self.W, self.H_cmplx = sig.freqz(
+        # calculate H_cplx(w) (complex) for w = 0 ... 2 pi:
+        self.w, self.h_cmplx = sig.freqz(
             fb_get('ba', 0), fb_get('ba', 1), worN=CFP.conf_settings['N_FFT'],
             whole=True, fs=2*np.pi)
         # replace nan and inf by finite values, otherwise np.unwrap yields
         # an array full of nans
-        self.H_cmplx = np.nan_to_num(self.H_cmplx)
+        self.h_cmplx = np.nan_to_num(self.h_cmplx)
 
     # --------------------------------------------------------------------------
     def draw(self):
@@ -194,47 +194,47 @@ class Plot_Phi(QWidget):
         Draw the figure with new limits, scale etc without recalculating H(f)
         """
 
-        self.unitPhi = qget_cmb_box(self.cmbUnitsPhi, data=False)
+        self.unit_phi = qget_cmb_box(self.cmb_units_phi, data=False)
 
         f_max_2 = fb_get('f_max') / 2.
 
         # ========= select frequency range to be displayed =====================
-        # === shift, scale and select: W -> F, H_cplx -> H_c
-        F = self.W * f_max_2 / np.pi
+        # === shift, scale and select: w -> f, H_cplx -> H_c
+        f = self.w * f_max_2 / np.pi
 
         if fb_get('freqSpecsRangeType') == 'sym':
-            # shift H and F by f_S/2
-            H = np.fft.fftshift(self.H_cmplx)
-            F -= f_max_2
+            # shift H and f by f_S/2
+            h = np.fft.fftshift(self.h_cmplx)
+            f -= f_max_2
         elif fb_get('freqSpecsRangeType') == 'half':
-            # only use the first half of H and F
-            H = self.H_cmplx[0:CFP.conf_settings['N_FFT']//2]
-            F = F[0:CFP.conf_settings['N_FFT']//2]
+            # only use the first half of H and f
+            h = self.h_cmplx[0:CFP.conf_settings['N_FFT']//2]
+            f = f[0:CFP.conf_settings['N_FFT']//2]
         else:  # fb_get('freqSpecsRangeType') == 'whole'
-            # use H and F as calculated
-            H = self.H_cmplx
+            # use H and f as calculated
+            h = self.h_cmplx
 
         y_str = r'$\angle H(\mathrm{e}^{\mathrm{j} \Omega})$ in '
-        if self.unitPhi == 'rad':
+        if self.unit_phi == 'rad':
             y_str += 'rad ' + r'$\rightarrow $'
             scale = 1.
-        elif self.unitPhi == 'rad/pi':
+        elif self.unit_phi == 'rad/pi':
             y_str += 'rad' + r'$ / \pi \;\rightarrow $'
             scale = 1. / np.pi
         else:
             y_str += 'deg ' + r'$\rightarrow $'
             scale = 180./np.pi
         fb_set('plt_phiLabel', y_str)
-        fb_set('plt_phiUnit', self.unitPhi)
+        fb_set('plt_phiUnit', self.unit_phi)
 
         if self.but_wrap.isChecked():
-            phi_plt = np.angle(H) * scale
+            phi_plt = np.angle(h) * scale
         else:
-            phi_plt = np.unwrap(np.angle(H)) * scale
+            phi_plt = np.unwrap(np.angle(h)) * scale
 
         # ---------------------------------------------------------
         self.ax.clear()  # need to clear, doesn't overwrite
-        self.ax.plot(F, phi_plt, label=r'$\phi(F)$')
+        self.ax.plot(f, phi_plt, label=r'$\phi(f)$')
         # ---------------------------------------------------------
 
         self.ax.xaxis.set_minor_locator(AutoMinorLocator())  # enable minor ticks
@@ -262,7 +262,7 @@ if __name__ == "__main__":
 
     app = QApplication(sys.argv)
     app.setStyleSheet(QSS.QSS_RC)
-    mainw = Plot_Phi()
+    mainw = PlotPhi()
     app.setActiveWindow(mainw)
     mainw.show()
     sys.exit(app.exec_())

@@ -633,8 +633,8 @@ class PlotTranStimUI(QWidget):
         """
         Update labels for time / frequency related specs
         """
-        if False: # fb.fil[0]["tab_yn"]["display_index_k"]: # button 'index_k' is set
-            # doesn't work yet, frequencies are scaled wrongly
+        if False: # fb_get("tab_yn", "display_index_k"): # button 'index_k' is checked
+            # doesn't work yet, n_fft is not available here. Labels need to be enabled as well.
             unit_frmt = None
             f_unit = ''
             t_unit = ''
@@ -748,7 +748,7 @@ class PlotTranStimUI(QWidget):
     def normalize_freqs(self) -> None:
         # TODO: move this to plot_tran_stim and update N_FFT
         """
-        Update normalized frequencies and periods if required.
+        Update widget with normalized frequencies and periods if required.
 
         `normalize_freqs()` is called when sampling frequency has been changed
         via signal ['view_changed':'f_S'] from plot_impz.process_sig_rx
@@ -777,9 +777,9 @@ class PlotTranStimUI(QWidget):
         self._update_energy_scaling_impz()
 
         # recalculate displayed freq spec values for (maybe) changed f_S
-        if False: # fb.fil[0]["tab_yn"]["display_index_k"]:
-            # doesn't work yet, frequencies are scaled wrongly
-            self.f_scale = self.N_FFT
+        if False:  # fb_get('tab_yn', 'display_index_k'):
+            # doesn't work yet, n_fft is not available in this scope.
+            self.f_scale = self.n_fft
         else:
             self.f_scale = fb_get('f_S')
         self.t_scale = fb_get('T_S')
@@ -787,29 +787,27 @@ class PlotTranStimUI(QWidget):
         # logger.warning("f_S = %s, prev = %s\nf_scale = %s, f_1 = %s, f_corr = %s",
         #               fb.fil[0]['f_S'], fb.fil[0]['f_s_prev'], self.f_scale, self.f1, f_corr)
 
-        # update and round the display
-        for w in DICT_FILTERED_WIDGETS:
-            var_name, param_name = DICT_FILTERED_WIDGETS[w]
+        # Update and round the display
+        # The dict contains entries like    'led_f1': ('f1', 'f_scale'),
+        for obj_name, param_tuple in DICT_FILTERED_WIDGETS.items():
             # read value and scale of normalized frequency / time value
-            var = getattr(self, var_name)
-            scale = getattr(self, param_name)
-            # access lineedit object
-            led = getattr(self, w)
-            # logger.warning("%s - %s - %s", w, var, getattr(self, w).text())
+            led = getattr(self, obj_name)  # lineedit object
+            var = getattr(self, param_tuple[0])
+            scale = getattr(self, param_tuple[1])
+
+            # logger.warning("%s - %s - %s", obj_name, var, getattr(self, obj_name).text())
             # update the text with the denormalized frequency / time variable
             led.setText(str(params['FMT'].format(var * scale)))
-            # self.led_f1.setText(str(params['FMT'].format(self.f1 * self.f_scale)))
 
-            # highlight lineedit field in red when normalized frequency is > 0.5
-            if var >= 0.5 and "_f" in w:  # only test this for 'led_f1' and 'led_f2'
+            # highlight lineedit field in red when normalized frequency is >= 0.5 for 'led_f1' and 'led_f2'
+            if var >= 0.5 and obj_name in {'led_f1', 'led_f2'}:
                 qstyle_widget(led, "error")
             else:
                 qstyle_widget(led, 'normal')
 
         self.update_freq_units()
 
-        # emit a signal if normalized frequencies have changed due to an update
-        # of f_S
+        # emit a signal if normalized frequencies have changed due to an update of f_S
         if fb.fil[0]['freq_locked']:
             self.emit({'ui_local_changed': 'f1_f2'})
 
@@ -1022,10 +1020,8 @@ class PlotTranStimUI(QWidget):
                 self.lbl_noi_par_2.setText(to_html("&nbsp;b =", frmt='bi'))
                 self.mls_b = safe_eval(
                     self.led_noi_par.text(), self.mls_b, return_type='int', sign='pos')
-                if self.mls_b < 2:
-                    self.mls_b = 2
-                if self.mls_b > 32:
-                    self.mls_b = 32
+                self.mls_b = max(self.mls_b, 2)
+                self.mls_b = min(self.mls_b, 32)
                 self.led_noi_par.setText(str(self.mls_b))
                 self.led_noi_par.setToolTip("<span>Length of sequence will be "
                                            "2<sup><i>b</i></sup> - 1 with <i>b</i> "

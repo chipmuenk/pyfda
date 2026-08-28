@@ -531,8 +531,8 @@ class PlotImpz_UI(QWidget):
         qcmb_box_populate(self.cmb_freq_display, self.cmb_freq_display_items,
                           self.cmb_freq_display_item)
 
-        self.but_hf = PushButtonRT(self, to_html("H_id", frmt="bi"), objectName="but_hf")
-        self.but_hf.setToolTip("<span>Show ideal frequency response, calculated "
+        self.but_hf_id = PushButtonRT(self, to_html("H_id", frmt="bi"), objectName="but_hf_id")
+        self.but_hf_id.setToolTip("<span>Show ideal frequency response, calculated "
                                "from the filter coefficients.</span>")
 
         self.but_freq_norm_impz = PushButtonRT(
@@ -568,7 +568,7 @@ class PlotImpz_UI(QWidget):
         layH_ctrl_freq_1.addWidget(self.cmb_plt_freq_resp)
         #
         layH_ctrl_freq_1.addSpacing(5)
-        layH_ctrl_freq_1.addWidget(self.but_hf)
+        layH_ctrl_freq_1.addWidget(self.but_hf_id)
         layH_ctrl_freq_1.addSpacing(5)
         #
         layH_ctrl_freq_1.addWidget(self.lbl_log_bottom_freq)

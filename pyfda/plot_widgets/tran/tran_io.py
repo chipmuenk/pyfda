@@ -25,7 +25,7 @@ from pyfda.libs.pyfda_qt_lib import (
 from pyfda.libs.csv_option_box import CSV_option_box
 
 from pyfda.pyfda_rc import params  # FMT string for QLineEdit fields, e.g. '{:.3g}'
-from pyfda.plot_widgets.tran.tran_io_ui import Tran_IO_UI
+from pyfda.plot_widgets.tran.tran_io_ui import TranIOUI
 
 logger = logging.getLogger(__name__)
 
@@ -62,21 +62,20 @@ class QFileDialogPlus(QDialog):
         """ initialize the User Interface """
         self.setWindowTitle("CSV Options")
 
-        butClose = QPushButton(self, text="Close")
-        # butClose.setText("Close")
+        but_close = QPushButton(self, text="Close")
 
         lay_v_main = QVBoxLayout()
         # lay_v_main.setAlignment(Qt.AlignTop) # only affects first widget (intended here)
         # lay_v_main.addLayout(lay_grid)
-        lay_v_main.addWidget(butClose)
+        lay_v_main.addWidget(but_close)
         lay_v_main.setContentsMargins(*params['wdg_margins'])
         self.setLayout(lay_v_main)
 
         # ============== Signals & Slots ================================
-        butClose.clicked.connect(self.close)
+        but_close.clicked.connect(self.close)
 
 # =========================================================================
-class Tran_IO(QWidget):
+class TranIO(QWidget):
     """
     Construct a widget for reading data from file
     """
@@ -90,7 +89,7 @@ class Tran_IO(QWidget):
         self.file_type = None  # type of loaded file
         self.x_file = None     # data loaded from file
 
-        self.ui = Tran_IO_UI()  # create the UI part with buttons etc.
+        self.ui = TranIOUI()  # create the UI part with buttons etc.
         self.parent = parent    # handle to instantiating object
 
         self.norm = self.ui.led_normalize_default
@@ -229,7 +228,7 @@ class Tran_IO(QWidget):
 
         self.N = None
         self.nchans = None
-        self.WL = None
+        self.wl = None
 
         info_str = ""
         err = False
@@ -243,7 +242,7 @@ class Tran_IO(QWidget):
                 err = True
             else:
                 self.f_s_file = io.read_wav_info.f_S
-                self.WL = io.read_wav_info.WL
+                self.wl = io.read_wav_info.wl
                 info_str = f" x {io.read_wav_info.sample_format},"
                 self.ui.lbl_f_s_value.setText(str(self.f_s_file))
 

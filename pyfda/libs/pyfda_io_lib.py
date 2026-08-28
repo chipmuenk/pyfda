@@ -763,7 +763,7 @@ def read_wav_info(file) -> int:
     # Pos. 32: Block align, # of bytes per sample incl. all channels (2 bytes)
     # block_align = str2int(HEADER[32:34])
 
-    # Pos. 34: Bits per sample, WL = wordlength in bytes (2 bytes)
+    # Pos. 34: Bits per sample, wl = wordlength in bytes (2 bytes)
     bits_per_sample = str2int(HEADER[34:36])
 
     if sample_format == 'float':
@@ -815,10 +815,10 @@ def read_wav_info(file) -> int:
                          "bits per sample.", bits_per_sample)
             return -1
 
-    read_wav_info.WL = bits_per_sample // 8  # Wordlength in bytes
+    read_wav_info.wl = bits_per_sample // 8  # Wordlength in bytes
 
     # Pos. 40 or 42: Total number of samples per channel
-    read_wav_info.N = str2int(f.read(4)) // (nchans * read_wav_info.WL)
+    read_wav_info.N = str2int(f.read(4)) // (nchans * read_wav_info.wl)
 
     read_wav_info.nchans = nchans  # number of channels
 
