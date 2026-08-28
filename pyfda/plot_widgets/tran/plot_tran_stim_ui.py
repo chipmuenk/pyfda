@@ -463,8 +463,8 @@ class PlotTranStimUI(QWidget):
         self.led_stim_formula.setText(str(self.stim_formula))
         self.led_stim_formula.setToolTip(
             "<span>Enter formula for stimulus in numexpr syntax, using the index "
-            "<i>n</i> or the time vector <i>t</i> and the following UI settings: "
-            + to_html("A_1, A_2, phi_1, phi_2, f_1, f_2, T_1, T_2, BW_1, BW_2",
+            "<i>n</i> or the time vector <i>t</i> and UI settings as "
+            + to_html("A1, A2, phi1, phi2, f1, f2, T1, T2, BW1, BW2",
                       frmt='i') + ".</span>")
 
         lay_h_formula_stim = QHBoxLayout()
