@@ -1,0 +1,44 @@
+app-id: com.github.chipmuenk.pyfda
+runtime: org.kde.Platform
+runtime-version: 6.6
+sdk: org.kde.Sdk
+base: com.riverbankcomputing.PyQt.BaseApp
+base-version: 6.6
+# when the runtime version changes, check if python version changed, because in pyqt5 the
+# python version is hardcoded!
+command: pyfdax
+rename-icon: pyfda_icon #Image will renamed to match the app-id convention
+rename-appdata-file: pyfda.appdata.xml
+rename-desktop-file: pyfda.desktop
+finish-args:
+  - --share=ipc
+  - --socket=wayland
+  - --socket=fallback-x11
+  - --device=dri
+  - --persist=.pyfda # so the configuration of different installations will not be overwritten
+
+Parameters:
+  git_url: &git_url https://github.com/chipmuenk/pyfda.git
+  # set commit id here for stables on flathub
+  git_tag: &git_tag develop
+
+modules:
+  # generated with https://github.com/flatpak/flatpak-builder-tools/tree/master/pip
+  - python3-pyfda.json
+
+  - name: pyfda
+    buildsystem: simple
+    build-commands:
+      - python3 setup.py install --prefix=${FLATPAK_DEST} --root=/ --optimize=1
+      - desktop-file-install --dir=/app/share/applications ressource/mime/applications/pyfda.desktop
+      - install -Dm755 ressource/linux/pyfda.appdata.xml /app/share/appdata/pyfda.appdata.xml
+      - install -Dm755 pyfda/images/icons/pyfda_icon_16.png /app/share/icons/hicolor/16x16/apps/pyfda_icon.png
+      - install -Dm755 pyfda/images/icons/pyfda_icon_32.png /app/share/icons/hicolor/32x32/apps/pyfda_icon.png
+      - install -Dm755 pyfda/images/icons/pyfda_icon_64.png /app/share/icons/hicolor/64x64/apps/pyfda_icon.png
+      - install -Dm755 pyfda/images/icons/pyfda_icon_128.png /app/share/icons/hicolor/128x128/apps/pyfda_icon.png
+      - install -Dm755 pyfda/images/icons/pyfda_icon_256.png /app/share/icons/hicolor/256x256/apps/pyfda_icon.png
+      - install -Dm755 pyfda/images/icons/pyfda_icon.svg /app/share/icons/hicolor/scalable/apps/pyfda_icon.svg
+    sources:
+      - type: git
+        url: *git_url
+        tag: *git_tag

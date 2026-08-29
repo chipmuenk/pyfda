@@ -36,56 +36,14 @@ jobs:
     - name: Checkout repository
       uses: actions/checkout@v4
 
-    - name: Clone flatpak manifest from Flathub
-      uses: GuillaumeFalourd/clone-github-repo-action@v1
-      with:
-        owner: 'flathub'
-        repository: 'com.github.chipmuenk.pyfda'
-
-    - name: list
-      run: ls
-
-    - name: Replace git tag by the commit id on which it runs
-      if: github.ref_type != 'tag'
-      run: >
-        sed -i 's@\&git_tag .*@\&git_tag "${{ github.sha }}"@' com.github.chipmuenk.pyfda/com.github.chipmuenk.pyfda.yaml
-
-    - name: Use correct git tag
-      if: github.ref_type == 'tag'
-      run: >
-        sed -i 's@\&git_tag .*@\&git_tag "${{ github.ref_name }}"@' com.github.chipmuenk.pyfda/com.github.chipmuenk.pyfda.yaml
-
-    - name: Replace source url
-      run: >
-        sed -i "s@\&git_url .*pyfda.git@\&git_url $GITHUB_SERVER_URL/$GITHUB_REPOSITORY@" com.github.chipmuenk.pyfda/com.github.chipmuenk.pyfda.yaml
-
-    - name: Add dev build marker to cmake options
-      if: github.ref_type != 'tag'
-      run: >
-        sed -i 's@config-opts: \["\(.*\)"\]@config-opts: ["\1", "-DDEV_BUILD=${{ github.ref_name }}"]@' com.github.chipmuenk.pyfda/com.github.chipmuenk.pyfda.yaml
-
-    - name: Replace desktop file name suffix
-      if: github.ref_type != 'tag'
-      run: >
-        sed -i 's@desktop-file-name-suffix: ""@desktop-file-name-suffix: " (Development)"@' com.github.chipmuenk.pyfda/com.github.chipmuenk.pyfda.yaml
-
-    - name: Show Flatpak manifest
-      run: cat com.github.chipmuenk.pyfda/com.github.chipmuenk.pyfda.yaml
-
     - name: Build package
       uses: bilelmoussaoui/flatpak-github-actions/flatpak-builder@v6
       with:
         bundle: com.github.chipmuenk.pyfda.flatpak
-        manifest-path: com.github.chipmuenk.pyfda/com.github.chipmuenk.pyfda.yaml
+        manifest-path: ressource/flatpak/com.github.chipmuenk.pyfda.yaml
         cache: false
         branch: development
         # Uploaded /__w/pyfda/pyfda/com.github.chipmuenk.pyfda.flatpak
-
-    - name: Publish build artifacts
-      uses: actions/upload-artifact@v4
-      with:
-        path: com.github.chipmuenk.pyfda/*
-        name: pyfda_Flatpak
 
   Validate_appdata_file:
     name: Validate appdata file
