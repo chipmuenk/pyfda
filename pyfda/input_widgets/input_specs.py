@@ -514,7 +514,7 @@ class Input_Specs(QWidget):
         # resulting in e.g. cheby1.LPman(fb.fil[0]) and writing back coefficients,
         # P/Z etc. back to fil[0].
 
-        err = call_fil_method(fb_get('rt').lower() + '_' +fb_get('fo'), fc=fb_get('fc'))
+        err = call_fil_method(fb_get('rt') + '_' +fb_get('fo'), fc=fb_get('fc'))
         # this is the same as e.g.
         # from pyfda.filter_design import ellip
         # inst = ellip.ellip()
