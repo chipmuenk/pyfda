@@ -102,12 +102,12 @@ class Firwin(QWidget):
                             "<b>-6 dB</b> pass band corner "
                             "frequency(ies) <b><i>F<sub>C</sub></i></b> .")},
                         },
-            'LP': {'man': {}, 'min': {}},
-            'HP': {'man': {'msg': ('a', r"<br /><b>Note:</b> Order needs to be odd!")},
+            'lp': {'man': {}, 'min': {}},
+            'hp': {'man': {'msg': ('a', r"<br /><b>Note:</b> Order needs to be odd!")},
                    'min': {}},
-            'BS': {'man': {'msg': ('a', r"<br /><b>Note:</b> Order needs to be odd!")},
+            'bs': {'man': {'msg': ('a', r"<br /><b>Note:</b> Order needs to be odd!")},
                    'min': {}},
-            'BP': {'man': {}, 'min': {}},
+            'bp': {'man': {}, 'min': {}},
             }
 
         self.info = """**Windowed FIR filters**
@@ -516,7 +516,7 @@ class Firwin(QWidget):
         self.emit({'view_changed': 'fft_win_type'}, sig_name='sig_tx_local')
         return N
 
-    def LPmin(self) -> int:
+    def lp_min(self) -> int:
         """ Design a low-pass FIR filter with minimum order using the window method."""
         self._get_params()
         self.N = self._firwin_ord([self.F_PB, self.F_SB], [1, 0],
@@ -530,7 +530,7 @@ class Firwin(QWidget):
         fb_set('N', self.N)  # update filterbroker with calculated order
         return 0
 
-    def LPman(self) -> int:
+    def lp_man(self) -> int:
         """ Design a low-pass FIR filter with user-defined order using the window method."""
         self._get_params()
         if not self._test_n():
@@ -539,7 +539,7 @@ class Firwin(QWidget):
                                window=self.qfft_win_select.calc_window(self.N, sym=True)))
         return 0
 
-    def HPmin(self) -> int:
+    def hp_min(self) -> int:
         """ Design a high-pass FIR filter with minimum order using the window method."""
         self._get_params()
         N = self._firwin_ord([self.F_SB, self.F_PB], [0, 1],
@@ -553,7 +553,7 @@ class Firwin(QWidget):
         fb_set('N', self.N)  # update filterbroker with calculated order
         return 0
 
-    def HPman(self) -> int:
+    def hp_man(self) -> int:
         """ Design a high-pass FIR filter with user-defined order using the window method."""
         self._get_params()
         self.N = round_odd(self.N)  # enforce odd order
@@ -564,7 +564,7 @@ class Firwin(QWidget):
         return 0
 
     # For BP and BS, F_PB and F_SB have two elements each
-    def BPmin(self) -> int:
+    def bp_min(self) -> int:
         """ Design a band-pass FIR filter with minimum order using the window method."""
         self._get_params()
         self.N = remezord([self.F_SB, self.F_PB, self.F_PB2, self.F_SB2], [0, 1, 0],
@@ -580,7 +580,7 @@ class Firwin(QWidget):
         fb_set('N', self.N)  # update filterbroker with calculated order
         return 0
 
-    def BPman(self) -> int:
+    def bp_man(self) -> int:
         """ Design a band-pass FIR filter with user-defined order using the window method."""
         self._get_params()
         if not self._test_n():
@@ -590,7 +590,7 @@ class Firwin(QWidget):
                                window=self.qfft_win_select.calc_window(self.N, sym=True)))
         return 0
 
-    def BSmin(self) -> int:
+    def bs_min(self) -> int:
         """ Design a band-stop FIR filter with minimum order using the window method."""
         self._get_params()
         N = remezord([self.F_PB, self.F_SB, self.F_SB2, self.F_PB2], [1, 0, 1],
@@ -606,7 +606,7 @@ class Firwin(QWidget):
         fb_set('N', self.N)  # update filterbroker with calculated order
         return 0
 
-    def BSman(self) -> int:
+    def bs_man(self) -> int:
         """ Design a band-stop FIR filter with user-defined order using the window method."""
         self._get_params()
         self.N = round_odd(self.N)  # enforce odd order
@@ -650,16 +650,16 @@ if __name__ == "__main__":
     # instantiate filter widget
     filt = Firwin()
 
-    layVDynWdg = QVBoxLayout()
-    layVDynWdg.addWidget(filt.wdg_fil, stretch=1)
+    lay_v_dyn_wdg = QVBoxLayout()
+    lay_v_dyn_wdg.addWidget(filt.wdg_fil, stretch=1)
 
     # fb_set('fo', 'min')
-    filt.LPman()  # design a low-pass with parameters from global dict
+    filt.lp_man()  # design a low-pass with parameters from global dict
     print(fb_get(filt.FRMT))  # return results in default format
 
     frm_main = QFrame()
     frm_main.setFrameStyle(QFrame.StyledPanel | QFrame.Sunken)
-    frm_main.setLayout(layVDynWdg)
+    frm_main.setLayout(lay_v_dyn_wdg)
 
     mainw = frm_main
     mainw.show()

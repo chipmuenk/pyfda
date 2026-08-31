@@ -137,9 +137,9 @@ class SelectFilter(QWidget):
             except KeyError as e:
                 logger.warning(
                   "KeyError: %s has no corresponding full name in FTB.RT_NAMES:\n%s", rt, e)
-        idx = self.cmb_response_type.findData('LP')  # find index for 'LP'
+        idx = self.cmb_response_type.findData('lp')  # find index for 'lp'
 
-        if idx == -1:  # Key 'LP' does not exist, use first entry instead
+        if idx == -1:  # Key 'lp' does not exist, use first entry instead
             idx = 0
 
         self.cmb_response_type.setCurrentIndex(idx)  # set initial index
@@ -179,7 +179,7 @@ class SelectFilter(QWidget):
         # Connect comboBoxes and setters, propgate change events hierarchically
         #  through all widget methods and emit 'filt_changed' in the end.
         self.cmb_response_type.currentIndexChanged.connect(
-                lambda: self._set_response_type(enb_signal=True))  # 'LP'
+                lambda: self._set_response_type(enb_signal=True))  # 'lp'
         self.cmb_filter_type.currentIndexChanged.connect(
                 lambda: self._set_filter_type(enb_signal=True))  # 'IIR'
         self.cmb_filter_class.currentIndexChanged.connect(

@@ -367,20 +367,20 @@ class Input_Info(QWidget):
             # construct pairs of corner frequency and corresponding amplitude
             # labels in ascending frequency for each response type
             _rt = fb_get('rt')
-            if _rt in {'LP', 'HP', 'BP', 'BS', 'HIL'}:
-                if _rt == 'LP':
+            if _rt in {'lp', 'hp', 'bp', 'bs', 'hil'}:
+                if _rt == 'lp':
                     f_lbls = ['F_PB', 'F_SB']
                     a_lbls = ['A_PB', 'A_SB']
-                elif _rt == 'HP':
+                elif _rt == 'hp':
                     f_lbls = ['F_SB', 'F_PB']
                     a_lbls = ['A_SB', 'A_PB']
-                elif _rt == 'BP':
+                elif _rt == 'bp':
                     f_lbls = ['F_SB', 'F_PB', 'F_PB2', 'F_SB2']
                     a_lbls = ['A_SB', 'A_PB', 'A_PB', 'A_SB2']
-                elif _rt == 'BS':
+                elif _rt == 'bs':
                     f_lbls = ['F_PB', 'F_SB', 'F_SB2', 'F_PB2']
                     a_lbls = ['A_PB', 'A_SB', 'A_SB', 'A_PB2']
-                elif _rt == 'HIL':
+                elif _rt == 'hil':
                     f_lbls = ['F_PB', 'F_PB2']
                     a_lbls = ['A_PB', 'A_PB']
 

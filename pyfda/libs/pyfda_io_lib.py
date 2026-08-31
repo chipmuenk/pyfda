@@ -1291,20 +1291,20 @@ def coe_header(title: str) -> str:
     unit = 'dB'  # fix this for the moment
     # construct pairs of corner frequency and corresponding amplitude
     # labels in ascending frequency for each response type
-    if fb_get('rt') in {'LP', 'HP', 'BP', 'BS', 'HIL'}:
-        if fb_get('rt') == 'LP':
+    if fb_get('rt') in {'lp', 'hp', 'bp', 'bs', 'hil'}:
+        if fb_get('rt') == 'lp':
             f_lbls = ['F_PB', 'F_SB']
             a_lbls = ['A_PB', 'A_SB']
-        elif fb_get('rt') == 'HP':
+        elif fb_get('rt') == 'hp':
             f_lbls = ['F_SB', 'F_PB']
             a_lbls = ['A_SB', 'A_PB']
-        elif fb_get('rt') == 'BP':
+        elif fb_get('rt') == 'bp':
             f_lbls = ['F_SB', 'F_PB', 'F_PB2', 'F_SB2']
             a_lbls = ['A_SB', 'A_PB', 'A_PB', 'A_SB2']
-        elif fb_get('rt') == 'BS':
+        elif fb_get('rt') == 'bs':
             f_lbls = ['F_PB', 'F_SB', 'F_SB2', 'F_PB2']
             a_lbls = ['A_PB', 'A_SB', 'A_SB', 'A_PB2']
-        elif fb_get('rt') == 'HIL':
+        elif fb_get('rt') == 'hil':
             f_lbls = ['F_PB', 'F_PB2']
             a_lbls = ['A_PB', 'A_PB']
 

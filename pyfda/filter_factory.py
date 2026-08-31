@@ -155,7 +155,7 @@ class FilterFactory():
         ----------
 
         method : string
-            The name of the design method to be called (e.g. 'LPmin')
+            The name of the design method to be called (e.g. 'lp_min')
 
         fc : string (optional, default: None)
             The name of the filter design class to be instantiated. When nothing
@@ -183,10 +183,10 @@ class FilterFactory():
         Examples
         --------
 
-        >>> call_fil_method("LPmin", fc="cheby1")
+        >>> call_fil_method("lp_min", fc="cheby1")
 
         The example first creates an instance of the filter class 'cheby1' and
-        then performs the actual filter design by calling the method 'LPmin'. This
+        then performs the actual filter design by calling the method 'lp_min'. This
         method reads and stores parameters from / to the filter dictionary.
         """
         if self.err_code >= 16 or self.err_code < 0:
@@ -278,12 +278,12 @@ if __name__ == '__main__':
     print("Cheby2.rt_dict", FilterFactory.fil_inst.rt_dict)
 
     print("\nTest 'call_fil_method:'\n=======================")
-    print("LPman, fc = Cheby2:",
-          call_fil_method("LPman", fc = "Cheby2"),"\n")
+    print("lp_man, fc = Cheby2:",
+          call_fil_method("lp_man", fc = "Cheby2"),"\n")
     print("\tLPmax:", call_fil_method("LPmax", fc = "Cheby2")) # doesn't exist
     print("Int 1:", call_fil_method(1, fc = "Cheby2"),"\n") # not a string
-    print("LPmin:", call_fil_method("LPmin"),"\n") # changed method
+    print("lp_min:", call_fil_method("lp_min"),"\n") # changed method
 
-    print("LPmin, fc = Cheby2:", call_fil_method("LPmin", fc = "Cheby2"),"\n")
-    print("LPman, fc = Cheby1:", call_fil_method("LPman", fc = "Cheby1"))
+    print("lp_min, fc = Cheby2:", call_fil_method("lp_min", fc = "Cheby2"),"\n")
+    print("lp_man, fc = Cheby1:", call_fil_method("lp_man", fc = "Cheby1"))
     print("fil_inst.ft = ", get_fil_inst().ft)

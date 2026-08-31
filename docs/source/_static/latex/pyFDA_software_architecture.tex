@@ -25,7 +25,7 @@ pdftitle={pyFDA: Software Architecture and Filter API},
 %\frontmatter
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\author{Prof. Dr. Christian Münker}
+\author{Prof. Dr. Christian Mï¿½nker}
 \title{pyFDA: Software Architecture and Filter API}
 \date{\today}
 %\maketitle
@@ -56,7 +56,7 @@ pdftitle={pyFDA: Software Architecture and Filter API},
 %
 %\def\thesection{\arabic{chapter}.\arabic{section}} 
 %\include{DSP_FPGA-Ueb_Changes}
-%\addcontentsline{toc}{chapter}{Änderungen}
+%\addcontentsline{toc}{chapter}{ï¿½nderungen}
 
 %\def\thesection{Aufgabe \arabic{chapter}.\arabic{section}} 
 
@@ -215,7 +215,7 @@ The actual design methods (LP, HP, ...) are called dynamically in \texttt{input\
 
 An example for a design method is
 \begin{lstlisting}[style = pyStyle]{}
-def LPman(self, fil_dict):
+def lp_man(self, fil_dict):
 	self.get_params(fil_dict)
 	self.save(fil_dict, sig.ellip(self.N, self.A_PB, self.A_SB, self.F_PB, 
 		btype='low', analog = False, output = frmt))
