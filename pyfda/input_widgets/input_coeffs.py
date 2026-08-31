@@ -218,8 +218,8 @@ class Input_Coeffs(QWidget):
         """
 
         # Reset overflow counters of quantization objects
-        self.Q[0].resetN()
-        self.Q[1].resetN()
+        self.Q[0].reset_n()
+        self.Q[1].reset_n()
 
         if np.isscalar(self.ba[0]) or np.isscalar(self.ba[1]):
             logger.error("No proper filter, coefficients are scalar!")

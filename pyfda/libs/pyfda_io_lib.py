@@ -1285,7 +1285,7 @@ def coe_header(title: str) -> str:
     f_vals = []
     a_lbls = []
     a_targs = []
-    a_targs_dB = []
+    a_targs_db = []
     ft = fb_get('ft')  # get filter type ('IIR', 'FIR')
     unit = fb_get('amp_specs_unit')
     unit = 'dB'  # fix this for the moment
@@ -1327,10 +1327,10 @@ def coe_header(title: str) -> str:
                 a = fb.fil[0][a_lbls[i]]
                 a_dB = lin2unit(fb.fil[0][a_lbls[i]], ft, a_lbls[i], unit)
                 a_targs.append(a)
-                a_targs_dB.append(a_dB)
+                a_targs_db.append(a_dB)
             except KeyError as e:
                 a_targs.append('')
-                a_targs_dB.append('')
+                a_targs_db.append('')
                 err[i] = True
                 logger.debug(e)
 
@@ -1340,7 +1340,7 @@ def coe_header(title: str) -> str:
                 del f_vals[i]
                 del a_lbls[i]
                 del a_targs[i]
-                del a_targs_dB[i]
+                del a_targs_db[i]
 
     date_frmt = "%d-%B-%Y %H:%M:%S"  # select date format
     unit = fb_get('plt_fUnit')
@@ -1359,7 +1359,7 @@ def coe_header(title: str) -> str:
     header += f"(Order = {fb_get('N')})\n"
     header += f"Sample Frequency \tf_S = {f_S} {unit}\n\n"
     header += "Corner Frequencies:\n"
-    for lf, f, la, a in zip(f_lbls, f_vals, a_lbls, a_targs_dB, strict=True):
+    for lf, f, la, a in zip(f_lbls, f_vals, a_lbls, a_targs_db, strict=True):
         header += "\t" + lf + " = " + str(f) + " " + unit + " : " + la + " = "
         header += str(a) + " dB\n"
     header += "-" * 85 + "\n"

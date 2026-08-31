@@ -490,7 +490,7 @@ class Fixed():
         self.q_dict = q_dict
 
         self.set_qdict({})  # trigger calculation of parameters
-        self.resetN()       # initialize overflow-counter
+        self.reset_n()       # initialize overflow-counter
 
         # arguments for regex replacement with illegal characters
         # ^ means "not", | means "or" and \ escapes
@@ -642,7 +642,7 @@ class Fixed():
 
         >>> q_obj_a = {'WI':1, 'WF':6, 'ovfl':'sat', 'quant':'round'}
         >>> myQa = Fixed(q_obj_a) # instantiate fixed-point object myQa
-        >>> myQa.resetN()  # reset overflow counter
+        >>> myQa.reset_n()  # reset overflow counter
         >>> a = np.arange(0,5, 0.05) # create input signal
 
         >>> aq = myQa.fixp(a) # quantize input signal
@@ -848,7 +848,7 @@ class Fixed():
         return yq
 
     # --------------------------------------------------------------------------
-    def resetN(self) -> None:
+    def reset_n(self) -> None:
         """ Reset counters and overflow-flag of Fixed object """
         frm = inspect.stack()[1]
         logger.debug("'reset_N' called from %s.%s():%s.",
@@ -1436,7 +1436,7 @@ def quant_coeffs(coeffs: np.iterable, Q: object, recursive: bool = False, out_fr
         logger.error("Unknown quantization format '%s', using default.", out_frmt)
         out_frmt = fb_get('qfrmt')
 
-    Q.resetN()  # reset all overflow counters
+    Q.reset_n()  # reset all overflow counters
 
     if coeffs is None:
         logger.error("Coeffs empty!")

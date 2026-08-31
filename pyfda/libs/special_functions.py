@@ -22,7 +22,7 @@ MAX_ISB_AMP = 0.65  # min stop band attenuation IIR
 MAX_FSB_AMP = 0.45  # min stop band attenuation FIR
 
 # ======================================================================
-def dB(lin: float | NDArray, power: bool = False) -> float | NDArray:
+def db(lin: float | NDArray, power: bool = False) -> float | NDArray:
     """
     Calculate dB from linear value. If power = True, calculate 10 log ...,
     else calculate 20 log ...

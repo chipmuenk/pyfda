@@ -334,7 +334,7 @@ class Plot_Hf(QWidget):
         hatch = params['mpl_hatch']
         hatch_borders = params['mpl_hatch_border']
 
-        def dB(lin):
+        def db(lin):
             return 20 * np.log10(lin)
 
         def _plot_specs():
@@ -359,18 +359,18 @@ class Plot_Hf(QWidget):
 
         if self.unit_a == 'dB':
             if fb_get('ft') == "FIR":
-                a_pb_max  = dB(1 + self.a_pb)
-                a_pb2_max = dB(1 + self.a_pb2)
+                a_pb_max  = db(1 + self.a_pb)
+                a_pb2_max = db(1 + self.a_pb2)
             else: # IIR dB
                 a_pb_max = a_pb2_max = 0
 
-            a_pb_min  = dB(1 - self.a_pb)
-            a_pb2_min = dB(1 - self.a_pb2)
+            a_pb_min  = db(1 - self.a_pb)
+            a_pb2_min = db(1 - self.a_pb2)
             a_pb_minx = min(a_pb_min, a_pb2_min) - 5
             a_pb_max_x = max(a_pb_max, a_pb2_max) + 5
 
-            a_sb  = dB(self.a_sb)
-            a_sb2 = dB(self.a_sb2)
+            a_sb  = db(self.a_sb)
+            a_sb2 = db(self.a_sb2)
             a_sb_max_x = max(a_sb, a_sb2) + 10
 
         else: # 'V' or 'W'
