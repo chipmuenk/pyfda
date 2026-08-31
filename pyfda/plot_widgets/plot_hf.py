@@ -339,23 +339,23 @@ class Plot_Hf(QWidget):
 
         def _plot_specs():
             # upper limits:
-            ax.plot(F_lim_upl, A_lim_upl, F_lim_upc, A_lim_upc, F_lim_upr, A_lim_upr,
+            ax.plot(f_lim_upl, a_lim_upl, f_lim_upc, a_lim_upc, f_lim_upr, a_lim_upr,
                     **hatch_borders)
-            if A_lim_upl.any():
-                ax.fill_between(F_lim_upl, max(A_lim_upl), A_lim_upl, **hatch)
-            if A_lim_upc.any():
-                ax.fill_between(F_lim_upc, max(A_lim_upc), A_lim_upc, **hatch)
-            if A_lim_upr.any():
-                ax.fill_between(F_lim_upr, max(A_lim_upr), A_lim_upr, **hatch)
+            if a_lim_upl.any():
+                ax.fill_between(f_lim_upl, max(a_lim_upl), a_lim_upl, **hatch)
+            if a_lim_upc.any():
+                ax.fill_between(f_lim_upc, max(a_lim_upc), a_lim_upc, **hatch)
+            if a_lim_upr.any():
+                ax.fill_between(f_lim_upr, max(a_lim_upr), a_lim_upr, **hatch)
             # lower limits:
-            ax.plot(F_lim_lol, A_lim_lol, F_lim_loc, A_lim_loc, F_lim_lor, A_lim_lor,
+            ax.plot(f_lim_lol, a_lim_lol, f_lim_loc, a_lim_loc, f_lim_lor, a_lim_lor,
                     **hatch_borders)
-            if A_lim_lol.any():
-                ax.fill_between(F_lim_lol, min(A_lim_lol), A_lim_lol, **hatch)
-            if A_lim_loc.any():
-                ax.fill_between(F_lim_loc, min(A_lim_loc), A_lim_loc, **hatch)
-            if A_lim_lor.any():
-                ax.fill_between(F_lim_lor, min(A_lim_lor), A_lim_lor, **hatch)
+            if a_lim_lol.any():
+                ax.fill_between(f_lim_lol, min(a_lim_lol), a_lim_lol, **hatch)
+            if a_lim_loc.any():
+                ax.fill_between(f_lim_loc, min(a_lim_loc), a_lim_loc, **hatch)
+            if a_lim_lor.any():
+                ax.fill_between(f_lim_lor, min(a_lim_lor), a_lim_lor, **hatch)
 
         if self.unitA == 'dB':
             if fb_get('ft') == "FIR":
@@ -371,7 +371,7 @@ class Plot_Hf(QWidget):
 
             A_SB  = dB(self.A_SB)
             A_SB2 = dB(self.A_SB2)
-            A_SB_maxx = max(A_SB, A_SB2) + 10
+            a_sb_max = max(A_SB, A_SB2) + 10
 
         else: # 'V' or 'W'
             if self.unitA == 'V':
@@ -391,7 +391,7 @@ class Plot_Hf(QWidget):
 
             A_SB  = self.A_SB ** exp
             A_SB2 = self.A_SB2 ** exp
-            A_SB_maxx = A_PB_min / 10.
+            a_sb_max = A_PB_min / 10.
 
         f_max_2 = self.f_max/2
         F_PB  = self.F_PB
@@ -399,90 +399,90 @@ class Plot_Hf(QWidget):
         F_SB2 = fb_get('F_SB2') * self.f_max
         F_PB2 = fb_get('F_PB2') * self.f_max
 
-        F_lim_upl = np.array([])   # left side limits, upper and lower
-        A_lim_upl = np.array([])
-        F_lim_lol = np.array([])
-        A_lim_lol = np.array([])
+        f_lim_upl = np.array([])   # left side limits, upper and lower
+        a_lim_upl = np.array([])
+        f_lim_lol = np.array([])
+        a_lim_lol = np.array([])
 
-        F_lim_upc = np.array([])   # center limits, upper and lower
-        A_lim_upc = np.array([])
-        F_lim_loc = np.array([])
-        A_lim_loc = np.array([])
+        f_lim_upc = np.array([])   # center limits, upper and lower
+        a_lim_upc = np.array([])
+        f_lim_loc = np.array([])
+        a_lim_loc = np.array([])
 
-        F_lim_upr = np.array([])   # right side limits, upper and lower
-        A_lim_upr = np.array([])
-        F_lim_lor = np.array([])
-        A_lim_lor = np.array([])
+        f_lim_upr = np.array([])   # right side limits, upper and lower
+        a_lim_upr = np.array([])
+        f_lim_lor = np.array([])
+        a_lim_lor = np.array([])
 
         if fb_get('rt') == 'lp':
-            F_lim_upl = np.array([0,        F_PB,     F_PB])
-            A_lim_upl = np.array([A_PB_max, A_PB_max, A_PB_maxx])
-            F_lim_lol = F_lim_upl
-            A_lim_lol = np.array([A_PB_min, A_PB_min, A_PB_minx])
+            f_lim_upl = np.array([0,        F_PB,     F_PB])
+            a_lim_upl = np.array([A_PB_max, A_PB_max, A_PB_maxx])
+            f_lim_lol = f_lim_upl
+            a_lim_lol = np.array([A_PB_min, A_PB_min, A_PB_minx])
 
-            F_lim_upr = np.array([F_SB,     F_SB, f_max_2])
-            A_lim_upr = np.array([A_SB_maxx, A_SB, A_SB])
+            f_lim_upr = np.array([F_SB,     F_SB, f_max_2])
+            a_lim_upr = np.array([a_sb_max, A_SB, A_SB])
 
         if fb_get('rt') == 'hp':
-            F_lim_upl = np.array([0,    F_SB, F_SB])
-            A_lim_upl = np.array([A_SB, A_SB, A_SB_maxx])
+            f_lim_upl = np.array([0,    F_SB, F_SB])
+            a_lim_upl = np.array([A_SB, A_SB, a_sb_max])
 
-            F_lim_upr = np.array([F_PB,      F_PB,     f_max_2])
-            A_lim_upr = np.array([A_PB_maxx, A_PB_max, A_PB_max])
-            F_lim_lor = F_lim_upr
-            A_lim_lor = np.array([A_PB_minx, A_PB_min, A_PB_min])
+            f_lim_upr = np.array([F_PB,      F_PB,     f_max_2])
+            a_lim_upr = np.array([A_PB_maxx, A_PB_max, A_PB_max])
+            f_lim_lor = f_lim_upr
+            a_lim_lor = np.array([A_PB_minx, A_PB_min, A_PB_min])
 
         if fb_get('rt') == 'bs':
-            F_lim_upl = np.array([0,        F_PB,     F_PB])
-            A_lim_upl = np.array([A_PB_max, A_PB_max, A_PB_maxx])
-            F_lim_lol = F_lim_upl
-            A_lim_lol = np.array([A_PB_min, A_PB_min, A_PB_minx])
+            f_lim_upl = np.array([0,        F_PB,     F_PB])
+            a_lim_upl = np.array([A_PB_max, A_PB_max, A_PB_maxx])
+            f_lim_lol = f_lim_upl
+            a_lim_lol = np.array([A_PB_min, A_PB_min, A_PB_minx])
 
-            F_lim_upc = np.array([F_SB, F_SB, F_SB2, F_SB2])
-            A_lim_upc = np.array([A_SB_maxx, A_SB, A_SB,  A_SB_maxx])
+            f_lim_upc = np.array([F_SB, F_SB, F_SB2, F_SB2])
+            a_lim_upc = np.array([a_sb_max, A_SB, A_SB,  a_sb_max])
 
-            F_lim_upr = np.array([F_PB2, F_PB2, f_max_2])
-            A_lim_upr = np.array([A_PB_maxx, A_PB2_max, A_PB2_max])
-            F_lim_lor = np.array(F_lim_upr)
-            A_lim_lor = np.array([A_PB_minx, A_PB2_min, A_PB2_min])
+            f_lim_upr = np.array([F_PB2, F_PB2, f_max_2])
+            a_lim_upr = np.array([A_PB_maxx, A_PB2_max, A_PB2_max])
+            f_lim_lor = np.array(f_lim_upr)
+            a_lim_lor = np.array([A_PB_minx, A_PB2_min, A_PB2_min])
 
         if fb_get('rt') == 'bp':
-            F_lim_upl = np.array([0,    F_SB, F_SB])
-            A_lim_upl = np.array([A_SB, A_SB, A_SB_maxx])
+            f_lim_upl = np.array([0,    F_SB, F_SB])
+            a_lim_upl = np.array([A_SB, A_SB, a_sb_max])
 
-            F_lim_upc = np.array([F_PB,      F_PB,     F_PB2,    F_PB2])
-            A_lim_upc = np.array([A_PB_maxx, A_PB_max, A_PB_max, A_PB_maxx])
-            F_lim_loc = F_lim_upc
-            A_lim_loc = np.array([A_PB_minx, A_PB_min, A_PB_min, A_PB_minx])
+            f_lim_upc = np.array([F_PB,      F_PB,     F_PB2,    F_PB2])
+            a_lim_upc = np.array([A_PB_maxx, A_PB_max, A_PB_max, A_PB_maxx])
+            f_lim_loc = f_lim_upc
+            a_lim_loc = np.array([A_PB_minx, A_PB_min, A_PB_min, A_PB_minx])
 
-            F_lim_upr = np.array([F_SB2,    F_SB2, f_max_2])
-            A_lim_upr = np.array([A_SB_maxx, A_SB2, A_SB2])
+            f_lim_upr = np.array([F_SB2,    F_SB2, f_max_2])
+            a_lim_upr = np.array([a_sb_max, A_SB2, A_SB2])
 
         if fb_get('rt') == 'hil':
-            F_lim_upc = np.array([F_PB,      F_PB,     F_PB2,    F_PB2])
-            A_lim_upc = np.array([A_PB_maxx, A_PB_max, A_PB_max, A_PB_maxx])
+            f_lim_upc = np.array([F_PB,      F_PB,     F_PB2,    F_PB2])
+            a_lim_upc = np.array([A_PB_maxx, A_PB_max, A_PB_max, A_PB_maxx])
 
-            F_lim_loc = F_lim_upc
-            A_lim_loc = np.array([A_PB_minx, A_PB_min, A_PB_min, A_PB_minx])
+            f_lim_loc = f_lim_upc
+            a_lim_loc = np.array([A_PB_minx, A_PB_min, A_PB_min, A_PB_minx])
 
         _plot_specs()  # plot specs in the range 0 ... f_S/2
 
         if fb_get('freqSpecsRangeType') != 'half':
             # add plot limits for other half of the spectrum
             if fb_get('freqSpecsRangeType') == 'sym':  # frequency axis +/- f_S/2
-                F_lim_upl = -F_lim_upl
-                F_lim_lol = -F_lim_lol
-                F_lim_upc = -F_lim_upc
-                F_lim_loc = -F_lim_loc
-                F_lim_upr = -F_lim_upr
-                F_lim_lor = -F_lim_lor
+                f_lim_upl = -f_lim_upl
+                f_lim_lol = -f_lim_lol
+                f_lim_upc = -f_lim_upc
+                f_lim_loc = -f_lim_loc
+                f_lim_upr = -f_lim_upr
+                f_lim_lor = -f_lim_lor
             else: # -> 'whole'
-                F_lim_upl = self.f_max - F_lim_upl
-                F_lim_lol = self.f_max - F_lim_lol
-                F_lim_upc = self.f_max - F_lim_upc
-                F_lim_loc = self.f_max - F_lim_loc
-                F_lim_upr = self.f_max - F_lim_upr
-                F_lim_lor = self.f_max - F_lim_lor
+                f_lim_upl = self.f_max - f_lim_upl
+                f_lim_lol = self.f_max - f_lim_lol
+                f_lim_upc = self.f_max - f_lim_upc
+                f_lim_loc = self.f_max - f_lim_loc
+                f_lim_upr = self.f_max - f_lim_upr
+                f_lim_lor = self.f_max - f_lim_lor
 
             _plot_specs()
 
@@ -724,7 +724,7 @@ class Plot_Hf(QWidget):
                     self.led_log_bottom.text(), self.log_bottom,
                     return_type='float', sign='neg')
                 self.led_log_bottom.setText(str(self.log_bottom))
-                A_lim = [self.log_bottom, 2]
+                a_lim = [self.log_bottom, 2]
                 H_str += ' in dB ' + r'$\rightarrow$'
 
             elif self.unitA == 'V':  #  'lin'
@@ -735,12 +735,12 @@ class Plot_Hf(QWidget):
                     A_min = min(A_min, np.nanmin(self.H_plt_im[np.isfinite(self.H_c)]))
 
                 A_min = max(A_min, self.lin_neg_bottom)
-                A_lim = [A_min, (1.05 + A_max)]
+                a_lim = [A_min, (1.05 + A_max)]
                 H_str +=' in V ' + r'$\rightarrow $'
                 self.ax.axhline(linewidth=1, color='k') # horizontal line at 0
 
             else: # unit is W
-                A_lim = [0, (1.03 + A_max)**2.]
+                a_lim = [0, (1.03 + A_max)**2.]
                 H_str += ' in W ' + r'$\rightarrow $'
 
             # TODO: self.draw_inset() # this gives an infinite recursion
@@ -753,7 +753,7 @@ class Plot_Hf(QWidget):
 
             #     self.ax_bounds = [self.ax.get_ybound()[0], self.ax.get_ybound()[1]]#, self.ax.get]
             self.ax.set_xlim(f_lim)
-            self.ax.set_ylim(A_lim)
+            self.ax.set_ylim(a_lim)
             self.ax.set_xlabel(fb_get('plt_fLabel'))
             self.ax.set_ylabel(H_str)
 
