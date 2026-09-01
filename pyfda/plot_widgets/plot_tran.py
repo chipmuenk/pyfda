@@ -1670,14 +1670,14 @@ class PlotTran(QWidget):
                         "you should display both sides (0 ... f_S or -f_S/2 ... f_S/2).")
                 # scale display of stimulus: `self.x` is unscaled, hence x_fft needs
                 # to be multiplied by self.scale_i
-                Px = np.sum(np.square(np.abs(self.x_fft))) * p_scale
+                p_x = np.sum(np.square(np.abs(self.x_fft))) * p_scale
                 if onesided and not freq_resp:
                     x_fft_disp = calc_ssb_spectrum(self.x_fft, mag=self.cmplx) * scale_impz
                 else:
                     x_fft_disp = self.x_fft * scale_impz
 
             if plt_stimulus_q:
-                Pxq = np.sum(np.square(np.abs(self.x_q_fft))) * p_scale
+                p_x_q = np.sum(np.square(np.abs(self.x_q_fft))) * p_scale
                 if onesided and not freq_resp:
                     x_q_fft_disp = calc_ssb_spectrum(
                         self.x_q_fft, mag=self.cmplx) / self.scale_iq * scale_impz
@@ -1685,7 +1685,7 @@ class PlotTran(QWidget):
                     x_q_fft_disp = self.x_q_fft / self.scale_iq * scale_impz
 
             if plt_response:
-                Py = np.sum(np.square(np.abs(self.y_fft * self.scale_o))) * p_scale
+                p_y = np.sum(np.square(np.abs(self.y_fft / self.scale_o))) * p_scale
                 if onesided and not freq_resp:
                     y_fft_disp = calc_ssb_spectrum(
                         self.y_fft, mag=self.cmplx) / self.scale_o * scale_impz
@@ -1746,7 +1746,7 @@ class PlotTran(QWidget):
                 cgain = 20 * np.log10(cgain)
 
                 if plt_stimulus:
-                    Px = 10*np.log10(Px)
+                    p_x = 10*np.log10(p_x)
                     if self.en_re_im_f:
                         x_r = np.maximum(20 * np.log10(np.abs(x_fft_disp.real)), self.ui.bottom_f)
                         x_i = np.maximum(20 * np.log10(np.abs(x_fft_disp.imag)), self.ui.bottom_f)
@@ -1756,7 +1756,7 @@ class PlotTran(QWidget):
                             x_i = angle_zero(x_fft_disp)
 
                 if plt_stimulus_q:
-                    Pxq = 10*np.log10(Pxq)
+                    p_x_q = 10*np.log10(p_x_q)
                     if self.en_re_im_f:
                         X_q_r = np.maximum(20 * np.log10(np.abs(x_q_fft_disp.real)),
                                            self.ui.bottom_f)
@@ -1768,7 +1768,7 @@ class PlotTran(QWidget):
                             X_q_i = angle_zero(x_q_fft_disp)
 
                 if plt_response:
-                    Py = 10*np.log10(Py)
+                    p_y = 10*np.log10(p_y)
                     if self.en_re_im_f:
                         y_r = np.maximum(20 * np.log10(np.abs(y_fft_disp.real)), self.ui.bottom_f)
                         y_i = np.maximum(20 * np.log10(np.abs(y_fft_disp.imag)), self.ui.bottom_f)
@@ -1899,7 +1899,7 @@ class PlotTran(QWidget):
                                    bottom=self.ui.bottom_f, plt_fmt=self.fmt_plot_stim,
                                    mkr_fmt=fmt_mkr_stim))
                 if show_info:
-                    l_r.extend([lbl_empty, label_re, f"$P_X$ = {Px:.3g} {unit_p}"])
+                    l_r.extend([lbl_empty, label_re, f"$P_X$ = {p_x:.3g} {unit_p}"])
                     h_r.extend([patch_trans, patch_trans])
                 else:
                     l_r.append(label_re)
@@ -1927,7 +1927,7 @@ class PlotTran(QWidget):
                     bottom=self.ui.bottom_f, plt_fmt=self.fmt_plot_stmq,
                     mkr_fmt=fmt_mkr_stmq))
                 if show_info:
-                    l_r.extend([lbl_empty, label_re, f"$P_{{Q}}$ = {Pxq:.3g} {unit_p}"])
+                    l_r.extend([lbl_empty, label_re, f"$P_{{Q}}$ = {p_x_q:.3g} {unit_p}"])
                     h_r.extend([patch_trans, patch_trans])
                 else:
                     l_r.append(label_re)
@@ -1955,7 +1955,7 @@ class PlotTran(QWidget):
                     bottom=self.ui.bottom_f, plt_fmt=self.fmt_plot_resp,
                     mkr_fmt=fmt_mkr_resp))
                 if show_info:
-                    l_r.extend([lbl_empty, label_re, f"$P_Y$ = {Py:.3g} {unit_p}"])
+                    l_r.extend([lbl_empty, label_re, f"$P_Y$ = {p_y:.3g} {unit_p}"])
                     h_r.extend([patch_trans, patch_trans])
                 else:
                     l_r.append(label_re)
