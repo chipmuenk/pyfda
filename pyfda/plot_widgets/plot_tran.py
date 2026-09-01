@@ -602,7 +602,7 @@ class PlotTran(QWidget):
             # Test whether stimulus or filter coefficients are complex and set flag
             #  correspondingly, additionally calculate up to 10 samples to test for
             # complex values:
-            self.N_first = 0  # initialize frame index
+            self.n_first = 0  # initialize frame index
             x_test = np.zeros(10, dtype=complex)
             # TODO: For stimuli that become complex only after the 10th sample,
             #       the test fails
@@ -693,21 +693,21 @@ class PlotTran(QWidget):
         -  Fixpoint widget, requesting "start_fx_response_calculation"
             via `process_rx_signal()` (fixpoint filter)
         """
-        while self.N_first < self.ui.n_end:
+        while self.n_first < self.ui.n_end:
             # logger.info("impz(): Calculating frame "
-            #             f"{int(np.ceil(self.N_first / self.ui.n_frame)) + 1} of "
+            #             f"{int(np.ceil(self.n_first / self.ui.n_frame)) + 1} of "
             #             f"{int(np.ceil(self.ui.n_end / self.ui.n_frame))}")
             # The last frame could be shorter than self.ui.n_frame:
-            len_frame = min(self.ui.n_frame, self.ui.n_end - self.N_first)
+            len_frame = min(self.ui.n_frame, self.ui.n_end - self.n_first)
             # Define slicing expression for the current frame
-            frame = slice(self.N_first, self.N_first + len_frame)
+            frame = slice(self.n_first, self.n_first + len_frame)
 
             # ------------------------------------------------------------------
             # ---- calculate stimuli for current frame inplace -----------------
             # ------------------------------------------------------------------
             # self.x[frame] = self.stim_wdg.calc_stimulus_frame(
             self.stim_wdg.calc_stimulus_frame(
-                self.x, n_first=self.N_first, n_frame=len_frame, n_end=self.ui.n_end)
+                self.x, n_first=self.n_first, n_frame=len_frame, n_end=self.ui.n_end)
 
             # ------------------------------------------------------------------
             # ---- calculate fixpoint or floating point response for current frame
@@ -752,8 +752,8 @@ class PlotTran(QWidget):
 
             # TODO: Test for user interrupt here
             # --- Increase frame counter ---------------------------------------
-            self.N_first += self.ui.n_frame
-            self.ui.prg_wdg.setValue(self.N_first)
+            self.n_first += self.ui.n_frame
+            self.ui.prg_wdg.setValue(self.n_first)
 
         # -------------------------------------------------------------
         # ----------------------- finish ------------------------------
