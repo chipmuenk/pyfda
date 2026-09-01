@@ -6,7 +6,7 @@ Demonstrates improved testability of class-based design.
 """
 
 import pytest
-from pyfda.filterbroker_v2 import FilterBroker, FilterConfig
+from docs.migration.filterbroker_v2 import FilterBroker, FilterConfig
 
 
 class TestFilterConfig:
@@ -339,14 +339,14 @@ class TestBackwardCompatibility:
     
     def test_fb_get_legacy(self):
         """Test legacy fb_get function."""
-        from pyfda.filterbroker_v2 import fb_get
+        from docs.migration.filterbroker_v2 import fb_get
         
         result = fb_get('N')
         assert result == 4  # default value
     
     def test_fb_set_legacy(self):
         """Test legacy fb_set function."""
-        from pyfda.filterbroker_v2 import fb_set
+        from docs.migration.filterbroker_v2 import fb_set
         
         result = fb_set('N', 8)
         assert result == 0  # success
@@ -356,7 +356,7 @@ class TestBackwardCompatibility:
     
     def test_fb_get_without_args(self):
         """Test fb_get without arguments returns dict."""
-        from pyfda.filterbroker_v2 import fb_get
+        from docs.migration.filterbroker_v2 import fb_get
         
         data = fb_get()
         assert isinstance(data, dict)
