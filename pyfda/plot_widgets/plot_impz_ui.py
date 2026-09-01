@@ -231,7 +231,7 @@ class PlotImpzUI(QWidget):
         self.led_n_frame.setMaximumWidth(qtext_width(N_x=8))
         self.led_n_frame.setVisible(False)
 
-        # This frame is a placeholder that is filled with content in Plot_Impz()
+        # This frame is a placeholder that is filled with content in PlotTran()
         self.frm_file_io = QFrame(self)
         self.frm_file_io.setContentsMargins(0, 0, 0, 0)
         self.frm_file_io.setEnabled(False)

@@ -39,12 +39,12 @@ logger = logging.getLogger(__name__)
 # TODO: "Home" calls redraw for botb mpl widgets
 # TODO: changing the view on some widgets redraws h[n] unncessarily
 
-classes = {'Plot_Impz': 'y[n] / Y(f)'}  #: Dict containing class name : display name
+classes = {'PlotTran': 'y[n] / Y(f)'}  #: Dict containing class name : display name
 
 USE_3D_CMPLX = False  # Plot complex responses as 3D (not yet implemented)
 
 
-class Plot_Impz(QWidget):
+class PlotTran(QWidget):
     """
     Construct a widget for plotting impulse and general transient responses
     """
@@ -781,8 +781,8 @@ class Plot_Impz(QWidget):
                 dc = sig.sosfreqz(self.sos, [0])  # yields (w(0), H(0))
             else:
                 dc = sig.freqz(self.bb, self.aa, [0])
-            self.y[max(self.ui.n_start, self.stim_wdg.T1_idx):] = \
-                self.y[max(self.ui.n_start, self.stim_wdg.T1_idx):] - abs(dc[1])
+            self.y[max(self.ui.n_start, self.stim_wdg.t1_idx):] = \
+                self.y[max(self.ui.n_start, self.stim_wdg.t1_idx):] - abs(dc[1])
 
         self.ui.prg_wdg.setValue(self.ui.n_end)  # 100% reached
         self.t_resp = time.process_time()
@@ -2047,7 +2047,7 @@ if __name__ == "__main__":
 
     app = QApplication(sys.argv)
     app.setStyleSheet(QSS.QSS_RC)
-    mainw = Plot_Impz()
+    mainw = PlotTran()
     app.setActiveWindow(mainw)
     mainw.show()
     sys.exit(app.exec_())

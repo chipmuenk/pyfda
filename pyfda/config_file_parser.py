@@ -77,7 +77,7 @@ class ConfigFileParser():
         'PlotPhi': {'name': 'φ(f)', 'mod': 'pyfda.plot_widgets.plot_phi'},
         'PlotTauG': {'name': 'tau_g', 'mod': 'pyfda.plot_widgets.plot_tau_g'},
         'Plot_PZ': {'name': 'P / Z', 'mod': 'pyfda.plot_widgets.plot_pz'},
-        'Plot_Impz': {'name': 'h[n]', 'mod': 'pyfda.plot_widgets.plot_impz'},
+        'PlotTran': {'name': 'h[n]', 'mod': 'pyfda.plot_widgets.plot_impz'},
         'Plot_3D': {'name': '3D', 'mod': 'pyfda.plot_widgets.plot_3d'}
         }
     INPUT_CLASSES_DICT: ClassVar[dict[str, dict[str, str]]] =\

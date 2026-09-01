@@ -322,7 +322,7 @@ class TranIO(QWidget):
 
         It processes `self.data_raw` and yields `self.x_file` as a result which
         is assigned as `self.stim_wdg.x_file = self.tran_io_wdg.x_file` in the class
-        `Plot_Impz()` when the signal `{'data_changed': 'file_io'}` is received.
+        `PlotTran()` when the signal `{'data_changed': 'file_io'}` is received.
 
         - For two channel `self.data_raw`, assign one channel or the sum of both channels
           to `data`. Alternatively, assign one channel of `self.data_raw` as real and the

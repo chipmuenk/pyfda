@@ -44,7 +44,7 @@ class PlotTranStim(QWidget):
         self.needs_calc = True   # flag whether plots need to be recalculated
         self.needs_redraw = [True] * 2  # flag which plot needs to be redrawn
         self.error = False
-        self.x_file = None  # data mapped from file io in Plot_Impz.file_io()
+        self.x_file = None  # data mapped from file io in PlotTran.file_io()
 
         self._construct_ui()
 
@@ -268,15 +268,15 @@ class PlotTranStim(QWidget):
         # -------------------------------------------------------------------
         if n_first == 0:
             # calculate index for t1, only needed for dirac, step and rect
-            self.T1_idx = int(np.round(self.ui.t1))
+            self.t1_idx = int(np.round(self.ui.t1))
             self.rad_phi1 = self.ui.phi1 / 180 * pi
             self.rad_phi2 = self.ui.phi2 / 180 * pi
         # -------------------------------------------------------------------
         # Initialization for current frame
         # -------------------------------------------------------------------
-        N_last = n_first + n_frame  # calculate last element index
-        frm_slc = slice(n_first, N_last)  # current slice
-        n = np.arange(n_first, N_last)  #  create frame index vector
+        n_last = n_first + n_frame  # calculate last element index
+        frm_slc = slice(n_first, n_last)  # current slice
+        n = np.arange(n_first, n_last)  #  create frame index vector
         t = n * fb_get('T_S')  # create time vector
         noi = 0  # fallback when no noise is selected
         # ====================================================================
@@ -290,12 +290,12 @@ class PlotTranStim(QWidget):
             if self.x_file is None:
                 logger.warning("No file loaded!")
             # file data is longer than frame, use only a part:
-            elif len(self.x_file) >= N_last:
+            elif len(self.x_file) >= n_last:
                 x[frm_slc] = self.x_file[frm_slc]
             # file data is shorter than frame, pad with zeros
             elif len(self.x_file) > n_first:
                 x[frm_slc] = np.concatenate(
-                    (self.x_file[n_first:], np.zeros(N_last - len(self.x_file))))
+                    (self.x_file[n_first:], np.zeros(n_last - len(self.x_file))))
             else:
                 # file data has been consumed, nothing left to be added
                 pass
@@ -305,8 +305,8 @@ class PlotTranStim(QWidget):
             pass
         # ----------------------------------------------------------------------
         elif self.ui.stim == "dirac":
-            if n_first <= self.T1_idx < N_last:
-                x[self.T1_idx - n_first] = self.ui.a1
+            if n_first <= self.t1_idx < n_last:
+                x[self.t1_idx - n_first] = self.ui.a1
         # ----------------------------------------------------------------------
         elif self.ui.stim == "sinc":
             x[frm_slc] = self.ui.a1 * sinc(2 * (n - self.ui.t1) * self.ui.f1)\
@@ -327,18 +327,18 @@ class PlotTranStim(QWidget):
                 self.ui.a2 * sig.gausspulse((n - self.ui.t2), fc=f2, bw=self.ui.bw2)
         # ----------------------------------------------------------------------
         elif self.ui.stim == "rect":
-            n_rise = int(self.T1_idx - np.floor(self.ui.tw_1/2))  # pos. of rising edge
+            n_rise = int(self.t1_idx - np.floor(self.ui.tw_1/2))  # pos. of rising edge
             n_min = max(n_rise, 0)
             n_max = min(n_rise + self.ui.tw_1, n_end)
             x[frm_slc] = self.ui.a1 * np.where((n >= n_min) & (n < n_max), 1, 0)
         # ----------------------------------------------------------------------
         elif self.ui.stim == "step":
-            if self.T1_idx < n_first:   # step before current frame
+            if self.t1_idx < n_first:   # step before current frame
                 x[frm_slc].fill(self.ui.a1)
-            if n_first <= self.T1_idx < N_last:  # step in current frame
-                x[frm_slc][0:self.T1_idx - n_first].fill(0)
-                x[frm_slc][self.T1_idx - n_first:N_last].fill(self.ui.a1)
-            elif self.T1_idx >= N_last:  # step after current frame
+            if n_first <= self.t1_idx < n_last:  # step in current frame
+                x[frm_slc][0:self.t1_idx - n_first].fill(0)
+                x[frm_slc][self.t1_idx - n_first:n_last].fill(self.ui.a1)
+            elif self.t1_idx >= n_last:  # step after current frame
                 x[frm_slc].fill(0)
         # ----------------------------------------------------------------------
         elif self.ui.stim == "cos":
@@ -373,12 +373,12 @@ class PlotTranStim(QWidget):
                 logger.warning(
                     "Frequencies f1 and f2 need to be != 0 and have the same sign!")
                 return
-            if self.ui.t2 == 0:  # sig.chirp is buggy, T_sim cannot be larger than T_end
-                T_end = n_end  # frequency sweep over complete interval
+            if self.ui.t2 == 0:  # sig.chirp is buggy, T_sim cannot be larger than t_end
+                t_end = n_end  # frequency sweep over complete interval
             else:
-                T_end = self.ui.t2  # frequency sweep till t2
+                t_end = self.ui.t2  # frequency sweep till t2
             x[frm_slc] = self.ui.a1 * sig.chirp(
-                n, self.ui.f1, T_end, self.ui.f2,
+                n, self.ui.f1, t_end, self.ui.f2,
                 method=self.ui.chirp_type, phi=self.rad_phi1)
         # ----------------------------------------------------------------------
         elif self.ui.stim == "triang":
@@ -541,12 +541,12 @@ class PlotTranStim(QWidget):
             if self.x_file is None:
                 logger.warning("No file loaded!")
             # file data is longer than frame, use only a part:
-            elif len(self.x_file) >= N_last:
+            elif len(self.x_file) >= n_last:
                 x[frm_slc] = add_signal(x[frm_slc], self.x_file[frm_slc])
             # file data is shorter than frame, pad with zeros
             elif len(self.x_file) > n_first:
                 x[frm_slc] = add_signal(x[frm_slc], np.concatenate(
-                    (self.x_file[n_first:], np.zeros(N_last - len(self.x_file)))))
+                    (self.x_file[n_first:], np.zeros(n_last - len(self.x_file)))))
             # file data has been consumed, nothing left to be added
             else:
                 return
