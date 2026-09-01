@@ -66,7 +66,7 @@ class AllpPZ(QWidget):
                                 "zeros will be calculated.</span>")
                             },
                 },
-            'AP': {'man':{}
+            'ap': {'man':{}
                     }
             }
 
@@ -195,7 +195,7 @@ class AllpPZ(QWidget):
     #--------------------------------------------------------------------------
     # The method name MUST be "filter_type"+"min_man", e.g. lp_min or bp_man
 
-    def APman(self) -> int:
+    def ap_man(self) -> int:
         """
         Calculate z =1/p* for a given set of poles p. If p=0, set z=0.
         The gain factor k is calculated from z and p at z = 1.
@@ -233,7 +233,7 @@ if __name__ == '__main__':
     lay_v_dyn_wdg = QVBoxLayout()
     lay_v_dyn_wdg.addWidget(wdg_allpass, stretch = 1)
 
-    filt.APman()  # design an all pass filter with parameters from global dict
+    filt.ap_man()  # design an all pass filter with parameters from global dict
     print(fb_get(filt.FRMT)) # return results in default format
 
     frm_main = QFrame()

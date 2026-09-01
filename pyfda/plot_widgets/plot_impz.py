@@ -488,16 +488,16 @@ class Plot_Impz(QWidget):
         """
         Check status of file_io widget:
         - if no file is loaded, do nothing. This shouldn't happen (check to be sure ...)
-        - else set N_end = len(file_data) in the UI
+        - else set n_end = len(file_data) in the UI
         """
         if not hasattr(self.tran_io_wdg, 'N') or self.tran_io_wdg.N == 0:
             self.ui.frm_file_io.setEnabled(False)
             logger.warning("No data loaded, you shouldn't see this message!")
-        # File is loaded, copy file length to N_end
+        # File is loaded, copy file length to n_end
         else:
             # copy number of data points to N, disable N_auto, enable lineedit for N
-            self.ui.update_n(N_end = self.tran_io_wdg.N)
-            self.ui.but_N_auto.setChecked(False)
+            self.ui.update_n(n_end = self.tran_io_wdg.N)
+            self.ui.but_n_auto.setChecked(False)
             self.ui.led_N_points.setEnabled(True)
 
     # -----------------------------------------------------------------------
@@ -608,7 +608,7 @@ class Plot_Impz(QWidget):
             #       the test fails
             # TODO: np.iscomplexobj() returns true for an array with dtype complex
             #       although each item is real.
-            self.stim_wdg.calc_stimulus_frame(x_test, n_frame = min(10, self.ui.N_end))
+            self.stim_wdg.calc_stimulus_frame(x_test, n_frame = min(10, self.ui.n_end))
 
             # convert from np.bool to bool to avoid deprecation warning concerning
             # 'np.bool_' scalars to be interpreted as an index.
@@ -629,18 +629,18 @@ class Plot_Impz(QWidget):
             self.stim_wdg.init_labels_stim()
             self.title_str = self.stim_wdg.title_str
 
-            self.n = np.arange(self.ui.N_end, dtype=float)
+            self.n = np.arange(self.ui.n_end, dtype=float)
 
             # initialize arrays for stimulus and response
             if self.cmplx:
-                self.x = np.zeros(self.ui.N_end, dtype=complex)
-                self.y = np.zeros(self.ui.N_end, dtype=complex)
+                self.x = np.zeros(self.ui.n_end, dtype=complex)
+                self.y = np.zeros(self.ui.n_end, dtype=complex)
             else:
-                self.x = np.zeros(self.ui.N_end, dtype=float)
-                self.y = np.zeros(self.ui.N_end, dtype=float)
+                self.x = np.zeros(self.ui.n_end, dtype=float)
+                self.y = np.zeros(self.ui.n_end, dtype=float)
 
             # initialize progress bar
-            self.ui.prg_wdg.setMaximum(self.ui.N_end)
+            self.ui.prg_wdg.setMaximum(self.ui.n_end)
             self.ui.prg_wdg.setValue(0)
             self.ui.but_run.setIcon(QIcon(":/stop.svg"))
             qstyle_widget(self.ui.but_run, "running")
@@ -693,12 +693,12 @@ class Plot_Impz(QWidget):
         -  Fixpoint widget, requesting "start_fx_response_calculation"
             via `process_rx_signal()` (fixpoint filter)
         """
-        while self.N_first < self.ui.N_end:
+        while self.N_first < self.ui.n_end:
             # logger.info("impz(): Calculating frame "
-            #             f"{int(np.ceil(self.N_first / self.ui.N_frame)) + 1} of "
-            #             f"{int(np.ceil(self.ui.N_end / self.ui.N_frame))}")
-            # The last frame could be shorter than self.ui.N_frame:
-            len_frame = min(self.ui.N_frame, self.ui.N_end - self.N_first)
+            #             f"{int(np.ceil(self.N_first / self.ui.n_frame)) + 1} of "
+            #             f"{int(np.ceil(self.ui.n_end / self.ui.n_frame))}")
+            # The last frame could be shorter than self.ui.n_frame:
+            len_frame = min(self.ui.n_frame, self.ui.n_end - self.N_first)
             # Define slicing expression for the current frame
             frame = slice(self.N_first, self.N_first + len_frame)
 
@@ -707,7 +707,7 @@ class Plot_Impz(QWidget):
             # ------------------------------------------------------------------
             # self.x[frame] = self.stim_wdg.calc_stimulus_frame(
             self.stim_wdg.calc_stimulus_frame(
-                self.x, n_first=self.N_first, n_frame=len_frame, n_end=self.ui.N_end)
+                self.x, n_first=self.N_first, n_frame=len_frame, n_end=self.ui.n_end)
 
             # ------------------------------------------------------------------
             # ---- calculate fixpoint or floating point response for current frame
@@ -752,7 +752,7 @@ class Plot_Impz(QWidget):
 
             # TODO: Test for user interrupt here
             # --- Increase frame counter ---------------------------------------
-            self.N_first += self.ui.N_frame
+            self.N_first += self.ui.n_frame
             self.ui.prg_wdg.setValue(self.N_first)
 
         # -------------------------------------------------------------
@@ -781,10 +781,10 @@ class Plot_Impz(QWidget):
                 dc = sig.sosfreqz(self.sos, [0])  # yields (w(0), H(0))
             else:
                 dc = sig.freqz(self.bb, self.aa, [0])
-            self.y[max(self.ui.N_start, self.stim_wdg.T1_idx):] = \
-                self.y[max(self.ui.N_start, self.stim_wdg.T1_idx):] - abs(dc[1])
+            self.y[max(self.ui.n_start, self.stim_wdg.T1_idx):] = \
+                self.y[max(self.ui.n_start, self.stim_wdg.T1_idx):] - abs(dc[1])
 
-        self.ui.prg_wdg.setValue(self.ui.N_end)  # 100% reached
+        self.ui.prg_wdg.setValue(self.ui.n_end)  # 100% reached
         self.t_resp = time.process_time()
 
         self.draw()
@@ -890,34 +890,34 @@ class Plot_Impz(QWidget):
         if self.x is None:
             self.X = np.zeros(N)  # dummy result
             logger.warning("Stimulus is 'None', FFT cannot be calculated.")
-        elif len(self.x) < self.ui.N_end:
+        elif len(self.x) < self.ui.n_end:
             self.X = np.zeros(N)  # dummy result
             logger.warning("Length of stimulus is %d < N = %d, FFT cannot be calculated.",
-                           len(self.x), self.ui.N_end)
+                           len(self.x), self.ui.n_end)
         else:
             # multiply the  time signal with window function
-            x_win = self.x[self.ui.N_start:self.ui.N_end] * win
+            x_win = self.x[self.ui.n_start:self.ui.n_end] * win
             # calculate absolute value and scale by N_FFT
             self.X = np.fft.fft(x_win) / self.ui.N
             # self.X[0] = self.X[0] * np.sqrt(2) # correct value at DC
 
             if get_fx() and hasattr(self, "q_i"):
                 # same for fixpoint simulation
-                x_q_win = self.q_i.fixp(self.x[self.ui.N_start:self.ui.N_end])\
+                x_q_win = self.q_i.fixp(self.x[self.ui.n_start:self.ui.n_end])\
                     * win
                 self.X_q = np.fft.fft(x_q_win) / self.ui.N
                 # self.X_q[0] = self.X_q[0] * np.sqrt(2) # correct value at DC
 
-        if self.y is None or len(self.y) < self.ui.N_end:
+        if self.y is None or len(self.y) < self.ui.n_end:
             self.Y = np.zeros(self.ui.N)  # dummy result
             if self.y is None:
                 logger.warning("Transient response is 'None', FFT cannot be calculated.")
             else:
                 logger.warning(
                     "Length of transient response is %d < N = %d, FFT cannot be "
-                    "calculated.", len(self.y), self.ui.N_end)
+                    "calculated.", len(self.y), self.ui.n_end)
         else:
-            y_win = self.y[self.ui.N_start:self.ui.N_end] * win
+            y_win = self.y[self.ui.n_start:self.ui.n_end] * win
             self.Y = np.fft.fft(y_win) / self.ui.N
             # self.Y[0] = self.Y[0] * np.sqrt(2) # correct value at DC
 
@@ -985,7 +985,7 @@ class Plot_Impz(QWidget):
 
         if idx == 0 and self.needs_redraw[0]\
                 and self.mplwidget_t.mpl_toolbar.plot_enabled:
-            self.draw_time(N_start=self.ui.N_start, N_end=self.ui.N_end)
+            self.draw_time(n_start=self.ui.n_start, n_end=self.ui.n_end)
         elif idx == 1 and self.needs_redraw[1]\
                 and self.mplwidget_f.mpl_toolbar.plot_enabled:
             self.draw_freq()
@@ -1170,7 +1170,7 @@ class Plot_Impz(QWidget):
             ax.yaxis.set_minor_locator(AutoMinorLocator())
 
     # ------------------------------------------------------------------------
-    def draw_time(self, N_start: int = 0, N_end: int = 0) -> None:
+    def draw_time(self, n_start: int = 0, n_end: int = 0) -> None:
         """
         (Re-)draw the time domain mplwidget
         """
@@ -1178,8 +1178,8 @@ class Plot_Impz(QWidget):
             for ax in self.mplwidget_t.fig.get_axes():  # remove all axes
                 self.mplwidget_t.fig.delaxes(ax)
             return
-        if N_end == 0:
-            N_end = self.ui.N_end
+        if n_end == 0:
+            n_end = self.ui.n_end
 
         h_str = self.stim_wdg.h_str
         h_i_str = 'undefined'  # this should always be overwritten
@@ -1215,7 +1215,7 @@ class Plot_Impz(QWidget):
 
         # fixpoint simulation enabled -> assign frame to x_q
         if get_fx() and hasattr(self, 'x_q'):
-            x_q = self.x_q[self.ui.N_start:N_end]
+            x_q = self.x_q[self.ui.n_start:n_end]
             if self.ui.but_log_time.isChecked():
                 x_q = np.maximum(20 * np.log10(abs(x_q)), self.ui.bottom_t)
         else:
@@ -1229,16 +1229,16 @@ class Plot_Impz(QWidget):
             #                      period=None)
             self.x_interp = sig.resample_poly(
                 self.x, I_x, 1, axis=0, window=('kaiser', 5.0),
-                padtype='line', cval=None)[N_start * I_x: N_end * I_x]
+                padtype='line', cval=None)[n_start * I_x: n_end * I_x]
             self.t_interp = np.linspace(
                 self.n[0], self.n[-1] + 1, len(self.n) * I_x,
-                endpoint=False)[N_start * I_x: N_end * I_x] * fb_get('T_S')
+                endpoint=False)[n_start * I_x: n_end * I_x] * fb_get('T_S')
 
 
-        t = self.t[N_start:N_end]
+        t = self.t[n_start:n_end]
         # obtain same scaling for x as for quantized signals:
-        x = self.x[N_start:N_end] * self.scale_i
-        y = self.y[N_start:N_end]
+        x = self.x[n_start:n_end] * self.scale_i
+        y = self.y[n_start:n_end]
 
         if self.cmplx:
             x_r = x.real
@@ -1488,13 +1488,13 @@ class Plot_Impz(QWidget):
         # --------------- 3D Complex  -----------------------------------------
         if USE_3D_CMPLX:  # not implemented / tested yet: complex data as 3D plot
             # plotting the stems
-            for i in range(self.ui.N_start, self.ui.N_end):
+            for i in range(self.ui.n_start, self.ui.n_end):
                 self.ax3d.plot([self.t[i], self.t[i]], [y_r[i], y_r[i]], [0, y_i[i]],
                                '-', linewidth=2, alpha=.5)
 
             # plotting a circle on the top of each stem
             self.ax3d.plot(
-                self.t[self.ui.N_start:], y_r[self.ui.N_start:], y_i[self.ui.N_start:],
+                self.t[self.ui.n_start:], y_r[self.ui.n_start:], y_i[self.ui.n_start:],
                 'o', markersize=8, markerfacecolor='none', label='$y[n]$')
 
             self.ax3d.set_xlabel('x')
@@ -1504,7 +1504,7 @@ class Plot_Impz(QWidget):
         # --------------- Title and common labels ---------------------------
         self.axes_time[-1].set_xlabel(fb_get('plt_tLabel'))
         self.axes_time[0].set_title(self.title_str)
-        self.ax_r.set_xlim([self.t[self.ui.N_start], self.t[self.ui.N_end-1]])
+        self.ax_r.set_xlim([self.t[self.ui.n_start], self.t[self.ui.n_end-1]])
         # expand_lim(self.ax_r, 0.02)
 
         self.redraw()  # redraw currently active mplwidget

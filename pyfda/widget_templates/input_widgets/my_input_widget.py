@@ -16,7 +16,7 @@ import logging
 from pyfda.libs.compat import (QWidget, QFont, QCheckBox, QFrame,
                       QTextBrowser, QVBoxLayout, QHBoxLayout, pyqtSignal)
 
-import pyfda.filterbroker as fb
+from pyfda.filterbroker import fb_get
 from pyfda.pyfda_rc import params
 
 logger = logging.getLogger(__name__)
@@ -58,7 +58,7 @@ class MyInputWidget(QWidget):
         # ============== UI Layout =====================================
         # widget / subwindow for filter infos
 
-        self.chk_filt_dict = QCheckBox("FiltDict", self)
+        self.chk_filt_dict = QCheckBox("Filter Dict", self)
         self.chk_filt_dict.setToolTip("Show filter dictionary for debugging.")
 
         self.lay_h_chk_boxes = QHBoxLayout()
@@ -99,7 +99,7 @@ class MyInputWidget(QWidget):
         """
         self.txt_filt_dict.setVisible(self.chk_filt_dict.isChecked())
 
-        fb_sorted = [str(key) +' : '+ str(fb.fil[0][key]) for key in sorted(fb.fil[0].keys())]
+        fb_sorted = [str(key) +' : '+ str(fb_get(key)) for key in sorted(fb_get().keys())]
         dictstr = pprint.pformat(fb_sorted)
         self.txt_filt_dict.setText(dictstr)
 

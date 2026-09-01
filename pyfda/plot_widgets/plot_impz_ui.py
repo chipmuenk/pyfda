@@ -85,10 +85,10 @@ class PlotImpzUI(QWidget):
         # - two bottom rows with action buttons
 
         # initial settings
-        self.N_start = 0
+        self.n_start = 0
         self.N = 100
         self.n_frame_user = 0
-        self.N_frame = 0
+        self.n_frame = 0
 
         # run
         self.cmb_sim_select_init = 'float'
@@ -200,14 +200,14 @@ class PlotImpzUI(QWidget):
 
         self.lbl_n_start = QLabel(to_html("N_0", frmt='bi') + " =", self)
         self.led_n_start = QLineEdit(self)
-        self.led_n_start.setText(str(self.N_start))
+        self.led_n_start.setText(str(self.n_start))
         self.led_n_start.setToolTip("<span>First point to plot.</span>")
         self.led_n_start.setMaximumWidth(qtext_width(N_x=8))
 
-        self.but_N_auto = PushButtonRT(self, text = "<b><i>N</i> = </b>")
-        self.but_N_auto.setCheckable(True)
-        self.but_N_auto.setChecked(True)
-        self.but_N_auto.setToolTip(
+        self.but_n_auto = PushButtonRT(self, text = "<b><i>N</i> = </b>")
+        self.but_n_auto.setCheckable(True)
+        self.but_n_auto.setChecked(True)
+        self.but_n_auto.setToolTip(
             "<span>When activated, calculate number of data points from estimated "
             "length of impulse response.</span>")
         # self.lbl_n_points = QLabel(to_html("N", frmt='bi') + " =", self)
@@ -218,12 +218,12 @@ class PlotImpzUI(QWidget):
             "Disable <b><i>N</i> =</b> for manual entry.</span>")
         self.led_n_points.setMaximumWidth(qtext_width(N_x=8))
         # Enable entry field only for manual mode
-        self.led_n_points.setEnabled(not self.but_N_auto.isChecked())
+        self.led_n_points.setEnabled(not self.but_n_auto.isChecked())
 
         self.lbl_n_frame = QLabel(to_html("N_Frame", frmt='bi') + " =", self)
         self.lbl_n_frame.setVisible(False)
         self.led_n_frame = QLineEdit(self)
-        self.led_n_frame.setText(str(self.N_frame))
+        self.led_n_frame.setText(str(self.n_frame))
         self.led_n_frame.setToolTip(
             "<span>Frame length; longer frames calculate faster but calculation cannot "
             "be stopped so quickly. "
@@ -284,7 +284,7 @@ class PlotImpzUI(QWidget):
         lay_h_ctrl_run.addWidget(self.led_n_frame)
         lay_h_ctrl_run.addWidget(self.lbl_n_start)
         lay_h_ctrl_run.addWidget(self.led_n_start)
-        lay_h_ctrl_run.addWidget(self.but_N_auto)
+        lay_h_ctrl_run.addWidget(self.but_n_auto)
         # lay_h_ctrl_run.addWidget(self.lbl_n_points)
         lay_h_ctrl_run.addWidget(self.led_n_points)
         lay_h_ctrl_run.addWidget(self.frm_file_io)
@@ -618,7 +618,7 @@ class PlotImpzUI(QWidget):
         # ----------------------------------------------------------------------
         # --- run control ---
         self.led_n_start.editingFinished.connect(self.update_n)
-        self.but_N_auto.clicked.connect(self.update_n_auto)
+        self.but_n_auto.clicked.connect(self.update_n_auto)
         self.led_n_points.editingFinished.connect(self.update_n)
         self.led_n_frame.editingFinished.connect(self.update_n)
         self.but_fft_wdg.clicked.connect(self.toggle_fft_wdg)
@@ -628,7 +628,7 @@ class PlotImpzUI(QWidget):
         """
         Update the number of data points to be plotted when the "N_auto" button is clicked.
         """
-        if not self.but_N_auto.isChecked():
+        if not self.but_n_auto.isChecked():
             # manual entry of number of data points, enable data entry and return
             self.led_n_points.setEnabled(True)
             return
@@ -638,9 +638,9 @@ class PlotImpzUI(QWidget):
         self.update_n()
 
     # -------------------------------------------------------------------------
-    def update_n(self, emit_signal=True, N_end=0):
+    def update_n(self, emit_signal=True, n_end=0):
         """
-        Update values for `self.N`, `self.N_start` and `self.N_end` from the
+        Update values for `self.N`, `self.n_start` and `self.n_end` from the
         corresponding QLineEditWidgets.
 
         Parameters
@@ -650,8 +650,8 @@ class PlotImpzUI(QWidget):
             the FFT window and the `plot_impz` widgets. In contrast to `view_changed`,
             this also forces a calculation of the transient response.
 
-        N_end: int
-            When `N_end` is specified, use the passed value for the total number of data
+        n_end: int
+            When `n_end` is specified, use the passed value for the total number of data
             points
 
         This method is called by:
@@ -659,37 +659,37 @@ class PlotImpzUI(QWidget):
         - `self._construct_ui()` with `emit_signal==False`
         - `plot_impz()` with `emit_signal==False` when the automatic calculation
                 of N has to be updated (e.g. order of FIR filter) has changed
-        - signal-slot connection when `N_start` or `N_end` QLineEdit widgets have
+        - signal-slot connection when `n_start` or `n_end` QLineEdit widgets have
                 been changed (`emit_signal==True`)
         """
         if not isinstance(emit_signal, bool):
             logger.error("update N: wrong data type emit_signal: '%s'", emit_signal)
 
         # Read value for first data point to be plotted from UI
-        self.N_start = safe_eval(self.led_n_start.text(), self.N_start,
+        self.n_start = safe_eval(self.led_n_start.text(), self.n_start,
                                  return_type='int', sign='poszero')
 
         # Read value for number of data points to be plotted from UI
         self.N = safe_eval(self.led_n_points.text(), self.N,
                                 return_type='int', sign='pos')
 
-        if N_end > 0: # specified max. number of data points, e.g. by file io
-            if N_end <= self.N_start:
+        if n_end > 0: # specified max. number of data points, e.g. by file io
+            if n_end <= self.n_start:
                 logger.warning(
                     "Total number of data points N = %d must be > "
-                    "N_start = %d, setting N_start = 0.", N_end, self.N_start)
-                self.N_start = 0
+                    "n_start = %d, setting n_start = 0.", n_end, self.n_start)
+                self.n_start = 0
                 self.led_n_start.setText("0")  # update widget
 
-            self.N_end = N_end
+            self.n_end = n_end
             # calculate number of data points to be plotted
-            self.N = self.N_end - self.N_start
+            self.N = self.n_end - self.n_start
         else:
-            if self.but_N_auto.isChecked():  # automatic calculation
+            if self.but_n_auto.isChecked():  # automatic calculation
                 self.N = impz_len(fb_get('ba'), level=-40)
 
-            # total number of points to be calculated: N_end = N + N_start
-            self.N_end = self.N + self.N_start
+            # total number of points to be calculated: n_end = N + n_start
+            self.n_end = self.N + self.n_start
 
         self.led_n_points.setText(str(self.N))  # update widget
 
@@ -698,12 +698,12 @@ class PlotImpzUI(QWidget):
                                       return_type='int', sign='poszero')
 
         if self.n_frame_user == 0:
-            self.N_frame = self.N_end  # use N_end for frame length
+            self.n_frame = self.n_end  # use n_end for frame length
             # update widget with "0" as set by user
             self.led_n_frame.setText("0")
         else:
-            self.N_frame = self.n_frame_user
-            self.led_n_frame.setText(str(self.N_frame))  # update widget
+            self.n_frame = self.n_frame_user
+            self.led_n_frame.setText(str(self.n_frame))  # update widget
 
         if emit_signal:
             # use `'ui_local_changed'` as this triggers recalculation of the

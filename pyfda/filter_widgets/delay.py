@@ -65,7 +65,7 @@ class Delay(QWidget):
                                 "<span>Enter desired number of delays <b><i>N</i></b>.</span>")
                             },
                 },
-            'AP': {'man':{}
+            'ap': {'man':{}
                     }
             }
 
@@ -168,7 +168,7 @@ class Delay(QWidget):
             #arg =[[0], np.zeros(self.N), 1] # crashes coeff tab
         fil_save(arg, self.FRMT, __name__)
 
-    def APman(self) -> int:
+    def ap_man(self) -> int:
         """
         Design an allpass filter with parameters from global dict
 
@@ -198,7 +198,7 @@ if __name__ == '__main__':
     lay_v_dyn_wdg = QVBoxLayout()
     lay_v_dyn_wdg.addWidget(filt.wdg_fil, stretch = 1)
 
-    filt.APman()  # design a low-pass with parameters from global dict
+    filt.ap_man()  # design a low-pass with parameters from global dict
     print(fb_get(filt.FRMT)) # return results in default format
 
     frm_main = QFrame()
