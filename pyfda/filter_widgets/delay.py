@@ -195,15 +195,15 @@ if __name__ == '__main__':
     # instantiate filter widget
     filt = Delay()
 
-    layVDynWdg = QVBoxLayout()
-    layVDynWdg.addWidget(filt.wdg_fil, stretch = 1)
+    lay_v_dyn_wdg = QVBoxLayout()
+    lay_v_dyn_wdg.addWidget(filt.wdg_fil, stretch = 1)
 
     filt.APman()  # design a low-pass with parameters from global dict
     print(fb_get(filt.FRMT)) # return results in default format
 
     frm_main = QFrame()
     frm_main.setFrameStyle(QFrame.StyledPanel|QFrame.Sunken)
-    frm_main.setLayout(layVDynWdg)
+    frm_main.setLayout(lay_v_dyn_wdg)
 
     form = frm_main
 

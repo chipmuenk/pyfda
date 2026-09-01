@@ -26,7 +26,7 @@ class Common():
                     "<b><i>F<sub>SB</sub></i></b> .")
                         }
                     },
-            'LP': {'man': {'fspecs': ('a', 'F_C'),
+            'lp': {'man': {'fspecs': ('a', 'F_C'),
                            'tspecs': ('u', {'frq': ('u', 'F_PB', 'F_SB'),
                                             'amp': ('a', 'A_PB', 'A_SB')})
                            },
@@ -35,7 +35,7 @@ class Common():
                                             'amp': ('a', 'A_PB', 'A_SB')})
                            }
                    },
-            'HP': {'man': {'fspecs': ('a', 'F_C'),
+            'hp': {'man': {'fspecs': ('a', 'F_C'),
                            'tspecs': ('u', {'frq': ('u', 'F_SB', 'F_PB'),
                                             'amp': ('a', 'A_SB', 'A_PB')})
                            },
@@ -44,7 +44,7 @@ class Common():
                                            'amp':('a','A_SB','A_PB')})
                          }
                     },
-            'BP': {'man':{'fspecs': ('a','F_C', 'F_C2'),
+            'bp': {'man':{'fspecs': ('a','F_C', 'F_C2'),
                           'tspecs': ('u', {'frq':('u','F_SB','F_PB','F_PB2','F_SB2'),
                                            'amp':('a','A_SB','A_PB')})
                          },
@@ -53,7 +53,7 @@ class Common():
                                            'amp':('a','A_SB','A_PB')})
                          },
                     },
-            'BS': {'man':{'fspecs': ('a','F_C','F_C2'),
+            'bs': {'man':{'fspecs': ('a','F_C','F_C2'),
                           'tspecs': ('u', {'frq':('u','F_PB','F_SB','F_SB2','F_PB2'),
                                            'amp':('a','A_PB','A_SB')})
                           },

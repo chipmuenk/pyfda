@@ -193,7 +193,7 @@ class AllpPZ(QWidget):
     #--------------------------------------------------------------------------
     # Filter design routines
     #--------------------------------------------------------------------------
-    # The method name MUST be "FilterType"+"MinMan", e.g. LPmin or BPman
+    # The method name MUST be "filter_type"+"min_man", e.g. lp_min or bp_man
 
     def APman(self) -> int:
         """
@@ -230,15 +230,15 @@ if __name__ == '__main__':
     filt = AllpPZ()
     wdg_allpass = getattr(filt, 'wdg_fil')
 
-    layVDynWdg = QVBoxLayout()
-    layVDynWdg.addWidget(wdg_allpass, stretch = 1)
+    lay_v_dyn_wdg = QVBoxLayout()
+    lay_v_dyn_wdg.addWidget(wdg_allpass, stretch = 1)
 
     filt.APman()  # design an all pass filter with parameters from global dict
     print(fb_get(filt.FRMT)) # return results in default format
 
     frm_main = QFrame()
     frm_main.setFrameStyle(QFrame.StyledPanel|QFrame.Sunken)
-    frm_main.setLayout(layVDynWdg)
+    frm_main.setLayout(lay_v_dyn_wdg)
 
     form = frm_main
 

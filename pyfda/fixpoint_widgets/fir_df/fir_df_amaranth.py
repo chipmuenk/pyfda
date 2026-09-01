@@ -151,7 +151,7 @@ class FIR_DF_amaranth():
         Reset register and overflow counters of quantizers
         (but don't reset coefficient quantizers)
         """
-        self.Q_O.resetN()
+        self.Q_O.reset_n()
         self.N_over_filt = 0
         self.zi = np.zeros(self.L - 1)
 

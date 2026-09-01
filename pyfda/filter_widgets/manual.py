@@ -75,22 +75,22 @@ class Manual_FIR():
             'COM':{'man':{'fo': ('d', 'N'),
                           'msg': msg_man}
                         },
-            'LP': {'man':{'tspecs': ('u', {'frq':('u','F_PB','F_SB'),
+            'lp': {'man':{'tspecs': ('u', {'frq':('u','F_PB','F_SB'),
                                            'amp':('u','A_PB','A_SB')})
                          }},
-            'HP': {'man':{'tspecs': ('u', {'frq':('u','F_SB','F_PB'),
+            'hp': {'man':{'tspecs': ('u', {'frq':('u','F_SB','F_PB'),
                                            'amp':('u','A_SB','A_PB')})
                         }},
-            'BS': {'man':{'tspecs': ('u', {'frq':('u','F_PB','F_SB','F_SB2', 'F_PB2'),
+            'bs': {'man':{'tspecs': ('u', {'frq':('u','F_PB','F_SB','F_SB2', 'F_PB2'),
                                            'amp':('u','A_PB','A_SB','A_PB2')})
                         }},
-            'BP': {'man':{'tspecs': ('u', {'frq':('u','F_SB','F_PB','F_PB2','F_SB2',),
+            'bp': {'man':{'tspecs': ('u', {'frq':('u','F_SB','F_PB','F_PB2','F_SB2',),
                                            'amp':('u','A_SB','A_PB','A_SB2')})
                         }},
-            'HIL': {'man':{'tspecs': ('u', {'frq':('u','F_SB','F_PB','F_PB2','F_SB2',),
+            'hil': {'man':{'tspecs': ('u', {'frq':('u','F_SB','F_PB','F_PB2','F_SB2',),
                                            'amp':('u','A_SB','A_PB','A_SB2')})
                         }},
-            'DIFF': {'man':{'tspecs': ('u', {'frq':('u','F_SB','F_PB','F_PB2','F_SB2',),
+            'diff': {'man':{'tspecs': ('u', {'frq':('u','F_SB','F_PB','F_PB2','F_SB2',),
                                            'amp':('u','A_SB','A_PB','A_SB2')})
                         }}
                    }
@@ -119,22 +119,22 @@ class Manual_FIR():
     #     self.A_SB  = fb_get('A_SB')
     #     self.A_SB2 = fb_get('A_SB2')
 
-    def LPman(self):
+    def lp_man(self):
         """ Dummy method, to display widgets corresponding to filter type in UI """
 
-    def HPman(self):
+    def hp_man(self):
         """ Dummy method, to display widgets corresponding to filter type in UI """
 
-    def BPman(self):
+    def bp_man(self):
         """ Dummy method, to display widgets corresponding to filter type in UI """
 
-    def BSman(self):
+    def bs_man(self):
         """ Dummy method, to display widgets corresponding to filter type in UI """
 
-    def HILman(self):
+    def hil_man(self):
         """ Dummy method, to display widgets corresponding to filter type in UI """
 
-    def DIFFman(self):
+    def diff_man(self):
         """ Dummy method, to display widgets corresponding to filter type in UI """
 
 #############################################################################
@@ -153,22 +153,22 @@ class Manual_IIR():
             'COM':{'man':{'fo': ('d', 'N'),
                           'msg': msg_man}
                         },
-            'LP': {'man':{'tspecs': ('u', {'frq':('u','F_PB','F_SB'),
+            'lp': {'man':{'tspecs': ('u', {'frq':('u','F_PB','F_SB'),
                                            'amp':('u','A_PB','A_SB')})
                          }},
-            'HP': {'man':{'tspecs': ('u', {'frq':('u','F_SB','F_PB'),
+            'hp': {'man':{'tspecs': ('u', {'frq':('u','F_SB','F_PB'),
                                            'amp':('u','A_SB','A_PB')})
                         }},
-            'BS': {'man':{'tspecs': ('u', {'frq':('u','F_PB','F_SB','F_SB2', 'F_PB2'),
+            'bs': {'man':{'tspecs': ('u', {'frq':('u','F_PB','F_SB','F_SB2', 'F_PB2'),
                                            'amp':('u','A_PB','A_SB','A_PB2')})
                         }},
-            'BP': {'man':{'tspecs': ('u', {'frq':('u','F_SB','F_PB','F_PB2','F_SB2',),
+            'bp': {'man':{'tspecs': ('u', {'frq':('u','F_SB','F_PB','F_PB2','F_SB2',),
                                            'amp':('u','A_SB','A_PB','A_SB2')})
                         }},
-            'HIL': {'man':{'tspecs': ('u', {'frq':('u','F_SB','F_PB','F_PB2','F_SB2',),
+            'hil': {'man':{'tspecs': ('u', {'frq':('u','F_SB','F_PB','F_PB2','F_SB2',),
                                            'amp':('u','A_SB','A_PB','A_SB2')})
                         }},
-            'DIFF': {'man':{'tspecs': ('u', {'frq':('u','F_SB','F_PB','F_PB2','F_SB2',),
+            'diff': {'man':{'tspecs': ('u', {'frq':('u','F_SB','F_PB','F_PB2','F_SB2',),
                                            'amp':('u','A_SB','A_PB','A_SB2')})
                         }}
                    }
@@ -198,22 +198,22 @@ class Manual_IIR():
     #     self.A_SB2 = fb_get('A_SB2')
 
 
-    def LPman(self):
+    def lp_man(self):
         """ Dummy method, to display widgets corresponding to filter type in UI """
 
-    def HPman(self):
+    def hp_man(self):
         """ Dummy method, to display widgets corresponding to filter type in UI """
 
-    def BPman(self):
+    def bp_man(self):
         """ Dummy method, to display widgets corresponding to filter type in UI """
 
-    def BSman(self):
+    def bs_man(self):
         """ Dummy method, to display widgets corresponding to filter type in UI """
 
-    def HILman(self):
+    def hil_man(self):
         """ Dummy method, to display widgets corresponding to filter type in UI """
 
-    def DIFFman(self):
+    def diff_man(self):
         """ Dummy method, to display widgets corresponding to filter type in UI """
 
 
@@ -223,9 +223,9 @@ if __name__ == '__main__':
     from pyfda.filterbroker import fb_get
 
     filt = Manual_IIR()    # instantiate filter
-    filt.LPman()  # design a low-pass with parameters from global dict
+    filt.lp_man()  # design a low-pass with parameters from global dict
     print(fb_get(FRMT)) # return results in default format
 
     filt = Manual_FIR()    # instantiate filter
-    filt.LPman()  # design a low-pass with parameters from global dict
+    filt.lp_man()  # design a low-pass with parameters from global dict
     print(fb_get(FRMT)) # return results in default format

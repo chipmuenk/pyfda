@@ -109,27 +109,27 @@ class MA(QWidget):
                    "per stage will be determined. Passband specs are not regarded.")
                         }
                     },
-            'LP': {'man':{'tspecs': ('u', {'frq':('u','F_PB','F_SB'),
+            'lp': {'man':{'tspecs': ('u', {'frq':('u','F_PB','F_SB'),
                                            'amp':('u','A_PB','A_SB')})
                           },
                    'min':{'tspecs': ('a', {'frq':('a','F_PB','F_SB'),
                                            'amp':('a','A_PB','A_SB')})
                    }
                 },
-            'HP': {'man':{'tspecs': ('u', {'frq':('u','F_SB','F_PB'),
+            'hp': {'man':{'tspecs': ('u', {'frq':('u','F_SB','F_PB'),
                                            'amp':('u','A_SB','A_PB')})
                          },
                    'min':{'tspecs': ('a', {'frq':('a','F_SB','F_PB'),
                                            'amp':('a','A_SB','A_PB')})
                          },
                 },
-            'BS': {'man':{'tspecs': ('u', {'frq':('u','F_PB','F_SB','F_SB2', 'F_PB2'),
+            'bs': {'man':{'tspecs': ('u', {'frq':('u','F_PB','F_SB','F_SB2', 'F_PB2'),
                                            'amp':('u','A_PB','A_SB','A_PB2')}),
                     'msg': ('a', "\nThis is not a proper band stop, it only lets pass"
                             " frequency components around DC and <i>f<sub>S</sub></i>/2."
                             " The order needs to be odd."),
                         }},
-            'BP': {'man':{'tspecs': ('u', {'frq':('u','F_SB','F_PB','F_PB2','F_SB2',),
+            'bp': {'man':{'tspecs': ('u', {'frq':('u','F_SB','F_PB','F_PB2','F_SB2',),
                                            'amp':('u','A_SB','A_PB','A_SB2')}),
                     'msg': ('a', "\nThis is not a proper band pass, it only lets pass"
                             " frequency components around <i>f<sub>S</sub></i>/4."
@@ -302,11 +302,11 @@ class MA(QWidget):
         L = self.delays + 1
         norm = L
 
-        if rt == 'LP':
+        if rt == 'lp':
             b0 = np.ones(L) #  h[n] = {1; 1; 1; ...}
             i = np.arange(1, L)
 
-        elif rt == 'HP':
+        elif rt == 'hp':
             b0 = np.ones(L)
             b0[::2] = -1. # h[n] = {1; -1; 1; -1; ...}
 
@@ -318,7 +318,7 @@ class MA(QWidget):
 
             norm = L
 
-        elif rt == 'BP':
+        elif rt == 'bp':
             # N is even, L is odd
             b0 = np.ones(L)
             b0[1::2] = 0
@@ -331,7 +331,7 @@ class MA(QWidget):
 
             norm = np.sum(abs(b0))
 
-        elif rt == 'BS':
+        elif rt == 'bs':
             # N is even, L is odd
             b0 = np.ones(L)
             b0[1::2] = 0
@@ -367,7 +367,7 @@ class MA(QWidget):
         return 0
 
 
-    def LPman(self) -> int:
+    def lp_man(self) -> int:
         """
         Design a low-pass Moving Average filter using manual specifications.
         Retrieves parameters and calculates the filter coefficients.
@@ -376,9 +376,9 @@ class MA(QWidget):
             int: Status code of the filter calculation.
         """
         self._get_params()
-        return self.calc_ma('LP')
+        return self.calc_ma('lp')
 
-    def LPmin(self) -> int:
+    def lp_min(self) -> int:
         """
         Design a low-pass Moving Average filter with minimum specifications.
         Calculates the minimum number of delays required to meet the stopband
@@ -390,9 +390,9 @@ class MA(QWidget):
         self._get_params()
         self.delays = int(np.ceil(1 / (self.A_SB **(1/self.stages) *
                                                      np.sin(self.F_SB * np.pi))))
-        return self.calc_ma('LP')
+        return self.calc_ma('lp')
 
-    def HPman(self) -> int:
+    def hp_man(self) -> int:
         """
         Design a high-pass Moving Average filter using manual specifications.
         Retrieves parameters and calculates the filter coefficients.
@@ -401,9 +401,9 @@ class MA(QWidget):
             int: Status code of the filter calculation.
         """
         self._get_params()
-        return self.calc_ma('HP')
+        return self.calc_ma('hp')
 
-    def HPmin(self) -> int:
+    def hp_min(self) -> int:
         """
         Design a high-pass Moving Average filter with minimum specifications.
         Calculates the minimum number of delays required to meet the stopband
@@ -415,9 +415,9 @@ class MA(QWidget):
         self._get_params()
         self.delays = int(np.ceil(1 / (self.A_SB **(1/self.stages) *
                                               np.sin((0.5 - self.F_SB) * np.pi))))
-        return self.calc_ma('HP')
+        return self.calc_ma('hp')
 
-    def BSman(self) -> int:
+    def bs_man(self) -> int:
         """
         Design a band-stop Moving Average filter using manual specifications.
         Enforces an odd order for the filter and calculates the coefficients.
@@ -427,9 +427,9 @@ class MA(QWidget):
         """
         self._get_params()
         self.delays = ceil_odd(self.delays)  # enforce odd order
-        return self.calc_ma('BS')
+        return self.calc_ma('bs')
 
-    def BPman(self) -> int:
+    def bp_man(self) -> int:
         """
         Design a band-pass Moving Average filter using manual specifications.
         Enforces an odd order for the filter and calculates the coefficients.
@@ -439,7 +439,7 @@ class MA(QWidget):
         """
         self._get_params()
         self.delays = ceil_odd(self.delays)  # enforce odd order
-        return self.calc_ma('BP')
+        return self.calc_ma('bp')
 #------------------------------------------------------------------------------
 if __name__ == '__main__':
     # run module standalone using "python -m pyfda.filter_widgets.ma"
@@ -451,15 +451,15 @@ if __name__ == '__main__':
     # instantiate filter widget
     filt = MA()
 
-    layVDynWdg = QVBoxLayout()
-    layVDynWdg.addWidget(filt.wdg_fil, stretch = 1)
+    lay_v_dyn_wdg = QVBoxLayout()
+    lay_v_dyn_wdg.addWidget(filt.wdg_fil, stretch = 1)
 
-    filt.LPman()  # design a low-pass with parameters from global dict
+    filt.lp_man()  # design a low-pass with parameters from global dict
     print(fb_get('zpk')) # return results in default format
 
     form = QFrame()
     form.setFrameStyle(QFrame.StyledPanel|QFrame.Sunken)
-    form.setLayout(layVDynWdg)
+    form.setLayout(lay_v_dyn_wdg)
 
     form.show()
 

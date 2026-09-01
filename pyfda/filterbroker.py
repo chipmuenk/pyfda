@@ -219,7 +219,7 @@ fil_ref = {
     'qfrmt_float_last': 'float64',  # last used float format
     'qfrmt_fx_last': 'qfrac',  # last used fixpoint format
 
-    'rt': 'LP',  # filter response type
+    'rt': 'lp',  # filter response type
     # coefficients as second order sections
     'sos': np.array([
         [

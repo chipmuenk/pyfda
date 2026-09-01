@@ -143,17 +143,17 @@ class FilterTreeBuilder():
     # Dictionary with translations between short method names and long names for
     # response types - the long name can be changed as you like, but don't change
     # the short name - it is used to construct the filter design method names
-    RT_NAMES = {"LP": "Lowpass", "HP": "Highpass", "BP": "Bandpass",
-                "BS": "Bandstop", "AP": "Allpass", "MB": "Multiband",
-                "HIL": "Hilbert", "DIFF": "Differentiator"}
+    RT_NAMES = {'lp': 'Lowpass', 'hp': 'Highpass', 'bp': 'Bandpass',
+                'bs': 'Bandstop', 'ap': 'Allpass', 'mb': 'Multiband',
+                'hil': 'Hilbert', 'diff': 'Differentiator'}
 
     # Dictionary with translations between short method names and long names for
     # response types
-    FT_NAMES = {"IIR": "IIR", "FIR": "FIR"}
+    FT_NAMES = {'IIR': 'IIR', 'FIR': 'FIR'}
 
     fil_tree: ClassVar[dict[str, object]] =\
         {
-        'LP': {
+        'lp': {
             'FIR': {
                 'Equiripple': {
                     'man':{'fo':     ('a', 'N'),
@@ -162,10 +162,10 @@ class FilterTreeBuilder():
                         'tspecs': ('u', {'frq': ('u', 'F_PB', 'F_SB'),
                                             'amp': ('u', 'A_PB', 'A_SB')}),
                         'msg':    ('a',
-                                    "Enter desired filter order <b><i>N</i></b>, corner "
-            "frequencies of pass and stop band(s), <b><i>F<sub>PB</sub></i></b>"
-            "&nbsp; and <b><i>F<sub>SB</sub></i></b>, and a weight "
-            "value <b><i>W</i></b>&nbsp; for each band."
+                                    'Enter desired filter order <b><i>N</i></b>, corner '
+            'frequencies of pass and stop band(s), <b><i>F<sub>PB</sub></i></b>'
+            '&nbsp; and <b><i>F<sub>SB</sub></i></b>, and a weight '
+            'value <b><i>W</i></b>&nbsp; for each band.'
                                     )
                             },
                     'min':{'fo':     ('d', 'N'),
@@ -174,11 +174,11 @@ class FilterTreeBuilder():
                         'tspecs': ('a', {'frq': ('a', 'F_PB', 'F_SB'),
                                             'amp': ('a', 'A_PB', 'A_SB')}),
                         'msg':    ('a',
-                "Enter maximum pass band ripple <b><i>A<sub>PB</sub></i></b>, "
-                "minimum stop band attenuation <b><i>A<sub>SB</sub> </i></b>"
-                "&nbsp;and the corresponding corner frequencies of pass and "
-                "stop band(s), <b><i>F<sub>PB</sub></i></b>&nbsp; and "
-                "<b><i>F<sub>SB</sub></i></b> ."
+                'Enter maximum pass band ripple <b><i>A<sub>PB</sub></i></b>, '
+                'minimum stop band attenuation <b><i>A<sub>SB</sub> </i></b>'
+                '&nbsp;and the corresponding corner frequencies of pass and '
+                'stop band(s), <b><i>F<sub>PB</sub></i></b>&nbsp; and '
+                '<b><i>F<sub>SB</sub></i></b> .'
                                         )
                         },
                     }
@@ -198,7 +198,7 @@ class FilterTreeBuilder():
                     }
                 }
             },
-        'HP': {
+        'hp': {
             'FIR': {
                 'Equiripple': {
                     'man':{'fo':     ('a', 'N'),
@@ -230,7 +230,7 @@ class FilterTreeBuilder():
                         }
                     }
             },
-        'BP': {
+        'bp': {
             'FIR': {
                 'Equiripple': {
                     'man':{'fo':     ('a', 'N'),
@@ -248,7 +248,7 @@ class FilterTreeBuilder():
                         }
                     }
                 },
-        'BS': {
+        'bs': {
             'FIR': {
                 'Equiripple': {
                     'man':{'fo':     ('a', 'N'),
@@ -349,7 +349,7 @@ class FilterTreeBuilder():
         .. code-block:: python
 
             self.rt_dict = {
-                     'LP': {'man':{'fo':     ('a','N'),
+                     'lp': {'man':{'fo':     ('a','N'),
                                    'msg':    ('a', r"<br /><b>Note:</b> Read this!"),
                                    'fspecs': ('a','F_C'),
                                    'tspecs': ('u', {'frq':('u','F_PB','F_SB'),
@@ -361,7 +361,7 @@ class FilterTreeBuilder():
                                                    'amp':('a','A_PB','A_SB')})
                                 }
                           },
-                    'HP': {'man':{'fo':     ('a','N'),
+                    'hp': {'man':{'fo':     ('a','N'),
                                   'fspecs': ('a','F_C'),
                                   'tspecs': ('u', {'frq':('u','F_SB','F_PB'),
                                                    'amp':('u','A_SB','A_PB')})
@@ -377,13 +377,13 @@ class FilterTreeBuilder():
         Build a dictionary of all filter combinations with the following hierarchy:
 
         response types -> filter types -> filter classes  -> filter order
-        rt (e.g. 'LP')    ft (e.g. 'IIR') fc (e.g. 'cheby1') fo ('min' or 'man')
+        rt (e.g. 'lp')    ft (e.g. 'IIR') fc (e.g. 'cheby1') fo ('min' or 'man')
 
         Resulting dictionary for fc for the example above:
 
         .. code-block:: python
 
-            'LP':{
+            'lp':{
             'IIR':{
                  'Cheby1':{
                      'man':{'fo':     ('a','N'),
@@ -449,7 +449,7 @@ if __name__ == "__main__":
     # Initialize FilterTreeBuilder class attribute 'fil_tree'
     FilterTreeBuilder().build_fil_tree()
 
-    fil_tree_ref = FilterTreeBuilder.fil_tree['LP']['FIR']['Equiripple']['min']
+    fil_tree_ref = FilterTreeBuilder.fil_tree['lp']['FIR']['Equiripple']['min']
     # Test Immutability - the following lines should all raise an exception
     try:
         fil_tree_ref.update({'msg':("hallo",)}) # this would change 'fil_tree'
@@ -457,10 +457,10 @@ if __name__ == "__main__":
         print(f"\nExpected AttributeError on update(): {e}\n")
 
     try:
-        FilterTreeBuilder.fil_tree['LP']['FIR']['Equiripple']['min']['par'] = ("A_1","F_1")
+        FilterTreeBuilder.fil_tree['lp']['FIR']['Equiripple']['min']['par'] = ("A_1","F_1")
     except TypeError as e:
         print(f"\nExpected TypeError on item assignment: {e}\n")
 
-    print(f"\nDict type: {type(FilterTreeBuilder.fil_tree['LP']['FIR']['Equiripple']).__name__}\n")
+    print(f"\nDict type: {type(FilterTreeBuilder.fil_tree['lp']['FIR']['Equiripple']).__name__}\n")
 
     print('FilterTreeBuilder.fil_tree["BP"] = ', pprint_log(FilterTreeBuilder.fil_tree["BP"]))

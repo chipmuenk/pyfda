@@ -29,7 +29,7 @@ from pyfda.plot_widgets.plot_fft_win import Plot_FFT_win
 
 logger = logging.getLogger(__name__)
 
-class PlotImpz_UI(QWidget):
+class PlotImpzUI(QWidget):
     """
     Create the UI for the PlotImpz class
     """
@@ -87,7 +87,7 @@ class PlotImpz_UI(QWidget):
         # initial settings
         self.N_start = 0
         self.N = 100
-        self.N_frame_user = 0
+        self.n_frame_user = 0
         self.N_frame = 0
 
         # run
@@ -198,11 +198,11 @@ class PlotImpz_UI(QWidget):
         self.prg_wdg.setMinimum(0)
         self.prg_wdg.setValue(0)
 
-        self.lbl_N_start = QLabel(to_html("N_0", frmt='bi') + " =", self)
-        self.led_N_start = QLineEdit(self)
-        self.led_N_start.setText(str(self.N_start))
-        self.led_N_start.setToolTip("<span>First point to plot.</span>")
-        self.led_N_start.setMaximumWidth(qtext_width(N_x=8))
+        self.lbl_n_start = QLabel(to_html("N_0", frmt='bi') + " =", self)
+        self.led_n_start = QLineEdit(self)
+        self.led_n_start.setText(str(self.N_start))
+        self.led_n_start.setToolTip("<span>First point to plot.</span>")
+        self.led_n_start.setMaximumWidth(qtext_width(N_x=8))
 
         self.but_N_auto = PushButtonRT(self, text = "<b><i>N</i> = </b>")
         self.but_N_auto.setCheckable(True)
@@ -210,26 +210,26 @@ class PlotImpz_UI(QWidget):
         self.but_N_auto.setToolTip(
             "<span>When activated, calculate number of data points from estimated "
             "length of impulse response.</span>")
-        # self.lbl_N_points = QLabel(to_html("N", frmt='bi') + " =", self)
-        self.led_N_points = QLineEdit(self)
-        self.led_N_points.setText(str(self.N))
-        self.led_N_points.setToolTip(
+        # self.lbl_n_points = QLabel(to_html("N", frmt='bi') + " =", self)
+        self.led_n_points = QLineEdit(self)
+        self.led_n_points.setText(str(self.N))
+        self.led_n_points.setToolTip(
             "<span>Number of data points to plot. "
             "Disable <b><i>N</i> =</b> for manual entry.</span>")
-        self.led_N_points.setMaximumWidth(qtext_width(N_x=8))
+        self.led_n_points.setMaximumWidth(qtext_width(N_x=8))
         # Enable entry field only for manual mode
-        self.led_N_points.setEnabled(not self.but_N_auto.isChecked())
+        self.led_n_points.setEnabled(not self.but_N_auto.isChecked())
 
-        self.lbl_N_frame = QLabel(to_html("N_Frame", frmt='bi') + " =", self)
-        self.lbl_N_frame.setVisible(False)
-        self.led_N_frame = QLineEdit(self)
-        self.led_N_frame.setText(str(self.N_frame))
-        self.led_N_frame.setToolTip(
+        self.lbl_n_frame = QLabel(to_html("N_Frame", frmt='bi') + " =", self)
+        self.lbl_n_frame.setVisible(False)
+        self.led_n_frame = QLineEdit(self)
+        self.led_n_frame.setText(str(self.N_frame))
+        self.led_n_frame.setToolTip(
             "<span>Frame length; longer frames calculate faster but calculation cannot "
             "be stopped so quickly. "
             "<i>N</i><sub>Frame</sub> = 0 calculates all samples in one frame.</span>")
-        self.led_N_frame.setMaximumWidth(qtext_width(N_x=8))
-        self.led_N_frame.setVisible(False)
+        self.led_n_frame.setMaximumWidth(qtext_width(N_x=8))
+        self.led_n_frame.setVisible(False)
 
         # This frame is a placeholder that is filled with content in Plot_Impz()
         self.frm_file_io = QFrame(self)
@@ -274,35 +274,35 @@ class PlotImpz_UI(QWidget):
         self.chk_fx_range_y.setToolTip(
              "<span>Display response fixpoint range (-.-).</span>")
 
-        layH_ctrl_run = QHBoxLayout()
-        layH_ctrl_run.addWidget(self.but_auto_run)
-        layH_ctrl_run.addWidget(self.but_run)
-        layH_ctrl_run.addWidget(self.cmb_sim_select)
-        layH_ctrl_run.addWidget(self.prg_wdg)
-        layH_ctrl_run.addSpacing(10)
-        layH_ctrl_run.addWidget(self.lbl_N_frame)
-        layH_ctrl_run.addWidget(self.led_N_frame)
-        layH_ctrl_run.addWidget(self.lbl_N_start)
-        layH_ctrl_run.addWidget(self.led_N_start)
-        layH_ctrl_run.addWidget(self.but_N_auto)
-        # layH_ctrl_run.addWidget(self.lbl_N_points)
-        layH_ctrl_run.addWidget(self.led_N_points)
-        layH_ctrl_run.addWidget(self.frm_file_io)
-        layH_ctrl_run.addSpacing(5)
-        layH_ctrl_run.addWidget(self.lbl_stim_cmplx_warn)
-        layH_ctrl_run.addSpacing(20)
-        layH_ctrl_run.addWidget(self.but_fft_wdg)
-        layH_ctrl_run.addWidget(self.qfft_win_select)
-        layH_ctrl_run.addSpacing(20)
-        layH_ctrl_run.addWidget(self.lbl_fx_range)
-        layH_ctrl_run.addWidget(self.chk_fx_range_x)
-        layH_ctrl_run.addWidget(self.chk_fx_range_y)
-        layH_ctrl_run.addStretch(10)
+        lay_h_ctrl_run = QHBoxLayout()
+        lay_h_ctrl_run.addWidget(self.but_auto_run)
+        lay_h_ctrl_run.addWidget(self.but_run)
+        lay_h_ctrl_run.addWidget(self.cmb_sim_select)
+        lay_h_ctrl_run.addWidget(self.prg_wdg)
+        lay_h_ctrl_run.addSpacing(10)
+        lay_h_ctrl_run.addWidget(self.lbl_n_frame)
+        lay_h_ctrl_run.addWidget(self.led_n_frame)
+        lay_h_ctrl_run.addWidget(self.lbl_n_start)
+        lay_h_ctrl_run.addWidget(self.led_n_start)
+        lay_h_ctrl_run.addWidget(self.but_N_auto)
+        # lay_h_ctrl_run.addWidget(self.lbl_n_points)
+        lay_h_ctrl_run.addWidget(self.led_n_points)
+        lay_h_ctrl_run.addWidget(self.frm_file_io)
+        lay_h_ctrl_run.addSpacing(5)
+        lay_h_ctrl_run.addWidget(self.lbl_stim_cmplx_warn)
+        lay_h_ctrl_run.addSpacing(20)
+        lay_h_ctrl_run.addWidget(self.but_fft_wdg)
+        lay_h_ctrl_run.addWidget(self.qfft_win_select)
+        lay_h_ctrl_run.addSpacing(20)
+        lay_h_ctrl_run.addWidget(self.lbl_fx_range)
+        lay_h_ctrl_run.addWidget(self.chk_fx_range_x)
+        lay_h_ctrl_run.addWidget(self.chk_fx_range_y)
+        lay_h_ctrl_run.addStretch(10)
 
-        # layH_ctrl_run.setContentsMargins(*params['wdg_margins'])
+        # lay_h_ctrl_run.setContentsMargins(*params['wdg_margins'])
 
         self.wdg_ctrl_run = QWidget(self)
-        self.wdg_ctrl_run.setLayout(layH_ctrl_run)
+        self.wdg_ctrl_run.setLayout(lay_h_ctrl_run)
         # --- end of run control ----------------------------------------
 
         # ----------- ---------------------------------------------------
@@ -412,70 +412,70 @@ class PlotImpz_UI(QWidget):
         # self.chk_colorbar_time.setChecked(True)
         # self.chk_colorbar_time.setVisible(spgr_en)
 
-        layH_ctrl_time_0 = QHBoxLayout()
-        layH_ctrl_time_0.addWidget(self.lbl_title_plot_time)
+        lay_h_ctrl_time_0 = QHBoxLayout()
+        lay_h_ctrl_time_0.addWidget(self.lbl_title_plot_time)
 
-        layH_ctrl_time_1 = QHBoxLayout()
-        layH_ctrl_time_1.addWidget(self.lbl_plt_time_stim)
-        layH_ctrl_time_1.addWidget(self.cmb_plt_time_stim)
-        layH_ctrl_time_1.addWidget(self.lbl_plt_time_stim_interp)
-        layH_ctrl_time_1.addWidget(self.chk_plt_time_stim_interp)
+        lay_h_ctrl_time_1 = QHBoxLayout()
+        lay_h_ctrl_time_1.addWidget(self.lbl_plt_time_stim)
+        lay_h_ctrl_time_1.addWidget(self.cmb_plt_time_stim)
+        lay_h_ctrl_time_1.addWidget(self.lbl_plt_time_stim_interp)
+        lay_h_ctrl_time_1.addWidget(self.chk_plt_time_stim_interp)
 #
-        layH_ctrl_time_1.addWidget(self.lbl_plt_time_stmq)
-        layH_ctrl_time_1.addWidget(self.cmb_plt_time_stmq)
+        lay_h_ctrl_time_1.addWidget(self.lbl_plt_time_stmq)
+        lay_h_ctrl_time_1.addWidget(self.cmb_plt_time_stmq)
         #
-        layH_ctrl_time_1.addWidget(lbl_plt_time_resp)
-        layH_ctrl_time_1.addWidget(self.cmb_plt_time_resp)
+        lay_h_ctrl_time_1.addWidget(lbl_plt_time_resp)
+        lay_h_ctrl_time_1.addWidget(self.cmb_plt_time_resp)
         #
-        layH_ctrl_time_1.addWidget(self.lbl_win_time)
-        layH_ctrl_time_1.addWidget(self.chk_win_time)
-        layH_ctrl_time_1.addSpacing(5)
-        layH_ctrl_time_1.addWidget(line1)
-        layH_ctrl_time_1.addSpacing(5)
+        lay_h_ctrl_time_1.addWidget(self.lbl_win_time)
+        lay_h_ctrl_time_1.addWidget(self.chk_win_time)
+        lay_h_ctrl_time_1.addSpacing(5)
+        lay_h_ctrl_time_1.addWidget(line1)
+        lay_h_ctrl_time_1.addSpacing(5)
         #
-        layH_ctrl_time_1.addWidget(self.lbl_log_bottom_time)
-        layH_ctrl_time_1.addWidget(self.led_log_bottom_time)
-        layH_ctrl_time_1.addWidget(self.but_log_time)
+        lay_h_ctrl_time_1.addWidget(self.lbl_log_bottom_time)
+        lay_h_ctrl_time_1.addWidget(self.led_log_bottom_time)
+        lay_h_ctrl_time_1.addWidget(self.but_log_time)
 
-        layH_ctrl_time_1.addSpacing(5)
-        layH_ctrl_time_1.addWidget(line2)
-        layH_ctrl_time_1.addSpacing(5)
+        lay_h_ctrl_time_1.addSpacing(5)
+        lay_h_ctrl_time_1.addWidget(line2)
+        lay_h_ctrl_time_1.addSpacing(5)
         #
-        layH_ctrl_time_1.addWidget(lbl_plt_time_spgr)
-        layH_ctrl_time_1.addWidget(self.cmb_plt_time_spgr)
-        layH_ctrl_time_1.addStretch(10)
+        lay_h_ctrl_time_1.addWidget(lbl_plt_time_spgr)
+        lay_h_ctrl_time_1.addWidget(self.cmb_plt_time_spgr)
+        lay_h_ctrl_time_1.addStretch(10)
 
-        layH_ctrl_time_spgr = QHBoxLayout()
-        layH_ctrl_time_spgr.addWidget(self.cmb_mode_spgr_time)
-        layH_ctrl_time_spgr.addWidget(self.lbl_byfs_spgr_time)
-        layH_ctrl_time_spgr.addWidget(self.chk_byfs_spgr_time)
-        layH_ctrl_time_spgr.addWidget(self.but_log_spgr_time)
-        layH_ctrl_time_spgr.addWidget(self.lbl_time_nfft_spgr)
-        layH_ctrl_time_spgr.addWidget(self.led_time_nfft_spgr)
-        layH_ctrl_time_spgr.addWidget(self.lbl_time_ovlp_spgr)
-        layH_ctrl_time_spgr.addWidget(self.led_time_ovlp_spgr)
-        layH_ctrl_time_spgr.addStretch(10)
+        lay_h_ctrl_time_spgr = QHBoxLayout()
+        lay_h_ctrl_time_spgr.addWidget(self.cmb_mode_spgr_time)
+        lay_h_ctrl_time_spgr.addWidget(self.lbl_byfs_spgr_time)
+        lay_h_ctrl_time_spgr.addWidget(self.chk_byfs_spgr_time)
+        lay_h_ctrl_time_spgr.addWidget(self.but_log_spgr_time)
+        lay_h_ctrl_time_spgr.addWidget(self.lbl_time_nfft_spgr)
+        lay_h_ctrl_time_spgr.addWidget(self.led_time_nfft_spgr)
+        lay_h_ctrl_time_spgr.addWidget(self.lbl_time_ovlp_spgr)
+        lay_h_ctrl_time_spgr.addWidget(self.led_time_ovlp_spgr)
+        lay_h_ctrl_time_spgr.addStretch(10)
 
-        # layH_ctrl_time.setContentsMargins(*params['wdg_margins'])
+        # lay_h_ctrl_time.setContentsMargins(*params['wdg_margins'])
         self.wdg_ctrl_time_0 = QWidget(self)
-        self.wdg_ctrl_time_0.setLayout(layH_ctrl_time_0)
+        self.wdg_ctrl_time_0.setLayout(lay_h_ctrl_time_0)
         self.wdg_ctrl_time_0.setContentsMargins(0, 0, 0, 0)
         self.wdg_ctrl_time_1 = QWidget(self)
-        self.wdg_ctrl_time_1.setLayout(layH_ctrl_time_1)
+        self.wdg_ctrl_time_1.setLayout(lay_h_ctrl_time_1)
         self.wdg_ctrl_time_1.setContentsMargins(0, 0, 0, 0)
         self.wdg_ctrl_time_spgr = QWidget(self)
-        self.wdg_ctrl_time_spgr.setLayout(layH_ctrl_time_spgr)
+        self.wdg_ctrl_time_spgr.setLayout(lay_h_ctrl_time_spgr)
         self.wdg_ctrl_time_spgr.setContentsMargins(0, 0, 0, 0)
 
-        layG_ctrl_time = QGridLayout()
-        layG_ctrl_time.addWidget(self.wdg_ctrl_time_0, 0, 0, 2, 1)
-        layG_ctrl_time.addWidget(self.wdg_ctrl_time_1, 0, 1)
-        layG_ctrl_time.addWidget(self.wdg_ctrl_time_spgr, 1, 1)
-        layG_ctrl_time.setContentsMargins(0, 0, 0, 0)
-        layG_ctrl_time.setVerticalSpacing(0)
+        lay_g_ctrl_time = QGridLayout()
+        lay_g_ctrl_time.addWidget(self.wdg_ctrl_time_0, 0, 0, 2, 1)
+        lay_g_ctrl_time.addWidget(self.wdg_ctrl_time_1, 0, 1)
+        lay_g_ctrl_time.addWidget(self.wdg_ctrl_time_spgr, 1, 1)
+        lay_g_ctrl_time.setContentsMargins(0, 0, 0, 0)
+        lay_g_ctrl_time.setVerticalSpacing(0)
 
         self.wdg_ctrl_time = QWidget(self, objectName="transparent")
-        self.wdg_ctrl_time.setLayout(layG_ctrl_time)
+        self.wdg_ctrl_time.setLayout(lay_g_ctrl_time)
         self.wdg_ctrl_time.setContentsMargins(0, 0, 0, 0) # (*rc.params['wdg_margins'])
 
         self.wdg_ctrl_time_spgr.setVisible(self.plt_time_spgr != "none")
@@ -554,52 +554,52 @@ class PlotImpz_UI(QWidget):
         self.but_freq_index_k.setToolTip(
             "<span>Show FFT indices instead of frequencies.</span>")
 
-        layH_ctrl_freq_0 = QHBoxLayout()
-        layH_ctrl_freq_0.addWidget(self.lbl_title_plot_freq)
+        lay_h_ctrl_freq_0 = QHBoxLayout()
+        lay_h_ctrl_freq_0.addWidget(self.lbl_title_plot_freq)
 
-        layH_ctrl_freq_1 = QHBoxLayout()
-        layH_ctrl_freq_1.addWidget(self.lbl_plt_freq_stim)
-        layH_ctrl_freq_1.addWidget(self.cmb_plt_freq_stim)
+        lay_h_ctrl_freq_1 = QHBoxLayout()
+        lay_h_ctrl_freq_1.addWidget(self.lbl_plt_freq_stim)
+        lay_h_ctrl_freq_1.addWidget(self.cmb_plt_freq_stim)
         #
-        layH_ctrl_freq_1.addWidget(self.lbl_plt_freq_stmq)
-        layH_ctrl_freq_1.addWidget(self.cmb_plt_freq_stmq)
+        lay_h_ctrl_freq_1.addWidget(self.lbl_plt_freq_stmq)
+        lay_h_ctrl_freq_1.addWidget(self.cmb_plt_freq_stmq)
         #
-        layH_ctrl_freq_1.addWidget(lbl_plt_freq_resp)
-        layH_ctrl_freq_1.addWidget(self.cmb_plt_freq_resp)
+        lay_h_ctrl_freq_1.addWidget(lbl_plt_freq_resp)
+        lay_h_ctrl_freq_1.addWidget(self.cmb_plt_freq_resp)
         #
-        layH_ctrl_freq_1.addSpacing(5)
-        layH_ctrl_freq_1.addWidget(self.but_hf_id)
-        layH_ctrl_freq_1.addSpacing(5)
+        lay_h_ctrl_freq_1.addSpacing(5)
+        lay_h_ctrl_freq_1.addWidget(self.but_hf_id)
+        lay_h_ctrl_freq_1.addSpacing(5)
         #
-        layH_ctrl_freq_1.addWidget(self.lbl_log_bottom_freq)
-        layH_ctrl_freq_1.addWidget(self.led_log_bottom_freq)
-        layH_ctrl_freq_1.addWidget(self.but_log_freq)
-        layH_ctrl_freq_1.addSpacing(5)
-        layH_ctrl_freq_1.addWidget(self.cmb_freq_display)
-        layH_ctrl_freq_1.addSpacing(5)
+        lay_h_ctrl_freq_1.addWidget(self.lbl_log_bottom_freq)
+        lay_h_ctrl_freq_1.addWidget(self.led_log_bottom_freq)
+        lay_h_ctrl_freq_1.addWidget(self.but_log_freq)
+        lay_h_ctrl_freq_1.addSpacing(5)
+        lay_h_ctrl_freq_1.addWidget(self.cmb_freq_display)
+        lay_h_ctrl_freq_1.addSpacing(5)
 
-        layH_ctrl_freq_1.addWidget(self.but_freq_norm_impz)
-        layH_ctrl_freq_1.addSpacing(5)
-        layH_ctrl_freq_1.addWidget(self.but_freq_index_k)
-        layH_ctrl_freq_1.addSpacing(5)
-        layH_ctrl_freq_1.addWidget(self.but_freq_show_info)
-        layH_ctrl_freq_1.addStretch(10)
-        # layH_ctrl_freq_1.setContentsMargins(*params['wdg_margins'])
+        lay_h_ctrl_freq_1.addWidget(self.but_freq_norm_impz)
+        lay_h_ctrl_freq_1.addSpacing(5)
+        lay_h_ctrl_freq_1.addWidget(self.but_freq_index_k)
+        lay_h_ctrl_freq_1.addSpacing(5)
+        lay_h_ctrl_freq_1.addWidget(self.but_freq_show_info)
+        lay_h_ctrl_freq_1.addStretch(10)
+        # lay_h_ctrl_freq_1.setContentsMargins(*params['wdg_margins'])
 
         self.wdg_ctrl_freq_0 = QWidget(self)
-        self.wdg_ctrl_freq_0.setLayout(layH_ctrl_freq_0)
+        self.wdg_ctrl_freq_0.setLayout(lay_h_ctrl_freq_0)
         self.wdg_ctrl_freq_0.setContentsMargins(0, 0, 0, 0)
         self.wdg_ctrl_freq_1 = QWidget(self)
-        self.wdg_ctrl_freq_1.setLayout(layH_ctrl_freq_1)
+        self.wdg_ctrl_freq_1.setLayout(lay_h_ctrl_freq_1)
         self.wdg_ctrl_freq_1.setContentsMargins(0, 0, 0, 0)
-        layG_ctrl_freq = QGridLayout()
-        layG_ctrl_freq.addWidget(self.wdg_ctrl_freq_0, 0, 0)
-        layG_ctrl_freq.addWidget(self.wdg_ctrl_freq_1, 0, 1)
-        layG_ctrl_freq.setContentsMargins(0, 0, 0, 0)
-        layG_ctrl_freq.setVerticalSpacing(0)
+        lay_g_ctrl_freq = QGridLayout()
+        lay_g_ctrl_freq.addWidget(self.wdg_ctrl_freq_0, 0, 0)
+        lay_g_ctrl_freq.addWidget(self.wdg_ctrl_freq_1, 0, 1)
+        lay_g_ctrl_freq.setContentsMargins(0, 0, 0, 0)
+        lay_g_ctrl_freq.setVerticalSpacing(0)
 
         self.wdg_ctrl_freq = QWidget(self, objectName="transparent")
-        self.wdg_ctrl_freq.setLayout(layG_ctrl_freq)
+        self.wdg_ctrl_freq.setLayout(lay_g_ctrl_freq)
         self.wdg_ctrl_freq.setContentsMargins(0, 0, 0, 0)  # (*rc.params['wdg_margins'])
         # ---- end Frequency Domain ------------------
 
@@ -617,10 +617,10 @@ class PlotImpz_UI(QWidget):
         # LOCAL SIGNALS & SLOTs
         # ----------------------------------------------------------------------
         # --- run control ---
-        self.led_N_start.editingFinished.connect(self.update_n)
+        self.led_n_start.editingFinished.connect(self.update_n)
         self.but_N_auto.clicked.connect(self.update_n_auto)
-        self.led_N_points.editingFinished.connect(self.update_n)
-        self.led_N_frame.editingFinished.connect(self.update_n)
+        self.led_n_points.editingFinished.connect(self.update_n)
+        self.led_n_frame.editingFinished.connect(self.update_n)
         self.but_fft_wdg.clicked.connect(self.toggle_fft_wdg)
 
     # -------------------------------------------------------------------------
@@ -630,11 +630,11 @@ class PlotImpz_UI(QWidget):
         """
         if not self.but_N_auto.isChecked():
             # manual entry of number of data points, enable data entry and return
-            self.led_N_points.setEnabled(True)
+            self.led_n_points.setEnabled(True)
             return
 
         # automatic calculation of number of data points, disable data entry
-        self.led_N_points.setEnabled(False)
+        self.led_n_points.setEnabled(False)
         self.update_n()
 
     # -------------------------------------------------------------------------
@@ -666,11 +666,11 @@ class PlotImpz_UI(QWidget):
             logger.error("update N: wrong data type emit_signal: '%s'", emit_signal)
 
         # Read value for first data point to be plotted from UI
-        self.N_start = safe_eval(self.led_N_start.text(), self.N_start,
+        self.N_start = safe_eval(self.led_n_start.text(), self.N_start,
                                  return_type='int', sign='poszero')
 
         # Read value for number of data points to be plotted from UI
-        self.N = safe_eval(self.led_N_points.text(), self.N,
+        self.N = safe_eval(self.led_n_points.text(), self.N,
                                 return_type='int', sign='pos')
 
         if N_end > 0: # specified max. number of data points, e.g. by file io
@@ -679,7 +679,7 @@ class PlotImpz_UI(QWidget):
                     "Total number of data points N = %d must be > "
                     "N_start = %d, setting N_start = 0.", N_end, self.N_start)
                 self.N_start = 0
-                self.led_N_start.setText("0")  # update widget
+                self.led_n_start.setText("0")  # update widget
 
             self.N_end = N_end
             # calculate number of data points to be plotted
@@ -691,19 +691,19 @@ class PlotImpz_UI(QWidget):
             # total number of points to be calculated: N_end = N + N_start
             self.N_end = self.N + self.N_start
 
-        self.led_N_points.setText(str(self.N))  # update widget
+        self.led_n_points.setText(str(self.N))  # update widget
 
         # read number of data points per frame from UI
-        self.N_frame_user = safe_eval(self.led_N_frame.text(), self.N_frame_user,
+        self.n_frame_user = safe_eval(self.led_n_frame.text(), self.n_frame_user,
                                       return_type='int', sign='poszero')
 
-        if self.N_frame_user == 0:
+        if self.n_frame_user == 0:
             self.N_frame = self.N_end  # use N_end for frame length
             # update widget with "0" as set by user
-            self.led_N_frame.setText("0")
+            self.led_n_frame.setText("0")
         else:
-            self.N_frame = self.N_frame_user
-            self.led_N_frame.setText(str(self.N_frame))  # update widget
+            self.N_frame = self.n_frame_user
+            self.led_n_frame.setText(str(self.N_frame))  # update widget
 
         if emit_signal:
             # use `'ui_local_changed'` as this triggers recalculation of the
@@ -741,7 +741,7 @@ if __name__ == "__main__":
 
     app = QApplication(sys.argv)
     app.setStyleSheet(QSS.QSS_RC)
-    mainw = PlotImpz_UI()
+    mainw = PlotImpzUI()
 
     lay_v_main = QVBoxLayout()
     lay_v_main.addWidget(mainw.wdg_ctrl_time)

@@ -346,7 +346,7 @@ class Input_Specs(QWidget):
 
         Then, the UIs of all subwidgets are updated using their `update_ui()` methods.
         """
-        rt = fb_get('rt')  # e.g. 'LP'
+        rt = fb_get('rt')  # e.g. 'lp'
         ft = fb_get('ft')  # e.g. 'FIR'
         fc = fb_get('fc')  # e.g. 'equiripple'
         fo = fb_get('fo')  # e.g. 'man'
@@ -509,16 +509,16 @@ class Input_Specs(QWidget):
         # call the method specified in the filter dict fil[0].
 
         # The name of the instance method is constructed from the response
-        # type (e.g. 'LP') and the filter order (e.g. 'man'), giving e.g. 'LPman'.
+        # type (e.g. 'lp') and the filter order (e.g. 'man'), giving e.g. 'LPman'.
         # The filter is designed by passing the specs in fil[0] to the method,
         # resulting in e.g. cheby1.LPman(fb.fil[0]) and writing back coefficients,
         # P/Z etc. back to fil[0].
 
-        err = call_fil_method(fb_get('rt') + fb_get('fo'), fc=fb_get('fc'))
+        err = call_fil_method(fb_get('rt') + '_' +fb_get('fo'), fc=fb_get('fc'))
         # this is the same as e.g.
         # from pyfda.filter_design import ellip
         # inst = ellip.ellip()
-        # inst.LPmin()
+        # inst.lp_min()
         # -----------------------------------------------------------------------
 
         if err > 0:

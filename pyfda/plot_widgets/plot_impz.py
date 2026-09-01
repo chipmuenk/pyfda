@@ -31,7 +31,7 @@ from pyfda.libs.pyfda_qt_lib import (
 from pyfda.plot_widgets.mpl_widget import MplWidget, stems, scatter
 from pyfda.plot_widgets.tran.plot_tran_stim import PlotTranStim
 from pyfda.plot_widgets.tran.tran_io import TranIO
-from pyfda.plot_widgets.plot_impz_ui import PlotImpz_UI
+from pyfda.plot_widgets.plot_impz_ui import PlotImpzUI
 from pyfda.pyfda_rc import params  # FMT string for QLineEdit fields, e.g. '{:.3g}'
 
 logger = logging.getLogger(__name__)
@@ -93,7 +93,7 @@ class Plot_Impz(QWidget):
         # ########################################################################
 
         # create the UI part with buttons etc.
-        self.ui = PlotImpz_UI()
+        self.ui = PlotImpzUI()
         self.stim_wdg = PlotTranStim()
         self.tran_io_wdg = TranIO(self)
 
@@ -608,7 +608,7 @@ class Plot_Impz(QWidget):
             #       the test fails
             # TODO: np.iscomplexobj() returns true for an array with dtype complex
             #       although each item is real.
-            self.stim_wdg.calc_stimulus_frame(x_test, N_frame = min(10, self.ui.N_end))
+            self.stim_wdg.calc_stimulus_frame(x_test, n_frame = min(10, self.ui.N_end))
 
             # convert from np.bool to bool to avoid deprecation warning concerning
             # 'np.bool_' scalars to be interpreted as an index.
@@ -698,16 +698,16 @@ class Plot_Impz(QWidget):
             #             f"{int(np.ceil(self.N_first / self.ui.N_frame)) + 1} of "
             #             f"{int(np.ceil(self.ui.N_end / self.ui.N_frame))}")
             # The last frame could be shorter than self.ui.N_frame:
-            L_frame = min(self.ui.N_frame, self.ui.N_end - self.N_first)
+            len_frame = min(self.ui.N_frame, self.ui.N_end - self.N_first)
             # Define slicing expression for the current frame
-            frame = slice(self.N_first, self.N_first + L_frame)
+            frame = slice(self.N_first, self.N_first + len_frame)
 
             # ------------------------------------------------------------------
             # ---- calculate stimuli for current frame inplace -----------------
             # ------------------------------------------------------------------
             # self.x[frame] = self.stim_wdg.calc_stimulus_frame(
             self.stim_wdg.calc_stimulus_frame(
-                self.x, N_first=self.N_first, N_frame=L_frame, N_end=self.ui.N_end)
+                self.x, n_first=self.N_first, n_frame=len_frame, n_end=self.ui.N_end)
 
             # ------------------------------------------------------------------
             # ---- calculate fixpoint or floating point response for current frame
@@ -1747,12 +1747,12 @@ class Plot_Impz(QWidget):
                 if plt_stimulus:
                     Px = 10*np.log10(Px)
                     if self.en_re_im_f:
-                        X_r = np.maximum(20 * np.log10(np.abs(X.real)), self.ui.bottom_f)
-                        X_i = np.maximum(20 * np.log10(np.abs(X.imag)), self.ui.bottom_f)
+                        x_r = np.maximum(20 * np.log10(np.abs(X.real)), self.ui.bottom_f)
+                        x_i = np.maximum(20 * np.log10(np.abs(X.imag)), self.ui.bottom_f)
                     else:
-                        X_r = np.maximum(20 * np.log10(np.abs(X)), self.ui.bottom_f)
+                        x_r = np.maximum(20 * np.log10(np.abs(X)), self.ui.bottom_f)
                         if self.en_mag_phi_f:
-                            X_i = angle_zero(X)
+                            x_i = angle_zero(X)
 
                 if plt_stimulus_q:
                     Pxq = 10*np.log10(Pxq)
@@ -1769,12 +1769,12 @@ class Plot_Impz(QWidget):
                 if plt_response:
                     Py = 10*np.log10(Py)
                     if self.en_re_im_f:
-                        Y_r = np.maximum(20 * np.log10(np.abs(Y.real)), self.ui.bottom_f)
-                        Y_i = np.maximum(20 * np.log10(np.abs(Y.imag)), self.ui.bottom_f)
+                        y_r = np.maximum(20 * np.log10(np.abs(Y.real)), self.ui.bottom_f)
+                        y_i = np.maximum(20 * np.log10(np.abs(Y.imag)), self.ui.bottom_f)
                     else:
-                        Y_r = np.maximum(20 * np.log10(np.abs(Y)), self.ui.bottom_f)
+                        y_r = np.maximum(20 * np.log10(np.abs(Y)), self.ui.bottom_f)
                         if self.en_mag_phi_f:
-                            Y_i = angle_zero(Y)
+                            y_i = angle_zero(Y)
 
                 if self.ui.but_hf_id.isChecked():
                     if self.en_re_im_f:
@@ -1792,12 +1792,12 @@ class Plot_Impz(QWidget):
                 h_f_post = ""
                 if plt_stimulus:
                     if self.en_re_im_f:
-                        X_r = X.real
-                        X_i = X.imag
+                        x_r = X.real
+                        x_i = X.imag
                     else:
-                        X_r = np.abs(X)
+                        x_r = np.abs(X)
                         if self.en_mag_phi_f:
-                            X_i = angle_zero(X)
+                            x_i = angle_zero(X)
 
                 if plt_stimulus_q:
                     if self.en_re_im_f:
@@ -1810,12 +1810,12 @@ class Plot_Impz(QWidget):
 
                 if plt_response:
                     if self.en_re_im_f:
-                        Y_r = Y.real
-                        Y_i = Y.imag
+                        y_r = Y.real
+                        y_i = Y.imag
                     else:
-                        Y_r = np.abs(Y)
+                        y_r = np.abs(Y)
                         if self.en_mag_phi_f:
-                            Y_i = angle_zero(Y)
+                            y_i = angle_zero(Y)
 
                 if self.ui.but_hf_id.isChecked():
                     if self.en_re_im_f:
@@ -1882,19 +1882,19 @@ class Plot_Impz(QWidget):
                     label_re = "$X_r$" + e_jomega_str
                     label_im = "$X_i$" + e_jomega_str
                     h_i.append(self.draw_data(
-                        self.plt_freq_stim, self.ax_f2, f, X_i, label=label_im,
+                        self.plt_freq_stim, self.ax_f2, f, x_i, label=label_im,
                         bottom=self.ui.bottom_f, plt_fmt=self.fmt_plot_stim,
                         mkr_fmt=fmt_mkr_stim))
                     l_i.append(label_im)
                 elif self.en_mag_phi_f:
                     label_im = r"$\angle X$" + e_jomega_str
                     h_i.append(self.draw_data(
-                        self.plt_freq_stim, self.ax_f2, f, X_i, label=label_im,
+                        self.plt_freq_stim, self.ax_f2, f, x_i, label=label_im,
                         plt_fmt=self.fmt_plot_stim, mkr_fmt=fmt_mkr_stim))
                     l_i.append(label_im)
 
                 h_r.append(
-                    self.draw_data(self.plt_freq_stim, self.ax_f1, f, X_r, label=label_re,
+                    self.draw_data(self.plt_freq_stim, self.ax_f1, f, x_r, label=label_re,
                                    bottom=self.ui.bottom_f, plt_fmt=self.fmt_plot_stim,
                                    mkr_fmt=fmt_mkr_stim))
                 if show_info:
@@ -1938,19 +1938,19 @@ class Plot_Impz(QWidget):
                     label_re = "$Y_r$" + e_jomega_str
                     label_im = "$Y_i$" + e_jomega_str
                     h_i.append(self.draw_data(
-                        self.plt_freq_resp, self.ax_f2, f, Y_i, label=label_im,
+                        self.plt_freq_resp, self.ax_f2, f, y_i, label=label_im,
                         bottom=self.ui.bottom_f, plt_fmt=self.fmt_plot_resp,
                         mkr_fmt=fmt_mkr_resp))
                     l_i.append(label_im)
                 elif self.en_mag_phi_f:
                     label_im = r"$\angle Y$" + e_jomega_str
                     h_i.append(self.draw_data(
-                        self.plt_freq_resp, self.ax_f2, f, Y_i, label=label_im,
+                        self.plt_freq_resp, self.ax_f2, f, y_i, label=label_im,
                         plt_fmt=self.fmt_plot_resp, mkr_fmt=fmt_mkr_resp))
                     l_i.append(label_im)
 
                 h_r.append(self.draw_data(
-                    self.plt_freq_resp, self.ax_f1, f, Y_r, label=label_re,
+                    self.plt_freq_resp, self.ax_f1, f, y_r, label=label_re,
                     bottom=self.ui.bottom_f, plt_fmt=self.fmt_plot_resp,
                     mkr_fmt=fmt_mkr_resp))
                 if show_info:

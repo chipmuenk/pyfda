@@ -99,10 +99,10 @@ class Cheby1():
                  "<b><i>-A<sub>PB</sub></i></b>&nbsp; allowed below unity gain in the "
                  "passband.")},
                                   },
-            'LP': {'man':{}, 'min':{}},
-            'HP': {'man':{}, 'min':{}},
-            'BS': {'man':{}, 'min':{}},
-            'BP': {'man':{}, 'min':{}},
+            'lp': {'man':{}, 'min':{}},
+            'hp': {'man':{}, 'min':{}},
+            'bs': {'man':{}, 'min':{}},
+            'bp': {'man':{}, 'min':{}},
             }
 
         self.info_doc = []
@@ -135,9 +135,9 @@ class Cheby1():
 
         # cheby1 filter routines support only one amplitude spec for
         # pass- and stop band each
-        if fb_get('rt') == 'BS':
+        if fb_get('rt') == 'bs':
             fb_set('A_PB2', fb_get('A_PB'))
-        elif fb_get('rt') == 'BP':
+        elif fb_get('rt') == 'bp':
             fb_set('A_SB2', fb_get('A_SB'))
 
     #--------------------------------------------------------------------------
@@ -168,7 +168,7 @@ class Cheby1():
         fil_save(arg, self.FRMT, __name__)
 
         if fb_get('fo') == 'min':
-            if fb_get('rt') in {'LP', 'HP'}:
+            if fb_get('rt') in {'lp', 'hp'}:
                 fb_set('F_C', self.F_PBC / 2.) # HP or LP - single  corner frequency
                 fb_set('N', self.N)
             else: # BP or BS - two corner frequencies
@@ -184,7 +184,7 @@ class Cheby1():
     #------------------------------------------------------------------------------
 
     # LP: F_PB < F_SB ---------------------------------------------------------
-    def LPmin(self) -> int:
+    def lp_min(self) -> int:
         """Cheby1 LP filter, minimum order"""
         self._get_params()
         self.N, self.F_PBC = cheb1ord(
@@ -193,7 +193,7 @@ class Cheby1():
             cheby1(self.N, self.A_PB, self.F_PBC, btype='low',
                    analog=self.analog, output=self.FRMT))
 
-    def LPman(self) -> int:
+    def lp_man(self) -> int:
         """Cheby1 LP filter, manual order"""
         self._get_params()
         return self._save(
@@ -201,7 +201,7 @@ class Cheby1():
                    analog=self.analog, output=self.FRMT))
 
     # HP: F_SB < F_PB ---------------------------------------------------------
-    def HPmin(self) -> int:
+    def hp_min(self) -> int:
         """Cheby1 HP filter, minimum order"""
         self._get_params()
         self.N, self.F_PBC = cheb1ord(
@@ -210,7 +210,7 @@ class Cheby1():
             cheby1(self.N, self.A_PB, self.F_PBC, btype='highpass',
                    analog=self.analog, output=self.FRMT))
 
-    def HPman(self) -> int:
+    def hp_man(self) -> int:
         """Cheby1 HP filter, manual order"""
         self._get_params()
         return self._save(cheby1(
@@ -222,7 +222,7 @@ class Cheby1():
     # hence the filter order needs to be doubled / halved before (re-)storing
 
     # BP: F_SB[0] < F_PB[0], F_SB[1] > F_PB[1] --------------------------------
-    def BPmin(self) -> int:
+    def bp_min(self) -> int:
         """Cheby1 BP filter, minimum order"""
         self._get_params()
         self.N, self.F_PBC = cheb1ord(
@@ -232,7 +232,7 @@ class Cheby1():
             cheby1(self.N, self.A_PB, self.F_PBC, btype='bandpass',
                    analog=self.analog, output=self.FRMT))
 
-    def BPman(self) -> int:
+    def bp_man(self) -> int:
         """Cheby1 BP filter, manual order"""
         self._get_params()
         return self._save(
@@ -240,7 +240,7 @@ class Cheby1():
                    analog=self.analog, output=self.FRMT))
 
     # BS: F_SB[0] > F_PB[0], F_SB[1] < F_PB[1] --------------------------------
-    def BSmin(self) -> int:
+    def bs_min(self) -> int:
         """Cheby1 BS filter, minimum order"""
         self._get_params()
         self.N, self.F_PBC = cheb1ord(
@@ -250,7 +250,7 @@ class Cheby1():
             cheby1(self.N, self.A_PB, self.F_PBC, btype='bandstop',
                    analog=self.analog, output=self.FRMT))
 
-    def BSman(self) -> int:
+    def bs_man(self) -> int:
         """Cheby1 BS filter, manual order"""
         self._get_params()
         return self._save(
@@ -263,5 +263,5 @@ if __name__ == '__main__':
     # Run this module standalone with 'python -m pyfda.filter_widgets.cheby1'
     filt = Cheby1()        # instantiate filter
     fb_set('fo', 'min')
-    filt.LPmin()  # design a low-pass with parameters from global dict
+    filt.lp_min()  # design a low-pass with parameters from global dict
     print(fb_get(filt.FRMT)) # return results in default format (e.g. 'ba')

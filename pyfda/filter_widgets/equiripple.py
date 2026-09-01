@@ -117,7 +117,7 @@ class Equiripple(QWidget):
                                 "<b><i>F<sub>SB</sub></i></b> .</span>")
                             }
                 },
-            'LP': {'man':{'wspecs': ('a','W_PB','W_SB'),
+            'lp': {'man':{'wspecs': ('a','W_PB','W_SB'),
                           'tspecs': ('u', {'frq':('a','F_PB','F_SB'),
                                            'amp':('u','A_PB','A_SB')})
                           },
@@ -126,7 +126,7 @@ class Equiripple(QWidget):
                                            'amp':('a','A_PB','A_SB')})
                         }
                 },
-            'HP': {'man':{'wspecs': ('a','W_SB','W_PB'),
+            'hp': {'man':{'wspecs': ('a','W_SB','W_PB'),
                           'tspecs': ('u', {'frq':('a','F_SB','F_PB'),
                                            'amp':('u','A_SB','A_PB')})
                          },
@@ -135,7 +135,7 @@ class Equiripple(QWidget):
                                            'amp':('a','A_SB','A_PB')})
                          }
                     },
-            'BP': {'man':{'wspecs': ('a','W_SB','W_PB','W_SB2'),
+            'bp': {'man':{'wspecs': ('a','W_SB','W_PB','W_SB2'),
                           'tspecs': ('u', {'frq':('a','F_SB','F_PB','F_PB2','F_SB2'),
                                            'amp':('u','A_SB','A_PB','A_SB2')})
                          },
@@ -144,7 +144,7 @@ class Equiripple(QWidget):
                                            'amp':('a','A_SB','A_PB','A_SB2')})
                          },
                     },
-            'BS': {'man':{'wspecs': ('a','W_PB','W_SB','W_PB2'),
+            'bs': {'man':{'wspecs': ('a','W_PB','W_SB','W_PB2'),
                           'tspecs': ('u', {'frq':('a','F_PB','F_SB','F_SB2','F_PB2'),
                                            'amp':('u','A_PB','A_SB','A_PB2')})
                           },
@@ -153,12 +153,12 @@ class Equiripple(QWidget):
                                            'amp':('a','A_PB','A_SB','A_PB2')})
                         }
                 },
-            'HIL': {'man':{'wspecs': ('a','W_SB','W_PB','W_SB2'),
+            'hil': {'man':{'wspecs': ('a','W_SB','W_PB','W_SB2'),
                            'tspecs': ('u', {'frq':('a','F_SB','F_PB','F_PB2','F_SB2'),
                                            'amp':('u','A_SB','A_PB','A_SB2')})
                          }
                     },
-            'DIFF': {'man':{'wspecs': ('a','W_PB'),
+            'diff': {'man':{'wspecs': ('a','W_PB'),
                             'tspecs': ('u', {'frq':('a','F_PB'),
                                            'amp':('i',)}),
                             'msg':('a',"Enter the max. frequency up to where the differentiator "
@@ -301,7 +301,7 @@ class Equiripple(QWidget):
             fb_set('N', self.N - 1)  # yes, update filterbroker
         return 0
 
-    def LPman(self) -> int:
+    def lp_man(self) -> int:
         """
         Design a low-pass FIR filter with given order using the Remez exchange algorithm.
 
@@ -329,7 +329,7 @@ class Equiripple(QWidget):
             remez(self.N,[0, self.F_PB, self.F_SB, 0.5], [1, 0],
                   weight = [fb_get('W_PB'), fb_get('W_SB')], fs = 1,
                   grid_density = self.grid_density))
-    def LPmin(self) -> int:
+    def lp_min(self) -> int:
         """
         Design a low-pass FIR filter using the Remez exchange algorithm.
 
@@ -357,10 +357,10 @@ class Equiripple(QWidget):
         return self._save(
             remez(self.N, F, A, weight = W, fs = 1, grid_density = self.grid_density))
 
-    def HPman(self) -> int:
+    def hp_man(self) -> int:
         """
         Design a low-pass FIR filter with given order using the Remez exchange algorithm.
-        For more details, see the `LPman` method.
+        For more details, see the `lp_man` method.
         """
         self._get_params()
         if self.N % 2 == 0: # even order, use odd symmetry (type III)
@@ -374,10 +374,10 @@ class Equiripple(QWidget):
                     weight = [fb_get('W_SB'), fb_get('W_PB')], fs = 1,
                     type = 'bandpass', grid_density = self.grid_density))
 
-    def HPmin(self) -> int:
+    def hp_min(self) -> int:
         """
         Design a high-pass FIR filter with minimum order using the Remez exchange algorithm.
-        For more details, see the `LPmin` method.
+        For more details, see the `lp_min` method.
         """
         self._get_params()
         (self.N, F, A, W) = remezord([self.F_SB, self.F_PB], [0, 1],
@@ -397,10 +397,10 @@ class Equiripple(QWidget):
                     grid_density = self.grid_density))
 
     # For BP and BS, F_PB and F_SB have two elements each
-    def BPman(self) -> int:
+    def bp_man(self) -> int:
         """
         Design a band-pass FIR filter with given order using the Remez exchange algorithm.
-        For more details, see the `LPman` method.
+        For more details, see the `lp_man` method.
         """
         self._get_params()
         return self._save(
@@ -408,10 +408,10 @@ class Equiripple(QWidget):
                   weight = [fb_get('W_SB'), fb_get('W_PB'), fb_get('W_SB2')], fs = 1,
                   grid_density = self.grid_density))
 
-    def BPmin(self) -> int:
+    def bp_min(self) -> int:
         """
         Design a band-pass FIR filter with minimum order using the Remez exchange algorithm.
-        For more details, see the `LPmin` method.
+        For more details, see the `lp_min` method.
         """
         self._get_params()
         (self.N, F, A, W) = remezord([self.F_SB, self.F_PB, self.F_PB2, self.F_SB2], [0, 1, 0],
@@ -423,10 +423,10 @@ class Equiripple(QWidget):
         return self._save(
             remez(self.N, F, A, weight = W, fs = 1, grid_density = self.grid_density))
 
-    def BSman(self) -> int:
+    def bs_man(self) -> int:
         """
         Design a band-stop FIR filter with given order using the Remez exchange algorithm.
-        For more details, see the `LPman` method.
+        For more details, see the `lp_man` method.
         """
         self._get_params()
         self.N = round_odd(self.N) # enforce odd order
@@ -435,10 +435,10 @@ class Equiripple(QWidget):
                   weight = [fb_get('W_PB'), fb_get('W_SB'), fb_get('W_PB2')], fs = 1,
                   grid_density = self.grid_density))
 
-    def BSmin(self) -> int:
+    def bs_min(self) -> int:
         """
         Design a band-stop FIR filter with minimum order using the Remez exchange algorithm.
-        For more details, see the `LPmin` method.
+        For more details, see the `lp_min` method.
         """
         self._get_params()
         (self.N, F, A, W) = remezord([self.F_PB, self.F_SB, self.F_SB2, self.F_PB2], [1, 0, 1],
@@ -450,7 +450,7 @@ class Equiripple(QWidget):
         return self._save(
             remez(self.N, F, A, weight = W, fs = 1, grid_density = self.grid_density))
 
-    def HILman(self) -> int:
+    def hil_man(self) -> int:
         """
         Design a Hilbert FIR filter with given order using the Remez exchange algorithm.
         The Hilbert filter is a special case of the band-pass filter with a wide passband,
@@ -462,7 +462,7 @@ class Equiripple(QWidget):
                   weight = [fb_get('W_SB'), fb_get('W_PB'), fb_get('W_SB2')], fs = 1,
                   type = 'hilbert', grid_density = self.grid_density))
 
-    def DIFFman(self) -> int:
+    def diff_man(self) -> int:
         """
         Design a FIR differentiator with given order using the Remez exchange algorithm.
         """
@@ -492,15 +492,15 @@ if __name__ == '__main__':
     # instantiate filter widget
     filt = Equiripple()
 
-    layVDynWdg = QVBoxLayout()
-    layVDynWdg.addWidget(filt.wdg_fil, stretch = 1)
+    lay_v_dyn_wdg = QVBoxLayout()
+    lay_v_dyn_wdg.addWidget(filt.wdg_fil, stretch = 1)
 
-    filt.LPman()  # design a low-pass with parameters from global dict
+    filt.lp_man()  # design a low-pass with parameters from global dict
     print(fb_get(filt.FRMT)) # return results in default format
 
     frm_main = QFrame()
     frm_main.setFrameStyle(QFrame.StyledPanel|QFrame.Sunken)
-    frm_main.setLayout(layVDynWdg)
+    frm_main.setLayout(lay_v_dyn_wdg)
 
     form = frm_main
 

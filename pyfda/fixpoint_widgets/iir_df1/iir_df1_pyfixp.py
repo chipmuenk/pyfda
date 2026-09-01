@@ -155,10 +155,10 @@ class IIR_DF1_pyfixp(object):
         Reset registers and overflow counters of quantizers
         (except for coefficient quant.)
         """
-        self.Q_mul_a.resetN()
-        self.Q_mul_b.resetN()
-        self.Q_acc.resetN()
-        self.Q_O.resetN()
+        self.Q_mul_a.reset_n()
+        self.Q_mul_b.reset_n()
+        self.Q_acc.reset_n()
+        self.Q_O.reset_n()
         self.N_over_filt = 0
         self.zi_a = np.zeros(self.L - 1)
         self.zi_b = np.zeros(self.L - 1)
@@ -278,8 +278,8 @@ class IIR_DF1_pyfixp(object):
             logger.warning("Overflows: N_Acc = %d, N_Mul_a = %d, N_Mul_b = %d.",
                            self.Q_acc.N_over, self.Q_mul_a.N_over, self.Q_mul_b.N_over)
         self.Q_acc.N_over += self.Q_mul_a.N_over + self.Q_mul_b.N_over
-        self.Q_mul_a.resetN()
-        self.Q_mul_b.resetN()
+        self.Q_mul_a.reset_n()
+        self.Q_mul_b.reset_n()
 
         return y_q[:len(x)], self.zi_b, self.zi_a
 

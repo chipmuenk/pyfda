@@ -87,7 +87,7 @@ class FilterConfig:
     fc: str = 'Ellip'  # filter class
     ft: str = 'IIR'  # filter type
     fo: str = 'man'  # filter order: 'man' or 'min'
-    rt: str = 'LP'  # filter response type
+    rt: str = 'lp'  # filter response type
 
     freq_locked: bool = False
     freq_specs_sort: bool = True

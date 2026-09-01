@@ -359,7 +359,7 @@ class Input_Info(QWidget):
             f_vals = []
             a_lbls = []
             a_targs = []
-            a_targs_dB = []
+            a_targs_db = []
             a_test = []
             ft = fb_get('ft')  # get filter type ('IIR', 'FIR')
             unit = fb_get('amp_specs_unit')
@@ -367,20 +367,20 @@ class Input_Info(QWidget):
             # construct pairs of corner frequency and corresponding amplitude
             # labels in ascending frequency for each response type
             _rt = fb_get('rt')
-            if _rt in {'LP', 'HP', 'BP', 'BS', 'HIL'}:
-                if _rt == 'LP':
+            if _rt in {'lp', 'hp', 'bp', 'bs', 'hil'}:
+                if _rt == 'lp':
                     f_lbls = ['F_PB', 'F_SB']
                     a_lbls = ['A_PB', 'A_SB']
-                elif _rt == 'HP':
+                elif _rt == 'hp':
                     f_lbls = ['F_SB', 'F_PB']
                     a_lbls = ['A_SB', 'A_PB']
-                elif _rt == 'BP':
+                elif _rt == 'bp':
                     f_lbls = ['F_SB', 'F_PB', 'F_PB2', 'F_SB2']
                     a_lbls = ['A_SB', 'A_PB', 'A_PB', 'A_SB2']
-                elif _rt == 'BS':
+                elif _rt == 'bs':
                     f_lbls = ['F_PB', 'F_SB', 'F_SB2', 'F_PB2']
                     a_lbls = ['A_PB', 'A_SB', 'A_SB', 'A_PB2']
-                elif _rt == 'HIL':
+                elif _rt == 'hil':
                     f_lbls = ['F_PB', 'F_PB2']
                     a_lbls = ['A_PB', 'A_PB']
 
@@ -403,10 +403,10 @@ class Input_Info(QWidget):
                         a = fb_get(a_lbls[i])
                         a_dB = lin2unit(fb_get(a_lbls[i]), ft, a_lbls[i], unit)
                         a_targs.append(a)
-                        a_targs_dB.append(a_dB)
+                        a_targs_db.append(a_dB)
                     except KeyError as e:
                         a_targs.append('')
-                        a_targs_dB.append('')
+                        a_targs_db.append('')
                         err[i] = True
                         logger.debug(e)
 
@@ -416,7 +416,7 @@ class Input_Info(QWidget):
                         del f_vals[i]
                         del a_lbls[i]
                         del a_targs[i]
-                        del a_targs_dB[i]
+                        del a_targs_db[i]
 
                 f_vals = np.asarray(f_vals)  # convert to numpy array
 
@@ -434,7 +434,7 @@ class Input_Info(QWidget):
 
             f_vals = np.append(f_vals, [f_min, f_max])
             a_targs = np.append(a_targs, [np.nan, np.nan])
-            a_targs_dB = np.append(a_targs_dB, [np.nan, np.nan])
+            a_targs_db = np.append(a_targs_db, [np.nan, np.nan])
             a_test = np.append(a_test, [h_min, h_max])
             # calculate response of test frequencies in dB
             a_test_db = -20*log10(abs(a_test))
@@ -449,10 +449,10 @@ class Input_Info(QWidget):
             eps = 1e-3
             for i in range(len(f_lbls)):
                 if 'PB' in f_lbls[i]:
-                    a_targs_pass.append((a_test_db[i] - a_targs_dB[i]) < eps)
+                    a_targs_pass.append((a_test_db[i] - a_targs_db[i]) < eps)
                     a_test[i] = 1 - abs(a_test[i])
                 elif 'SB' in f_lbls[i]:
-                    a_targs_pass.append(a_test_db[i] >= a_targs_dB[i])
+                    a_targs_pass.append(a_test_db[i] >= a_targs_db[i])
                 else:
                     a_targs_pass.append(True)
 
@@ -478,7 +478,7 @@ class Input_Info(QWidget):
                 self.tbl_filt_perf.setItem(
                     row, 0, QTableWidgetItem(str(f'{(f_vals[row]*f_S):.4g}')))
                 self.tbl_filt_perf.setItem(
-                    row, 1, QTableWidgetItem(str(f'{-a_targs_dB[row]:2.3g}')))
+                    row, 1, QTableWidgetItem(str(f'{-a_targs_db[row]:2.3g}')))
                 self.tbl_filt_perf.setItem(
                     row, 2, QTableWidgetItem(str(f'{-a_test_db[row]:2.3f}')))
                 if a_targs[row] < 0.01:
