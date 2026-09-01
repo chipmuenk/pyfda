@@ -1666,8 +1666,10 @@ class PlotTran(QWidget):
             if plt_stimulus:
                 if onesided and self.cmplx and not freq_resp:
                     logger.warning(
-                        "You are displaying a single-sided spectrum. For complex-valued time signals, "
-                        "you should display both sides (0 ... f_S or -f_S/2 ... f_S/2).")
+                        "You are displaying a single-sided spectrum. "
+                        "For complex-valued time signals, display both sides "
+                        "(0 ... f_S or -f_S/2 ... f_S/2)."
+                    )
                 # scale display of stimulus: `self.x` is unscaled, hence x_fft needs
                 # to be multiplied by self.scale_i
                 p_x = np.sum(np.square(np.abs(self.x_fft))) * p_scale
@@ -1736,6 +1738,9 @@ class PlotTran(QWidget):
             # -----------------------------------------------------------------
             # Calculate log FFT and power if selected, set units
             # -----------------------------------------------------------------
+            # initialize variables to None to avoid "referenced before assignment" error
+            x_fft_disp_r = x_fft_disp_i = y_fft_disp_r = y_fft_disp_i = None
+            x_q_fft_disp_r = x_q_fft_disp_i = h_id_r = h_id_i = None
             if self.ui.but_log_freq.isChecked():
                 unit = " in dBV"
                 unit_p = "dBW"
@@ -1748,34 +1753,41 @@ class PlotTran(QWidget):
                 if plt_stimulus:
                     p_x = 10*np.log10(p_x)
                     if self.en_re_im_f:
-                        x_r = np.maximum(20 * np.log10(np.abs(x_fft_disp.real)), self.ui.bottom_f)
-                        x_i = np.maximum(20 * np.log10(np.abs(x_fft_disp.imag)), self.ui.bottom_f)
+                        x_fft_disp_r = np.maximum(
+                            20 * np.log10(np.abs(x_fft_disp.real)), self.ui.bottom_f)
+                        x_fft_disp_i = np.maximum(
+                            20 * np.log10(np.abs(x_fft_disp.imag)), self.ui.bottom_f)
                     else:
-                        x_r = np.maximum(20 * np.log10(np.abs(x_fft_disp)), self.ui.bottom_f)
+                        x_fft_disp_r = np.maximum(
+                            20 * np.log10(np.abs(x_fft_disp)), self.ui.bottom_f)
                         if self.en_mag_phi_f:
-                            x_i = angle_zero(x_fft_disp)
+                            x_fft_disp_i = angle_zero(x_fft_disp)
 
                 if plt_stimulus_q:
                     p_x_q = 10*np.log10(p_x_q)
                     if self.en_re_im_f:
-                        X_q_r = np.maximum(20 * np.log10(np.abs(x_q_fft_disp.real)),
+                        x_q_fft_disp_r = np.maximum(20 * np.log10(np.abs(x_q_fft_disp.real)),
                                            self.ui.bottom_f)
-                        X_q_i = np.maximum(20 * np.log10(np.abs(x_q_fft_disp.imag)),
+                        x_q_fft_disp_i = np.maximum(20 * np.log10(np.abs(x_q_fft_disp.imag)),
                                            self.ui.bottom_f)
                     else:
-                        X_q_r = np.maximum(20 * np.log10(np.abs(x_q_fft_disp)), self.ui.bottom_f)
+                        x_q_fft_disp_r = np.maximum(
+                            20 * np.log10(np.abs(x_q_fft_disp)), self.ui.bottom_f)
                         if self.en_mag_phi_f:
-                            X_q_i = angle_zero(x_q_fft_disp)
+                            x_q_fft_disp_i = angle_zero(x_q_fft_disp)
 
                 if plt_response:
                     p_y = 10*np.log10(p_y)
                     if self.en_re_im_f:
-                        y_r = np.maximum(20 * np.log10(np.abs(y_fft_disp.real)), self.ui.bottom_f)
-                        y_i = np.maximum(20 * np.log10(np.abs(y_fft_disp.imag)), self.ui.bottom_f)
+                        y_fft_disp_r = np.maximum(
+                            20 * np.log10(np.abs(y_fft_disp.real)), self.ui.bottom_f)
+                        y_fft_disp_i = np.maximum(
+                            20 * np.log10(np.abs(y_fft_disp.imag)), self.ui.bottom_f)
                     else:
-                        y_r = np.maximum(20 * np.log10(np.abs(y_fft_disp)), self.ui.bottom_f)
+                        y_fft_disp_r = np.maximum(
+                            20 * np.log10(np.abs(y_fft_disp)), self.ui.bottom_f)
                         if self.en_mag_phi_f:
-                            y_i = angle_zero(y_fft_disp)
+                            y_fft_disp_i = angle_zero(y_fft_disp)
 
                 if self.ui.but_hf_id.isChecked():
                     if self.en_re_im_f:
@@ -1793,30 +1805,30 @@ class PlotTran(QWidget):
                 h_f_post = ""
                 if plt_stimulus:
                     if self.en_re_im_f:
-                        x_r = x_fft_disp.real
-                        x_i = x_fft_disp.imag
+                        x_fft_disp_r = x_fft_disp.real
+                        x_fft_disp_i = x_fft_disp.imag
                     else:
-                        x_r = np.abs(x_fft_disp)
+                        x_fft_disp_r = np.abs(x_fft_disp)
                         if self.en_mag_phi_f:
-                            x_i = angle_zero(x_fft_disp)
+                            x_fft_disp_i = angle_zero(x_fft_disp)
 
                 if plt_stimulus_q:
                     if self.en_re_im_f:
-                        X_q_r = x_q_fft_disp.real
-                        X_q_i = x_q_fft_disp.imag
+                        x_q_fft_disp_r = x_q_fft_disp.real
+                        x_q_fft_disp_i = x_q_fft_disp.imag
                     else:
-                        X_q_r = np.abs(x_q_fft_disp)
+                        x_q_fft_disp_r = np.abs(x_q_fft_disp)
                         if self.en_mag_phi_f:
-                            X_q_i = angle_zero(x_q_fft_disp)
+                            x_q_fft_disp_i = angle_zero(x_q_fft_disp)
 
                 if plt_response:
                     if self.en_re_im_f:
-                        y_r = y_fft_disp.real
-                        y_i = y_fft_disp.imag
+                        y_fft_disp_r = y_fft_disp.real
+                        y_fft_disp_i = y_fft_disp.imag
                     else:
-                        y_r = np.abs(y_fft_disp)
+                        y_fft_disp_r = np.abs(y_fft_disp)
                         if self.en_mag_phi_f:
-                            y_i = angle_zero(y_fft_disp)
+                            y_fft_disp_i = angle_zero(y_fft_disp)
 
                 if self.ui.but_hf_id.isChecked():
                     if self.en_re_im_f:
@@ -1883,19 +1895,19 @@ class PlotTran(QWidget):
                     label_re = "$X_r$" + e_jomega_str
                     label_im = "$X_i$" + e_jomega_str
                     h_i.append(self.draw_data(
-                        self.plt_freq_stim, self.ax_f2, f, x_i, label=label_im,
+                        self.plt_freq_stim, self.ax_f2, f, x_fft_disp_i, label=label_im,
                         bottom=self.ui.bottom_f, plt_fmt=self.fmt_plot_stim,
                         mkr_fmt=fmt_mkr_stim))
                     l_i.append(label_im)
                 elif self.en_mag_phi_f:
                     label_im = r"$\angle X$" + e_jomega_str
                     h_i.append(self.draw_data(
-                        self.plt_freq_stim, self.ax_f2, f, x_i, label=label_im,
+                        self.plt_freq_stim, self.ax_f2, f, x_fft_disp_i, label=label_im,
                         plt_fmt=self.fmt_plot_stim, mkr_fmt=fmt_mkr_stim))
                     l_i.append(label_im)
 
                 h_r.append(
-                    self.draw_data(self.plt_freq_stim, self.ax_f1, f, x_r, label=label_re,
+                    self.draw_data(self.plt_freq_stim, self.ax_f1, f, x_fft_disp_r, label=label_re,
                                    bottom=self.ui.bottom_f, plt_fmt=self.fmt_plot_stim,
                                    mkr_fmt=fmt_mkr_stim))
                 if show_info:
@@ -1911,19 +1923,19 @@ class PlotTran(QWidget):
                     label_re = "$X_{Q,r}$" + e_jomega_str
                     label_im = "$X_{Q,i}$" + e_jomega_str
                     h_i.append(self.draw_data(
-                        self.plt_freq_stmq, self.ax_f2, f, X_q_i, label=label_im,
+                        self.plt_freq_stmq, self.ax_f2, f, x_q_fft_disp_i, label=label_im,
                         bottom=self.ui.bottom_f, plt_fmt=self.fmt_plot_stmq,
                         mkr_fmt=fmt_mkr_stmq))
                     l_i.append(label_im)
                 elif self.en_mag_phi_f:
                     label_im = r"$\angle X_Q$" + e_jomega_str
                     h_i.append(self.draw_data(
-                        self.plt_freq_stmq, self.ax_f2, f, X_q_i, label=label_im,
+                        self.plt_freq_stmq, self.ax_f2, f, x_q_fft_disp_i, label=label_im,
                         plt_fmt=self.fmt_plot_stmq, mkr_fmt=fmt_mkr_stmq))
                     l_i.append(label_im)
 
                 h_r.append(self.draw_data(
-                    self.plt_freq_stmq, self.ax_f1, f, X_q_r, label=label_re,
+                    self.plt_freq_stmq, self.ax_f1, f, x_q_fft_disp_r, label=label_re,
                     bottom=self.ui.bottom_f, plt_fmt=self.fmt_plot_stmq,
                     mkr_fmt=fmt_mkr_stmq))
                 if show_info:
@@ -1939,19 +1951,19 @@ class PlotTran(QWidget):
                     label_re = "$Y_r$" + e_jomega_str
                     label_im = "$Y_i$" + e_jomega_str
                     h_i.append(self.draw_data(
-                        self.plt_freq_resp, self.ax_f2, f, y_i, label=label_im,
+                        self.plt_freq_resp, self.ax_f2, f, y_fft_disp_i, label=label_im,
                         bottom=self.ui.bottom_f, plt_fmt=self.fmt_plot_resp,
                         mkr_fmt=fmt_mkr_resp))
                     l_i.append(label_im)
                 elif self.en_mag_phi_f:
                     label_im = r"$\angle Y$" + e_jomega_str
                     h_i.append(self.draw_data(
-                        self.plt_freq_resp, self.ax_f2, f, y_i, label=label_im,
+                        self.plt_freq_resp, self.ax_f2, f, y_fft_disp_i, label=label_im,
                         plt_fmt=self.fmt_plot_resp, mkr_fmt=fmt_mkr_resp))
                     l_i.append(label_im)
 
                 h_r.append(self.draw_data(
-                    self.plt_freq_resp, self.ax_f1, f, y_r, label=label_re,
+                    self.plt_freq_resp, self.ax_f1, f, y_fft_disp_r, label=label_re,
                     bottom=self.ui.bottom_f, plt_fmt=self.fmt_plot_resp,
                     mkr_fmt=fmt_mkr_resp))
                 if show_info:
