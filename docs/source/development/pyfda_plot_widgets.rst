@@ -42,9 +42,9 @@ plot_pz
 	
 .. _dev_plot_impz:
 
-plot_impz
+plot_tran
 ---------------------
-.. automodule:: pyfda.plot_widgets.plot_impz
+.. automodule:: pyfda.plot_widgets.plot_tran
 	:members:
 
 .. _dev_plot_3d:

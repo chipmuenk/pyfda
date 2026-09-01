@@ -29,14 +29,14 @@ from pyfda.plot_widgets.plot_fft_win import Plot_FFT_win
 
 logger = logging.getLogger(__name__)
 
-class PlotImpzUI(QWidget):
+class PlotTranUI(QWidget):
     """
-    Create the UI for the PlotImpz class
+    Create the UI for the PlotTran class
     """
     # incoming: not implemented at the moment, update_n is triggered directly
-    # by plot_impz
+    # by plot_tran
     # sig_rx = pyqtSignal(object)
-    # outgoing: from various UI elements to PlotImpz ('ui_local_changed':'xxx')
+    # outgoing: from various UI elements to PlotTran ('ui_local_changed':'xxx')
     sig_tx = pyqtSignal(object)
     # outgoing: to fft related widgets (FFT window widget, qfft_win_select)
     sig_tx_fft = pyqtSignal(object)
@@ -73,7 +73,7 @@ class PlotImpzUI(QWidget):
             if 'view_changed' in dict_sig and 'fft_win' in dict_sig['view_changed']:
                 # local connection to FFT window widget and qfft_win_select
                 self.emit(dict_sig, sig_name='sig_tx_fft')
-                # global connection to e.g. plot_impz
+                # global connection to e.g. plot_tran
                 self.emit(dict_sig)
 
     # ------------------------------------------------------------------------
@@ -647,7 +647,7 @@ class PlotImpzUI(QWidget):
         ==========
         emit_signal: bool
             When `emit_signal==True` (default), fire `{'ui_local_changed': 'N'}` to update
-            the FFT window and the `plot_impz` widgets. In contrast to `view_changed`,
+            the FFT window and the `plot_tran` widgets. In contrast to `view_changed`,
             this also forces a calculation of the transient response.
 
         n_end: int
@@ -657,7 +657,7 @@ class PlotImpzUI(QWidget):
         This method is called by:
 
         - `self._construct_ui()` with `emit_signal==False`
-        - `plot_impz()` with `emit_signal==False` when the automatic calculation
+        - `plot_tran()` with `emit_signal==False` when the automatic calculation
                 of N has to be updated (e.g. order of FIR filter) has changed
         - signal-slot connection when `n_start` or `n_end` QLineEdit widgets have
                 been changed (`emit_signal==True`)
@@ -734,14 +734,14 @@ class PlotImpzUI(QWidget):
 
 # ------------------------------------------------------------------------------
 if __name__ == "__main__":
-    # Run widget standalone with `python -m pyfda.plot_widgets.plot_impz_ui`
+    # Run widget standalone with `python -m pyfda.plot_widgets.plot_tran_ui`
     import sys
     from pyfda.libs.compat import QApplication
     from pyfda.pyfda_rc import QSS
 
     app = QApplication(sys.argv)
     app.setStyleSheet(QSS.QSS_RC)
-    mainw = PlotImpzUI()
+    mainw = PlotTranUI()
 
     lay_v_main = QVBoxLayout()
     lay_v_main.addWidget(mainw.wdg_ctrl_time)

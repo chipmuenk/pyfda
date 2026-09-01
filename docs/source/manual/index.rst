@@ -41,7 +41,7 @@ Subwindow for Plotting Widgets
       plot_phi
       plot_tau_g
       plot_pz
-      plot_impz
+      plot_tran
       plot_3d
 
 Some documentation treats general filter design and fixpoint arithmetics stuff.

@@ -238,13 +238,13 @@ class Input_Fixpoint_Specs(QWidget):
                     # `impz.impz_init()`
                     if not self.fx_wdg_found:
                         logger.error("No fixpoint widget found!")
-                        # process this in PlotImpz()
+                        # process this in PlotTran()
                         self.emit({'fx_sim': 'error'})
                         return
                     # initialize fixpoint filter and check for error during initialization
                     err = self.fx_filt_init()
                     if err != 0:  # returned an error
-                        # process this in PlotImpz()
+                        # process this in PlotTran()
                         self.emit({'fx_sim': 'error'})
                     else:
                         # Reset overflow counter for input and output quantizer
@@ -261,7 +261,7 @@ class Input_Fixpoint_Specs(QWidget):
                                  self.fx_filt_ui.__class__.__name__)
                             self.emit({'fx_sim': 'error'})
 
-                        # next, start fx response calculation in `plot_impz()`
+                        # next, start fx response calculation in `plot_tran()`
                         return
 
                 # --------------- finish --------------

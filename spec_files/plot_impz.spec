@@ -14,7 +14,7 @@ excludes += collect_submodules('tkinter')
 excludes += collect_submodules('docutils')
 
 
-a = Analysis(['pyfda/plot_widgets/plot_impz.py'],
+a = Analysis(['pyfda/plot_widgets/plot_tran.py'],
              pathex=['pyfda/plot_widgets', 'D:\\Daten/design/python/git/pyfda'],
              binaries=[],
              datas=datas,

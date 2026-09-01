@@ -64,7 +64,7 @@ datas += json_files
 ### Plot Widgets
 hiddenimports += [
     'pyfda.plot_widgets.plot_hf','pyfda.plot_widgets.plot_phi','pyfda.plot_widgets.plot_tau_g',
-    'pyfda.plot_widgets.plot_pz','pyfda.plot_widgets.plot_impz','pyfda.plot_widgets.plot_3d']
+    'pyfda.plot_widgets.plot_pz','pyfda.plot_widgets.plot_tran','pyfda.plot_widgets.plot_3d']
 ### Input Widgets
 hiddenimports += [
     'pyfda.input_widgets.input_specs','pyfda.input_widgets.input_coeffs',

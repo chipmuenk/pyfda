@@ -24,7 +24,7 @@ datas += [ ('pyfda/fixpoint_widgets/*.png', 'pyfda/fixpoint_widgets') ]
 
 hiddenimports += [
     'pyfda.plot_widgets.plot_hf','pyfda.plot_widgets.plot_phi','pyfda.plot_widgets.plot_tau_g',
-    'pyfda.plot_widgets.plot_pz','pyfda.plot_widgets.plot_impz','pyfda.plot_widgets.plot_3d']
+    'pyfda.plot_widgets.plot_pz','pyfda.plot_widgets.plot_tran','pyfda.plot_widgets.plot_3d']
 hiddenimports += [
     'pyfda.input_widgets.input_specs','pyfda.input_widgets.input_coeffs',
     'pyfda.input_widgets.input_pz','pyfda.input_widgets.input_info',

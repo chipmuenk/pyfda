@@ -31,7 +31,7 @@ from pyfda.libs.pyfda_qt_lib import (
 from pyfda.plot_widgets.mpl_widget import MplWidget, stems, scatter
 from pyfda.plot_widgets.tran.plot_tran_stim import PlotTranStim
 from pyfda.plot_widgets.tran.tran_io import TranIO
-from pyfda.plot_widgets.plot_impz_ui import PlotImpzUI
+from pyfda.plot_widgets.plot_tran_ui import PlotTranUI
 from pyfda.pyfda_rc import params  # FMT string for QLineEdit fields, e.g. '{:.3g}'
 
 logger = logging.getLogger(__name__)
@@ -93,7 +93,7 @@ class PlotTran(QWidget):
         # ########################################################################
 
         # create the UI part with buttons etc.
-        self.ui = PlotImpzUI()
+        self.ui = PlotTranUI()
         self.stim_wdg = PlotTranStim()
         self.tran_io_wdg = TranIO(self)
 
@@ -129,7 +129,7 @@ class PlotTran(QWidget):
         self.mplwidget_t.lay_v_main_mpl.setContentsMargins(*params['mpl_margins'])
         self.mplwidget_t.mpl_toolbar.a_en.setVisible(True)
         self.mplwidget_t.mpl_toolbar.a_he.setEnabled(True)
-        self.mplwidget_t.mpl_toolbar.a_he.info = "manual/plot_impz.html"
+        self.mplwidget_t.mpl_toolbar.a_he.info = "manual/plot_tran.html"
         self.mplwidget_t.mpl_toolbar.a_ui_num_levels = 4
         self.mplwidget_t.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
 
@@ -140,7 +140,7 @@ class PlotTran(QWidget):
         self.mplwidget_f.lay_v_main_mpl.setContentsMargins(*params['mpl_margins'])
         self.mplwidget_f.mpl_toolbar.a_en.setVisible(True)
         self.mplwidget_f.mpl_toolbar.a_he.setEnabled(True)
-        self.mplwidget_f.mpl_toolbar.a_he.info = "manual/plot_impz.html"
+        self.mplwidget_f.mpl_toolbar.a_he.info = "manual/plot_tran.html"
         self.mplwidget_f.mpl_toolbar.a_ui_num_levels = 4
         self.mplwidget_f.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
 
@@ -2040,7 +2040,7 @@ class PlotTran(QWidget):
 # ------------------------------------------------------------------------------
 
 if __name__ == "__main__":
-    # Run widget standalone with `python -m pyfda.plot_widgets.plot_impz`
+    # Run widget standalone with `python -m pyfda.plot_widgets.plot_tran`
     import sys
     from pyfda.libs.compat import QApplication
     from pyfda.pyfda_rc import QSS

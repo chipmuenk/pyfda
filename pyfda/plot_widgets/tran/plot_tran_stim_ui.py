@@ -171,7 +171,7 @@ class PlotTranStimUI(QWidget):
     """
     # incoming:
     sig_rx = pyqtSignal(object)
-    # outgoing: from various UI elements to PlotImpz ('ui_local_changed':'xxx')
+    # outgoing: from various UI elements to PlotTran ('ui_local_changed':'xxx')
     sig_tx = pyqtSignal(object)
     # outgoing: to fft related widgets (FFT window widget, qfft_win_select)
     sig_tx_fft = pyqtSignal(object)
@@ -317,7 +317,7 @@ class PlotTranStimUI(QWidget):
         qcmb_box_populate(
             self.cmb_file_io, CMB_FILE_IO_ITEMS, self.cmb_file_io_default)
 
-        # TODO: lay_h_file_io is instantiated in plot_impz, this is very hacky
+        # TODO: lay_h_file_io is instantiated in plot_tran, this is very hacky
         self.lay_h_file_io = QHBoxLayout()
         self.lay_h_file_io.addWidget(self.but_file_io)
         self.lay_h_file_io.addWidget(self.lbl_file_io)
@@ -751,7 +751,7 @@ class PlotTranStimUI(QWidget):
         Update widget with normalized frequencies and periods if required.
 
         `normalize_freqs()` is called when sampling frequency has been changed
-        via signal ['view_changed':'f_S'] from plot_impz.process_sig_rx
+        via signal ['view_changed':'f_S'] from plot_tran.process_sig_rx
 
         Frequency and time related entries are always stored normalized w.r.t. f_S
         which is loaded from filter dictionary and stored as  `self.f_scale`

@@ -47,7 +47,7 @@ pyfda.plot\_widgets.plot\_hf module
 pyfda.plot\_widgets.plot\_impz module
 -------------------------------------
 
-.. automodule:: pyfda.plot_widgets.plot_impz
+.. automodule:: pyfda.plot_widgets.plot_tran
    :members:
    :undoc-members:
    :show-inheritance:
@@ -55,7 +55,7 @@ pyfda.plot\_widgets.plot\_impz module
 pyfda.plot\_widgets.plot\_impz\_ui module
 -----------------------------------------
 
-.. automodule:: pyfda.plot_widgets.plot_impz_ui
+.. automodule:: pyfda.plot_widgets.plot_tran_ui
    :members:
    :undoc-members:
    :show-inheritance:
