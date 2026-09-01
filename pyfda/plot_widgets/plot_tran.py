@@ -881,35 +881,36 @@ class PlotTran(QWidget):
     # -----------------------------------------------------------------------
     def calc_fft(self):
         """
-        (Re-)calculate FFTs of stimulus `self.X`, quantized stimulus `self.X_q`
-        and response `self.Y` using the window function from `self.ui.all_wins_dict['win']`.
+        (Re-)calculate FFTs of stimulus `self.x_fft`, quantized stimulus
+        `self.x_q_fft` and response `self.y_fft` using the window function
+        from `self.ui.all_wins_dict['win']`.
         """
         # calculate FFT of stimulus / response
         N = self.ui.N
         win = self.ui.qfft_win_select.calc_window(N) / self.ui.all_wins_dict['cgain']
         if self.x is None:
-            self.X = np.zeros(N)  # dummy result
+            self.x_fft = np.zeros(N)  # dummy result
             logger.warning("Stimulus is 'None', FFT cannot be calculated.")
         elif len(self.x) < self.ui.n_end:
-            self.X = np.zeros(N)  # dummy result
+            self.x_fft = np.zeros(N)  # dummy result
             logger.warning("Length of stimulus is %d < N = %d, FFT cannot be calculated.",
                            len(self.x), self.ui.n_end)
         else:
             # multiply the  time signal with window function
             x_win = self.x[self.ui.n_start:self.ui.n_end] * win
             # calculate absolute value and scale by N_FFT
-            self.X = np.fft.fft(x_win) / self.ui.N
-            # self.X[0] = self.X[0] * np.sqrt(2) # correct value at DC
+            self.x_fft = np.fft.fft(x_win) / self.ui.N
+            # self.x_fft[0] = self.x_fft[0] * np.sqrt(2) # correct value at DC
 
             if get_fx() and hasattr(self, "q_i"):
                 # same for fixpoint simulation
                 x_q_win = self.q_i.fixp(self.x[self.ui.n_start:self.ui.n_end])\
                     * win
-                self.X_q = np.fft.fft(x_q_win) / self.ui.N
-                # self.X_q[0] = self.X_q[0] * np.sqrt(2) # correct value at DC
+                self.x_q_fft = np.fft.fft(x_q_win) / self.ui.N
+                # self.x_q_fft[0] = self.x_q_fft[0] * np.sqrt(2) # correct value at DC
 
         if self.y is None or len(self.y) < self.ui.n_end:
-            self.Y = np.zeros(self.ui.N)  # dummy result
+            self.y_fft = np.zeros(self.ui.N)  # dummy result
             if self.y is None:
                 logger.warning("Transient response is 'None', FFT cannot be calculated.")
             else:
@@ -918,11 +919,11 @@ class PlotTran(QWidget):
                     "calculated.", len(self.y), self.ui.n_end)
         else:
             y_win = self.y[self.ui.n_start:self.ui.n_end] * win
-            self.Y = np.fft.fft(y_win) / self.ui.N
-            # self.Y[0] = self.Y[0] * np.sqrt(2) # correct value at DC
+            self.y_fft = np.fft.fft(y_win) / self.ui.N
+            # self.y_fft[0] = self.y_fft[0] * np.sqrt(2) # correct value at DC
 
         # if self.ui.chk_win_freq.isChecked():
-        #    self.Win = np.abs(np.fft.fft(win)) / self.ui.N
+        #    self.win_fft = np.abs(np.fft.fft(win)) / self.ui.N
 
         self.needs_redraw[1] = True   # redraw of frequency widget needed
 
@@ -1580,7 +1581,7 @@ class PlotTran(QWidget):
         plt_response = self.plt_freq_resp != "none"
         plt_stimulus = self.plt_freq_stim != "none"
         plt_stimulus_q = self.plt_freq_stmq != "none" and get_fx()\
-            and hasattr(self, "X_q")
+            and hasattr(self, "x_q_fft")
 
         if "*" in qget_cmb_box(self.ui.cmb_plt_freq_stim):
             fmt_mkr_stim = self.fmt_mkr_stim
@@ -1667,43 +1668,43 @@ class PlotTran(QWidget):
                     logger.warning(
                         "You are displaying a single-sided spectrum. For complex-valued time signals, "
                         "you should display both sides (0 ... f_S or -f_S/2 ... f_S/2).")
-                # scale display of stimulus: `self.x` is unscaled, hence X needs
+                # scale display of stimulus: `self.x` is unscaled, hence x_fft needs
                 # to be multiplied by self.scale_i
-                Px = np.sum(np.square(np.abs(self.X))) * p_scale
+                Px = np.sum(np.square(np.abs(self.x_fft))) * p_scale
                 if onesided and not freq_resp:
-                    X = calc_ssb_spectrum(self.X, mag=self.cmplx) * scale_impz
+                    x_fft_disp = calc_ssb_spectrum(self.x_fft, mag=self.cmplx) * scale_impz
                 else:
-                    X = self.X * scale_impz
+                    x_fft_disp = self.x_fft * scale_impz
 
             if plt_stimulus_q:
-                Pxq = np.sum(np.square(np.abs(self.X_q))) * p_scale
+                Pxq = np.sum(np.square(np.abs(self.x_q_fft))) * p_scale
                 if onesided and not freq_resp:
-                    X_q = calc_ssb_spectrum(
-                        self.X_q, mag=self.cmplx) / self.scale_iq * scale_impz
+                    x_q_fft_disp = calc_ssb_spectrum(
+                        self.x_q_fft, mag=self.cmplx) / self.scale_iq * scale_impz
                 else:
-                    X_q = self.X_q / self.scale_iq * scale_impz
+                    x_q_fft_disp = self.x_q_fft / self.scale_iq * scale_impz
 
             if plt_response:
-                Py = np.sum(np.square(np.abs(self.Y * self.scale_o))) * p_scale
+                Py = np.sum(np.square(np.abs(self.y_fft * self.scale_o))) * p_scale
                 if onesided and not freq_resp:
-                    Y = calc_ssb_spectrum(
-                        self.Y, mag=self.cmplx) / self.scale_o * scale_impz
+                    y_fft_disp = calc_ssb_spectrum(
+                        self.y_fft, mag=self.cmplx) / self.scale_o * scale_impz
                 else:
-                    Y = self.Y / self.scale_o * scale_impz
+                    y_fft_disp = self.y_fft / self.scale_o * scale_impz
 
             # ----------------------------------------------------------------
             # Scale and shift frequency range
             # ----------------------------------------------------------------
             if fb_get('freqSpecsRangeType') == 'sym':
-                # display -f_S/2 ... f_S/2 ->  shift X, Y and f using fftshift()
+                # display -f_S/2 ... f_S/2 ->  shift x_fft_disp, y_fft_disp and f using fftshift()
                 if plt_response:
-                    Y = np.fft.fftshift(Y)
+                    y_fft_disp = np.fft.fftshift(y_fft_disp)
 
                 if plt_stimulus:
-                    X = np.fft.fftshift(X)
+                    x_fft_disp = np.fft.fftshift(x_fft_disp)
 
                 if plt_stimulus_q:
-                    X_q = np.fft.fftshift(X_q)
+                    x_q_fft_disp = np.fft.fftshift(x_q_fft_disp)
 
                 f = np.fft.fftshift(f)
 
@@ -1714,13 +1715,13 @@ class PlotTran(QWidget):
                     h_id /= 2
 
             elif onesided:
-                # display 0 ... f_S/2 -> only use the first half of X, Y and f
+                # display 0 ... f_S/2 -> only use the first half of x_fft_disp, y_fft_disp and f
                 if plt_response:
-                    Y = Y[0:self.ui.N//2]
+                    y_fft_disp = y_fft_disp[0:self.ui.N//2]
                 if plt_stimulus:
-                    X = X[0:self.ui.N//2]
+                    x_fft_disp = x_fft_disp[0:self.ui.N//2]
                 if plt_stimulus_q:
-                    X_q = X_q[0:self.ui.N//2]
+                    x_q_fft_disp = x_q_fft_disp[0:self.ui.N//2]
 
                 f = f[0:self.ui.N//2]
                 f_id = f_id[0:CFP.conf_settings['N_FFT']//2]
@@ -1747,34 +1748,34 @@ class PlotTran(QWidget):
                 if plt_stimulus:
                     Px = 10*np.log10(Px)
                     if self.en_re_im_f:
-                        x_r = np.maximum(20 * np.log10(np.abs(X.real)), self.ui.bottom_f)
-                        x_i = np.maximum(20 * np.log10(np.abs(X.imag)), self.ui.bottom_f)
+                        x_r = np.maximum(20 * np.log10(np.abs(x_fft_disp.real)), self.ui.bottom_f)
+                        x_i = np.maximum(20 * np.log10(np.abs(x_fft_disp.imag)), self.ui.bottom_f)
                     else:
-                        x_r = np.maximum(20 * np.log10(np.abs(X)), self.ui.bottom_f)
+                        x_r = np.maximum(20 * np.log10(np.abs(x_fft_disp)), self.ui.bottom_f)
                         if self.en_mag_phi_f:
-                            x_i = angle_zero(X)
+                            x_i = angle_zero(x_fft_disp)
 
                 if plt_stimulus_q:
                     Pxq = 10*np.log10(Pxq)
                     if self.en_re_im_f:
-                        X_q_r = np.maximum(20 * np.log10(np.abs(X_q.real)),
+                        X_q_r = np.maximum(20 * np.log10(np.abs(x_q_fft_disp.real)),
                                            self.ui.bottom_f)
-                        X_q_i = np.maximum(20 * np.log10(np.abs(X_q.imag)),
+                        X_q_i = np.maximum(20 * np.log10(np.abs(x_q_fft_disp.imag)),
                                            self.ui.bottom_f)
                     else:
-                        X_q_r = np.maximum(20 * np.log10(np.abs(X_q)), self.ui.bottom_f)
+                        X_q_r = np.maximum(20 * np.log10(np.abs(x_q_fft_disp)), self.ui.bottom_f)
                         if self.en_mag_phi_f:
-                            X_q_i = angle_zero(X_q)
+                            X_q_i = angle_zero(x_q_fft_disp)
 
                 if plt_response:
                     Py = 10*np.log10(Py)
                     if self.en_re_im_f:
-                        y_r = np.maximum(20 * np.log10(np.abs(Y.real)), self.ui.bottom_f)
-                        y_i = np.maximum(20 * np.log10(np.abs(Y.imag)), self.ui.bottom_f)
+                        y_r = np.maximum(20 * np.log10(np.abs(y_fft_disp.real)), self.ui.bottom_f)
+                        y_i = np.maximum(20 * np.log10(np.abs(y_fft_disp.imag)), self.ui.bottom_f)
                     else:
-                        y_r = np.maximum(20 * np.log10(np.abs(Y)), self.ui.bottom_f)
+                        y_r = np.maximum(20 * np.log10(np.abs(y_fft_disp)), self.ui.bottom_f)
                         if self.en_mag_phi_f:
-                            y_i = angle_zero(Y)
+                            y_i = angle_zero(y_fft_disp)
 
                 if self.ui.but_hf_id.isChecked():
                     if self.en_re_im_f:
@@ -1792,30 +1793,30 @@ class PlotTran(QWidget):
                 h_f_post = ""
                 if plt_stimulus:
                     if self.en_re_im_f:
-                        x_r = X.real
-                        x_i = X.imag
+                        x_r = x_fft_disp.real
+                        x_i = x_fft_disp.imag
                     else:
-                        x_r = np.abs(X)
+                        x_r = np.abs(x_fft_disp)
                         if self.en_mag_phi_f:
-                            x_i = angle_zero(X)
+                            x_i = angle_zero(x_fft_disp)
 
                 if plt_stimulus_q:
                     if self.en_re_im_f:
-                        X_q_r = X_q.real
-                        X_q_i = X_q.imag
+                        X_q_r = x_q_fft_disp.real
+                        X_q_i = x_q_fft_disp.imag
                     else:
-                        X_q_r = np.abs(X_q)
+                        X_q_r = np.abs(x_q_fft_disp)
                         if self.en_mag_phi_f:
-                            X_q_i = angle_zero(X_q)
+                            X_q_i = angle_zero(x_q_fft_disp)
 
                 if plt_response:
                     if self.en_re_im_f:
-                        y_r = Y.real
-                        y_i = Y.imag
+                        y_r = y_fft_disp.real
+                        y_i = y_fft_disp.imag
                     else:
-                        y_r = np.abs(Y)
+                        y_r = np.abs(y_fft_disp)
                         if self.en_mag_phi_f:
-                            y_i = angle_zero(Y)
+                            y_i = angle_zero(y_fft_disp)
 
                 if self.ui.but_hf_id.isChecked():
                     if self.en_re_im_f:
