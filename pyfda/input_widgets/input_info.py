@@ -369,20 +369,20 @@ class Input_Info(QWidget):
             _rt = fb_get('rt')
             if _rt in {'lp', 'hp', 'bp', 'bs', 'hil'}:
                 if _rt == 'lp':
-                    f_lbls = ['F_PB', 'F_SB']
-                    a_lbls = ['A_PB', 'A_SB']
+                    f_lbls = ['f_pb', 'f_sb']
+                    a_lbls = ['a_pb', 'a_sb']
                 elif _rt == 'hp':
-                    f_lbls = ['F_SB', 'F_PB']
-                    a_lbls = ['A_SB', 'A_PB']
+                    f_lbls = ['f_sb', 'f_pb']
+                    a_lbls = ['a_sb', 'a_pb']
                 elif _rt == 'bp':
-                    f_lbls = ['F_SB', 'F_PB', 'F_PB2', 'F_SB2']
-                    a_lbls = ['A_SB', 'A_PB', 'A_PB', 'A_SB2']
+                    f_lbls = ['f_sb', 'f_pb', 'f_pb2', 'f_sb2']
+                    a_lbls = ['a_sb', 'a_pb', 'a_pb', 'a_sb2']
                 elif _rt == 'bs':
-                    f_lbls = ['F_PB', 'F_SB', 'F_SB2', 'F_PB2']
-                    a_lbls = ['A_PB', 'A_SB', 'A_SB', 'A_PB2']
+                    f_lbls = ['f_pb', 'f_sb', 'f_sb2', 'f_pb2']
+                    a_lbls = ['a_pb', 'a_sb', 'a_sb', 'a_pb2']
                 elif _rt == 'hil':
-                    f_lbls = ['F_PB', 'F_PB2']
-                    a_lbls = ['A_PB', 'A_PB']
+                    f_lbls = ['f_pb', 'f_pb2']
+                    a_lbls = ['a_pb', 'a_pb']
 
             # Try to get lists of frequency / amplitude specs from the filter dict
             # that correspond to the f_lbls / a_lbls pairs defined above

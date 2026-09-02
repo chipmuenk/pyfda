@@ -33,7 +33,7 @@ logger = logging.getLogger(__name__)
 class AmplitudeSpecs(QWidget):
     """
     Build and update widget for entering the amplitude
-    specifications like A_SB, A_PB etc.
+    specifications like a_sb, a_pb etc.
     """
     sig_rx = pyqtSignal(object)  # receive signals from higher hierarchies
     sig_tx = pyqtSignal(object)  # emitted when amplitude unit or spec has been changed
@@ -128,9 +128,9 @@ class AmplitudeSpecs(QWidget):
         self.n_cur_labels = 0  # number of currently visible labels / qlineedits
 
         # - Build a list from all entries in the fil_dict dictionary starting
-        #   with "A" (= amplitude specifications of the current filter)
+        #   with "a_" (= amplitude specifications of the current filter)
         # - Pass the list to update_ui which recreates the widget
-        new_labels = [str(lbl) for lbl in fb_get() if lbl[0] == 'A']
+        new_labels = [str(lbl) for lbl in fb_get() if lbl[0:2] == 'a_']
         self.update_ui(new_labels=new_labels)
 
         # ----------------------------------------------------------------------
@@ -223,10 +223,10 @@ class AmplitudeSpecs(QWidget):
             self.qlineedit[i].setText(str(fb_get(new_labels[i])))
             self.qlineedit[i].setObjectName(new_labels[i])  # update ID
 
-            if "sb" in new_labels[i].lower():
+            if "sb" in new_labels[i]:
                 self.qlineedit[i].setToolTip(
                     "<span>" + tool_tipp_sb + " (&gt; 0).</span>")
-            elif "pb" in new_labels[i].lower():
+            elif "pb" in new_labels[i]:
                 self.qlineedit[i].setToolTip(
                     "<span>Maximum ripple (&gt; 0) in (this) pass band.<span/>")
             qstyle_widget(self.qlineedit[i], state)
@@ -344,8 +344,8 @@ if __name__ == '__main__':
     app = QApplication(sys.argv)
     app.setStyleSheet(QSS.QSS_RC)
     mainw = AmplitudeSpecs()
-    mainw.update_ui(new_labels=['a', 'A_SB', 'A_SB2', 'A_PB', 'A_PB2'])
-    mainw.update_ui(new_labels=['u', 'A_PB', 'A_SB'])
+    mainw.update_ui(new_labels=['a', 'a_sb', 'a_sb2', 'a_pb', 'a_pb2'])
+    mainw.update_ui(new_labels=['u', 'a_pb', 'a_sb'])
 
     app.setActiveWindow(mainw)
     mainw.show()

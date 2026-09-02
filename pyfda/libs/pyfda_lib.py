@@ -950,7 +950,7 @@ def to_html(text: str, frmt: str = None) -> str:
     Examples
     --------
 
-        >>> to_html("F_SB", frmt='bi')
+        >>> to_html("f_sb", frmt='bi')
         "<b><i>F<sub>SB</sub></i></b>"
         >>> to_html("F_1", frmt='i')
         "<i>F</i><sub>1</sub>"

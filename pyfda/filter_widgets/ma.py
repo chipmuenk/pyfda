@@ -109,28 +109,28 @@ class MA(QWidget):
                    "per stage will be determined. Passband specs are not regarded.")
                         }
                     },
-            'lp': {'man':{'tspecs': ('u', {'frq':('u','F_PB','F_SB'),
-                                           'amp':('u','A_PB','A_SB')})
+            'lp': {'man':{'tspecs': ('u', {'frq':('u','f_pb','f_sb'),
+                                           'amp':('u','a_pb','a_sb')})
                           },
-                   'min':{'tspecs': ('a', {'frq':('a','F_PB','F_SB'),
-                                           'amp':('a','A_PB','A_SB')})
+                   'min':{'tspecs': ('a', {'frq':('a','f_pb','f_sb'),
+                                           'amp':('a','a_pb','a_sb')})
                    }
                 },
-            'hp': {'man':{'tspecs': ('u', {'frq':('u','F_SB','F_PB'),
-                                           'amp':('u','A_SB','A_PB')})
+            'hp': {'man':{'tspecs': ('u', {'frq':('u','f_sb','f_pb'),
+                                           'amp':('u','a_sb','a_pb')})
                          },
-                   'min':{'tspecs': ('a', {'frq':('a','F_SB','F_PB'),
-                                           'amp':('a','A_SB','A_PB')})
+                   'min':{'tspecs': ('a', {'frq':('a','f_sb','f_pb'),
+                                           'amp':('a','a_sb','a_pb')})
                          },
                 },
-            'bs': {'man':{'tspecs': ('u', {'frq':('u','F_PB','F_SB','F_SB2', 'F_PB2'),
-                                           'amp':('u','A_PB','A_SB','A_PB2')}),
+            'bs': {'man':{'tspecs': ('u', {'frq':('u','f_pb','f_sb','f_sb2', 'f_pb2'),
+                                           'amp':('u','a_pb','a_sb','a_pb2')}),
                     'msg': ('a', "\nThis is not a proper band stop, it only lets pass"
                             " frequency components around DC and <i>f<sub>S</sub></i>/2."
                             " The order needs to be odd."),
                         }},
-            'bp': {'man':{'tspecs': ('u', {'frq':('u','F_SB','F_PB','F_PB2','F_SB2',),
-                                           'amp':('u','A_SB','A_PB','A_SB2')}),
+            'bp': {'man':{'tspecs': ('u', {'frq':('u','f_sb','f_pb','f_pb2','f_sb2',),
+                                           'amp':('u','a_sb','a_pb','a_sb2')}),
                     'msg': ('a', "\nThis is not a proper band pass, it only lets pass"
                             " frequency components around <i>f<sub>S</sub></i>/4."
                             " The order needs to be odd."),
@@ -261,12 +261,12 @@ class MA(QWidget):
     def _get_params(self) -> None:
         """
         Retrieve and set filter parameters from the filter dictionary.
-        This method fetches the stopband frequency (F_SB) and stopband
-        attenuation (A_SB) from the filterbroker.
+        This method fetches the stopband frequency (f_sb) and stopband
+        attenuation (a_sb) from the filterbroker.
         """
         # N is total order, L is number of taps per stage
-        self.F_SB  = fb_get('F_SB')
-        self.A_SB  = fb_get('A_SB')
+        self.f_sb  = fb_get('f_sb')
+        self.a_sb  = fb_get('a_sb')
 
 
     def _save(self) -> None:
@@ -388,8 +388,8 @@ class MA(QWidget):
             int: Status code of the filter calculation.
         """
         self._get_params()
-        self.delays = int(np.ceil(1 / (self.A_SB **(1/self.stages) *
-                                                     np.sin(self.F_SB * np.pi))))
+        self.delays = int(np.ceil(1 / (self.a_sb **(1/self.stages) *
+                                                     np.sin(self.f_sb * np.pi))))
         return self.calc_ma('lp')
 
     def hp_man(self) -> int:
@@ -413,8 +413,8 @@ class MA(QWidget):
             int: Status code of the filter calculation.
         """
         self._get_params()
-        self.delays = int(np.ceil(1 / (self.A_SB **(1/self.stages) *
-                                              np.sin((0.5 - self.F_SB) * np.pi))))
+        self.delays = int(np.ceil(1 / (self.a_sb **(1/self.stages) *
+                                              np.sin((0.5 - self.f_sb) * np.pi))))
         return self.calc_ma('hp')
 
     def bs_man(self) -> int:

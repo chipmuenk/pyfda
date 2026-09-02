@@ -16,7 +16,7 @@ class TestFilterConfig:
         """Test that default values are initialized correctly."""
         config = FilterConfig()
         assert config.N == 4
-        assert config.F_C == 0.1
+        assert config.f_c == 0.1
         assert config.f_S == 1.0
     
     def test_to_dict(self):
@@ -26,15 +26,15 @@ class TestFilterConfig:
         data = config.to_dict()
         
         assert data['N'] == 8
-        assert 'F_C' in data
+        assert 'f_c' in data
     
     def test_from_dict(self):
         """Test deserialization from dict."""
-        data = {'N': 12, 'F_C': 0.25, 'f_S': 2.0}
+        data = {'N': 12, 'f_c': 0.25, 'f_S': 2.0}
         config = FilterConfig.from_dict(data)
         
         assert config.N == 12
-        assert config.F_C == 0.25
+        assert config.f_c == 0.25
         assert config.f_S == 2.0
 
 
@@ -60,8 +60,8 @@ class TestFilterBrokerBasics:
         assert broker.get('N') == 8
         
         # Test multiple sets
-        assert broker.set('F_C', 0.25) is True
-        assert broker.get('F_C') == 0.25
+        assert broker.set('f_c', 0.25) is True
+        assert broker.get('f_c') == 0.25
         
         # Original value unchanged
         assert broker.get('N') == 8
@@ -188,24 +188,24 @@ class TestBatchSet:
         """Test setting multiple values at once."""
         broker = FilterBroker.get_instance()
         
-        updates = {'N': 8, 'F_C': 0.25, 'f_S': 2.0}
+        updates = {'N': 8, 'f_c': 0.25, 'f_S': 2.0}
         assert broker.batch_set(updates) is True
         
         assert broker.get('N') == 8
-        assert broker.get('F_C') == 0.25
+        assert broker.get('f_c') == 0.25
         assert broker.get('f_S') == 2.0
     
     def test_batch_set_creates_single_undo(self):
         """Test that batch_set creates only one undo entry."""
         broker = FilterBroker.get_instance()
         
-        updates = {'N': 8, 'F_C': 0.25}
+        updates = {'N': 8, 'f_c': 0.25}
         broker.batch_set(updates)
         
         # Undo should restore both values
         broker.undo()
         assert broker.get('N') == 4  # default
-        assert broker.get('F_C') == 0.1  # default
+        assert broker.get('f_c') == 0.1  # default
 
 
 class TestSubscriptions:
@@ -289,19 +289,19 @@ class TestSerialization:
         """Test serialization to dict."""
         broker = FilterBroker.get_instance()
         broker.set('N', 12)
-        broker.set('F_C', 0.25)
+        broker.set('f_c', 0.25)
         
         data = broker.to_dict()
         
         assert data['N'] == 12
-        assert data['F_C'] == 0.25
+        assert data['f_c'] == 0.25
         assert 'f_S' in data
     
     def test_from_dict(self):
         """Test deserialization from dict."""
         broker1 = FilterBroker.get_instance()
         broker1.set('N', 12)
-        broker1.set('F_C', 0.25)
+        broker1.set('f_c', 0.25)
         
         # Save state
         data = broker1.to_dict()
@@ -312,18 +312,18 @@ class TestSerialization:
         broker2.from_dict(data)
         
         assert broker2.get('N') == 12
-        assert broker2.get('F_C') == 0.25
+        assert broker2.get('f_c') == 0.25
     
     def test_reset_to_defaults(self):
         """Test resetting to default values."""
         broker = FilterBroker.get_instance()
         broker.set('N', 12)
-        broker.set('F_C', 0.25)
+        broker.set('f_c', 0.25)
         
         broker.reset_to_defaults()
         
         assert broker.get('N') == 4
-        assert broker.get('F_C') == 0.1
+        assert broker.get('f_c') == 0.1
         
         # Can undo the reset
         assert broker.undo() is True

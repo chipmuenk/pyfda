@@ -66,7 +66,7 @@ class Equiripple(QWidget):
 
     have the steepest rate of transition between the frequency response’s passband
     and stopband of all FIR filters. This comes at the expense of a constant ripple
-    (equiripple) :math:`A_PB` and :math:`A_SB` in both pass and stop band.
+    (equiripple) :math:`a_pb` and :math:`a_sb` in both pass and stop band.
 
     The filter-coefficients are calculated in such a way that the transfer function
     minimizes the maximum error (**Minimax** design) between the desired gain and the
@@ -74,9 +74,9 @@ class Equiripple(QWidget):
     The filter design algorithm is known as **Parks-McClellan** algorithm, in
     Matlab (R) it is called ``firpm``.
 
-    Manual filter order design requires specifying the frequency bands (:math:`F_PB`,
-    :math:`f_SB` etc.), the filter order :math:`N` and weight factors :math:`W_PB`,
-    :math:`W_SB` etc.) for individual bands.
+    Manual filter order design requires specifying the frequency bands (:math:`f_pb`,
+    :math:`f_SB` etc.), the filter order :math:`N` and weight factors :math:`w_pb`,
+    :math:`w_sb` etc.) for individual bands.
 
     The minimum order and the weight factors needed to fulfill the target specifications
     is estimated from frequency and amplitude specifications using Ichige's algorithm.
@@ -117,49 +117,49 @@ class Equiripple(QWidget):
                                 "<b><i>F<sub>SB</sub></i></b> .</span>")
                             }
                 },
-            'lp': {'man':{'wspecs': ('a','W_PB','W_SB'),
-                          'tspecs': ('u', {'frq':('a','F_PB','F_SB'),
-                                           'amp':('u','A_PB','A_SB')})
+            'lp': {'man':{'wspecs': ('a','w_pb','w_sb'),
+                          'tspecs': ('u', {'frq':('a','f_pb','f_sb'),
+                                           'amp':('u','a_pb','a_sb')})
                           },
-                   'min':{'wspecs': ('d','W_PB','W_SB'),
-                          'tspecs': ('a', {'frq':('a','F_PB','F_SB'),
-                                           'amp':('a','A_PB','A_SB')})
+                   'min':{'wspecs': ('d','w_pb','w_sb'),
+                          'tspecs': ('a', {'frq':('a','f_pb','f_sb'),
+                                           'amp':('a','a_pb','a_sb')})
                         }
                 },
-            'hp': {'man':{'wspecs': ('a','W_SB','W_PB'),
-                          'tspecs': ('u', {'frq':('a','F_SB','F_PB'),
-                                           'amp':('u','A_SB','A_PB')})
+            'hp': {'man':{'wspecs': ('a','w_sb','w_pb'),
+                          'tspecs': ('u', {'frq':('a','f_sb','f_pb'),
+                                           'amp':('u','a_sb','a_pb')})
                          },
-                   'min':{'wspecs': ('d','W_SB','W_PB'),
-                          'tspecs': ('a', {'frq':('a','F_SB','F_PB'),
-                                           'amp':('a','A_SB','A_PB')})
+                   'min':{'wspecs': ('d','w_sb','w_pb'),
+                          'tspecs': ('a', {'frq':('a','f_sb','f_pb'),
+                                           'amp':('a','a_sb','a_pb')})
                          }
                     },
-            'bp': {'man':{'wspecs': ('a','W_SB','W_PB','W_SB2'),
-                          'tspecs': ('u', {'frq':('a','F_SB','F_PB','F_PB2','F_SB2'),
-                                           'amp':('u','A_SB','A_PB','A_SB2')})
+            'bp': {'man':{'wspecs': ('a','w_sb','w_pb','W_SB2'),
+                          'tspecs': ('u', {'frq':('a','f_sb','f_pb','f_pb2','f_sb2'),
+                                           'amp':('u','a_sb','a_pb','a_sb2')})
                          },
-                   'min':{'wspecs': ('d','W_SB','W_PB','W_SB2'),
-                          'tspecs': ('a', {'frq':('a','F_SB','F_PB','F_PB2','F_SB2'),
-                                           'amp':('a','A_SB','A_PB','A_SB2')})
+                   'min':{'wspecs': ('d','w_sb','w_pb','W_SB2'),
+                          'tspecs': ('a', {'frq':('a','f_sb','f_pb','f_pb2','f_sb2'),
+                                           'amp':('a','a_sb','a_pb','a_sb2')})
                          },
                     },
-            'bs': {'man':{'wspecs': ('a','W_PB','W_SB','W_PB2'),
-                          'tspecs': ('u', {'frq':('a','F_PB','F_SB','F_SB2','F_PB2'),
-                                           'amp':('u','A_PB','A_SB','A_PB2')})
+            'bs': {'man':{'wspecs': ('a','w_pb','w_sb','W_PB2'),
+                          'tspecs': ('u', {'frq':('a','f_pb','f_sb','f_sb2','f_pb2'),
+                                           'amp':('u','a_pb','a_sb','a_pb2')})
                           },
-                   'min':{'wspecs': ('d','W_PB','W_SB','W_PB2'),
-                          'tspecs': ('a', {'frq':('a','F_PB','F_SB','F_SB2','F_PB2'),
-                                           'amp':('a','A_PB','A_SB','A_PB2')})
+                   'min':{'wspecs': ('d','w_pb','w_sb','W_PB2'),
+                          'tspecs': ('a', {'frq':('a','f_pb','f_sb','f_sb2','f_pb2'),
+                                           'amp':('a','a_pb','a_sb','a_pb2')})
                         }
                 },
-            'hil': {'man':{'wspecs': ('a','W_SB','W_PB','W_SB2'),
-                           'tspecs': ('u', {'frq':('a','F_SB','F_PB','F_PB2','F_SB2'),
-                                           'amp':('u','A_SB','A_PB','A_SB2')})
+            'hil': {'man':{'wspecs': ('a','w_sb','w_pb','W_SB2'),
+                           'tspecs': ('u', {'frq':('a','f_sb','f_pb','f_pb2','f_sb2'),
+                                           'amp':('u','a_sb','a_pb','a_sb2')})
                          }
                     },
-            'diff': {'man':{'wspecs': ('a','W_PB'),
-                            'tspecs': ('u', {'frq':('a','F_PB'),
+            'diff': {'man':{'wspecs': ('a','w_pb'),
+                            'tspecs': ('u', {'frq':('a','f_pb'),
                                            'amp':('i',)}),
                             'msg':('a',"Enter the max. frequency up to where the differentiator "
                                         "works.")
@@ -255,15 +255,15 @@ class Equiripple(QWidget):
         """
         self.N     = fb_get('N') + 1  # remez algorithms expects number of taps
                                         # which is larger by one than the order!!
-        self.F_PB  = fb_get('F_PB')
-        self.F_SB  = fb_get('F_SB')
-        self.F_PB2 = fb_get('F_PB2')
-        self.F_SB2 = fb_get('F_SB2')
+        self.f_pb  = fb_get('f_pb')
+        self.f_sb  = fb_get('f_sb')
+        self.f_pb2 = fb_get('f_pb2')
+        self.f_sb2 = fb_get('f_sb2')
         # remez amplitude specs are linear (not in dBs)
-        self.A_PB  = fb_get('A_PB')
-        self.A_PB2 = fb_get('A_PB2')
-        self.A_SB  = fb_get('A_SB')
-        self.A_SB2 = fb_get('A_SB2')
+        self.a_pb  = fb_get('a_pb')
+        self.a_pb2 = fb_get('a_pb2')
+        self.a_sb  = fb_get('a_sb')
+        self.a_sb2 = fb_get('a_sb2')
 
         self.alg = 'ichige'
 
@@ -309,8 +309,8 @@ class Equiripple(QWidget):
         instance parameters and in the filter dict, they are retrieved using `fb_get()`.
 
 
-        - 'W_PB': Weight for the passband.
-        - 'W_SB': Weight for the stopband.
+        - 'w_pb': Weight for the passband.
+        - 'w_sb': Weight for the stopband.
         - Other keys required by `_get_params`.
 
         Returns:
@@ -326,8 +326,8 @@ class Equiripple(QWidget):
         """
         self._get_params()
         return self._save(
-            remez(self.N,[0, self.F_PB, self.F_SB, 0.5], [1, 0],
-                  weight = [fb_get('W_PB'), fb_get('W_SB')], fs = 1,
+            remez(self.N,[0, self.f_pb, self.f_sb, 0.5], [1, 0],
+                  weight = [fb_get('w_pb'), fb_get('w_sb')], fs = 1,
                   grid_density = self.grid_density))
     def lp_min(self) -> int:
         """
@@ -339,8 +339,8 @@ class Equiripple(QWidget):
         coefficients are saved in the provided filter dictionary.
 
         Filter specifications are read from the filter dictionary with `fb_get()`,
-        These are passeband and stopband frequencies (`F_PB`, `F_SB`),
-        passband and stopband ripple (`A_PB`, `A_SB`), and other parameters.
+        These are passeband and stopband frequencies (`f_pb`, `f_sb`),
+        passband and stopband ripple (`a_pb`, `a_sb`), and other parameters.
 
         Returns
         -------
@@ -349,11 +349,11 @@ class Equiripple(QWidget):
             filter coefficients are saved in the filter dictionary using `fb_set()`.
         """
         self._get_params()
-        (self.N, F, A, W) = remezord([self.F_PB, self.F_SB], [1, 0],
-                                     [self.A_PB, self.A_SB], fs = 1, alg = self.alg)
+        (self.N, F, A, W) = remezord([self.f_pb, self.f_sb], [1, 0],
+                                     [self.a_pb, self.a_sb], fs = 1, alg = self.alg)
         # A is always [1, 0] for LP filters
-        fb_set('W_PB', W[0])
-        fb_set('W_SB', W[1])
+        fb_set('w_pb', W[0])
+        fb_set('w_sb', W[1])
         return self._save(
             remez(self.N, F, A, weight = W, fs = 1, grid_density = self.grid_density))
 
@@ -365,13 +365,13 @@ class Equiripple(QWidget):
         self._get_params()
         if self.N % 2 == 0: # even order, use odd symmetry (type III)
             return self._save(
-                remez(self.N,[0, self.F_SB, self.F_PB, 0.5], [0, 1],
-                      weight = [fb_get('W_SB'), fb_get('W_PB')], fs = 1,
+                remez(self.N,[0, self.f_sb, self.f_pb, 0.5], [0, 1],
+                      weight = [fb_get('w_sb'), fb_get('w_pb')], fs = 1,
                       type = 'hilbert', grid_density = self.grid_density))
         # odd order,
         return self._save(
-            remez(self.N,[0, self.F_SB, self.F_PB, 0.5], [0, 1],
-                    weight = [fb_get('W_SB'), fb_get('W_PB')], fs = 1,
+            remez(self.N,[0, self.f_sb, self.f_pb, 0.5], [0, 1],
+                    weight = [fb_get('w_sb'), fb_get('w_pb')], fs = 1,
                     type = 'bandpass', grid_density = self.grid_density))
 
     def hp_min(self) -> int:
@@ -380,13 +380,13 @@ class Equiripple(QWidget):
         For more details, see the `lp_min` method.
         """
         self._get_params()
-        (self.N, F, A, W) = remezord([self.F_SB, self.F_PB], [0, 1],
-                                     [self.A_SB, self.A_PB], fs = 1, alg = self.alg)
+        (self.N, F, A, W) = remezord([self.f_sb, self.f_pb], [0, 1],
+                                     [self.a_sb, self.a_pb], fs = 1, alg = self.alg)
         # A is always [0, 1] for HP filters
 
         # self.N = ceil_odd(N)  # enforce odd order
-        fb_set('W_SB', W[0])
-        fb_set('W_PB', W[1])
+        fb_set('w_sb', W[0])
+        fb_set('w_pb', W[1])
         if self.N % 2 == 0: # even order
             return self._save(
                 remez(self.N, F, A, weight = W, fs = 1, type = 'hilbert',
@@ -396,7 +396,7 @@ class Equiripple(QWidget):
             remez(self.N, F, A, weight = W, fs = 1, type = 'bandpass',
                     grid_density = self.grid_density))
 
-    # For BP and BS, F_PB and F_SB have two elements each
+    # For BP and BS, f_pb and f_sb have two elements each
     def bp_man(self) -> int:
         """
         Design a band-pass FIR filter with given order using the Remez exchange algorithm.
@@ -404,8 +404,8 @@ class Equiripple(QWidget):
         """
         self._get_params()
         return self._save(
-            remez(self.N, [0, self.F_SB, self.F_PB, self.F_PB2, self.F_SB2, 0.5], [0, 1, 0],
-                  weight = [fb_get('W_SB'), fb_get('W_PB'), fb_get('W_SB2')], fs = 1,
+            remez(self.N, [0, self.f_sb, self.f_pb, self.f_pb2, self.f_sb2, 0.5], [0, 1, 0],
+                  weight = [fb_get('w_sb'), fb_get('w_pb'), fb_get('W_SB2')], fs = 1,
                   grid_density = self.grid_density))
 
     def bp_min(self) -> int:
@@ -414,11 +414,11 @@ class Equiripple(QWidget):
         For more details, see the `lp_min` method.
         """
         self._get_params()
-        (self.N, F, A, W) = remezord([self.F_SB, self.F_PB, self.F_PB2, self.F_SB2], [0, 1, 0],
-                                     [self.A_SB, self.A_PB, self.A_SB2], fs = 1, alg = self.alg)
+        (self.N, F, A, W) = remezord([self.f_sb, self.f_pb, self.f_pb2, self.f_sb2], [0, 1, 0],
+                                     [self.a_sb, self.a_pb, self.a_sb2], fs = 1, alg = self.alg)
         # A is always [0, 1, 0] for BP filters
-        fb_set('W_SB', W[0])
-        fb_set('W_PB', W[1])
+        fb_set('w_sb', W[0])
+        fb_set('w_pb', W[1])
         fb_set('W_SB2', W[2])
         return self._save(
             remez(self.N, F, A, weight = W, fs = 1, grid_density = self.grid_density))
@@ -431,8 +431,8 @@ class Equiripple(QWidget):
         self._get_params()
         self.N = round_odd(self.N) # enforce odd order
         return self._save(
-            remez(self.N,[0, self.F_PB, self.F_SB, self.F_SB2, self.F_PB2, 0.5], [1, 0, 1],
-                  weight = [fb_get('W_PB'), fb_get('W_SB'), fb_get('W_PB2')], fs = 1,
+            remez(self.N,[0, self.f_pb, self.f_sb, self.f_sb2, self.f_pb2, 0.5], [1, 0, 1],
+                  weight = [fb_get('w_pb'), fb_get('w_sb'), fb_get('W_PB2')], fs = 1,
                   grid_density = self.grid_density))
 
     def bs_min(self) -> int:
@@ -441,11 +441,11 @@ class Equiripple(QWidget):
         For more details, see the `lp_min` method.
         """
         self._get_params()
-        (self.N, F, A, W) = remezord([self.F_PB, self.F_SB, self.F_SB2, self.F_PB2], [1, 0, 1],
-                                [self.A_PB, self.A_SB, self.A_PB2], fs = 1, alg = self.alg)
+        (self.N, F, A, W) = remezord([self.f_pb, self.f_sb, self.f_sb2, self.f_pb2], [1, 0, 1],
+                                [self.a_pb, self.a_sb, self.a_pb2], fs = 1, alg = self.alg)
         # A is always [1, 0, 1] for BS filters
-        fb_set('W_PB', W[0])
-        fb_set('W_SB', W[1])
+        fb_set('w_pb', W[0])
+        fb_set('w_sb', W[1])
         fb_set('W_PB2', W[2])
         return self._save(
             remez(self.N, F, A, weight = W, fs = 1, grid_density = self.grid_density))
@@ -458,8 +458,8 @@ class Equiripple(QWidget):
         """
         self._get_params()
         return self._save(
-            remez(self.N,[0, self.F_SB, self.F_PB, self.F_PB2, self.F_SB2, 0.5], [0, 1, 0],
-                  weight = [fb_get('W_SB'), fb_get('W_PB'), fb_get('W_SB2')], fs = 1,
+            remez(self.N,[0, self.f_sb, self.f_pb, self.f_pb2, self.f_sb2, 0.5], [0, 1, 0],
+                  weight = [fb_get('w_sb'), fb_get('w_pb'), fb_get('W_SB2')], fs = 1,
                   type = 'hilbert', grid_density = self.grid_density))
 
     def diff_man(self) -> int:
@@ -468,16 +468,16 @@ class Equiripple(QWidget):
         """
         self._get_params()
         self.N = ceil_even(self.N) # enforce even order
-        if self.F_PB < 0.1:
+        if self.f_pb < 0.1:
             logger.warning(
                 "Relative bandwidth %s for pass band is too low, "
-                "inreasing to 0.1.", self.F_PB)
-            self.F_PB = 0.1
-            fb_set('F_PB', self.F_PB)
+                "inreasing to 0.1.", self.f_pb)
+            self.f_pb = 0.1
+            fb_set('f_pb', self.f_pb)
             self.emit({'specs_changed': 'equiripple'})
 
         return self._save(
-            remez(self.N, [0, self.F_PB], [np.pi * fb_get('W_PB')], fs = 1,
+            remez(self.N, [0, self.f_pb], [np.pi * fb_get('w_pb')], fs = 1,
                   type = 'differentiator', grid_density = self.grid_density))
 
 #------------------------------------------------------------------------------

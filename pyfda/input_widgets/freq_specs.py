@@ -434,8 +434,8 @@ if __name__ == '__main__':
     app = QApplication(sys.argv)
     app.setStyleSheet(QSS.QSS_RC)
     mainw = FreqSpecs()
-    mainw.update_ui(new_labels=['F_SB', 'F_SB2', 'F_PB', 'F_PB2'])
-#    mainw.update_ui(new_labels = ['F_PB','F_PB2'])
+    mainw.update_ui(new_labels=['f_sb', 'f_sb2', 'f_pb', 'f_pb2'])
+#    mainw.update_ui(new_labels = ['f_pb','f_pb2'])
 
     app.setActiveWindow(mainw)
     mainw.show()

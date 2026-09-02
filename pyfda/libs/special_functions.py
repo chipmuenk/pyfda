@@ -40,14 +40,14 @@ def lin2unit(lin_value: float, filt_type: str, amp_label: str,
     Convert linear amplitude specification to dB or W, depending on filter
     type ('FIR' or 'IIR') and whether the specifications belong to passband
     or stopband. This is determined by checking whether amp_label contains
-    the strings 'PB' or 'SB' :
+    the strings 'pb' or 'sb' :
 
     - Passband:
         .. math::
 
-            \\text{IIR:}\quad A_{dB} &= -20 \log_{10}(1 - lin\_value)
+            \\text{IIR:}\quad a_{dB} &= -20 \log_{10}(1 - lin\_value)
 
-            \\text{FIR:}\quad A_{dB} &=  20 \log_{10}\\frac{1 + lin\_value}{1 - lin\_value}
+            \\text{FIR:}\quad a_{dB} &=  20 \log_{10}\\frac{1 + lin\_value}{1 - lin\_value}
 
     - Stopband:
         .. math::
@@ -57,7 +57,7 @@ def lin2unit(lin_value: float, filt_type: str, amp_label: str,
     Returns the result as a float.
     """
     if unit == 'dB':
-        if "PB" in amp_label:  # passband
+        if 'pb' in amp_label:  # passband
             if filt_type == 'IIR':
                 unit_value = -20 * log10(1. - lin_value)
             else:
@@ -98,7 +98,7 @@ def unit2lin(unit_value: float, filt_type: str, amp_label: str,
 
     if unit == 'dB':
         try:
-            if "PB" in amp_label:  # passband
+            if 'pb' in amp_label:  # passband
                 if filt_type == 'IIR':
                     lin_value = 1. - 10.**(-unit_value / 20.)
                 else:
@@ -117,7 +117,7 @@ def unit2lin(unit_value: float, filt_type: str, amp_label: str,
         lin_value = unit_value
 
     # check limits to avoid errors during filter design
-    if "PB" in amp_label:  # passband
+    if 'pb' in amp_label:  # passband
         if lin_value < MIN_PB_AMP:
             lin_value = MIN_PB_AMP
             msg += "too small, "

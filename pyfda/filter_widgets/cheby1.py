@@ -18,7 +18,7 @@ API version info
 ----------------
 
     1.0: initial working release
-    1.1: - copy A_PB -> A_PB2 and A_SB -> A_SB2 for BS / BP designs
+    1.1: - copy a_pb -> a_pb2 and a_sb -> a_sb2 for BS / BP designs
          - mark private methods as private
     1.2: new API using fil_save (enable SOS features when available)
     1.3: new public methods destruct_ui + construct_ui (no longer called by __init__)
@@ -61,7 +61,7 @@ class Cheby1():
     **Chebyshev Type 1 filters**
 
     maximize the rate of cutoff between the frequency response’s passband and stopband,
-    at the expense of passband ripple :math:`A_PB` and increased ringing in
+    at the expense of passband ripple :math:`a_pb` and increased ringing in
     the step response. The stopband drops monotonously.
 
     Type I filters roll off faster than Type II, but Type II filters do not
@@ -69,15 +69,15 @@ class Cheby1():
 
     The passband has a constant ripple (equiripple) with a total of :math:`N` maxima
     and minima (for example, a 5th-order filter has 3 maxima and 2 minima). Consequently,
-    the DC gain is unity for odd-order low-pass filters, and :math:`-A_PB` dB for even-order
+    the DC gain is unity for odd-order low-pass filters, and :math:`-a_pb` dB for even-order
     filters.
 
-    For a manual filter design, the order :math:`N`, the passband ripple :math:`A_PB` and
-    the critical frequency / frequencies :math:`F_C` where the gain drops below
-    :math:`-A_PB` have to be specified.
+    For a manual filter design, the order :math:`N`, the passband ripple :math:`a_pb` and
+    the critical frequency / frequencies :math:`f_c` where the gain drops below
+    :math:`-a_pb` have to be specified.
 
     The ``cheb1ord()`` helper routine calculates the minimum order :math:`N` and the
-    critical passband frequency :math:`F_C` from passband / stopband specifications.
+    critical passband frequency :math:`f_c` from passband / stopband specifications.
 
     **Design routines:**
 
@@ -121,24 +121,24 @@ class Cheby1():
 
         self.N     = fb_get('N')
         # Frequencies are normalized to f_Nyq = f_S/2, ripple specs are in dB
-        self.F_PB  = fb_get('F_PB') * 2
-        self.F_SB  = fb_get('F_SB') * 2
-        self.F_C = fb_get('F_C') * 2
-        self.F_PB2 = fb_get('F_PB2') * 2
-        self.F_SB2 = fb_get('F_SB2') * 2
-        self.F_C2 = fb_get('F_C2') * 2
+        self.f_pb  = fb_get('f_pb') * 2
+        self.f_sb  = fb_get('f_sb') * 2
+        self.f_c = fb_get('f_c') * 2
+        self.f_pb2 = fb_get('f_pb2') * 2
+        self.f_sb2 = fb_get('f_sb2') * 2
+        self.f_c2 = fb_get('f_c2') * 2
         self.F_PBC = None
 
-        self.A_PB = lin2unit(fb_get('A_PB'), 'IIR', 'A_PB', unit='dB')
-        self.A_SB = lin2unit(fb_get('A_SB'), 'IIR', 'A_SB', unit='dB')
+        self.a_pb = lin2unit(fb_get('a_pb'), 'IIR', 'a_pb', unit='dB')
+        self.a_sb = lin2unit(fb_get('a_sb'), 'IIR', 'a_sb', unit='dB')
 
 
         # cheby1 filter routines support only one amplitude spec for
         # pass- and stop band each
         if fb_get('rt') == 'bs':
-            fb_set('A_PB2', fb_get('A_PB'))
+            fb_set('a_pb2', fb_get('a_pb'))
         elif fb_get('rt') == 'bp':
-            fb_set('A_SB2', fb_get('A_SB'))
+            fb_set('a_sb2', fb_get('a_sb'))
 
     #--------------------------------------------------------------------------
     def _test_n(self) -> bool:
@@ -169,11 +169,11 @@ class Cheby1():
 
         if fb_get('fo') == 'min':
             if fb_get('rt') in {'lp', 'hp'}:
-                fb_set('F_C', self.F_PBC / 2.) # HP or LP - single  corner frequency
+                fb_set('f_c', self.F_PBC / 2.) # HP or LP - single  corner frequency
                 fb_set('N', self.N)
             else: # BP or BS - two corner frequencies
-                fb_set('F_C', self.F_PBC[0] / 2.)
-                fb_set('F_C2', self.F_PBC[1] / 2.)
+                fb_set('f_c', self.F_PBC[0] / 2.)
+                fb_set('f_c2', self.F_PBC[1] / 2.)
                 fb_set('N', self.N * 2)
         return 0
 
@@ -183,78 +183,78 @@ class Cheby1():
     #
     #------------------------------------------------------------------------------
 
-    # LP: F_PB < F_SB ---------------------------------------------------------
+    # LP: f_pb < f_sb ---------------------------------------------------------
     def lp_min(self) -> int:
         """Cheby1 LP filter, minimum order"""
         self._get_params()
         self.N, self.F_PBC = cheb1ord(
-            self.F_PB, self.F_SB, self.A_PB, self.A_SB, analog=self.analog)
+            self.f_pb, self.f_sb, self.a_pb, self.a_sb, analog=self.analog)
         return self._save(
-            cheby1(self.N, self.A_PB, self.F_PBC, btype='low',
+            cheby1(self.N, self.a_pb, self.F_PBC, btype='low',
                    analog=self.analog, output=self.FRMT))
 
     def lp_man(self) -> int:
         """Cheby1 LP filter, manual order"""
         self._get_params()
         return self._save(
-            cheby1(self.N, self.A_PB, self.F_C, btype='low',
+            cheby1(self.N, self.a_pb, self.f_c, btype='low',
                    analog=self.analog, output=self.FRMT))
 
-    # HP: F_SB < F_PB ---------------------------------------------------------
+    # HP: f_sb < f_pb ---------------------------------------------------------
     def hp_min(self) -> int:
         """Cheby1 HP filter, minimum order"""
         self._get_params()
         self.N, self.F_PBC = cheb1ord(
-            self.F_PB,self.F_SB, self.A_PB, self.A_SB, analog=self.analog)
+            self.f_pb,self.f_sb, self.a_pb, self.a_sb, analog=self.analog)
         return self._save(
-            cheby1(self.N, self.A_PB, self.F_PBC, btype='highpass',
+            cheby1(self.N, self.a_pb, self.F_PBC, btype='highpass',
                    analog=self.analog, output=self.FRMT))
 
     def hp_man(self) -> int:
         """Cheby1 HP filter, manual order"""
         self._get_params()
         return self._save(cheby1(
-            self.N, self.A_PB, self.F_C, btype='highpass',
+            self.N, self.a_pb, self.f_c, btype='highpass',
             analog=self.analog, output=self.FRMT))
 
-    # For BP and BS, A_PB, F_PB and F_stop have two elements each.
+    # For BP and BS, a_pb, f_pb and F_stop have two elements each.
     # The min. filter order and the design algorithms use half the actual filter order,
     # hence the filter order needs to be doubled / halved before (re-)storing
 
-    # BP: F_SB[0] < F_PB[0], F_SB[1] > F_PB[1] --------------------------------
+    # BP: f_sb[0] < f_pb[0], f_sb[1] > f_pb[1] --------------------------------
     def bp_min(self) -> int:
         """Cheby1 BP filter, minimum order"""
         self._get_params()
         self.N, self.F_PBC = cheb1ord(
-            [self.F_PB, self.F_PB2], [self.F_SB, self.F_SB2], self.A_PB, self.A_SB,
+            [self.f_pb, self.f_pb2], [self.f_sb, self.f_sb2], self.a_pb, self.a_sb,
             analog=self.analog)
         return self._save(
-            cheby1(self.N, self.A_PB, self.F_PBC, btype='bandpass',
+            cheby1(self.N, self.a_pb, self.F_PBC, btype='bandpass',
                    analog=self.analog, output=self.FRMT))
 
     def bp_man(self) -> int:
         """Cheby1 BP filter, manual order"""
         self._get_params()
         return self._save(
-            cheby1(self.N//2, self.A_PB,[self.F_C, self.F_C2], btype='bandpass',
+            cheby1(self.N//2, self.a_pb,[self.f_c, self.f_c2], btype='bandpass',
                    analog=self.analog, output=self.FRMT))
 
-    # BS: F_SB[0] > F_PB[0], F_SB[1] < F_PB[1] --------------------------------
+    # BS: f_sb[0] > f_pb[0], f_sb[1] < f_pb[1] --------------------------------
     def bs_min(self) -> int:
         """Cheby1 BS filter, minimum order"""
         self._get_params()
         self.N, self.F_PBC = cheb1ord(
-            [self.F_PB, self.F_PB2], [self.F_SB, self.F_SB2], self.A_PB,self.A_SB,
+            [self.f_pb, self.f_pb2], [self.f_sb, self.f_sb2], self.a_pb,self.a_sb,
             analog = self.analog)
         return self._save(
-            cheby1(self.N, self.A_PB, self.F_PBC, btype='bandstop',
+            cheby1(self.N, self.a_pb, self.F_PBC, btype='bandstop',
                    analog=self.analog, output=self.FRMT))
 
     def bs_man(self) -> int:
         """Cheby1 BS filter, manual order"""
         self._get_params()
         return self._save(
-            cheby1(self.N//2, self.A_PB, [self.F_C, self.F_C2], btype='bandstop',
+            cheby1(self.N//2, self.a_pb, [self.f_c, self.f_c2], btype='bandstop',
                    analog=self.analog, output=self.FRMT))
 
 #------------------------------------------------------------------------------

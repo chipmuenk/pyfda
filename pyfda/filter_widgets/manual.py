@@ -75,23 +75,23 @@ class Manual_FIR():
             'COM':{'man':{'fo': ('d', 'N'),
                           'msg': msg_man}
                         },
-            'lp': {'man':{'tspecs': ('u', {'frq':('u','F_PB','F_SB'),
-                                           'amp':('u','A_PB','A_SB')})
+            'lp': {'man':{'tspecs': ('u', {'frq':('u','f_pb','f_sb'),
+                                           'amp':('u','a_pb','a_sb')})
                          }},
-            'hp': {'man':{'tspecs': ('u', {'frq':('u','F_SB','F_PB'),
-                                           'amp':('u','A_SB','A_PB')})
+            'hp': {'man':{'tspecs': ('u', {'frq':('u','f_sb','f_pb'),
+                                           'amp':('u','a_sb','a_pb')})
                         }},
-            'bs': {'man':{'tspecs': ('u', {'frq':('u','F_PB','F_SB','F_SB2', 'F_PB2'),
-                                           'amp':('u','A_PB','A_SB','A_PB2')})
+            'bs': {'man':{'tspecs': ('u', {'frq':('u','f_pb','f_sb','f_sb2', 'f_pb2'),
+                                           'amp':('u','a_pb','a_sb','a_pb2')})
                         }},
-            'bp': {'man':{'tspecs': ('u', {'frq':('u','F_SB','F_PB','F_PB2','F_SB2',),
-                                           'amp':('u','A_SB','A_PB','A_SB2')})
+            'bp': {'man':{'tspecs': ('u', {'frq':('u','f_sb','f_pb','f_pb2','f_sb2',),
+                                           'amp':('u','a_sb','a_pb','a_sb2')})
                         }},
-            'hil': {'man':{'tspecs': ('u', {'frq':('u','F_SB','F_PB','F_PB2','F_SB2',),
-                                           'amp':('u','A_SB','A_PB','A_SB2')})
+            'hil': {'man':{'tspecs': ('u', {'frq':('u','f_sb','f_pb','f_pb2','f_sb2',),
+                                           'amp':('u','a_sb','a_pb','a_sb2')})
                         }},
-            'diff': {'man':{'tspecs': ('u', {'frq':('u','F_SB','F_PB','F_PB2','F_SB2',),
-                                           'amp':('u','A_SB','A_PB','A_SB2')})
+            'diff': {'man':{'tspecs': ('u', {'frq':('u','f_sb','f_pb','f_pb2','f_sb2',),
+                                           'amp':('u','a_sb','a_pb','a_sb2')})
                         }}
                    }
 
@@ -107,17 +107,17 @@ class Manual_FIR():
     #     parameters, scaling / transforming them if needed.
     #     """
     #     self.N     = fb_get('N')
-    #     self.F_PB  = fb_get('F_PB')
-    #     self.F_SB  = fb_get('F_SB')
-    #     self.F_PB2 = fb_get('F_PB2')
-    #     self.F_SB2 = fb_get('F_SB2')
-    #     self.F_C   = fb_get('F_C')
-    #     self.F_C2  = fb_get('F_C2')
+    #     self.f_pb  = fb_get('f_pb')
+    #     self.f_sb  = fb_get('f_sb')
+    #     self.f_pb2 = fb_get('f_pb2')
+    #     self.f_sb2 = fb_get('f_sb2')
+    #     self.f_c   = fb_get('f_c')
+    #     self.f_c2  = fb_get('f_c2')
 
-    #     self.A_PB  = fb_get('A_PB')
-    #     self.A_PB2 = fb_get('A_PB2')
-    #     self.A_SB  = fb_get('A_SB')
-    #     self.A_SB2 = fb_get('A_SB2')
+    #     self.a_pb  = fb_get('a_pb')
+    #     self.a_pb2 = fb_get('a_pb2')
+    #     self.a_sb  = fb_get('a_sb')
+    #     self.a_sb2 = fb_get('a_sb2')
 
     def lp_man(self):
         """ Dummy method, to display widgets corresponding to filter type in UI """
@@ -153,23 +153,23 @@ class Manual_IIR():
             'COM':{'man':{'fo': ('d', 'N'),
                           'msg': msg_man}
                         },
-            'lp': {'man':{'tspecs': ('u', {'frq':('u','F_PB','F_SB'),
-                                           'amp':('u','A_PB','A_SB')})
+            'lp': {'man':{'tspecs': ('u', {'frq':('u','f_pb','f_sb'),
+                                           'amp':('u','a_pb','a_sb')})
                          }},
-            'hp': {'man':{'tspecs': ('u', {'frq':('u','F_SB','F_PB'),
-                                           'amp':('u','A_SB','A_PB')})
+            'hp': {'man':{'tspecs': ('u', {'frq':('u','f_sb','f_pb'),
+                                           'amp':('u','a_sb','a_pb')})
                         }},
-            'bs': {'man':{'tspecs': ('u', {'frq':('u','F_PB','F_SB','F_SB2', 'F_PB2'),
-                                           'amp':('u','A_PB','A_SB','A_PB2')})
+            'bs': {'man':{'tspecs': ('u', {'frq':('u','f_pb','f_sb','f_sb2', 'f_pb2'),
+                                           'amp':('u','a_pb','a_sb','a_pb2')})
                         }},
-            'bp': {'man':{'tspecs': ('u', {'frq':('u','F_SB','F_PB','F_PB2','F_SB2',),
-                                           'amp':('u','A_SB','A_PB','A_SB2')})
+            'bp': {'man':{'tspecs': ('u', {'frq':('u','f_sb','f_pb','f_pb2','f_sb2',),
+                                           'amp':('u','a_sb','a_pb','a_sb2')})
                         }},
-            'hil': {'man':{'tspecs': ('u', {'frq':('u','F_SB','F_PB','F_PB2','F_SB2',),
-                                           'amp':('u','A_SB','A_PB','A_SB2')})
+            'hil': {'man':{'tspecs': ('u', {'frq':('u','f_sb','f_pb','f_pb2','f_sb2',),
+                                           'amp':('u','a_sb','a_pb','a_sb2')})
                         }},
-            'diff': {'man':{'tspecs': ('u', {'frq':('u','F_SB','F_PB','F_PB2','F_SB2',),
-                                           'amp':('u','A_SB','A_PB','A_SB2')})
+            'diff': {'man':{'tspecs': ('u', {'frq':('u','f_sb','f_pb','f_pb2','f_sb2',),
+                                           'amp':('u','a_sb','a_pb','a_sb2')})
                         }}
                    }
 
@@ -185,17 +185,17 @@ class Manual_IIR():
     #     parameters, scaling / transforming them if needed.
     #     """
     #     self.N     = fb_get('N')
-    #     self.F_PB  = fb_get('F_PB')
-    #     self.F_SB  = fb_get('F_SB')
-    #     self.F_PB2 = fb_get('F_PB2')
-    #     self.F_SB2 = fb_get('F_SB2')
-    #     self.F_C   = fb_get('F_C')
-    #     self.F_C2  = fb_get('F_C2')
+    #     self.f_pb  = fb_get('f_pb')
+    #     self.f_sb  = fb_get('f_sb')
+    #     self.f_pb2 = fb_get('f_pb2')
+    #     self.f_sb2 = fb_get('f_sb2')
+    #     self.f_c   = fb_get('f_c')
+    #     self.f_c2  = fb_get('f_c2')
 
-    #     self.A_PB  = fb_get('A_PB')
-    #     self.A_PB2 = fb_get('A_PB2')
-    #     self.A_SB  = fb_get('A_SB')
-    #     self.A_SB2 = fb_get('A_SB2')
+    #     self.a_pb  = fb_get('a_pb')
+    #     self.a_pb2 = fb_get('a_pb2')
+    #     self.a_sb  = fb_get('a_sb')
+    #     self.a_sb2 = fb_get('a_sb2')
 
 
     def lp_man(self):

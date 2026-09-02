@@ -55,28 +55,28 @@ logger = logging.getLogger(__name__)
 class FilterConfig:
     """Type-safe filter configuration with all design parameters."""
     # Amplitude specs (linear units)
-    A_PB: float = 0.2056717652757185
-    A_PB2: float = 0.01
-    A_SB: float = 0.001
-    A_SB2: float = 0.0001
+    a_pb: float = 0.2056717652757185
+    a_pb2: float = 0.01
+    a_sb: float = 0.001
+    a_sb2: float = 0.0001
 
     # Frequency specs (normalized to F_S)
-    F_C: float = 0.1
-    F_C2: float = 0.4
+    f_c: float = 0.1
+    f_c2: float = 0.4
     F_N: float = 0.2
     F_N2: float = 0.4
-    F_PB: float = 0.1
-    F_PB2: float = 0.3
-    F_SB: float = 0.2
-    F_SB2: float = 0.4
+    f_pb: float = 0.1
+    f_pb2: float = 0.3
+    f_sb: float = 0.2
+    f_sb2: float = 0.4
 
     N: int = 4  # filter order
     T_S: float = 1.0  # sample time
 
     # Weights for pass- and stopbands
-    W_PB: float = 1.0
+    w_pb: float = 1.0
     W_PB2: float = 1.0
-    W_SB: float = 1.0
+    w_sb: float = 1.0
     W_SB2: float = 1.0
 
     amp_specs_unit: str = 'dB'
@@ -216,7 +216,7 @@ class FilterBroker:
         Parameters
         ----------
         key : str
-            Configuration key (e.g., 'N', 'F_C')
+            Configuration key (e.g., 'N', 'f_c')
         default : Any, optional
             Default value if key doesn't exist
 
@@ -229,7 +229,7 @@ class FilterBroker:
         --------
         >>> broker = FilterBroker.get_instance()
         >>> order = broker.get('N')  # Returns int
-        >>> freq = broker.get('F_C')  # Returns float
+        >>> freq = broker.get('f_c')  # Returns float
         """
         if not hasattr(self._config, key):
             logger.warning("Key '%s' not found in FilterConfig", key)
@@ -315,7 +315,7 @@ class FilterBroker:
 
         Examples
         --------
-        >>> broker.batch_set({'N': 8, 'F_C': 0.25})
+        >>> broker.batch_set({'N': 8, 'f_c': 0.25})
         True
         """
         if not updates:

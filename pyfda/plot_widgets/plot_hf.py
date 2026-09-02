@@ -329,7 +329,7 @@ class Plot_Hf(QWidget):
     #------------------------------------------------------------------------------
     def plot_spec_limits(self, ax):
         """
-        Plot the specifications limits (F_SB, A_SB, ...) as hatched areas with borders.
+        Plot the specifications limits (f_sb, a_sb, ...) as hatched areas with borders.
         """
         hatch = params['mpl_hatch']
         hatch_borders = params['mpl_hatch_border']
@@ -395,9 +395,9 @@ class Plot_Hf(QWidget):
 
         f_max_2 = self.f_max/2
         f_pb  = self.f_pb
-        f_sb  = fb_get('F_SB') * self.f_max
-        f_sb2 = fb_get('F_SB2') * self.f_max
-        f_pb2 = fb_get('F_PB2') * self.f_max
+        f_sb  = fb_get('f_sb') * self.f_max
+        f_sb2 = fb_get('f_sb2') * self.f_max
+        f_pb2 = fb_get('f_pb2') * self.f_max
 
         f_lim_upl = np.array([])   # left side limits, upper and lower
         a_lim_upl = np.array([])
@@ -620,16 +620,16 @@ class Plot_Hf(QWidget):
             param_list = []
 
 
-        SB = [k for k in param_list if 'A_SB' in k]
-        PB = [k for k in param_list if 'A_PB' in k]
+        sb = [k for k in param_list if 'a_sb' in k]
+        pb = [k for k in param_list if 'a_pb' in k]
 
-        if SB:
-            a_min = min(fb_get(k) for k in SB)
+        if sb:
+            a_min = min(fb_get(k) for k in sb)
         else:
             a_min = 5e-4
 
-        if PB:
-            a_max = max(fb_get(k) for k in PB)
+        if pb:
+            a_max = max(fb_get(k) for k in pb)
         else:
             a_max = 1
 
@@ -655,13 +655,13 @@ class Plot_Hf(QWidget):
 
         self.f_max = fb_get('f_max')
 
-        self.f_pb = fb_get('F_PB') * self.f_max
-        self.f_maxB = fb_get('F_SB') * self.f_max
+        self.f_pb = fb_get('f_pb') * self.f_max
+        self.f_maxB = fb_get('f_sb') * self.f_max
 
-        self.a_pb  = fb_get('A_PB')
-        self.a_pb2 = fb_get('A_PB2')
-        self.a_sb  = fb_get('A_SB')
-        self.a_sb2 = fb_get('A_SB2')
+        self.a_pb  = fb_get('a_pb')
+        self.a_pb2 = fb_get('a_pb2')
+        self.a_sb  = fb_get('a_sb')
+        self.a_sb2 = fb_get('a_sb2')
 
         f_lim = fb_get('freqSpecsRange')
 

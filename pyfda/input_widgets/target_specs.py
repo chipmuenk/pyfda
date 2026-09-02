@@ -28,7 +28,7 @@ logger = logging.getLogger(__name__)
 class TargetSpecs(QWidget):
     """
     Build and update widget for entering the target specifications (frequencies
-    and amplitudes) like F_SB, F_PB, A_SB, etc.
+    and amplitudes) like f_sb, f_pb, a_sb, etc.
     """
     # class variables (shared between instances if more than one exists)
     sig_rx = pyqtSignal(object)  # incoming

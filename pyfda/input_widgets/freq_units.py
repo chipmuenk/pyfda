@@ -478,7 +478,7 @@ if __name__ == '__main__':
     mainw = FreqUnits()
     app.setActiveWindow(mainw)
     mainw.update_ui()
-#    mainw.updateUI(newLabels = ['F_PB','F_PB2'])
+#    mainw.updateUI(newLabels = ['f_pb','f_pb2'])
 
     mainw.show()
     sys.exit(app.exec_())

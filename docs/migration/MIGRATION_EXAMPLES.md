@@ -21,7 +21,7 @@ class OldFilterWidget:
     
     def set_filter_specs(self, order, freq):
         fb.fb_set('N', order)
-        fb.fb_set('F_C', freq)
+        fb.fb_set('f_c', freq)
     
     def undo_last_change(self):
         fb.restore_fil()
@@ -46,7 +46,7 @@ class NewFilterWidget:
     
     def set_filter_specs(self, order: int, freq: float) -> bool:
         # Batch operation = single undo entry
-        return self.broker.batch_set({'N': order, 'F_C': freq})
+        return self.broker.batch_set({'N': order, 'f_c': freq})
     
     def undo_last_change(self) -> bool:
         return self.broker.undo()
@@ -97,7 +97,7 @@ from pyfda import filterbroker as fb
 class OldFilterDesigner:
     def design_lowpass(self):
         order = fb.fb_get('N')
-        freq = fb.fb_get('F_C')
+        freq = fb.fb_get('f_c')
 
         # Design filter
         ba = self._compute_coefficients(order, freq)
@@ -133,7 +133,7 @@ class NewFilterDesigner:
         """Design lowpass filter with current parameters."""
         try:
             order = self.broker.get('N')
-            freq = self.broker.get('F_C')
+            freq = self.broker.get('f_c')
             
             if not self._validate_params(order, freq):
                 return False
@@ -166,7 +166,7 @@ class NewFilterDesigner:
     
     def _on_param_changed(self, key: str, old_val, new_val):
         """Called when any filter parameter changes."""
-        if key in ['N', 'F_C', 'ft', 'rt']:
+        if key in ['N', 'f_c', 'ft', 'rt']:
             print(f"Parameter {key} changed: {old_val} -> {new_val}")
             # Could trigger automatic redesign here
             # self.design_lowpass()
@@ -179,7 +179,7 @@ def test_new_designer():
     mock_broker = MagicMock(spec=FilterBroker)
     mock_broker.get.side_effect = lambda key: {
         'N': 8,
-        'F_C': 0.25
+        'f_c': 0.25
     }.get(key)
     mock_broker.set.return_value = True
 
@@ -279,7 +279,7 @@ class OldFilterUI:
         self.ui.update_coefficients_table()
     
     def on_frequency_changed(self, new_freq):
-        fb.fb_set('F_C', new_freq)
+        fb.fb_set('f_c', new_freq)
         # Manually update all dependent UI elements again
         self.ui.update_freq_response()
         self.ui.update_filter_plot()
@@ -316,7 +316,7 @@ class NewFilterUI:
     
     def on_frequency_changed(self, new_freq: float):
         """Called when user changes frequency."""
-        self.broker.set('F_C', new_freq)
+        self.broker.set('f_c', new_freq)
         # No manual update calls needed!
     
     def _on_filter_param_changed(self, key: str, old_val, new_val):

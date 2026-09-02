@@ -217,7 +217,7 @@ An example for a design method is
 \begin{lstlisting}[style = pyStyle]{}
 def lp_man(self, fil_dict):
 	self.get_params(fil_dict)
-	self.save(fil_dict, sig.ellip(self.N, self.A_PB, self.A_SB, self.F_PB, 
+	self.save(fil_dict, sig.ellip(self.N, self.a_pb, self.a_sb, self.f_pb, 
 		btype='low', analog = False, output = frmt))
 \end{lstlisting}
 
@@ -232,7 +232,7 @@ def get_params(self, fil_dict):
  parameters, scaling / transforming them if needed.
  """
  self.N     = fil_dict['N']
- self.F_PB  = fil_dict['F_PB'] * 2 # Frequencies are normalized to f_Nyq
+ self.f_pb  = fil_dict['f_pb'] * 2 # Frequencies are normalized to f_Nyq
 \end{lstlisting}
 
 The local helper function \texttt{save()} saves the filter design back to the dictionary and the filter order and corner frequencies if they have been calculated by a minimum order algorithm.
@@ -264,13 +264,13 @@ All information that is displayed in \texttt{input\_widget/input\_info.py} in a 
 self.info = """
 **Elliptic filters**
 
-(also known as Cauer filters) have a constant ripple :math:`A_PB` resp.
-:math:`A_SB` in both pass- and stopband(s).
+(also known as Cauer filters) have a constant ripple :math:`a_pb` resp.
+:math:`a_sb` in both pass- and stopband(s).
 
 For the filter design, the order :math:`N`, minimum stopband attenuation
-:math:`A_SB`, the passband ripple :math:`A_PB` and
-the critical frequency / frequencies :math:`F_PB` where the gain drops below
-:math:`-A_PB` have to be specified.
+:math:`a_sb`, the passband ripple :math:`a_pb` and
+the critical frequency / frequencies :math:`f_pb` where the gain drops below
+:math:`-a_pb` have to be specified.
 
 **Design routines:**
 

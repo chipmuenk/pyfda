@@ -58,7 +58,7 @@ from .common import Common, remezord
 logger = logging.getLogger(__name__)
 
 # TODO: Hilbert, differentiator, multiband are missing
-# TODO: Improve calculation of F_C and F_C2 using the weights
+# TODO: Improve calculation of f_c and f_c2 using the weights
 # TODO: Automatic setting of density factor for remez calculation?
 #       Automatic switching to Kaiser / Hermann?
 # TODO: Parameters for windows are not stored in the filter dictionary
@@ -311,18 +311,18 @@ class Firwin(QWidget):
         parameters, scaling / transforming them if needed.
         """
         self.N     = fb_get('N')
-        self.F_PB  = fb_get('F_PB')
-        self.F_SB  = fb_get('F_SB')
-        self.F_PB2 = fb_get('F_PB2')
-        self.F_SB2 = fb_get('F_SB2')
-        self.F_C   = fb_get('F_C')
-        self.F_C2  = fb_get('F_C2')
+        self.f_pb  = fb_get('f_pb')
+        self.f_sb  = fb_get('f_sb')
+        self.f_pb2 = fb_get('f_pb2')
+        self.f_sb2 = fb_get('f_sb2')
+        self.f_c   = fb_get('f_c')
+        self.f_c2  = fb_get('f_c2')
 
         # firwin amplitude specs are linear (not in dBs)
-        self.A_PB  = fb_get('A_PB')
-        self.A_PB2 = fb_get('A_PB2')
-        self.A_SB  = fb_get('A_SB')
-        self.A_SB2 = fb_get('A_SB2')
+        self.a_pb  = fb_get('a_pb')
+        self.a_pb2 = fb_get('a_pb2')
+        self.a_sb  = fb_get('a_sb')
+        self.a_sb2 = fb_get('a_sb2')
 
 #        self.alg = 'ichige' # algorithm for determining the minimum order
 #        self.alg = self.cmb_firwin_alg.currentText()
@@ -506,7 +506,7 @@ class Firwin(QWidget):
         # delta_A = np.sqrt(A[0] * A[1])
 
         if fb_get('filter_widgets', 'firwin', 'id') == "kaiser":
-            N, beta = sig.kaiserord(20 * np.log10(np.abs(fb_get('A_SB'))), delta_f)
+            N, beta = sig.kaiserord(20 * np.log10(np.abs(fb_get('a_sb'))), delta_f)
             self.all_wins_dict["kaiser"]["par"][0]["val"] = beta
             self.qfft_win_select.led_win_par_0.setText(str(beta))
             self.qfft_win_select.ui2dict_params()  # pass changed parameter to other widgets
@@ -519,13 +519,13 @@ class Firwin(QWidget):
     def lp_min(self) -> int:
         """ Design a low-pass FIR filter with minimum order using the window method."""
         self._get_params()
-        self.N = self._firwin_ord([self.F_PB, self.F_SB], [1, 0],
-                                  [self.A_PB, self.A_SB], alg=self.alg)
+        self.N = self._firwin_ord([self.f_pb, self.f_sb], [1, 0],
+                                  [self.a_pb, self.a_sb], alg=self.alg)
         if not self._test_n():
             return -1
 
-        fb_set('F_C', (self.F_SB + self.F_PB)/2)  # average calculated F_PB and F_SB
-        self._save(self.firwin(self.N, fb_get('F_C'), nyq=0.5,
+        fb_set('f_c', (self.f_sb + self.f_pb)/2)  # average calculated f_pb and f_sb
+        self._save(self.firwin(self.N, fb_get('f_c'), nyq=0.5,
                                window=self.qfft_win_select.calc_window(self.N, sym=True)))
         fb_set('N', self.N)  # update filterbroker with calculated order
         return 0
@@ -535,20 +535,20 @@ class Firwin(QWidget):
         self._get_params()
         if not self._test_n():
             return -1
-        self._save(self.firwin(self.N, fb_get('F_C'), nyq=0.5,
+        self._save(self.firwin(self.N, fb_get('f_c'), nyq=0.5,
                                window=self.qfft_win_select.calc_window(self.N, sym=True)))
         return 0
 
     def hp_min(self) -> int:
         """ Design a high-pass FIR filter with minimum order using the window method."""
         self._get_params()
-        N = self._firwin_ord([self.F_SB, self.F_PB], [0, 1],
-                             [self.A_SB, self.A_PB], alg=self.alg)
+        N = self._firwin_ord([self.f_sb, self.f_pb], [0, 1],
+                             [self.a_sb, self.a_pb], alg=self.alg)
         self.N = round_odd(N)  # enforce odd order
         if not self._test_n():
             return -1
-        fb_set('F_C', (self.F_SB + self.F_PB)/2)  # average calculated F_PB and F_SB
-        self._save(self.firwin(self.N, fb_get('F_C'), pass_zero=False, nyq=0.5,
+        fb_set('f_c', (self.f_sb + self.f_pb)/2)  # average calculated f_pb and f_sb
+        self._save(self.firwin(self.N, fb_get('f_c'), pass_zero=False, nyq=0.5,
                                window=self.qfft_win_select.calc_window(self.N, sym=True)))
         fb_set('N', self.N)  # update filterbroker with calculated order
         return 0
@@ -559,22 +559,22 @@ class Firwin(QWidget):
         self.N = round_odd(self.N)  # enforce odd order
         if not self._test_n():
             return -1
-        self._save(self.firwin(self.N, fb_get('F_C'), pass_zero=False, nyq=0.5,
+        self._save(self.firwin(self.N, fb_get('f_c'), pass_zero=False, nyq=0.5,
                                window=self.qfft_win_select.calc_window(self.N, sym=True)))
         return 0
 
-    # For BP and BS, F_PB and F_SB have two elements each
+    # For BP and BS, f_pb and f_sb have two elements each
     def bp_min(self) -> int:
         """ Design a band-pass FIR filter with minimum order using the window method."""
         self._get_params()
-        self.N = remezord([self.F_SB, self.F_PB, self.F_PB2, self.F_SB2], [0, 1, 0],
-                          [self.A_SB, self.A_PB, self.A_SB2], fs=1, alg=self.alg)[0]
+        self.N = remezord([self.f_sb, self.f_pb, self.f_pb2, self.f_sb2], [0, 1, 0],
+                          [self.a_sb, self.a_pb, self.a_sb2], fs=1, alg=self.alg)[0]
         if not self._test_n():
             return -1
 
-        fb_set('F_C', (self.F_SB + self.F_PB)/2)  # average calculated F_PB and F_SB
-        fb_set('F_C2', (self.F_SB2 + self.F_PB2)/2)
-        self._save(self.firwin(self.N, [fb_get('F_C'), fb_get('F_C2')], nyq=0.5,
+        fb_set('f_c', (self.f_sb + self.f_pb)/2)  # average calculated f_pb and f_sb
+        fb_set('f_c2', (self.f_sb2 + self.f_pb2)/2)
+        self._save(self.firwin(self.N, [fb_get('f_c'), fb_get('f_c2')], nyq=0.5,
                                pass_zero=False,
                                window=self.qfft_win_select.calc_window(self.N, sym=True)))
         fb_set('N', self.N)  # update filterbroker with calculated order
@@ -585,7 +585,7 @@ class Firwin(QWidget):
         self._get_params()
         if not self._test_n():
             return -1
-        self._save(self.firwin(self.N, [fb_get('F_C'), fb_get('F_C2')], nyq=0.5,
+        self._save(self.firwin(self.N, [fb_get('f_c'), fb_get('f_c2')], nyq=0.5,
                                pass_zero=False,
                                window=self.qfft_win_select.calc_window(self.N, sym=True)))
         return 0
@@ -593,14 +593,14 @@ class Firwin(QWidget):
     def bs_min(self) -> int:
         """ Design a band-stop FIR filter with minimum order using the window method."""
         self._get_params()
-        N = remezord([self.F_PB, self.F_SB, self.F_SB2, self.F_PB2], [1, 0, 1],
-                     [self.A_PB, self.A_SB, self.A_PB2], fs=1, alg=self.alg)[0]
+        N = remezord([self.f_pb, self.f_sb, self.f_sb2, self.f_pb2], [1, 0, 1],
+                     [self.a_pb, self.a_sb, self.a_pb2], fs=1, alg=self.alg)[0]
         self.N = round_odd(N)  # enforce odd order
         if not self._test_n():
             return -1
-        fb_set('F_C', (self.F_SB + self.F_PB) / 2)  # average calculated F_PB and F_SB
-        fb_set('F_C2', (self.F_SB2 + self.F_PB2) / 2)
-        self._save(self.firwin(self.N, [fb_get('F_C'), fb_get('F_C2')],
+        fb_set('f_c', (self.f_sb + self.f_pb) / 2)  # average calculated f_pb and f_sb
+        fb_set('f_c2', (self.f_sb2 + self.f_pb2) / 2)
+        self._save(self.firwin(self.N, [fb_get('f_c'), fb_get('f_c2')],
                                window=self.qfft_win_select.calc_window(self.N, sym=True),
                                pass_zero=True, nyq=0.5))
         fb_set('N', self.N)  # update filterbroker with calculated order
@@ -612,7 +612,7 @@ class Firwin(QWidget):
         self.N = round_odd(self.N)  # enforce odd order
         if not self._test_n():
             return -1
-        self._save(self.firwin(self.N, [fb_get('F_C'), fb_get('F_C2')],
+        self._save(self.firwin(self.N, [fb_get('f_c'), fb_get('f_c2')],
                                window=self.qfft_win_select.calc_window(self.N, sym=True),
                                pass_zero=True, nyq=0.5))
         return 0

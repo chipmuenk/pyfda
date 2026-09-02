@@ -56,7 +56,7 @@ from pydantic import BaseModel, ConfigDict
 
 class FilterConfig(BaseModel):
     N: int
-    F_C: float
+    f_c: float
     ba: np.ndarray
     # ...automatic validation on assignment
 ```

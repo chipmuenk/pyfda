@@ -26,7 +26,7 @@ logger = logging.getLogger(__name__)
 class WeightSpecs(QWidget):
     """
     Build and update widget for entering the weight
-    specifications like W_SB, W_PB etc.
+    specifications like w_sb, w_pb etc.
     """
     sig_rx = pyqtSignal(object)  # receive signals from higher hierarchies
     sig_tx = pyqtSignal(object)  # outgoing signals
@@ -103,10 +103,10 @@ class WeightSpecs(QWidget):
         self.setLayout(self.lay_v_main)
 
         # - Build a list from all entries in the filter dictionary starting
-        #   with "W" (= weight specifications of the current filter)
+        #   with "w_" (= weight specifications of the current filter)
         # - Pass the list to setEntries which recreates the widget
         self.n_cur_labels = 0  # number of currently visible labels / qlineedits
-        new_labels = [str(lbl) for lbl in fb_get() if lbl[0] == 'W']
+        new_labels = [str(lbl) for lbl in fb_get() if lbl[0:2] == 'w_']
         self.update_ui(new_labels=new_labels)
 
         # ----------------------------------------------------------------------
@@ -300,8 +300,8 @@ if __name__ == '__main__':
     app.setStyleSheet(QSS.QSS_RC)
     mainw = WeightSpecs()
 
-    mainw.update_ui(new_labels=['W_SB', 'W_SB2', 'W_PB', 'W_PB2'])
-    mainw.update_ui(new_labels=['W_PB', 'W_PB2'])
+    mainw.update_ui(new_labels=['w_sb', 'W_SB2', 'w_pb', 'W_PB2'])
+    mainw.update_ui(new_labels=['w_pb', 'W_PB2'])
 
     app.setActiveWindow(mainw)
     mainw.show()

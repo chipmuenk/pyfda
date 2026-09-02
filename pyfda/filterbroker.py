@@ -64,25 +64,25 @@ undo_ptr = 0  # pointer to current undo memory % UNDO_LEN
 fil_ref = {
     '_id': [], # a list with the keyword 'pyfda' and the version, e.g. ['pyfda', 1]
     # amplitude specs (linear units)
-    'A_PB': 0.2056717652757185,
-    'A_PB2': 0.01,
-    'A_SB': 0.001,
-    'A_SB2': 0.0001,
+    'a_pb': 0.2056717652757185,
+    'a_pb2': 0.01,
+    'a_sb': 0.001,
+    'a_sb2': 0.0001,
     # frequency specs (normalized to F_S)
-    'F_C': 0.1,
-    'F_C2': 0.4,
+    'f_c': 0.1,
+    'f_c2': 0.4,
     'F_N': 0.2,
     'F_N2': 0.4,
-    'F_PB': 0.1,
-    'F_PB2': 0.3,
-    'F_SB': 0.2,
-    'F_SB2': 0.4,
+    'f_pb': 0.1,
+    'f_pb2': 0.3,
+    'f_sb': 0.2,
+    'f_sb2': 0.4,
     'N': 4,  # filter order
     'T_S': 1.0,  # sample time
     # weights for pass- and stopbands
-    'W_PB': 1.0,
+    'w_pb': 1.0,
     'W_PB2': 1.0,
-    'W_SB': 1.0,
+    'w_sb': 1.0,
     'W_SB2': 1.0,
     #
     'amp_specs_unit': 'dB',
