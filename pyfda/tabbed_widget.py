@@ -61,7 +61,7 @@ class TabbedWidget(QWidget):
         Initialize UI with tabbed subwidgets: Instantiate dynamically each widget
         from the dict `wdg_classes_dict`. The dict has entries like
         {
-        'Plot_Hf': {'name': '|H(f)|', 'mod': 'pyfda.plot_widgets.plot_hf'},
+        'PlotHf': {'name': '|H(f)|', 'mod': 'pyfda.plot_widgets.plot_hf'},
         ...
         }
         defining the display name and the fully qualified name of the widget.

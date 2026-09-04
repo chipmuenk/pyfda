@@ -33,10 +33,10 @@ from pyfda.plot_widgets.mpl_widget import MplWidget
 
 logger = logging.getLogger(__name__)
 
-classes = {'Plot_PZ': 'P/Z'}  #: Dict containing class name : display name
+classes = {'PlotPZ': 'P/Z'}  #: Dict containing class name : display name
 
 
-class Plot_PZ(QWidget):
+class PlotPZ(QWidget):
     """ Widget for plotting poles and zeros """
     # incoming, connected in sender widget (locally connected to self.process_sig_rx() )
     sig_rx = pyqtSignal(object)
@@ -616,7 +616,7 @@ if __name__ == "__main__":
 
     app = QApplication(sys.argv)
     app.setStyleSheet(QSS.QSS_RC)
-    mainw = Plot_PZ()
+    mainw = PlotPZ()
     app.setActiveWindow(mainw)
     mainw.show()
     sys.exit(app.exec_())

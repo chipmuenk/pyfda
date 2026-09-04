@@ -641,8 +641,8 @@ class PlotTranStimUI(QWidget):
             self.lbl_freq_1.setText(self.txt_freq_1_k)
             self.lbl_freq_2.setText(self.txt_freq_2_k)
         else:
-            f_unit = fb_get('plt_fUnit')
-            t_unit = fb_get('plt_tUnit').replace(r"$\mu$", "&mu;")
+            f_unit = fb_get('plt_f_unit')
+            t_unit = fb_get('plt_t_unit').replace(r"$\mu$", "&mu;")
             if fb_get('freq_specs_unit') in {'f_S', 'f_Ny'}:
                 # Normalized frequency labels with capital F
                 self.lbl_freq_1.setText(self.txt_freq_1_f_cap)

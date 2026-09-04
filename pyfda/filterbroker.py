@@ -71,8 +71,6 @@ fil_ref = {
     # frequency specs (normalized to F_S)
     'f_c': 0.1,
     'f_c2': 0.4,
-    'F_N': 0.2,
-    'F_N2': 0.4,
     'f_pb': 0.1,
     'f_pb2': 0.3,
     'f_sb': 0.2,
@@ -81,9 +79,9 @@ fil_ref = {
     'T_S': 1.0,  # sample time
     # weights for pass- and stopbands
     'w_pb': 1.0,
-    'W_PB2': 1.0,
+    'w_pb2': 1.0,
     'w_sb': 1.0,
-    'W_SB2': 1.0,
+    'w_sb2': 1.0,
     #
     'amp_specs_unit': 'dB',
     # [b, a] coefficients:
@@ -138,11 +136,11 @@ fil_ref = {
              'normalize': True}
         },
     'fo': 'man',  # filter order, man or min
-    'freqSpecsRange': [
+    'freq_specs_range': [
         0,
         0.5
     ],
-    'freqSpecsRangeType': 'half',
+    'freq_specs_range_type': 'half',
     'freq_locked': False, # don't update absolute frequencies when f_S is changed
     'freq_specs_sort': True,  # sort freq. specs in ascending order
     'freq_specs_unit': 'f_S',
@@ -208,12 +206,12 @@ fil_ref = {
         }
     },
     'info': 'Ellip. LP (default)',
-    'plt_fLabel': '$F = f\\, /\\, f_S = \\Omega \\, /\\,  2 \\mathrm{\\pi} \\; \\rightarrow$',
-    'plt_fUnit': 'f_S',
-    'plt_phiLabel': '$\\angle H(\\mathrm{e}^{\\mathrm{j} \\Omega})$ in rad $\\rightarrow $',
-    'plt_phiUnit': 'rad',
-    'plt_tLabel': '$n = t\\, /\\, T_S \\; \\rightarrow$',
-    'plt_tUnit': 'T_S',
+    'plt_f_label': '$F = f\\, /\\, f_S = \\Omega \\, /\\,  2 \\mathrm{\\pi} \\; \\rightarrow$',
+    'plt_f_unit': 'f_S',
+    'plt_phi_label': '$\\angle H(\\mathrm{e}^{\\mathrm{j} \\Omega})$ in rad $\\rightarrow $',
+    'plt_phi_unit': 'rad',
+    'plt_t_label': '$n = t\\, /\\, T_S \\; \\rightarrow$',
+    'plt_t_unit': 'T_S',
 
     'qfrmt': 'float64',  # global quantization format {'float64', 'float32', 'qint', 'qfrac'}
     'qfrmt_float_last': 'float64',  # last used float format

@@ -300,8 +300,8 @@ if __name__ == '__main__':
     app.setStyleSheet(QSS.QSS_RC)
     mainw = WeightSpecs()
 
-    mainw.update_ui(new_labels=['w_sb', 'W_SB2', 'w_pb', 'W_PB2'])
-    mainw.update_ui(new_labels=['w_pb', 'W_PB2'])
+    mainw.update_ui(new_labels=['w_sb', 'w_sb2', 'w_pb', 'w_pb2'])
+    mainw.update_ui(new_labels=['w_pb', 'w_pb2'])
 
     app.setActiveWindow(mainw)
     mainw.show()

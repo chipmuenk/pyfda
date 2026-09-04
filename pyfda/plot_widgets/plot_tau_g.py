@@ -181,15 +181,15 @@ class PlotTauG(QWidget):
         f_max_2 = fb_get('f_max') / 2.
         f = self.w * f_max_2 / np.pi
 
-        if fb_get('freqSpecsRangeType') == 'sym':
+        if fb_get('freq_specs_range_type') == 'sym':
             # shift tau_g and f by f_S/2
             tau_g = np.fft.fftshift(self.tau_g)
             f -= f_max_2
-        elif fb_get('freqSpecsRangeType') == 'half':
+        elif fb_get('freq_specs_range_type') == 'half':
             # only use the first half of H and f
             tau_g = self.tau_g[0:CFP.conf_settings['N_FFT']//2]
             f = f[0:CFP.conf_settings['N_FFT']//2]
-        else:  # fb_get('freqSpecsRangeType') == 'whole'
+        else:  # fb_get('freq_specs_range_type') == 'whole'
             # use H and f as calculated
             tau_g = self.tau_g
 
@@ -200,7 +200,7 @@ class PlotTauG(QWidget):
             tau_str = r'$ \tau_g(\mathrm{e}^{\mathrm{j} \Omega}) / T_S \; \rightarrow $'
         else:
             tau_str = r'$ \tau_g(\mathrm{e}^{\mathrm{j} \Omega})$'\
-                + ' in ' + fb_get('plt_tUnit') + r' $ \rightarrow $'
+                + ' in ' + fb_get('plt_t_unit') + r' $ \rightarrow $'
             tau_g = tau_g / fb_get('f_S')
 
         # ---------------------------------------------------------
@@ -213,12 +213,12 @@ class PlotTauG(QWidget):
         self.ax.yaxis.set_minor_locator(
             AutoMinorLocator())  # enable minor ticks
         self.ax.set_title(r'Group Delay $ \tau_g$')
-        self.ax.set_xlabel(fb_get('plt_fLabel'))
+        self.ax.set_xlabel(fb_get('plt_f_label'))
         self.ax.set_ylabel(tau_str)
         # widen y-limits to suppress numerical inaccuracies when tau_g = constant
         self.ax.set_ylim(
             [max(np.nanmin(tau_g)-0.5, 0), np.nanmax(tau_g) + 0.5])
-        self.ax.set_xlim(fb_get('freqSpecsRange'))
+        self.ax.set_xlim(fb_get('freq_specs_range'))
 
         self.redraw()
 

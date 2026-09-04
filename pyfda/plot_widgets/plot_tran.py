@@ -1407,8 +1407,8 @@ class PlotTran(QWidget):
             else:
                 s = None
                 sig_lbl = 'None'
-            spgr_args = r"$({0}, {1})$".format(fb_get('plt_tLabel')[1],
-                                               fb_get('plt_fLabel')[1])
+            spgr_args = r"$({0}, {1})$".format(fb_get('plt_t_label')[1],
+                                               fb_get('plt_f_label')[1])
 
             # ------- Unit / Mode ----------------------
             mode = qget_cmb_box(self.ui.cmb_mode_spgr_time, data=True)
@@ -1459,7 +1459,7 @@ class PlotTran(QWidget):
             f, t, Sxx = sig.spectrogram(
                 s, fb_get('f_S'), window=win,  # ('tukey', 0.25),
                 nperseg=self.ui.time_nfft_spgr, noverlap=self.ui.time_ovlp_spgr,
-                nfft=None, return_onesided=fb_get('freqSpecsRangeType') == 'half',
+                nfft=None, return_onesided=fb_get('freq_specs_range_type') == 'half',
                 scaling=scaling, mode=mode, detrend='constant')
             # Fs : sampling frequency for scaling
             # window: callable or ndarray, default window_hanning
@@ -1484,7 +1484,7 @@ class PlotTran(QWidget):
                                                     pad=0.005)
             cbar.ax.set_ylabel(spgr_pre + spgr_symb + spgr_args + spgr_unit)
 
-            self.ax_s.set_ylabel(fb_get('plt_fLabel'))
+            self.ax_s.set_ylabel(fb_get('plt_f_label'))
 
         # --------------- 3D Complex  -----------------------------------------
         if USE_3D_CMPLX:  # not implemented / tested yet: complex data as 3D plot
@@ -1503,7 +1503,7 @@ class PlotTran(QWidget):
             self.ax3d.set_zlabel('z')
 
         # --------------- Title and common labels ---------------------------
-        self.axes_time[-1].set_xlabel(fb_get('plt_tLabel'))
+        self.axes_time[-1].set_xlabel(fb_get('plt_t_label'))
         self.axes_time[0].set_title(self.title_str)
         self.ax_r.set_xlim([self.t[self.ui.n_start], self.t[self.ui.n_end-1]])
         # expand_lim(self.ax_r, 0.02)
@@ -1613,7 +1613,7 @@ class PlotTran(QWidget):
                 h_f_str += r'$H_{id}$, '
             h_f_str = h_f_str.rstrip(', ') + e_jomega_str
 
-            f_range = fb_get('freqSpecsRange')
+            f_range = fb_get('freq_specs_range')
 
             if self.ui.but_freq_index_k.isChecked():
                 #
@@ -1662,7 +1662,7 @@ class PlotTran(QWidget):
 
             # scale with window NENBW for correct power calculation
             p_scale = scale_impz / nenbw
-            onesided = fb_get('freqSpecsRangeType') == 'half'
+            onesided = fb_get('freq_specs_range_type') == 'half'
             if plt_stimulus:
                 if onesided and self.cmplx and not freq_resp:
                     logger.warning(
@@ -1697,7 +1697,7 @@ class PlotTran(QWidget):
             # ----------------------------------------------------------------
             # Scale and shift frequency range
             # ----------------------------------------------------------------
-            if fb_get('freqSpecsRangeType') == 'sym':
+            if fb_get('freq_specs_range_type') == 'sym':
                 # display -f_S/2 ... f_S/2 ->  shift x_fft_disp, y_fft_disp and f using fftshift()
                 if plt_response:
                     y_fft_disp = np.fft.fftshift(y_fft_disp)
@@ -1729,7 +1729,7 @@ class PlotTran(QWidget):
                 f_id = f_id[0:CFP.conf_settings['N_FFT']//2]
                 h_id = h_id[0:CFP.conf_settings['N_FFT']//2]
 
-            else:  # fb_get('freqSpecsRangeType') == 'whole'
+            else:  # fb_get('freq_specs_range_type') == 'whole'
                 # display 0 ... f_S -> shift frequency axis
                 f = np.fft.fftshift(f) + f_max/2.
                 if not freq_resp:
@@ -2010,9 +2010,9 @@ class PlotTran(QWidget):
             if self.ui.but_freq_index_k.isChecked():
                 self.axes_f[-1].set_xlabel(r'$k \; \rightarrow$')
             else:
-                self.axes_f[-1].set_xlabel(fb_get('plt_fLabel'))
+                self.axes_f[-1].set_xlabel(fb_get('plt_f_label'))
             self.ax_f1.set_ylabel(h_fr_str)
-            # self.ax_f1.set_xlim(fb_get('freqSpecsRange'))
+            # self.ax_f1.set_xlim(fb_get('freq_specs_range'))
             self.ax_f1.set_xlim(f_range)
             self.ax_f1.set_title("Spectrum of " + self.title_str)
 

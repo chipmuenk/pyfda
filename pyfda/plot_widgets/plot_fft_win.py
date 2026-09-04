@@ -623,10 +623,10 @@ class Plot_FFT_win(QDialog):
         self.ax_t.cla()
         self.ax_f.cla()
 
-        self.ax_t.set_xlabel(fb.fil[0]['plt_tLabel'])
+        self.ax_t.set_xlabel(fb.fil[0]['plt_t_label'])
         self.ax_t.set_ylabel(r'$w[n] \; \rightarrow$')
 
-        self.ax_f.set_xlabel(fb.fil[0]['plt_fLabel'])
+        self.ax_f.set_xlabel(fb.fil[0]['plt_f_label'])
         self.ax_f.set_ylabel(r'$W(f) \; \rightarrow$')
 
         if self.but_log_t.isChecked():
@@ -656,7 +656,7 @@ class Plot_FFT_win(QDialog):
             self.mainlobe_3dB_disp = self.mainlobe_3dB_idx
             self.mainlobe_3dB_unit = "bins"
         else:
-            self.ax_f.set_xlabel(fb.fil[0]['plt_fLabel'])
+            self.ax_f.set_xlabel(fb.fil[0]['plt_f_label'])
             x = F
 
             self.but_bin_f.setText("<b>&Delta; <i>f</i></b>")

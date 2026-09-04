@@ -250,7 +250,7 @@ class FreqSpecs(QWidget):
         self.dict2ui()
 
         # Always set label for frequency unit according to selected unit.
-        unit = fb_get('plt_fUnit')
+        unit = fb_get('plt_f_unit')
         if unit in {"f_S", "f_Ny"}:
             unit_frmt = 'bi'
         else:

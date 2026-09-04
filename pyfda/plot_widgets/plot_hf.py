@@ -7,7 +7,7 @@
 # (see file LICENSE in root directory for details)
 
 r"""
-The ``Plot_Hf`` class constructs the widget to plot the magnitude
+The ``PlotHf`` class constructs the widget to plot the magnitude
 frequency response \|H(f)\| of the filter either in linear or logarithmic
 scale. Optionally, the magnitude specifications and the phase
 can be overlayed.
@@ -35,10 +35,10 @@ from pyfda.libs.pyfda_qt_classes import PushButton
 
 logger = logging.getLogger(__name__)
 
-classes = {'Plot_Hf': '|H(f)|'}  #: Dict containing class name : display name
+classes = {'PlotHf': '|H(f)|'}  #: Dict containing class name : display name
 
 
-class Plot_Hf(QWidget):
+class PlotHf(QWidget):
     r"""
     Widget for plotting \|H(f)\|, frequency specs and the phase
     """
@@ -467,9 +467,9 @@ class Plot_Hf(QWidget):
 
         _plot_specs()  # plot specs in the range 0 ... f_S/2
 
-        if fb_get('freqSpecsRangeType') != 'half':
+        if fb_get('freq_specs_range_type') != 'half':
             # add plot limits for other half of the spectrum
-            if fb_get('freqSpecsRangeType') == 'sym':  # frequency axis +/- f_S/2
+            if fb_get('freq_specs_range_type') == 'sym':  # frequency axis +/- f_S/2
                 f_lim_upl = -f_lim_upl
                 f_lim_lol = -f_lim_lol
                 f_lim_upc = -f_lim_upc
@@ -520,7 +520,7 @@ class Plot_Hf(QWidget):
                         transform=self.mplwidget.fig.transFigure, zorder=-1)
                 self.ax_i.add_patch(rect)
 
-                self.ax_i.set_xlim(fb_get('freqSpecsRange'))
+                self.ax_i.set_xlim(fb_get('freq_specs_range'))
                 if self.chk_show_h_abs.isChecked():
                     self.ax_i.plot(self.F, self.h_plt_abs,  label=r'$|H(F)|$')
                 if self.chk_show_h_re.isChecked():
@@ -565,10 +565,10 @@ class Plot_Hf(QWidget):
             self.ax_p.is_twin = True  # mark this as 'twin' to suppress second grid in mpl_widget
 #
             phi_str = r'$\angle H(\mathrm{e}^{\mathrm{j} \Omega})$'
-            if fb_get('plt_phiUnit') == 'rad':
+            if fb_get('plt_phi_unit') == 'rad':
                 phi_str += ' in rad ' + r'$\rightarrow $'
                 scale = 1.
-            elif fb_get('plt_phiUnit') == 'rad/pi':
+            elif fb_get('plt_phi_unit') == 'rad/pi':
                 phi_str += ' in rad' + r'$ / \pi \;\rightarrow $'
                 scale = 1./ np.pi
             else:
@@ -663,21 +663,21 @@ class Plot_Hf(QWidget):
         self.a_sb  = fb_get('a_sb')
         self.a_sb2 = fb_get('a_sb2')
 
-        f_lim = fb_get('freqSpecsRange')
+        f_lim = fb_get('freq_specs_range')
 
         # ========= select frequency range to be displayed =====================
         # === shift, scale and select: W -> F, H_cplx -> H_c
         self.F = self.W / (2 * np.pi) * self.f_max
 
-        if fb_get('freqSpecsRangeType') == 'sym':
+        if fb_get('freq_specs_range_type') == 'sym':
             # shift H and F by f_S/2
             self.H_c = np.fft.fftshift(self.H_cmplx)
             self.F -= self.f_max/2.
-        elif fb_get('freqSpecsRangeType') == 'half':
+        elif fb_get('freq_specs_range_type') == 'half':
             # only use the first half of H and F
             self.H_c = self.H_cmplx[0:CFP.conf_settings['N_FFT']//2]
             self.F = self.F[0:CFP.conf_settings['N_FFT']//2]
-        else:  # fb_get('freqSpecsRangeType') == 'whole'
+        else:  # fb_get('freq_specs_range_type') == 'whole'
             # use H and F as calculated
             self.H_c = self.H_cmplx
 
@@ -754,7 +754,7 @@ class Plot_Hf(QWidget):
             #     self.ax_bounds = [self.ax.get_ybound()[0], self.ax.get_ybound()[1]]#, self.ax.get]
             self.ax.set_xlim(f_lim)
             self.ax.set_ylim(a_lim)
-            self.ax.set_xlabel(fb_get('plt_fLabel'))
+            self.ax.set_xlabel(fb_get('plt_f_label'))
             self.ax.set_ylabel(H_str)
 
             title_str = ""
@@ -807,7 +807,7 @@ if __name__ == "__main__":
 
     app = QApplication(sys.argv)
     app.setStyleSheet(QSS.QSS_RC)
-    mainw = Plot_Hf()
+    mainw = PlotHf()
     app.setActiveWindow(mainw)
     mainw.show()
     sys.exit(app.exec_())

@@ -73,10 +73,10 @@ class ConfigFileParser():
 
     PLOT_CLASSES_DICT: ClassVar[dict[str, dict[str, str]]] =\
         {
-        'Plot_Hf': {'name': '|H(f)|', 'mod': 'pyfda.plot_widgets.plot_hf'},
+        'PlotHf': {'name': '|H(f)|', 'mod': 'pyfda.plot_widgets.plot_hf'},
         'PlotPhi': {'name': 'φ(f)', 'mod': 'pyfda.plot_widgets.plot_phi'},
         'PlotTauG': {'name': 'tau_g', 'mod': 'pyfda.plot_widgets.plot_tau_g'},
-        'Plot_PZ': {'name': 'P / Z', 'mod': 'pyfda.plot_widgets.plot_pz'},
+        'PlotPZ': {'name': 'P / Z', 'mod': 'pyfda.plot_widgets.plot_pz'},
         'PlotTran': {'name': 'h[n]', 'mod': 'pyfda.plot_widgets.plot_tran'},
         'Plot_3D': {'name': '3D', 'mod': 'pyfda.plot_widgets.plot_3d'}
         }
@@ -84,7 +84,7 @@ class ConfigFileParser():
         {
         'Input_Specs': {'name': 'Specs', 'mod': 'pyfda.input_widgets.input_specs'},
         'Input_Coeffs': {'name': 'b,a', 'mod': 'pyfda.input_widgets.input_coeffs'},
-        'Input_PZ': {'name': 'P/Z', 'mod': 'pyfda.input_widgets.input_pz'},
+        'InputPZ': {'name': 'P/Z', 'mod': 'pyfda.input_widgets.input_pz'},
         'Input_Info': {'name': 'Info', 'mod': 'pyfda.input_widgets.input_info'},
         'Input_Files': {'name': 'Files', 'mod': 'pyfda.input_widgets.input_files'},
         'Input_Fixpoint_Specs': {'name': 'Fixpoint',

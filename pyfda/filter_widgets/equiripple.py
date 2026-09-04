@@ -135,25 +135,25 @@ class Equiripple(QWidget):
                                            'amp':('a','a_sb','a_pb')})
                          }
                     },
-            'bp': {'man':{'wspecs': ('a','w_sb','w_pb','W_SB2'),
+            'bp': {'man':{'wspecs': ('a','w_sb','w_pb','w_sb2'),
                           'tspecs': ('u', {'frq':('a','f_sb','f_pb','f_pb2','f_sb2'),
                                            'amp':('u','a_sb','a_pb','a_sb2')})
                          },
-                   'min':{'wspecs': ('d','w_sb','w_pb','W_SB2'),
+                   'min':{'wspecs': ('d','w_sb','w_pb','w_sb2'),
                           'tspecs': ('a', {'frq':('a','f_sb','f_pb','f_pb2','f_sb2'),
                                            'amp':('a','a_sb','a_pb','a_sb2')})
                          },
                     },
-            'bs': {'man':{'wspecs': ('a','w_pb','w_sb','W_PB2'),
+            'bs': {'man':{'wspecs': ('a','w_pb','w_sb','w_pb2'),
                           'tspecs': ('u', {'frq':('a','f_pb','f_sb','f_sb2','f_pb2'),
                                            'amp':('u','a_pb','a_sb','a_pb2')})
                           },
-                   'min':{'wspecs': ('d','w_pb','w_sb','W_PB2'),
+                   'min':{'wspecs': ('d','w_pb','w_sb','w_pb2'),
                           'tspecs': ('a', {'frq':('a','f_pb','f_sb','f_sb2','f_pb2'),
                                            'amp':('a','a_pb','a_sb','a_pb2')})
                         }
                 },
-            'hil': {'man':{'wspecs': ('a','w_sb','w_pb','W_SB2'),
+            'hil': {'man':{'wspecs': ('a','w_sb','w_pb','w_sb2'),
                            'tspecs': ('u', {'frq':('a','f_sb','f_pb','f_pb2','f_sb2'),
                                            'amp':('u','a_sb','a_pb','a_sb2')})
                          }
@@ -405,7 +405,7 @@ class Equiripple(QWidget):
         self._get_params()
         return self._save(
             remez(self.N, [0, self.f_sb, self.f_pb, self.f_pb2, self.f_sb2, 0.5], [0, 1, 0],
-                  weight = [fb_get('w_sb'), fb_get('w_pb'), fb_get('W_SB2')], fs = 1,
+                  weight = [fb_get('w_sb'), fb_get('w_pb'), fb_get('w_sb2')], fs = 1,
                   grid_density = self.grid_density))
 
     def bp_min(self) -> int:
@@ -419,7 +419,7 @@ class Equiripple(QWidget):
         # A is always [0, 1, 0] for BP filters
         fb_set('w_sb', W[0])
         fb_set('w_pb', W[1])
-        fb_set('W_SB2', W[2])
+        fb_set('w_sb2', W[2])
         return self._save(
             remez(self.N, F, A, weight = W, fs = 1, grid_density = self.grid_density))
 
@@ -432,7 +432,7 @@ class Equiripple(QWidget):
         self.N = round_odd(self.N) # enforce odd order
         return self._save(
             remez(self.N,[0, self.f_pb, self.f_sb, self.f_sb2, self.f_pb2, 0.5], [1, 0, 1],
-                  weight = [fb_get('w_pb'), fb_get('w_sb'), fb_get('W_PB2')], fs = 1,
+                  weight = [fb_get('w_pb'), fb_get('w_sb'), fb_get('w_pb2')], fs = 1,
                   grid_density = self.grid_density))
 
     def bs_min(self) -> int:
@@ -446,7 +446,7 @@ class Equiripple(QWidget):
         # A is always [1, 0, 1] for BS filters
         fb_set('w_pb', W[0])
         fb_set('w_sb', W[1])
-        fb_set('W_PB2', W[2])
+        fb_set('w_pb2', W[2])
         return self._save(
             remez(self.N, F, A, weight = W, fs = 1, grid_density = self.grid_density))
 
@@ -459,7 +459,7 @@ class Equiripple(QWidget):
         self._get_params()
         return self._save(
             remez(self.N,[0, self.f_sb, self.f_pb, self.f_pb2, self.f_sb2, 0.5], [0, 1, 0],
-                  weight = [fb_get('w_sb'), fb_get('w_pb'), fb_get('W_SB2')], fs = 1,
+                  weight = [fb_get('w_sb'), fb_get('w_pb'), fb_get('w_sb2')], fs = 1,
                   type = 'hilbert', grid_density = self.grid_density))
 
     def diff_man(self) -> int:

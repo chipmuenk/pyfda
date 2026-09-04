@@ -34,7 +34,7 @@ class ItemDelegatePZ(QStyledItemDelegate):
     """
     def __init__(self, parent: Any) -> None:
         """
-        Pass instance `parent` of parent class (Input_PZ)
+        Pass instance `parent` of parent class (InputPZ)
         """
         super().__init__(parent)
         self.parent = parent  # instance of the parent (not the base) class

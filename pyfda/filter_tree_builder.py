@@ -234,14 +234,14 @@ class FilterTreeBuilder():
             'FIR': {
                 'Equiripple': {
                     'man':{'fo':     ('a', 'N'),
-                        'wspecs': ('a', 'w_sb', 'w_pb', 'W_SB2'),
+                        'wspecs': ('a', 'w_sb', 'w_pb', 'w_sb2'),
                         'fspecs': ('a', 'f_c', 'f_c2'),
                         'tspecs': ('u', {'frq': ('u', 'f_sb', 'f_pb', 'f_pb2', 'f_sb2'),
                                             'amp': ('u', 'a_sb', 'a_pb', 'a_sb2')})
                         },
                     'min':{'fo':     ('d', 'N'),
                         'fspecs': ('d', 'f_c', 'f_c2'),
-                        'wspecs': ('d', 'w_sb', 'w_pb', 'W_SB2'),
+                        'wspecs': ('d', 'w_sb', 'w_pb', 'w_sb2'),
                         'tspecs': ('a', {'frq': ('a', 'f_sb', 'f_pb', 'f_pb2', 'f_sb2'),
                                             'amp': ('a', 'a_sb', 'a_pb', 'a_sb2')})
                         }
@@ -252,13 +252,13 @@ class FilterTreeBuilder():
             'FIR': {
                 'Equiripple': {
                     'man':{'fo':     ('a', 'N'),
-                        'wspecs': ('a', 'w_pb', 'w_sb', 'W_PB2'),
+                        'wspecs': ('a', 'w_pb', 'w_sb', 'w_pb2'),
                         'fspecs': ('a', 'f_c', 'f_c2'),
                         'tspecs': ('u', {'frq': ('u', 'f_pb', 'f_sb', 'f_sb2', 'f_pb2'),
                                             'amp': ('u', 'a_pb', 'a_sb', 'a_pb2')})
                         },
                     'min':{'fo':     ('d', 'N'),
-                        'wspecs': ('d', 'w_pb', 'w_sb', 'W_PB2'),
+                        'wspecs': ('d', 'w_pb', 'w_sb', 'w_pb2'),
                         'fspecs': ('d', 'f_c', 'f_c2'),
                         'tspecs': ('a', {'frq': ('a', 'f_pb', 'f_sb', 'f_sb2', 'f_pb2'),
                                             'amp': ('a', 'a_pb', 'a_sb', 'a_pb2')})

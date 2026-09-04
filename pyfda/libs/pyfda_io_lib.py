@@ -1343,7 +1343,7 @@ def coe_header(title: str) -> str:
                 del a_targs_db[i]
 
     date_frmt = "%d-%B-%Y %H:%M:%S"  # select date format
-    unit = fb_get('plt_fUnit')
+    unit = fb_get('plt_f_unit')
     if unit in {'f_S', 'f_Ny'}:
         f_S = ""
     else:

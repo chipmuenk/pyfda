@@ -31,14 +31,14 @@ class FreqUnits(QWidget):
     The following key-value pairs of the `fil[0]` dict are modified:
 
         - `'freq_specs_unit'` : The unit ('f_S', 'f_Ny', 'Hz' etc.) as a string
-        - `'freqSpecsRange'` : A list with two entries for minimum and maximum frequency
+        - `'freq_specs_range'` : A list with two entries for minimum and maximum frequency
                                values for labelling the frequency axis
         - `'f_S'` : The sampling frequency for referring frequency values to as a float
         - `'f_max'` : maximum frequency for scaling frequency axis
-        - `'plt_fUnit'`: frequency unit as string
-        - `'plt_tUnit'`: time unit as string
-        - `'plt_fLabel'`: label for frequency axis
-        - `'plt_tLabel'`: label for time axis
+        - `'plt_f_unit'`: frequency unit as string
+        - `'plt_t_unit'`: time unit as string
+        - `'plt_f_label'`: label for frequency axis
+        - `'plt_t_label'`: label for time axis
 
     """
     # class variables (shared between instances if more than one exists)
@@ -251,7 +251,7 @@ class FreqUnits(QWidget):
         Set various scale factors and labels depending on the setting of the unit
         combobox.
 
-        Update the freqSpecsRange and finally, emit 'view_changed':'f_S' signal
+        Update the freq_specs_range and finally, emit 'view_changed':'f_S' signal
         """
         if not emit_signal:  # triggered by function call, not by a change of UI
             # Load f_S display from dict
@@ -265,7 +265,7 @@ class FreqUnits(QWidget):
                     fb_get('freq_specs_unit')
                 )
             # Load Frequency range type (0 ... f_S/2 etc.) from dict
-            qset_cmb_box(self.cmb_f_range, fb_get('freqSpecsRangeType'),
+            qset_cmb_box(self.cmb_f_range, fb_get('freq_specs_range_type'),
                          data=True, fireSignals=True)
 
         f_unit = qget_cmb_box(self.cmb_f_units, data=False)  # selected frequency unit,
@@ -346,10 +346,10 @@ class FreqUnits(QWidget):
         fb_set({
             'f_s_scale': f_s_scale,  # scale factor for f_S (Hz, kHz, ...)
             'freq_specs_unit': f_unit,  # frequency unit
-            'plt_fUnit': f_unit,  # time and frequency unit as string, e.g.
-            'plt_tUnit': self.t_units[idx],  #  for plot axis labeling
-            'plt_fLabel': f_label,  # plot axis labels including unit and arrow
-            'plt_tLabel': t_label
+            'plt_f_unit': f_unit,  # time and frequency unit as string, e.g.
+            'plt_t_unit': self.t_units[idx],  #  for plot axis labeling
+            'plt_f_label': f_label,  # plot axis labels including unit and arrow
+            'plt_t_label': t_label
             })
 
         self._freq_range(emit_signal=False)  # update f_lim setting without emit_signalting signal
@@ -428,7 +428,7 @@ class FreqUnits(QWidget):
 
         rangeType = qget_cmb_box(self.cmb_f_range)
 
-        fb_set('freqSpecsRangeType', rangeType)
+        fb_set('freq_specs_range_type', rangeType)
         f_max = fb_get('f_max')
 
         if rangeType == 'whole':
@@ -438,7 +438,7 @@ class FreqUnits(QWidget):
         else:
             f_lim = [0, f_max/2.]
 
-        fb_set('freqSpecsRange', f_lim)  # store settings in dict
+        fb_set('freq_specs_range', f_lim)  # store settings in dict
 
         if emit_signal:
             self.emit({'view_changed': 'f_range'})
@@ -454,7 +454,7 @@ class FreqUnits(QWidget):
         # This updates the following widgets:
         # - `self.led_f_s` from `fb_get('f_S')`
         # - `self.cmb_f_units` with `fb_get('freq_specs_unit')`
-        # - `self.cmb_f_range` from `fb_get('freqSpecsRangeType')``
+        # - `self.cmb_f_range` from `fb_get('freq_specs_range_type')``
         # The other widgets are updated automatically.
 
 # -------------------------------------------------------------

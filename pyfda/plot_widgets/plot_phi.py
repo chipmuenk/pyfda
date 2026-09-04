@@ -202,15 +202,15 @@ class PlotPhi(QWidget):
         # === shift, scale and select: w -> f, H_cplx -> H_c
         f = self.w * f_max_2 / np.pi
 
-        if fb_get('freqSpecsRangeType') == 'sym':
+        if fb_get('freq_specs_range_type') == 'sym':
             # shift H and f by f_S/2
             h = np.fft.fftshift(self.h_cmplx)
             f -= f_max_2
-        elif fb_get('freqSpecsRangeType') == 'half':
+        elif fb_get('freq_specs_range_type') == 'half':
             # only use the first half of H and f
             h = self.h_cmplx[0:CFP.conf_settings['N_FFT']//2]
             f = f[0:CFP.conf_settings['N_FFT']//2]
-        else:  # fb_get('freqSpecsRangeType') == 'whole'
+        else:  # fb_get('freq_specs_range_type') == 'whole'
             # use H and f as calculated
             h = self.h_cmplx
 
@@ -224,8 +224,8 @@ class PlotPhi(QWidget):
         else:
             y_str += 'deg ' + r'$\rightarrow $'
             scale = 180./np.pi
-        fb_set('plt_phiLabel', y_str)
-        fb_set('plt_phiUnit', self.unit_phi)
+        fb_set('plt_phi_label', y_str)
+        fb_set('plt_phi_unit', self.unit_phi)
 
         if self.but_wrap.isChecked():
             phi_plt = np.angle(h) * scale
@@ -240,9 +240,9 @@ class PlotPhi(QWidget):
         self.ax.xaxis.set_minor_locator(AutoMinorLocator())  # enable minor ticks
         self.ax.yaxis.set_minor_locator(AutoMinorLocator())  # enable minor ticks
         self.ax.set_title(r'Phase Frequency Response')
-        self.ax.set_xlabel(fb_get('plt_fLabel'))
+        self.ax.set_xlabel(fb_get('plt_f_label'))
         self.ax.set_ylabel(y_str)
-        self.ax.set_xlim(fb_get('freqSpecsRange'))
+        self.ax.set_xlim(fb_get('freq_specs_range'))
 
         self.redraw()
 

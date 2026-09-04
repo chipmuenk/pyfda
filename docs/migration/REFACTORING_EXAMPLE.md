@@ -54,8 +54,6 @@ class FilterConfig:
     # Frequency specs (normalized to F_S)
     f_c: float = 0.1
     f_c2: float = 0.4
-    F_N: float = 0.2
-    F_N2: float = 0.4
     f_pb: float = 0.1
     f_pb2: float = 0.3
     f_sb: float = 0.2
@@ -66,9 +64,9 @@ class FilterConfig:
     
     # Weights
     w_pb: float = 1.0
-    W_PB2: float = 1.0
+    w_pb2: float = 1.0
     w_sb: float = 1.0
-    W_SB2: float = 1.0
+    w_sb2: float = 1.0
     
     amp_specs_unit: str = 'dB'
     

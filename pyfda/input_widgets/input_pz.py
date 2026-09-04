@@ -31,9 +31,9 @@ from pyfda.input_widgets.item_delegate_pz import ItemDelegatePZ
 
 logger = logging.getLogger(__name__)
 
-classes = {'Input_PZ': 'P/Z'}  #: Dict containing class name : display name
+classes = {'InputPZ': 'P/Z'}  #: Dict containing class name : display name
 
-class Input_PZ(QWidget):
+class InputPZ(QWidget):
     """
     Widget for entering, exporting / importing and saving / loading filter data
     in pole / zero format (P/Z) with gain.
@@ -714,7 +714,7 @@ if __name__ == '__main__':
     from pyfda.pyfda_rc import QSS
     app = QApplication(sys.argv)
     app.setStyleSheet(QSS.QSS_RC)
-    mainw = Input_PZ()
+    mainw = InputPZ()
     app.setActiveWindow(mainw)
     mainw.show()
     sys.exit(app.exec_())
