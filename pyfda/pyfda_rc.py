@@ -51,7 +51,7 @@ params = {
             'destination': False  # source/target is 'clipboard' or 'file'
             },
     'screen': { # screen properties default values, updated in pyfdax.py
-        'ref_dpi': 96, 'scaling': 1.0, # dpi for scaling = 1 and scaling factor
+        'ref_dpi': 96, 'ldpi': 96, 'pdpi': 96, 'scaling': 1.0, # dpi for scaling = 1 and scaling factor
         'height': 720, 'width': 1024}, # height and width in pixels
     'FMT_ba': 4,      # number of digits for coefficient table
     'FMT_pz': 5,      # number of digits for Pole/Zero table
