@@ -25,7 +25,7 @@ from pyfda.libs.pyfda_qt_classes import QVLine, PushButton, PushButtonRT
 # FMT string for QLineEdit fields, e.g. '{:.3g}'
 # from pyfda.pyfda_rc import params
 
-from pyfda.plot_widgets.plot_fft_win import Plot_FFT_win
+from pyfda.plot_widgets.plot_fft_win import PlotFFTWin
 
 logger = logging.getLogger(__name__)
 
@@ -64,7 +64,7 @@ class PlotTranUI(QWidget):
             return
 
         # --- signals coming from the FFT window widget or the FFT window selector
-        if dict_sig['class'] in {'Plot_FFT_win', 'QFFTWinCmbBox'}:
+        if dict_sig['class'] in {'PlotFFTWin', 'QFFTWinCmbBox'}:
             if 'close_event' in dict_sig:   # hide FFT window widget and return
                 self.hide_fft_wdg()
                 return
@@ -258,9 +258,9 @@ class PlotTranUI(QWidget):
         self.all_wins_dict = self.qfft_win_select.all_wins_dict
 
         # instantiate FFT window with default windows dict
-        self.win_viewer = Plot_FFT_win(fb_get('tran_freq_win'),
+        self.win_viewer = PlotFFTWin(cur_win_dict_name=('tran_freq_win',),
             app='spec', all_wins_dict=self.all_wins_dict, sym=False,
-            title="pyFDA Spectral Window Viewer", object_name="impz_win_viewer")
+            title="pyFDA Spectral Window Viewer", object_name="tran_win_viewer")
         # create handle to window to hide it during the "quit" dialogue,
         # hide window initially, this is modeless i.e. a non-blocking popup window
         dirs.tran_freq_win_handle = self.win_viewer

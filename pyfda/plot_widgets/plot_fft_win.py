@@ -18,6 +18,7 @@ import matplotlib.patches as mpl_patches
 
 # importing filterbroker initializes all its globals:
 import pyfda.filterbroker as fb
+from pyfda.filterbroker import fb_get, fb_set
 from pyfda.libs.compat import (
     Qt, pyqtSignal, QHBoxLayout, QVBoxLayout, QDialog, QLabel, QLineEdit,
     QFrame, QFont, QTextBrowser, QSplitter, QTableWidget, QTableWidgetItem,
@@ -32,7 +33,7 @@ from pyfda.plot_widgets.mpl_widget import MplWidget
 logger = logging.getLogger(__name__)
 
 # ------------------------------------------------------------------------------
-class Plot_FFT_win(QDialog):
+class PlotFFTWin(QDialog):
     """
     Create a pop-up widget for displaying time and frequency view of an FFT
     window.
@@ -48,9 +49,11 @@ class Plot_FFT_win(QDialog):
     parent : class instance
         reference to parent
 
-    cur_win_dict : dict
-        Dictionary keeping the current window and its parameters. This is usually
-        a sub-dictionary of `fb.fil[0]`.
+    cur_win_dict_name : tuple
+        Name of the current window dictionary, a sub-dictionary of `fil[0]`. The tuple contains
+        the keys to access the sub-dictionary via `fb_get()` and `fb_set()`, e.g.
+        `('tran_freq_win',)` for the spectral window viewer and `('filter_widgets', 'firwin')`
+        for the FIR window viewer.
 
     app : str
         String specifying the target application, 'fir' for windowed fir filter design,
@@ -80,7 +83,7 @@ class Plot_FFT_win(QDialog):
     sig_rx = pyqtSignal(object)  # incoming
     sig_tx = pyqtSignal(object)  # outgoing
 
-    def __init__(self, cur_win_dict: dict, app: str = 'spec', all_wins_dict: dict | None = None,
+    def __init__(self, cur_win_dict_name: tuple, app: str = 'spec', all_wins_dict: dict | None = None,
                  sym: bool = False, title: str = 'pyFDA Window Viewer',
                  ignore_close_event: bool = False, object_name: str = "plot_fft_win"
                  ) -> None:
@@ -94,7 +97,7 @@ class Plot_FFT_win(QDialog):
 
         if all_wins_dict is None:
             all_wins_dict = {}
-        self.cur_win_dict = cur_win_dict
+        self.cur_win_dict_name = cur_win_dict_name
         self.app = app
         self.sym = sym
 
@@ -103,7 +106,7 @@ class Plot_FFT_win(QDialog):
         self.bottom_f = -80  # min. value for dB display
         self.bottom_t = -60
         # initial number of data points for visualization
-        self.N_view = self.cur_win_dict['win_len']
+        self.n_view = fb_get(*self.cur_win_dict_name, 'win_len')
 
         self.pad = 32  # zero padding factor for smooth FFT plot
 
@@ -135,7 +138,7 @@ class Plot_FFT_win(QDialog):
             "high sidelobes create bad stopband attenuations.</span>"
         ]
 
-        self.qfft_win_select = QFFTWinCmbBox(self.cur_win_dict,
+        self.qfft_win_select = QFFTWinCmbBox(fb_get(*self.cur_win_dict_name),
             all_wins_dict=all_wins_dict, app=self.app,
             objectName=self.objectName() + '_cmb')
         self.all_wins_dict = self.qfft_win_select.all_wins_dict
@@ -220,11 +223,11 @@ class Plot_FFT_win(QDialog):
         self.bfont = QFont()
         self.bfont.setBold(True)
 
-        self.lbl_N = QLabel(to_html("N =", frmt='bi'))
-        self.led_N = QLineEdit(self)
-        self.led_N.setText(str(self.N_view))
-        self.led_N.setMaximumWidth(qtext_width(N_x=8))
-        self.led_N.setToolTip(
+        self.lbl_n = QLabel(to_html("N =", frmt='bi'))
+        self.led_n = QLineEdit(self)
+        self.led_n.setText(str(self.n_view))
+        self.led_n.setMaximumWidth(qtext_width(N_x=8))
+        self.led_n.setToolTip(
             "<span>Number of window data points to display.</span>")
 
         # By default, the enter key triggers the default 'dialog action' in QDialog
@@ -276,50 +279,50 @@ class Plot_FFT_win(QDialog):
         #
         # This widget encompasses all control subwidgets
         # ----------------------------------------------------------------------
-        layH_win_select = QHBoxLayout()
-        layH_win_select.addWidget(self.qfft_win_select)
-        layH_win_select.setContentsMargins(0, 0, 0, 0)
-        layH_win_select.addWidget(self.lbl_N)
-        layH_win_select.addWidget(self.led_N)
-        layH_win_select.addStretch(1)
-        self.frmQFFT = QFrame(self, objectName="frmQFFT")
-        self.frmQFFT.setLayout(layH_win_select)
+        lay_h_win_select = QHBoxLayout()
+        lay_h_win_select.addWidget(self.qfft_win_select)
+        lay_h_win_select.setContentsMargins(0, 0, 0, 0)
+        lay_h_win_select.addWidget(self.lbl_n)
+        lay_h_win_select.addWidget(self.led_n)
+        lay_h_win_select.addStretch(1)
+        self.frm_q_fft = QFrame(self, objectName="frm_q_fft")
+        self.frm_q_fft.setLayout(lay_h_win_select)
 
         hline = QHLine()
 
-        layHControls_t = QHBoxLayout()
-        layHControls_t.addWidget(self.lbl_title_time)
-        layHControls_t.addWidget(self.lbl_log_bottom_t)
-        layHControls_t.addWidget(self.led_log_bottom_t)
-        layHControls_t.addWidget(self.but_log_t)
-        layHControls_t.addStretch(5)
+        lay_h_controls_t = QHBoxLayout()
+        lay_h_controls_t.addWidget(self.lbl_title_time)
+        lay_h_controls_t.addWidget(self.lbl_log_bottom_t)
+        lay_h_controls_t.addWidget(self.led_log_bottom_t)
+        lay_h_controls_t.addWidget(self.but_log_t)
+        lay_h_controls_t.addStretch(5)
 
-        layHControls_f = QHBoxLayout()
-        layHControls_f.addStretch(1)
-        layHControls_f.addWidget(self.lbl_title_freq)
-        layHControls_f.addWidget(self.but_norm_f)
-        layHControls_f.addStretch(1)
-        layHControls_f.addWidget(self.but_half_f)
-        layHControls_f.addStretch(1)
-        layHControls_f.addWidget(self.lbl_log_bottom_f)
-        layHControls_f.addWidget(self.led_log_bottom_f)
-        layHControls_f.addWidget(self.but_log_f)
-        layHControls_f.addWidget(QVLine(width=2))
-        layHControls_f.addWidget(self.but_bin_f)
-        layHControls_f.addStretch(5)
+        lay_h_controls_f = QHBoxLayout()
+        lay_h_controls_f.addStretch(1)
+        lay_h_controls_f.addWidget(self.lbl_title_freq)
+        lay_h_controls_f.addWidget(self.but_norm_f)
+        lay_h_controls_f.addStretch(1)
+        lay_h_controls_f.addWidget(self.but_half_f)
+        lay_h_controls_f.addStretch(1)
+        lay_h_controls_f.addWidget(self.lbl_log_bottom_f)
+        lay_h_controls_f.addWidget(self.led_log_bottom_f)
+        lay_h_controls_f.addWidget(self.but_log_f)
+        lay_h_controls_f.addWidget(QVLine(width=2))
+        lay_h_controls_f.addWidget(self.but_bin_f)
+        lay_h_controls_f.addStretch(5)
 
         lay_h_controls = QHBoxLayout()
-        lay_h_controls.addLayout(layHControls_t, stretch=10)
+        lay_h_controls.addLayout(lay_h_controls_t, stretch=10)
         lay_h_controls.addWidget(QVLine(width=4), stretch=1)
-        lay_h_controls.addLayout(layHControls_f, stretch=10)
+        lay_h_controls.addLayout(lay_h_controls_f, stretch=10)
 
-        layVControls = QVBoxLayout()
-        layVControls.addWidget(self.frmQFFT)
-        layVControls.addWidget(hline)
-        layVControls.addLayout(lay_h_controls)
+        lay_v_controls = QVBoxLayout()
+        lay_v_controls.addWidget(self.frm_q_fft)
+        lay_v_controls.addWidget(hline)
+        lay_v_controls.addLayout(lay_h_controls)
 
         self.frm_controls = QFrame(self, objectName="frm_controls")
-        self.frm_controls.setLayout(layVControls)
+        self.frm_controls.setLayout(lay_v_controls)
 
         # ----------------------------------------------------------------------
         #               ### mplwidget ###
@@ -363,14 +366,14 @@ class Plot_FFT_win(QDialog):
 
         self._construct_table(self.tbl_rows, self.tbl_cols, " ")
 
-        self.txtInfoBox = QTextBrowser(self)
+        self.txt_info_box = QTextBrowser(self)
 
-        layVInfo = QVBoxLayout(self)
-        layVInfo.addWidget(self.tbl_win_props)
-        layVInfo.addWidget(self.txtInfoBox)
+        lay_v_info = QVBoxLayout(self)
+        lay_v_info.addWidget(self.tbl_win_props)
+        lay_v_info.addWidget(self.txt_info_box)
 
         self.frm_info = QFrame(self, objectName="frmInfo")
-        self.frm_info.setLayout(layVInfo)
+        self.frm_info.setLayout(lay_v_info)
 
         # ----------------------------------------------------------------------
         #               ### splitter ###
@@ -415,7 +418,7 @@ class Plot_FFT_win(QDialog):
         self.led_log_bottom_t.editingFinished.connect(self.update_bottom)
         self.led_log_bottom_f.editingFinished.connect(self.update_bottom)
 
-        self.led_N.editingFinished.connect(self.calc_win_draw)
+        self.led_n.editingFinished.connect(self.calc_win_draw)
 
         self.but_norm_f.clicked.connect(self.calc_win_draw)
         self.but_half_f.clicked.connect(self.update_view)
@@ -428,15 +431,14 @@ class Plot_FFT_win(QDialog):
 # ------------------------------------------------------------------------------
     def save_ui(self):
         """
-        Save the window type and the number of FFT points to the corresponding
-        section of `fb.fil[0]`, i.e. to `self.cur_win_dict`
+        Save the window type and the number of FFT points to `fil[0]*self.cur_win_dict_name]`
 
         "id": "hann",  # window id
         "disp_name": "Hann",  # display name
         "par_val": [],    # list of window parameters
         "win_len": 32  # window length for window viewer
         """
-        self.cur_win_dict['win_len'] = self.N_view
+        fb_set(*self.cur_win_dict_name, 'win_len', self.n_view)  # store number of view points in dict
         self.qfft_win_select.ui2win_dict()
 
 
@@ -444,11 +446,11 @@ class Plot_FFT_win(QDialog):
     def load_ui(self):
         """
         Load the window type and the number of FFT points from the corresponding
-        section of `fb.fil[0]`, i.e. from `self.cur_win_dict`.
+        section of `fil[0]`, i.e. from the section `mywin`.
         """
-        self.N_view = safe_eval(self.cur_win_dict['win_len'], self.N_view, sign='pos',
+        self.n_view = safe_eval(fb_get(*self.cur_win_dict_name, 'win_len'), self.n_view, sign='pos',
                                 return_type='int')  # sanitize value
-        self.led_N.setText(str(self.N_view))  # update ui
+        self.led_n.setText(str(self.n_view))  # update ui
         self.qfft_win_select.dict2ui(force_update=True)
 
         self.calc_win_draw()
@@ -517,50 +519,50 @@ class Plot_FFT_win(QDialog):
         ----------
 
         """
-        self.N_view = safe_eval(self.led_N.text(), self.N_view, sign='pos',
+        self.n_view = safe_eval(self.led_n.text(), self.n_view, sign='pos',
                                 return_type='int')
-        self.cur_win_dict['win_len'] = self.N_view  # store number of view points in dict
-        self.led_N.setText(str(self.N_view))
-        self.n = np.arange(self.N_view)
-        self.win_view = self.qfft_win_select.calc_window(self.N_view, sym=self.sym)
+        fb_set(*self.cur_win_dict_name, 'win_len', self.n_view)  # store number of view points in dict
+        self.led_n.setText(str(self.n_view))
+        self.n = np.arange(self.n_view)
+        self.win_view = self.qfft_win_select.calc_window(self.n_view, sym=self.sym)
 
         if self.qfft_win_select.err:
             self.qfft_win_select.dict2ui()
 
-        self.nenbw = self.N_view * np.sum(np.square(self.win_view))\
+        self.nenbw = self.n_view * np.sum(np.square(self.win_view))\
             / np.square(np.sum(self.win_view)) # normalized equiv. noise BW
-        self.cgain = np.sum(self.win_view) / self.N_view  # coherent gain
+        self.cgain = np.sum(self.win_view) / self.n_view  # coherent gain
 
         # calculate the FFT of the window with a zero padding factor
         # of `self.pad` and create the frequency axis
-        self.F = fftfreq(self.N_view * self.pad, d=1. / fb.fil[0]['f_S'])
-        self.k = fftfreq(self.N_view * self.pad, d=1./(self.N_view))
-        self.Win = np.abs(fft(self.win_view, self.N_view * self.pad))
+        self.F = fftfreq(self.n_view * self.pad, d=1. / fb_get('f_S'))
+        self.k = fftfreq(self.n_view * self.pad, d=1./(self.n_view))
+        self.Win = np.abs(fft(self.win_view, self.n_view * self.pad))
         # calculate the max. amplitude error in the middle of the bin
-        self.max_a_err = self.Win[self.pad // 2] / (self.N_view * self.cgain)
+        self.max_a_err = self.Win[self.pad // 2] / (self.n_view * self.cgain)
 
         # Correct gain for periodic signals (coherent gain)
         if self.but_norm_f.isChecked():
-            self.Win /= (self.N_view * self.cgain)
+            self.Win /= (self.n_view * self.cgain)
 
         # calculate frequency of first zero and maximum sidelobe level,
         # argrelmin() returns an array with indices of relative minima
-        first_zero = argrelmin(self.Win[:(self.N_view*self.pad)//2])
+        first_zero = argrelmin(self.Win[:(self.n_view*self.pad)//2])
 
         if np.shape(first_zero)[1] > 0:
             first_zero = first_zero[0][0]
             self.first_zero_f = self.F[first_zero]
             self.first_zero_idx = first_zero / float(self.pad)
             self.sidelobe_level = np.max(
-                self.Win[first_zero:(self.N_view*self.pad)//2])
+                self.Win[first_zero:(self.n_view*self.pad)//2])
         else:
             self.first_zero_f = np.nan
             self.sidelobe_level = 0
 
-        mainlobe_3dB_idx = (
+        mainlobe_3db_idx = (
             np.abs(self.Win[:len(self.F*self.pad)//2] - self.Win[0]/np.sqrt(2))).argmin()
-        self.mainlobe_3dB_freq = self.F[mainlobe_3dB_idx]
-        self.mainlobe_3dB_idx = mainlobe_3dB_idx / float(self.pad)
+        self.mainlobe_3db_freq = self.F[mainlobe_3db_idx]
+        self.mainlobe_3db_idx = mainlobe_3db_idx / float(self.pad)
 
         self.update_view()
 
@@ -623,10 +625,10 @@ class Plot_FFT_win(QDialog):
         self.ax_t.cla()
         self.ax_f.cla()
 
-        self.ax_t.set_xlabel(fb.fil[0]['plt_t_label'])
+        self.ax_t.set_xlabel(fb_get('plt_t_label'))
         self.ax_t.set_ylabel(r'$w[n] \; \rightarrow$')
 
-        self.ax_f.set_xlabel(fb.fil[0]['plt_f_label'])
+        self.ax_f.set_xlabel(fb_get('plt_f_label'))
         self.ax_f.set_ylabel(r'$W(f) \; \rightarrow$')
 
         if self.but_log_t.isChecked():
@@ -653,10 +655,10 @@ class Plot_FFT_win(QDialog):
             self.nenbw_unit = "bins"
             self.first_zero_disp = self.first_zero_idx
             self.first_zero_unit = "bins"
-            self.mainlobe_3dB_disp = self.mainlobe_3dB_idx
-            self.mainlobe_3dB_unit = "bins"
+            self.mainlobe_3db_disp = self.mainlobe_3db_idx
+            self.mainlobe_3db_unit = "bins"
         else:
-            self.ax_f.set_xlabel(fb.fil[0]['plt_f_label'])
+            self.ax_f.set_xlabel(fb_get('plt_f_label'))
             x = F
 
             self.but_bin_f.setText("<b>&Delta; <i>f</i></b>")
@@ -664,8 +666,8 @@ class Plot_FFT_win(QDialog):
             self.nenbw_unit = "dB"
             self.first_zero_disp = self.first_zero_f
             self.first_zero_unit = "f_S"
-            self.mainlobe_3dB_disp = self.mainlobe_3dB_freq
-            self.mainlobe_3dB_unit = "f_S"
+            self.mainlobe_3db_disp = self.mainlobe_3db_freq
+            self.mainlobe_3db_unit = "f_S"
 
         if self.but_log_f.isChecked():
             self.ax_f.plot(x, np.maximum(
@@ -691,22 +693,22 @@ class Plot_FFT_win(QDialog):
         self.led_log_bottom_f.setVisible(self.but_log_f.isChecked())
         self.lbl_log_bottom_f.setVisible(self.but_log_f.isChecked())
 
-        cur_id = self.cur_win_dict['id']
+        cur_id = fb_get(*self.cur_win_dict_name, 'id')
         cur_win_d = self.all_wins_dict[cur_id]
         cur_name = cur_win_d['disp_name']
 
         param_txt = ""
-        if len(self.cur_win_dict['par_val']) > 0:
-            if type(self.cur_win_dict['par_val'][0]) in {str}:
-                p1 = self.cur_win_dict['par_val'][0]
+        if fb_get(*self.cur_win_dict_name, 'par_val'):
+            if type(fb_get(*self.cur_win_dict_name, 'par_val')[0]) == str:
+                p1 = fb_get(*self.cur_win_dict_name, 'par_val')[0]
             else:
-                p1 = "{0:.3g}".format(self.cur_win_dict['par_val'][0])
+                p1 = f"{fb_get(*self.cur_win_dict_name, 'par_val')[0]:.3g}"
             param_txt = f" ({self.all_wins_dict[cur_id]['par'][0]['name_tex']} = {p1})"
-        if len(self.cur_win_dict['par_val']) > 1:
-            if type(self.cur_win_dict['par_val'][1]) in {str}:
-                p2 = self.cur_win_dict['par_val'][1]
+        if len(fb_get(*self.cur_win_dict_name, 'par_val')) > 1:
+            if type(fb_get(*self.cur_win_dict_name, 'par_val')[1]) in {str}:
+                p2 = fb_get(*self.cur_win_dict_name, 'par_val')[1]
             else:
-                p2 = "{0:.3g}".format(self.cur_win_dict['par_val'][1])
+                p2 = f"{fb_get(*self.cur_win_dict_name, 'par_val')[1]:.3g}"
             param_txt = param_txt[:-1] +\
                 f", {self.all_wins_dict[cur_id]['par'][1]['name_tex']} = {p2})"
         self.mplwidget.fig.suptitle(f"{cur_name} Window" + param_txt)
@@ -716,39 +718,39 @@ class Plot_FFT_win(QDialog):
                                       lw=0, alpha=0)
         # Info legend for time domain window
         labels_t = []
-        labels_t.append(f"$N$ = {self.N_view}")
+        labels_t.append(f"$N$ = {self.n_view}")
         self.ax_t.legend([patch], labels_t, loc='best', fontsize='small',
                          fancybox=True, framealpha=0.7,
                          handlelength=0, handletextpad=0)
 
         # Info legend for frequency domain window
         labels_f = []
-        N_patches = 0
+        n_patches = 0
         if self.tbl_sel[0]:  # NENBW
             labels_f.append(f"$NENBW$ = {self.nenbw_disp:.3g} {self.nenbw_unit}")
-            N_patches += 1
+            n_patches += 1
 
         if self.tbl_sel[1]:  # Correlated gain
             labels_f.append(f"$CGAIN$ = {self.cgain_disp:.3g} {self.cgain_unit}")
-            N_patches += 1
+            n_patches += 1
 
         if self.tbl_sel[2]:  # first_zero
             labels_f.append(f"1$^{{st}}$ Zero = {self.first_zero_disp:.3g} {self.first_zero_unit}")
-            N_patches += 1
+            n_patches += 1
             # plot a line at the first zero
             if not np.isnan(self.first_zero_f):
                 self.ax_f.axvline(self.first_zero_disp, ls='dotted', c='b')
 
         if self.tbl_sel[3]:  # 3dB bandwidth
-            labels_f.append(f"$W_{{3dB}}$ = {self.mainlobe_3dB_disp:.3g} {self.mainlobe_3dB_unit}")
-            N_patches += 1
+            labels_f.append(f"$W_{{3dB}}$ = {self.mainlobe_3db_disp:.3g} {self.mainlobe_3db_unit}")
+            n_patches += 1
             # plot a line at the -3dB bandwidth
-            if not np.isnan(self.mainlobe_3dB_disp):
-                self.ax_f.axvline(self.mainlobe_3dB_disp, ls='dotted', c='b')
+            if not np.isnan(self.mainlobe_3db_disp):
+                self.ax_f.axvline(self.mainlobe_3db_disp, ls='dotted', c='b')
 
         if self.tbl_sel[4]:  # max ampl. error
             labels_f.append(f"$A_{{err,max}}$ = {self.max_a_err_disp:.3g} {self.max_a_err_unit}")
-            N_patches += 1
+            n_patches += 1
 
         if self.tbl_sel[5]:  # max. sidelobe
             # plot a line at the max. sidelobe level
@@ -756,10 +758,10 @@ class Plot_FFT_win(QDialog):
                 self.ax_f.axhline(self.sidelobe_level_disp, ls='dotted', c='b')
                 labels_f.append(
                     f"$A_{{SL,max}}$ = {self.sidelobe_level_disp:.3g} {self.cgain_unit}")
-            N_patches += 1
+            n_patches += 1
 
-        if N_patches > 0:
-            self.ax_f.legend([patch] * N_patches, labels_f, loc='best',
+        if n_patches > 0:
+            self.ax_f.legend([patch] * n_patches, labels_f, loc='best',
                              fontsize='small', fancybox=True, framealpha=0.7,
                              handlelength=0, handletextpad=0)
 
@@ -773,11 +775,11 @@ class Plot_FFT_win(QDialog):
         """
         Update the text info box for the window
         """
-        cur_id = self.cur_win_dict['id']
+        cur_id = fb_get(*self.cur_win_dict_name, 'id')
         if 'info' in self.all_wins_dict[cur_id]:
-            self.txtInfoBox.setText(self.all_wins_dict[cur_id]['info'])
+            self.txt_info_box.setText(self.all_wins_dict[cur_id]['info'])
         else:
-            self.txtInfoBox.clear()
+            self.txt_info_box.clear()
 
         # 0
         self._set_table_item(0, 0, "NENBW", font=self.bfont)  # , sel=True)
@@ -793,8 +795,8 @@ class Plot_FFT_win(QDialog):
         self._set_table_item(1, 2, self.first_zero_unit)
         # 3
         self._set_table_item(1, 3, "3dB Width Mainlobe", font=self.bfont)  # , sel=True)
-        self._set_table_item(1, 4, f"{self.mainlobe_3dB_disp:.4g}")
-        self._set_table_item(1, 5, self.mainlobe_3dB_unit)
+        self._set_table_item(1, 4, f"{self.mainlobe_3db_disp:.4g}")
+        self._set_table_item(1, 5, self.mainlobe_3db_unit)
         # 4
         self._set_table_item(2, 0, "Max. Amp. Error", font=self.bfont)  # , sel=True)
         self._set_table_item(2, 1, f"{self.max_a_err_disp:.4g}")
@@ -826,7 +828,7 @@ if __name__ == '__main__':
     app.setStyleSheet(QSS.QSS_RC)
     dirs.clipboard = QApplication.clipboard()  # create clipboard instance
 
-    mainw = Plot_FFT_win(app='spec', cur_win_dict=fb.fil[0]['tran_freq_win'],
+    mainw = PlotFFTWin(app='spec', cur_win_dict_name=('tran_freq_win',),
                          ignore_close_event=False)
 
     app.setActiveWindow(mainw)

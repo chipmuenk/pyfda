@@ -51,7 +51,7 @@ from pyfda.libs.pyfda_qt_classes import PushButton
 from pyfda.libs.pyfda_sig_lib import fil_save
 from pyfda.libs.fft_windows_cmb_box import QFFTWinCmbBox
 # from pyfda.libs.pyfda_fft_windows_lib import all_wins_dict_ref
-from pyfda.plot_widgets.plot_fft_win import Plot_FFT_win
+from pyfda.plot_widgets.plot_fft_win import PlotFFTWin
 
 from .common import Common, remezord
 
@@ -150,7 +150,7 @@ class Firwin(QWidget):
             logger.warning("Stopped infinite loop:\n%s", pprint_log(dict_sig))
 
         # --- signals coming from the FFT window widget or the qfft_win_select
-        if dict_sig['class'] in {'Plot_FFT_win', 'QFFTWinCmbBox'}:
+        if dict_sig['class'] in {'PlotFFTWin', 'QFFTWinCmbBox'}:
             if 'close_event' in dict_sig:  # hide FFT window windget and return
                 self.hide_fft_wdg()
                 return
@@ -189,7 +189,7 @@ class Firwin(QWidget):
         # self.qfft_win_select.setSizeAdjustPolicy(QComboBox.AdjustToContents))
 
         # instantiate FFT window with freshly created windows dict
-        self.win_viewer = Plot_FFT_win(fb_get('filter_widgets', 'firwin'),
+        self.win_viewer = PlotFFTWin(cur_win_dict_name=('filter_widgets', 'firwin', ),
             app='fir', all_wins_dict=self.all_wins_dict, sym=True,
             title="pyFDA FIR Window Viewer", object_name="firwin_win_viewer")
         # create handle to window to hide it during the "quit" dialogue,
