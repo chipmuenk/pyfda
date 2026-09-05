@@ -22,7 +22,7 @@ logger = logging.getLogger(__name__)
 
 
 # ------------------------------------------------------------------------------
-class CSV_option_box(QDialog):
+class CSVOptionBox(QDialog):
     """
     Create a pop-up widget for setting CSV options. This is needed when storing /
     reading Comma-Separated Value (CSV) files containing coefficients or poles
@@ -196,7 +196,7 @@ if __name__ == '__main__':
 
     app = QApplication(sys.argv)
     app.setStyleSheet(QSS.QSS_RC)
-    mainw = CSV_option_box()
+    mainw = CSVOptionBox()
     app.setActiveWindow(mainw)
     mainw.show()
     sys.exit(app.exec_())

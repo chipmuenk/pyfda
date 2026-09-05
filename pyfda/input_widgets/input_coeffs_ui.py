@@ -17,7 +17,7 @@ from pyfda.filterbroker import fb_get
 from pyfda.libs.compat import (
     pyqtSignal, Qt, QWidget, QLabel, QLineEdit, QComboBox, QPushButton, QFrame,
     QSpinBox, QFont, QIcon, QVBoxLayout, QHBoxLayout, QSizePolicy)
-from pyfda.libs.csv_option_box import CSV_option_box
+from pyfda.libs.csv_option_box import CSVOptionBox
 from pyfda.libs.pyfda_lib import to_html
 from pyfda.libs.pyfda_qt_lib import qstyle_widget, qcmb_box_populate, emit
 from pyfda.libs.pyfda_qt_classes import PushButton
@@ -347,7 +347,7 @@ class Input_Coeffs_UI(QWidget):
                 # Important: Handle to window must be class attribute, otherwise it
                 # (and the attached window) is deleted immediately when it goes
                 # out of scope
-                dirs.csv_options_handle = CSV_option_box()
+                dirs.csv_options_handle = CSVOptionBox()
                 dirs.csv_options_handle.sig_tx.connect(self.process_sig_rx)
                 dirs.csv_options_handle.show()  # modeless i.e. non-blocking popup window
                 self.emit({'ui_global_changed': 'csv'})

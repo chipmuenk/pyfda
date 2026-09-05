@@ -22,7 +22,7 @@ import pyfda.libs.pyfda_dirs as dirs
 from pyfda.libs.pyfda_lib import safe_eval, pprint_log
 from pyfda.libs.pyfda_qt_lib import (
     emit, qstyle_widget, qget_cmb_box, qset_cmb_box, qwindow_stay_on_top)
-from pyfda.libs.csv_option_box import CSV_option_box
+from pyfda.libs.csv_option_box import CSVOptionBox
 
 from pyfda.pyfda_rc import params  # FMT string for QLineEdit fields, e.g. '{:.3g}'
 from pyfda.plot_widgets.tran.tran_io_ui import TranIOUI
@@ -400,7 +400,7 @@ class TranIO(QWidget):
             if self.ui.but_csv_options.isChecked():
                 # Important: Handle to window must be class attribute otherwise it (and
                 # the attached window) is deleted immediately when it goes out of scope
-                dirs.csv_options_handle = CSV_option_box()
+                dirs.csv_options_handle = CSVOptionBox()
                 dirs.csv_options_handle.sig_tx.connect(self.process_sig_rx)
                 dirs.csv_options_handle.show()  # modeless i.e. non-blocking popup window
                 # alert other widgets that csv options / visibility have changed
