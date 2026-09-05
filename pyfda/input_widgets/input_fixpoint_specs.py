@@ -339,24 +339,24 @@ class Input_Fixpoint_Specs(QWidget):
         self.cmb_fx_wdg = QComboBox(self)
         self.cmb_fx_wdg.setSizeAdjustPolicy(QComboBox.AdjustToContents)
 
-        self.lblTitle = QLabel("not set", self)
-        self.lblTitle.setWordWrap(True)
-        self.lblTitle.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
+        self.lbl_title = QLabel("not set", self)
+        self.lbl_title.setWordWrap(True)
+        self.lbl_title.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
 
         self.lbl_descr = QLabel("", self)
         self.lbl_descr.setWordWrap(True)
 
-        layHTitle = QHBoxLayout()
-        layHTitle.addWidget(self.cmb_fx_wdg)
-        layHTitle.addWidget(self.lblTitle)
+        lay_h_title = QHBoxLayout()
+        lay_h_title.addWidget(self.cmb_fx_wdg)
+        lay_h_title.addWidget(self.lbl_title)
 
         layVTitle = QVBoxLayout()
-        layVTitle.addLayout(layHTitle)
+        layVTitle.addLayout(lay_h_title)
         layVTitle.addWidget(self.lbl_descr)
 
-        self.frmTitle = QFrame(self)
-        self.frmTitle.setLayout(layVTitle)
-        self.frmTitle.setContentsMargins(*params['wdg_margins'])
+        self.frm_title = QFrame(self)
+        self.frm_title.setLayout(layVTitle)
+        self.frm_title.setContentsMargins(*params['wdg_margins'])
 
         # -----------------------------------------------------------------
         #       Input and Output Quantizer
@@ -425,7 +425,7 @@ class Input_Fixpoint_Specs(QWidget):
         #       Top level layout
         # -------------------------------------------------------------
         lay_v_main = QVBoxLayout()
-        lay_v_main.addWidget(self.frmTitle)
+        lay_v_main.addWidget(self.frm_title)
         lay_v_main.addWidget(frm_hdl_btns)
         lay_v_main.addWidget(self.wdg_wq_input)
         lay_v_main.addWidget(wdg_fx_dyn)
@@ -651,7 +651,7 @@ class Input_Fixpoint_Specs(QWidget):
             self.but_export_code.setVisible(False)
             self.img_fixp = self.embed_fixp_img(self.no_fx_filter_img)
             self.resize_img()
-            self.lblTitle.setText("")
+            self.lbl_title.setText("")
 
             self.fx_filt_ui = None
         # -----------------------------------------------------------
@@ -697,7 +697,7 @@ class Input_Fixpoint_Specs(QWidget):
             self.resize_img()
 
             # ---- set title and description for filter
-            self.lblTitle.setText(self.fx_filt_ui.title)
+            self.lbl_title.setText(self.fx_filt_ui.title)
             if hasattr(self.fx_filt_ui, "description"):
                 self.lbl_descr.setVisible(True)
                 self.lbl_descr.setText(self.fx_filt_ui.description)
@@ -752,7 +752,7 @@ class Input_Fixpoint_Specs(QWidget):
         is_fixp = get_fx()
 
         # fixpoint widgets are only visible in fixpoint mode
-        self.frmTitle.setVisible(is_fixp)
+        self.frm_title.setVisible(is_fixp)
         self.wdg_wq_input.setVisible(is_fixp)
         self.wdg_wq_output.setVisible(is_fixp)
         self.frmImg.setVisible(is_fixp)

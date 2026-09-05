@@ -82,42 +82,42 @@ class AmplitudeSpecs(QWidget):
 
         bfont = QFont()
         bfont.setBold(True)
-        lblTitle = QLabel(str(self.title), self)  # field for widget title
-        lblTitle.setFont(bfont)
-        lblTitle.setWordWrap(True)
+        lbl_title = QLabel(str(self.title), self)  # field for widget title
+        lbl_title.setFont(bfont)
+        lbl_title.setWordWrap(True)
 
         lbl_units = QLabel("in", self)
 
-        self.cmbUnitsA = QComboBox(self, objectName="cmbUnitsA")
-        self.cmbUnitsA.addItems(amp_units)
-        self.cmbUnitsA.setToolTip(
+        self.cmb_units_a = QComboBox(self, objectName="cmb_units_a")
+        self.cmb_units_a.addItems(amp_units)
+        self.cmb_units_a.setToolTip(
             "<span>Unit for amplitude specifications:"
             " dB is attenuation (&gt; 0); levels in V and W have to be &lt; 1.</span>")
 
         # fit size dynamically to largest element:
-        self.cmbUnitsA.setSizeAdjustPolicy(QComboBox.AdjustToContents)
+        self.cmb_units_a.setSizeAdjustPolicy(QComboBox.AdjustToContents)
 
         # find index for default unit from dictionary and set the unit
-        amp_idx = self.cmbUnitsA.findData(fb_get('amp_specs_unit'))
+        amp_idx = self.cmb_units_a.findData(fb_get('amp_specs_unit'))
         amp_idx = max(amp_idx, 0)
-        self.cmbUnitsA.setCurrentIndex(amp_idx)  # initialize for dBs
+        self.cmb_units_a.setCurrentIndex(amp_idx)  # initialize for dBs
 
-        layHTitle = QHBoxLayout()  # layout for title and unit
-        layHTitle.addWidget(lblTitle)
-        layHTitle.addStretch(5)
-        layHTitle.addWidget(lbl_units, Qt.AlignLeft)
-        layHTitle.addWidget(self.cmbUnitsA, Qt.AlignLeft)
+        lay_h_title = QHBoxLayout()  # layout for title and unit
+        lay_h_title.addWidget(lbl_title)
+        lay_h_title.addStretch(5)
+        lay_h_title.addWidget(lbl_units, Qt.AlignLeft)
+        lay_h_title.addWidget(self.cmb_units_a, Qt.AlignLeft)
 
-        self.layGSpecs = QGridLayout()  # sublayout for spec fields
+        self.lay_g_specs = QGridLayout()  # sublayout for spec fields
         # set the title as the first (fixed) entry in grid layout. The other
         # fields are added and hidden dynamically in _show_entries and _hide_entries()
-        self.layGSpecs.addLayout(layHTitle, 0, 0, 1, 2)
-        self.layGSpecs.setAlignment(Qt.AlignLeft)
-        self.layGSpecs.setAlignment(Qt.AlignTop)
+        self.lay_g_specs.addLayout(lay_h_title, 0, 0, 1, 2)
+        self.lay_g_specs.setAlignment(Qt.AlignLeft)
+        self.lay_g_specs.setAlignment(Qt.AlignTop)
 
         # This is the top level widget, encompassing the other widgets
         self.frm_main = QFrame(self)
-        self.frm_main.setLayout(self.layGSpecs)
+        self.frm_main.setLayout(self.lay_g_specs)
 
         self.lay_v_main = QVBoxLayout()  # Widget main layout
         self.lay_v_main.addWidget(self.frm_main)
@@ -141,7 +141,7 @@ class AmplitudeSpecs(QWidget):
         # ----------------------------------------------------------------------
         # LOCAL SIGNALS & SLOTs / EVENT MONITORING
         # ----------------------------------------------------------------------
-        self.cmbUnitsA.currentIndexChanged.connect(self._set_amp_unit)
+        self.cmb_units_a.currentIndexChanged.connect(self._set_amp_unit)
         #       ^ this also triggers the initial dict2ui
         # DYNAMIC EVENT MONITORING
         # Every time a field is edited, call self._store_entry and
@@ -265,7 +265,7 @@ class AmplitudeSpecs(QWidget):
         Store unit for amplitude in filter dictionary, reload amplitude spec
         entries via dict2ui and fire a sigUnitChanged signal
         """
-        fb_set('amp_specs_unit', qget_cmb_box(self.cmbUnitsA, data=False))
+        fb_set('amp_specs_unit', qget_cmb_box(self.cmb_units_a, data=False))
         self.dict2ui()
 
         self.emit({'view_changed': 'a_unit'})
@@ -282,7 +282,7 @@ class AmplitudeSpecs(QWidget):
         displayed values are adapted to the amplitude unit, not the dictionary!
         """
         if self.spec_edited:
-            unit = str(self.cmbUnitsA.currentText())
+            unit = str(self.cmb_units_a.currentText())
             filt_type = fb_get('ft')
             amp_label = str(source.objectName())
             amp_value = safe_eval(source.text(), self.data_prev, sign='pos')
@@ -326,8 +326,8 @@ class AmplitudeSpecs(QWidget):
                 self.qlineedit[i].installEventFilter(self)  # filter events
 
                 # first entry is title
-                self.layGSpecs.addWidget(self.qlabels[i], i+1, 0)
-                self.layGSpecs.addWidget(self.qlineedit[i], i+1, 1)
+                self.lay_g_specs.addWidget(self.qlabels[i], i+1, 0)
+                self.lay_g_specs.addWidget(self.qlineedit[i], i+1, 1)
 
         else:  # make the right number of widgets visible
             for i in range(self.n_cur_labels, num_new_labels):

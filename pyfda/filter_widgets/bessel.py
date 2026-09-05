@@ -155,7 +155,7 @@ class Bessel():
         self.f_sb  = fb_get('f_sb') * 2
         self.f_pb2 = fb_get('f_pb2') * 2
         self.f_sb2 = fb_get('f_sb2') * 2
-        self.F_PBC = None
+        self.f_pb_c = None
         self.f_c   = fb_get('f_c') * 2
         self.f_c2  = fb_get('f_c2') * 2
 
@@ -190,7 +190,7 @@ class Bessel():
 
         For min. filter order algorithms, update filter dictionary with calculated
         new values for filter order N (doubled for BP and BS designs)
-        and corner frequency(s) F_PBC.
+        and corner frequency(s) f_pb_c.
         """
         if not self._test_n():
             return -1
@@ -199,10 +199,10 @@ class Bessel():
         fb_set('N', self.N) # always save, might have been limited by _test_n
         if fb_get('fo') == 'min':
             if fb_get('rt') in {'lp', 'hp'}:
-                fb_set('f_c', self.F_PBC / 2.) # HP or LP - single  corner frequency
+                fb_set('f_c', self.f_pb_c / 2.) # HP or LP - single  corner frequency
             else: # BP or BS - two corner frequencies; order needs to be doubled
-                fb_set('f_c', self.F_PBC[0] / 2.)
-                fb_set('f_c2', self.F_PBC[1] / 2.)
+                fb_set('f_c', self.f_pb_c[0] / 2.)
+                fb_set('f_c2', self.f_pb_c[1] / 2.)
                 fb_set('N', self.N * 2)
         return 0
 
@@ -210,9 +210,9 @@ class Bessel():
     def lp_min(self) -> int:
         """Bessel LP filter, minimum order"""
         self._get_params()
-        self.N, self.F_PBC = buttord(self.f_pb, self.f_sb, self.a_pb, self.a_sb)
+        self.N, self.f_pb_c = buttord(self.f_pb, self.f_sb, self.a_pb, self.a_sb)
         return self._save(
-            bessel(self.N, self.F_PBC, btype='low', analog=False, output=self.FRMT))
+            bessel(self.N, self.f_pb_c, btype='low', analog=False, output=self.FRMT))
 
 
     def lp_man(self) -> int:
@@ -225,9 +225,9 @@ class Bessel():
     def hp_min(self) -> int:
         """Bessel HP filter, minimum order"""
         self._get_params()
-        self.N, self.F_PBC = buttord(self.f_pb, self.f_sb, self.a_pb,self.a_sb)
+        self.N, self.f_pb_c = buttord(self.f_pb, self.f_sb, self.a_pb,self.a_sb)
         return self._save(
-            bessel(self.N, self.F_PBC, btype='highpass', analog=False, output=self.FRMT))
+            bessel(self.N, self.f_pb_c, btype='highpass', analog=False, output=self.FRMT))
 
     def hp_man(self) -> int:
         """Bessel HP filter, manual order"""
@@ -243,10 +243,10 @@ class Bessel():
     def bp_min(self) -> int:
         """Bessel BP filter, minimum order"""
         self._get_params()
-        self.N, self.F_PBC = buttord(
+        self.N, self.f_pb_c = buttord(
             [self.f_pb, self.f_pb2], [self.f_sb, self.f_sb2], self.a_pb, self.a_sb)
         return self._save(
-            bessel(self.N, self.F_PBC, btype='bandpass', analog=False, output=self.FRMT))
+            bessel(self.N, self.f_pb_c, btype='bandpass', analog=False, output=self.FRMT))
 
     def bp_man(self) -> int:
         """Bessel BP filter, manual order"""
@@ -259,10 +259,10 @@ class Bessel():
     def bs_min(self) -> int:
         """Bessel BS filter, minimum order"""
         self._get_params()
-        self.N, self.F_PBC = buttord(
+        self.N, self.f_pb_c = buttord(
             [self.f_pb, self.f_pb2], [self.f_sb, self.f_sb2], self.a_pb,self.a_sb)
         return self._save(
-            bessel(self.N, self.F_PBC, btype='bandstop', analog=False, output=self.FRMT))
+            bessel(self.N, self.f_pb_c, btype='bandstop', analog=False, output=self.FRMT))
 
     def bs_man(self) -> int:
         """Bessel BS filter, manual order"""
