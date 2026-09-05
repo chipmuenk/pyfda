@@ -369,10 +369,12 @@ class PlotTran(QWidget):
 
     # -----------------------------------------------------------------------
     def process_sig_rx(self, dict_sig: dict | None = None) -> None:
-        # Process signals coming from
-        # - the navigation toolbars (time and freq.)
-        # - local widgets (impz_ui) and
-        # - plot_tab_widgets() (global signals)
+        """
+        Process signals coming from
+        - the navigation toolbars (time and freq.)
+        - local widgets (impz_ui) and
+        - plot_tab_widgets() (global signals)
+        """
 
         logger.debug(
             "SIG_RX - needs_calc: %s | vis: %s\n%s\t ",
@@ -1415,16 +1417,16 @@ class PlotTran(QWidget):
             self.ui.lbl_byfs_spgr_time.setVisible(mode == 'psd')
             self.ui.chk_byfs_spgr_time.setVisible(mode == 'psd')
             spgr_pre = ""
-            dB_scale = 20  # default log scale for magnitude in dB
+            db_scale = 20  # default log scale for magnitude in dB
             spgr_unit = r" in W / Hz"  # default unit for spectrogram
             scaling = "density"  # default scaling for spectrogram
             if self.ui.but_log_spgr_time.isChecked():
-                dB_unit = "dB"
+                db_unit = "dB"
             else:
-                dB_unit = ""
+                db_unit = ""
             if mode == "psd":
                 spgr_symb = fr"$S_{{{sig_lbl.lower()+sig_lbl.lower()}}}$"
-                dB_scale = 10  # log scale for PSD
+                db_scale = 10  # log scale for PSD
 
                 if self.ui.chk_byfs_spgr_time.isChecked():
                     # display result scaled by f_S
@@ -1435,14 +1437,14 @@ class PlotTran(QWidget):
                     scaling = "density"
                 else:
                     # display result in W / bin
-                    spgr_unit = f" in {dB_unit}W"
+                    spgr_unit = f" in {db_unit}W"
                     scaling = "spectrum"
 
             elif mode in {"magnitude", "complex"}:
                 # "complex" cannot be plotted directly
                 spgr_pre = r"|"
                 spgr_symb = f"${sig_lbl}$"
-                spgr_unit = fr"| in {dB_unit}V"
+                spgr_unit = fr"| in {db_unit}V"
 
             elif mode in {"angle", "phase"}:
                 spgr_unit = r" in rad"
@@ -1477,7 +1479,7 @@ class PlotTran(QWidget):
             # self.ax_s.colorbar(col_mesh)
 
             if self.ui.but_log_spgr_time.isChecked():
-                Sxx = np.maximum(dB_scale * np.log10(np.abs(Sxx)), self.ui.bottom_t)
+                Sxx = np.maximum(db_scale * np.log10(np.abs(Sxx)), self.ui.bottom_t)
             # shading: 'auto', 'gouraud', 'nearest'
             col_mesh = self.ax_s.pcolormesh(t, f, Sxx, shading='auto')
             cbar = self.mplwidget_t.fig.colorbar(col_mesh, ax=self.ax_s, aspect=30,

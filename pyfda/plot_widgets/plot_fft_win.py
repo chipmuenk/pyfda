@@ -17,7 +17,6 @@ from scipy.signal import argrelmin
 import matplotlib.patches as mpl_patches
 
 # importing filterbroker initializes all its globals:
-import pyfda.filterbroker as fb
 from pyfda.filterbroker import fb_get, fb_set
 from pyfda.libs.compat import (
     Qt, pyqtSignal, QHBoxLayout, QVBoxLayout, QDialog, QLabel, QLineEdit,
@@ -83,7 +82,8 @@ class PlotFFTWin(QDialog):
     sig_rx = pyqtSignal(object)  # incoming
     sig_tx = pyqtSignal(object)  # outgoing
 
-    def __init__(self, cur_win_dict_name: tuple, app: str = 'spec', all_wins_dict: dict | None = None,
+    def __init__(self, cur_win_dict_name: tuple, app: str = 'spec',
+                 all_wins_dict: dict | None = None,
                  sym: bool = False, title: str = 'pyFDA Window Viewer',
                  ignore_close_event: bool = False, object_name: str = "plot_fft_win"
                  ) -> None:
@@ -438,7 +438,7 @@ class PlotFFTWin(QDialog):
         "par_val": [],    # list of window parameters
         "win_len": 32  # window length for window viewer
         """
-        fb_set(*self.cur_win_dict_name, 'win_len', self.n_view)  # store number of view points in dict
+        fb_set(*self.cur_win_dict_name, 'win_len', self.n_view)
         self.qfft_win_select.ui2win_dict()
 
 
@@ -521,7 +521,7 @@ class PlotFFTWin(QDialog):
         """
         self.n_view = safe_eval(self.led_n.text(), self.n_view, sign='pos',
                                 return_type='int')
-        fb_set(*self.cur_win_dict_name, 'win_len', self.n_view)  # store number of view points in dict
+        fb_set(*self.cur_win_dict_name, 'win_len', self.n_view)
         self.led_n.setText(str(self.n_view))
         self.n = np.arange(self.n_view)
         self.win_view = self.qfft_win_select.calc_window(self.n_view, sym=self.sym)

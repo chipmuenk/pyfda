@@ -51,7 +51,8 @@ params = {
             'destination': False  # source/target is 'clipboard' or 'file'
             },
     'screen': { # screen properties default values, updated in pyfdax.py
-        'ref_dpi': 96, 'ldpi': 96, 'pdpi': 96, 'scaling': 1.0, # dpi for scaling = 1 and scaling factor
+        'ref_dpi': 96, 'scaling': 1.0, # dpi ref. value for scaling = 1 and scaling factor
+        'ldpi': 96, 'pdpi': 96, # logical and physical dpi of the screen, updated in pyfdax.py
         'height': 720, 'width': 1024}, # height and width in pixels
     'FMT_ba': 4,      # number of digits for coefficient table
     'FMT_pz': 5,      # number of digits for Pole/Zero table
@@ -135,6 +136,12 @@ MPL_RC_LIGHT = {
 
 
 class QSS():
+    """
+    Container for the application's Qt and Matplotlib style definitions.
+
+    This class groups the dark/light theme settings, widget style sheets, and
+    Matplotlib runtime configuration used by pyFDA.
+    """
 
 # common matplotlib widget settings
     mpl_rc =\
