@@ -20,7 +20,7 @@ import numpy as np
 import scipy.signal as sig
 
 from pyfda.config_file_parser import ConfigFileParser as CFP
-import pyfda.filterbroker as fb
+from pyfda.libs.pyfda_lib import fb_get
 from pyfda.libs.compat import (
     QWidget, QLabel, QFrame, QDial, QHBoxLayout, pyqtSignal, QComboBox, QLineEdit)
 from pyfda.libs.pyfda_lib import to_html, safe_eval
@@ -257,7 +257,7 @@ class PlotPZ(QWidget):
 
     # --------------------------------------------------------------------------
     def draw(self):
-        self.but_fir_poles.setVisible(fb.fil[0]['ft'] == 'FIR')
+        self.but_fir_poles.setVisible(fb_get('ft') == 'FIR')
         contour = qget_cmb_box(self.cmb_overlay) in {"contour", "contourf"}
         self.led_bottom.setVisible(contour)
         self.lbl_bottom.setVisible(contour)
@@ -278,13 +278,13 @@ class PlotPZ(QWidget):
         p_marker = params['P_Marker']
         z_marker = params['Z_Marker']
 
-        zpk = fb.fil[0]['zpk']
+        zpk = fb_get('zpk')
 
         self.ax.clear()
 
         [z, p, k] = self.zplane(
             z=zpk[0], p=zpk[1], k=zpk[2], plt_ax=self.ax,
-            plt_poles=self.but_fir_poles.isChecked() or fb.fil[0]['ft'] == 'IIR',
+            plt_poles=self.but_fir_poles.isChecked() or fb_get('ft') == 'IIR',
             mps=p_marker[0], mpc=p_marker[1], mzs=z_marker[0], mzc=z_marker[1])
 
         self.ax.xaxis.set_minor_locator(AutoMinorLocator())  # enable minor ticks
@@ -520,7 +520,7 @@ class PlotPZ(QWidget):
         ------
         - The method uses the current axis limits to create a grid in the z-plane.
         - The magnitude response is computed using the filter coefficients from
-          `fb.fil[0]['ba']`.
+          `fil[0]['ba']`.
         - A colorbar is added to the plot to represent the magnitude values.
         """
         if overlay not in {"contour", "contourf"}:
@@ -541,7 +541,7 @@ class PlotPZ(QWidget):
         else:
             h_max = self.zmax
             h_min = self.zmin
-        Hmag = h_mag(fb.fil[0]['ba'][0], fb.fil[0]['ba'][1], z, h_max, h_min=h_min,
+        Hmag = h_mag(fb_get('ba')[0], fb_get('ba')[1], z, h_max, h_min=h_min,
                      log=self.but_log.isChecked())
 
         if overlay == "contour":
@@ -580,7 +580,7 @@ class PlotPZ(QWidget):
         # suppress "divide by zero in log10" warnings
         old_settings_seterr = np.seterr()
         np.seterr(divide='ignore')
-        ba = fb.fil[0]['ba']
+        ba = fb_get('ba')
         w, H = sig.freqz(ba[0], ba[1], worN=CFP.conf_settings['N_FFT'], whole=True)
         H = np.abs(H)
         if self.but_log.isChecked():
