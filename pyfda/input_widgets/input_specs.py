@@ -778,7 +778,7 @@ def load_filter(self, all_filters: bool = False) -> int:
 # ------------------------------------------------------------------------------
 def save_filter(self) -> int:
     """
-    Save filter `fb.fil[0]` as JSON formatted textfile, zipped binary numpy array
+    Save filter `fil[0]` as JSON formatted textfile, zipped binary numpy array
     or pickle object
 
     Returns
@@ -786,7 +786,7 @@ def save_filter(self) -> int:
     0 for success, -1 for file cancel or error
     """
     # provide an identifier with version number for pyfda files
-    fb.fil[0].update({'_id': ['pyfda', FILTER_FILE_VERSION]})
+    fb_set('_id', ['pyfda', FILTER_FILE_VERSION])
 
     file_name, file_type = select_file(
         self, title="Save Filter", mode='w', file_types = ("json", "npz", "pkl"))
@@ -797,14 +797,14 @@ def save_filter(self) -> int:
     err = False
     # create a copy of the filter to be saved that only contains keys of the
     # reference filter dict and warn of unsupported keys:
-    keys_unsupported = [k for k in fb.fil[0] if k not in fb.fil_ref]
+    keys_unsupported = [k for k in fb_get() if k not in fb.fil_ref]
     if keys_unsupported:
-        fil_clean = {k:v for k, v in fb.fil[0].items() if k in fb.fil_ref}
+        fil_clean = {k:v for k, v in fb_get().items() if k in fb.fil_ref}
         logger.warning(
             "The following keys are ignored because they are not part of the\n"
             "\tfilter reference dict:\n\t%s", keys_unsupported)
     else:
-        fil_clean = fb.fil[0]
+        fil_clean = fb_get()
 
     if file_type in {"npz", "pkl"}:
         try:

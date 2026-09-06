@@ -38,7 +38,6 @@ from pyfda.libs.special_functions import lin2unit
 import pyfda.libs.pyfda_fix_lib as fx
 from pyfda.pyfda_rc import params
 import pyfda.libs.pyfda_dirs as dirs
-import pyfda.filterbroker as fb  # importing filterbroker initializes all its globals
 from pyfda.filterbroker import get_fx, fb_get, fb_set
 
 from .compat import QFileDialog
@@ -1317,14 +1316,14 @@ def coe_header(title: str) -> str:
         a_targs = []
         for i in range(len(f_lbls)):
             try:
-                f = fb.fil[0][f_lbls[i]]
+                f = fb_get(f_lbls[i])
                 f_vals.append(f)
             except KeyError as e:
                 f_vals.append('')
                 err[i] = True
                 logger.debug(e)
             try:
-                a = fb.fil[0][a_lbls[i]]
+                a = fb_get(a_lbls[i])
                 a_dB = lin2unit(fb.fil[0][a_lbls[i]], ft, a_lbls[i], unit)
                 a_targs.append(a)
                 a_targs_db.append(a_dB)

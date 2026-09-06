@@ -429,7 +429,7 @@ class Plot_FFT_win(QDialog):
     def save_ui(self):
         """
         Save the window type and the number of FFT points to the corresponding
-        section of `fb.fil[0]`, i.e. to `self.cur_win_dict`
+        section of `fil[0]`, i.e. to `self.cur_win_dict`
 
         "id": "hann",  # window id
         "disp_name": "Hann",  # display name
@@ -444,7 +444,7 @@ class Plot_FFT_win(QDialog):
     def load_ui(self):
         """
         Load the window type and the number of FFT points from the corresponding
-        section of `fb.fil[0]`, i.e. from `self.cur_win_dict`.
+        section of `fil[0]`, i.e. from `self.cur_win_dict`.
         """
         self.N_view = safe_eval(self.cur_win_dict['win_len'], self.N_view, sign='pos',
                                 return_type='int')  # sanitize value
