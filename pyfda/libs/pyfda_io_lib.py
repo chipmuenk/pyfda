@@ -1324,9 +1324,9 @@ def coe_header(title: str) -> str:
                 logger.debug(e)
             try:
                 a = fb_get(a_lbls[i])
-                a_dB = lin2unit(fb.fil[0][a_lbls[i]], ft, a_lbls[i], unit)
+                a_db = lin2unit(a, ft, a_lbls[i], unit)
                 a_targs.append(a)
-                a_targs_db.append(a_dB)
+                a_targs_db.append(a_db)
             except KeyError as e:
                 a_targs.append('')
                 a_targs_db.append('')
