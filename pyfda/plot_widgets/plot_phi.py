@@ -90,7 +90,7 @@ class PlotPhi(QWidget):
         - Frame with control elements
         """
 
-        self.cmb_units_phi = QComboBox(self, objectName="cmbUnitsA")
+        self.cmb_units_phi = QComboBox(self, objectName="cmb_units_a")
         units = ["rad", "rad/pi",  "deg"]
         scales = [1.,   1. / np.pi, 180./np.pi]
         for unit, scale in zip(units, scales, strict=True):

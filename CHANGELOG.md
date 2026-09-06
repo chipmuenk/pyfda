@@ -286,7 +286,7 @@ only be used under Ubuntu (or probably other Debian related distros)
 
 ### Maintenance
 
-- move CSV_option_box to separate module 'csv_option_box.py'
+- move CSVOptionBox to separate module 'csv_option_box.py'
 
 ## [v0.6.1](https://github.com/chipmuenk/pyfda/tree/v0.6.1) (2022-03-28)
 

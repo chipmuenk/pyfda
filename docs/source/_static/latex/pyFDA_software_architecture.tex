@@ -246,13 +246,13 @@ def save(self, fil_dict, arg):
   """
   pyfda_lib.save_fil(fil_dict, arg, frmt, __name__)
 
-  if self.F_PBC is not None: # has corner frequency been calculated?
+  if self.f_pb_c is not None: # has corner frequency been calculated?
     fil_dict['N'] = self.N # yes, update filterbroker
-    if np.isscalar(self.F_PBC): # HP or LP - a single corner frequency
-      fil_dict['F_PBC'] = self.F_PBC / 2.
+    if np.isscalar(self.f_pb_c): # HP or LP - a single corner frequency
+      fil_dict['f_pb_c'] = self.f_pb_c / 2.
     else: # BP or BS - two corner frequencies (BP or BS)
-      fil_dict['F_PBC'] = self.F_PBC[0] / 2.
-      fil_dict['F_PBC2'] = self.F_PBC[1] / 2.
+      fil_dict['f_pb_c'] = self.f_pb_c[0] / 2.
+      fil_dict['f_pb_c2'] = self.f_pb_c[1] / 2.
 \end{lstlisting}
 
 The method

@@ -108,8 +108,8 @@ class AboutWindow(QDialog):
             lambda: self.to_clipboard(self.info_str + "<br />" + self.about_str))
         but_about.clicked.connect(self.display_about_str)
         but_changelog.clicked.connect(self.display_changelog)
-        but_lic_mit.clicked.connect(self.display_MIT_lic)
-        but_lic_gpl_v3.clicked.connect(self.display_GPL_lic)
+        but_lic_mit.clicked.connect(self.display_mit_lic)
+        but_lic_gpl_v3.clicked.connect(self.display_gpl_lic)
         but_close.clicked.connect(self.close)
 
     # ------------------------------------------------------------------------------
@@ -237,7 +237,7 @@ class AboutWindow(QDialog):
         self.txt_display.setText(self.style_html_links(log_str))
 
     # ------------------------------------------------------------------------------
-    def display_MIT_lic(self) -> None:
+    def display_mit_lic(self) -> None:
         """ Display MIT license """
         with open(os.path.join(dirs.INSTALL_DIR, "..", "LICENSE.md"), 'r',
                   encoding="utf-8") as f:
@@ -245,7 +245,7 @@ class AboutWindow(QDialog):
         self.txt_display.setText(self.style_html_links(lic_str))
 
     # ------------------------------------------------------------------------------
-    def display_GPL_lic(self) -> None:
+    def display_gpl_lic(self) -> None:
         """ Display GPL license """
         with open(os.path.join(dirs.INSTALL_DIR, "..", "LICENSE_GPLv3.md"), 'r',
                   encoding="utf-8") as f:

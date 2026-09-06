@@ -123,7 +123,7 @@ class PlotHf(QWidget):
 
         self.lblIn = QLabel(to_html("Unit:", frmt="b"), self)
 
-        self.cmb_units_a = QComboBox(self, objectName="cmbUnitsA")
+        self.cmb_units_a = QComboBox(self, objectName="cmb_units_a")
         qcmb_box_populate(self.cmb_units_a, self.cmb_units_a_items,
                           self.cmb_units_a_default)
 

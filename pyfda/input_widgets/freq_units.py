@@ -127,7 +127,7 @@ class FreqUnits(QWidget):
         self.lbl_units.setFont(bfont)
 
         self.f_s_old = fb_get('f_S')  # store current sampling frequency
-        self.T_s_old = fb_get('T_S')  # store current sampling period
+        self.t_s_old = fb_get('T_S')  # store current sampling period
 
         self.lbl_f_s = QLabel(self)
         self.lbl_f_s.setText(to_html("f_S =", frmt='bi'))
@@ -165,22 +165,22 @@ class FreqUnits(QWidget):
         self.but_sort.setToolTip("Sort frequencies in ascending order when activated.")
         self.but_sort.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
 
-        self.layHUnits = QHBoxLayout()
-        self.layHUnits.addWidget(self.cmb_f_units)
-        self.layHUnits.addWidget(self.cmb_f_range)
-        self.layHUnits.addWidget(self.but_sort)
+        self.lay_h_units = QHBoxLayout()
+        self.lay_h_units.addWidget(self.cmb_f_units)
+        self.lay_h_units.addWidget(self.cmb_f_range)
+        self.lay_h_units.addWidget(self.but_sort)
 
         # Create a gridLayout consisting of QLabel and QLineEdit fields
         # for setting f_S, the units and the actual frequency specs:
-        self.layGSpecWdg = QGridLayout()  # sublayout for spec fields
-        self.layGSpecWdg.addWidget(self.lbl_f_s, 1, 0)
-        # self.layGSpecWdg.addWidget(self.led_f_s,1,1)
-        self.layGSpecWdg.addLayout(lay_h_f_s, 1, 1)
-        self.layGSpecWdg.addWidget(self.lbl_units, 0, 0)
-        self.layGSpecWdg.addLayout(self.layHUnits, 0, 1)
+        self.lay_g_specs_wdg = QGridLayout()  # sublayout for spec fields
+        self.lay_g_specs_wdg.addWidget(self.lbl_f_s, 1, 0)
+        # self.lay_g_specs_wdg.addWidget(self.led_f_s,1,1)
+        self.lay_g_specs_wdg.addLayout(lay_h_f_s, 1, 1)
+        self.lay_g_specs_wdg.addWidget(self.lbl_units, 0, 0)
+        self.lay_g_specs_wdg.addLayout(self.lay_h_units, 0, 1)
 
         frm_main = QFrame(self)
-        frm_main.setLayout(self.layGSpecWdg)
+        frm_main.setLayout(self.lay_g_specs_wdg)
 
         self.lay_v_main.addWidget(frm_main)
         self.lay_v_main.setContentsMargins(*params['wdg_margins'])
@@ -311,7 +311,7 @@ class FreqUnits(QWidget):
                 fb_set(
                     {'f_S': self.f_s_old,
                      'f_max': self.f_s_old,
-                     'T_S': self.T_s_old}
+                     'T_S': self.t_s_old}
                 )
 
             # --- try to pick the most suitable unit for f_S --------------
@@ -337,7 +337,7 @@ class FreqUnits(QWidget):
                 emit_signal = True
             # -------------------------------------------------------------
             self.f_s_old = fb_get('f_S')
-            self.T_s_old = fb_get('T_S')
+            self.t_s_old = fb_get('T_S')
             self.led_f_s.setText(params['FMT'].format(fb_get('f_S')))
 
             f_label = r"$f$ in " + f_unit + r"$\; \rightarrow$"
@@ -382,11 +382,11 @@ class FreqUnits(QWidget):
             and emit `{'view_changed': 'f_S'}`.
             """
             if self.spec_edited:
-                f_S_tmp = safe_eval(source.text(), fb_get('f_S'), sign='pos')
+                f_s_tmp = safe_eval(source.text(), fb_get('f_S'), sign='pos')
                 fb_set({
-                    'f_S': f_S_tmp,
-                    'T_S': 1./f_S_tmp,
-                    'f_max': f_S_tmp
+                    'f_S': f_s_tmp,
+                    'T_S': 1./f_s_tmp,
+                    'f_max': f_s_tmp
                     })
 
                 self._freq_range(emit_signal=False)  # update plotting range
@@ -426,14 +426,14 @@ class FreqUnits(QWidget):
         if isinstance(emit_signal, int):  # signal was emitted by combobox
             emit_signal = True
 
-        rangeType = qget_cmb_box(self.cmb_f_range)
+        f_range_type = qget_cmb_box(self.cmb_f_range)
 
-        fb_set('freq_specs_range_type', rangeType)
+        fb_set('freq_specs_range_type', f_range_type)
         f_max = fb_get('f_max')
 
-        if rangeType == 'whole':
+        if f_range_type == 'whole':
             f_lim = [0, f_max]
-        elif rangeType == 'sym':
+        elif f_range_type == 'sym':
             f_lim = [-f_max/2., f_max/2.]
         else:
             f_lim = [0, f_max/2.]
