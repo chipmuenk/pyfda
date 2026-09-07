@@ -21,7 +21,7 @@ from pyfda.libs.pyfda_lib import (
     mod_version, set_dict_defaults, first_item, pprint_log, cmp_version)
 from pyfda.libs.pyfda_qt_lib import qget_cmb_box, emit
 
-from pyfda.fixpoint_widgets.fx_ui_wq import FxWqUI
+from pyfda.fixpoint_widgets.fx_wq_ui import FxWqUI
 from .fir_df_amaranth import FIR_DF_amaranth
 
 logger = logging.getLogger(__name__)
@@ -219,11 +219,11 @@ class FIR_DF_amaranth_UI(QWidget):
         """
         # try:
         if qget_cmb_box(self.wdg_wq_accu.cmb_w) == 'f':
-            A_coeff = int(np.ceil(np.log2(len(fb_get('ba', 0)))))
+            a_coeff = int(np.ceil(np.log2(len(fb_get('ba', 0)))))
         elif qget_cmb_box(self.wdg_wq_accu.cmb_w) == 'a':
-            A_coeff = int(np.ceil(np.log2(np.sum(np.abs(fb_get('ba', 0))))))
+            a_coeff = int(np.ceil(np.log2(np.sum(np.abs(fb_get('ba', 0))))))
         else:
-            A_coeff = 0
+            a_coeff = 0
         # except BaseException:
         #     logger.error("An error occurred:", exc_info=True)
         #     return
@@ -233,7 +233,7 @@ class FIR_DF_amaranth_UI(QWidget):
             fb_set('fxq', 'QACC', 'WF', fb_get('fxq', 'QI', 'WF')\
                 + fb_get('fxq', 'QCB', 'WF'))
             fb_set('fxq', 'QACC', 'WI', fb_get('fxq', 'QI', 'WI')\
-                + fb_get('fxq', 'QCB', 'WI') + A_coeff)
+                + fb_get('fxq', 'QCB', 'WI') + a_coeff)
 
         # update UI and Q.q_dict (quantization settings) from filter dict
         self.wdg_wq_accu.dict2ui(fb_get('fxq')['QACC'])

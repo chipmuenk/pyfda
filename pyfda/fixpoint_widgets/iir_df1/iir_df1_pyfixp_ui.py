@@ -19,7 +19,7 @@ from pyfda.filterbroker import fb_get, fb_set
 from pyfda.libs.pyfda_lib import set_dict_defaults, pprint_log, first_item
 from pyfda.libs.pyfda_qt_lib import qget_cmb_box, emit
 from pyfda.libs.compat import QWidget, QVBoxLayout, pyqtSignal
-from pyfda.fixpoint_widgets.fx_ui_wq import FxWqUI
+from pyfda.fixpoint_widgets.fx_wq_ui import FxWqUI
 
 from pyfda.fixpoint_widgets.iir_df1.iir_df1_pyfixp import IIR_DF1_pyfixp
 

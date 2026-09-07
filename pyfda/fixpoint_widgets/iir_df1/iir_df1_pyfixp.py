@@ -48,8 +48,8 @@ class IIR_DF1_pyfixp(object):
         # create various quantizers and initialize / reset them
         self.Q_a = fx.Fixed(self.p['QCA'])  # recursive coeffs
         self.Q_b = fx.Fixed(self.p['QCB'])  # transversal coeffs.
-        self.Q_mul_a = fx.Fixed(self.p['QACC'].copy())  # partial products a y
-        self.Q_mul_b = fx.Fixed(self.p['QACC'].copy())  # partial products b x
+        self.q_mul_a = fx.Fixed(self.p['QACC'].copy())  # partial products a y
+        self.q_mul_b = fx.Fixed(self.p['QACC'].copy())  # partial products b x
         self.Q_mul = fx.Fixed(self.p['QACC'].copy())  # partial products
         self.Q_acc = fx.Fixed(self.p['QACC'])  # accumulator
         self.Q_O = fx.Fixed(self.p['QO'])  # output
@@ -103,14 +103,14 @@ class IIR_DF1_pyfixp(object):
         # Quantizer dict for partial products yq * aq
         DW_a = int(np.ceil(np.log2(len(self.p['QCA']))))  # word growth
         # word format for sum of partial products a_i * y_i
-        self.Q_mul_a.set_qdict(
+        self.q_mul_a.set_qdict(
             {'WI': self.p['QO']['WI'] + self.p['QCA']['WI'] + DW_a,
              'WF': self.p['QO']['WF'] + self.p['QCA']['WF']})
 
         # Quantizer dict for partial products xq * bq
         DW_b = int(np.ceil(np.log2(len(self.p['QCB']))))  # word growth
         # word format for sum of partial products b_i * x_i
-        self.Q_mul_b.set_qdict(
+        self.q_mul_b.set_qdict(
             {'WI': self.p['QI']['WI'] + self.p['QCB']['WI'] + DW_b,
              'WF': self.p['QI']['WF'] + self.p['QCB']['WF']})
 
@@ -155,8 +155,8 @@ class IIR_DF1_pyfixp(object):
         Reset registers and overflow counters of quantizers
         (except for coefficient quant.)
         """
-        self.Q_mul_a.reset_n()
-        self.Q_mul_b.reset_n()
+        self.q_mul_a.reset_n()
+        self.q_mul_b.reset_n()
         self.Q_acc.reset_n()
         self.Q_O.reset_n()
         self.N_over_filt = 0
@@ -249,12 +249,12 @@ class IIR_DF1_pyfixp(object):
 
         for k in range(len(x)):
             # calculate partial products xb_q and ya_q at time k and quantize them
-            # with Q_mul_b resp. Q_mul_a:
-            xb_q = self.Q_mul_b.fixp(self.zi_b[k:k + len(self.b_q)] * self.b_q,
+            # with q_mul_b resp. q_mul_a:
+            xb_q = self.q_mul_b.fixp(self.zi_b[k:k + len(self.b_q)] * self.b_q,
                                      in_frmt=qfrmt, out_frmt=qfrmt)
 
             # append a zero to ya_q to equalize length of xb_q and ya_q
-            ya_q = np.append(self.Q_mul_a.fixp(self.zi_a * self.a_q[1:],
+            ya_q = np.append(self.q_mul_a.fixp(self.zi_a * self.a_q[1:],
                                                in_frmt=qfrmt, out_frmt=qfrmt),
                                                0)
 
@@ -266,20 +266,20 @@ class IIR_DF1_pyfixp(object):
             #   (output) state register
             self.zi_a[1:] = self.zi_a[:-1]
             y_q[k] = self.Q_O.requant(
-                (self.Q_acc.requant(np.sum(xb_q), self.Q_mul_b)
-                - self.Q_acc.requant(np.sum(ya_q), self.Q_mul_a)),
+                (self.Q_acc.requant(np.sum(xb_q), self.q_mul_b)
+                - self.Q_acc.requant(np.sum(ya_q), self.q_mul_a)),
                                 self.Q_acc)
             self.zi_a[0] = y_q[k]
 
         self.zi_b = self.zi_b[-(self.L-1):]  # store last L-1 inputs (i.e. the L-1 registers)
 
         # Overflows in Q_mul are added to overflows in Q_Acc, then Q_mul is reset
-        if self.Q_acc.N_over > 0 or self.Q_mul_a.N_over > 0 or self.Q_mul_b.N_over > 0:
+        if self.Q_acc.N_over > 0 or self.q_mul_a.N_over > 0 or self.q_mul_b.N_over > 0:
             logger.warning("Overflows: N_Acc = %d, N_Mul_a = %d, N_Mul_b = %d.",
-                           self.Q_acc.N_over, self.Q_mul_a.N_over, self.Q_mul_b.N_over)
-        self.Q_acc.N_over += self.Q_mul_a.N_over + self.Q_mul_b.N_over
-        self.Q_mul_a.reset_n()
-        self.Q_mul_b.reset_n()
+                           self.Q_acc.N_over, self.q_mul_a.N_over, self.q_mul_b.N_over)
+        self.Q_acc.N_over += self.q_mul_a.N_over + self.q_mul_b.N_over
+        self.q_mul_a.reset_n()
+        self.q_mul_b.reset_n()
 
         return y_q[:len(x)], self.zi_b, self.zi_a
 

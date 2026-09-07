@@ -23,7 +23,7 @@ from pyfda.libs.pyfda_qt_lib import qstyle_widget, qcmb_box_populate, emit
 from pyfda.libs.pyfda_qt_classes import PushButton
 from pyfda.libs.pyfda_lib import first_item
 import pyfda.libs.pyfda_dirs as dirs
-from pyfda.fixpoint_widgets.fx_ui_wq import FxWqUI
+from pyfda.fixpoint_widgets.fx_wq_ui import FxWqUI
 from pyfda.pyfda_rc import params
 
 logger = logging.getLogger(__name__)

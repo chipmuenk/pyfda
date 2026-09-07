@@ -30,7 +30,7 @@ import pyfda.libs.pyfda_dirs as dirs
 from pyfda.libs.pyfda_lib import pprint_log
 from pyfda.libs.pyfda_qt_lib import (
     qget_cmb_box, qcmb_box_populate, qset_cmb_box, emit)
-from pyfda.fixpoint_widgets.fx_ui_wq import FxWqUI
+from pyfda.fixpoint_widgets.fx_wq_ui import FxWqUI
 from pyfda.pyfda_rc import params
 
 # when deltasigma module is present, add a corresponding entry to the combobox

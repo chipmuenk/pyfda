@@ -18,7 +18,7 @@ from pyfda.libs.pyfda_qt_lib import qget_cmb_box, emit
 
 from pyfda.libs.compat import QWidget, QVBoxLayout, pyqtSignal
 
-from pyfda.fixpoint_widgets.fx_ui_wq import FxWqUI
+from pyfda.fixpoint_widgets.fx_wq_ui import FxWqUI
 
 from .fir_df_nmigen import FIR_DF_amaranth
 from pyfda.fixpoint_widgets.fixpoint_helpers import UI_W, UI_Q
@@ -196,9 +196,9 @@ class FIR_DF_amaranth_UI(QWidget):
         """
         try:
             if qget_cmb_box(self.wdg_w_accu.cmb_w, data=False) == 'f':
-                A_coeff = int(np.ceil(np.log2(len(fb.fil[0]['fxq']['b']))))
+                a_coeff = int(np.ceil(np.log2(len(fb.fil[0]['fxq']['b']))))
             elif qget_cmb_box(self.wdg_w_accu.cmb_w, data=False) == 'a':
-                A_coeff = int(np.ceil(np.log2(np.sum(np.abs(fb.fil[0]['ba'][0])))))
+                a_coeff = int(np.ceil(np.log2(np.sum(np.abs(fb.fil[0]['ba'][0])))))
         except Exception as e:
             logger.error(e)
             return
@@ -208,7 +208,7 @@ class FIR_DF_amaranth_UI(QWidget):
             fb.fil[0]['fxq']['QA']['WF'] = fb.fil[0]['fxq']['QI']['WF']\
                 + fb.fil[0]['fxq']['QCB']['WF']
             fb.fil[0]['fxq']['QA']['WI'] = fb.fil[0]['fxq']['QI']['WI']\
-                + fb.fil[0]['fxq']['QCB']['WI'] + A_coeff
+                + fb.fil[0]['fxq']['QCB']['WI'] + a_coeff
 
         # calculate total accumulator word length
         fb.fil[0]['fxq']['QA']['W'] = fb.fil[0]['fxq']['QA']['WI']\

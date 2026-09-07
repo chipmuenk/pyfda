@@ -224,8 +224,8 @@ class Input_Specs(QWidget):
                                                 objectName="target_specs_inst")
 
         # Subwidget for displaying infos on the design method
-        self.lblMsg = QLabel(self)
-        self.lblMsg.setWordWrap(True)
+        self.lbl_msg = QLabel(self)
+        self.lbl_msg.setWordWrap(True)
 
         # ----------------------------------------------------------------------
         # GLOBAL SIGNALS & SLOTs
@@ -289,7 +289,7 @@ class Input_Specs(QWidget):
         lay_h_buttons_action.setContentsMargins(*params['wdg_margins'])
 
         lay_v_msg = QVBoxLayout()
-        lay_v_msg.addWidget(self.lblMsg)
+        lay_v_msg.addWidget(self.lbl_msg)
 
         self.frm_msg = QFrame(self)
         self.frm_msg.setLayout(lay_v_msg)
@@ -403,7 +403,7 @@ class Input_Specs(QWidget):
                 all_widgets['msg'][0] != 'i'):
             self.frm_msg.setVisible(True)
             self.frm_msg.setEnabled(all_widgets['msg'][0] != 'd')
-            self.lblMsg.setText(all_widgets['msg'][1:][0])
+            self.lbl_msg.setText(all_widgets['msg'][1:][0])
         else:
             self.frm_msg.hide()
 
