@@ -29,16 +29,7 @@ logger = logging.getLogger(__name__)
 # #############################################################################
 # General layout settings
 # #############################################################################
-
 MPL_MS = 8  # base size for matplotlib markers
-FONT_SIZE_QT = 12 # * CFP.conf_settings['SCALE_QT']  # base size for Qt fonts
-FONT_SIZE_BASE = str(FONT_SIZE_QT) + "pt"  # base font size of widgets in pt
-FONT_SIZE_MEDIUM = str(FONT_SIZE_QT * 1.1) + "pt"
-FONT_SIZE_LARGE = str(FONT_SIZE_QT * 1.2) + "pt"
-FONT_SIZE_XLARGE = str(FONT_SIZE_QT * 1.4) + "pt"
-
-FONT_SIZE_MPL = 12 # * CFP.conf_settings['SCALE_MPL']
-
 # Various parameters for calculation, plotting and UI
 params = {
     'FMT': '{:.3g}',  # format string for QLineEdit fields
@@ -142,7 +133,14 @@ class QSS():
     This class groups the dark/light theme settings, widget style sheets, and
     Matplotlib runtime configuration used by pyFDA.
     """
+    FONT_SIZE_QT = 12 * CFP.conf_settings['SCALE_QT']  # base size for Qt fonts
+    FONT_SIZE_BASE = str(FONT_SIZE_QT) + "pt"  # base font size of widgets in pt
+    FONT_SIZE_MEDIUM = str(FONT_SIZE_QT * 1.1) + "pt"
+    FONT_SIZE_LARGE = str(FONT_SIZE_QT * 1.2) + "pt"
+    FONT_SIZE_XLARGE = str(FONT_SIZE_QT * 1.4) + "pt"
 
+    FONT_SIZE_MPL = FONT_SIZE_QT * CFP.conf_settings['SCALE_MPL']
+    logger.error("FONT_SIZE_MPL = %d, SCALE_MPL = %f", FONT_SIZE_MPL, CFP.conf_settings['SCALE_MPL'])
 # common matplotlib widget settings
     mpl_rc =\
         { 'lines.linewidth'           : 1.5,
@@ -622,6 +620,15 @@ class QSS():
         Collate QSS string from common settings, special settings for the tab bar and a
         color scheme that depends on the theme selected in `pyfda.conf`.
         """
+        FONT_SIZE_QT = 12 * CFP.conf_settings['SCALE_QT']  # base size for Qt fonts
+        FONT_SIZE_BASE = str(FONT_SIZE_QT) + "pt"  # base font size of widgets in pt
+        FONT_SIZE_MEDIUM = str(FONT_SIZE_QT * 1.1) + "pt"
+        FONT_SIZE_LARGE = str(FONT_SIZE_QT * 1.2) + "pt"
+        FONT_SIZE_XLARGE = str(FONT_SIZE_QT * 1.4) + "pt"
+
+        FONT_SIZE_MPL = FONT_SIZE_QT * CFP.conf_settings['SCALE_MPL']
+        logger.error("FONT_SIZE_MPL = %d, SCALE_MPL = %f", FONT_SIZE_MPL, CFP.conf_settings['SCALE_MPL'])
+
         QSS.THEME = CFP.conf_settings['THEME']
         if QSS.THEME == 'dark':
             QSS.mpl_rc.update(MPL_RC_DARK)

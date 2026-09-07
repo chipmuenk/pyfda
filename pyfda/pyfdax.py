@@ -154,7 +154,7 @@ def main():
     # fm = QFontMetrics(font)
     # try to find a good value for matplotlib font size depending on screen resolution
 
-    fontsize = int(round(10 * scaling))  # for matplotlib (not used yet)
+    # fontsize = int(round(10 * scaling * CFP.conf_settings['SCALE_MPL']))  # for matplotlib (not used yet)
     # logical dpi is set in mpl_widget for all matplotlib figure canvasses
 
     # rc.mpl_rc['font.size'] = fontsize
@@ -170,7 +170,7 @@ def main():
     logger.info("Starting pyfda with screen resolution %d x %d, avail: %d x %d",
                 width, height, avail_geometry.width(), avail_geometry.height())
     logger.info("with %s (%s) and matplotlib fontsize %d.",
-                style, CFP.conf_settings['THEME'], fontsize)
+                style, CFP.conf_settings['THEME'], QSS.FONT_SIZE_MPL)
     logger.info("lDPI = %.2f, pDPI = %.2f, pix.ratio = %f",
                 ldpi, pdpi, pixel_ratio)
 
