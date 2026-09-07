@@ -18,7 +18,7 @@ from pyfda.libs.pyfda_qt_lib import qget_cmb_box, emit
 
 from pyfda.libs.compat import QWidget, QVBoxLayout, pyqtSignal
 
-from pyfda.fixpoint_widgets.fx_ui_wq import FX_UI_WQ
+from pyfda.fixpoint_widgets.fx_ui_wq import FxWqUI
 
 from .fir_df_nmigen import FIR_DF_amaranth
 from pyfda.fixpoint_widgets.fixpoint_helpers import UI_W, UI_Q
@@ -77,8 +77,8 @@ class FIR_DF_amaranth_UI(QWidget):
 
         self.wdg_w_coeffs = UI_W(self, fb.fil[0]['fxq']['QCB'], wdg_name='w_coeff',
                                  label='Coeff. Format <i>B<sub>I.F&nbsp;</sub></i>:',
-                                 tip_WI='Number of integer bits - edit in "b,a" tab',
-                                 tip_WF='Number of fractional bits - edit in "b,a" tab',
+                                 wi_tip='Number of integer bits - edit in "b,a" tab',
+                                 wf_tip='Number of fractional bits - edit in "b,a" tab',
                                  WI=fb.fil[0]['fxq']['QCB']['WI'],
                                  WF=fb.fil[0]['fxq']['QCB']['WF'])
 
@@ -96,9 +96,9 @@ class FIR_DF_amaranth_UI(QWidget):
                                label='Accu Format <i>Q<sub>A&nbsp;</sub></i>:')
 
         # initial setting for accumulator
-        cmbW = qget_cmb_box(self.wdg_w_accu.cmbW, data=False)
-        self.wdg_w_accu.ledWF.setEnabled(cmbW == 'm')
-        self.wdg_w_accu.ledWI.setEnabled(cmbW == 'm')
+        cmb_w = qget_cmb_box(self.wdg_w_accu.cmb_w, data=False)
+        self.wdg_w_accu.led_wf.setEnabled(cmb_w == 'm')
+        self.wdg_w_accu.led_wi.setEnabled(cmb_w == 'm')
 
         # ----------------------------------------------------------------------
         # LOCAL SIGNALS & SLOTs & EVENTFILTERS
@@ -138,14 +138,14 @@ class FIR_DF_amaranth_UI(QWidget):
                 fb.fil[0]['fxq'].update(self.ui2dict())
 
             elif dict_sig['wdg_name'] == 'w_accu':  # accu format updated
-                cmbW = qget_cmb_box(self.wdg_w_accu.cmbW, data=False)
-                self.wdg_w_accu.ledWF.setEnabled(cmbW == 'm')
-                self.wdg_w_accu.ledWI.setEnabled(cmbW == 'm')
-                if cmbW in {'f', 'a'}\
+                cmb_w = qget_cmb_box(self.wdg_w_accu.cmb_w, data=False)
+                self.wdg_w_accu.led_wf.setEnabled(cmb_w == 'm')
+                self.wdg_w_accu.led_wi.setEnabled(cmb_w == 'm')
+                if cmb_w in {'f', 'a'}\
                         or ('ui' in dict_sig and dict_sig['ui'] in {'WF', 'WI'}):
                     pass
 
-                elif cmbW == 'm':  # switched to manual, don't do anything
+                elif cmb_w == 'm':  # switched to manual, don't do anything
                     return
 
             # Accu quantization or overflow settings have been changed
@@ -187,24 +187,24 @@ class FIR_DF_amaranth_UI(QWidget):
         """
         Calculate number of extra integer bits needed in the accumulator (bit
         growth) depending on the coefficient area (sum of absolute coefficient
-        values) for `cmbW == 'auto'` or depending on the number of coefficients
-        for `cmbW == 'full'`. The latter works for arbitrary coefficients but
+        values) for `cmb_w == 'auto'` or depending on the number of coefficients
+        for `cmb_w == 'full'`. The latter works for arbitrary coefficients but
         requires more bits.
 
         The new values are written to the fixpoint coefficient dict
         `fb.fil[0]['fxq']['QA']`.
         """
         try:
-            if qget_cmb_box(self.wdg_w_accu.cmbW, data=False) == 'f':
+            if qget_cmb_box(self.wdg_w_accu.cmb_w, data=False) == 'f':
                 A_coeff = int(np.ceil(np.log2(len(fb.fil[0]['fxq']['b']))))
-            elif qget_cmb_box(self.wdg_w_accu.cmbW, data=False) == 'a':
+            elif qget_cmb_box(self.wdg_w_accu.cmb_w, data=False) == 'a':
                 A_coeff = int(np.ceil(np.log2(np.sum(np.abs(fb.fil[0]['ba'][0])))))
         except Exception as e:
             logger.error(e)
             return
 
-        if qget_cmb_box(self.wdg_w_accu.cmbW, data=False) == 'f' or\
-                qget_cmb_box(self.wdg_w_accu.cmbW, data=False) == 'a':
+        if qget_cmb_box(self.wdg_w_accu.cmb_w, data=False) == 'f' or\
+                qget_cmb_box(self.wdg_w_accu.cmb_w, data=False) == 'a':
             fb.fil[0]['fxq']['QA']['WF'] = fb.fil[0]['fxq']['QI']['WF']\
                 + fb.fil[0]['fxq']['QCB']['WF']
             fb.fil[0]['fxq']['QA']['WI'] = fb.fil[0]['fxq']['QI']['WI']\

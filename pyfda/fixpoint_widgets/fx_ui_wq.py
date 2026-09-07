@@ -7,7 +7,7 @@
 # (see file LICENSE in root directory for details)
 
 """
-Helper classes and functions for generating and simulating fixpoint filters
+Subwidget for selecting and displaying fixpoint quantization / overflow options.
 """
 import logging
 import sys
@@ -25,9 +25,34 @@ from pyfda.pyfda_rc import params
 
 logger = logging.getLogger(__name__)
 
+CMB_Q_ITEMS = [
+    "Select the kind of quantization.",
+    ("round", "Round",
+    "<span>Round towards nearest representable number</span>"),
+    ("fix", "Fix", "Round towards zero"),
+    ("floor", "Floor", "<span>Round towards negative infinity / "
+    "two's complement truncation.</span>"),
+    ("none", "None",
+    "<span>No quantization (only for debugging)</span>")
+    ]
+CMB_OV_ITEMS = [
+    "<span>Select overflow behaviour.</span>",
+    ("wrap", "Wrap", "Two's complement wrap around"),
+    ("sat", "Sat",
+    "<span>Saturation, i.e. limit at min. / max. value</span>"),
+    ("none", "None",
+    "<span>No overflow behaviour (only for debugging)</span>")
+    ]
+CMB_W_ITEMS = [
+    "<span>Select word format manually / automatically</span>",
+    ("m", "M", "<span><b>Manual</b> entry of integer and fractional "
+    "word length.</span>"),
+    ("a", "A", "<span><b>Automatic</b> estimation of required integer "
+        "and fractional word length.</span>")
+    ]
 
 # ------------------------------------------------------------------------------
-class FX_UI_WQ(QWidget):
+class FxWqUI(QWidget):
     """
     Subwidget for selecting and displaying fixpoint quantization / overflow options.
 
@@ -74,29 +99,29 @@ class FX_UI_WQ(QWidget):
     ----------------:---------------------------#-------------------------------------
     'label'         : ''                        # widget text label, usually set by the
     'label_q'       : 'Quant.'                  # subwidget text label
-    'cmb_q'         : List with tooltip and combo box choices (default: 'round', 'fix',
-                        'floor'), see `pyfda_qt_lib.qcmb_box_populate()` or code below
+    'CMB_Q_ITEMS'   : List with tooltip and combo box choices (default: 'round', 'fix',
+                    'floor'), see `pyfda_qt_lib.qcmb_box_populate()` or code below
 
     'label_ov'      : 'Ovfl.'                   # subwidget text label
-    'cmb_ov'        : List with tooltip and combo box choices (default: 'wrap', 'sat')
+    'CMB_OV_ITEMS'  : List with tooltip and combo box choices (default: 'wrap', 'sat')
 
     'fractional'    : True                      # Display WF, otherwise WF=0
     'lbl_sep'       : '.'                       # label between WI and WF field
     'max_led_width' : 30                        # max. length of lineedit field
-    'WI_len'        : 2                         # max. number of integer *digits*
-    'tip_WI'        : 'Number of integer bits'  # Mouse-over tooltip
-    'WF_len'        : 2                         # max. number of frac. *digits*
-    'tip_WF'        : 'Number of frac. bits'    # Mouse-over tooltip
+    'wi_len'        : 2                         # max. number of integer *digits*
+    'wi_tip'        : 'Number of integer bits'  # Mouse-over tooltip
+    'wf_len'        : 2                         # max. number of frac. *digits*
+    'wf_tip'        : 'Number of frac. bits'    # Mouse-over tooltip
 
     'lock_vis'      : 'off''                    # Pushbutton for locking visible
     'tip_lock'      : 'Sync input/output quant.'# Tooltip for lock push button
 
     'cmb_w_vis'     : 'off'                     # Is Auto/Man. selection visible?
                                                 #  ['a', 'm', 'f']
-    'cmb_w_items'   : List with tooltip and combo box choices
+    'CMB_W_ITEMS'   : List with tooltip and combo box choices
     'count_ovfl_vis': 'on'                      # Is overflow counter visible?
                                                 #   ['on', 'off', 'auto']
-    'MSB_LSB_vis'   : 'off'                     # Are MSB / LSB settings visible?
+    'msb_lsb_vis'   : 'off'                     # Are MSB / LSB settings visible?
 
     All labels support HTML formatting.
 
@@ -104,7 +129,7 @@ class FX_UI_WQ(QWidget):
     parameters, e.g.:
 
     ```
-        self.wdg_wq_accu = FX_UI_WQ(
+        self.wdg_wq_accu = FxWqUI(
             fb_get('fxq', 'QACC'), objectName='wdg_wq_accu_inst',
             label='<b>Accu Quantizer <i>Q<sub>A&nbsp;</sub></i>:</b>')
     ```
@@ -118,7 +143,7 @@ class FX_UI_WQ(QWidget):
 
         self.setObjectName(objectName)
         if not q_dict:
-            raise ValueError("FX_UI_WQ: No quantization dictionary passed!")
+            raise ValueError("FxWqUI: No quantization dictionary passed!")
 
         # TODO: Is passing q_dict by reference a bug or not?
 
@@ -156,39 +181,20 @@ class FX_UI_WQ(QWidget):
     # --------------------------------------------------------------------------
     def _construct_ui(self, **kwargs) -> None:
         """ Construct widget """
-        cmb_q = ["Select the kind of quantization.",
-                 ("round", "Round",
-                  "<span>Round towards nearest representable number</span>"),
-                 ("fix", "Fix", "Round towards zero"),
-                 ("floor", "Floor", "<span>Round towards negative infinity / "
-                  "two's complement truncation.</span>"),
-                 ("none", "None",
-                  "<span>No quantization (only for debugging)</span>")]
-        cmb_ov = ["<span>Select overflow behaviour.</span>",
-                  ("wrap", "Wrap", "Two's complement wrap around"),
-                  ("sat", "Sat",
-                   "<span>Saturation, i.e. limit at min. / max. value</span>"),
-                  ("none", "None",
-                   "<span>No overflow behaviour (only for debugging)</span>")]
-        cmb_w = ["<span>Select word format manually / automatically</span>",
-                ("m", "M", "<span><b>Manual</b> entry of integer and fractional "
-                "word length.</span>"),
-                ("a", "A", "<span><b>Automatic</b> estimation of required integer "
-                 "and fractional word length.</span>")                 ]
         # default widget settings:
         ui_dict = {'label': '',
-                   'label_q': 'Quant.', 'cmb_q_items': cmb_q,
-                   'label_ov': 'Ovfl.', 'cmb_ov_items': cmb_ov,
+                   'label_q': 'Quant.', 'cmb_q_items': CMB_Q_ITEMS,
+                   'label_ov': 'Ovfl.', 'cmb_ov_items': CMB_OV_ITEMS,
                    #
                    'lbl_sep': '.', 'max_led_width': 30,
-                   'WI_len': 2, 'tip_WI': 'Number of integer bits',
-                   'WF_len': 2, 'tip_WF': 'Number of fractional bits',
+                   'wi_len': 2, 'wi_tip': 'Number of integer bits',
+                   'wf_len': 2, 'wf_tip': 'Number of fractional bits',
                    'fractional': True,
-                   'cmb_w_vis': 'on', 'cmb_w_items': cmb_w,
+                   'cmb_w_vis': 'on', 'cmb_w_items': CMB_W_ITEMS,
                    'lock_vis': 'off',
                    'tip_lock':
                        '<span>Sync input and output quantization formats.</span>',
-                   'count_ovfl_vis': 'auto', 'MSB_LSB_vis': 'off'
+                   'count_ovfl_vis': 'auto', 'msb_lsb_vis': 'off'
                    }
 
         # update local `ui_dict` with keyword arguments passed during construction
@@ -200,16 +206,16 @@ class FX_UI_WQ(QWidget):
 
         lbl_wdg = QLabel(ui_dict['label'], self)
 
-        self.cmbQuant = QComboBox(self, objectName='quant')
-        idx = qcmb_box_populate(self.cmbQuant, ui_dict['cmb_q_items'], self.q_dict['quant'])
+        self.cmb_quant = QComboBox(self, objectName='quant')
+        idx = qcmb_box_populate(self.cmb_quant, ui_dict['cmb_q_items'], self.q_dict['quant'])
         if idx == -1:
             logger.warning(
                 'Initialization value "%s" was not found in "quant" combo box.',
                 self.q_dict['quant']
             )
 
-        self.cmbOvfl = QComboBox(self, objectName='ovfl')
-        idx = qcmb_box_populate(self.cmbOvfl, ui_dict['cmb_ov_items'], self.q_dict['ovfl'])
+        self.cmb_ovfl = QComboBox(self, objectName='ovfl')
+        idx = qcmb_box_populate(self.cmb_ovfl, ui_dict['cmb_ov_items'], self.q_dict['ovfl'])
         if idx == -1:
             logger.warning(
                 'Initialization value "%s" was not found in "ovfl" combo box.',
@@ -217,17 +223,17 @@ class FX_UI_WQ(QWidget):
             )
 
         # ComboBox size is adjusted automatically to fit the longest element
-        self.cmbQuant.setSizeAdjustPolicy(QComboBox.AdjustToContents)
-        self.cmbOvfl.setSizeAdjustPolicy(QComboBox.AdjustToContents)
+        self.cmb_quant.setSizeAdjustPolicy(QComboBox.AdjustToContents)
+        self.cmb_ovfl.setSizeAdjustPolicy(QComboBox.AdjustToContents)
 
-        self.cmbW = QComboBox(self, objectName="cmbW")
-        idx = qcmb_box_populate(self.cmbW, ui_dict['cmb_w_items'], self.q_dict['w_a_m'])
+        self.cmb_w = QComboBox(self, objectName="cmb_w")
+        idx = qcmb_box_populate(self.cmb_w, ui_dict['cmb_w_items'], self.q_dict['w_a_m'])
         if idx == -1:
             logger.warning(
                 'Initialization value "%s" was not found in "auto/man" combo box.',
                 self.q_dict['w_a_m']
             )
-        self.cmbW.setVisible(ui_dict['cmb_w_vis'] == 'on')
+        self.cmb_w.setVisible(ui_dict['cmb_w_vis'] == 'on')
 
         self.but_lock = PushButton(self, icon=QIcon(':/lock-locked.svg'))
         self.but_lock.setVisible(ui_dict['lock_vis'] == 'on')
@@ -238,62 +244,62 @@ class FX_UI_WQ(QWidget):
         sp_retain.setRetainSizeWhenHidden(True)
         self.but_lock.setSizePolicy(sp_retain)
 
-        self.ledWI = QLineEdit(self, objectName="WI")
-        self.ledWI.setToolTip(ui_dict['tip_WI'])
-        self.ledWI.setMaxLength(ui_dict['WI_len'])  # maximum of 2 digits
-        self.ledWI.setFixedWidth(ui_dict['max_led_width'])  # width of lineedit in points
+        self.led_wi = QLineEdit(self, objectName="WI")
+        self.led_wi.setToolTip(ui_dict['wi_tip'])
+        self.led_wi.setMaxLength(ui_dict['wi_len'])  # maximum of 2 digits
+        self.led_wi.setFixedWidth(ui_dict['max_led_width'])  # width of lineedit in points
 
         self.lbl_sep1 = QLabel(to_html(ui_dict['lbl_sep'], frmt='b'), self)
         self.lbl_sep1.setVisible(ui_dict['fractional'])
         self.lbl_sep2 = QLabel(to_html(')', frmt='b'), self)
         self.lbl_sep2.setVisible(False)
 
-        self.ledWF = QLineEdit(self, objectName="WF")
-        self.ledWF.setToolTip(ui_dict['tip_WF'])
-        self.ledWF.setMaxLength(ui_dict['WI_len'])  # maximum of 2 digits
-        self.ledWF.setFixedWidth(ui_dict['max_led_width'])  # width of lineedit in points
-        self.ledWF.setVisible(ui_dict['fractional'])
+        self.led_wf = QLineEdit(self, objectName="WF")
+        self.led_wf.setToolTip(ui_dict['wf_tip'])
+        self.led_wf.setMaxLength(ui_dict['wf_len'])  # maximum of 2 digits
+        self.led_wf.setFixedWidth(ui_dict['max_led_width'])  # width of lineedit in points
+        self.led_wf.setVisible(ui_dict['fractional'])
 
         self.count_ovfl_vis = ui_dict['count_ovfl_vis']
         self.lbl_ovfl_count = QLabel(to_html("N_ov = 0"))
         self.lbl_ovfl_count.setAutoFillBackground(True)
 
-        self.MSB_LSB_vis = ui_dict['MSB_LSB_vis']
+        self.msb_lsb_vis = ui_dict['msb_lsb_vis']
 
         # -------------------------------------------------------------------
         # MSB / LSB size
         # ---------------------------------------------------------------------
-        self.lbl_MSB = QLabel(self)
-        self.lbl_MSB.setText("undefined")
+        self.lbl_msb = QLabel(self)
+        self.lbl_msb.setText("undefined")
 
-        self.lbl_LSB = QLabel(self)
-        self.lbl_LSB.setText("undefined")
+        self.lbl_lsb = QLabel(self)
+        self.lbl_lsb.setText("undefined")
 
-        layH_W = QHBoxLayout()
-        layH_W.addWidget(self.ledWI)
-        layH_W.addWidget(self.lbl_sep1)
-        layH_W.addWidget(self.ledWF)
-        layH_W.addWidget(self.lbl_sep2)
-        layH_W.setContentsMargins(0, 0, 0, 0)
+        lay_h_w = QHBoxLayout()
+        lay_h_w.addWidget(self.led_wi)
+        lay_h_w.addWidget(self.lbl_sep1)
+        lay_h_w.addWidget(self.led_wf)
+        lay_h_w.addWidget(self.lbl_sep2)
+        lay_h_w.setContentsMargins(0, 0, 0, 0)
 
-        layG = QGridLayout()
-        layG.setColumnStretch(1, 10)
+        lay_g = QGridLayout()
+        lay_g.setColumnStretch(1, 10)
         # first row
-        layG.addWidget(lbl_wdg, 0, 0)
-        layG.addWidget(self.but_lock, 0, 3)
-        layG.addWidget(self.cmbW, 0, 4)
-        layG.addLayout(layH_W, 0, 5)
+        lay_g.addWidget(lbl_wdg, 0, 0)
+        lay_g.addWidget(self.but_lock, 0, 3)
+        lay_g.addWidget(self.cmb_w, 0, 4)
+        lay_g.addLayout(lay_h_w, 0, 5)
         # second row
-        layG.addWidget(self.lbl_ovfl_count, 1, 0)
-        layG.addWidget(self.cmbOvfl, 1, 3, 1, 2)
-        layG.addWidget(self.cmbQuant, 1, 5)
+        lay_g.addWidget(self.lbl_ovfl_count, 1, 0)
+        lay_g.addWidget(self.cmb_ovfl, 1, 3, 1, 2)
+        lay_g.addWidget(self.cmb_quant, 1, 5)
         # third row - MSB / LSB
-        layG.addWidget(self.lbl_MSB, 2, 0, 1, 2)
-        layG.addWidget(self.lbl_LSB, 2, 3, 1, 3, Qt.AlignRight)
-        layG.setContentsMargins(5, 5, 5, 5)
+        lay_g.addWidget(self.lbl_msb, 2, 0, 1, 2)
+        lay_g.addWidget(self.lbl_lsb, 2, 3, 1, 3, Qt.AlignRight)
+        lay_g.setContentsMargins(5, 5, 5, 5)
 
         frm_main = QFrame(self)
-        frm_main.setLayout(layG)
+        frm_main.setLayout(lay_g)
 
         lay_v_main = QVBoxLayout()  # Widget main layout
         lay_v_main.addWidget(frm_main)
@@ -307,8 +313,8 @@ class FX_UI_WQ(QWidget):
         WI = int(self.q_dict['WI'])
         WF = int(self.q_dict['WF'])
         # W = WI + WF + 1
-        self.ledWI.setText(str(WI))
-        self.ledWF.setText(str(WF))
+        self.led_wi.setText(str(WI))
+        self.led_wf.setText(str(WF))
 
         # create fixpoint quantization object from passed quantization dict
         self.Q = fx.Fixed(self.q_dict)
@@ -324,11 +330,11 @@ class FX_UI_WQ(QWidget):
         # ----------------------------------------------------------------------
         # LOCAL SIGNALS & SLOTs
         # ----------------------------------------------------------------------
-        self.cmbOvfl.currentIndexChanged.connect(self.ui2dict)
-        self.cmbQuant.currentIndexChanged.connect(self.ui2dict)
-        self.ledWI.editingFinished.connect(self.ui2dict)
-        self.ledWF.editingFinished.connect(self.ui2dict)
-        self.cmbW.currentIndexChanged.connect(self.ui2dict)
+        self.cmb_ovfl.currentIndexChanged.connect(self.ui2dict)
+        self.cmb_quant.currentIndexChanged.connect(self.ui2dict)
+        self.led_wi.editingFinished.connect(self.ui2dict)
+        self.led_wf.editingFinished.connect(self.ui2dict)
+        self.cmb_w.currentIndexChanged.connect(self.ui2dict)
 
         self.but_lock.clicked.connect(self.but_lock_checked)
 
@@ -400,29 +406,29 @@ class FX_UI_WQ(QWidget):
         Emit a signal with `{'ui_local_changed': <objectName of the sender>}`.
         """
         # read, sanitize and write back to UI fractional part WF
-        WF = int(safe_eval(self.ledWF.text(), self.Q.q_dict['WF'], return_type="int",
+        WF = int(safe_eval(self.led_wf.text(), self.Q.q_dict['WF'], return_type="int",
                            sign='poszero'))
-        self.ledWF.setText(str(WF))
+        self.led_wf.setText(str(WF))
 
         # read, sanitize and write back to UI integer part WI of word length. In 'qfrac' mode,
         # the WI field shows the number of integer bits, in 'qint' mode, it shows the total word
         # length W. In both cases, the value for 'WI' is stored in the dicts.
-        WI = int(safe_eval(self.ledWI.text(), self.Q.q_dict['WI'] + WF + 1, return_type="int",
+        WI = int(safe_eval(self.led_wi.text(), self.Q.q_dict['WI'] + WF + 1, return_type="int",
                            sign='poszero'))
         if fb_get('qfrmt') == 'qint' and WI <= WF:
             logger.warning(
                 "Total word length has to be larger than Fractional scaling WF = %s!", WF)
             WI = self.Q.q_dict['WI'] + WF + 1
-        self.ledWI.setText(str(WI))
+        self.led_wi.setText(str(WI))
 
         if fb_get('qfrmt') == 'qint':
             WI = WI - WF - 1
 
-        ovfl = qget_cmb_box(self.cmbOvfl)
-        quant = qget_cmb_box(self.cmbQuant)
-        w_a_m = qget_cmb_box(self.cmbW)
+        ovfl = qget_cmb_box(self.cmb_ovfl)
+        quant = qget_cmb_box(self.cmb_quant)
+        w_a_m = qget_cmb_box(self.cmb_w)
         if w_a_m not in {'m', 'a', 'f'}:
-            logger.error("Unknown option '%s' for cmbW combobox!", w_a_m)
+            logger.error("Unknown option '%s' for cmb_w combobox!", w_a_m)
 
         # update quantizer dict and derived quantities like W and reset counters
         self.Q.set_qdict(
@@ -430,12 +436,12 @@ class FX_UI_WQ(QWidget):
         # update global filter dict
         self.q_dict.update(self.Q.q_dict)
         # update display of WI and WF depending on fixpoint mode
-        self.update_WI_WF()
+        self._update_wi_wf()
 
         if self.sender():
             # logger.error("sender = %s", self.sender().objectName())
-#             if self.sender().objectName() == 'cmbW':
-#                self.enable_subwidgets()  # enable / disable WI and WF subwidgets
+#             if self.sender().objectName() == 'cmb_w':
+#                self._enable_subwidgets()  # enable / disable WI and WF subwidgets
             dict_sig = {'sender_name': self.objectName(),
                         'ui_local_changed': self.sender().objectName()}
             self.emit(dict_sig)
@@ -447,7 +453,7 @@ class FX_UI_WQ(QWidget):
         """
         Use the passed quantization dict `q_dict` to update:
 
-        * UI subwidgets `WI`, `WF` `quant`, `ovfl`, `cmbW`
+        * UI subwidgets `WI`, `WF` `quant`, `ovfl`, `cmb_w`
         * the instance quantizer object `self.Q.q_dict`
         * overflow counters need to be updated from calling instance
 
@@ -464,60 +470,60 @@ class FX_UI_WQ(QWidget):
         # Update all non-numeric instance quantization dict entries from passed `q_dict`
         # Auto-calculation of integer bits etc. needs to performed in parent subwidget!
         if 'w_a_m' in q_dict:
-            i = qset_cmb_box(self.cmbW, q_dict['w_a_m'])
+            i = qset_cmb_box(self.cmb_w, q_dict['w_a_m'])
             if i < 0:
                 logger.error("Unknown value q_dict['w_a_m'] = %s", q_dict['w_a_m'])
 
         if 'quant' in q_dict:
-            i = qset_cmb_box(self.cmbQuant, q_dict['quant'])
+            i = qset_cmb_box(self.cmb_quant, q_dict['quant'])
             if i < 0:
                 logger.error("Unknown value q_dict['quant'] = %s", q_dict['quant'])
 
         if 'ovfl' in q_dict:
-            i = qset_cmb_box(self.cmbOvfl, q_dict['ovfl'])
+            i = qset_cmb_box(self.cmb_ovfl, q_dict['ovfl'])
             if i < 0:
                 logger.error("Unknown value q_dict['ovfl'] = %s", q_dict['ovfl'])
 
         WI = safe_eval(
             q_dict['WI'], self.Q.q_dict['WI'], return_type="int", sign='poszero')
 
-        self.ledWI.setText(str(WI))
+        self.led_wi.setText(str(WI))
 
         WF = safe_eval(
             q_dict['WF'], self.Q.q_dict['WF'], return_type="int", sign='poszero')
-        self.ledWF.setText(str(WF))
+        self.led_wf.setText(str(WF))
 
         self.Q.set_qdict(q_dict)  # update quantization object and derived parameters
 
-        self.update_WI_WF()  # set WI / WF widgets visibility depending on 'w_a_m'
+        self._update_wi_wf()  # set WI / WF widgets visibility depending on 'w_a_m'
 
     # --------------------------------------------------------------------------
-    def update_WI_WF(self) -> None:
+    def _update_wi_wf(self) -> None:
         """
         Update display, visibility / writability of integer and fractional part of the
         quantization format. depending on `get_fx()` ...['qfrmt'] and
         ...['w_a_m'] settings
         """
-        self.ledWI.setVisible(get_fx())
-        self.ledWF.setVisible(get_fx())
+        self.led_wi.setVisible(get_fx())
+        self.led_wf.setVisible(get_fx())
 
         if not get_fx():  # float modes
             self.lbl_sep1.setText(to_html("---", frmt='b'))
             self.lbl_sep2.setVisible(False)
         elif fb_get('qfrmt') == 'qint':
             self.lbl_sep1.setText(to_html("(", frmt='b'))
-            self.ledWF.setToolTip("Scale factor 2<sup>-WF</sup>")
-            self.ledWI.setText(str(self.Q.q_dict['WI'] + self.Q.q_dict['WF'] + 1))
-            self.ledWI.setToolTip("Total number of bits")
+            self.led_wf.setToolTip("Scale factor 2<sup>-WF</sup>")
+            self.led_wi.setText(str(self.Q.q_dict['WI'] + self.Q.q_dict['WF'] + 1))
+            self.led_wi.setToolTip("Total number of bits")
             self.lbl_sep2.setVisible(True)
 
             LSB = 1.
             MSB = 2. ** (self.Q.q_dict['WI'] + self.Q.q_dict['WF'] - 1)
         elif fb_get('qfrmt') == "qfrac":
             self.lbl_sep1.setText(to_html(".", frmt='b'))
-            self.ledWF.setToolTip("Number of fractional bits")
-            self.ledWI.setText(str(self.Q.q_dict['WI']))
-            self.ledWI.setToolTip("Number of integer bits")
+            self.led_wf.setToolTip("Number of fractional bits")
+            self.led_wi.setText(str(self.Q.q_dict['WI']))
+            self.led_wi.setToolTip("Number of integer bits")
             self.lbl_sep2.setVisible(False)
 
             LSB = 2 ** -self.Q.q_dict['WF']
@@ -525,44 +531,44 @@ class FX_UI_WQ(QWidget):
         else:
             logger.error("Unknown quantization format '%s'", fb_get('qfrmt'))
 
-        self.ledWF.setText(str(self.Q.q_dict['WF']))
+        self.led_wf.setText(str(self.Q.q_dict['WF']))
 
 
-        if self.MSB_LSB_vis == 'off' or not get_fx():
+        if self.msb_lsb_vis == 'off' or not get_fx():
             # Don't show any data
-            self.lbl_MSB.setVisible(False)
-            self.lbl_LSB.setVisible(False)
-        elif self.MSB_LSB_vis == 'max':
+            self.lbl_msb.setVisible(False)
+            self.lbl_lsb.setVisible(False)
+        elif self.msb_lsb_vis == 'max':
             # Show MAX and LSB data
-            self.lbl_MSB.setVisible(True)
-            self.lbl_LSB.setVisible(True)
-            self.lbl_MSB.setText(
+            self.lbl_msb.setVisible(True)
+            self.lbl_lsb.setVisible(True)
+            self.lbl_msb.setText(
                 "<b><i>&nbsp;&nbsp;Max</i><sub>10</sub> = </b>"
                 f"{2. * MSB - LSB:.{params['FMT_ba']}g}")
-            self.lbl_LSB.setText(
+            self.lbl_lsb.setText(
                 f"<b><i>LSB</i><sub>10</sub> = </b>{LSB:.{params['FMT_ba']}g}")
-        elif self.MSB_LSB_vis == 'msb':
+        elif self.msb_lsb_vis == 'msb':
             # Show MSB and LSB data
-            self.lbl_MSB.setVisible(True)
-            self.lbl_LSB.setVisible(True)
-            self.lbl_MSB.setText(
+            self.lbl_msb.setVisible(True)
+            self.lbl_lsb.setVisible(True)
+            self.lbl_msb.setText(
                 "<b><i>&nbsp;&nbsp;MSB</i><sub>10</sub> = </b>"
                 f"{MSB:.{params['FMT_ba']}g}")
-            self.lbl_LSB.setText(
+            self.lbl_lsb.setText(
                 f"<b><i>LSB</i><sub>10</sub> = </b>{LSB:.{params['FMT_ba']}g}")
         else:
-            logger.error("Unknown option MSB_LSB_vis = '%s'", self.MSB_LSB_vis)
+            logger.error("Unknown option msb_lsb_vis = '%s'", self.msb_lsb_vis)
 
-        self.enable_subwidgets()
+        self._enable_subwidgets()
 
     # --------------------------------------------------------------------------
-    def enable_subwidgets(self) -> None:
+    def _enable_subwidgets(self) -> None:
         """
         Enable integer and fractional part of the quantization format, depending on
         'w_a_m' settings.
         """
-        self.ledWI.setEnabled(self.Q.q_dict['w_a_m'] == 'm')
-        self.ledWF.setEnabled(self.Q.q_dict['w_a_m'] == 'm')
+        self.led_wi.setEnabled(self.Q.q_dict['w_a_m'] == 'm')
+        self.led_wf.setEnabled(self.Q.q_dict['w_a_m'] == 'm')
 # ==============================================================================
 if __name__ == '__main__':
     # Run widget standalone with `python -m pyfda.fixpoint_widgets.fx_ui_wq`
@@ -573,7 +579,7 @@ if __name__ == '__main__':
     app = QApplication(sys.argv)
     app.setStyleSheet(QSS.QSS_RC)
 
-    mainw = FX_UI_WQ({}, label='<b>Quantizer</b>', label_2="for the masses")
+    mainw = FxWqUI({}, label='<b>Quantizer</b>', label_2="for the masses")
     app.setActiveWindow(mainw)
     mainw.show()
     sys.exit(app.exec_())

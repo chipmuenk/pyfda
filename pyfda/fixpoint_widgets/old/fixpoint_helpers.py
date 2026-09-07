@@ -108,11 +108,11 @@ class UI_W(QWidget):
 
         lblW = QLabel(to_html(dict_ui['label'], frmt='bi'), self)
 
-        self.cmbW = QComboBox(self)
-        self.cmbW.addItems(dict_ui['combo_items'])
-        self.cmbW.setVisible(dict_ui['combo_visible'])
-        self.cmbW.setToolTip(dict_ui['tip_combo'])
-        self.cmbW.setObjectName("cmbW")
+        self.cmb_w = QComboBox(self)
+        self.cmb_w.addItems(dict_ui['combo_items'])
+        self.cmb_w.setVisible(dict_ui['combo_visible'])
+        self.cmb_w.setToolTip(dict_ui['tip_combo'])
+        self.cmb_w.setObjectName("cmb_w")
 
         self.but_lock = QPushButton(self)
         self.but_lock.setCheckable(True)
@@ -120,30 +120,30 @@ class UI_W(QWidget):
         self.but_lock.setVisible(dict_ui['lock_visible'])
         self.but_lock.setToolTip(dict_ui['tip_lock'])
 
-        self.ledWI = QLineEdit(self)
-        self.ledWI.setToolTip(dict_ui['tip_WI'])
-        self.ledWI.setMaxLength(dict_ui['WI_len'])  # maximum of 2 digits
-        self.ledWI.setFixedWidth(dict_ui['max_led_width'])  # width of lineedit in points
-        self.ledWI.setObjectName("WI")
+        self.led_wi = QLineEdit(self)
+        self.led_wi.setToolTip(dict_ui['tip_WI'])
+        self.led_wi.setMaxLength(dict_ui['WI_len'])  # maximum of 2 digits
+        self.led_wi.setFixedWidth(dict_ui['max_led_width'])  # width of lineedit in points
+        self.led_wi.setObjectName("WI")
 
         lbl_sep = QLabel(dict_ui['lbl_sep'], self)
         lbl_sep.setVisible(dict_ui['fractional'])
 
-        self.ledWF = QLineEdit(self)
-        self.ledWF.setToolTip(dict_ui['tip_WF'])
-        self.ledWF.setMaxLength(dict_ui['WI_len'])  # maximum of 2 digits
-        self.ledWF.setFixedWidth(dict_ui['max_led_width'])  # width of lineedit in points
-        self.ledWF.setVisible(dict_ui['fractional'])
-        self.ledWF.setObjectName("WF")
+        self.led_wf = QLineEdit(self)
+        self.led_wf.setToolTip(dict_ui['tip_WF'])
+        self.led_wf.setMaxLength(dict_ui['WI_len'])  # maximum of 2 digits
+        self.led_wf.setFixedWidth(dict_ui['max_led_width'])  # width of lineedit in points
+        self.led_wf.setVisible(dict_ui['fractional'])
+        self.led_wf.setObjectName("WF")
 
         layH = QHBoxLayout()
         layH.addWidget(lblW)
         layH.addStretch()
-        layH.addWidget(self.cmbW)
+        layH.addWidget(self.cmb_w)
         layH.addWidget(self.but_lock)
-        layH.addWidget(self.ledWI)
+        layH.addWidget(self.led_wi)
         layH.addWidget(lbl_sep)
-        layH.addWidget(self.ledWF)
+        layH.addWidget(self.led_wf)
         layH.setContentsMargins(0, 0, 0, 0)
 
         frm_main = QFrame(self)
@@ -158,8 +158,8 @@ class UI_W(QWidget):
         # ----------------------------------------------------------------------
         # INITIAL SETTINGS
         # ----------------------------------------------------------------------
-        self.ledWI.setText(str(dict_ui['WI']))
-        self.ledWF.setText(str(dict_ui['WF']))
+        self.led_wi.setText(str(dict_ui['WI']))
+        self.led_wf.setText(str(dict_ui['WF']))
 
         frm_main.setEnabled(dict_ui['enabled'])
         frm_main.setVisible(dict_ui['visible'])
@@ -167,10 +167,10 @@ class UI_W(QWidget):
         # ----------------------------------------------------------------------
         # LOCAL SIGNALS & SLOTs
         # ----------------------------------------------------------------------
-        self.ledWI.editingFinished.connect(self.ui2dict)
-        self.ledWF.editingFinished.connect(self.ui2dict)
+        self.led_wi.editingFinished.connect(self.ui2dict)
+        self.led_wf.editingFinished.connect(self.ui2dict)
         self.but_lock.clicked.connect(self.butLock_clicked)
-        self.cmbW.currentIndexChanged.connect(self.ui2dict)
+        self.cmb_w.currentIndexChanged.connect(self.ui2dict)
         # initialize button icon
         self.butLock_clicked(self.but_lock.isChecked())
 
@@ -236,12 +236,12 @@ class UI_W(QWidget):
         Emit a signal with `{'ui':objectName of the sender}`.
         """
 
-        self.WI = int(safe_eval(self.ledWI.text(), self.WI, return_type="int",
+        self.WI = int(safe_eval(self.led_wi.text(), self.WI, return_type="int",
                                 sign='poszero'))
-        self.ledWI.setText(str(self.WI))
-        self.WF = int(safe_eval(self.ledWF.text(), self.WF, return_type="int",
+        self.led_wi.setText(str(self.WI))
+        self.WF = int(safe_eval(self.led_wf.text(), self.WF, return_type="int",
                                 sign='poszero'))
-        self.ledWF.setText(str(self.WF))
+        self.led_wf.setText(str(self.WF))
         self.W = int(self.WI + self.WF + 1)
 
         self.q_dict.update({'WI': self.WI, 'WF': self.WF, 'W': self.W})
@@ -267,13 +267,13 @@ class UI_W(QWidget):
 
         if 'WI' in q_dict:
             self.WI = safe_eval(q_dict['WI'], self.WI, return_type="int", sign='poszero')
-            self.ledWI.setText(str(self.WI))
+            self.led_wi.setText(str(self.WI))
         else:
             logger.warning("No key 'WI' in dict!")
 
         if 'WF' in q_dict:
             self.WF = safe_eval(q_dict['WF'], self.WF, return_type="int", sign='poszero')
-            self.ledWF.setText(str(self.WF))
+            self.led_wf.setText(str(self.WF))
         else:
             logger.warning("No key 'WF' in dict!")
 
@@ -348,22 +348,22 @@ class UI_Q(QWidget):
         self.wdg_name = dict_ui['wdg_name']
 
         lblQuant = QLabel(dict_ui['label_q'], self)
-        self.cmbQuant = QComboBox(self)
-        self.cmbQuant.addItems(dict_ui['cmb_q'])
-        qset_cmb_box(self.cmbQuant, dict_ui['quant'])
-        self.cmbQuant.setToolTip(dict_ui['tip_q'])
-        self.cmbQuant.setObjectName('quant')
+        self.cmb_quant = QComboBox(self)
+        self.cmb_quant.addItems(dict_ui['cmb_q'])
+        qset_cmb_box(self.cmb_quant, dict_ui['quant'])
+        self.cmb_quant.setToolTip(dict_ui['tip_q'])
+        self.cmb_quant.setObjectName('quant')
 
         lblOvfl = QLabel(dict_ui['label_ov'], self)
-        self.cmbOvfl = QComboBox(self)
-        self.cmbOvfl.addItems(dict_ui['cmb_ov'])
-        qset_cmb_box(self.cmbOvfl, dict_ui['ovfl'])
-        self.cmbOvfl.setToolTip(dict_ui['tip_ov'])
-        self.cmbOvfl.setObjectName('ovfl')
+        self.cmb_ovfl = QComboBox(self)
+        self.cmb_ovfl.addItems(dict_ui['cmb_ov'])
+        qset_cmb_box(self.cmb_ovfl, dict_ui['ovfl'])
+        self.cmb_ovfl.setToolTip(dict_ui['tip_ov'])
+        self.cmb_ovfl.setObjectName('ovfl')
 
         # ComboBox size is adjusted automatically to fit the longest element
-        self.cmbQuant.setSizeAdjustPolicy(QComboBox.AdjustToContents)
-        self.cmbOvfl.setSizeAdjustPolicy(QComboBox.AdjustToContents)
+        self.cmb_quant.setSizeAdjustPolicy(QComboBox.AdjustToContents)
+        self.cmb_ovfl.setSizeAdjustPolicy(QComboBox.AdjustToContents)
 
 #        self.wdg_ui_w = UI_W(**self.dict_ui_w)
 
@@ -373,26 +373,26 @@ class UI_Q(QWidget):
         #     layH.addWidget(lblW)
         # layH.addStretch()
         # layH.addWidget(lblOvfl)
-        # layH.addWidget(self.cmbOvfl)
+        # layH.addWidget(self.cmb_ovfl)
         # # layH.addStretch(1)
         # layH.addWidget(lblQuant)
-        # layH.addWidget(self.cmbQuant)
+        # layH.addWidget(self.cmb_quant)
         # layH.setContentsMargins(0, 0, 0, 0)
 
-        layG = QGridLayout()
+        lay_g = QGridLayout()
         # if dict_ui['label'] != "":
         lblW = QLabel(to_html(dict_ui['label'], frmt='bi'), self)
-        layG.addWidget(lblW, 0, 0)
+        lay_g.addWidget(lblW, 0, 0)
         # layH.addStretch()
-        layG.addWidget(lblOvfl, 0, 1)
-        layG.addWidget(self.cmbOvfl, 0, 2)
+        lay_g.addWidget(lblOvfl, 0, 1)
+        lay_g.addWidget(self.cmb_ovfl, 0, 2)
         # layH.addStretch(1)
-        layG.addWidget(lblQuant, 1, 1)
-        layG.addWidget(self.cmbQuant, 1, 2)
-        layG.setContentsMargins(0, 0, 0, 0)
+        lay_g.addWidget(lblQuant, 1, 1)
+        lay_g.addWidget(self.cmb_quant, 1, 2)
+        lay_g.setContentsMargins(0, 0, 0, 0)
 
         frm_main = QFrame(self)
-        frm_main.setLayout(layG)
+        frm_main.setLayout(lay_g)
 
         lay_v_main = QVBoxLayout()  # Widget main layout
         lay_v_main.addWidget(frm_main)
@@ -403,16 +403,16 @@ class UI_Q(QWidget):
         # ----------------------------------------------------------------------
         # INITIAL SETTINGS
         # ----------------------------------------------------------------------
-        self.ovfl = qget_cmb_box(self.cmbOvfl, data=False)
-        self.quant = qget_cmb_box(self.cmbQuant, data=False)
+        self.ovfl = qget_cmb_box(self.cmb_ovfl, data=False)
+        self.quant = qget_cmb_box(self.cmb_quant, data=False)
         frm_main.setEnabled(dict_ui['enabled'])
         frm_main.setVisible(dict_ui['visible'])
 
         # ----------------------------------------------------------------------
         # LOCAL SIGNALS & SLOTs
         # ----------------------------------------------------------------------
-        self.cmbOvfl.currentIndexChanged.connect(self.ui2dict)
-        self.cmbQuant.currentIndexChanged.connect(self.ui2dict)
+        self.cmb_ovfl.currentIndexChanged.connect(self.ui2dict)
+        self.cmb_quant.currentIndexChanged.connect(self.ui2dict)
 
     # --------------------------------------------------------------------------
     def ui2dict(self):
@@ -420,8 +420,8 @@ class UI_Q(QWidget):
         Update the quantization dict and the attributes `self.ovfl` and
         `self.quant` from the UI
         """
-        self.ovfl = self.cmbOvfl.currentText()
-        self.quant = self.cmbQuant.currentText()
+        self.ovfl = self.cmb_ovfl.currentText()
+        self.quant = self.cmb_quant.currentText()
 
         self.q_dict.update({'ovfl': self.ovfl,
                             'quant': self.quant})
@@ -438,12 +438,12 @@ class UI_Q(QWidget):
             q_dict = self.q_dict
 
         if 'quant' in q_dict:
-            qset_cmb_box(self.cmbQuant, q_dict['quant'])
+            qset_cmb_box(self.cmb_quant, q_dict['quant'])
         else:
             logger.warning("No key 'quant' in dict!")
 
         if 'ovfl' in q_dict:
-            qset_cmb_box(self.cmbOvfl, q_dict['ovfl'])
+            qset_cmb_box(self.cmb_ovfl, q_dict['ovfl'])
         else:
             logger.warning("No key 'ovfl' in dict!")
 
@@ -520,7 +520,7 @@ class UI_WQ(QWidget):
                   ("wrap", "Wrap", "Two's complement wrap around"),
                   ("sat", "Sat",
                    "<span>Saturation, i.e. limit at min. / max. value</span>")]
-        cmb_w = ["<span>Set Accumulator word format</span>",
+        CMB_W_ITEMS = ["<span>Set Accumulator word format</span>",
                  ("m", "Man", "<span>Manual entry of word format.</span>"),
                  ("a", "Auto",
                   "<span>Automatic calculation from coefficients and input word formats "
@@ -539,7 +539,7 @@ class UI_WQ(QWidget):
                    'WI': 0, 'WI_len': 2, 'tip_WI': 'Number of integer bits',
                    'WF': 15, 'WF_len': 2, 'tip_WF': 'Number of fractional bits',
                    'fractional': True,
-                   'cmb_w_vis': False, 'cmb_w_items': cmb_w, 'cmb_w_init': 'm',
+                   'cmb_w_vis': False, 'cmb_w_items': CMB_W_ITEMS, 'cmb_w_init': 'm',
                    'lock_visible': False, 'tip_lock': 'Lock input/output quantization.'
                    }
         # test whether quantization and overflow parameters in self.q_dict are
@@ -561,25 +561,25 @@ class UI_WQ(QWidget):
         lbl_wdg = QLabel(dict_ui['label'], self)
 
         lblQuant = QLabel(dict_ui['label_q'], self)
-        self.cmbQuant = QComboBox(self)
-        qcmb_box_populate(self.cmbQuant, dict_ui['cmb_q_items'], dict_ui['quant'])
-        self.cmbQuant.setObjectName('quant')
+        self.cmb_quant = QComboBox(self)
+        qcmb_box_populate(self.cmb_quant, dict_ui['cmb_q_items'], dict_ui['quant'])
+        self.cmb_quant.setObjectName('quant')
 
         lblOvfl = QLabel(dict_ui['label_ov'], self)
-        self.cmbOvfl = QComboBox(self)
-        qcmb_box_populate(self.cmbOvfl, dict_ui['cmb_ov_items'], dict_ui['ovfl'])
-        self.cmbOvfl.setObjectName('ovfl')
+        self.cmb_ovfl = QComboBox(self)
+        qcmb_box_populate(self.cmb_ovfl, dict_ui['cmb_ov_items'], dict_ui['ovfl'])
+        self.cmb_ovfl.setObjectName('ovfl')
 
         # ComboBox size is adjusted automatically to fit the longest element
-        self.cmbQuant.setSizeAdjustPolicy(QComboBox.AdjustToContents)
-        self.cmbOvfl.setSizeAdjustPolicy(QComboBox.AdjustToContents)
+        self.cmb_quant.setSizeAdjustPolicy(QComboBox.AdjustToContents)
+        self.cmb_ovfl.setSizeAdjustPolicy(QComboBox.AdjustToContents)
 
         lbl_W = QLabel(to_html(dict_ui['label_w']), self)
 
-        self.cmbW = QComboBox(self)
-        qcmb_box_populate(self.cmbW, dict_ui['cmb_w_items'], dict_ui['cmb_w_init'])
-        self.cmbW.setVisible(dict_ui['cmb_w_vis'] == 'on')
-        self.cmbW.setObjectName("cmbW")
+        self.cmb_w = QComboBox(self)
+        qcmb_box_populate(self.cmb_w, dict_ui['cmb_w_items'], dict_ui['cmb_w_init'])
+        self.cmb_w.setVisible(dict_ui['cmb_w_vis'] == 'on')
+        self.cmb_w.setObjectName("cmb_w")
 
         self.but_lock = QPushButton(self)
         self.but_lock.setCheckable(True)
@@ -587,45 +587,45 @@ class UI_WQ(QWidget):
         self.but_lock.setVisible(dict_ui['lock_visible'])
         self.but_lock.setToolTip(dict_ui['tip_lock'])
 
-        self.ledWI = QLineEdit(self)
-        self.ledWI.setToolTip(dict_ui['tip_WI'])
-        self.ledWI.setMaxLength(dict_ui['WI_len'])  # maximum of 2 digits
-        self.ledWI.setFixedWidth(dict_ui['max_led_width'])  # width of lineedit in points
-        self.ledWI.setObjectName("WI")
+        self.led_wi = QLineEdit(self)
+        self.led_wi.setToolTip(dict_ui['tip_WI'])
+        self.led_wi.setMaxLength(dict_ui['WI_len'])  # maximum of 2 digits
+        self.led_wi.setFixedWidth(dict_ui['max_led_width'])  # width of lineedit in points
+        self.led_wi.setObjectName("WI")
 
         lbl_sep = QLabel(dict_ui['lbl_sep'], self)
         lbl_sep.setVisible(dict_ui['fractional'])
 
-        self.ledWF = QLineEdit(self)
-        self.ledWF.setToolTip(dict_ui['tip_WF'])
-        self.ledWF.setMaxLength(dict_ui['WI_len'])  # maximum of 2 digits
-        self.ledWF.setFixedWidth(dict_ui['max_led_width'])  # width of lineedit in points
-        self.ledWF.setVisible(dict_ui['fractional'])
-        self.ledWF.setObjectName("WF")
+        self.led_wf = QLineEdit(self)
+        self.led_wf.setToolTip(dict_ui['tip_WF'])
+        self.led_wf.setMaxLength(dict_ui['WI_len'])  # maximum of 2 digits
+        self.led_wf.setFixedWidth(dict_ui['max_led_width'])  # width of lineedit in points
+        self.led_wf.setVisible(dict_ui['fractional'])
+        self.led_wf.setObjectName("WF")
 
         lay_W = QHBoxLayout()
         lay_W.addStretch()
         lay_W.addWidget(lbl_W)
         # lay_W.addStretch()
-        lay_W.addWidget(self.cmbW)
+        lay_W.addWidget(self.cmb_w)
         lay_W.addWidget(self.but_lock)
-        lay_W.addWidget(self.ledWI)
+        lay_W.addWidget(self.led_wi)
         lay_W.addWidget(lbl_sep)
-        lay_W.addWidget(self.ledWF)
+        lay_W.addWidget(self.led_wf)
         lay_W.setContentsMargins(0, 0, 0, 0)
 
-        layG = QGridLayout()
-        layG.addWidget(lbl_wdg, 0, 0)
-        layG.addLayout(lay_W, 1, 0)
+        lay_g = QGridLayout()
+        lay_g.addWidget(lbl_wdg, 0, 0)
+        lay_g.addLayout(lay_W, 1, 0)
         # lay_W.addStretch()
-        layG.addWidget(lblOvfl, 0, 1)
-        layG.addWidget(self.cmbOvfl, 0, 2)
-        layG.addWidget(lblQuant, 1, 1)
-        layG.addWidget(self.cmbQuant, 1, 2)
-        layG.setContentsMargins(0, 0, 0, 0)
+        lay_g.addWidget(lblOvfl, 0, 1)
+        lay_g.addWidget(self.cmb_ovfl, 0, 2)
+        lay_g.addWidget(lblQuant, 1, 1)
+        lay_g.addWidget(self.cmb_quant, 1, 2)
+        lay_g.setContentsMargins(0, 0, 0, 0)
 
         frm_main = QFrame(self)
-        frm_main.setLayout(layG)
+        frm_main.setLayout(lay_g)
 
         lay_v_main = QVBoxLayout()  # Widget main layout
         lay_v_main.addWidget(frm_main)
@@ -636,14 +636,14 @@ class UI_WQ(QWidget):
         # ----------------------------------------------------------------------
         # INITIAL SETTINGS
         # ----------------------------------------------------------------------
-        self.ovfl = qget_cmb_box(self.cmbOvfl)
-        self.quant = qget_cmb_box(self.cmbQuant)
+        self.ovfl = qget_cmb_box(self.cmb_ovfl)
+        self.quant = qget_cmb_box(self.cmb_quant)
 
         self.WI = int(dict_ui['WI'])
         self.WF = int(dict_ui['WF'])
         self.W = self.WI + self.WF + 1
-        self.ledWI.setText(str(self.WI))
-        self.ledWF.setText(str(self.WF))
+        self.led_wi.setText(str(self.WI))
+        self.led_wf.setText(str(self.WF))
 
         # initialize button icon
         self.butLock_clicked(self.but_lock.isChecked())
@@ -654,13 +654,13 @@ class UI_WQ(QWidget):
         # ----------------------------------------------------------------------
         # LOCAL SIGNALS & SLOTs
         # ----------------------------------------------------------------------
-        self.cmbOvfl.currentIndexChanged.connect(self.ui2dict)
-        self.cmbQuant.currentIndexChanged.connect(self.ui2dict)
+        self.cmb_ovfl.currentIndexChanged.connect(self.ui2dict)
+        self.cmb_quant.currentIndexChanged.connect(self.ui2dict)
 
-        self.ledWI.editingFinished.connect(self.ui2dict)
-        self.ledWF.editingFinished.connect(self.ui2dict)
+        self.led_wi.editingFinished.connect(self.ui2dict)
+        self.led_wf.editingFinished.connect(self.ui2dict)
         self.but_lock.clicked.connect(self.butLock_clicked)
-        self.cmbW.currentIndexChanged.connect(self.ui2dict)
+        self.cmb_w.currentIndexChanged.connect(self.ui2dict)
 
     # --------------------------------------------------------------------------
     def quant_coeffs(self, q_dict: dict, coeffs: iterable, to_int: bool = False) -> list:
@@ -726,16 +726,16 @@ class UI_WQ(QWidget):
 
         Emit a signal with `{'ui':objectName of the sender}`.
         """
-        self.WI = int(safe_eval(self.ledWI.text(), self.WI, return_type="int",
+        self.WI = int(safe_eval(self.led_wi.text(), self.WI, return_type="int",
                                 sign='poszero'))
-        self.ledWI.setText(str(self.WI))
-        self.WF = int(safe_eval(self.ledWF.text(), self.WF, return_type="int",
+        self.led_wi.setText(str(self.WI))
+        self.WF = int(safe_eval(self.led_wf.text(), self.WF, return_type="int",
                                 sign='poszero'))
-        self.ledWF.setText(str(self.WF))
+        self.led_wf.setText(str(self.WF))
         self.W = int(self.WI + self.WF + 1)
 
-        self.ovfl = qget_cmb_box(self.cmbOvfl)
-        self.quant = qget_cmb_box(self.cmbQuant)
+        self.ovfl = qget_cmb_box(self.cmb_ovfl)
+        self.quant = qget_cmb_box(self.cmb_quant)
 
         self.q_dict.update({'ovfl': self.ovfl, 'quant': self.quant,
                             'WI': self.WI, 'WF': self.WF, 'W': self.W})
@@ -758,24 +758,24 @@ class UI_WQ(QWidget):
             q_dict = self.q_dict
 
         if 'quant' in q_dict:
-            qset_cmb_box(self.cmbQuant, q_dict['quant'])
+            qset_cmb_box(self.cmb_quant, q_dict['quant'])
         else:
             logger.warning("No key 'quant' in dict!")
 
         if 'ovfl' in q_dict:
-            qset_cmb_box(self.cmbOvfl, q_dict['ovfl'])
+            qset_cmb_box(self.cmb_ovfl, q_dict['ovfl'])
         else:
             logger.warning("No key 'ovfl' in dict!")
 
         if 'WI' in q_dict:
             self.WI = safe_eval(q_dict['WI'], self.WI, return_type="int", sign='poszero')
-            self.ledWI.setText(str(self.WI))
+            self.led_wi.setText(str(self.WI))
         else:
             logger.warning("No key 'WI' in dict!")
 
         if 'WF' in q_dict:
             self.WF = safe_eval(q_dict['WF'], self.WF, return_type="int", sign='poszero')
-            self.ledWF.setText(str(self.WF))
+            self.led_wf.setText(str(self.WF))
         else:
             logger.warning("No key 'WF' in dict!")
 

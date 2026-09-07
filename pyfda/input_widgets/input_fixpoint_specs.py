@@ -30,7 +30,7 @@ import pyfda.libs.pyfda_dirs as dirs
 from pyfda.libs.pyfda_lib import pprint_log
 from pyfda.libs.pyfda_qt_lib import (
     qget_cmb_box, qcmb_box_populate, qset_cmb_box, emit)
-from pyfda.fixpoint_widgets.fx_ui_wq import FX_UI_WQ
+from pyfda.fixpoint_widgets.fx_ui_wq import FxWqUI
 from pyfda.pyfda_rc import params
 
 # when deltasigma module is present, add a corresponding entry to the combobox
@@ -135,7 +135,7 @@ class Input_Fixpoint_Specs(QWidget):
                 return
 
             if dict_sig['ui_local_changed']\
-                    not in {'WI', 'WF', 'ovfl', 'quant', 'cmbW', 'but_lock'}:
+                    not in {'WI', 'WF', 'ovfl', 'quant', 'cmb_w', 'but_lock'}:
                 logger.warning("Unknown value '%s' for key 'ui_local_changed'",
                                dict_sig['ui_local_changed'])
                 return
@@ -365,18 +365,18 @@ class Input_Fixpoint_Specs(QWidget):
         #       - pass the quantization dictionary to the constructor
         # -----------------------------------------------------------------
 
-        self.wdg_wq_input = FX_UI_WQ(
+        self.wdg_wq_input = FxWqUI(
             fb_get('fxq', 'QI'), objectName='fx_ui_wq_input',
             label='<b>Input Quantizer <i>Q<sub>I&nbsp;</sub></i>:</b>',
             lock_vis='on', cmb_w_vis='off')
         if HAS_DS:
-            self.wdg_wq_input.cmbQuant.addItem('DSM', userData='dsm')
-            self.wdg_wq_input.cmbQuant.setItemData(
-                self.wdg_wq_input.cmbQuant.count() - 1,
-                self.wdg_wq_input.cmbQuant.tr("Delta-Sigma Modulation"), Qt.ToolTipRole)
+            self.wdg_wq_input.cmb_quant.addItem('DSM', userData='dsm')
+            self.wdg_wq_input.cmb_quant.setItemData(
+                self.wdg_wq_input.cmb_quant.count() - 1,
+                self.wdg_wq_input.cmb_quant.tr("Delta-Sigma Modulation"), Qt.ToolTipRole)
         self.wdg_wq_input.sig_tx.connect(self.sig_rx_local)
 
-        self.wdg_wq_output = FX_UI_WQ(
+        self.wdg_wq_output = FxWqUI(
             fb_get('fxq', 'QO'), objectName='fx_ui_wq_output',
             label='<b>Output Quantizer <i>Q<sub>O&nbsp;</sub></i>:</b>',
             cmb_w_vis='off')

@@ -21,7 +21,7 @@ from pyfda.libs.pyfda_lib import (
     mod_version, set_dict_defaults, first_item, pprint_log, cmp_version)
 from pyfda.libs.pyfda_qt_lib import qget_cmb_box, emit
 
-from pyfda.fixpoint_widgets.fx_ui_wq import FX_UI_WQ
+from pyfda.fixpoint_widgets.fx_ui_wq import FxWqUI
 from .fir_df_amaranth import FIR_DF_amaranth
 
 logger = logging.getLogger(__name__)
@@ -96,10 +96,10 @@ class FIR_DF_amaranth_UI(QWidget):
         # if 'QCB' not in fil[0]['fxq']:
         #     fil[0]['fxq'].update({'QCB': {}})  # no coefficient settings in dict yet
         #     logger.warning("QCB key missing")
-        self.wdg_wq_coeffs = FX_UI_WQ(
+        self.wdg_wq_coeffs = FxWqUI(
             fb_get('fxq', 'QCB'), objectName='fx_ui_wq_fir_df_coeffs_b',
             label='<b>Coeff. Quantization <i>b<sub>I.F&nbsp;</sub></i>:</b>',
-            MSB_LSB_vis='max',
+            msb_lsb_vis='max',
             cmb_ov_items=["<span>Select overflow behaviour.</span>",
                   ("wrap", "Wrap", "Two's complement wrap around"),
                   ("sat", "Sat",
@@ -120,7 +120,7 @@ class FIR_DF_amaranth_UI(QWidget):
         set_dict_defaults(fb_get('fxq', 'QACC'),
             {'WI': 0, 'WF': 31, 'ovfl': 'wrap', 'quant': 'floor', 'w_a_m': 'a',
              'N_over': 0})
-        self.wdg_wq_accu = FX_UI_WQ(
+        self.wdg_wq_accu = FxWqUI(
             fb_get('fxq', 'QACC'), objectName='fx_ui_wq_fir_df_accu',
             cmb_w_vis='on', cmb_w_items=self.cmb_wq_accu_items,
             count_ovfl_vis='auto',
@@ -170,7 +170,7 @@ class FIR_DF_amaranth_UI(QWidget):
 
         Note: If coefficient / accu quantization settings have been changed in the UI,
         the referenced dicts `fb.fil[0]['fxq']['QCB']` and `...['QACC']` have already
-        been updated by the corresponding subwidgets `FX_UI_WQ`
+        been updated by the corresponding subwidgets `FxWqUI`
         """
         logger.debug("sig_rx:\n%s", pprint_log(dict_sig))
         if dict_sig['id'] == id(self):
@@ -186,11 +186,11 @@ class FIR_DF_amaranth_UI(QWidget):
                 return
 
             if dict_sig['sender_name'] == 'fx_ui_wq_fir_df_accu':  # accu format updated
-                cmbW = qget_cmb_box(self.wdg_wq_accu.cmbW)
-                if cmbW in {'f', 'a'}\
+                cmb_w = qget_cmb_box(self.wdg_wq_accu.cmb_w)
+                if cmb_w in {'f', 'a'}\
                         or dict_sig['ui_local_changed'] in {'WF', 'WI'}:
                     self.update_accu_settings()
-                elif cmbW == 'm':  # switched to manual, don't do anything
+                elif cmb_w == 'm':  # switched to manual, don't do anything
                     # self.wdg_wq_accu.dict2ui()?
                     return
 
@@ -210,17 +210,17 @@ class FIR_DF_amaranth_UI(QWidget):
 
         Calculate number of extra integer bits for the accumulator (guard bits)
         depending on the coefficient area (sum of absolute coefficient
-        values) for `cmbW == 'auto'` or depending on the number of coefficients
-        for `cmbW == 'full'`. The latter works for arbitrary coefficients but
+        values) for `cmb_w == 'auto'` or depending on the number of coefficients
+        for `cmb_w == 'full'`. The latter works for arbitrary coefficients but
         requires more bits.
 
         The new values are written to the fixpoint coefficient dict
         `fb.fil[0]['fxq']['QACC']` and the UI is updated.
         """
         # try:
-        if qget_cmb_box(self.wdg_wq_accu.cmbW) == 'f':
+        if qget_cmb_box(self.wdg_wq_accu.cmb_w) == 'f':
             A_coeff = int(np.ceil(np.log2(len(fb_get('ba', 0)))))
-        elif qget_cmb_box(self.wdg_wq_accu.cmbW) == 'a':
+        elif qget_cmb_box(self.wdg_wq_accu.cmb_w) == 'a':
             A_coeff = int(np.ceil(np.log2(np.sum(np.abs(fb_get('ba', 0))))))
         else:
             A_coeff = 0
@@ -229,7 +229,7 @@ class FIR_DF_amaranth_UI(QWidget):
         #     return
 
         # calculate required accumulator word format and update filter dict
-        if qget_cmb_box(self.wdg_wq_accu.cmbW) in {'f', 'a'}:
+        if qget_cmb_box(self.wdg_wq_accu.cmb_w) in {'f', 'a'}:
             fb_set('fxq', 'QACC', 'WF', fb_get('fxq', 'QI', 'WF')\
                 + fb_get('fxq', 'QCB', 'WF'))
             fb_set('fxq', 'QACC', 'WI', fb_get('fxq', 'QI', 'WI')\

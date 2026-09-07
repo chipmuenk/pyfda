@@ -87,11 +87,11 @@ class FilterCoeffsTest(unittest.TestCase):
         # The following triggers recalculation of scale etc.
         self.set_cmb_box(self.ui.cmbQFrmt, 'Integer')
         self.set_cmb_box(self.ui.cmbQOvfl, 'sat')
-        self.set_cmb_box(self.ui.cmbQuant, 'round')
+        self.set_cmb_box(self.ui.cmb_quant, 'round')
 
         self.assertEqual(self.ui.ledScale.text(), "128")
-        self.assertEqual(self.ui.ledWI.text(), "7")
-        self.assertEqual(self.ui.ledWF.text(), "0")
+        self.assertEqual(self.ui.led_wi.text(), "7")
+        self.assertEqual(self.ui.led_wf.text(), "0")
 # ==============================================================================
     def test_defaults(self):
         """Test GUI setting in its default state"""
@@ -141,11 +141,11 @@ class FilterCoeffsTest(unittest.TestCase):
         self.assertEqual(qget_cmb_box(self.ui.cmb_filter_type, data=False), "FIR")
 
         self.assertEqual(self.ui.ledW.text(), "16")
-        self.assertEqual(self.ui.ledWF.text(), "15")
-        self.assertEqual(self.ui.ledWI.text(), "0")
+        self.assertEqual(self.ui.led_wf.text(), "15")
+        self.assertEqual(self.ui.led_wi.text(), "0")
         self.assertEqual(qget_cmb_box(self.ui.cmb_fx_base, data=False).lower(), "dec")
         self.assertEqual(self.get_cmb_box(self.ui.cmbQOvfl), 'wrap')
-        self.assertEqual(self.get_cmb_box(self.ui.cmbQuant), 'floor')
+        self.assertEqual(self.get_cmb_box(self.ui.cmb_quant), 'floor')
         self.assertEqual(self.ui.but_set_zero.text(), "= 0")
 
         self.assertEqual(self.form.tblCoeff.rowCount(), 3)

@@ -23,7 +23,7 @@ from pyfda.libs.pyfda_qt_lib import qstyle_widget, qcmb_box_populate, emit
 from pyfda.libs.pyfda_qt_classes import PushButton
 from pyfda.libs.pyfda_lib import first_item
 import pyfda.libs.pyfda_dirs as dirs
-from pyfda.fixpoint_widgets.fx_ui_wq import FX_UI_WQ
+from pyfda.fixpoint_widgets.fx_ui_wq import FxWqUI
 from pyfda.pyfda_rc import params
 
 logger = logging.getLogger(__name__)
@@ -301,15 +301,15 @@ class Input_Coeffs_UI(QWidget):
         #######################################################################
 
         # -------------------
-        self.wdg_wq_coeffs_b = FX_UI_WQ(
+        self.wdg_wq_coeffs_b = FxWqUI(
             fb_get('fxq', 'QCB'), objectName='fx_ui_wq_coeffs_b',
             label='<b>Coeff. Quantization <i>b<sub>I.F&nbsp;</sub></i>:</b>',
-            MSB_LSB_vis='max')
+            msb_lsb_vis='max')
         # -------------------
-        self.wdg_wq_coeffs_a = FX_UI_WQ(
+        self.wdg_wq_coeffs_a = FxWqUI(
             fb_get('fxq', 'QCA'), objectName='fx_ui_wq_coeffs_a',
             label='<b>Coeff. Quantization <i>a<sub>I.F&nbsp;</sub></i>:</b>',
-            MSB_LSB_vis='max')
+            msb_lsb_vis='max')
 
         #######################################################################
         # ########################  Main UI Layout ############################
