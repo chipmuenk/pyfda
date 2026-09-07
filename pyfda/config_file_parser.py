@@ -123,8 +123,10 @@ class ConfigFileParser():
     conf_settings: ClassVar[dict[str, object]] =\
         {
         'EXCEPTION_LEVEL': 0,  # 0: quiet, 1: print error stack, 2: end pyfda
-        'THEME': 'light',
-        'N_FFT':  8192  # number of FFT points for most widgets except y[n]
+        'N_FFT':  8192,  # number of FFT points for most widgets except y[n]
+        'SCALE_MPL': 1.0,
+        'SCALE_QT': 1.0,
+        'THEME': 'light'  # light, dark
         }
 
 
@@ -282,7 +284,7 @@ class ConfigFileParser():
     def build_widget_tree(self) -> None:
         """
         This is only called once during the start from `pyfdax.py`. QSS and matplotlib
-        settings must have been set _before_ `build_widget_tree()` has been called as
+        settings must have been set _before_ `build_widget_tree()` is called as
         all Qt widgets are instantiated here to ensure they exist and run without error.
         Due to this, a running QApplication is needed for this as well.
 
