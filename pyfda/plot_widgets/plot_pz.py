@@ -20,7 +20,7 @@ import numpy as np
 import scipy.signal as sig
 
 from pyfda.config_file_parser import ConfigFileParser as CFP
-import pyfda.filterbroker as fb
+from pyfda.filterbroker import fb_get
 from pyfda.libs.compat import (
     QWidget, QLabel, QFrame, QDial, QHBoxLayout, pyqtSignal, QComboBox, QLineEdit)
 from pyfda.libs.pyfda_lib import to_html, safe_eval
@@ -114,16 +114,16 @@ class PlotPZ(QWidget):
         self.but_log.setChecked(True)
         self.but_log.setToolTip("<span>Log. scale for overlays.</span>")
 
-        self.diaRad_Hf = QDial(self)
-        self.diaRad_Hf.setRange(2, 10)
-        self.diaRad_Hf.setValue(2)
-        self.diaRad_Hf.setTracking(False)  # produce less events when turning
-        self.diaRad_Hf.setFixedHeight(30)
-        self.diaRad_Hf.setFixedWidth(30)
-        self.diaRad_Hf.setWrapping(False)
-        self.diaRad_Hf.setToolTip("<span>Set max. radius for |H(f)| plot.</span>")
+        self.dia_rad_hf = QDial(self)
+        self.dia_rad_hf.setRange(2, 10)
+        self.dia_rad_hf.setValue(2)
+        self.dia_rad_hf.setTracking(False)  # produce less events when turning
+        self.dia_rad_hf.setFixedHeight(30)
+        self.dia_rad_hf.setFixedWidth(30)
+        self.dia_rad_hf.setWrapping(False)
+        self.dia_rad_hf.setToolTip("<span>Set max. radius for |H(f)| plot.</span>")
 
-        self.lblRad_Hf = QLabel("Radius", self)
+        self.lbl_rad_hf = QLabel("Radius", self)
 
         self.lbl_bottom = QLabel(to_html("Bottom =", frmt='bi'), self)
         self.led_bottom = QLineEdit(self, objectName="led_bottom")
@@ -149,8 +149,8 @@ class PlotPZ(QWidget):
         lay_h_controls.addWidget(self.lbl_overlay)
         lay_h_controls.addWidget(self.cmb_overlay)
         lay_h_controls.addWidget(self.but_log)
-        lay_h_controls.addWidget(self.diaRad_Hf)
-        lay_h_controls.addWidget(self.lblRad_Hf)
+        lay_h_controls.addWidget(self.dia_rad_hf)
+        lay_h_controls.addWidget(self.lbl_rad_hf)
         lay_h_controls.addWidget(self.lbl_top)
         lay_h_controls.addWidget(self.led_top)
         lay_h_controls.addWidget(self.lbl_top_db)
@@ -197,7 +197,7 @@ class PlotPZ(QWidget):
         self.but_log.clicked.connect(self._log_clicked)
         self.led_bottom.editingFinished.connect(self._log_clicked)
         self.led_top.editingFinished.connect(self._log_clicked)
-        self.diaRad_Hf.valueChanged.connect(self.draw)
+        self.dia_rad_hf.valueChanged.connect(self.draw)
         self.but_fir_poles.clicked.connect(self.draw)
 
     # --------------------------------------------------------------------------
@@ -257,7 +257,14 @@ class PlotPZ(QWidget):
 
     # --------------------------------------------------------------------------
     def draw(self):
-        self.but_fir_poles.setVisible(fb.fil[0]['ft'] == 'FIR')
+        """
+        Refresh the pole-zero plot and update the visible overlay controls.
+
+        This method reinitializes the Matplotlib axes when necessary and
+        redraws the pole/zero diagram using the current filter data and
+        selected overlay mode.
+        """
+        self.but_fir_poles.setVisible(fb_get('ft') == 'FIR')
         contour = qget_cmb_box(self.cmb_overlay) in {"contour", "contourf"}
         self.led_bottom.setVisible(contour)
         self.lbl_bottom.setVisible(contour)
@@ -266,8 +273,7 @@ class PlotPZ(QWidget):
         self.lbl_top.setVisible(contour)
         self.lbl_top_db.setVisible(contour and self.but_log.isChecked())
 
-        if True:
-            self.init_axes()
+        self.init_axes()
         self.draw_pz()
 
     # --------------------------------------------------------------------------
@@ -278,13 +284,13 @@ class PlotPZ(QWidget):
         p_marker = params['P_Marker']
         z_marker = params['Z_Marker']
 
-        zpk = fb.fil[0]['zpk']
+        zpk = fb_get('zpk')
 
         self.ax.clear()
 
-        [z, p, k] = self.zplane(
+        _ = self.zplane(
             z=zpk[0], p=zpk[1], k=zpk[2], plt_ax=self.ax,
-            plt_poles=self.but_fir_poles.isChecked() or fb.fil[0]['ft'] == 'IIR',
+            plt_poles=self.but_fir_poles.isChecked() or fb_get('ft') == 'IIR',
             mps=p_marker[0], mpc=p_marker[1], mzs=z_marker[0], mzc=z_marker[1])
 
         self.ax.xaxis.set_minor_locator(AutoMinorLocator())  # enable minor ticks
@@ -296,7 +302,7 @@ class PlotPZ(QWidget):
         overlay = qget_cmb_box(self.cmb_overlay)
         self.but_log.setVisible(overlay != "none")
 
-        self.draw_Hf(r=self.diaRad_Hf.value(), Hf_visible=overlay == "h(f)")
+        self.draw_hf(r=self.dia_rad_hf.value(), h_f_visible=overlay == "h(f)")
 
         self.draw_contours(overlay)
 
@@ -311,7 +317,7 @@ class PlotPZ(QWidget):
 
     # --------------------------------------------------------------------------
     def zplane(self, b=None, a=1, z=None, p=None, k=1,  pn_eps=1e-3, analog=False,
-               plt_ax=None, plt_poles=True, style='equal', anaCircleRad=0, lw=2,
+               plt_ax=None, plt_poles=True, style='equal', ana_circle_rad=0, lw=2,
                mps=10, mzs=10, mpc='r', mzc='b', plabel='Poles', zlabel='Zeros'):
         """
         Plot the poles and zeros in the complex z-plane either from the
@@ -339,7 +345,7 @@ class PlotPZ(QWidget):
 
         analog : boolean (default: False)
             When True, create a P/Z plot suitable for the s-plane, i.e. suppress
-            the unit circle (unless anaCircleRad > 0) and scale the plot for
+            the unit circle (unless ana_circle_rad > 0) and scale the plot for
             a good display of all poles and zeros.
 
         pn_eps : float (default : 1e-2)
@@ -452,9 +458,9 @@ class PlotPZ(QWidget):
         #    ax.spines['top'].set_visible(True)
 
         else:  # s-plane
-            if anaCircleRad > 0:
-                # plot a circle with radius = anaCircleRad
-                uc = patches.Circle((0, 0), radius=anaCircleRad, fill=False,
+            if ana_circle_rad > 0:
+                # plot a circle with radius = ana_circle_rad
+                uc = patches.Circle((0, 0), radius=ana_circle_rad, fill=False,
                                     color='grey', ls='solid', zorder=1)
                 plt_ax.add_patch(uc)
             # plot real and imaginary axis
@@ -493,12 +499,12 @@ class PlotPZ(QWidget):
 #
 # =============================================================================
         xl = plt_ax.get_xlim()
-        Dx = max(abs(xl[1]-xl[0]), 0.05)
+        dx = max(abs(xl[1]-xl[0]), 0.05)
         yl = plt_ax.get_ylim()
-        Dy = max(abs(yl[1]-yl[0]), 0.05)
+        dy = max(abs(yl[1]-yl[0]), 0.05)
 
-        plt_ax.set_xlim((xl[0]-Dx*0.02, max(xl[1]+Dx*0.02, 0)))
-        plt_ax.set_ylim((yl[0]-Dy*0.02, yl[1] + Dy*0.02))
+        plt_ax.set_xlim((xl[0]-dx*0.02, max(xl[1]+dx*0.02, 0)))
+        plt_ax.set_ylim((yl[0]-dy*0.02, yl[1] + dy*0.02))
 
         return z, p, k
 
@@ -520,7 +526,7 @@ class PlotPZ(QWidget):
         ------
         - The method uses the current axis limits to create a grid in the z-plane.
         - The magnitude response is computed using the filter coefficients from
-          `fb.fil[0]['ba']`.
+          `fil[0]['ba']`.
         - A colorbar is added to the plot to represent the magnitude values.
         """
         if overlay not in {"contour", "contourf"}:
@@ -541,16 +547,16 @@ class PlotPZ(QWidget):
         else:
             h_max = self.zmax
             h_min = self.zmin
-        Hmag = h_mag(fb.fil[0]['ba'][0], fb.fil[0]['ba'][1], z, h_max, h_min=h_min,
+        h_mag_values = h_mag(fb_get('ba')[0], fb_get('ba')[1], z, h_max, h_min=h_min,
                      log=self.but_log.isChecked())
 
         if overlay == "contour":
-            self.ax.contour(x, y, Hmag, 20, alpha=0.5, cmap=self.cmap)
+            self.ax.contour(x, y, h_mag_values, 20, alpha=0.5, cmap=self.cmap)
         else:
-            self.ax.contourf(x, y, Hmag, 20, alpha=0.5, cmap=self.cmap)
+            self.ax.contourf(x, y, h_mag_values, 20, alpha=0.5, cmap=self.cmap)
 
         m_cb = cm.ScalarMappable(cmap=self.cmap)    # normalized proxy object that is
-        m_cb.set_array(Hmag)                        # mappable for colorbar (?)
+        m_cb.set_array(h_mag_values)                        # mappable for colorbar (?)
         self.col_bar = self.mplwidget.fig.colorbar(
             m_cb, ax=self.ax, shrink=1.0, aspect=40, pad=0.01, fraction=0.08)
 
@@ -560,7 +566,7 @@ class PlotPZ(QWidget):
         self.ax.set_ylim(yl)  # Fixed: Correctly restore the y-axis limits
 
     # --------------------------------------------------------------------------
-    def draw_Hf(self, r: float = 2, Hf_visible: bool = True) -> None:
+    def draw_hf(self, r: float = 2, h_f_visible: bool = True) -> None:
         """
         Draw the magnitude frequency response around the unit circle.
 
@@ -569,28 +575,28 @@ class PlotPZ(QWidget):
         r : float
             Radius for scaling the frequency response.
 
-        Hf_visible : bool
+        h_f_visible : bool
             Whether to display the frequency response.
         """
-        self.diaRad_Hf.setVisible(Hf_visible)
-        self.lblRad_Hf.setVisible(Hf_visible)
-        if not Hf_visible:
+        self.dia_rad_hf.setVisible(h_f_visible)
+        self.lbl_rad_hf.setVisible(h_f_visible)
+        if not h_f_visible:
             return
 
         # suppress "divide by zero in log10" warnings
         old_settings_seterr = np.seterr()
         np.seterr(divide='ignore')
-        ba = fb.fil[0]['ba']
-        w, H = sig.freqz(ba[0], ba[1], worN=CFP.conf_settings['N_FFT'], whole=True)
-        H = np.abs(H)
+        ba = fb_get('ba')
+        w, h = sig.freqz(ba[0], ba[1], worN=CFP.conf_settings['N_FFT'], whole=True)
+        h = np.abs(h)
         if self.but_log.isChecked():
-            H = np.clip(np.log10(H), -6, None)  # clip to -120 dB
-            H = H - np.max(H)  # shift scale to h_min ... 0
-            H = 1 + (r-1) * (1 + H / abs(np.min(H)))  # scale to 1 ... r
+            h = np.clip(np.log10(h), -6, None)  # clip to -120 dB
+            h = h - np.max(h)  # shift scale to h_min ... 0
+            h = 1 + (r-1) * (1 + h / abs(np.min(h)))  # scale to 1 ... r
         else:
-            H = 1 + (r-1) * H / np.max(H)  # map |H(f)| to a range 1 ... r
-        y = H * np.sin(w)
-        x = H * np.cos(w)
+            h = 1 + (r-1) * h / np.max(h)  # map |H(f)| to a range 1 ... r
+        y = h * np.sin(w)
+        x = h * np.cos(w)
 
         self.ax.plot(x, y, label="|H(f)|")
         uc = patches.Circle((0, 0), radius=r, fill=False,
