@@ -111,15 +111,15 @@ class PlotHf(QWidget):
         self.chk_show_h_im = QCheckBox(self)
         self.chk_show_h_im.setToolTip("Show imaginary part of H(F)")
 
-        layG_show_H = QGridLayout()
-        layG_show_H.addWidget(self.lbl_show_H_abs, 0, 0)
-        layG_show_H.addWidget(self.chk_show_h_abs, 0, 1)
-        layG_show_H.addWidget(self.lbl_show_H_re, 1, 0)
-        layG_show_H.addWidget(self.chk_show_h_re, 1, 1)
-        layG_show_H.addWidget(self.lbl_show_H_im, 2, 0)
-        layG_show_H.addWidget(self.chk_show_h_im, 2, 1)
-        layG_show_H.setContentsMargins(0,0,10,0)
-        layG_show_H.setSpacing(0)
+        lay_g_show_h = QGridLayout()
+        lay_g_show_h.addWidget(self.lbl_show_H_abs, 0, 0)
+        lay_g_show_h.addWidget(self.chk_show_h_abs, 0, 1)
+        lay_g_show_h.addWidget(self.lbl_show_H_re, 1, 0)
+        lay_g_show_h.addWidget(self.chk_show_h_re, 1, 1)
+        lay_g_show_h.addWidget(self.lbl_show_H_im, 2, 0)
+        lay_g_show_h.addWidget(self.chk_show_h_im, 2, 1)
+        lay_g_show_h.setContentsMargins(0,0,10,0)
+        lay_g_show_h.setSpacing(0)
 
         self.lblIn = QLabel(to_html("Unit:", frmt="b"), self)
 
@@ -145,10 +145,10 @@ class PlotHf(QWidget):
             "only affects the display of phase and re / im components.</span>")
 
         self.lblInset = QLabel(to_html("Inset", "bi"), self)
-        self.cmbInset = QComboBox(self, objectName="cmbInset")
-        self.cmbInset.addItems(['off', 'edit', 'fixed'])
-        self.cmbInset.setToolTip("Display/edit second inset plot")
-        self.cmbInset.setCurrentIndex(0)
+        self.cmb_inset = QComboBox(self, objectName="cmb_inset")
+        self.cmb_inset.addItems(['off', 'edit', 'fixed'])
+        self.cmb_inset.setToolTip("Display/edit second inset plot")
+        self.cmb_inset.setCurrentIndex(0)
         self.inset_idx = 0  # store previous index for comparison
 
         self.but_specs = PushButton(self, "Specs")
@@ -169,7 +169,7 @@ class PlotHf(QWidget):
         # This widget encompasses all control subwidgets
         # ----------------------------------------------------------------------
         lay_h_controls = QHBoxLayout()
-        lay_h_controls.addLayout(layG_show_H)
+        lay_h_controls.addLayout(lay_g_show_h)
         lay_h_controls.addWidget(self.lblIn)
         lay_h_controls.addWidget(self.cmb_units_a)
         lay_h_controls.addStretch(1)
@@ -180,7 +180,7 @@ class PlotHf(QWidget):
         lay_h_controls.addWidget(self.but_zerophase)
         lay_h_controls.addStretch(1)
         lay_h_controls.addWidget(self.lblInset)
-        lay_h_controls.addWidget(self.cmbInset)
+        lay_h_controls.addWidget(self.cmb_inset)
         lay_h_controls.addStretch(1)
         lay_h_controls.addWidget(self.but_specs)
         lay_h_controls.addStretch(1)
@@ -223,7 +223,7 @@ class PlotHf(QWidget):
         self.chk_show_h_im.clicked.connect(self.draw)
 
         self.but_zerophase.clicked.connect(self.draw)
-        self.cmbInset.currentIndexChanged.connect(self.draw_inset)
+        self.cmb_inset.currentIndexChanged.connect(self.draw_inset)
 
         self.but_specs.clicked.connect(self.draw)
         self.but_phase.clicked.connect(self.draw)
@@ -496,12 +496,12 @@ class PlotHf(QWidget):
         #        or specs (i.e. where is passband etc.)
 
 # DEBUG
-#            print(self.cmbInset.currentIndex(), self.mplwidget.fig.axes) # list of axes in Figure
+#            print(self.cmb_inset.currentIndex(), self.mplwidget.fig.axes) # list of axes in Figure
 #            for ax in self.mplwidget.fig.axes:
 #                print(ax)
-#                print("cmbInset, inset_idx:",self.cmbInset.currentIndex(), self.inset_idx)
+#                print("cmb_inset, inset_idx:",self.cmb_inset.currentIndex(), self.inset_idx)
 
-        if self.cmbInset.currentIndex() > 0:
+        if self.cmb_inset.currentIndex() > 0:
             if self.inset_idx == 0:
                 # Inset was turned off before, create a new one
                 #  Add an axes at position rect [left, bottom, width, height]:
@@ -528,7 +528,7 @@ class PlotHf(QWidget):
                 if self.chk_show_h_im.isChecked():
                     self.ax_i.plot(self.F, self.h_plt_im, label=r'$\Im\{H(F)\}$')
 
-            if self.cmbInset.currentIndex() == 1: # edit / navigate inset
+            if self.cmb_inset.currentIndex() == 1: # edit / navigate inset
                 self.ax_i.set_navigate(True)
                 self.ax.set_navigate(False)
                 if self.but_specs.isChecked():
@@ -544,7 +544,7 @@ class PlotHf(QWidget):
             except AttributeError:
                 pass
 
-        self.inset_idx = self.cmbInset.currentIndex()  # update index
+        self.inset_idx = self.cmb_inset.currentIndex()  # update index
         self.draw()
 
     # ------------------------------------------------------------------------------
@@ -685,7 +685,7 @@ class PlotHf(QWidget):
         if self.but_zerophase.isChecked():
             self.H_c = self.H_c * np.exp(1j * self.W[0:len(self.F)] * fb_get('N')/2.)
 
-        H_str = r'$H(\mathrm{e}^{\mathrm{j} \Omega})$'
+        h_str = r'$H(\mathrm{e}^{\mathrm{j} \Omega})$'
 
         # ================ Main Plotting Routine =========================
         # ===  clear the axes and (re)draw the plot (if selectable)
@@ -725,7 +725,7 @@ class PlotHf(QWidget):
                     return_type='float', sign='neg')
                 self.led_log_bottom.setText(str(self.log_bottom))
                 a_lim = [self.log_bottom, 2]
-                H_str += ' in dB ' + r'$\rightarrow$'
+                h_str += ' in dB ' + r'$\rightarrow$'
 
             elif self.unit_a == 'V':  #  'lin'
                 a_min = 0
@@ -736,12 +736,12 @@ class PlotHf(QWidget):
 
                 a_min = max(a_min, self.lin_neg_bottom)
                 a_lim = [a_min, (1.05 + a_max)]
-                H_str +=' in V ' + r'$\rightarrow $'
+                h_str +=' in V ' + r'$\rightarrow $'
                 self.ax.axhline(linewidth=1, color='k') # horizontal line at 0
 
             else: # unit is W
                 a_lim = [0, (1.03 + a_max)**2.]
-                H_str += ' in W ' + r'$\rightarrow $'
+                h_str += ' in W ' + r'$\rightarrow $'
 
             # TODO: self.draw_inset() # this gives an infinite recursion
             self.draw_phase(self.ax)
@@ -755,7 +755,7 @@ class PlotHf(QWidget):
             self.ax.set_xlim(f_lim)
             self.ax.set_ylim(a_lim)
             self.ax.set_xlabel(fb_get('plt_f_label'))
-            self.ax.set_ylabel(H_str)
+            self.ax.set_ylabel(h_str)
 
             title_str = ""
             if self.chk_show_h_abs.isChecked():
