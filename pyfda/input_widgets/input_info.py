@@ -20,7 +20,7 @@ import scipy.signal as sig
 
 from pyfda.config_file_parser import ConfigFileParser as CFP
 from pyfda.filterbroker import fb_get
-import pyfda.filter_factory as ff
+from pyfda.filter_factory import get_fil_inst
 from pyfda.filter_tree_builder import FilterTreeBuilder as FTB
 from pyfda.input_widgets.input_info_about import AboutWindow
 from pyfda.libs.compat import (
@@ -278,27 +278,28 @@ class Input_Info(QWidget):
         """
         Display info from filter design file and docstring
         """
-        if hasattr(ff.fil_inst, 'info'):
+        fil_inst = get_fil_inst()
+        if hasattr(fil_inst, 'info'):
             if self.but_rich_text.isChecked():
                 self.txt_filt_info_box.setText(publish_string(
-                    self._clean_doc(ff.fil_inst.info), writer_name='html',
+                    self._clean_doc(fil_inst.info), writer_name='html',
                     settings_overrides={'output_encoding': 'unicode'}))
             else:
-                self.txt_filt_info_box.setText(textwrap.dedent(ff.fil_inst.info))
+                self.txt_filt_info_box.setText(textwrap.dedent(fil_inst.info))
         else:
             self.txt_filt_info_box.setText("")
 
-        if self.but_docstring.isChecked() and hasattr(ff.fil_inst, 'info_doc'):
+        if self.but_docstring.isChecked() and hasattr(fil_inst, 'info_doc'):
             if self.but_rich_text.isChecked():
                 self.txt_filt_info_box.append(
                     '<hr /><b>Python module docstring:</b>\n')
-                for doc in ff.fil_inst.info_doc:
+                for doc in fil_inst.info_doc:
                     self.txt_filt_info_box.append(publish_string(
                      self._clean_doc(doc), writer_name='html',
                      settings_overrides={'output_encoding': 'unicode'}))
             else:
                 self.txt_filt_info_box.append('\nPython module docstring:\n')
-                for doc in ff.fil_inst.info_doc:
+                for doc in fil_inst.info_doc:
                     self.txt_filt_info_box.append(self._clean_doc(doc))
 
         self.txt_filt_info_box.moveCursor(QTextCursor.Start)

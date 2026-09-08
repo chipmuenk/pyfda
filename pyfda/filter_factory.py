@@ -21,8 +21,6 @@ from pyfda.libs.pyfda_lib import debug_exception
 
 logger = logging.getLogger(__name__)
 
-# Class variable for instance of filter class
-fil_inst = None
 
 class FilterFactory():
     """
@@ -258,6 +256,7 @@ _fil_factory = FilterFactory()
 create_fil_inst = _fil_factory.create_fil_inst
 call_fil_method = _fil_factory.call_fil_method
 def get_fil_inst():
+    """ Return the instance of the filter design class created by ``create_fil_inst()``."""
     return _fil_factory.fil_inst
 # Usage:
 # from filter_factory import create_fil_inst, call_fil_method, get_fil_inst
