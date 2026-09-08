@@ -100,28 +100,28 @@ class PlotHf(QWidget):
         """
         Define and construct the subwidgets
         """
-        self.lbl_show_H_abs = QLabel(to_html('| H |', frmt='b'))
+        self.lbl_show_h_abs = QLabel(to_html('| H |', frmt='b'))
         self.chk_show_h_abs = QCheckBox(self)
         self.chk_show_h_abs.setChecked(True)
         self.chk_show_h_abs.setToolTip("Show magnitude of H(F)")
-        self.lbl_show_H_re = QLabel(to_html('re{H}&nbsp;', frmt='b'))
+        self.lbl_show_h_re = QLabel(to_html('re{H}&nbsp;', frmt='b'))
         self.chk_show_h_re = QCheckBox(self)
         self.chk_show_h_re.setToolTip("Show real part of H(F)")
-        self.lbl_show_H_im = QLabel(to_html('im{H}', frmt='b'))
+        self.lbl_show_h_im = QLabel(to_html('im{H}', frmt='b'))
         self.chk_show_h_im = QCheckBox(self)
         self.chk_show_h_im.setToolTip("Show imaginary part of H(F)")
 
         lay_g_show_h = QGridLayout()
-        lay_g_show_h.addWidget(self.lbl_show_H_abs, 0, 0)
+        lay_g_show_h.addWidget(self.lbl_show_h_abs, 0, 0)
         lay_g_show_h.addWidget(self.chk_show_h_abs, 0, 1)
-        lay_g_show_h.addWidget(self.lbl_show_H_re, 1, 0)
+        lay_g_show_h.addWidget(self.lbl_show_h_re, 1, 0)
         lay_g_show_h.addWidget(self.chk_show_h_re, 1, 1)
-        lay_g_show_h.addWidget(self.lbl_show_H_im, 2, 0)
+        lay_g_show_h.addWidget(self.lbl_show_h_im, 2, 0)
         lay_g_show_h.addWidget(self.chk_show_h_im, 2, 1)
         lay_g_show_h.setContentsMargins(0,0,10,0)
         lay_g_show_h.setSpacing(0)
 
-        self.lblIn = QLabel(to_html("Unit:", frmt="b"), self)
+        self.lbl_in = QLabel(to_html("Unit:", frmt="b"), self)
 
         self.cmb_units_a = QComboBox(self, objectName="cmb_units_a")
         qcmb_box_populate(self.cmb_units_a, self.cmb_units_a_items,
@@ -144,7 +144,7 @@ class PlotHf(QWidget):
             "Only available for FIR filters and for unit 'V', it "
             "only affects the display of phase and re / im components.</span>")
 
-        self.lblInset = QLabel(to_html("Inset", "bi"), self)
+        self.lbl_inset = QLabel(to_html("Inset", "bi"), self)
         self.cmb_inset = QComboBox(self, objectName="cmb_inset")
         self.cmb_inset.addItems(['off', 'edit', 'fixed'])
         self.cmb_inset.setToolTip("Display/edit second inset plot")
@@ -170,7 +170,7 @@ class PlotHf(QWidget):
         # ----------------------------------------------------------------------
         lay_h_controls = QHBoxLayout()
         lay_h_controls.addLayout(lay_g_show_h)
-        lay_h_controls.addWidget(self.lblIn)
+        lay_h_controls.addWidget(self.lbl_in)
         lay_h_controls.addWidget(self.cmb_units_a)
         lay_h_controls.addStretch(1)
         lay_h_controls.addWidget(self.lbl_log_bottom)
@@ -179,7 +179,7 @@ class PlotHf(QWidget):
         lay_h_controls.addStretch(1)
         lay_h_controls.addWidget(self.but_zerophase)
         lay_h_controls.addStretch(1)
-        lay_h_controls.addWidget(self.lblInset)
+        lay_h_controls.addWidget(self.lbl_inset)
         lay_h_controls.addWidget(self.cmb_inset)
         lay_h_controls.addStretch(1)
         lay_h_controls.addWidget(self.but_specs)
@@ -590,7 +590,7 @@ class PlotHf(QWidget):
         (Re-)Calculate the complex frequency response H_cmplx(W) (complex)
         for W = 0 ... 2 pi:
         """
-        self.W, self.H_cmplx = sig.freqz(
+        self.W, self.h_cmplx = sig.freqz(
             fb_get('ba', 0), fb_get('ba', 1),
             worN=CFP.conf_settings['N_FFT'], whole=True, fs=2*np.pi)
 
@@ -656,7 +656,7 @@ class PlotHf(QWidget):
         self.f_max = fb_get('f_max')
 
         self.f_pb = fb_get('f_pb') * self.f_max
-        self.f_maxB = fb_get('f_sb') * self.f_max
+        # self.f_max_b = fb_get('f_sb') * self.f_max
 
         self.a_pb  = fb_get('a_pb')
         self.a_pb2 = fb_get('a_pb2')
@@ -671,15 +671,15 @@ class PlotHf(QWidget):
 
         if fb_get('freq_specs_range_type') == 'sym':
             # shift H and F by f_S/2
-            self.H_c = np.fft.fftshift(self.H_cmplx)
+            self.H_c = np.fft.fftshift(self.h_cmplx)
             self.F -= self.f_max/2.
         elif fb_get('freq_specs_range_type') == 'half':
             # only use the first half of H and F
-            self.H_c = self.H_cmplx[0:CFP.conf_settings['N_FFT']//2]
+            self.H_c = self.h_cmplx[0:CFP.conf_settings['N_FFT']//2]
             self.F = self.F[0:CFP.conf_settings['N_FFT']//2]
         else:  # fb_get('freq_specs_range_type') == 'whole'
             # use H and F as calculated
-            self.H_c = self.H_cmplx
+            self.H_c = self.h_cmplx
 
         # remove linear phase if button is checked
         if self.but_zerophase.isChecked():

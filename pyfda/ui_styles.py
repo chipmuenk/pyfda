@@ -14,8 +14,8 @@ Default parameters, paths etc. are defined in the params dict.
 
 Some parameters are specified as symbolic strings, e.g. |FONT_SIZE_BASE|, which are replaced
 by the actual values in `pyfda_rc.py`.
-
 """
+# pylint: disable=too-few-public-methods
 from cycler import cycler
 from pyfda.libs.pyfda_lib import replace_mult
 
@@ -449,10 +449,9 @@ QSS_TAB_BAR_OVLP = """
     }
     """
 
-# provide a default value for testing
-
-QSS_RC = '\n/* Light QSS Mode */\n' + QSS_COMMON + QSS_TAB_BAR + QSS_LIGHT
-QSS_RC = replace_mult(QSS_RC, {
+# provide a default value for module testing
+qss_rc = '\n/* Light QSS Mode */\n' + QSS_COMMON + QSS_TAB_BAR + QSS_LIGHT
+QSS_RC = replace_mult(qss_rc, {
     "|FONT_SIZE_BASE|": "12",
     "|FONT_SIZE_MEDIUM|": "13",
     "|FONT_SIZE_LARGE|": "14",
