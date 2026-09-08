@@ -322,7 +322,6 @@ def replace_mult(source: str|dict, repl_dict: dict) -> str|dict:
             for old_str, new_val in repl_dict.items():
                 if v == old_str:
                     source[k] = new_val
-        logger.warning(source)
         return source
 
     logger.warning("replace_mult(): Unsupported type '%s' of %s for replacement.",
