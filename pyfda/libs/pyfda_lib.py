@@ -284,31 +284,50 @@ def clean_ascii(arg):
 
     return arg
 
-
 # ------------------------------------------------------------------------------
-def qstr(text):
+def replace_mult(source: str|dict, repl_dict: dict) -> str|dict:
     """
-    Convert text (QVariant, QString, string) or numeric object to plain string.
+    Replace all occurrences of the keys of `repl_dict` with their corresponding values
+    in the string `string`.
 
-    In Python 3, python Qt objects are automatically converted to QVariant
-    when stored as "data" (itemData) e.g. in a QComboBox and converted back when
-    retrieving to QString.
-    In Python 2, QVariant is returned when itemData is retrieved.
-    This is first converted from the QVariant container format to a
-    QString, next to a "normal" non-unicode string.
-
-    Parameters
-    ----------
-
-    text: QVariant, QString, string or numeric data type that can be converted
-      to string
-
-    Returns
-    -------
-
-    The current `text` data as a unicode (utf8) string
+    e.g.
+    repl_dict = {
+        'is': 'was',
+        'does': 'did',
+    '!': '?'
+    }
     """
-    return str(text)  # this should be sufficient for Python 3 ?!
+    # match every string to be replaced
+    if isinstance(source, str):
+        finder = re.compile("|".join(re.escape(k) for k in repl_dict.keys()))
+        result = []
+        pos = 0
+        while True:
+            match = finder.search(source, pos)
+            if match:
+                # cut off the part up until match
+                result.append(source[pos : match.start()])
+                # cut off the matched part and replace it in place
+                result.append(repl_dict[source[match.start() : match.end()]])
+                pos = match.end()
+            else:
+                # the rest after the last match
+                result.append(source[pos:])
+                break
+        return "".join(result)
+
+    if isinstance(source, dict):
+        # Replace words only in string items of the dict
+        for k, v in source.items():
+            for old_str, new_val in repl_dict.items():
+                if v == old_str:
+                    source[k] = new_val
+        logger.warning(source)
+        return source
+
+    logger.warning("replace_mult(): Unsupported type '%s' of %s for replacement.",
+                    type(source).__name__, source)
+    return source
 
 ###############################################################################
 # General functions ###########################################################
