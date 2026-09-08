@@ -112,7 +112,15 @@ def main():
 
     os.environ["QT_ENABLE_HIGHDPI_SCALING"]   = "1"
 
+    # Get all available system styles:
+    #   from PyQt5.QtWidgets import QStyleFactory
+    #   print(QStyleFactory.keys())
 
+    # General:          fusion
+    # MS Windows only:  windowsxp, windowsvista
+    # Mac only:         macintosh
+
+    # QApplication.setStyle(QStyleFactory.create('Cleanlooks')) re-create default styles
     # Instantiate QApplication object, passing command line arguments
     app = QApplication(sys.argv)
     app.setStyle('Fusion')  # set a platform independent base style
