@@ -133,7 +133,7 @@ class QSS():
     This class groups the dark/light theme settings, widget style sheets, and
     Matplotlib runtime configuration used by pyFDA.
     """
-    FONT_SIZE_QT = 12 * CFP.conf_settings['SCALE_QT']  # base size for Qt fonts
+    FONT_SIZE_QT = 12 * CFP.conf_settings['SCALE_UI']  # base size for Qt fonts
     FONT_SIZE_BASE = str(FONT_SIZE_QT) + "pt"  # base font size of widgets in pt
     FONT_SIZE_MEDIUM = str(FONT_SIZE_QT * 1.1) + "pt"
     FONT_SIZE_LARGE = str(FONT_SIZE_QT * 1.2) + "pt"
@@ -620,7 +620,7 @@ class QSS():
         Collate QSS string from common settings, special settings for the tab bar and a
         color scheme that depends on the theme selected in `pyfda.conf`.
         """
-        FONT_SIZE_QT = 12 * CFP.conf_settings['SCALE_QT']  # base size for Qt fonts
+        FONT_SIZE_QT = 12 * CFP.conf_settings['SCALE_UI']  # base size for Qt fonts
         FONT_SIZE_BASE = str(FONT_SIZE_QT) + "pt"  # base font size of widgets in pt
         FONT_SIZE_MEDIUM = str(FONT_SIZE_QT * 1.1) + "pt"
         FONT_SIZE_LARGE = str(FONT_SIZE_QT * 1.2) + "pt"

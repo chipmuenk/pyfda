@@ -125,7 +125,7 @@ class ConfigFileParser():
         'EXCEPTION_LEVEL': 0,  # 0: quiet, 1: print error stack, 2: end pyfda
         'N_FFT':  8192,  # number of FFT points for most widgets except y[n]
         'SCALE_MPL': 1.0,
-        'SCALE_QT': 1.0,
+        'SCALE_UI': 1.0,
         'THEME': 'light'  # light, dark
         }
 
