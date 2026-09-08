@@ -598,4 +598,5 @@ variables.ignored-argument-names = "_.*|^ignored_|^unused_"
 # builtins.
 variables.redefining-builtins-modules = [ "six.moves", "past.builtins", "future.builtins", "builtins", "io" ]
 
-
+[tool.pylint.main]
+load-plugins = ["pylint_qt"]
