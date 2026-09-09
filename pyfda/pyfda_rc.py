@@ -72,35 +72,6 @@ class QSS():
     Matplotlib runtime configuration used by pyfda.
     """
 
-    # common matplotlib widget settings
-    mpl_rc : ClassVar[dict[str, dict[str, Any]]] =\
-        { 'lines.linewidth'           : 1.5,
-          'lines.markersize'          : '|MPL_MS|',         # markersize, in points
-          'font.family'               : 'sans-serif',  # 'serif',
-          'font.style'                : 'normal',
-          'mathtext.fontset'          : 'stixsans',  # 'stix',
-          'mathtext.default'          : 'it',
-          'mathtext.fallback'         : 'cm',
-          'font.size'                 : '|FONT_SIZE_MPL|',
-          'legend.fontsize'           : 'medium',
-          'axes.labelsize'            : 'medium',
-          'axes.titlesize'            : 'large',
-          'axes.linewidth'            : 1,  # linewidth for coordinate system
-          # grid settings are partially overwritten in mpl_widget.py
-          'axes.formatter.use_mathtext': True,  # use mathtext for scientific notation.
-          'grid.linestyle'            : ':',
-          'grid.linewidth'            : 0.5,    # in points
-          # 'grid.color'               : b0b0b0, # grid color, set in dark / light styles
-          'grid.alpha'                : 0.5,    # transparency, between 0.0 and 1.0
-
-          'xtick.direction'           : 'in',
-          'ytick.direction'           : 'in',
-          'figure.figsize'            : (5, 4),
-          'figure.dpi'                : 100,
-          'hatch.color'               : '#808080',
-          'hatch.linewidth'           : 0.5
-        }
-
     # provide a default value for module level testing
     QSS_RC = ui_styles.QSS_RC
 
@@ -112,20 +83,22 @@ class QSS():
         Collate QSS string from common settings, special settings for the tab bar and a
         color scheme that depends on the theme selected in `pyfda.conf`.
         """
-        FONT_SIZE_QT = 12 * CFP.conf_settings['SCALE_UI']  # base size for Qt fonts
-        FONT_SIZE_BASE = str(FONT_SIZE_QT) + "pt"  # base font size of widgets in pt
-        FONT_SIZE_MEDIUM = str(FONT_SIZE_QT * 1.1) + "pt"
-        FONT_SIZE_LARGE = str(FONT_SIZE_QT * 1.2) + "pt"
-        FONT_SIZE_XLARGE = str(FONT_SIZE_QT * 1.4) + "pt"
+        _font_size_qt = CFP.conf_settings['FONT_SIZE_QT']  # base size for Qt fonts
+        _font_size_base = str(_font_size_qt) + "pt"  # base font size of widgets in pt
+        _font_size_medium = str(_font_size_qt * 1.1) + "pt"
+        _font_size_large = str(_font_size_qt * 1.2) + "pt"
+        _font_size_xlarge = str(_font_size_qt * 1.4) + "pt"
 
-        QSS.FONT_SIZE_MPL = FONT_SIZE_QT * CFP.conf_settings['SCALE_MPL']
+        QSS.FONT_SIZE_MPL = _font_size_qt * CFP.conf_settings['SCALE_MPL']
+
+        QSS.mpl_rc = ui_styles.MPL_RC.copy()  # common settings for matplotlib widgets
 
         # dictionary for replacing placeholders in the QSS string with actual values
         replace_dict = {
-            '|FONT_SIZE_BASE|': FONT_SIZE_BASE,
-            '|FONT_SIZE_MEDIUM|': FONT_SIZE_MEDIUM,
-            '|FONT_SIZE_LARGE|': FONT_SIZE_LARGE,
-            '|FONT_SIZE_XLARGE|': FONT_SIZE_XLARGE,
+            '|FONT_SIZE_BASE|': _font_size_base,
+            '|FONT_SIZE_MEDIUM|': _font_size_medium,
+            '|FONT_SIZE_LARGE|': _font_size_large,
+            '|FONT_SIZE_XLARGE|': _font_size_xlarge,
             '|FONT_SIZE_MPL|': QSS.FONT_SIZE_MPL,
             '|MPL_MS|': MPL_MS
         }

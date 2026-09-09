@@ -124,8 +124,8 @@ class ConfigFileParser():
         {
         'EXCEPTION_LEVEL': 0,  # 0: quiet, 1: print error stack, 2: end pyfda
         'N_FFT':  8192,  # number of FFT points for most widgets except y[n]
-        'SCALE_MPL': 1.0,
-        'SCALE_UI': 1.0,
+        'FONT_SIZE_QT': 12.0,  # Font size for Qt widgets in pt
+        'SCALE_MPL': 1.0,  # Scale for ont size for matplotlib widgets w.r.t. Qt widgets
         'THEME': 'light'  # light, dark
         }
 
