@@ -463,21 +463,50 @@ QSS_RC = replace_mult(
 # Matplotlib layout settings
 # #############################################################################
 
+# common settings for matplotlib widgets
+MPL_RC = {
+    'lines.linewidth'           : 1.5,
+    'lines.markersize'          : '|MPL_MS|',         # markersize, in points
+    'font.family'               : 'sans-serif',  # 'serif',
+    'font.style'                : 'normal',
+    'mathtext.fontset'          : 'stixsans',  # 'stix',
+    'mathtext.default'          : 'it',
+    'mathtext.fallback'         : 'cm',
+    'font.size'                 : '|FONT_SIZE_MPL|',
+    'legend.fontsize'           : 'medium',
+    'axes.labelsize'            : 'medium',
+    'axes.titlesize'            : 'large',
+    'axes.linewidth'            : 1,  # linewidth for coordinate system
+    # grid settings are partially overwritten in mpl_widget.py
+    'axes.formatter.use_mathtext': True,  # use mathtext for scientific notation.
+    'grid.linestyle'            : ':',
+    'grid.linewidth'            : 0.5,    # in points
+    # 'grid.color'               : b0b0b0, # grid color, set in dark / light styles
+    'grid.alpha'                : 0.5,    # transparency, between 0.0 and 1.0
+
+    'xtick.direction'           : 'in',
+    'ytick.direction'           : 'in',
+    'figure.figsize'            : (5, 4),
+    'figure.dpi'                : 100,
+    'hatch.color'               : '#808080',
+    'hatch.linewidth'           : 0.5
+}
+
 # dark theme for matplotlib widgets
 MPL_RC_DARK = {
-        'axes.facecolor'    : 'black',
-        'axes.labelcolor'   : 'white',
-        'axes.edgecolor'    : 'white',
-        'figure.facecolor'  : '#303030',
-        'figure.edgecolor'  : '#808080',
-        'savefig.facecolor' : 'black',
-        'savefig.edgecolor' : 'black',
-        'xtick.color'       : 'white',
-        'ytick.color'       : 'white',
-        'text.color'        : 'white',
-        'grid.color'        : '#CCCCCC',
-        'axes.prop_cycle'   : cycler('color', ['r', 'g', 'c', 'm', 'y', 'w'])
-        }
+    'axes.facecolor'    : 'black',
+    'axes.labelcolor'   : 'white',
+    'axes.edgecolor'    : 'white',
+    'figure.facecolor'  : '#303030',
+    'figure.edgecolor'  : '#808080',
+    'savefig.facecolor' : 'black',
+    'savefig.edgecolor' : 'black',
+    'xtick.color'       : 'white',
+    'ytick.color'       : 'white',
+    'text.color'        : 'white',
+    'grid.color'        : '#CCCCCC',
+    'axes.prop_cycle'   : cycler('color', ['r', 'g', 'c', 'm', 'y', 'w'])
+    }
 # light theme for matplotlib widgets
 MPL_RC_LIGHT = {
     'axes.facecolor'    : 'white',
@@ -495,34 +524,34 @@ MPL_RC_LIGHT = {
     }
 
 MPL_PARAMS_LIGHT = {
-            'mpl_hatch': {                         # hatched area for specs
-                         'facecolor': 'none',
-                         'hatch': '/',
-                         'edgecolor': '#808080',   # same as figure.edgecolor
-                         'lw': 0.0},               # no border around hatched area
+    'mpl_hatch': {                         # hatched area for specs
+                    'facecolor': 'none',
+                    'hatch': '/',
+                    'edgecolor': '#808080',   # same as figure.edgecolor
+                    'lw': 0.0},               # no border around hatched area
 
-            'mpl_stimuli': {                       # style for stimulus signals
-                          'mfc': 'k', 'mec': 'k',  # marker face + edge color
-                          'ms': '|MPL_MS|',        # marker size
-                          'alpha': 0.25,           # transparency (marker + stem)
-                          'markerfmt': '*',        # marker symbol
-                          'lw': '2'}               # stem linewidth
-                    }
+    'mpl_stimuli': {                       # style for stimulus signals
+                    'mfc': 'k', 'mec': 'k',  # marker face + edge color
+                    'ms': '|MPL_MS|',        # marker size
+                    'alpha': 0.25,           # transparency (marker + stem)
+                    'markerfmt': '*',        # marker symbol
+                    'lw': '2'}               # stem linewidth
+            }
 
 MPL_PARAMS_DARK = {
-            'mpl_hatch': {                         # hatched area for specs
-                         'facecolor': 'none',
-                         'hatch': '/',
-                         'edgecolor': '#808080',   # same as figure.edgecolor
-                         'lw': 0.0},               # no border around hatched area
+    'mpl_hatch': {                         # hatched area for specs
+                    'facecolor': 'none',
+                    'hatch': '/',
+                    'edgecolor': '#808080',   # same as figure.edgecolor
+                    'lw': 0.0},               # no border around hatched area
 
-            'mpl_stimuli': {                       # style for stimulus signals
-                          'mfc': 'w', 'mec': 'w',  # marker face + edge color
-                          'ms': '|MPL_MS|',        # marker size
-                          'alpha': 0.25,           # transparency (marker + stem)
-                          'markerfmt': '*',        # marker symbol
-                          'lw': '2'}               # stem linewidth
-                    }
+    'mpl_stimuli': {                       # style for stimulus signals
+                    'mfc': 'w', 'mec': 'w',  # marker face + edge color
+                    'ms': '|MPL_MS|',        # marker size
+                    'alpha': 0.25,           # transparency (marker + stem)
+                    'markerfmt': '*',        # marker symbol
+                    'lw': '2'}               # stem linewidth
+            }
 
 # fill_params = {'facecolor':'none','hatch':'/', 'edgecolor':rcParams['figure.edgecolor'],
 # 'lw':0.0}
