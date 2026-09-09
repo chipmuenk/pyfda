@@ -30,12 +30,12 @@ from pyfda.libs.compat import (
     QHBoxLayout, QInputDialog, FigureCanvas, NavigationToolbar, QtWidgets, QEvent)
 from pyfda.libs.pyfda_qt_lib import emit
 from pyfda.libs.pyfda_qt_classes import EventTypes
-from pyfda import pyfda_rc
+from pyfda.pyfda_rc import QSS, params
 
 logger = logging.getLogger(__name__)
 
 # read user settings for linewidth, font size etc. and apply them to matplotlib
-for key, value in pyfda_rc.QSS.mpl_rc.items():
+for key, value in QSS.mpl_rc.items():
     rcParams[key] = value
 
 # ------------------------------------------------------------------------------
@@ -134,7 +134,7 @@ class MplWidget(QWidget):
         self.plt_lim = []  # define variable for x,y plot limits
 
         self.fig = Figure(constrained_layout=True,
-                          dpi=pyfda_rc.params['screen']['ldpi'])
+                          dpi=params['screen']['ldpi'])
 
         self.canvas = FigureCanvas(self.fig)
         self.canvas.setSizePolicy(QSizePolicy.Expanding,

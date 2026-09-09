@@ -21,7 +21,7 @@ from pyfda.libs.compat import (
 # load the icons resource file:
 from pyfda import qrc_resources  # noqa: F401  # pylint: disable=unused-import
 from pyfda.libs.pyfda_qt_lib import qwindow_stay_on_top
-from pyfda.libs.pyfda_lib import mod_version, CRLF
+from pyfda.libs.pyfda_text_lib import mod_version, CRLF
 import pyfda.libs.pyfda_dirs as dirs
 from pyfda.pyfda_rc import params
 

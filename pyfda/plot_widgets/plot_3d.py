@@ -24,7 +24,8 @@ from pyfda.config_file_parser import ConfigFileParser as CFP
 from pyfda.filterbroker import fb_get
 from pyfda.libs.compat import (
     QWidget, QComboBox, QLabel, QLineEdit, QDial, QGridLayout, QFrame, pyqtSignal)
-from pyfda.libs.pyfda_lib import mod_version, safe_eval, to_html
+from pyfda.libs.pyfda_num_lib import safe_eval
+from pyfda.libs.pyfda_text_lib import to_html
 from pyfda.libs.special_functions import h_mag
 from pyfda.libs.pyfda_qt_lib import qget_cmb_box
 from pyfda.libs.pyfda_qt_classes import PushButton
@@ -34,13 +35,6 @@ from pyfda.pyfda_rc import params
 logger = logging.getLogger(__name__)
 
 classes = {'Plot_3D': '3D'}  #: Dict containing class name : display name
-
-# if mod_version('vispy'):
-#     from vispy import plot  # (?)
-#     HAS_VISPY = True
-# else:
-#     HAS_VISPY = False
-
 
 class Plot_3D(QWidget):
     """

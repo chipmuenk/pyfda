@@ -19,7 +19,8 @@ import scipy
 
 # import pyfda.filterbroker as fb
 from pyfda.libs.pyfda_qt_lib import qcmb_box_populate, qset_cmb_box, qget_cmb_box, emit
-from pyfda.libs.pyfda_lib import to_html, safe_eval, pprint_log
+from pyfda.libs.pyfda_num_lib import safe_eval
+from pyfda.libs.pyfda_text_lib import to_html, pprint_log
 from pyfda.libs.pyfda_fft_windows_lib import all_wins_dict_ref
 from pyfda.pyfda_rc import params
 from .compat import (

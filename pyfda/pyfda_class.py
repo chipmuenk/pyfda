@@ -23,7 +23,7 @@ from pyfda.config_file_parser import ConfigFileParser as CFP
 from pyfda.libs.compat import (Qt, QtGui, QtCore, QMainWindow, QApplication, QSplitter,
                      QMessageBox, QPlainTextEdit, QMenu, pyqtSignal)
 import pyfda.libs.pyfda_dirs as dirs # initial import constructs file paths
-from pyfda.libs.pyfda_lib import to_html
+from pyfda.libs.pyfda_text_lib import to_html
 from pyfda.tabbed_widget import TabbedWidget
 
 logger = logging.getLogger(__name__)

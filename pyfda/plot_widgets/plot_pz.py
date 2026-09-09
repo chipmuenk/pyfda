@@ -23,7 +23,8 @@ from pyfda.config_file_parser import ConfigFileParser as CFP
 from pyfda.filterbroker import fb_get
 from pyfda.libs.compat import (
     QWidget, QLabel, QFrame, QDial, QHBoxLayout, pyqtSignal, QComboBox, QLineEdit)
-from pyfda.libs.pyfda_lib import to_html, safe_eval
+from pyfda.libs.pyfda_num_lib import safe_eval
+from pyfda.libs.pyfda_text_lib import to_html
 from pyfda.libs.special_functions import h_mag, unique_roots
 from pyfda.libs.pyfda_qt_lib import qcmb_box_populate, qget_cmb_box, qtext_width
 from pyfda.libs.pyfda_qt_classes import PushButton

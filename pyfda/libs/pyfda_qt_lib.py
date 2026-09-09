@@ -11,10 +11,11 @@ Library with various helper functions for Qt widgets
 """
 import logging
 
-from .pyfda_lib import pprint_log
+from pyfda.libs.pyfda_text_lib import pprint_log
 
-from .compat import Qt, QtGui, QMessageBox, QComboBox, QDialog, QtWidgets, QFont, QFontMetrics
-from .pyfda_dirs import OS, OS_VER
+from pyfda.libs.compat import (
+    Qt, QtGui, QMessageBox, QComboBox, QDialog, QtWidgets, QFont, QFontMetrics)
+from pyfda.libs.pyfda_dirs import OS, OS_VER
 
 logger = logging.getLogger(__name__)
 

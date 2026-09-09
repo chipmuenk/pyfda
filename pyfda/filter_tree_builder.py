@@ -442,7 +442,7 @@ if __name__ == "__main__":
     #  "QWidget: Must construct a QApplication before a QWidget"
     # when instantiating filters with dynamic widgets (equiripple, firwin)
     from pyfda.libs.compat import QApplication
-    from pyfda.libs.pyfda_lib import pprint_log
+    from pyfda.libs.pyfda_text_lib import pprint_log
     app = QApplication(sys.argv)
     logging.basicConfig(level=logging.INFO)
 

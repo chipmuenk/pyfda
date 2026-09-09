@@ -17,7 +17,8 @@ import pyfda.libs.pyfda_fix_lib as fx
 from pyfda.libs.compat import (
     Qt, QWidget, QLabel, QLineEdit, QComboBox, QIcon,
     QVBoxLayout, QHBoxLayout, QGridLayout, QFrame, pyqtSignal)
-from pyfda.libs.pyfda_lib import safe_eval, to_html
+from pyfda.libs.pyfda_num_lib import safe_eval
+from pyfda.libs.pyfda_text_lib import to_html
 from pyfda.libs.pyfda_qt_lib import (
     qcmb_box_populate, qget_cmb_box, qset_cmb_box, qstyle_widget, emit)
 from pyfda.libs.pyfda_qt_classes import PushButton

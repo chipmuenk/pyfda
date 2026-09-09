@@ -16,7 +16,7 @@ import numpy as np
 
 from pyfda.filterbroker import fb_get, fb_set
 from pyfda.filterbroker import set_fx
-from pyfda.libs.pyfda_lib import pprint_log, first_item
+from pyfda.libs.pyfda_text_lib import pprint_log, first_item
 from pyfda.libs.pyfda_qt_lib import qget_cmb_box, emit
 from pyfda.libs.compat import QWidget, QVBoxLayout, pyqtSignal
 

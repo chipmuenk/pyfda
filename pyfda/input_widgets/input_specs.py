@@ -31,7 +31,8 @@ from pyfda.libs.compat import (
     QVBoxLayout, QHBoxLayout, QSizePolicy)
 
 import pyfda.libs.pyfda_dirs as dirs
-from pyfda.libs.pyfda_lib import to_html, first_item, iter2ndarray, compare_dictionaries
+from pyfda.libs.pyfda_text_lib import to_html, first_item, compare_dictionaries
+from pyfda.libs.pyfda_num_lib import iter2ndarray
 from pyfda.libs.pyfda_qt_lib import (
     popup_warning, qstyle_widget, qcmb_box_populate, qget_cmb_box, emit)
 from pyfda.libs.pyfda_io_lib import select_file
@@ -44,12 +45,12 @@ logger = logging.getLogger(__name__)
 # filter files and test for the version when loading filter files.
 FILTER_FILE_VERSION = '2'
 
-classes = {'Input_Specs': 'Specs'}  #: Dict containing class name : display name
+classes = {'InputSpecs': 'Specs'}  #: Dict containing class name : display name
 # This is read by `tree_builder._build_widget_class_dicts()` into the dict
 #  `filterbroker.INPUT_CLASSES_DICT` and used to create the widgets in input_tab_widgets.
 
 # TODO: a lot of methods from other classes are called here, this is very intransparent
-class Input_Specs(QWidget):
+class InputSpecs(QWidget):
     """
     Build widget for entering all filter specs
     """
@@ -947,7 +948,7 @@ if __name__ == '__main__':
 
     app = QApplication(sys.argv)
     app.setStyleSheet(QSS.QSS_RC)
-    mainw = Input_Specs()
+    mainw = InputSpecs()
     app.setActiveWindow(mainw)
     mainw.show()
     sys.exit(app.exec_())

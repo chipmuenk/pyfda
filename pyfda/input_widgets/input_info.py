@@ -27,7 +27,8 @@ from pyfda.libs.compat import (
     QtGui, QWidget, QFont, QFrame, QLabel, QTableWidget, QTableWidgetItem,
     QTextBrowser, QTextCursor, QLineEdit, QVBoxLayout, QHBoxLayout, QGridLayout,
     QSplitter, Qt, pyqtSignal)
-from pyfda.libs.pyfda_lib import mod_version, to_html, safe_eval
+from pyfda.libs.pyfda_num_lib import safe_eval
+from pyfda.libs.pyfda_text_lib import to_html, mod_version
 from pyfda.libs.special_functions import lin2unit
 from pyfda.libs.pyfda_qt_lib import emit
 from pyfda.libs.pyfda_qt_classes import PushButton

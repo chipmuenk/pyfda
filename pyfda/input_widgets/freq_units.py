@@ -16,7 +16,8 @@ from pyfda.filterbroker import fb_get, fb_set
 from pyfda.libs.compat import (
     QtCore, QWidget, QLabel, QLineEdit, QComboBox, QFrame, QFont, QSizePolicy,
     QIcon, QVBoxLayout, QHBoxLayout, QGridLayout, pyqtSignal, QEvent)
-from pyfda.libs.pyfda_lib import to_html, safe_eval, first_item
+from pyfda.libs.pyfda_num_lib import safe_eval
+from pyfda.libs.pyfda_text_lib import to_html, first_item
 from pyfda.libs.pyfda_qt_lib import qget_cmb_box, qset_cmb_box, qcmb_box_populate, emit
 from pyfda.libs.pyfda_qt_classes import PushButton
 from pyfda.pyfda_rc import params  # FMT string for QLineEdit fields, e.g. '{:.3g}'

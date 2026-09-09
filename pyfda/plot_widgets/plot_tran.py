@@ -24,7 +24,8 @@ from pyfda.config_file_parser import ConfigFileParser as CFP
 from pyfda.filterbroker import get_fx, set_fx, fb_get, fb_set
 import pyfda.libs.pyfda_fix_lib as fx
 from pyfda.libs.pyfda_sig_lib import angle_zero, calc_ssb_spectrum
-from pyfda.libs.pyfda_lib import safe_eval, first_item
+from pyfda.libs.pyfda_num_lib import safe_eval
+from pyfda.libs.pyfda_text_lib import first_item
 from pyfda.libs.pyfda_qt_lib import (
     emit, qget_cmb_box, qset_cmb_box, qstyle_widget, qcmb_box_add_item,
     qcmb_box_del_item)

@@ -16,8 +16,8 @@ from pyfda.libs.compat import (
     Qt, QtCore, QWidget, QComboBox, QLineEdit, QLabel, QApplication,
     pyqtSignal, QEvent, QHBoxLayout, QVBoxLayout, QGridLayout)
 
-from pyfda.libs.pyfda_lib import to_html, safe_eval, pprint_log
-import pyfda.filterbroker as fb
+from pyfda.libs.pyfda_num_lib import safe_eval
+from pyfda.libs.pyfda_text_lib import to_html, pprint_log
 from pyfda.filterbroker import fb_get
 from pyfda.libs.pyfda_qt_lib import (
     qcmb_box_populate, qget_cmb_box, qtext_width, qstyle_widget, emit)
@@ -785,7 +785,7 @@ class PlotTranStimUI(QWidget):
         self.t_scale = fb_get('T_S')
 
         # logger.warning("f_S = %s, prev = %s\nf_scale = %s, f_1 = %s, f_corr = %s",
-        #               fb.fil[0]['f_S'], fb.fil[0]['f_s_prev'], self.f_scale, self.f1, f_corr)
+        #               fb_get('f_S'), fb_get('f_s_prev'), self.f_scale, self.f1, f_corr)
 
         # Update and round the display
         # The dict contains entries like    'led_f1': ('f1', 'f_scale'),
@@ -808,7 +808,7 @@ class PlotTranStimUI(QWidget):
         self.update_freq_units()
 
         # emit a signal if normalized frequencies have changed due to an update of f_S
-        if fb.fil[0]['freq_locked']:
+        if fb_get('freq_locked'):
             self.emit({'ui_local_changed': 'f1_f2'})
 
     # -------------------------------------------------------------

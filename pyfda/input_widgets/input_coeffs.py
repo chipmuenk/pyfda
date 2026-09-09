@@ -21,7 +21,8 @@ from pyfda.libs.compat import (
     Qt, QWidget, QApplication, QTableWidget, QTableWidgetItem, QVBoxLayout, pyqtSignal,
     QColor, QBrush)
 import pyfda.libs.pyfda_dirs as dirs
-from pyfda.libs.pyfda_lib import safe_eval, pprint_log
+from pyfda.libs.pyfda_num_lib import safe_eval
+from pyfda.libs.pyfda_text_lib import pprint_log
 from pyfda.libs.pyfda_qt_lib import (
     emit, qstyle_widget, qset_cmb_box, qget_cmb_box, qget_selected)
 from pyfda.libs.pyfda_io_lib import qtable2csv, export_fil_data, select_file, file2array
@@ -662,7 +663,7 @@ class Input_Coeffs(QWidget):
         if __name__ == '__main__':
             self.load_dict()  # only needed for stand-alone test
 
-        # Change filter type to "Manual" and update UI in Input_Specs() ...
+        # Change filter type to "Manual" and update UI in InputSpecs() ...
         self.emit({'filt_changed': 'input_coeffs'})
         # ... and update filter data and widgets
         self.emit({'data_changed': 'filter_designed'})

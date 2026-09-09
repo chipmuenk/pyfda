@@ -23,7 +23,7 @@ import numpy as np
 from pyfda.filterbroker import fb_get, fb_set
 from pyfda.libs.compat import QWidget, QLabel, QLineEdit, pyqtSignal, QVBoxLayout, QHBoxLayout
 from pyfda.libs.pyfda_qt_lib import popup_warning, emit
-from pyfda.libs.pyfda_lib import safe_eval
+from pyfda.libs.pyfda_num_lib import safe_eval
 from pyfda.libs.pyfda_sig_lib import fil_save, zeros_with_val
 
 logger = logging.getLogger(__name__)

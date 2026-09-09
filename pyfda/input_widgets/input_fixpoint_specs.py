@@ -27,7 +27,7 @@ from pyfda.filterbroker import get_fx, fb_get, fb_set
 from pyfda.config_file_parser import ConfigFileParser as CFP
 
 import pyfda.libs.pyfda_dirs as dirs
-from pyfda.libs.pyfda_lib import pprint_log
+from pyfda.libs.pyfda_text_lib import pprint_log
 from pyfda.libs.pyfda_qt_lib import (
     qget_cmb_box, qcmb_box_populate, qset_cmb_box, emit)
 from pyfda.fixpoint_widgets.fx_wq_ui import FxWqUI

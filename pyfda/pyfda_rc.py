@@ -18,11 +18,10 @@ by the actual values in `pyfda_rc.py`.
 
 # pylint: disable=too-few-public-methods
 import logging
-from typing import Any, ClassVar
 
 import matplotlib.font_manager
 
-from pyfda.libs.pyfda_lib import CRLF, replace_mult
+from pyfda.libs.pyfda_text_lib import CRLF, replace_mult
 from pyfda.config_file_parser import ConfigFileParser as CFP
 # Register resources like icons, this also gets rid of "unused import" warnings
 # during module test
@@ -41,7 +40,7 @@ params = {
     'FMT': '{:.3g}',  # format string for QLineEdit fields
     'CSV': {  # format options and parameters for CSV-files and clipboard
             'delimiter': 'auto',  # default delimiter
-            'lineterminator': CRLF,  # OS-dependent line break from pyfda_lib
+            'lineterminator': CRLF,  # OS-dependent line break from pyfda_text_lib
             'orientation': 'auto',  # 'auto', 'vert', 'horiz'# table orientation
             'header': 'auto',  # 'auto', 'on', 'off'
             # 'cmsis' : False,  # True, False
@@ -63,7 +62,6 @@ params = {
     'link_color': 'blue'  # link color in HTML text
           }
 
-
 class QSS():
     """
     Container for the application's Qt and Matplotlib style definitions.
@@ -72,11 +70,13 @@ class QSS():
     Matplotlib runtime configuration used by pyfda.
     """
 
-    # provide a default value for module level testing
+    # provide default values for module level testing
     QSS_RC = ui_styles.QSS_RC
+    mpl_rc = ui_styles.MPL_RC.copy()  # common settings for matplotlib widgets
 
     def __init__(self):
-        pass
+        print("QSS: importing QSS class")
+        QSS.set_qss(self)
 
     def set_qss(self):
         """
@@ -90,7 +90,6 @@ class QSS():
         _font_size_xlarge = str(_font_size_qt * 1.4) + "pt"
 
         QSS.FONT_SIZE_MPL = _font_size_qt * CFP.conf_settings['SCALE_MPL']
-
         QSS.mpl_rc = ui_styles.MPL_RC.copy()  # common settings for matplotlib widgets
 
         # dictionary for replacing placeholders in the QSS string with actual values

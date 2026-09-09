@@ -16,7 +16,7 @@ import sys
 from pyfda.libs.compat import (
     QTabWidget, QWidget, QVBoxLayout, QScrollArea, pyqtSignal, QEvent, QtCore,
     QSizePolicy)
-from pyfda.libs.pyfda_lib import pprint_log
+from pyfda.libs.pyfda_text_lib import pprint_log
 from pyfda.libs.pyfda_qt_lib import emit
 from pyfda.pyfda_rc import params
 

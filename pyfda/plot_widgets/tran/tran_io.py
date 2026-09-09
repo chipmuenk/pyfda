@@ -18,8 +18,8 @@ from pyfda.libs.compat import QWidget, pyqtSignal, QVBoxLayout, QDialog, QPushBu
 import pyfda.libs.pyfda_io_lib as io
 from pyfda.filterbroker import fb_get, fb_set
 import pyfda.libs.pyfda_dirs as dirs
-
-from pyfda.libs.pyfda_lib import safe_eval, pprint_log
+from pyfda.libs.pyfda_num_lib import safe_eval
+from pyfda.libs.pyfda_text_lib import pprint_log
 from pyfda.libs.pyfda_qt_lib import (
     emit, qstyle_widget, qget_cmb_box, qset_cmb_box, qwindow_stay_on_top)
 from pyfda.libs.csv_option_box import CSVOptionBox

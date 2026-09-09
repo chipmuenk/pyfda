@@ -16,7 +16,7 @@ import logging
 from pyfda.libs.compat import (
     QWidget, QComboBox, QLabel, QPushButton, QLineEdit, QFrame,
     QHBoxLayout, QVBoxLayout, QGridLayout, QIcon, QSizePolicy)
-from pyfda.libs.pyfda_lib import to_html
+from pyfda.libs.pyfda_text_lib import to_html
 from pyfda.libs.pyfda_qt_lib import (
     qget_cmb_box, qcmb_box_populate,
     qcmb_box_add_items, qcmb_box_del_item, qtext_width)

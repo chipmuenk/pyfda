@@ -24,8 +24,9 @@ from pyfda.libs.compat import (
     QSizePolicy, QHeaderView)
 from pyfda.libs.fft_windows_cmb_box import QFFTWinCmbBox
 import pyfda.libs.pyfda_dirs as dirs
-from pyfda.libs.pyfda_lib import safe_eval, to_html, pprint_log
 from pyfda.libs.pyfda_qt_lib import qwindow_stay_on_top, qtext_width, emit
+from pyfda.libs.pyfda_num_lib import safe_eval
+from pyfda.libs.pyfda_text_lib import to_html, pprint_log
 from pyfda.libs.pyfda_qt_classes import QVLine, QHLine, PushButton, PushButtonRT
 from pyfda.plot_widgets.mpl_widget import MplWidget
 

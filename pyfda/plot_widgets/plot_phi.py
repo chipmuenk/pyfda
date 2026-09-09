@@ -19,7 +19,7 @@ from pyfda.filterbroker import fb_get, fb_set
 from pyfda.libs.compat import (
     QWidget, QComboBox, QHBoxLayout, QFrame, pyqtSignal)
 from pyfda.plot_widgets.mpl_widget import MplWidget
-from pyfda.libs.pyfda_lib import pprint_log
+from pyfda.libs.pyfda_text_lib import pprint_log
 from pyfda.libs.pyfda_qt_lib import qget_cmb_box, emit
 from pyfda.libs.pyfda_qt_classes import PushButton
 from pyfda.pyfda_rc import params

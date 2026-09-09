@@ -16,7 +16,7 @@ from typing import Any
 from pyfda.libs.compat import (
     QtCore, QLineEdit, QBrush, QColor, QSize, QStyledItemDelegate, Qt)
 from pyfda.libs.pyfda_qt_lib import qstyle_widget
-from pyfda.libs.pyfda_lib import frmt2cmplx
+from pyfda.libs.pyfda_num_lib import frmt2cmplx
 from pyfda.pyfda_rc import params
 
 from PyQt5.QtCore import QModelIndex, QLocale

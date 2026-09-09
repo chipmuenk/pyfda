@@ -82,7 +82,7 @@ class ConfigFileParser():
         }
     INPUT_CLASSES_DICT: ClassVar[dict[str, dict[str, str]]] =\
         {
-        'Input_Specs': {'name': 'Specs', 'mod': 'pyfda.input_widgets.input_specs'},
+        'InputSpecs': {'name': 'Specs', 'mod': 'pyfda.input_widgets.input_specs'},
         'Input_Coeffs': {'name': 'b,a', 'mod': 'pyfda.input_widgets.input_coeffs'},
         'InputPZ': {'name': 'P/Z', 'mod': 'pyfda.input_widgets.input_pz'},
         'Input_Info': {'name': 'Info', 'mod': 'pyfda.input_widgets.input_info'},
@@ -604,7 +604,7 @@ if __name__ == "__main__":
     # The test information is taken from the dicts in filterbroker.py
     #
     logging.basicConfig(level=logging.INFO)
-    from pyfda.libs.pyfda_lib import pprint_log
+    from pyfda.libs.pyfda_text_lib import pprint_log
 
     cfp = ConfigFileParser()
     cfp.parse_conf_file()

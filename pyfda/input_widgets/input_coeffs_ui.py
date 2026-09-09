@@ -18,10 +18,10 @@ from pyfda.libs.compat import (
     pyqtSignal, Qt, QWidget, QLabel, QLineEdit, QComboBox, QPushButton, QFrame,
     QSpinBox, QFont, QIcon, QVBoxLayout, QHBoxLayout, QSizePolicy)
 from pyfda.libs.csv_option_box import CSVOptionBox
-from pyfda.libs.pyfda_lib import to_html
+from pyfda.libs.pyfda_text_lib import to_html
 from pyfda.libs.pyfda_qt_lib import qstyle_widget, qcmb_box_populate, emit
 from pyfda.libs.pyfda_qt_classes import PushButton
-from pyfda.libs.pyfda_lib import first_item
+from pyfda.libs.pyfda_text_lib import first_item
 import pyfda.libs.pyfda_dirs as dirs
 from pyfda.fixpoint_widgets.fx_wq_ui import FxWqUI
 from pyfda.pyfda_rc import params

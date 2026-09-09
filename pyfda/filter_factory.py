@@ -17,7 +17,7 @@ An instance of a filter design class (e.g. "Cheby1") is created with:
 import importlib
 import logging
 from pyfda.config_file_parser import ConfigFileParser as CFP
-from pyfda.libs.pyfda_lib import debug_exception
+from pyfda.libs.pyfda_num_lib import debug_exception
 
 logger = logging.getLogger(__name__)
 

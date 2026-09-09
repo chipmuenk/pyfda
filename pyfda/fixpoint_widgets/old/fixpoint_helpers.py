@@ -20,8 +20,8 @@ from pyfda.libs.compat import (
     QVBoxLayout, QHBoxLayout, QGridLayout, QFrame, pyqtSignal)
 
 from pyfda.libs.pyfda_qt_lib import qcmb_box_populate, qget_cmb_box, qset_cmb_box
-# from pyfda.pyfda_rc import params
-from pyfda.libs.pyfda_lib import safe_eval, to_html
+from pyfda.libs.pyfda_num_lib import safe_eval
+from pyfda.libs.pyfda_text_lib import to_html
 
 import logging
 logger = logging.getLogger(__name__)

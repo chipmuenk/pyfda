@@ -27,7 +27,7 @@ except ImportError:
     DS = False
 
 from pyfda.filterbroker import get_fx, fb_get, fb_set
-from pyfda.libs.pyfda_lib import is_numeric
+from pyfda.libs.pyfda_num_lib import is_numeric
 
 logger = logging.getLogger(__name__)
 

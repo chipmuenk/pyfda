@@ -16,7 +16,7 @@ import os
 import matplotlib
 
 from pyfda.libs.compat import Qt, QApplication, QIcon
-# from pyfda.libs.pyfda_lib import ANSIcolors as ACol
+# from pyfda.libs.pyfda_text_lib import ANSIcolors as ACol
 import pyfda.libs.pyfda_dirs as dirs # initial import constructs file paths
 from pyfda.filter_tree_builder import FilterTreeBuilder
 from pyfda.config_file_parser import ConfigFileParser as CFP

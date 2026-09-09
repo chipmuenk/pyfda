@@ -13,7 +13,7 @@ import logging
 
 from pyfda.libs.pyfda_qt_lib import (qget_cmb_box, qset_cmb_box, qcmb_box_populate,
                            qwindow_stay_on_top, emit)
-from pyfda.libs.pyfda_lib import to_html
+from pyfda.libs.pyfda_text_lib import to_html
 from pyfda.pyfda_rc import params
 from pyfda.libs.compat import (QLabel, QComboBox, QDialog, QPushButton,
                      QVBoxLayout, QGridLayout, pyqtSignal)

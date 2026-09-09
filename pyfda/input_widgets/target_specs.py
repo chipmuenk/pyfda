@@ -17,7 +17,7 @@ from pyfda.filterbroker import fb_get
 from pyfda.filter_tree_builder import FilterTreeBuilder as FTB
 from pyfda.libs.compat import (
     QWidget, QLabel, QFont, QFrame, pyqtSignal, Qt, QHBoxLayout, QVBoxLayout)
-from pyfda.libs.pyfda_lib import first_item
+from pyfda.libs.pyfda_text_lib import first_item
 from pyfda.libs.pyfda_qt_lib import emit
 from pyfda.input_widgets import amplitude_specs, freq_specs
 from pyfda.pyfda_rc import params

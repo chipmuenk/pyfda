@@ -23,7 +23,8 @@ from pyfda.libs.pyfda_qt_lib import qget_cmb_box, qstyle_widget, emit
 from pyfda.libs.pyfda_io_lib import qtable2csv, file2array, export_fil_data, select_file
 from pyfda.libs.pyfda_sig_lib import zeros_with_val, zpk2array, normalize_zpk_gain, fil_save
 import pyfda.libs.pyfda_dirs as dirs
-from pyfda.libs.pyfda_lib import safe_eval, frmt2cmplx, pprint_log
+from pyfda.libs.pyfda_num_lib import safe_eval, frmt2cmplx
+from pyfda.libs.pyfda_text_lib import pprint_log
 from pyfda.pyfda_rc import params
 
 from pyfda.input_widgets.input_pz_ui import Input_PZ_UI
@@ -391,7 +392,7 @@ class InputPZ(QWidget):
         if __name__ == '__main__':
             self.dict2ui()  # only needed for stand-alone test
 
-        # Change filter type to "Manual" and update UI in Input_Specs() ...
+        # Change filter type to "Manual" and update UI in InputSpecs() ...
         self.emit({'filt_changed': 'input_coeffs'})
         # ... and update filter data and widgets
         self.emit({'data_changed': 'filter_designed'})
