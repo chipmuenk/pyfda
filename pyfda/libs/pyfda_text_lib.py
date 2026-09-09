@@ -10,6 +10,8 @@
 Library with various functions to handle text / strings / dicts, 
 e.g. for logging, HTML formatting, ANSI colors etc.
 """
+# pylint: disable=too-few-public-methods
+
 import logging
 import os
 import re
@@ -24,7 +26,6 @@ import markdown
 from mplcursors import __version__ as V_CUR
 from scipy import __version__ as V_SCI
 
-from pyfda.config_file_parser import ConfigFileParser as CFP
 from pyfda.libs.frozendict import FrozenDict
 import pyfda.libs.pyfda_dirs as dirs
 
@@ -544,3 +545,8 @@ def to_html(text: str, frmt: str = None) -> str:
             html = re.sub(r'_(\w+)', r'<sub>\1</sub>', html)
 
     return html
+
+# ------------------------------------------------------------------------------
+if __name__ == '__main__':
+    # ==============================================================================
+    logger.info(mod_version())

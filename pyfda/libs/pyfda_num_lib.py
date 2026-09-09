@@ -13,18 +13,10 @@ import logging
 import re
 import traceback
 
-from docutils import __version__ as V_DOC
-from matplotlib import __version__ as V_MPL
 import numpy as np
 import numexpr
-import markdown
-from mplcursors import __version__ as V_CUR
-from scipy import __version__ as V_SCI
 
 from pyfda.config_file_parser import ConfigFileParser as CFP
-
-from .compat import QT_VERSION_STR as V_QT
-from .compat import PYQT_VERSION_STR as V_PYQT
 
 logger = logging.getLogger(__name__)
 
@@ -568,4 +560,4 @@ def format_ticks(ax, xy: str, scale: float = 1., format: str = "%.1f") -> None:
 # ------------------------------------------------------------------------------
 if __name__ == '__main__':
     # ==============================================================================
-    logger.info(mod_version())
+    pass

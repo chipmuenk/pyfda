@@ -9,6 +9,7 @@
 """
 User plotting widget
 """
+# pylint: disable=too-few-public-methods
 import logging
 
 from pyfda.libs.compat import QWidget, pyqtSignal

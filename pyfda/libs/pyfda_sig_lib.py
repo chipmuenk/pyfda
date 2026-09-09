@@ -15,7 +15,7 @@ import numpy as np
 from numpy import pi
 import scipy.signal as sig
 
-from pyfda.libs import pyfda_lib
+from pyfda.libs.pyfda_num_lib import iter2ndarray
 from pyfda.filterbroker import fb_get, fb_set
 
 logger = logging.getLogger(__name__)
@@ -284,7 +284,7 @@ def zpk2array(zpk: list) -> np.ndarray  | str:
             return err
     else:
         return f"'zpk' has an unsuitable type '{type(zpk)}'"
-    return pyfda_lib.iter2ndarray(zpk)
+    return iter2ndarray(zpk)
 
 # ------------------- -----------------------------------------------------------
 def angle_zero(X: np.ndarray, n_eps: float = 1e3, wrapped: bool = True) -> np.ndarray:
@@ -765,7 +765,7 @@ def group_delay(b: np.ndarray, a: np.ndarray = 1, nfft: int = 512, whole: bool =
     Examples
     --------
     >>> b = [1,2,3] # Coefficients of H(z) = 1 + 2 z^2 + 3 z^3
-    >>> tau_g, td = pyfda_lib.grpdelay(b)
+    >>> tau_g, td = pyfda_sig_lib.grpdelay(b)
 """
 
     if not whole:
