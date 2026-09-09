@@ -15,6 +15,8 @@ Default parameters, paths etc. are defined in the params dict.
 Some parameters are specified as symbolic strings, e.g. |FONT_SIZE_BASE|, which are replaced
 by the actual values in `pyfda_rc.py`.
 """
+
+# pylint: disable=too-few-public-methods
 import logging
 from typing import Any, ClassVar
 
@@ -26,7 +28,7 @@ from pyfda.config_file_parser import ConfigFileParser as CFP
 # during module test
 from pyfda import qrc_resources  # noqa: F401 # pylint: disable=unused-import
 
-import pyfda.ui_styles as ui_styles
+from pyfda import ui_styles
 
 logger = logging.getLogger(__name__)
 
@@ -69,15 +71,8 @@ class QSS():
     This class groups the dark/light theme settings, widget style sheets, and
     Matplotlib runtime configuration used by pyFDA.
     """
-    FONT_SIZE_QT = 12 * CFP.conf_settings['SCALE_UI']  # base size for Qt fonts
-    FONT_SIZE_BASE = str(FONT_SIZE_QT) + "pt"  # base font size of widgets in pt
-    FONT_SIZE_MEDIUM = str(FONT_SIZE_QT * 1.1) + "pt"
-    FONT_SIZE_LARGE = str(FONT_SIZE_QT * 1.2) + "pt"
-    FONT_SIZE_XLARGE = str(FONT_SIZE_QT * 1.4) + "pt"
 
-    FONT_SIZE_MPL = FONT_SIZE_QT * CFP.conf_settings['SCALE_MPL']
-    logger.error("FONT_SIZE_MPL = %d, SCALE_MPL = %f", FONT_SIZE_MPL, CFP.conf_settings['SCALE_MPL'])
-# common matplotlib widget settings
+    # common matplotlib widget settings
     mpl_rc : ClassVar[dict[str, dict[str, Any]]] =\
         { 'lines.linewidth'           : 1.5,
           'lines.markersize'          : '|MPL_MS|',         # markersize, in points
@@ -123,7 +118,7 @@ class QSS():
         FONT_SIZE_LARGE = str(FONT_SIZE_QT * 1.2) + "pt"
         FONT_SIZE_XLARGE = str(FONT_SIZE_QT * 1.4) + "pt"
 
-        FONT_SIZE_MPL = FONT_SIZE_QT * CFP.conf_settings['SCALE_MPL']
+        QSS.FONT_SIZE_MPL = FONT_SIZE_QT * CFP.conf_settings['SCALE_MPL']
 
         # dictionary for replacing placeholders in the QSS string with actual values
         replace_dict = {
@@ -131,7 +126,7 @@ class QSS():
             '|FONT_SIZE_MEDIUM|': FONT_SIZE_MEDIUM,
             '|FONT_SIZE_LARGE|': FONT_SIZE_LARGE,
             '|FONT_SIZE_XLARGE|': FONT_SIZE_XLARGE,
-            '|FONT_SIZE_MPL|': FONT_SIZE_MPL,
+            '|FONT_SIZE_MPL|': QSS.FONT_SIZE_MPL,
             '|MPL_MS|': MPL_MS
         }
 
@@ -197,6 +192,6 @@ class QSS():
 #------------------------------------------------------------------------------
 
 if __name__ == '__main__':
-    # Run this module standalone with 'python -m pyfda.pyfda_rc' to test the QSS and MPL_RC settings
+    # Run this module standalone with 'python -m pyfda.pyfda_rc'
 
     QSS().set_qss()

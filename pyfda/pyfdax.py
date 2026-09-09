@@ -161,11 +161,8 @@ def main():
     # font.setPointSize(yourPointSize)
     # fm = QFontMetrics(font)
     # try to find a good value for matplotlib font size depending on screen resolution
-
-    # fontsize = int(round(10 * scaling * CFP.conf_settings['SCALE_MPL']))  # for matplotlib (not used yet)
     # logical dpi is set in mpl_widget for all matplotlib figure canvasses
 
-    # rc.mpl_rc['font.size'] = fontsize
     rc.params['screen'] = {
         'ref_dpi': ref_dpi, 'ldpi': ldpi, 'pdpi': pdpi, 'scaling': scaling,
         'height': height, 'width': width}

@@ -450,13 +450,14 @@ QSS_TAB_BAR_OVLP = """
     """
 
 # provide a default value for module testing
-qss_rc = '\n/* Light QSS Mode */\n' + QSS_COMMON + QSS_TAB_BAR + QSS_LIGHT
-QSS_RC = replace_mult(qss_rc, {
+QSS_RC = replace_mult(
+    '\n/* Light QSS Mode */\n' + QSS_COMMON + QSS_TAB_BAR + QSS_LIGHT,
+    {
     "|FONT_SIZE_BASE|": "12",
     "|FONT_SIZE_MEDIUM|": "13",
     "|FONT_SIZE_LARGE|": "14",
     "|FONT_SIZE_XLARGE|": "15"
-})
+    })
 
 # #############################################################################
 # Matplotlib layout settings
@@ -525,4 +526,3 @@ MPL_PARAMS_DARK = {
 
 # fill_params = {'facecolor':'none','hatch':'/', 'edgecolor':rcParams['figure.edgecolor'],
 # 'lw':0.0}
-
