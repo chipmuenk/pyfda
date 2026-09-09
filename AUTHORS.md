@@ -1,6 +1,6 @@
 ### Authors
 
-[pyFDA][home] is written and maintained by Christian Muenker,
+[pyfda][home] is written and maintained by Christian Muenker,
 along with the contributors on [github](https://github.com/chipmuenk/pyfda) .
 
 #### Special thanks:
@@ -11,7 +11,7 @@ along with the contributors on [github](https://github.com/chipmuenk/pyfda) .
 - [@sriyash25](https://github.com/sriyash25) for his contributions on fixpoint filters during the GSoC 2018
 
 
-Icons (except the pyFDA icon) are taken from the "Open Iconic" Icons collection 
+Icons (except the pyfda icon) are taken from the "Open Iconic" Icons collection 
 at  [https://useiconic.com/open/](https://useiconic.com/open/) under MIT license.
 
 [home]: README_PYPI.md

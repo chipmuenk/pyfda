@@ -10,12 +10,12 @@ toc=listof, english, parskip=half]{scrartcl} % doppelseitiger Druck
 %\includeonly{2010-DSP_FPGA-Ueb_Kap_1_2}
 %
 \hypersetup{
-pdftitle={pyFDA: Software Architecture and Filter API},
+pdftitle={pyfda: Software Architecture and Filter API},
                    pdfauthor={Christian Muenker},
-                   pdfsubject={pyFDA},
-                   pdfkeywords={pyFDA, filter design, python}
+                   pdfsubject={pyfda},
+                   pdfkeywords={pyfda, filter design, python}
                    }
-\def\CodePath{../pyFDA}
+\def\CodePath{../pyfda}
 \def\pyFirstLine{1}
 %
 %
@@ -26,18 +26,18 @@ pdftitle={pyFDA: Software Architecture and Filter API},
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \author{Prof. Dr. Christian M�nker}
-\title{pyFDA: Software Architecture and Filter API}
+\title{pyfda: Software Architecture and Filter API}
 \date{\today}
 %\maketitle
 \begin{titlepage}
 \begin{center}
-\begin{Huge}pyFDA: Software Architecture and Filter API\end{Huge}
+\begin{Huge}pyfda: Software Architecture and Filter API\end{Huge}
 \\[1cm]
 \LARGE Christian M\"unker
 \vfill
 \includegraphics[width=13cm]{pyFDA_screenshot_3}
 
-\footnotesize{pyFDA screenshot}
+\footnotesize{pyfda screenshot}
 \vfill
 \Large \today \\[1cm]
 \href{mailto:Christian.Muenker@hm.edu}{Christian.Muenker@hm.edu}
@@ -67,7 +67,7 @@ pdftitle={pyFDA: Software Architecture and Filter API},
 \setcounter{topnumber}{3} % max. Anzahl von Gleitobjekten im oberen Teil der Seite
 
 \section{Overview}
-pyFDA has been written to be extensible and modular, easing the addition of own filter and analysis modules. 
+pyfda has been written to be extensible and modular, easing the addition of own filter and analysis modules. 
 
 This has (hopefully) been achieved with three central concepts:
 \begin{description}
@@ -78,7 +78,7 @@ This has (hopefully) been achieved with three central concepts:
 \subsection{Class Structure and Hierarchy}
 The following graphics have been created from the top directory using \textbt{pyreverse} and some post-processing with LibreOffice (and they are only readable when zoomed in):
 
-\texttt{pyreverse -o pdf -k --ignore=simpleeval.py,input\_target\_spec.py -p pyFDA .}
+\texttt{pyreverse -o pdf -k --ignore=simpleeval.py,input\_target\_spec.py -p pyfda .}
 
 where 
 \texttt{-k} only shows the class names (not the attributes and methods)
@@ -87,14 +87,14 @@ where
 
 \begin{figure}[ht]
 \centering
-\includegraphics[width = \textwidth]{packages_pyFDA}
-\caption{Packages in pyFDA}
+\includegraphics[width = \textwidth]{packages_pyfda}
+\caption{Packages in pyfda}
 \end{figure}
 
 \begin{figure}[ht]
 \centering
-\includegraphics[width = \textwidth]{classes_pyFDA}
-\caption{Class hierarchy in pyFDA (composition diagram)}
+\includegraphics[width = \textwidth]{classes_pyfda}
+\caption{Class hierarchy in pyfda (composition diagram)}
 \end{figure}
 
 
@@ -161,8 +161,8 @@ When a filter design has been changed, this information is propagated through th
 
 \begin{figure}[ht]
 \centering
-\includegraphics[width = \textwidth]{pyFDA_signals}
-\caption{Signaling across hierarchies in pyFDA}
+\includegraphics[width = \textwidth]{pyfda_signals}
+\caption{Signaling across hierarchies in pyfda}
 \end{figure}
 
 
@@ -184,17 +184,17 @@ where \textbt{sigSpecsChanged} signifies that specifications have been changed (
 
 \begin{figure}[ht]
 \centering
-\includegraphics[width = \textwidth]{pyFDA_signals_input_widgets}
+\includegraphics[width = \textwidth]{pyfda_signals_input_widgets}
 \caption{Signaling between input widgets (component: input\_widgets.py)}
 \end{figure}
 
 \section{Filter Design Objects}
 The structure of a filter file and the attributes and methods that need to be provided are described in this section.
 
-When starting pyFDA, \texttt{filter\_tree\_builder.py} is run, extracting the relevant information from all *.py files found in the subdirectory filter\_design and building a hierachical tree in \texttt{filter\_broker.py}. 
+When starting pyfda, \texttt{filter\_tree\_builder.py} is run, extracting the relevant information from all *.py files found in the subdirectory filter\_design and building a hierachical tree in \texttt{filter\_broker.py}. 
 
 
-When adding new filter objects \texttt{my\_filter.py} to an pyFDA installation, two things need to be kept in mind:
+When adding new filter objects \texttt{my\_filter.py} to an pyfda installation, two things need to be kept in mind:
 
 \begin{itemize}
 \item copying it to the \texttt{filter\_widgets} directory

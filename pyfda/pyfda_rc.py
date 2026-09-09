@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 #
-# This file is part of the pyFDA project hosted at https://github.com/chipmuenk/pyfda
+# This file is part of the pyfda project hosted at https://github.com/chipmuenk/pyfda
 #
-# Copyright © pyFDA Project Contributors
+# Copyright © pyfda Project Contributors
 # Licensed under the terms of the MIT License
 # (see file LICENSE in root directory for details)
 
@@ -69,7 +69,7 @@ class QSS():
     Container for the application's Qt and Matplotlib style definitions.
 
     This class groups the dark/light theme settings, widget style sheets, and
-    Matplotlib runtime configuration used by pyFDA.
+    Matplotlib runtime configuration used by pyfda.
     """
 
     # common matplotlib widget settings

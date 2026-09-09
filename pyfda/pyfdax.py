@@ -1,13 +1,13 @@
 # -*- coding: utf-8 -*-
 #
-# This file is part of the pyFDA project hosted at https://github.com/chipmuenk/pyfda
+# This file is part of the pyfda project hosted at https://github.com/chipmuenk/pyfda
 #
-# Copyright © pyFDA Project Contributors
+# Copyright © pyfda Project Contributors
 # Licensed under the terms of the MIT License
 # (see file LICENSE in root directory for details)
 
 """
-Mainwindow for the pyFDA app
+Mainwindow for the pyfda app
 """
 import logging
 import sys
@@ -23,7 +23,7 @@ from pyfda.config_file_parser import ConfigFileParser as CFP
 import pyfda.pyfda_rc as rc
 from pyfda.pyfda_rc import QSS
 
-from pyfda.pyfda_class import pyFDA
+from pyfda.pyfda_class import Pyfda
 
 # specify matplotlib backend for systems that have both PyQt4 and PyQt5 installed to avoid
 # "RuntimeError: the PyQt4.QtCore and PyQt5.QtCore modules both wrap the QObject class"
@@ -170,7 +170,7 @@ def main():
     # from config file
     FilterTreeBuilder().build_fil_tree()
 
-    mainw = pyFDA()
+    mainw = Pyfda()
     logger.info("Logging to '%s'", dirs.LOG_DIR_FILE)
     logger.info("Starting pyfda with screen resolution %d x %d, avail: %d x %d",
                 width, height, avail_geometry.width(), avail_geometry.height())

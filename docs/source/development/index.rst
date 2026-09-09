@@ -1,7 +1,7 @@
 Development
 ===========
 
-This part of the documentation describes the features of pyFDA that are relevant for developers.
+This part of the documentation describes the features of pyfda that are relevant for developers.
 
 .. autosummary ::
    :toctree: generated

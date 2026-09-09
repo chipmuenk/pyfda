@@ -3,7 +3,7 @@
 	<id>pyfda</id>
 	<metadata_license>MIT</metadata_license>
 	<project_license>MIT</project_license>
-	<name>pyFDA</name>
+	<name>pyfda</name>
 	<summary>GUI based tool for analysing and designing discrete time filters</summary>
 	<description>
 		<p>Design and analyse discrete time DSP filters with a user-friendly GUI tool. Fixpoint filters in time and frequency domain, too.</p>

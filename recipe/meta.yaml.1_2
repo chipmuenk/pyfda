@@ -50,22 +50,22 @@ test:
     - pyfdax_no_term --help
 
 about:
-  home: https://github.com/chipmuenk/pyFDA
+  home: https://github.com/chipmuenk/pyfda
   license: MIT License
   license_family: MIT
   license_file: ''
-  summary: pyFDA is a python tool with a user-friendly GUI for designing and analysing discrete time filters.
-  description: "pyFDA\n*****\n\nPython Filter Design Analysis Tool\n==================================\n\npyFDA is a GUI based tool in Python / Qt for analysing and designing discrete time filters. The\
-    \ capability for generating Verilog and VHDL code for the designed and quantized filters will be added in the next release.\n\n.. image:: https://github.com/chipmuenk/pyFDA/raw/master/images/pyFDA_screenshot_3.PNG\n\
+  summary: pyfda is a python tool with a user-friendly GUI for designing and analysing discrete time filters.
+  description: "pyfda\n*****\n\nPython Filter Design Analysis Tool\n==================================\n\npyfda is a GUI based tool in Python / Qt for analysing and designing discrete time filters. The\
+    \ capability for generating Verilog and VHDL code for the designed and quantized filters will be added in the next release.\n\n.. image:: https://github.com/chipmuenk/pyfda/raw/master/images/pyfda_screenshot_3.PNG\n\
     \    :width: 300px\n\nPrerequisites\n-------------\nThe software runs under Python 2.7 and 3.3 ... 3.6. The following additional libraries are required:\n\n* numpy\n* scipy\n* matplotlib\n* pyQt4 or\
     \ pyQt5\n\n* Optional libraries:\n    * docutils for rendering info text as rich text\n    * xlwt and / or XlsxWriter for exporting filter coefficients as \\*.xls(x) files\n\n\nInstalling and starting\
-    \ pyFDA\n-----------------------------\n\nThere is only one version of pyfda for all supported operating systems, Python and Qt versions. As there are no binaries included, you can simply install from\
+    \ pyfda\n-----------------------------\n\nThere is only one version of pyfda for all supported operating systems, Python and Qt versions. As there are no binaries included, you can simply install from\
     \ the source.\n\n**conda**\n\nIf you use the Anaconda distribution, you can install / update pyfda from my Anaconda channel `Chipmuenk` (https://anaconda.org/Chipmuenk/pyfda) using\n\n    ``>> conda\
     \ install -c Chipmuenk pyfda``\nresp.\n\n    ``>> conda update  -c Chipmuenk pyfda``\n\n**pip**\n\nOtherwise, you can install from PyPI using\n\n    ``>> pip install pyfda``\n\nor upgrade using\n\n\
     \    ``>> pip install pyfda -U``\n\n**from setup.py**\n\nDownload the zip file and extract it to a directory of your choice. Install it either to your ``<python>/Lib/site-packages`` subdirectory using\n\
     \n    ``>> python setup.py install``\n\nor run it where you have installed the python source files using (for testing / development)\n\n    ``>> python setup.py develop``\n\nIn both cases, start scripts\
-    \ ``pyfdax`` and `pyfdax_no_term` are created (with / without terminal).\n\nFor development, you can also run pyFDA using::\n\n    In [1]: %run -m pyfda.pyfdax # IPython or\n    >> python -m pyfda.pyfdax\
-    \    # plain python interpreter\n\n    \nor run individual files from pyFDA using e.g.::\n\n    In [2]: %run -m pyfda.input_widgets.input_pz  # IPython or\n    >> python -m pyfda.input_widgets.input_pz\
+    \ ``pyfdax`` and `pyfdax_no_term` are created (with / without terminal).\n\nFor development, you can also run pyfda using::\n\n    In [1]: %run -m pyfda.pyfdax # IPython or\n    >> python -m pyfda.pyfdax\
+    \    # plain python interpreter\n\n    \nor run individual files from pyfda using e.g.::\n\n    In [2]: %run -m pyfda.input_widgets.input_pz  # IPython or\n    >> python -m pyfda.input_widgets.input_pz\
     \     # plain python interpreter\n   \nCustomization\n-------------\n\nThe layout and some default paths can be customized using the file ``pyfda/pyfda_rc.py``.\n\nFeatures\n--------\n\n* **Filter design**\n\
     \    * **Design methods**: Equiripple, Firwin, Moving Average, Bessel, Butterworth, Elliptic, Chebyshev 1 and 2 (from scipy.signal and custom methods)\n    * **Second-Order Sections** are used in the\
     \ filter design when available for more robust filter design and analysis\n    * **Remember all specifications** when changing filter design methods\n    * **Fine-tune** manually the filter order and\

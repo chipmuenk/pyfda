@@ -448,7 +448,7 @@ only be used under Ubuntu (or probably other Debian related distros)
 #### New features
 
 - [PR \#183:](https://github.com/chipmuenk/pyfda/pull/187) Include license information for
-  distribution of pyFDA as source code and in bundled form, redesign the whole
+  distribution of pyfda as source code and in bundled form, redesign the whole
   "About" window, add CHANGELOG.md (this file) and move attributions to AUTHORS.md
 - Add cursor / annotations in plots ([Issue \#112](https://github.com/chipmuenk/pyfda/issues/112)) This is only available when
   [mplcursors](https://mplcursors.readthedocs.io/) module is installed and for matplotlib >= 3.1.
@@ -531,7 +531,7 @@ The truth value of an array with more than one element is ambiguous. Use a.any()
 
 - **HDL synthesis (beta status, expect bugs)**
   - Use migen to generate synthesizable Verilog netlists for basic filter topologies and do fixpoint simulation
-  - When migen is missing on your system, pyFDA will start without the fixpoint tab but otherwise fully functional
+  - When migen is missing on your system, pyfda will start without the fixpoint tab but otherwise fully functional
 
 - **Didactic improvements**
   - Improved display of transient response and FFT of transient response

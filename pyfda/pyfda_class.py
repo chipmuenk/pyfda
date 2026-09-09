@@ -1,13 +1,13 @@
 # -*- coding: utf-8 -*-
 #
-# This file is part of the pyFDA project hosted at https://github.com/chipmuenk/pyfda
+# This file is part of the pyfda project hosted at https://github.com/chipmuenk/pyfda
 #
-# Copyright © pyFDA Project Contributors
+# Copyright © pyfda Project Contributors
 # Licensed under the terms of the MIT License
 # (see file LICENSE in root directory for details)
 
 """
-Mainwindow for the pyFDA app
+Mainwindow for the pyfda app
 """
 import os
 import logging
@@ -184,7 +184,7 @@ logging.ColorFormatter = ColorFormatter
 logging.config.fileConfig(dirs.USER_LOG_CONF_DIR_FILE)#, disable_existing_loggers=True)
 #==============================================================================
 
-class pyFDA(QMainWindow):
+class Pyfda(QMainWindow):
     """
     Create the main window consisting of a tabbed widget for entering filter
     specifications, poles / zeros etc. and another tabbed widget for plotting
@@ -252,13 +252,13 @@ class pyFDA(QMainWindow):
         splt_v_plt_logger.setSizes(
             [int(splt_v_plt_logger_h*0.95), int(splt_v_plt_logger_h*0.05 - 8)])
 
-        self.setWindowTitle('pyFDA - Python Filter Design and Analysis')
+        self.setWindowTitle('pyfda - Python Filter Design and Analysis')
 
         #=============== Menubar =======================================
 
 #        about_action = QAction('&About', self)
 #        about_action.setShortcut('Ctrl+A')
-#        about_action.setStatusTip('Info about pyFDA')
+#        about_action.setStatusTip('Info about pyfda')
 #
 #        menubar = self.menuBar()
 #        file_menu = menubar.addMenu('&About')
@@ -330,7 +330,7 @@ class pyFDA(QMainWindow):
             dirs.firwin_handle.hide()
 
         reply = QMessageBox.question(self, 'Message',
-            "Quit pyFDA?", QMessageBox.Yes, QMessageBox.No)
+            "Quit pyfda?", QMessageBox.Yes, QMessageBox.No)
 
         if reply == QMessageBox.Yes:
             # Clear clipboard before exit to avoid error message on older Qt versions

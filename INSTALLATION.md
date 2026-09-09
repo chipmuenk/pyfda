@@ -62,7 +62,7 @@ or
     
     In [1]: %run -m pyfda.pyfdax # IPython
     
-For testing purposes, most individual files from pyFDA can be run using e.g.
+For testing purposes, most individual files from pyfda can be run using e.g.
 
     > python -m pyfda.input_widgets.input_pz       # Plain python interpreter
 

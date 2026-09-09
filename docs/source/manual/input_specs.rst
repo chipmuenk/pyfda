@@ -33,8 +33,8 @@ Not all combinations of design algorithms and response types are available - you
 won't be offered unavailable combinations and some fields may be greyed out.
 
 A nice description of the design of FIR filters (also with pyfda) can be found at 
-[Designing Generic FIR Filters with pyFDA and NumPy]
-(https://tomverbeure.github.io/2020/10/11/Designing-Generic-FIR-Filters-with-pyFDA-and-Numpy.html)
+[Designing Generic FIR Filters with pyfda and NumPy]
+(https://tomverbeure.github.io/2020/10/11/Designing-Generic-FIR-Filters-with-pyfda-and-Numpy.html)
 
 Order
 ------

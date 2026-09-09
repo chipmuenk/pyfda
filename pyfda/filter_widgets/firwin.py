@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 #
-# This file is part of the pyFDA project hosted at https://github.com/chipmuenk/pyfda
+# This file is part of the pyfda project hosted at https://github.com/chipmuenk/pyfda
 #
-# Copyright © pyFDA Project Contributors
+# Copyright © pyfda Project Contributors
 # Licensed under the terms of the MIT License
 # (see file LICENSE in root directory for details)
 
@@ -191,7 +191,7 @@ class Firwin(QWidget):
         # instantiate FFT window with freshly created windows dict
         self.win_viewer = PlotFFTWin(cur_win_dict_name=('filter_widgets', 'firwin', ),
             app='fir', all_wins_dict=self.all_wins_dict, sym=True,
-            title="pyFDA FIR Window Viewer", object_name="firwin_win_viewer")
+            title="pyfda FIR Window Viewer", object_name="firwin_win_viewer")
         # create handle to window to hide it during the "quit" dialogue,
         # hide window initially, this is modeless i.e. a non-blocking popup window
         dirs.firwin_handle = self.win_viewer

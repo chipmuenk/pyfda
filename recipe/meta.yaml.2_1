@@ -55,14 +55,14 @@ test:
     - pyfdax_no_term --help
 
 about:
-  home: "https://github.com/chipmuenk/pyFDA"
+  home: "https://github.com/chipmuenk/pyfda"
   license: "MIT"
   license_family: "MIT"
   license_file: "LICENSE"
-  summary: "pyFDA is a python tool with a user-friendly GUI for designing and analysing discrete time filters."
+  summary: "pyfda is a python tool with a user-friendly GUI for designing and analysing discrete time filters."
   description: "See the package README.rst or pyfda.readthedocs.io for more information."
   doc_url: "https://pyfda.readthedocs.io/"
-  dev_url: "https://github.com/chipmuenk/pyFDA"
+  dev_url: "https://github.com/chipmuenk/pyfda"
   doc_source_url: "https://github.com/chipmuenk/pyfda/blob/master/README.rst"
 
 extra:

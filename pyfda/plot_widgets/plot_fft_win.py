@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 #
-# This file is part of the pyFDA project hosted at https://github.com/chipmuenk/pyfda
+# This file is part of the pyfda project hosted at https://github.com/chipmuenk/pyfda
 #
-# Copyright © pyFDA Project Contributors
+# Copyright © pyfda Project Contributors
 # Licensed under the terms of the MIT License
 # (see file LICENSE in root directory for details)
 
@@ -84,7 +84,7 @@ class PlotFFTWin(QDialog):
 
     def __init__(self, cur_win_dict_name: tuple, app: str = 'spec',
                  all_wins_dict: dict | None = None,
-                 sym: bool = False, title: str = 'pyFDA Window Viewer',
+                 sym: bool = False, title: str = 'pyfda Window Viewer',
                  ignore_close_event: bool = False, object_name: str = "plot_fft_win"
                  ) -> None:
         super().__init__()

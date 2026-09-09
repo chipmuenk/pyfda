@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 #
-# This file is part of the pyFDA project hosted at https://github.com/chipmuenk/pyfda
+# This file is part of the pyfda project hosted at https://github.com/chipmuenk/pyfda
 #
-# Copyright © pyFDA Project Contributors
+# Copyright © pyfda Project Contributors
 # Licensed under the terms of the MIT License
 # (see file LICENSE in root directory for details)
 
@@ -32,7 +32,7 @@ class MyInputWidget(QWidget):
         super().__init__()
 
         self.tab_label = 'MyWdg'
-        self.tool_tip = "<span>This is my first pyFDA widget!</span>"
+        self.tool_tip = "<span>This is my first pyfda widget!</span>"
 
         self._construct_ui()
         self.dict2ui()

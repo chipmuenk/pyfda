@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 #
-# This file is part of the pyFDA project hosted at https://github.com/chipmuenk/pyfda
+# This file is part of the pyfda project hosted at https://github.com/chipmuenk/pyfda
 #
-# Copyright © pyFDA Project Contributors
+# Copyright © pyfda Project Contributors
 # Licensed under the terms of the MIT License
 # (see file LICENSE in root directory for details)
 
@@ -33,7 +33,7 @@ class AboutWindow(QDialog):
 
     def __init__(self):
         super().__init__()
-        self.setWindowTitle("About pyFDA")
+        self.setWindowTitle("About pyfda")
         self.collect_info()
         self._construct_ui()
         qwindow_stay_on_top(self, True)
@@ -55,7 +55,7 @@ class AboutWindow(QDialog):
 
         but_lic_mit = QPushButton(self)
         but_lic_mit.setText("MIT License")
-        but_lic_mit.setToolTip("MIT License for pyFDA source code")
+        but_lic_mit.setToolTip("MIT License for pyfda source code")
 
         but_lic_gpl_v3 = QPushButton(self)
         but_lic_gpl_v3.setText("GPLv3 License")
@@ -198,7 +198,7 @@ class AboutWindow(QDialog):
                    f"| **Home Dir**  |   `{dirs.HOME_DIR}` |\n"
                    f"| **Temp Dir** | `{dirs.TEMP_DIR}` |\n"
                    "| - - - - - - -  | - - - - - - - - -|\n"
-                   f"| **pyFDA Config** | `{dirs.USER_CONF_DIR_FILE}` |\n"
+                   f"| **pyfda Config** | `{dirs.USER_CONF_DIR_FILE}` |\n"
                    f"| **Log. Config** | `{dirs.USER_LOG_CONF_DIR_FILE}` |\n"
                    f"| **Logfile**  | `{dirs.LOG_DIR_FILE}` |"
         )
