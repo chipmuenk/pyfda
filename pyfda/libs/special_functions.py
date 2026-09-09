@@ -7,9 +7,6 @@ import numpy as np
 from numpy import pi, sin, cos, log10
 from numpy.typing import NDArray
 
-__all__ =  ['dB', 'lin2unit', 'unit2lin',
-           'cround', 'h_mag']
-
 logger = logging.getLogger(__name__)
 
 # Amplitude max, min values to prevent scipy aborts

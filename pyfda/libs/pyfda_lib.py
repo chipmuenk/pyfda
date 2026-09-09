@@ -38,11 +38,6 @@ if V_NUM_MKL:
 else:
     MKL = " (no mkl)"
 
-__all__ = ['cmp_version', 'mod_version',
-           'set_dict_defaults', 'clean_ascii', 'safe_eval',
-           'expand_lim', 'format_ticks',
-           'to_html']
-
 logger = logging.getLogger(__name__)
 
 PY32_64 = struct.calcsize("P") * 8  # yields 32 or 64, depending on 32 or 64 bit Python
