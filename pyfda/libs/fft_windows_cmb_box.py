@@ -227,7 +227,7 @@ class QFFTWinCmbBox(QWidget):
             cur_win_id = "rectangular"
 
         self.cur_win_dict['id'] = cur_win_id
-        # fb.fb_set((fil_key+'id', cur_win_id)
+        # fb_set((fil_key+'id', cur_win_id)
         self.cur_win_dict['disp_name'] = self.all_wins_dict[cur_win_id]['disp_name']
         self.cur_win_dict['par_val'] = self.all_wins_dict[cur_win_id]['par_val']
 

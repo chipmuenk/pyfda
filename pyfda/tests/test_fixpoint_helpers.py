@@ -14,7 +14,7 @@ import unittest
 import numpy as np
 from numpy.testing import assert_array_equal
 from pyfda.libs import pyfda_fix_lib as fx
-import pyfda.filterbroker as fb
+from pyfda.filterbroker import fb_set
 try:
     from nmigen import Cat, If, Replicate, Signal, Module, run_simulation
     from pyfda.fixpoint_widgets.fixpoint_helpers import requant
@@ -33,7 +33,7 @@ class TestSequenceFunctions(unittest.TestCase):
 
         self.stim = np.array([0,1,15,64,32767,-1,-64,0]) # last zero isn't tested due to latency of 1
 
-        fb.fil[0].update({'qfrmt': 'qfrac', 'fx_base': 'dec'})
+        fb_set{'qfrmt': 'qfrac', 'fx_base': 'dec'})
         # initialize a pyfda fixpoint quantizer
         q_obj = {'WI':0, 'WF':3, 'ovfl':'sat', 'quant':'round'}
         self.myQ = fx.Fixed(q_obj) # instantiate fixpoint object with settings above
@@ -82,7 +82,7 @@ class TestSequenceFunctions(unittest.TestCase):
         """
         Check whether parameters are written correctly to the fixpoint instance
         """
-        fb.fil[0].update({'qfrmt': 'qfrac', 'fx_base': 'hex'})
+        fb_set({'qfrmt': 'qfrac', 'fx_base': 'hex'})
         q_obj = {'WI':7, 'WF':3, 'ovfl':'none', 'quant':'fix'}
         self.myQ.set_qdict(q_obj)
 

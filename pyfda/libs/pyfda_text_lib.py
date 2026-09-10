@@ -308,9 +308,10 @@ def set_dict_defaults(d: dict, default_dict: dict) -> None:
 def compare_dictionaries(
         ref_dict: dict, new_dict: dict, path: str = "") -> list:
     """
-    Compare recursively a new dictionary `new_dict` to a reference dictionary `ref_dict`.
-    Keys in `new_dict` that are not contained in `ref_dict` are deleted from `new_dict`,
-    keys in `ref_dict` missing in `new_dict` are copied with their value to `new_dict`.
+    Compare recursively a nested dictionary `new_dict` to a reference dictionary `ref_dict`.
+    Keys in `new_dict` that are not contained in `ref_dict` are deleted from `new_dict` and copied
+    to a list of discarded keys, `keys_err[1]`. Keys in `ref_dict` missing in `new_dict` are
+    copied with their value to `new_dict`, keys are copied to `keys_err[0]`.
 
     Params
     ------

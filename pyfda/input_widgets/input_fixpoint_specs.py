@@ -191,9 +191,9 @@ class Input_Fixpoint_Specs(QWidget):
         Trigger fx simulation:
 
         1. `'fx_sim': 'init'`: Start fixpoint simulation by sending
-           `'fx_sim':'start_fx_response_calculation'`
+              `'fx_sim':'start_fx_response_calculation'`
 
-        2. Store fixpoint response in `fb.fx_result` and return to initiating routine
+        2. 'fx_sim': 'finish'`: Fixpoint simulation has finished, update I/O widgets
         """
 
         logger.debug(

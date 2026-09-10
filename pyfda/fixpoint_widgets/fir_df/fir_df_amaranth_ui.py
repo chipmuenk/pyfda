@@ -113,13 +113,6 @@ class FIR_DF_amaranth_UI(QWidget):
         lay_v_wq_coeffs = QVBoxLayout()
         lay_v_wq_coeffs.addWidget(self.wdg_wq_coeffs)
 
-        # widget for accumulator quantization
-        # Attention: fb.fil[0]['fxq']['QACC'] == self.wdg_wq_accu.q_dict
-        # if 'QACC' not in fb.fil[0]['fxq']:
-        #     fb.fil[0]['fxq']['QACC'] = {}
-        set_dict_defaults(fb_get('fxq', 'QACC'),
-            {'WI': 0, 'WF': 31, 'ovfl': 'wrap', 'quant': 'floor', 'w_a_m': 'a',
-             'N_over': 0})
         self.wdg_wq_accu = FxWqUI(
             fb_get('fxq', 'QACC'), objectName='fx_ui_wq_fir_df_accu',
             cmb_w_vis='on', cmb_w_items=self.cmb_wq_accu_items,
@@ -169,7 +162,7 @@ class FIR_DF_amaranth_UI(QWidget):
         Ignore all other signals
 
         Note: If coefficient / accu quantization settings have been changed in the UI,
-        the referenced dicts `fb.fil[0]['fxq']['QCB']` and `...['QACC']` have already
+        the referenced dicts `fil[0]['fxq']['QCB']` and `...['QACC']` have already
         been updated by the corresponding subwidgets `FxWqUI`
         """
         logger.debug("sig_rx:\n%s", pprint_log(dict_sig))
@@ -215,7 +208,7 @@ class FIR_DF_amaranth_UI(QWidget):
         requires more bits.
 
         The new values are written to the fixpoint coefficient dict
-        `fb.fil[0]['fxq']['QACC']` and the UI is updated.
+        `fil[0]['fxq']['QACC']` and the UI is updated.
         """
         # try:
         if qget_cmb_box(self.wdg_wq_accu.cmb_w) == 'f':
@@ -250,7 +243,7 @@ class FIR_DF_amaranth_UI(QWidget):
         :class:`pyfda.input_widgets.input_fixpoint_specs.Input_Fixpoint_Specs`.
         """
 
-        self.wdg_wq_coeffs.dict2ui(fb.fil[0]['fxq']['QCB'])  # update coefficient wordlength
+        self.wdg_wq_coeffs.dict2ui(fb_get('fxq', 'QCB'))  # update coefficient wordlength
         self.update_accu_settings()   # update accumulator q settings and UI
 
     # --------------------------------------------------------------------------
