@@ -1371,7 +1371,7 @@ class PlotTran(QWidget):
             # --- labels and markers -----
             # plt.setp(ax_r.get_xticklabels(), visible=False)
             # is shorter but imports matplotlib, set property directly instead:
-            [label.set_visible(False) for label in self.ax_r.get_xticklabels()]
+            _ = [label.set_visible(False) for label in self.ax_r.get_xticklabels()]
             # self.ax_r.set_ylabel(h_str + r'$\rightarrow $') # common x-axis
 
             self.ax_i.set_ylabel(h_i_str + r'$\rightarrow $')
@@ -1417,6 +1417,7 @@ class PlotTran(QWidget):
             self.ui.chk_byfs_spgr_time.setVisible(mode == 'psd')
             spgr_pre = ""
             db_scale = 20  # default log scale for magnitude in dB
+            spgr_symb = fr"$S_{{{sig_lbl.lower() + sig_lbl.lower()}}}$"
             spgr_unit = r" in W / Hz"  # default unit for spectrogram
             scaling = "density"  # default scaling for spectrogram
             if self.ui.but_log_spgr_time.isChecked():
@@ -1424,7 +1425,6 @@ class PlotTran(QWidget):
             else:
                 db_unit = ""
             if mode == "psd":
-                spgr_symb = fr"$S_{{{sig_lbl.lower()+sig_lbl.lower()}}}$"
                 db_scale = 10  # log scale for PSD
 
                 if self.ui.chk_byfs_spgr_time.isChecked():
@@ -1456,7 +1456,7 @@ class PlotTran(QWidget):
 # =============================================================================
             win = self.ui.qfft_win_select.calc_window(self.ui.time_nfft_spgr)
 
-            f, t, Sxx = sig.spectrogram(
+            f, t, s_xx = sig.spectrogram(
                 s, fb_get('f_S'), window=win,  # ('tukey', 0.25),
                 nperseg=self.ui.time_nfft_spgr, noverlap=self.ui.time_ovlp_spgr,
                 nfft=None, return_onesided=fb_get('freq_specs_range_type') == 'half',
@@ -1473,14 +1473,14 @@ class PlotTran(QWidget):
             # mode: 'psd', 'complex','magnitude','angle', 'phase' (no unwrapping)
 
 #            col_mesh = self.ax_s.pcolormesh(t, np.fft.fftshift(f),
-#                           np.fft.fftshift(Sxx, axes=0), shading='gouraud')
+#                           np.fft.fftshift(s_xx, axes=0), shading='gouraud')
             # self.ax_s.colorbar(col_mesh)
 
             spgr_args = fr"$({fb_get('plt_t_label')[1]}, {fb_get('plt_f_label')[1]})$"
             if self.ui.but_log_spgr_time.isChecked():
-                Sxx = np.maximum(db_scale * np.log10(np.abs(Sxx)), self.ui.bottom_t)
+                s_xx = np.maximum(db_scale * np.log10(np.abs(s_xx)), self.ui.bottom_t)
             # shading: 'auto', 'gouraud', 'nearest'
-            col_mesh = self.ax_s.pcolormesh(t, f, Sxx, shading='auto')
+            col_mesh = self.ax_s.pcolormesh(t, f, s_xx, shading='auto')
             cbar = self.mplwidget_t.fig.colorbar(col_mesh, ax=self.ax_s, aspect=30,
                                                     pad=0.005)
             cbar.ax.set_ylabel(spgr_pre + spgr_symb + spgr_args + spgr_unit)
