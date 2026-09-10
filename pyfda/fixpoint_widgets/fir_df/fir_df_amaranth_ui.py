@@ -14,11 +14,9 @@ import sys
 
 import numpy as np
 
-import pyfda.filterbroker as fb
 from pyfda.filterbroker import set_fx, fb_get, fb_set
 from pyfda.libs.compat import QWidget, QVBoxLayout, pyqtSignal
-from pyfda.libs.pyfda_text_lib import (
-    mod_version, set_dict_defaults, first_item, pprint_log, cmp_version)
+from pyfda.libs.pyfda_text_lib import mod_version, first_item, pprint_log, cmp_version
 from pyfda.libs.pyfda_qt_lib import qget_cmb_box, emit
 
 from pyfda.fixpoint_widgets.fx_wq_ui import FxWqUI
@@ -27,11 +25,11 @@ from .fir_df_amaranth import FIR_DF_amaranth
 logger = logging.getLogger(__name__)
 
 #  Dict containing {widget class name : display name}
-classes = {'FIR_DF_amaranth_UI': 'FIR_DF (Amaranth)'}
+classes = {'FirDFAmaranthUI': 'FIR_DF (Amaranth)'}
 
 
 # =============================================================================
-class FIR_DF_amaranth_UI(QWidget):
+class FirDFAmaranthUI(QWidget):
     """
     Widget for entering word formats & quantization, also instantiates fixpoint
     filter class :class:`FilterFIR`.
@@ -279,7 +277,7 @@ if __name__ == '__main__':
     app.setStyleSheet(QSS.QSS_RC)
     set_fx(True)  # enable fixpoint mode
 
-    mainw = FIR_DF_amaranth_UI()
+    mainw = FirDFAmaranthUI()
     app.setActiveWindow(mainw)
     mainw.show()
     sys.exit(app.exec_())
