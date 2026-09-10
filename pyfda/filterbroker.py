@@ -42,6 +42,9 @@ import copy
 import logging
 from typing import Iterable
 
+from pyfda.libs.pyfda_num_lib import iter2ndarray
+from pyfda.libs.pyfda_text_lib import compare_dictionaries
+
 import numpy as np
 
 logger = logging.getLogger(__name__)
@@ -51,6 +54,10 @@ logger = logging.getLogger(__name__)
 # State of filter design: 'ok', 'changed', 'error', 'active'
 design_filt_state = 'changed'
 # ===========================================================
+# ----------------------------------------------------------------------------------
+# Include this version number as `'_id': ('pyfda', FILTER_FILE_VERSION)` when saving
+# filter files and test for the version when loading filter files.
+FILTER_FILE_VERSION = '2'
 
 UNDO_LEN = 20  # depth of circular undo buffer
 undo_step = 0  # number of undo steps, limited to UNDO_LEN
@@ -684,6 +691,150 @@ def _handle_qfrmt_change(keys_tuple: tuple, fil_dict: dict) -> None:
         fil_dict['qfrmt_fx_last'] = fil_dict['qfrmt']
     else:  # float mode, store current float format
         fil_dict['qfrmt_float_last'] = fil_dict['qfrmt']
+
+# -------------------------------------------------------------------------------
+def clean_loaded_filter(fil_loaded: dict) -> int:
+    """
+    Sanitize the loaded filter dictionary `fil_loaded` by comparing it to the reference dict `fil_ref`.
+    If keys are missing in the loaded dict, they are copied with their default values from the
+    reference dict. If unsupported keys are found, they are ignored and a warning is issued.
+
+    Parameters
+    ----------
+    fil_loaded : dict
+        The loaded filter dictionary to be sanitized.
+
+    Returns
+    -------
+    int
+        -1: Error occurred during sanitization (e.g. missing keys or unsuitable data type/shape)
+        0: Successful sanitization
+
+    """
+    # --- Sanitize *keys* by comparing to reference dict -----------------------
+    backup_fil()  # backup current filter fil_loaded
+
+    key_errs = compare_dictionaries(fil_ref, fil_loaded)
+    key_errs[0].sort()  # keys missing in the loaded dict
+    key_errs[1].sort()  # unsupported keys; keys not in reference dict
+
+    err_str = ""
+    if key_errs[0]:
+        # '\n'.join(...) converts list to multi-line string
+        err_str += (
+            f"\n\tThe following {len(key_errs[0])} key(s) have not been found in "
+            "the loaded dict,\n"\
+            "\tthey are copied with their default values from the reference dict:\n\t\t"
+                + "\n\t\t".join(key_errs[0])
+            )
+    if key_errs[1]:
+        err_str += (
+            f"\n\tThe following {len(key_errs[1])} key(s) are not part of the "
+            "reference dict and have been ignored:\n\t\t"
+            + "\n\t\t".join(key_errs[1])
+        )
+    if err_str != "":
+        logger.warning(err_str)
+
+    # --- Sanitize *values* in filter dictionary, keys are ok by now
+    for k in fil_loaded:
+        # Bytes need to be decoded for py3 to be used as keys later on
+        if isinstance(fil_loaded[k], bytes):
+            fil_loaded[k] = fil_loaded[k].decode('utf-8')
+        if fil_loaded[k] is None:
+            logger.warning("Entry fil_loaded[%s] is empty!", k)
+
+    if 'ba' not in fil_loaded:
+        logger.error(
+            "Missing key 'ba, cancelling file operation.")
+        restore_fil()
+        return -1
+    if isinstance(fb_get('ba'), np.ndarray):
+        pass
+    elif isinstance(fb_get('ba'), (list, tuple)):
+        fb_set('ba', iter2ndarray(fb_get('ba')))
+    else:
+        logger.error("Unsuitable 'ba' data type '%s', cancelling file operation.",
+                        type(fb_get('ba')).__name__)
+    if np.ndim(fb_get('ba')) != 2 or len(fb_get('ba')[0]) < 3:
+        logger.error(
+            "Unsuitable shape %s of 'ba' data, cancelling file operation.",
+            np.shape(fb_get('ba')))
+        restore_fil()
+        return -1
+
+    if 'zpk' not in fil_loaded:
+        logger.error("Missing key 'zpk', cancelling file operation.")
+        restore_fil()
+        return -1
+    if isinstance(fb_get('zpk'), np.ndarray):
+        pass
+    elif isinstance(fb_get('zpk'), (list, tuple)):
+        fb_set('zpk', iter2ndarray(fb_get('zpk')))
+    else:
+        logger.error("Unsuitable 'zpk' data type '%s', cancelling file operation.",
+                        type(fb_get('zpk')).__name__)
+    if np.ndim(fb_get('zpk')) != 2 or np.shape(fb_get('zpk'))[0] != 3:
+        logger.error(
+            "Unsuitable shape %s of 'zpk' data, cancelling file operation.",
+            np.shape(fb_get('zpk')))
+        restore_fil()
+        return -1
+
+    if 'sos' not in fil_loaded:
+        logger.error("Missing key 'sos', creating key and empty list.")
+        fb_set('sos', [])
+    elif isinstance(fb_get('sos'), (list, tuple)):
+        fb_set('sos', iter2ndarray(fb_get('sos')))
+    elif not isinstance(fb_get('sos'), np.ndarray):
+        logger.error("Unsuitable 'sos' data type '%s', creating empty list.",
+                        type(fb_get('sos')).__name__)
+        fb_set('sos', [])
+    elif np.ndim(fb_get('sos')) != 2 or np.shape(fb_get('sos'))[1] != 6:
+        logger.warning("Unsuitable shape %s of 'sos' data, storing empty list.",
+            np.shape(fb_get('sos')))
+        fb_set('sos', [])
+    # TODO: create an extra function, checking whether the sos data can be converted
+    # to the correct shape instead of deleting it
+    return 0
+
+# ---------------------------------------------------------
+def clean_filters(all: bool = True) -> list[dict] | dict:
+    """
+    Test if the keys in the global dict `fil[0]` are compatible with the reference dict `fil_ref`.
+    If not, remove the unsupported keys and issue a warning.
+
+    Parameters
+    ----------
+    all : bool
+        If True, clean all filter dicts `fil[0]` ... `fil[9]`, otherwise only clean `fil[0]`.
+
+    Returns
+    -------
+    list[dict] | dict
+        The cleaned filter dict(s) with only the keys that are in the reference dict `fil_ref`.
+    """
+    def _clean_dict_i(i: int) -> dict:
+        # provide an identifier with version number for pyfda files
+        fil[i].update({'_id': ['pyfda', FILTER_FILE_VERSION]})
+        # only copy the keys that are in the reference dict, remove unsupported keys
+        fil_clean_i = {k:v for k, v in fil[i].items() if k in fil_ref}
+        keys_unsupported = [k for k in fil[i] if k not in fil_ref]
+        if keys_unsupported != []:
+            logger.warning(
+                "The following keys are ignored because they are not part of the\n"
+                "\tfilter reference dict:\n\t%s", keys_unsupported)
+        return fil_clean_i
+
+    if all:
+        fil_clean = [None] * 10
+        for i in range(10):
+            fil_clean[i] = _clean_dict_i(i)
+    else:
+        fil_clean = _clean_dict_i(0)
+
+    return fil_clean
+
 
 # Comparing nested dicts
 # https://stackoverflow.com/questions/27265939/comparing-python-dictionaries-and-nested-dictionaries

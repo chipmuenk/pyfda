@@ -21,7 +21,7 @@ import sys
 import numpy as np
 
 import pyfda.filterbroker as fb
-from pyfda.filterbroker import fb_get, fb_set, backup_fil, restore_fil
+from pyfda.filterbroker import fb_get, fb_set, clean_filters, clean_loaded_filter
 from pyfda.filter_factory import call_fil_method
 from pyfda.filter_tree_builder import FilterTreeBuilder as FTB
 from pyfda.input_widgets import (
@@ -31,7 +31,7 @@ from pyfda.libs.compat import (
     QVBoxLayout, QHBoxLayout, QSizePolicy)
 
 import pyfda.libs.pyfda_dirs as dirs
-from pyfda.libs.pyfda_text_lib import to_html, first_item, compare_dictionaries
+from pyfda.libs.pyfda_text_lib import to_html, first_item
 from pyfda.libs.pyfda_num_lib import iter2ndarray
 from pyfda.libs.pyfda_qt_lib import (
     popup_warning, qstyle_widget, qcmb_box_populate, qget_cmb_box, emit)
@@ -512,8 +512,7 @@ class InputSpecs(QWidget):
         # The name of the instance method is constructed from the response
         # type (e.g. 'lp') and the filter order (e.g. 'man'), giving e.g. 'LPman'.
         # The filter is designed by passing the specs in fil[0] to the method,
-        # resulting in e.g. cheby1.LPman(fb.fil[0]) and writing back coefficients,
-        # P/Z etc. back to fil[0].
+        # resulting in e.g. cheby1.LPman() and writing coefficients, P/Z etc. back to fil[0].
 
         err = call_fil_method(fb_get('rt') + '_' +fb_get('fo'), fc=fb_get('fc'))
         # this is the same as e.g.
@@ -612,7 +611,8 @@ def load_filter(self, all_filters: bool = False) -> int:
                 fb_temp = json.load(f)
 
         except (IOError, json.JSONDecodeError) as e:
-            logger.error("Failed loading / opening\n\t%s!\n%s", file_name, e)
+            logger.error("JSON error: Failed loading / opening\n\t%s!\n%s", file_name, e)
+            f.close()
             return -1
 
     else:
@@ -673,108 +673,15 @@ def load_filter(self, all_filters: bool = False) -> int:
     # Handle errors occurring during id test
     if err:
         return -1
-    if all_filters:
-        fb.fil = fb_temp  # assign all filters
-    else:
-        fb.fil[0] = fb_temp  # only assign one slice
-
-    # --- Sanitize keys by comparing to reference dict -----------------------
-    backup_fil()  # backup current filter fb.fil[0]
-    try:
-        key_errs = compare_dictionaries(fb.fil_ref, fb.fil[0])
-        key_errs[0].sort()  # keys missing in the loaded dict
-        key_errs[1].sort()  # unsupported keys; keys not in reference dict
-
-        err_str = ""
-        if key_errs[0]:
-            # '\n'.join(...) converts list to multi-line string
-            err_str += (
-                f"\n\tThe following {len(key_errs[0])} key(s) have not been found in "
-                "the loaded dict,\n"\
-                "\tthey are copied with their default values from the reference dict:\n\t\t"
-                    + "\n\t\t".join(key_errs[0])
-                )
-        if key_errs[1]:
-            err_str += (
-                f"\n\tThe following {len(key_errs[1])} key(s) are not part of the "
-                "reference dict and have been ignored:\n\t\t"
-                + "\n\t\t".join(key_errs[1])
-            )
-        if err_str != "":
-            logger.warning(err_str)
-
-    # --- Sanitize *values* in filter dictionary, keys are ok by now
-        for k in fb.fil[0]:
-            # Bytes need to be decoded for py3 to be used as keys later on
-            if isinstance(fb.fil[0][k], bytes):
-                fb.fil[0][k] = fb.fil[0][k].decode('utf-8')
-            if fb.fil[0][k] is None:
-                logger.warning("Entry fb.fil[0][%s] is empty!", k)
-
-        if 'ba' not in fb.fil[0]:
-            logger.error(
-                "Missing key 'ba, cancelling file operation.")
-            restore_fil()
-            return -1
-        if isinstance(fb_get('ba'), np.ndarray):
-            pass
-        elif isinstance(fb_get('ba'), (list, tuple)):
-            fb_set('ba', iter2ndarray(fb_get('ba')))
-        else:
-            logger.error("Unsuitable 'ba' data type '%s', cancelling file operation.",
-                         type(fb_get('ba')).__name__)
-        if np.ndim(fb_get('ba')) != 2 or len(fb_get('ba')[0]) < 3:
-            logger.error(
-                "Unsuitable shape %s of 'ba' data, cancelling file operation.",
-                np.shape(fb_get('ba')))
-            restore_fil()
-            return -1
-
-        if 'zpk' not in fb.fil[0]:
-            logger.error("Missing key 'zpk', cancelling file operation.")
-            restore_fil()
-            return -1
-        if isinstance(fb_get('zpk'), np.ndarray):
-            pass
-        elif isinstance(fb_get('zpk'), (list, tuple)):
-            fb_set('zpk', iter2ndarray(fb_get('zpk')))
-        else:
-            logger.error("Unsuitable 'zpk' data type '%s', cancelling file operation.",
-                         type(fb_get('zpk')).__name__)
-        if np.ndim(fb_get('zpk')) != 2 or np.shape(fb_get('zpk'))[0] != 3:
-            logger.error(
-                "Unsuitable shape %s of 'zpk' data, cancelling file operation.",
-                np.shape(fb_get('zpk')))
-            restore_fil()
-            return -1
-
-        if 'sos' not in fb.fil[0]:
-            logger.error("Missing key 'sos', creating key and empty list.")
-            fb_set('sos', [])
-        elif isinstance(fb_get('sos'), (list, tuple)):
-            fb_set('sos', iter2ndarray(fb_get('sos')))
-        elif not isinstance(fb_get('sos'), np.ndarray):
-            logger.error("Unsuitable 'sos' data type '%s', creating empty list.",
-                         type(fb_get('sos')).__name__)
-            fb_set('sos', [])
-        elif np.ndim(fb_get('sos')) != 2 or np.shape(fb_get('sos'))[1] != 6:
-            logger.warning("Unsuitable shape %s of 'sos' data, storing empty list.",
-                np.shape(fb_get('sos')))
-            fb_set('sos', [])
-        # TODO: create an extra function, checking whether the sos data can be converted
-        # to the correct shape instead of deleting it
-
-        logger.info('Successfully loaded filter\n\t"%s"', file_name)
-        dirs.last_file_name = file_name
-        dirs.last_file_dir = os.path.dirname(file_name)  # update default working dir
-        dirs.last_file_type = file_type  # save new default file type
-        return 0
-
-    except Exception as e:
-        logger.error("Unexpected error:\n%s", e)
-        restore_fil()
+    if fb.clean_loaded_filter(fb_temp) == -1:  # clean and copy loaded filter(s) to fb.fil
+        logger.warning("Error(s) occurred, filter could not be loaded.")
         return -1
 
+    logger.info('Successfully loaded filter\n\t"%s"', file_name)
+    dirs.last_file_name = file_name
+    dirs.last_file_dir = os.path.dirname(file_name)  # update default working dir
+    dirs.last_file_type = file_type  # save new default file type
+    return 0
 
 # ------------------------------------------------------------------------------
 def save_filter(self) -> int:
@@ -796,16 +703,7 @@ def save_filter(self) -> int:
         return -1  # operation cancelled or other error
 
     err = False
-    # create a copy of the filter to be saved that only contains keys of the
-    # reference filter dict and warn of unsupported keys:
-    keys_unsupported = [k for k in fb_get() if k not in fb.fil_ref]
-    if keys_unsupported:
-        fil_clean = {k:v for k, v in fb_get().items() if k in fb.fil_ref}
-        logger.warning(
-            "The following keys are ignored because they are not part of the\n"
-            "\tfilter reference dict:\n\t%s", keys_unsupported)
-    else:
-        fil_clean = fb_get()
+    fil_clean = clean_filters(all = False)  # create a copy of the filter dict to be saved
 
     if file_type in {"npz", "pkl"}:
         try:
@@ -859,18 +757,7 @@ def save_all_filters(self) -> int:
     err = False
     # create a copy of the filters to be saved that only contains keys of the
     # reference filter dict and warn of unsupported keys:
-    fil_clean = [None] * 10
-    for i in range(10):
-        # provide an identifier with version number for pyfda files
-        fb.fil[i].update({'_id': ['pyfda', FILTER_FILE_VERSION]})
-        keys_unsupported = [k for k in fb.fil[i] if k not in fb.fil_ref]
-        if keys_unsupported != []:
-            fil_clean[i] = {k:v for k, v in fb.fil[i].items() if k in fb.fil_ref}
-            logger.warning(
-                "The following keys are ignored because they are not part of the\n"
-                "\tfilter reference dict:\n\t%s", keys_unsupported)
-        else:
-            fil_clean[i] = fb.fil[i]
+    fil_clean = clean_filters()
 
     if file_type in {"npz", "pkl"}:
         try:
