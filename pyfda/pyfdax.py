@@ -48,9 +48,8 @@ logger = logging.getLogger(__name__)
 cfp = CFP()
 cfp.parse_conf_file()
 
-# apply QSS and matplotlib styling
-qss = QSS()
-qss.set_qss()
+# apply QSS and matplotlib styling, now with settings from the config file
+QSS.set_qss(QSS)
 
 cfp.build_widget_tree()
 
