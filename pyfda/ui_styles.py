@@ -449,16 +449,6 @@ QSS_TAB_BAR_OVLP = """
     }
     """
 
-# provide a default value for module testing
-QSS_RC = replace_mult(
-    '\n/* Light QSS Mode */\n' + QSS_COMMON + QSS_TAB_BAR + QSS_LIGHT,
-    {
-    "|FONT_SIZE_BASE|": "12",
-    "|FONT_SIZE_MEDIUM|": "13",
-    "|FONT_SIZE_LARGE|": "14",
-    "|FONT_SIZE_XLARGE|": "15"
-    })
-
 # #############################################################################
 # Matplotlib layout settings
 # #############################################################################
