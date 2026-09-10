@@ -17,7 +17,6 @@ by the actual values in `pyfda_rc.py`.
 """
 # pylint: disable=too-few-public-methods
 from cycler import cycler
-from pyfda.libs.pyfda_text_lib import replace_mult
 
 # #############################################################################
 # QWidget style sheets (QSS)

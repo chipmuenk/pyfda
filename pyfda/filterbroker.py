@@ -695,7 +695,7 @@ def _handle_qfrmt_change(keys_tuple: tuple, fil_dict: dict) -> None:
 # -------------------------------------------------------------------------------
 def clean_loaded_filter(fil_loaded: dict) -> int:
     """
-    Sanitize the loaded filter dictionary `fil_loaded` by comparing it to the reference dict `fil_ref`.
+    Sanitize loaded filter dictionary `fil_loaded` by comparing it to the reference dict `fil_ref`.
     If keys are missing in the loaded dict, they are copied with their default values from the
     reference dict. If unsupported keys are found, they are ignored and a warning is issued.
 
@@ -800,14 +800,14 @@ def clean_loaded_filter(fil_loaded: dict) -> int:
     return 0
 
 # ---------------------------------------------------------
-def clean_filters(all: bool = True) -> list[dict] | dict:
+def clean_filters(all_filters: bool = True) -> list[dict] | dict:
     """
     Test if the keys in the global dict `fil[0]` are compatible with the reference dict `fil_ref`.
     If not, remove the unsupported keys and issue a warning.
 
     Parameters
     ----------
-    all : bool
+    all_filters : bool
         If True, clean all filter dicts `fil[0]` ... `fil[9]`, otherwise only clean `fil[0]`.
 
     Returns
@@ -827,7 +827,7 @@ def clean_filters(all: bool = True) -> list[dict] | dict:
                 "\tfilter reference dict:\n\t%s", keys_unsupported)
         return fil_clean_i
 
-    if all:
+    if all_filters:
         fil_clean = [None] * 10
         for i in range(10):
             fil_clean[i] = _clean_dict_i(i)

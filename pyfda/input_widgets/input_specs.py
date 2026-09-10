@@ -32,7 +32,6 @@ from pyfda.libs.compat import (
 
 import pyfda.libs.pyfda_dirs as dirs
 from pyfda.libs.pyfda_text_lib import to_html, first_item
-from pyfda.libs.pyfda_num_lib import iter2ndarray
 from pyfda.libs.pyfda_qt_lib import (
     popup_warning, qstyle_widget, qcmb_box_populate, qget_cmb_box, emit)
 from pyfda.libs.pyfda_io_lib import select_file
@@ -191,10 +190,10 @@ class InputSpecs(QWidget):
         self.led_info.setToolTip(self.led_info_tool_tip)
         # self.led_info.home(True)  # move cursor to beginning of line
 
-        self.butDesignFilt = QPushButton("DESIGN FILTER", self)
-        self.butDesignFilt.setToolTip("Design filter with chosen specs")
-        self.butQuit = QPushButton("Quit", self)
-        self.butQuit.setToolTip("Exit pyfda tool")
+        self.but_design_filt = QPushButton("DESIGN FILTER", self)
+        self.but_design_filt.setToolTip("Design filter with chosen specs")
+        self.but_quit = QPushButton("Quit", self)
+        self.but_quit.setToolTip("Exit pyfda tool")
 
         # Subwidget for selecting filter with response type rt (LP, ...),
         #    filter type ft (IIR, ...) and filter class fc (cheby1, ...)
@@ -256,8 +255,8 @@ class InputSpecs(QWidget):
         self.cmb_filter_load.currentIndexChanged.connect(self._load_filter)
         self.cmb_filter_save.currentIndexChanged.connect(self._save_filter)
         self.led_info.editingFinished.connect(self._save_info2dict)
-        self.butDesignFilt.clicked.connect(self.start_design_filt)
-        self.butQuit.clicked.connect(self.quit_program)  # emit 'close_event'
+        self.but_design_filt.clicked.connect(self.start_design_filt)
+        self.but_quit.clicked.connect(self.quit_program)  # emit 'close_event'
         # ----------------------------------------------------------------------
 
     # --------------------------------------------------------------------------
@@ -285,8 +284,8 @@ class InputSpecs(QWidget):
         # LAYOUT for Design and Quit buttons
         # ----------------------------------------------------------------------
         lay_h_buttons_action = QHBoxLayout()
-        lay_h_buttons_action.addWidget(self.butDesignFilt)  # <Design Filter> button
-        lay_h_buttons_action.addWidget(self.butQuit)        # <Quit> button
+        lay_h_buttons_action.addWidget(self.but_design_filt)  # <Design Filter> button
+        lay_h_buttons_action.addWidget(self.but_quit)        # <Quit> button
         lay_h_buttons_action.setContentsMargins(*params['wdg_margins'])
 
         lay_v_msg = QVBoxLayout()
@@ -544,11 +543,11 @@ class InputSpecs(QWidget):
         - "error": filter design failed with current specs
         """
         man = "manual" in fb_get('fc').lower()
-        self.butDesignFilt.setDisabled(man)
+        self.but_design_filt.setDisabled(man)
         if man:
             state = 'ok'
         fb.design_filt_state = state
-        qstyle_widget(self.butDesignFilt, state)
+        qstyle_widget(self.but_design_filt, state)
 
     # --------------------------------------------------------------------------
     def quit_program(self) -> None:
@@ -673,7 +672,7 @@ def load_filter(self, all_filters: bool = False) -> int:
     # Handle errors occurring during id test
     if err:
         return -1
-    if fb.clean_loaded_filter(fb_temp) == -1:  # clean and copy loaded filter(s) to fb.fil
+    if clean_loaded_filter(fb_temp) == -1:  # clean and copy loaded filter(s) to fb.fil
         logger.warning("Error(s) occurred, filter could not be loaded.")
         return -1
 
@@ -703,7 +702,7 @@ def save_filter(self) -> int:
         return -1  # operation cancelled or other error
 
     err = False
-    fil_clean = clean_filters(all = False)  # create a copy of the filter dict to be saved
+    fil_clean = clean_filters(all_filters=False)  # create a copy of the filter dict to be saved
 
     if file_type in {"npz", "pkl"}:
         try:
