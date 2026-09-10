@@ -1456,7 +1456,7 @@ class PlotTran(QWidget):
 # =============================================================================
             win = self.ui.qfft_win_select.calc_window(self.ui.time_nfft_spgr)
 
-            f, t, s_xx = sig.spectrogram(
+            f, t, Sxx = sig.spectrogram(
                 s, fb_get('f_S'), window=win,  # ('tukey', 0.25),
                 nperseg=self.ui.time_nfft_spgr, noverlap=self.ui.time_ovlp_spgr,
                 nfft=None, return_onesided=fb_get('freq_specs_range_type') == 'half',
@@ -1473,14 +1473,14 @@ class PlotTran(QWidget):
             # mode: 'psd', 'complex','magnitude','angle', 'phase' (no unwrapping)
 
 #            col_mesh = self.ax_s.pcolormesh(t, np.fft.fftshift(f),
-#                           np.fft.fftshift(s_xx, axes=0), shading='gouraud')
+#                           np.fft.fftshift(Sxx, axes=0), shading='gouraud')
             # self.ax_s.colorbar(col_mesh)
 
             spgr_args = fr"$({fb_get('plt_t_label')[1]}, {fb_get('plt_f_label')[1]})$"
             if self.ui.but_log_spgr_time.isChecked():
-                s_xx = np.maximum(db_scale * np.log10(np.abs(s_xx)), self.ui.bottom_t)
+                Sxx = np.maximum(db_scale * np.log10(np.abs(Sxx)), self.ui.bottom_t)
             # shading: 'auto', 'gouraud', 'nearest'
-            col_mesh = self.ax_s.pcolormesh(t, f, s_xx, shading='auto')
+            col_mesh = self.ax_s.pcolormesh(t, f, Sxx, shading='auto')
             cbar = self.mplwidget_t.fig.colorbar(col_mesh, ax=self.ax_s, aspect=30,
                                                     pad=0.005)
             cbar.ax.set_ylabel(spgr_pre + spgr_symb + spgr_args + spgr_unit)
