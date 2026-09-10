@@ -43,7 +43,7 @@ logger = logging.getLogger(__name__)
 # --------------------------------------------------------------------------------------
 # Include this version number as `'_id': ('pyfda', FILTER_FILE_VERSION)` when saving
 # filter files and test for the version when loading filter files.
-FILTER_FILE_VERSION = '2'
+FILTER_FILE_VERSION = '3'
 
 classes = {'InputSpecs': 'Specs'}  #: Dict containing class name : display name
 # This is read by `tree_builder._build_widget_class_dicts()` into the dict

@@ -57,7 +57,7 @@ design_filt_state = 'changed'
 # ----------------------------------------------------------------------------------
 # Include this version number as `'_id': ('pyfda', FILTER_FILE_VERSION)` when saving
 # filter files and test for the version when loading filter files.
-FILTER_FILE_VERSION = '2'
+FILTER_FILE_VERSION = '3'
 
 UNDO_LEN = 20  # depth of circular undo buffer
 undo_step = 0  # number of undo steps, limited to UNDO_LEN
@@ -767,35 +767,36 @@ def clean_loaded_filter(fil_loaded: dict) -> int:
         logger.error("Missing key 'zpk', cancelling file operation.")
         restore_fil()
         return -1
-    if isinstance(fb_get('zpk'), np.ndarray):
+    if isinstance(fil_loaded['zpk'], np.ndarray):
         pass
-    elif isinstance(fb_get('zpk'), (list, tuple)):
-        fb_set('zpk', iter2ndarray(fb_get('zpk')))
+    elif isinstance(fil_loaded['zpk'], (list, tuple)):
+        fil_loaded['zpk'] = iter2ndarray(fil_loaded['zpk'])
     else:
         logger.error("Unsuitable 'zpk' data type '%s', cancelling file operation.",
-                        type(fb_get('zpk')).__name__)
-    if np.ndim(fb_get('zpk')) != 2 or np.shape(fb_get('zpk'))[0] != 3:
+                        type(fil_loaded['zpk']).__name__)
+    if np.ndim(fil_loaded['zpk']) != 2 or np.shape(fil_loaded['zpk'])[0] != 3:
         logger.error(
             "Unsuitable shape %s of 'zpk' data, cancelling file operation.",
-            np.shape(fb_get('zpk')))
+            np.shape(fil_loaded['zpk']))
         restore_fil()
         return -1
 
     if 'sos' not in fil_loaded:
         logger.error("Missing key 'sos', creating key and empty list.")
-        fb_set('sos', [])
-    elif isinstance(fb_get('sos'), (list, tuple)):
-        fb_set('sos', iter2ndarray(fb_get('sos')))
-    elif not isinstance(fb_get('sos'), np.ndarray):
+        fil_loaded['sos'] = []
+    elif isinstance(fil_loaded['sos'], (list, tuple)):
+        fil_loaded['sos'] = iter2ndarray(fil_loaded['sos'])
+    elif not isinstance(fil_loaded['sos'], np.ndarray):
         logger.error("Unsuitable 'sos' data type '%s', creating empty list.",
-                        type(fb_get('sos')).__name__)
-        fb_set('sos', [])
-    elif np.ndim(fb_get('sos')) != 2 or np.shape(fb_get('sos'))[1] != 6:
+                        type(fil_loaded['sos']).__name__)
+        fil_loaded['sos'] = []
+    elif np.ndim(fil_loaded['sos']) != 2 or np.shape(fil_loaded['sos'])[1] != 6:
         logger.warning("Unsuitable shape %s of 'sos' data, storing empty list.",
-            np.shape(fb_get('sos')))
-        fb_set('sos', [])
+            np.shape(fil_loaded['sos']))
+        fil_loaded['sos'] = []
     # TODO: create an extra function, checking whether the sos data can be converted
     # to the correct shape instead of deleting it
+    fil[0] = fil_loaded  # update global filter dict with sanitized loaded dict
     return 0
 
 # ---------------------------------------------------------
