@@ -35,8 +35,6 @@ from pyfda.pyfda_rc import QSS, params
 logger = logging.getLogger(__name__)
 
 # read user settings for linewidth, font size etc. and apply them to matplotlib
-if not QSS.is_initialized:
-    QSS.set_qss(QSS)
 for key, value in QSS.mpl_rc.items():
     rcParams[key] = value
 

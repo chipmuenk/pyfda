@@ -69,9 +69,6 @@ class QSS():
     This class groups the dark/light theme settings, widget style sheets, and
     Matplotlib runtime configuration used by pyfda.
     """
-    # set_qss() needs to be called before any Qt widgets are created, otherwise the style
-    #  sheet can not be applied as parameters need to be replaced in the QSS string.
-    is_initialized: bool = False
 
     def __init__(self):
         print("QSS: initializing QSS class")
@@ -159,8 +156,10 @@ class QSS():
         # matplotlib.rcParams['mathtext.fontset'] = 'stixsans'
         # matplotlib.rcParams['font.family'] = 'STIXGeneral'
 
-        QSS.is_initialized = True
+# set_qss() needs to be called before any Qt widgets are created, otherwise the style
+# sheet can not be applied as placeholders need to be replaced in the QSS string.
 
+QSS.set_qss(QSS)
 #------------------------------------------------------------------------------
 
 if __name__ == '__main__':
