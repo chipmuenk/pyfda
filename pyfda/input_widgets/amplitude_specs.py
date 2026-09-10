@@ -230,6 +230,7 @@ class AmplitudeSpecs(QWidget):
             elif "pb" in new_labels[i]:
                 self.qlineedit[i].setToolTip(
                     "<span>Maximum ripple (&gt; 0) in (this) pass band.<span/>")
+
             qstyle_widget(self.qlineedit[i], state)
 
         self.n_cur_labels = num_new_labels  # update number of currently visible labels
