@@ -21,7 +21,7 @@ import sys
 import numpy as np
 
 import pyfda.filterbroker as fb
-from pyfda.filterbroker import fb_get, fb_set, clean_filter_keys, clean_loaded_filter
+from pyfda.filterbroker import fb_get, fb_set, clean_filter_keys, load_cleaned_filter
 from pyfda.filter_factory import call_fil_method
 from pyfda.filter_tree_builder import FilterTreeBuilder as FTB
 from pyfda.input_widgets import (
@@ -639,8 +639,8 @@ def load_filter(self, all_filters: bool = False) -> bool:
     # Handle errors occurring during id test
     if err:
         return False
-
-    if clean_loaded_filter(fb_temp) == -1:  # clean and copy loaded filter(s) to fb.fil
+    # clean and copy loaded filter(s) to fb.fil
+    if load_cleaned_filter(fb_temp) == -1:
         logger.warning("Error(s) occurred, filter could not be loaded.")
         return False
 

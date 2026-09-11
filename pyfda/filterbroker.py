@@ -693,7 +693,7 @@ def _handle_qfrmt_change(keys_tuple: tuple, fil_dict: dict) -> None:
         fil_dict['qfrmt_float_last'] = fil_dict['qfrmt']
 
 # -------------------------------------------------------------------------------
-def clean_loaded_filter(fil_loaded: dict) -> int:
+def load_cleaned_filter(fil_loaded: dict) -> int:
     """
     Sanitize loaded filter dictionary `fil_loaded` by comparing it to the reference dict `fil_ref`.
     If keys are missing in the loaded dict, they are copied with their default values from the
