@@ -13,6 +13,7 @@ import json
 import logging
 
 import numpy as np
+from numpy.typing import NDArray
 
 logger = logging.getLogger(__name__)
 
@@ -21,7 +22,9 @@ class JSONNumpyEncoder(json.JSONEncoder):
     Special json encoder for numpy and other non-supported types, building upon
     https://stackoverflow.com/questions/26646362/numpy-array-is-not-json-serializable
     """
-    def default(self, obj) -> str:
+    def default(self, obj: int | float | complex | NDArray) \
+        -> int | float | str | list:
+        logger.warning("JSONNumpyEncoder")
         if isinstance(obj, np.integer):
             return int(obj)
         if isinstance(obj, np.floating):

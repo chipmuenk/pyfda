@@ -802,7 +802,7 @@ def clean_loaded_filter(fil_loaded: dict) -> int:
 # ---------------------------------------------------------
 def clean_filter_keys(all_filters: bool = True) -> list[dict] | dict:
     """
-    Test if the keys in the global dict `fil[0]` are compatible with the reference dict `fil_ref`.
+    Test if the keys in the global dict `fil[0]` are identical to th the reference dict `fil_ref`.
     If not, remove the unsupported keys and issue a warning.
 
     Parameters
@@ -816,7 +816,7 @@ def clean_filter_keys(all_filters: bool = True) -> list[dict] | dict:
         The cleaned filter dict(s) with only the keys that are in the reference dict `fil_ref`.
     """
     def _clean_dict_i(i: int) -> dict:
-        # provide an identifier with version number for pyfda files
+        # provide identifier and version number for pyfda files
         fil[i].update({'_id': ['pyfda', FILTER_FILE_VERSION]})
         # only copy the keys that are in the reference dict, remove unsupported keys
         fil_clean_i = {k:v for k, v in fil[i].items() if k in fil_ref}
