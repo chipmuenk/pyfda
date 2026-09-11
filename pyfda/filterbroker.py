@@ -712,8 +712,6 @@ def load_cleaned_filter(fil_loaded: dict) -> int:
 
     """
     # --- Sanitize *keys* by comparing to reference dict -----------------------
-    backup_fil()  # backup current filter fil_loaded
-
     key_errs = compare_dictionaries(fil_ref, fil_loaded)
     key_errs[0].sort()  # keys missing in the loaded dict
     key_errs[1].sort()  # unsupported keys; keys not in reference dict
@@ -736,64 +734,8 @@ def load_cleaned_filter(fil_loaded: dict) -> int:
     if err_str != "":
         logger.warning(err_str)
 
-    # --- Sanitize *values* in filter dictionary, keys are ok by now
-    for k in fil_loaded:
-        # Bytes need to be decoded for py3 to be used as keys later on
-        if isinstance(fil_loaded[k], bytes):
-            fil_loaded[k] = fil_loaded[k].decode('utf-8')
-        if fil_loaded[k] is None:
-            logger.warning("Entry fil_loaded[%s] is empty!", k)
-
-    if 'ba' not in fil_loaded:
-        logger.error(
-            "Missing key 'ba, cancelling file operation.")
-        restore_fil()
+    if clean_dict_values(fil_loaded) == -1:
         return -1
-    if isinstance(fb_get('ba'), np.ndarray):
-        pass
-    elif isinstance(fb_get('ba'), (list, tuple)):
-        fb_set('ba', iter2ndarray(fb_get('ba')))
-    else:
-        logger.error("Unsuitable 'ba' data type '%s', cancelling file operation.",
-                        type(fb_get('ba')).__name__)
-    if np.ndim(fb_get('ba')) != 2 or len(fb_get('ba')[0]) < 3:
-        logger.error(
-            "Unsuitable shape %s of 'ba' data, cancelling file operation.",
-            np.shape(fb_get('ba')))
-        restore_fil()
-        return -1
-
-    if 'zpk' not in fil_loaded:
-        logger.error("Missing key 'zpk', cancelling file operation.")
-        restore_fil()
-        return -1
-    if isinstance(fil_loaded['zpk'], np.ndarray):
-        pass
-    elif isinstance(fil_loaded['zpk'], (list, tuple)):
-        fil_loaded['zpk'] = iter2ndarray(fil_loaded['zpk'])
-    else:
-        logger.error("Unsuitable 'zpk' data type '%s', cancelling file operation.",
-                        type(fil_loaded['zpk']).__name__)
-    if np.ndim(fil_loaded['zpk']) != 2 or np.shape(fil_loaded['zpk'])[0] != 3:
-        logger.error(
-            "Unsuitable shape %s of 'zpk' data, cancelling file operation.",
-            np.shape(fil_loaded['zpk']))
-        restore_fil()
-        return -1
-
-    if 'sos' not in fil_loaded:
-        logger.error("Missing key 'sos', creating key and empty list.")
-        fil_loaded['sos'] = []
-    elif isinstance(fil_loaded['sos'], (list, tuple)):
-        fil_loaded['sos'] = iter2ndarray(fil_loaded['sos'])
-    elif not isinstance(fil_loaded['sos'], np.ndarray):
-        logger.error("Unsuitable 'sos' data type '%s', creating empty list.",
-                        type(fil_loaded['sos']).__name__)
-        fil_loaded['sos'] = []
-    elif np.ndim(fil_loaded['sos']) != 2 or np.shape(fil_loaded['sos'])[1] != 6:
-        logger.warning("Unsuitable shape %s of 'sos' data, storing empty list.",
-            np.shape(fil_loaded['sos']))
-        fil_loaded['sos'] = []
     # TODO: create an extra function, checking whether the sos data can be converted
     # to the correct shape instead of deleting it
     fil[0] = fil_loaded  # update global filter dict with sanitized loaded dict
@@ -836,6 +778,72 @@ def clean_filter_keys(all_filters: bool = True) -> list[dict] | dict:
 
     return fil_clean
 
+# ---------------------------------------------------------
+def clean_dict_values(fil_dict: dict) -> int:
+    """
+    Sanitize *values* of filter data entries ('sos', 'zpk', 'ba') in filter dictionary,
+    they all should be NDArrays. If not, try to correct the data type or try to convert
+    them from one of the other data entries.
+    """
+    for k in fil_dict:
+        # Bytes need to be decoded for py3 to be used as keys later on
+        if isinstance(fil_dict[k], bytes):
+            fil_dict[k] = fil_dict[k].decode('utf-8')
+        if fil_dict[k] is None:
+            logger.warning("fil[%s] is empty!", k)
+
+    if 'ba' not in fil_dict:
+        logger.error(
+            "Missing key 'ba', cancelling file operation.")
+        return -1
+
+    # check whether d['ba'] is an NDArray
+    if isinstance(fb_get('ba'), np.ndarray):
+        pass
+    elif isinstance(fb_get('ba'), (list, tuple)):
+        fb_set('ba', iter2ndarray(fb_get('ba')))
+    else:
+        logger.error("Unsuitable 'ba' data type '%s', cancelling file operation.",
+                        type(fb_get('ba')).__name__)
+    if np.ndim(fb_get('ba')) != 2 or len(fb_get('ba')[0]) < 3:
+        logger.error(
+            "Unsuitable shape %s of 'ba' data, cancelling file operation.",
+            np.shape(fb_get('ba')))
+        return -1
+
+    # check whether d['zpk'] is an NDArray
+    if 'zpk' not in fil_dict:
+        logger.error("Missing key 'zpk', cancelling file operation.")
+        return -1
+    if isinstance(fil_dict['zpk'], np.ndarray):
+        pass
+    elif isinstance(fil_dict['zpk'], (list, tuple)):
+        fil_dict['zpk'] = iter2ndarray(fil_dict['zpk'])
+    else:
+        logger.error("Unsuitable 'zpk' data type '%s', cancelling file operation.",
+                        type(fil_dict['zpk']).__name__)
+    if np.ndim(fil_dict['zpk']) != 2 or np.shape(fil_dict['zpk'])[0] != 3:
+        logger.error(
+            "Unsuitable shape %s of 'zpk' data, cancelling file operation.",
+            np.shape(fil_dict['zpk']))
+        return -1
+
+    # check whether d['sos'] is an NDArray of shape 2 x 6
+    if 'sos' not in fil_dict:
+        logger.error("Missing key 'sos', creating key and empty list.")
+        fil_dict['sos'] = []
+    elif isinstance(fil_dict['sos'], (list, tuple)):
+        fil_dict['sos'] = iter2ndarray(fil_dict['sos'])
+    elif not isinstance(fil_dict['sos'], np.ndarray):
+        logger.error("Unsuitable 'sos' data type '%s', creating empty list.",
+                        type(fil_dict['sos']).__name__)
+        fil_dict['sos'] = []
+    elif np.ndim(fil_dict['sos']) != 2 or np.shape(fil_dict['sos'])[1] != 6:
+        logger.warning("Unsuitable shape %s of 'sos' data, storing empty list.",
+            np.shape(fil_dict['sos']))
+        fil_dict['sos'] = []
+
+    return 0
 
 # ===============================================================================================
 
