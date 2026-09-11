@@ -60,7 +60,7 @@ class SelectFilter(QWidget):
         self._set_response_type()  # first time initialization
 
     # -------------------------------------------------------------------------
-    def emit(self, dict_sig):
+    def emit(self, dict_sig) -> None:
         """
         Access imported function `emit()` as instance method, passing `self`
         with its attributes
@@ -68,7 +68,7 @@ class SelectFilter(QWidget):
         emit(self, dict_sig)
 
     # -------------------------------------------------------------------------
-    def process_sig_rx(self, dict_sig):
+    def process_sig_rx(self, dict_sig) -> None:
         """
         Process signals coming in via sig_rx
 
@@ -90,7 +90,7 @@ class SelectFilter(QWidget):
             self.dict2ui()
 
     # -------------------------------------------------------------------------
-    def _construct_ui(self):
+    def _construct_ui(self) -> None:
         """
         Construct UI with comboboxes for selecting filter:
 
@@ -239,7 +239,7 @@ class SelectFilter(QWidget):
         self.setLayout(lay_h_main)
 
     # --------------------------------------------------------------------------
-    def dict2ui(self):
+    def dict2ui(self) -> None:
         """
         Reload comboboxes from filter dictionary to update changed settings
         after loading a filter design from disk.
@@ -255,7 +255,7 @@ class SelectFilter(QWidget):
         self._set_response_type()
 
     # --------------------------------------------------------------------------
-    def _set_response_type(self, enb_signal=False):
+    def _set_response_type(self, enb_signal: bool = False) -> None:
         """
         Triggered when cmb_response_type (LP, HP, ...) is changed:
         Copy selection to self.rt and fil[0] and reconstruct filter type combo
@@ -289,7 +289,7 @@ class SelectFilter(QWidget):
         self._set_filter_type(enb_signal)
 
     # --------------------------------------------------------------------------
-    def _set_filter_type(self, enb_signal=False):
+    def _set_filter_type(self, enb_signal: bool = False) -> None:
         """"
         Triggered when cmb_filter_type (IIR, FIR, ...) is changed:
         - read filter type ft and copy it to fil[0]['ft'] and self.ft
@@ -334,7 +334,7 @@ class SelectFilter(QWidget):
         self._set_design_method(enb_signal)
 
     # --------------------------------------------------------------------------
-    def _set_design_method(self, enb_signal=False):
+    def _set_design_method(self, enb_signal: bool = False) -> None:
         """
         Triggered when cmb_filter_class (cheby1, ...) is changed:
         - read design method fc and copy it to fil[0]
@@ -382,7 +382,7 @@ class SelectFilter(QWidget):
         self.load_filter_order(enb_signal)
 
     # --------------------------------------------------------------------------
-    def load_filter_order(self, enb_signal=False):
+    def load_filter_order(self, enb_signal: bool = False) -> None:
         """
         Called by set_design_method or from InputSpecs (with enb_signal = False),
           load filter order setting from fil[0] and update widgets
@@ -420,7 +420,7 @@ class SelectFilter(QWidget):
             self.emit({'filt_changed': 'filter_type'})
 
     # ------------------------------------------------------------------------------
-    def _set_filter_order(self, enb_signal=False):
+    def _set_filter_order(self, enb_signal: bool = False) -> None:
         """
         Triggered when either _led_order_n or _chk_min_order are edited:
         - copy settings to fil[0]
@@ -456,7 +456,7 @@ class SelectFilter(QWidget):
             self.emit({'filt_changed': 'filter_order_widget'})
 
     # ------------------------------------------------------------------------------
-    def _destruct_dyn_widgets(self):
+    def _destruct_dyn_widgets(self) -> None:
         """
         Delete the dynamically instantiated filter design subwidget 'wdg_fil'
         (if there is one).
@@ -496,7 +496,7 @@ class SelectFilter(QWidget):
             #                  "you should not see this message!")
 
     # ------------------------------------------------------------------------------
-    def _construct_dyn_widgets(self):
+    def _construct_dyn_widgets(self) -> None:
         """
         Create filter widget UI dynamically and
         connect its sig_tx signal to sig_tx in this scope.
