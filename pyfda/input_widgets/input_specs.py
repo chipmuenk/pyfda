@@ -603,6 +603,7 @@ def load_filter(self, all_filters: bool = False) -> bool:
             return False
 
     elif file_type == 'json':
+        logger.warning("JSON selected")
         try:
             with io.open(file_name, 'r', encoding='utf-8') as f:  # open in text mode (json files)
                 fb_temp = json.load(f)
@@ -728,7 +729,7 @@ def save_all_filters(self) -> int:
     err = False
     # create a copy of the filters to be saved that only contains keys of the
     # reference filter dict and warn of unsupported keys:
-    fil_clean = clean_filter_keys()
+    fil_clean = clean_filter_keys(all_filters=True)
 
     if file_type in {"npz", "pkl"}:
         try:
