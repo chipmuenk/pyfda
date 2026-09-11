@@ -800,7 +800,7 @@ def clean_loaded_filter(fil_loaded: dict) -> int:
     return 0
 
 # ---------------------------------------------------------
-def clean_filters(all_filters: bool = True) -> list[dict] | dict:
+def clean_filter_keys(all_filters: bool = True) -> list[dict] | dict:
     """
     Test if the keys in the global dict `fil[0]` are compatible with the reference dict `fil_ref`.
     If not, remove the unsupported keys and issue a warning.

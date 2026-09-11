@@ -21,7 +21,7 @@ import sys
 import numpy as np
 
 import pyfda.filterbroker as fb
-from pyfda.filterbroker import fb_get, fb_set, clean_filters, clean_loaded_filter
+from pyfda.filterbroker import fb_get, fb_set, clean_filter_keys, clean_loaded_filter
 from pyfda.filter_factory import call_fil_method
 from pyfda.filter_tree_builder import FilterTreeBuilder as FTB
 from pyfda.input_widgets import (
@@ -31,6 +31,7 @@ from pyfda.libs.compat import (
     QVBoxLayout, QHBoxLayout, QSizePolicy)
 
 import pyfda.libs.pyfda_dirs as dirs
+from pyfda.libs.json_numpy_encoder import JSONNumpyEncoder
 from pyfda.libs.pyfda_text_lib import to_html, first_item
 from pyfda.libs.pyfda_qt_lib import (
     popup_warning, qstyle_widget, qcmb_box_populate, qget_cmb_box, emit)
@@ -421,11 +422,8 @@ class InputSpecs(QWidget):
         # 'File' or 'File (all)' selected, update fil[0] resp. fil[0] ... fil[9] from file
         if src in {"file", "file_all"}:
             ret = load_filter(self, all_filters=src == "file_all")
-            if ret == -1:
+            if not ret:
                 return  # aborted or error occurred -> do nothing
-            if ret != 0:
-                logger.error('Unknown return code "%s"!', ret)
-                return
 
         elif src == "def":  # restore default filter
             fb.fil[0] = copy.deepcopy(fb.fil_ref)
@@ -557,7 +555,7 @@ class InputSpecs(QWidget):
         self.emit({'close_event': ''})
 
 # ==============================================================================
-def load_filter(self, all_filters: bool = False) -> int:
+def load_filter(self, all_filters: bool = False) -> bool:
     """
     Load filter from JSON, zipped binary numpy array or (c)pickled object to
     filter dictionary
@@ -569,7 +567,7 @@ def load_filter(self, all_filters: bool = False) -> int:
 
     Returns
     -------
-    0 for success, -1 for file cancel or error
+    True for success, False for file cancel or error
     """
     file_name, file_type = select_file(
         self, title="Load Filter", mode="rb", file_types = ("json", "npz", "pkl"))
@@ -602,7 +600,7 @@ def load_filter(self, all_filters: bool = False) -> int:
 
         except IOError as e:
             logger.error("Failed opening %s!\n%s", file_name, e)
-            return -1
+            return False
 
     elif file_type == 'json':
         try:
@@ -612,50 +610,19 @@ def load_filter(self, all_filters: bool = False) -> int:
         except (IOError, json.JSONDecodeError) as e:
             logger.error("JSON error: Failed loading / opening\n\t%s!\n%s", file_name, e)
             f.close()
-            return -1
+            return False
 
     else:
         logger.error('Unknown file type "%s"', file_type)
-        return -1
+        return False
 
-    # --- Test loaded file content for correct type and shape ------------------
-    if isinstance(fb_temp, list):
-        if len(fb_temp) != 10:
-            logger.error(
-                "File contains a list with wrong length = %d != 10 "
-                "which cannot be loaded!", len(fb_temp))
-            return -1
-        if all_filters:
-            pass  # file content is well-formed for loading all filters
-        else:
-            msg = ("This file contains all 10 memory locations! "
-                "Load the first one as current design (Yes) or abort (No)?")
-            err = not popup_warning(None, message=msg)
-            if not err:
-                fb_temp = fb_temp[0]  # only process first filter
-            else:
-                return -1
-
-    elif type(fb_temp) is dict:
-        if not all_filters:
-            pass  # file contains a single filter -> o.k.
-        else:
-            msg = ("This file contains only one filter! "
-                "Load as current design (Yes) or abort (No)?")
-            err = not popup_warning(None, message=msg)
-            if not err:
-                all_filters = False  # process as single filter
-            else:
-                return -1
-
-    else:
-        logger.error(
-            "Wrong data type '%s' or shape, cannot load file.", type(fb_temp))
-        return -1
+    # --- Verify loaded file content for correct type and shape ------------------
+    if verify_file_shape(fb_temp, all_filters) == -1:
+        return False
 
     # --- Test for correct id and version number ------------------------------
     err = False
-    if all_filters:
+    if isinstance(fb_temp, list):
         fb_id = fb_temp[0]  # test first slice of all filters for correct id
     else:
         fb_id = fb_temp
@@ -671,21 +638,22 @@ def load_filter(self, all_filters: bool = False) -> int:
 
     # Handle errors occurring during id test
     if err:
-        return -1
+        return False
+
     if clean_loaded_filter(fb_temp) == -1:  # clean and copy loaded filter(s) to fb.fil
         logger.warning("Error(s) occurred, filter could not be loaded.")
-        return -1
+        return False
 
     logger.info('Successfully loaded filter\n\t"%s"', file_name)
     dirs.last_file_name = file_name
     dirs.last_file_dir = os.path.dirname(file_name)  # update default working dir
     dirs.last_file_type = file_type  # save new default file type
-    return 0
+    return True
 
 # ------------------------------------------------------------------------------
 def save_filter(self) -> int:
     """
-    Save filter `fil[0]` as JSON formatted textfile, zipped binary numpy array
+    Save current filter as JSON formatted textfile, zipped binary numpy array
     or pickle object
 
     Returns
@@ -702,7 +670,8 @@ def save_filter(self) -> int:
         return -1  # operation cancelled or other error
 
     err = False
-    fil_clean = clean_filters(all_filters=False)  # create a copy of the filter dict to be saved
+
+    fil_clean = clean_filter_keys(all_filters=False)  # create a copy of the filter dict to be saved
 
     if file_type in {"npz", "pkl"}:
         try:
@@ -720,10 +689,10 @@ def save_filter(self) -> int:
         try:
             with io.open(file_name, 'w', encoding='utf-8') as f:  # open in text mode
                 # first, convert dict containing numpy arrays to a pure json string
-                fb_fil_clean_json = json.dumps(fil_clean, cls=NumpyEncoder, indent=2,
+                fil_clean_json = json.dumps(fil_clean, cls=JSONNumpyEncoder, indent=2,
                                         ensure_ascii=False, sort_keys=True )
                 # next, dump the string to a file
-                f.write(fb_fil_clean_json)
+                f.write(fil_clean_json)
 
         except IOError as e:
             err = True
@@ -745,6 +714,9 @@ def save_all_filters(self) -> int:
     """
     Save all filters `fb.fil` as JSON formatted textfile, zipped binary numpy array
     or pickle object
+
+    Returns
+    -------
     """
 
     file_name, file_type = select_file(
@@ -756,7 +728,7 @@ def save_all_filters(self) -> int:
     err = False
     # create a copy of the filters to be saved that only contains keys of the
     # reference filter dict and warn of unsupported keys:
-    fil_clean = clean_filters()
+    fil_clean = clean_filter_keys()
 
     if file_type in {"npz", "pkl"}:
         try:
@@ -775,7 +747,7 @@ def save_all_filters(self) -> int:
         try:
             with io.open(file_name, 'w') as f:  # open in text mode
                 # first, convert dict containing numpy arrays to a pure json string
-                fb_fil_0_json = json.dumps(fil_clean, cls=NumpyEncoder, indent=2,
+                fb_fil_0_json = json.dumps(fil_clean, cls=JSONNumpyEncoder, indent=2,
                                         ensure_ascii=False, sort_keys=True )
                 # next, dump the string to a file
                 f.write(fb_fil_0_json)
@@ -795,38 +767,56 @@ def save_all_filters(self) -> int:
         return 0
     return -1
 
-
 # ------------------------------------------------------------------------------
-class NumpyEncoder(json.JSONEncoder):
+def verify_file_shape(fb_temp: list[dict] | dict, all_filters) -> int:
     """
-    Special json encoder for numpy and other non-supported types, building upon
-    https://stackoverflow.com/questions/26646362/numpy-array-is-not-json-serializable
+    Verify that the loaded file content is either a list containing 10 dicts (10
+    filters) or a single dict (one filter)
+
+    Parameters
+    ----------
+    fb_temp: list[dict] | dict
+
+    all_filters: bool
+
+    Returns
+    -------
+    int
+
     """
-    def default(self, obj):
-        if isinstance(obj, np.integer):
-            return int(obj)
-        if isinstance(obj, np.floating):
-            return float(obj)
-        if isinstance(obj, np.ndarray):
-            return obj.tolist()
-        if isinstance(obj, complex):
-            if obj.imag < 0:
-                return str(obj.real) + str(obj.imag) + "j"
-            return str(obj.real) + "+" + str(obj.imag) + "j"
-        if callable(obj):
-            logger.warning("Object '%s' not JSON serializable as it is a function.", obj)
-            return ""
+    if isinstance(fb_temp, list):
+        if len(fb_temp) != 10:
+            logger.error(
+                "File contains a list with wrong length = %d != 10 "
+                "which cannot be loaded!", len(fb_temp))
+            return -1
+        if not all_filters:
+            msg = ("This file contains all 10 memory locations! "
+                "Load the first one as current design (Yes) or abort (No)?")
+            err = not popup_warning(None, message=msg)
+            if not err:
+                fb_temp = fb_temp[0]  # only process first filter
+                return 0
 
-        try:
-            return json.JSONEncoder.default(self, obj)
-        except TypeError as e:
-            logger.warning(
-                "Object of type '%s' is not JSON serializable.\n%s", type(obj), e)
-            return ""
+    elif type(fb_temp) is dict:
+        if not all_filters:
+            pass  # file contains a single filter -> o.k.
+        else:
+            msg = ("This file contains only one filter! "
+                "Load as current design (Yes) or abort (No)?")
+            err = not popup_warning(None, message=msg)
+            if not err:
+                all_filters = False  # process as single filter
+            else:
+                return -1
 
+    else:
+        logger.error(
+            "Wrong data type '%s' or shape, cannot load file.", type(fb_temp))
 
+    return -1
 
-# ------------------------------------------------------------------------------
+# ==========================================================================
 if __name__ == '__main__':
     # Run widget standalone with `python -m pyfda.input_widgets.input_specs`
     from pyfda.libs.compat import QApplication
