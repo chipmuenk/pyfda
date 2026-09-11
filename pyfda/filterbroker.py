@@ -837,8 +837,7 @@ def clean_filter_keys(all_filters: bool = True) -> list[dict] | dict:
     return fil_clean
 
 
-# Comparing nested dicts
-# https://stackoverflow.com/questions/27265939/comparing-python-dictionaries-and-nested-dictionaries
+# ===============================================================================================
 
 if __name__ == '__main__':
     # Run widget standalone with `python -m pyfda.filterbroker`

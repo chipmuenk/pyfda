@@ -352,6 +352,9 @@ def compare_dictionaries(
 
     return key_errs
 
+    # https://stackoverflow.com/questions/27265939/
+    #   comparing-python-dictionaries-and-nested-dictionaries
+
 
 # -----------------------------------------------------------------------------
 def first_item(d: dict) -> str:
