@@ -423,6 +423,7 @@ class InputSpecs(QWidget):
         if src in {"file", "file_all"}:
             ret = load_filter(self, all_filters=src == "file_all")
             if not ret:
+                self.cmb_filter_load.setCurrentIndex(0)
                 return  # aborted or error occurred -> do nothing
 
         elif src == "def":  # restore default filter
@@ -573,7 +574,7 @@ def load_filter(self, all_filters: bool = False) -> bool:
         self, title="Load Filter", mode="rb", file_types = ("json", "npz", "pkl"))
 
     if file_name is None:
-        return -1  # operation cancelled or some other error
+        return False  # operation cancelled or some other error
 
     if file_type in {"npz", "pkl"}:
         try:
@@ -618,8 +619,14 @@ def load_filter(self, all_filters: bool = False) -> bool:
         return False
 
     # --- Verify loaded file content for correct type and shape ------------------
-    if verify_file_shape(fb_temp, all_filters) == -1:
-        return False
+    ret = verify_file_shape(fb_temp, all_filters)
+    if ret == 1:
+        return False  # unsuitable type / shape
+    if ret == 2:
+        fb_temp = fb_temp[0]  # only use the first filter of the list as requested by user
+    elif ret == 3:
+        all_filters = False  # filter contains only a dict although 'all filters' had
+                             # been selected. User decided to still load the single filter
 
     # --- Test for correct id and version number ------------------------------
     err = False
@@ -783,6 +790,13 @@ def verify_file_shape(fb_temp: list[dict] | dict, all_filters) -> int:
     Returns
     -------
     int
+        0: Successful verification
+        1: Error, filter is unsuitable
+        2: A list of filter dicts has been passed but a single filter has been requested
+            (`all_filters == False`). This needs to be fixed one hierarchy level up.
+            by extracting the first filter
+        3: A single dict has been passed but a list of filters has been requested
+            (`all_filters == True`). This needs to be fixed one hierarchy level up.
 
     """
     if isinstance(fb_temp, list):
@@ -790,32 +804,29 @@ def verify_file_shape(fb_temp: list[dict] | dict, all_filters) -> int:
             logger.error(
                 "File contains a list with wrong length = %d != 10 "
                 "which cannot be loaded!", len(fb_temp))
-            return -1
+            return 1
         if not all_filters:
             msg = ("This file contains all 10 memory locations! "
                 "Load the first one as current design (Yes) or abort (No)?")
-            err = not popup_warning(None, message=msg)
-            if not err:
-                fb_temp = fb_temp[0]  # only process first filter
-                return 0
+            if popup_warning(None, message=msg):  # 'yes' has been pressed
+                # extract first filter one level higher
+                return 2
+        else:
+            return 0
 
     elif type(fb_temp) is dict:
         if not all_filters:
-            pass  # file contains a single filter -> o.k.
-        else:
-            msg = ("This file contains only one filter! "
-                "Load as current design (Yes) or abort (No)?")
-            err = not popup_warning(None, message=msg)
-            if not err:
-                all_filters = False  # process as single filter
-            else:
-                return -1
+            return 0  # file contains a single filter -> o.k.
 
+        msg = ("This file contains only one filter! "
+            "Load as current design (Yes) or abort (No)?")
+        if popup_warning(None, message=msg):  # 'yes' has been pressed
+            # process as single filter, set `all_filters = False` one level higher
+            return 3
     else:
         logger.error(
             "Wrong data type '%s' or shape, cannot load file.", type(fb_temp))
-
-    return -1
+    return 1
 
 # ==========================================================================
 if __name__ == '__main__':
