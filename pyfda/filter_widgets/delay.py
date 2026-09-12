@@ -60,7 +60,7 @@ class Delay(QWidget):
         self.rt_dicts = ('com',)
 
         self.rt_dict = {
-            'COM': {'man': {'fo':('a', 'N'),
+            'com': {'man': {'fo':('a', 'N'),
                             'msg':('a',
                                 "<span>Enter desired number of delays <b><i>N</i></b>.</span>")
                             },

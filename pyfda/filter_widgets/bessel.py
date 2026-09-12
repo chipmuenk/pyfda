@@ -87,7 +87,7 @@ class Bessel():
 
         self.ft = 'IIR' #: filter type
         self.rt_dict =  {
-            'COM':{'man':{'fo': ('a', 'N'),
+            'com':{'man':{'fo': ('a', 'N'),
                    'msg':('a', "Enter the filter order <b><i>N</i></b> and the critical "
                                "frequency or frequencies <b><i>F<sub>C</sub></i></b> .")},
                    'min':{'fo': ('d', 'N'),

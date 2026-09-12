@@ -80,7 +80,7 @@ class Butter():
         self.ft = 'IIR'
 
         self.rt_dict =  {
-            'COM':{'man':{'fo': ('a', 'N'),
+            'com':{'man':{'fo': ('a', 'N'),
                    'msg':('a', "Enter the filter order <b><i>N</i></b> and the -3 dB corner "
                                "frequency(ies) <b><i>F<sub>C</sub></i></b> &nbsp; .")},
                    'min':{'fo': ('d', 'N'),

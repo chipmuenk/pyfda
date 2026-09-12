@@ -410,7 +410,7 @@ class FilterTreeBuilder():
         ft = get_fil_inst().ft                 # get filter type (e.g. 'FIR')
 
         for rt in rt_dict:                     # iterate over all response types
-            if rt == 'COM':                    # handle common info later
+            if rt == 'com':                    # handle common info later
                 continue
 
             if rt not in fil_tree:             # is response type already in dict?
@@ -425,11 +425,11 @@ class FilterTreeBuilder():
             # now append all the individual 'min' / 'man'  subwidget infos to fc:
             fil_tree[rt][ft][fc].update(rt_dict[rt])
 
-            if 'COM' in rt_dict:      # Now handle common info
+            if 'com' in rt_dict:      # Now handle common info
                 for fo in rt_dict[rt]:  # iterate over 'min' / 'max'
-                    if fo in rt_dict['COM']:  # and add common info first
+                    if fo in rt_dict['com']:  # and add common info first
                         merge_dicts_hierarchically(fil_tree[rt][ft][fc][fo],
-                                    rt_dict['COM'][fo], mode='add2')
+                                    rt_dict['com'][fo], mode='add2')
 
         return fil_tree
 

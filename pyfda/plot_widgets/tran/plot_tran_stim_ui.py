@@ -150,7 +150,7 @@ STIM_WDG_DICT = {
     "cos":     {"dc", "a1", "a2", "phi1", "phi2", "f1", "f2", "noise"},
     "sine":    {"dc", "a1", "a2", "phi1", "phi2", "f1", "f2", "noise"},
     "exp":     {"dc", "a1", "a2", "phi1", "phi2", "f1", "f2", "noise"},
-    "diric":   {"dc", "a1", "t1", "N1", "f1", "noise"},
+    "diric":   {"dc", "a1", "t1", "n1", "f1", "noise"},
 
     "chirp":   {"dc", "a1", "phi1", "f1", "f2", "t2", "noise"},
     "triang":  {"dc", "a1", "phi1", "f1", "noise", "bl"},
@@ -160,7 +160,7 @@ STIM_WDG_DICT = {
     "am":      {"dc", "a1", "a2", "phi1", "phi2", "f1", "f2", "noise"},
     "pmfm":    {"dc", "a1", "a2", "phi1", "phi2", "f1", "f2", "noise"},
     "pwm":     {"dc", "a1", "a2", "phi1", "phi2", "f1", "f2", "noise", "bl"},
-    "formula": {"dc", "a1", "a2", "phi1", "phi2", "f1", "f2", "N1", "N2",
+    "formula": {"dc", "a1", "a2", "phi1", "phi2", "f1", "f2", "n1", "n2",
                 "t1", "t2", "bw1", "bw2", "noise"}
                 }
 
@@ -854,8 +854,8 @@ class PlotTranStimUI(QWidget):
         self.lbl_t_1.setVisible("t1" in stim_wdg)
         self.led_t_1.setVisible("t1" in stim_wdg)
         self.lbl_t_u_1.setVisible("t1" in stim_wdg)
-        self.lbl_n_1.setVisible("N1" in stim_wdg)
-        self.led_n_1.setVisible("N1" in stim_wdg)
+        self.lbl_n_1.setVisible("n1" in stim_wdg)
+        self.led_n_1.setVisible("n1" in stim_wdg)
         self.lbl_tw_1.setVisible("tw_1" in stim_wdg)
         self.led_tw_1.setVisible("tw_1" in stim_wdg)
         self.lbl_twu_1.setVisible("tw_1" in stim_wdg)
@@ -873,8 +873,8 @@ class PlotTranStimUI(QWidget):
         self.lbl_t_2.setVisible("t2" in stim_wdg)
         self.led_t_2.setVisible("t2" in stim_wdg)
         self.lbl_t_u_2.setVisible("t2" in stim_wdg)
-        self.lbl_n_2.setVisible("N2" in stim_wdg)
-        self.led_n_2.setVisible("N2" in stim_wdg)
+        self.lbl_n_2.setVisible("n2" in stim_wdg)
+        self.led_n_2.setVisible("n2" in stim_wdg)
         self.lbl_tw_2.setVisible("tw_2" in stim_wdg)
         self.led_tw_2.setVisible("tw_2" in stim_wdg)
         self.lbl_twu_2.setVisible("tw_2" in stim_wdg)
@@ -916,13 +916,13 @@ class PlotTranStimUI(QWidget):
         """ Update value for self.n1 from `self.led_n_1`"""
         self.n1 = safe_eval(self.led_n_1.text(), self.n1, return_type='int', sign='pos')
         self.led_n_1.setText(str(self.n1))
-        self.emit({'ui_local_changed': 'N1'})
+        self.emit({'ui_local_changed': 'n1'})
 
     def _update_n_2(self) -> None:
         """ Update value for self.n2 from `self.led_n_2`"""
         self.n2 = safe_eval(self.led_n_2.text(), self.n2, return_type='int', sign='pos')
         self.led_n_2.setText(str(self.n2))
-        self.emit({'ui_local_changed': 'N2'})
+        self.emit({'ui_local_changed': 'n2'})
 
     def _update_bw_1(self) -> None:
         """ Update value for self.bw1 from QLineEditWidget"""

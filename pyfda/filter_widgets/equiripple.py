@@ -98,7 +98,7 @@ class Equiripple(QWidget):
         self.rt_dicts = ('com',)
 
         self.rt_dict = {
-            'COM': {'man': {'fo':('a', 'N'),
+            'com': {'man': {'fo':('a', 'N'),
                             'msg':('a',
                                 "<span>Enter desired filter order <b><i>N</i></b>, corner "
                                 "frequencies of pass and stop band(s), <b><i>F<sub>PB</sub>"

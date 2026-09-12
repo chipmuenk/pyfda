@@ -92,7 +92,7 @@ class Firwin(QWidget):
         self.rt_dict = c.rt_base_iir
 
         self.rt_dict_add = {
-            'COM': {
+            'com': {
                 'min': {
                     'msg': ('a',
                             "<br /><b>Note:</b> Filter order is only a rough "

@@ -60,7 +60,7 @@ class AllpPZ(QWidget):
         # the following defines which subwidgets are "a"ctive, "i"nvisible or "d"eactivated
         self.rt_dicts = ('com',)
         self.rt_dict = {
-            'COM': {'man': {'fo':('d', 'N'),
+            'com': {'man': {'fo':('d', 'N'),
                             'msg':('a',
                                 "<span>Enter poles  <b><i>p</i></b> for allpass function,"
                                 "zeros will be calculated.</span>")

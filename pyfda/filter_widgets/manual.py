@@ -72,7 +72,7 @@ class Manual_FIR():
         self.ft = 'FIR'
 
         self.rt_dict = {
-            'COM':{'man':{'fo': ('d', 'N'),
+            'com':{'man':{'fo': ('d', 'N'),
                           'msg': msg_man}
                         },
             'lp': {'man':{'tspecs': ('u', {'frq':('u','f_pb','f_sb'),
@@ -150,7 +150,7 @@ class Manual_IIR():
         self.ft = 'IIR'
 
         self.rt_dict = {
-            'COM':{'man':{'fo': ('d', 'N'),
+            'com':{'man':{'fo': ('d', 'N'),
                           'msg': msg_man}
                         },
             'lp': {'man':{'tspecs': ('u', {'frq':('u','f_pb','f_sb'),

@@ -92,7 +92,7 @@ class Cheby1():
         self.rt_dict = c.rt_base_iir
 
         self.rt_dict_add = {
-            'COM':{'man':{'msg':('a',
+            'com':{'man':{'msg':('a',
                 r"Enter the filter order <b><i>N</i></b> and the critical frequency "
                  "or frequencies <b><i>F<sub>C</sub></i></b>&nbsp; where the gain first "
                  "drops below the maximum ripple "

@@ -85,7 +85,7 @@ class Ellip():
         c = Common()
         self.rt_dict = c.rt_base_iir
         self.rt_dict_add = {
-            'COM':{'man':{'msg':('a',
+            'com':{'man':{'msg':('a',
                   "Enter the filter order <b><i>N</i></b>, the minimum stop "
                   "band attenuation <b><i>A<sub>SB</sub></i></b> and the frequency or "
                   "frequencies <b><i>F<sub>C</sub></i></b>  where the gain first drops "

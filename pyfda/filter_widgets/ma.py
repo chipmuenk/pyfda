@@ -95,7 +95,7 @@ class MA(QWidget):
         # (common data comes first):
 
         self.rt_dict = {
-            'COM':{'man':{'fo': ('d', 'N'),
+            'com':{'man':{'fo': ('d', 'N'),
                           'msg':('a',
                    "Enter desired order (= delays) <b><i>M</i></b> per stage and"
                     " the number of <b>stages</b>. Target frequencies and amplitudes"

@@ -5,8 +5,10 @@
 # Copyright © pyfda Project Contributors
 # Licensed under the terms of the MIT License
 # (see file LICENSE in root directory for details)
+
 """ Common settings and some helper functions for filter design """
 
+# pylint: disable=too-few-public-methods
 import numpy as np
 
 class Common():
@@ -15,7 +17,7 @@ class Common():
     """
     def __init__(self):
         self.rt_base_iir = {
-            'COM': {'man': {'fo': ('a', 'N')},
+            'com': {'man': {'fo': ('a', 'N')},
                     'min': {'fo': ('d', 'N'),
                             'msg': (
                               'a',
@@ -187,15 +189,15 @@ def remlplen_herrmann(fp: float, fs: float, dp: float, ds: float) -> int:
     Jour., 52(6):769-799, Jul./Aug. 1973.
     """
 
-    dF = fs-fp
+    df = fs-fp
     a = [5.309e-3, 7.114e-2, -4.761e-1, -2.66e-3, -5.941e-1, -4.278e-1]
     b = [11.01217, 0.51244]
-    Dinf = np.log10(ds) * (a[0] * np.log10(dp)**2 + a[1] * np.log10(dp) + a[2])\
+    dinf = np.log10(ds) * (a[0] * np.log10(dp)**2 + a[1] * np.log10(dp) + a[2])\
         + a[3] * np.log10(dp)**2 + a[4] * np.log10(dp) + a[5]
     f = b[0] + b[1] * (np.log10(dp) - np.log10(ds))
-    N1 = Dinf / dF - f * dF + 1
+    n1 = dinf / df - f * df + 1
 
-    return int(N1)
+    return int(n1)
 
 # -------------------------------------------------------------------
 def remlplen_kaiser(fp: float, fs: float, dp: float, ds: float) -> int:
@@ -211,10 +213,10 @@ def remlplen_kaiser(fp: float, fs: float, dp: float, ds: float) -> int:
     function, Proc. IEEE Int. Symp. Circuits and Systems, 20-23, April 1974.
     """
 
-    dF = fs-fp
-    N2 = (-20*np.log10(np.sqrt(dp*ds))-13.0)/(14.6*dF)+1.0
+    df = fs-fp
+    n2 = (-20*np.log10(np.sqrt(dp*ds))-13.0)/(14.6*df)+1.0
 
-    return int(N2)
+    return int(n2)
 
 # ------------------------------------------------------------------------------
 def remlplen_ichige(fp: float, fs: float, dp: float, ds: float) -> int:
@@ -231,29 +233,29 @@ def remlplen_ichige(fp: float, fs: float, dp: float, ds: float) -> int:
     This seems to give the most accurate results of the three approximations.
     """
     #   dp_lin = (10**(dp/20.0)-1) / (10**(dp/20.0)+1)*2
-    def func_v(dF: float, dp: float) -> float:
+    def func_v(df: float, dp: float) -> float:
         """ Helper function """
-        return 2.325 * ((-np.log10(dp))**-0.445) * dF ** (-1.39)
+        return 2.325 * ((-np.log10(dp))**-0.445) * df ** (-1.39)
 
-    def func_g(dF: float, fp: float) -> float:
+    def func_g(df: float, fp: float) -> float:
         """ Helper function """
-        return (2.0 / np.pi) * np.arctan(func_v(dF, dp) * (1.0 / fp - 1.0 / (0.5 - dF)))
+        return (2.0 / np.pi) * np.arctan(func_v(df, dp) * (1.0 / fp - 1.0 / (0.5 - df)))
 
-    def func_h(dF: float, fp: float, c: float) -> float:
+    def func_h(df: float, fp: float, c: float) -> float:
         """ Helper function """
-        return (2.0/np.pi) * np.arctan((c/dF)*(1.0/fp-1.0/(0.5-dF)))
+        return (2.0/np.pi) * np.arctan((c/df)*(1.0/fp-1.0/(0.5-df)))
 
-    dF = fs-fp
-    # v = lambda dF, dp: 2.325*((-np.log10(dp))**-0.445)*dF**(-1.39)
-    # g = lambda fp, dF, d: (2.0/np.pi)*np.arctan(v(dF, dp)*(1.0/fp-1.0/(0.5-dF)))
-    # h = lambda fp, dF, c: (2.0/np.pi)*np.arctan((c/dF)*(1.0/fp-1.0/(0.5-dF)))
-    Nc = np.ceil(1.0+(1.101/dF) * (-np.log10(2.0*dp)) ** 1.1)
-    Nm = (0.52/dF)*np.log10(dp/ds)*(-np.log10(dp))**0.17
-    N3 = np.ceil(Nc*(func_g(dF, fp) + func_g(dF, 0.5-dF-fp) + 1.0) / 3.0)
-    DN = np.ceil(Nm*(func_h(dF, fp, 1.1) - (func_h(dF, 0.5-dF-fp, 0.29) - 1.0) / 2.0))
-    N4 = N3 + DN
+    df = fs-fp
+    # v = lambda df, dp: 2.325*((-np.log10(dp))**-0.445)*df**(-1.39)
+    # g = lambda fp, df, d: (2.0/np.pi)*np.arctan(v(df, dp)*(1.0/fp-1.0/(0.5-df)))
+    # h = lambda fp, df, c: (2.0/np.pi)*np.arctan((c/df)*(1.0/fp-1.0/(0.5-df)))
+    nc = np.ceil(1.0+(1.101/df) * (-np.log10(2.0*dp)) ** 1.1)
+    nm = (0.52/df)*np.log10(dp/ds)*(-np.log10(dp))**0.17
+    n3 = np.ceil(nc*(func_g(df, fp) + func_g(df, 0.5-df-fp) + 1.0) / 3.0)
+    dn = np.ceil(nm*(func_h(df, fp, 1.1) - (func_h(df, 0.5-df-fp, 0.29) - 1.0) / 2.0))
+    n4 = n3 + dn
 
-    return int(N4)
+    return int(n4)
 
 # ------------------------------------------------------------------------------
 if __name__ == '__main__':
