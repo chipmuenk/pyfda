@@ -94,7 +94,6 @@ def main():
         12 pt = 12/72 = 1/6 logical inch = 96/6 pixels = 16 pixels @ 96 dpi
 
 
-
     Enable automatic scaling based on the monitor's pixel density.
     This doesn't change the size of point based fonts:
     `os.environ["QT_ENABLE_HIGHDPI_SCALING"]   = "1"`

@@ -45,6 +45,8 @@ from typing import Iterable
 from pyfda.libs.pyfda_num_lib import iter2ndarray
 from pyfda.libs.pyfda_text_lib import compare_dictionaries
 
+from pyfda.filter_storage import fil_ref
+
 import numpy as np
 
 logger = logging.getLogger(__name__)
@@ -63,292 +65,54 @@ UNDO_LEN = 20  # depth of circular undo buffer
 undo_step = 0  # number of undo steps, limited to UNDO_LEN
 undo_ptr = 0  # pointer to current undo memory % UNDO_LEN
 
-# -----------------------------------------------------------------------------
-# Reference dictionary containing current filter type, specifications, design
-# and some auxiliary information, the initial definition here is copied into
-# fil[0] ... [9] which can be modified by input widgets and design routines
-# -----------------------------------------------------------------------------
-fil_ref = {
-    '_id': [], # a list with the keyword 'pyfda' and the version, e.g. ['pyfda', 1]
-    # amplitude specs (linear units)
-    'a_pb': 0.2056717652757185,
-    'a_pb2': 0.01,
-    'a_sb': 0.001,
-    'a_sb2': 0.0001,
-    # frequency specs (normalized to F_S)
-    'f_c': 0.1,
-    'f_c2': 0.4,
-    'f_pb': 0.1,
-    'f_pb2': 0.3,
-    'f_sb': 0.2,
-    'f_sb2': 0.4,
-    'N': 4,  # filter order
-    'T_S': 1.0,  # sample time
-    # weights for pass- and stopbands
-    'w_pb': 1.0,
-    'w_pb2': 1.0,
-    'w_sb': 1.0,
-    'w_sb2': 1.0,
-    #
-    'amp_specs_unit': 'dB',
-    # [b, a] coefficients:
-    'ba': np.array([
-        [
-            0.005009993265049969,
-            0.002969044992011087,
-            0.007446465726559892,
-            0.0029690449920110867,
-            0.00500999326504997
-        ],
-        [
-            1.0,
-            -3.18194574253062,
-            4.1391887955869535,
-            -2.567503107299107,
-            0.639724627220979
-        ]
-    ]),
-    'creator': [
-        'sos',
-        'pyfda.filter_widgets.ellip'
-    ],
-    'f_S': 1.0,
-    'f_s_prev': 1.0,  # previous sampling frequency
-    # 'f_s_wav': 16000,  # sampling frequency for wav files
-    'f_max': 1.0,
-    'f_s_scale': 1.0,
-    'fc': 'Ellip',  # filter class
-    # Window parameters for frequency domain analysis of transient signals
-    'tran_freq_win': {
-        'id': 'rectangular',  # window id
-        'disp_name': 'Rectangular',  # display name
-        'par_val': [],    # list of window parameters
-        'win_len': 32  # window length for window viewer
-    },
-    # parameter(s) of dynamically instantiated filter widgets
-    'filter_widgets': {
-        # Equiripple FIR filters
-        'equiripple': {'grid_density': 16},
-        # Windowed FIR filters
-        'firwin':
-            {'id': 'kaiser', # Window id
-             'disp_name': 'Kaiser', # display name
-             'par_val': [10],    # list of window parameters
-             'win_len': 32  # window length for window viewer
-            },
-        # Moving Average filters
-        'ma':
-            {'delays': 5,
-             'stages': 2,
-             'normalize': True}
-        },
-    'fo': 'man',  # filter order, man or min
-    'freq_specs_range': [
-        0,
-        0.5
-    ],
-    'freq_specs_range_type': 'half',
-    'freq_locked': False, # don't update absolute frequencies when f_S is changed
-    'freq_specs_sort': True,  # sort freq. specs in ascending order
-    'freq_specs_unit': 'f_S',
-    'ft': 'IIR',  # filter type
-    'fx_base': 'dec', # global number format for fx display {'dec', 'hex', 'bin', 'oct', 'csd'}
-    # string with current fixpoint module and class
-    'fx_mod_class_name': 'pyfda.fixpoint_widgets.iir_df1.iir_df1_pyfixp_ui',
-    # Settings for quantization subwidgets
-    # ---------------------------------------------------------------------------
-    #  Sub-dicts for quantization of
-    #   'QI':input, 'QO': output, 'QCA': coeffs a, 'QCB': coeffs b, 'QACC': accumulator
-    #    (more subwidgets can be added by fixpoint widget if needed)
-    #  Keys:
-    #   'N_over': number of overflows during last quantization process
-    #   'WF': fractional bits, 'WI': integer bits
-    #   'ovfl': overflow behaviour, 'quant': quantizer behaviour
-    #   'w_a_m': word length automatic / manual calculation (not needed for 'QI', 'QO')
-    'fxq':{
-        # accumulator quantization
-        'QACC': {
-            'N_over': 0,
-            'WF': 28,
-            'WI': 3,
-            'ovfl': 'wrap',
-            'quant': 'floor',
-            'w_a_m': 'a'
-        },
-        # 'a' coefficient quantization
-        'QCA': {
-            'N_over': 0,
-            'WF': 12,
-            'WI': 3,
-            'ovfl': 'wrap',
-            'quant': 'floor',
-            'w_a_m': 'a'
-        },
-        # 'b' coefficient quantization
-        'QCB': {
-            'N_over': 0,
-            'WF': 15,
-            'WI': 0,
-            'ovfl': 'wrap',
-            'quant': 'floor',
-            'w_a_m': 'a'
-        },
-        # input quantization
-        'QI': {
-            'N_over': 0,
-            'WF': 15,
-            'WI': 0,
-            'ovfl': 'sat',
-            'quant': 'round',
-            'w_a_m': 'm'
-        },
-        # output quantization
-        'QO': {
-            'N_over': 0,
-            'WF': 15,
-            'WI': 0,
-            'ovfl': 'wrap',
-            'quant': 'floor',
-            'w_a_m': 'm'
-        }
-    },
-    'info': 'Ellip. LP (default)',
-    'plt_f_label': '$F = f\\, /\\, f_S = \\Omega \\, /\\,  2 \\mathrm{\\pi} \\; \\rightarrow$',
-    'plt_f_unit': 'f_S',
-    'plt_phi_label': '$\\angle H(\\mathrm{e}^{\\mathrm{j} \\Omega})$ in rad $\\rightarrow $',
-    'plt_phi_unit': 'rad',
-    'plt_t_label': '$n = t\\, /\\, T_S \\; \\rightarrow$',
-    'plt_t_unit': 'T_S',
-
-    'qfrmt': 'float64',  # global quantization format {'float64', 'float32', 'qint', 'qfrac'}
-    'qfrmt_float_last': 'float64',  # last used float format
-    'qfrmt_fx_last': 'qfrac',  # last used fixpoint format
-
-    'rt': 'lp',  # filter response type
-    # coefficients as second order sections
-    'sos': np.array([
-        [
-            0.005009993265049969,
-            0.005370024900373368,
-            0.00500999326504997,
-            1.0,
-            -1.6295801387915057,
-            0.7159415650206529
-        ],
-        [
-            1.0,
-            -0.47923815089965677,
-            1.0,
-            1.0,
-            -1.5523656037391145,
-            0.8935430745699543
-        ]
-    ]),
-    'timestamp': 1717151329.1387591,  # time when filter was created
-    # 'timestamp': time.time(),
-
-    # causal zeros/poles/gain
-    'zpk': np.array([
-        [
-            -0.5359313492330422+0.8442615642733304j,
-            -0.5359313492330422-0.8442615642733304j,
-            0.23961907544982838+0.9708669830005394j,
-            0.23961907544982838-0.9708669830005394j
-        ],
-        [
-            0.8147900693957527+0.22816377415075598j,
-            0.8147900693957527-0.22816377415075598j,
-            0.7761828018695571+0.539521392209686j,
-            0.7761828018695571-0.539521392209686j
-        ],
-        [
-            0.005009993265049969+0.0j,
-            0.0+0.0j,
-            0.0+0.0j,
-            0.0+0.0j
-        ]
-    ]),
-    # Tab-specific infos
-    'tab_yn':{
-        'display_index_k': False
-    }
-}
-# =============================================================================
-
   # create empty lists with length 10 for multiple filter designs and undo memory
 fil = [None] * 10
 fil_undo = [None] * UNDO_LEN
 
-# Copy fil_ref to fil[0] ... fil[9] to initialize all memories
-
-# Why doesn't this work? It seems that all entries in fil[0] ... fil[9] are references to the
-# same dict fil_ref, so that changing one of them changes all of them. This is not the case
-# for the nested dicts and lists, which are also references but they are not changed by changing
-# the reference to the outer dict. So we need to create a deep copy of fil_ref for each entry
-# in fil.
-# for f in fil:
-#   f = copy.deepcopy(fil_ref)
-for i, _ in enumerate(fil):
-    fil[i] = copy.deepcopy(fil_ref)
-
-class _BackupFilterDict():
+# -----------------------------------------------------------------------
+def fil_copy(src: str = "ref", dest: str = "all") -> None:
     """
-    Back up and restore the global filter dict `fil[0]`.
-
+    Copy `'src'` filter to `'dest'` filter where:
+    - `'src'` can be  the reference filter ("ref") or fil[0] ... fil[9] ("0" ... "9") 
+    - `'dest'` can be all filters ("all") or fil[0] ... fil[9] ("0" ... "9")
+    Other source or target destinations give an error.
     """
-    def __init__(self):
-        # undo step, limited to 0 ... UNDO_LEN. This prevents exceeding the available
-        # UNDO_LEN memories and trying to restore more than the stored copies
-        self.undo_stp = 0
-        self.undo_ptr = 0  # pointer to current undo memory % UNDO_LEN
 
-    def restore_fil(self) -> int:
-        """
-        Restore current global dict `fil[0]` from undo memory `fil_undo`
+    # for f in fil:
+    #   f = copy.deepcopy(fil_ref)
+    # does not work because all entries in fil[0] ... fil[9] become references to the same dict `fil_ref`,
+    # so that changing one of them changes all of them. This is not the case for the nested dicts and
+    # lists, which are also references but they are not changed by changing the reference to the
+    # outer dict. So we need to create a deep copy of fil_ref for each entry in `fil``.
 
-        Returns
-        -------
-        int
-            -1: undo buffer empty, nothing restored
-            0: successful restore
-        """
+    if dest == "all":
+        for i, _ in enumerate(fil):
+            fil[i] = copy.deepcopy(fil_ref)
+            return
 
-        # undo buffer is empty, don't restore anything
-        if self.undo_stp < 1:
-            self.undo_stp = 0
-            return -1
+    targ_idx = int(dest)
 
-        fil[0] = copy.deepcopy(fil_undo[undo_ptr])
-        self.undo_stp -= 1
-        self.undo_ptr = (self.undo_ptr + UNDO_LEN - 1) % UNDO_LEN
-        return 0
+    if src == "ref":
+        fil[targ_idx] = copy.deepcopy(fil_ref)
+        return
 
-    # -------------------------
-    def backup_fil(self) -> int:
-        """
-        Store current global dict `fb.fil[0]` to undo memory `fil_undo`
+    src_idx = int(src)
+    fil[targ_idx] = fil[src_idx]
+    return
 
-        Returns
-        -------
-        int
-            undo step, limited to 0 ... UNDO_LEN
-        """
+def fil_info(idx: int) -> str:
+    """
+    Return filter info string
+    """
+    return fil[idx]['info']
 
-        # prevent buffer overflow
-        self.undo_stp += 1
-        self.undo_stp = min(self.undo_stp, UNDO_LEN)
-        # increase buffer pointer, allowing for circular wrap around
-        self.undo_ptr = (self.undo_ptr + 1) % UNDO_LEN
-        fil_undo[self.undo_ptr] = copy.deepcopy(fil[0])
-        logger.debug("Undo ptr = %s", self.undo_ptr)
-        return self.undo_stp
 
-# -------------------------------------------------
-_backup_filter_dict = _BackupFilterDict()
-# import this from other modules
-backup_fil = _backup_filter_dict.backup_fil
-restore_fil = _backup_filter_dict.restore_fil
-# -------------------------------------------------
+# -------------------
+fil_copy()
+# -------------------
+
+
+# =============================================================================
 
 # -------------------------
 def _print_dict(keys_tuple: tuple, top_dict_str = "fil[0]") -> str:
@@ -518,6 +282,7 @@ def fb_set(*keys_tuple: tuple, backup: bool = True, new_key: bool = False,
     fb_set('fxq', 'QCA', 'WF', 12) is equivalent to `fil[0]['fxq']['QCA']['WF'] = 12`
     fb_set('fxq', 'QCA', {'WF': 15, 'WI': 0}) is equivalent to
             `fil[0]['fxq']['QCA']['WF'] = 15` and `fil[0]['fxq']['QCA']['WI'] = 0`
+
     Parameters
     ----------
     keys_tuple : tuple
@@ -550,10 +315,6 @@ def fb_set(*keys_tuple: tuple, backup: bool = True, new_key: bool = False,
 
     TypeError
         If `keys_tuple` is not of type Tuple or if it has less than two items
-
-    TODO: Dict entries need to be protected from accidental overwriting by
-    the user. This will be done by prepending the dict name with an underscore
-    `_fil[0]` once all direct accesses have been removed.
     """
 
     logger.debug("tuple_keys: %s", keys_tuple)
@@ -629,6 +390,7 @@ def fb_set(*keys_tuple: tuple, backup: bool = True, new_key: bool = False,
         return -1
 
     return 0
+
 
 # =================
 # Helper functions
@@ -706,9 +468,10 @@ def load_cleaned_filter(fil_loaded: dict) -> int:
 
     Returns
     -------
-    int
-        -1: Error occurred during sanitization (e.g. missing keys or unsuitable data type/shape)
+    int:
         0: Successful sanitization
+        1: Error occurred during sanitization (e.g. missing keys or unsuitable data type/shape)
+
 
     """
     # --- Sanitize *keys* by comparing to reference dict -----------------------
@@ -734,10 +497,12 @@ def load_cleaned_filter(fil_loaded: dict) -> int:
     if err_str != "":
         logger.warning(err_str)
 
-    if clean_dict_values(fil_loaded) == -1:
-        return -1
-    # TODO: create an extra function, checking whether the sos data can be converted
-    # to the correct shape instead of deleting it
+    # sanitize some of the values of the loaded filter dict
+    fil_loaded = sanitize_dict_values(fil_loaded)
+
+    if not fil_loaded:
+        return 1  # values could not be sanitized, return with an error
+
     fil[0] = fil_loaded  # update global filter dict with sanitized loaded dict
     return 0
 
@@ -779,11 +544,23 @@ def clean_filter_keys(all_filters: bool = True) -> list[dict] | dict:
     return fil_clean
 
 # ---------------------------------------------------------
-def clean_dict_values(fil_dict: dict) -> int:
+def sanitize_dict_values(fil_dict: dict) -> dict | None:
     """
     Sanitize *values* of filter data entries ('sos', 'zpk', 'ba') in filter dictionary,
     they all should be NDArrays. If not, try to correct the data type or try to convert
-    them from one of the other data entries.
+    them from one of the other data entries. If this does not work, return error code 1.
+
+    Parameters
+    ----------
+    fil_dict : dict
+        The filter dict that will be stored as `fil[0]`.
+
+    Returns
+    -------
+    dict | None:
+        dict: dict with verified / cleaned values
+        None: dict contained unrecoverable errors
+
     """
     for k in fil_dict:
         # Bytes need to be decoded for py3 to be used as keys later on
@@ -795,55 +572,123 @@ def clean_dict_values(fil_dict: dict) -> int:
     if 'ba' not in fil_dict:
         logger.error(
             "Missing key 'ba', cancelling file operation.")
-        return -1
+        return None
 
-    # check whether d['ba'] is an NDArray
-    if isinstance(fb_get('ba'), np.ndarray):
-        pass
-    elif isinstance(fb_get('ba'), (list, tuple)):
-        fb_set('ba', iter2ndarray(fb_get('ba')))
-    else:
+    # check whether d['ba'] is an iterable
+    if not isinstance(fil_dict['ba'], (np.ndarray, list, tuple)):
         logger.error("Unsuitable 'ba' data type '%s', cancelling file operation.",
-                        type(fb_get('ba')).__name__)
-    if np.ndim(fb_get('ba')) != 2 or len(fb_get('ba')[0]) < 3:
+                        type(fil_dict['ba']).__name__)
+        return None
+
+    # check whether data has correct dimensions
+    if np.ndim(fil_dict['ba']) != 2 or len(fil_dict['ba'][0]) < 3:
         logger.error(
             "Unsuitable shape %s of 'ba' data, cancelling file operation.",
-            np.shape(fb_get('ba')))
-        return -1
+            np.shape(fil_dict['ba']))
+        return None
+
+    elif isinstance(fil_dict['ba'], (list, tuple)):
+        # convert list / tuple to numpy array
+        fil_dict['ba'] = iter2ndarray(fil_dict['ba'])
 
     # check whether d['zpk'] is an NDArray
     if 'zpk' not in fil_dict:
         logger.error("Missing key 'zpk', cancelling file operation.")
-        return -1
-    if isinstance(fil_dict['zpk'], np.ndarray):
-        pass
-    elif isinstance(fil_dict['zpk'], (list, tuple)):
-        fil_dict['zpk'] = iter2ndarray(fil_dict['zpk'])
-    else:
+        return None
+
+    if not isinstance(fil_dict['zpk'], (np.ndarray, list, tuple)):
         logger.error("Unsuitable 'zpk' data type '%s', cancelling file operation.",
                         type(fil_dict['zpk']).__name__)
+
     if np.ndim(fil_dict['zpk']) != 2 or np.shape(fil_dict['zpk'])[0] != 3:
         logger.error(
             "Unsuitable shape %s of 'zpk' data, cancelling file operation.",
             np.shape(fil_dict['zpk']))
-        return -1
+        return None
+
+    if isinstance(fil_dict['zpk'], (list, tuple)):
+        # convert list / tuple to numpy array
+        fil_dict['zpk'] = iter2ndarray(fil_dict['zpk'])
 
     # check whether d['sos'] is an NDArray of shape 2 x 6
     if 'sos' not in fil_dict:
-        logger.error("Missing key 'sos', creating key and empty list.")
+        logger.error("Missing key 'sos', creating key and empty entry.")
         fil_dict['sos'] = []
-    elif isinstance(fil_dict['sos'], (list, tuple)):
-        fil_dict['sos'] = iter2ndarray(fil_dict['sos'])
-    elif not isinstance(fil_dict['sos'], np.ndarray):
-        logger.error("Unsuitable 'sos' data type '%s', creating empty list.",
+
+    if not isinstance(fil_dict['sos'], (np.ndarray, list, tuple)):
+        logger.error("Unsuitable 'sos' data type '%s', creating empty entry.",
                         type(fil_dict['sos']).__name__)
         fil_dict['sos'] = []
+
     elif np.ndim(fil_dict['sos']) != 2 or np.shape(fil_dict['sos'])[1] != 6:
-        logger.warning("Unsuitable shape %s of 'sos' data, storing empty list.",
+        logger.warning("Unsuitable shape %s of 'sos' data, creating empty entry.",
             np.shape(fil_dict['sos']))
         fil_dict['sos'] = []
 
-    return 0
+    elif isinstance(fil_dict['sos'], (list, tuple)):
+        fil_dict['sos'] = iter2ndarray(fil_dict['sos'])
+
+    return fil_dict
+
+# ------------------------------------------------------------------------------
+class _BackupFilterDict():
+    """
+    Back up and restore the global filter dict `fil[0]`.
+
+    """
+    def __init__(self):
+        # undo step, limited to 0 ... UNDO_LEN. This prevents exceeding the available
+        # UNDO_LEN memories and trying to restore more than the stored copies
+        self.undo_stp = 0
+        self.undo_ptr = 0  # pointer to current undo memory % UNDO_LEN
+
+    def restore_fil(self) -> int:
+        """
+        Restore current global dict `fil[0]` from undo memory `fil_undo`
+
+        Returns
+        -------
+        int
+            -1: undo buffer empty, nothing restored
+            0: successful restore
+        """
+
+        # undo buffer is empty, don't restore anything
+        if self.undo_stp < 1:
+            self.undo_stp = 0
+            return -1
+
+        fil[0] = copy.deepcopy(fil_undo[undo_ptr])
+        self.undo_stp -= 1
+        self.undo_ptr = (self.undo_ptr + UNDO_LEN - 1) % UNDO_LEN
+        return 0
+
+    # -------------------------
+    def backup_fil(self) -> int:
+        """
+        Store current global dict `fil[0]` to undo memory `fil_undo`
+
+        Returns
+        -------
+        int
+            undo step, limited to 0 ... UNDO_LEN
+        """
+
+        # prevent buffer overflow
+        self.undo_stp += 1
+        self.undo_stp = min(self.undo_stp, UNDO_LEN)
+        # increase buffer pointer, allowing for circular wrap around
+        self.undo_ptr = (self.undo_ptr + 1) % UNDO_LEN
+        fil_undo[self.undo_ptr] = copy.deepcopy(fil[0])
+        logger.debug("Undo ptr = %s", self.undo_ptr)
+        return self.undo_stp
+
+# -------------------------------------------------
+_backup_filter_dict = _BackupFilterDict()
+# import this from other modules
+backup_fil = _backup_filter_dict.backup_fil
+restore_fil = _backup_filter_dict.restore_fil
+# -------------------------------------------------
 
 # ===============================================================================================
 
