@@ -450,10 +450,10 @@ class Input_Info(QWidget):
             a_targs_pass = []
             eps = 1e-3
             for i in range(len(f_lbls)):
-                if 'PB' in f_lbls[i]:
+                if 'pb' in f_lbls[i]:
                     a_targs_pass.append((a_test_db[i] - a_targs_db[i]) < eps)
                     a_test[i] = 1 - abs(a_test[i])
-                elif 'SB' in f_lbls[i]:
+                elif 'sb' in f_lbls[i]:
                     a_targs_pass.append(a_test_db[i] >= a_targs_db[i])
                 else:
                     a_targs_pass.append(True)
