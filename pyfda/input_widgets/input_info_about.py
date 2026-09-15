@@ -21,6 +21,7 @@ from pyfda.libs.compat import (
 # load the icons resource file:
 from pyfda import qrc_resources  # noqa: F401  # pylint: disable=unused-import
 from pyfda.libs.pyfda_qt_lib import qwindow_stay_on_top
+from pyfda.libs.pyfda_qt_classes import PushButton
 from pyfda.libs.pyfda_text_lib import mod_version, CRLF
 import pyfda.libs.pyfda_dirs as dirs
 from pyfda.pyfda_rc import params
@@ -45,21 +46,21 @@ class AboutWindow(QDialog):
         but_clipboard.setIcon(QIcon(':/to_clipboard.svg'))
         but_clipboard.setToolTip("Copy text to clipboard.")
 
-        but_about = QPushButton(self)
-        but_about.setText("About")
-        but_about.setToolTip("Display 'About' info")
+        self.but_about = PushButton(self)
+        self.but_about.setText("About")
+        self.but_about.setToolTip("Display 'About' info")
 
-        but_changelog = QPushButton(self)
-        but_changelog.setText("Changelog")
-        but_changelog.setToolTip("Display changelog")
+        self.but_changelog = PushButton(self)
+        self.but_changelog.setText("Changelog")
+        self.but_changelog.setToolTip("Display changelog")
 
-        but_lic_mit = QPushButton(self)
-        but_lic_mit.setText("MIT License")
-        but_lic_mit.setToolTip("MIT License for pyfda source code")
+        self.but_lic_mit = PushButton(self)
+        self.but_lic_mit.setText("MIT License")
+        self.but_lic_mit.setToolTip("MIT License for pyfda source code")
 
-        but_lic_gpl_v3 = QPushButton(self)
-        but_lic_gpl_v3.setText("GPLv3 License")
-        but_lic_gpl_v3.setToolTip("GPLv3 License for bundled distribution")
+        self.but_lic_gpl_v3 = PushButton(self)
+        self.but_lic_gpl_v3.setText("GPLv3 License")
+        self.but_lic_gpl_v3.setToolTip("GPLv3 License for bundled distribution")
 
         but_close = QPushButton(self)
         but_close.setIcon(QIcon(':/circle-x.svg'))
@@ -67,10 +68,10 @@ class AboutWindow(QDialog):
 
         lay_g_buttons = QGridLayout()
         lay_g_buttons.addWidget(but_clipboard, 0, 0)
-        lay_g_buttons.addWidget(but_about, 0, 1)
-        lay_g_buttons.addWidget(but_changelog, 0, 2)
-        lay_g_buttons.addWidget(but_lic_mit, 0, 3)
-        lay_g_buttons.addWidget(but_lic_gpl_v3, 0, 4)
+        lay_g_buttons.addWidget(self.but_about, 0, 1)
+        lay_g_buttons.addWidget(self.but_changelog, 0, 2)
+        lay_g_buttons.addWidget(self.but_lic_mit, 0, 3)
+        lay_g_buttons.addWidget(self.but_lic_gpl_v3, 0, 4)
         lay_g_buttons.addWidget(but_close, 0, 5)
 
         lbl_info = QLabel(self)
@@ -106,10 +107,10 @@ class AboutWindow(QDialog):
 
         but_clipboard.clicked.connect(
             lambda: self.to_clipboard(self.info_str + "<br />" + self.about_str))
-        but_about.clicked.connect(self.display_about_str)
-        but_changelog.clicked.connect(self.display_changelog)
-        but_lic_mit.clicked.connect(self.display_mit_lic)
-        but_lic_gpl_v3.clicked.connect(self.display_gpl_lic)
+        self.but_about.clicked.connect(self.display_about_str)
+        self.but_changelog.clicked.connect(self.display_changelog)
+        self.but_lic_mit.clicked.connect(self.display_mit_lic)
+        self.but_lic_gpl_v3.clicked.connect(self.display_gpl_lic)
         but_close.clicked.connect(self.close)
 
     # ------------------------------------------------------------------------------
@@ -227,6 +228,8 @@ class AboutWindow(QDialog):
     def display_about_str(self) -> None:
         """ Display general "About" info """
         self.txt_display.setText(self.style_html_links(self.about_str + self.lic_str))
+        self.deselect_buttons()
+        self.but_about.setChecked(True)
 
     # ------------------------------------------------------------------------------
     def display_changelog(self) -> None:
@@ -235,6 +238,8 @@ class AboutWindow(QDialog):
                   encoding="utf-8") as f:
             log_str = markdown.markdown(f.read(), output_format='html5')
         self.txt_display.setText(self.style_html_links(log_str))
+        self.deselect_buttons()
+        self.but_changelog.setChecked(True)
 
     # ------------------------------------------------------------------------------
     def display_mit_lic(self) -> None:
@@ -243,6 +248,8 @@ class AboutWindow(QDialog):
                   encoding="utf-8") as f:
             lic_str = markdown.markdown(f.read(), output_format='html5')
         self.txt_display.setText(self.style_html_links(lic_str))
+        self.deselect_buttons()
+        self.but_lic_mit.setChecked(True)
 
     # ------------------------------------------------------------------------------
     def display_gpl_lic(self) -> None:
@@ -251,12 +258,21 @@ class AboutWindow(QDialog):
                   encoding="utf-8") as f:
             lic_str = markdown.markdown(f.read(), output_format='html5')
         self.txt_display.setText(self.style_html_links(lic_str))
+        self.deselect_buttons()
+        self.but_lic_gpl_v3.setChecked(True)
 
     # ------------------------------------------------------------------------------
     def style_html_links(self, text: str) -> None:
         """ Embed HTML string between <body> tags with styling for links """
         return (f"<head><style>a:link {{color: {params['link_color']}}}</style></head>"
                 f"<body>{text}</body>")
+
+    def deselect_buttons(self) -> None:
+        """ Deselect all buttons """
+        self.but_about.setChecked(False)
+        self.but_changelog.setChecked(False)
+        self.but_lic_gpl_v3.setChecked(False)
+        self.but_lic_mit.setChecked(False)
 
 # =============================================================================
 if __name__ == '__main__':
