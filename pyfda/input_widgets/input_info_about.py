@@ -74,7 +74,7 @@ class AboutWindow(QDialog):
         lay_g_buttons.addWidget(but_close, 0, 5)
 
         lbl_info = QLabel(self)
-        lbl_info.setText(self.info_str)
+        lbl_info.setText(self.INFO_STR)
         lbl_info.setOpenExternalLinks(True)
         lbl_info.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Minimum)
 
@@ -105,7 +105,7 @@ class AboutWindow(QDialog):
         self.setLayout(lay_v_main)
 
         but_clipboard.clicked.connect(
-            lambda: self.to_clipboard(self.info_str + "<br />" + self.about_str))
+            lambda: self.to_clipboard(self.INFO_STR + "<br />" + self.ABOUT_STR))
         but_about.clicked.connect(self.display_about_str)
         but_changelog.clicked.connect(self.display_changelog)
         but_lic_mit.clicked.connect(self.display_mit_lic)
@@ -161,13 +161,13 @@ class AboutWindow(QDialog):
         """
         Collect information about version, imported modules in strings:
 
-        `self.info_str` : General info, copyright, version, link to readthedocs
+        `self.INFO_STR` : General info, copyright, version, link to readthedocs
                           This info is always visible.
 
-        `self.about_str`: OS, user name, directories, versions of installed software
+        `self.ABOUT_STR`: OS, user name, directories, versions of installed software
         """
 
-        self.info_str = self.style_html_links(
+        self.INFO_STR = self.style_html_links(
             "<b><a href=https://www.github.com/chipmuenk/pyfda>pyfda</a> "
             f"Version {dirs.VERSION} (c) 2013 - 2026 Christian Münker</b><br />"
             "Design, analyze and synthesize digital filters. Docs @ "
@@ -221,12 +221,12 @@ class AboutWindow(QDialog):
                 extensions=['markdown.extensions.tables'])
         # pyinstaller needs explicit definition of extensions path
 
-        self.about_str = os_str + dirs_str + ver_str
+        self.ABOUT_STR = os_str + dirs_str + ver_str
 
     # ------------------------------------------------------------------------------
     def display_about_str(self) -> None:
         """ Display general "About" info """
-        self.txt_display.setText(self.style_html_links(self.about_str + self.lic_str))
+        self.txt_display.setText(self.style_html_links(self.ABOUT_STR + self.lic_str))
 
     # ------------------------------------------------------------------------------
     def display_changelog(self) -> None:

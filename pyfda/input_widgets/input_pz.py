@@ -375,12 +375,12 @@ class InputPZ(QWidget):
         the QLineEdit for setting the gain has to be treated separately.
         """
         fb_set('N', len(self.zpk[0]))
-        # Switch to manual filter order and 'Manual_IIR' resp. 'Manual_FIR' filter class
+        # Switch to manual filter order and 'ManualIIR' resp. 'ManualFIR' filter class
         fb_set('fo', 'man')
         if np.any(self.zpk[1]):  # any non-zero poles?
-            fb_set('fc', 'Manual_IIR')
+            fb_set('fc', 'ManualIIR')
         else:
-            fb_set('fc', 'Manual_FIR')
+            fb_set('fc', 'ManualFIR')
 
         try:
             fil_save(self.zpk, 'zpk', __name__)  # save with new gain

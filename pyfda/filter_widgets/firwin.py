@@ -31,7 +31,7 @@ API version info
          This dict is now called self.rt_dict. When present, the dict self.rt_dict_add
          is read and merged with the first one.
     2.2: Rename `filter_classes` -> `classes`, remove Py2 compatibility
-    2.3: Add `has_ui` attribute to filter classes
+    2.3: Add `HAS_UI` attribute to filter classes
 """
 import logging
 
@@ -75,7 +75,7 @@ class Firwin(QWidget):
 
     FRMT = 'ba'     # output format(s) of filter design routines 'zpk' / 'ba' / 'sos'
                     # currently, only 'ba' is supported for firwin routines
-    has_ui = True #: Flag whether the filter class has a UI or not
+    HAS_UI = True #: Flag whether the filter class has a UI or not
 
     sig_tx = pyqtSignal(object)  # local signal between FFT widget and FFTWin_Selector
     sig_tx_local = pyqtSignal(object)

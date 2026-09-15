@@ -29,7 +29,7 @@ API version info
          is read and merged with the first one.
     2.1: Remove method destruct_ui and attributes self.wdg and self.hdl
     2.2: Rename `filter_classes` -> `classes`, remove Py2 compatibility
-    2.3: Add `has_ui` attribute to filter classes
+    2.3: Add `HAS_UI` attribute to filter classes
 """
 import logging
 
@@ -59,7 +59,7 @@ class Equiripple(QWidget):
 
     FRMT = 'ba' # output format of filter design routines ('zpk' / 'ba' / 'sos')
             # currently, only 'ba' is supported for equiripple routines
-    has_ui = True #: Flag whether the filter class has a UI or not
+    HAS_UI = True #: Flag whether the filter class has a UI or not
     info = """
     **Equiripple filters**
 

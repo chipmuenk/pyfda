@@ -30,7 +30,7 @@ API version info
          This dict is now called self.rt_dict. When present, the dict self.rt_dict_add
          is read and merged with the first one.
     2.2: Rename `filter_classes` -> `classes`, remove Py2 compatibility
-    2.3: Add `has_ui` attribute to filter classes
+    2.3: Add `HAS_UI` attribute to filter classes
 """
 from scipy.signal import cheby2, cheb2ord
 
@@ -53,7 +53,7 @@ class Cheby2():
     """
 
     FRMT = 'sos' # output format of filter design routines 'zpk' / 'ba' / 'sos'
-    has_ui = False #: Flag whether the filter class has a UI or not
+    HAS_UI = False #: Flag whether the filter class has a UI or not
     info = """
     **Chebyshev Type 2 filters**
 

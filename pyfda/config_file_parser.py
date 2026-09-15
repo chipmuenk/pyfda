@@ -111,8 +111,8 @@ class ConfigFileParser():
         'Equiripple': {'name': 'Equiripple', 'mod': 'pyfda.filter_widgets.equiripple'},
         'Firwin': {'name': 'Windowed FIR', 'mod': 'pyfda.filter_widgets.firwin'},
         'MA': {'name': 'Moving Average', 'mod': 'pyfda.filter_widgets.ma'},
-        'Manual_FIR': {'name': 'Manual', 'mod': 'pyfda.filter_widgets.manual'},
-        'Manual_IIR': {'name': 'Manual', 'mod': 'pyfda.filter_widgets.manual'}
+        'ManualFIR': {'name': 'Manual', 'mod': 'pyfda.filter_widgets.manual'},
+        'ManualIIR': {'name': 'Manual', 'mod': 'pyfda.filter_widgets.manual'}
         }
 
     # -----------------------------------------------------------------------------

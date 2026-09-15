@@ -645,12 +645,12 @@ class Input_Coeffs(QWidget):
         """
         fb_set('N', max(len(self.ba[0]), len(self.ba[1])) - 1)
 
-        # Switch to manual filter order and 'Manual_IIR' resp. 'Manual_FIR' filter class
+        # Switch to manual filter order and 'ManualIIR' resp. 'ManualFIR' filter class
         fb_set('fo', 'man')
         if fb_get('ft') == 'IIR':
-            fb_set('fc', 'Manual_IIR')
+            fb_set('fc', 'ManualIIR')
         else:
-            fb_set('fc','Manual_FIR')
+            fb_set('fc','ManualFIR')
 
         # save, check and convert coeffs, check filter type
         try:

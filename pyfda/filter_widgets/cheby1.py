@@ -32,7 +32,7 @@ API version info
     2.1: Remove empty methods construct_ui and destruct_ui and attributes
          self.wdg and self.hdl
     2.2: Rename `filter_classes` -> `classes`, remove Py2 compatibility
-    2.3: Add `has_ui` attribute to filter classes
+    2.3: Add `HAS_UI` attribute to filter classes
 """
 from scipy.signal import cheby1, cheb1ord
 
@@ -56,7 +56,7 @@ class Cheby1():
     """
 
     FRMT = 'sos' # output format of filter design routines 'zpk' / 'ba' / 'sos'
-    has_ui = False #: Flag whether the filter class has a UI or not
+    HAS_UI = False #: Flag whether the filter class has a UI or not
     info = """
     **Chebyshev Type 1 filters**
 

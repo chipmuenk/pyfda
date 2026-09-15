@@ -374,7 +374,7 @@ class SelectFilter(QWidget):
             #         ))
             # ===================================================================
             # construct dyn. subwidgets if available
-            if hasattr(get_fil_inst(), 'has_ui') and get_fil_inst().has_ui:
+            if hasattr(get_fil_inst(), 'HAS_UI') and get_fil_inst().HAS_UI:
                 self._construct_dyn_widgets()
 
             self.fc_last = fb_get('fc')  # store current fc as last fc

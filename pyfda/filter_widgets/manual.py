@@ -41,15 +41,15 @@ API version info:
 __version__ = "2.2"
 
  #: Dict containing class name : display name
-classes = {'Manual_FIR':'Manual', 'Manual_IIR':'Manual'}
+classes = {'ManualFIR':'Manual', 'ManualIIR':'Manual'}
 
 FRMT = 'ba' # default output format of filter design routines 'zpk' / 'ba' / 'sos'
-has_ui = False #: Flag whether the filter class has a UI or not
+HAS_UI = False #: Flag whether the filter class has a UI or not
 
 msg_man = ('a', "Design the filter using the P/Z or the b/a widget. "
                 "The target specs are only used for entering and displaying spec limits.")
 
-info_str =\
+INFO_STR =\
 """
 **Manual Filter Design**
 
@@ -59,7 +59,7 @@ or the magnitude frequency response (select "Show Specs") to check whether
 the designed filter fulfills the target specs.
 """
 
-class Manual_FIR():
+class ManualFIR():
     """
     Dummy filter design class, used / displayed when coefficients or P/Z have
     been entered manually.
@@ -95,7 +95,7 @@ class Manual_FIR():
                         }}
                    }
 
-        self.info = info_str
+        self.info = INFO_STR
         self.info_doc = []
         self.info_doc.append('manual FIR\n==========')
 
@@ -138,7 +138,7 @@ class Manual_FIR():
         """ Dummy method, to display widgets corresponding to filter type in UI """
 
 #############################################################################
-class Manual_IIR():
+class ManualIIR():
     """
     Dummy filter design class, used / displayed when coefficients or P/Z have
     been entered manually.
@@ -173,7 +173,7 @@ class Manual_IIR():
                         }}
                    }
 
-        self.info = info_str
+        self.info = INFO_STR
         self.info_doc = []
         self.info_doc.append('manual IIR\n==========')
 
@@ -222,10 +222,10 @@ if __name__ == '__main__':
     # Run module standalone using "python -m pyfda.filter_widgets.manual"
     from pyfda.filterbroker import fb_get
 
-    filt = Manual_IIR()    # instantiate filter
+    filt = ManualIIR()    # instantiate filter
     filt.lp_man()  # design a low-pass with parameters from global dict
     print(fb_get(FRMT)) # return results in default format
 
-    filt = Manual_FIR()    # instantiate filter
+    filt = ManualFIR()    # instantiate filter
     filt.lp_man()  # design a low-pass with parameters from global dict
     print(fb_get(FRMT)) # return results in default format

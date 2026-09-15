@@ -158,7 +158,7 @@ class InputSpecs(QWidget):
             self._update_ui()
             self.sel_fil.dict2ui()
             # Update state of "DESIGN FILTER" button
-            # It is disabled for "Manual_IIR" and "Manual_FIR" filter classes
+            # It is disabled for "ManualIIR" and "ManualFIR" filter classes
             self.color_design_button('changed')
         elif 'data_changed' in dict_sig and dict_sig['data_changed'] == 'filter_loaded':
             # Update info string from filter dict & set button = "ok"
@@ -410,7 +410,7 @@ class InputSpecs(QWidget):
             self.frm_msg.hide()
 
         # Update state of "DESIGN FILTER" button
-        # It is disabled for "Manual_IIR" and "Manual_FIR" filter classes
+        # It is disabled for "ManualIIR" and "ManualFIR" filter classes
         self.color_design_button('changed')
 
     # --------------------------------------------------------------------------
