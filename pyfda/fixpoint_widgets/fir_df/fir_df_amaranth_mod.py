@@ -128,7 +128,6 @@ class FIR_DF_amaranth_mod(Elaboratable):
         self.Q_mul.reset_n()
         # self.Q_acc.reset_n()
         # self.Q_O.reset_n()
-        self.N_over_filt = 0
         self.zi = np.zeros(self.L - 1)
 
     # ---------------------------------------------------------

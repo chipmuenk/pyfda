@@ -159,7 +159,6 @@ class IIR_DF1_pyfixp(object):
         self.q_mul_b.reset_n()
         self.Q_acc.reset_n()
         self.Q_O.reset_n()
-        self.N_over_filt = 0
         self.zi_a = np.zeros(self.L - 1)
         self.zi_b = np.zeros(self.L - 1)
 
