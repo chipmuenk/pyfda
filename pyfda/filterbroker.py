@@ -42,12 +42,12 @@ import copy
 import logging
 from typing import Iterable
 
+import numpy as np
+
 from pyfda.libs.pyfda_num_lib import iter2ndarray
 from pyfda.libs.pyfda_text_lib import compare_dictionaries
 
 from pyfda.filter_storage import fil_ref
-
-import numpy as np
 
 logger = logging.getLogger(__name__)
 # ==========================================================
@@ -80,10 +80,10 @@ def fil_copy(src: str = "ref", dest: str = "all") -> None:
 
     # for f in fil:
     #   f = copy.deepcopy(fil_ref)
-    # does not work because all entries in fil[0] ... fil[9] become references to the same dict `fil_ref`,
-    # so that changing one of them changes all of them. This is not the case for the nested dicts and
-    # lists, which are also references but they are not changed by changing the reference to the
-    # outer dict. So we need to create a deep copy of fil_ref for each entry in `fil``.
+    #
+    # does not work because all entries in fil[0] ... fil[9] become references to the same dict
+    # `fil_ref`, so that changing one of them changes all of them. By creating a deep copy of
+    # fil_ref for each entry in `fil`` individually, this does not happen (???).
 
     if dest == "all":
         for i, _ in enumerate(fil):
@@ -100,6 +100,7 @@ def fil_copy(src: str = "ref", dest: str = "all") -> None:
     fil[targ_idx] = fil[src_idx]
     return
 
+# -----------------------------------------------------------------------
 def fil_info(idx: int) -> str:
     """
     Return filter info string
@@ -587,7 +588,8 @@ def sanitize_dict_values(fil_dict: dict) -> dict | None:
             np.shape(fil_dict['ba']))
         return None
 
-    elif isinstance(fil_dict['ba'], (list, tuple)):
+    # d['ba'] is not a numpy array but can be converted
+    if isinstance(fil_dict['ba'], (list, tuple)):
         # convert list / tuple to numpy array
         fil_dict['ba'] = iter2ndarray(fil_dict['ba'])
 
@@ -599,6 +601,7 @@ def sanitize_dict_values(fil_dict: dict) -> dict | None:
     if not isinstance(fil_dict['zpk'], (np.ndarray, list, tuple)):
         logger.error("Unsuitable 'zpk' data type '%s', cancelling file operation.",
                         type(fil_dict['zpk']).__name__)
+        return None
 
     if np.ndim(fil_dict['zpk']) != 2 or np.shape(fil_dict['zpk'])[0] != 3:
         logger.error(
@@ -606,6 +609,7 @@ def sanitize_dict_values(fil_dict: dict) -> dict | None:
             np.shape(fil_dict['zpk']))
         return None
 
+    # d['zpk'] is not a numpy array but can be converted
     if isinstance(fil_dict['zpk'], (list, tuple)):
         # convert list / tuple to numpy array
         fil_dict['zpk'] = iter2ndarray(fil_dict['zpk'])
