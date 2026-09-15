@@ -44,10 +44,10 @@ if mod_version('docutils') is not None:
 else:
     HAS_DOCUTILS = False
 
-classes = {'Input_Info': 'Info'}  #: Dict containing class name : display name
+classes = {'InputInfo': 'Info'}  #: Dict containing class name : display name
 
 # ------------------------------------------------------------------------------
-class Input_Info(QWidget):
+class InputInfo(QWidget):
     """
     Create widget for displaying infos about filter specs and filter design method
     """
@@ -144,10 +144,10 @@ class Input_Info(QWidget):
         self.frm_debug.setVisible(self.but_debug.isChecked())
         self.frm_debug.setContentsMargins(0, 0, 0, 0)
 
-        lbl_settings_NFFT = QLabel(to_html("N_FFT =", frmt='bi'), self)
-        self.led_settings_NFFT = QLineEdit(self)
-        self.led_settings_NFFT.setText(str(CFP.conf_settings['N_FFT']))
-        self.led_settings_NFFT.setToolTip("<span>Number of FFT points for frequency "
+        lbl_settings_nfft = QLabel(to_html("N_FFT =", frmt='bi'), self)
+        self.led_settings_nfft = QLineEdit(self)
+        self.led_settings_nfft.setText(str(CFP.conf_settings['N_FFT']))
+        self.led_settings_nfft.setToolTip("<span>Number of FFT points for frequency "
                                           "domain widgets.</span>")
         lbl_exception_handling = QLabel(to_html("Exception Level =", frmt='b'), self)
         self.led_exception_handling = QLineEdit(self)
@@ -157,8 +157,8 @@ class Input_Info(QWidget):
             "0: quiet, 1: print error stack, 2: end pyfda.</span>")
 
         lay_g_settings = QGridLayout()
-        lay_g_settings.addWidget(lbl_settings_NFFT, 1, 0)
-        lay_g_settings.addWidget(self.led_settings_NFFT, 1, 1)
+        lay_g_settings.addWidget(lbl_settings_nfft, 1, 0)
+        lay_g_settings.addWidget(self.led_settings_nfft, 1, 1)
         lay_g_settings.addWidget(lbl_exception_handling, 2, 0)
         lay_g_settings.addWidget(self.led_exception_handling, 2, 1)
 
@@ -217,7 +217,7 @@ class Input_Info(QWidget):
         self.but_filt_perf.clicked.connect(self._show_filt_perf)
         self.but_about.clicked.connect(self._about_window)
         self.but_settings.clicked.connect(self._show_settings)
-        self.led_settings_NFFT.editingFinished.connect(self._update_settings_nfft)
+        self.led_settings_nfft.editingFinished.connect(self._update_settings_nfft)
         self.led_exception_handling.editingFinished.connect(self._set_exception_handling)
 
         self.but_debug.clicked.connect(self._show_debug)
@@ -251,9 +251,9 @@ class Input_Info(QWidget):
     def _update_settings_nfft(self):
         """ Update value for self.par1 from QLineEdit Widget"""
         CFP.conf_settings['N_FFT'] = safe_eval(
-            self.led_settings_NFFT.text(), CFP.conf_settings['N_FFT'],
+            self.led_settings_nfft.text(), CFP.conf_settings['N_FFT'],
             sign='pos', return_type='int')
-        self.led_settings_NFFT.setText(str(CFP.conf_settings['N_FFT']))
+        self.led_settings_nfft.setText(str(CFP.conf_settings['N_FFT']))
         self.emit({'data_changed': 'n_fft'})
 
     # -------------------------------------------------------------------------
@@ -277,7 +277,7 @@ class Input_Info(QWidget):
     # --------------------------------------------------------------------------
     def _show_doc(self):
         """
-        Display info from filter design file and docstring
+        Display filter info (class variable) from filter design file and docstring
         """
         fil_inst = get_fil_inst()
         if hasattr(fil_inst, 'info'):
@@ -403,9 +403,9 @@ class Input_Info(QWidget):
                         logger.debug(e)
                     try:
                         a = fb_get(a_lbls[i])
-                        a_dB = lin2unit(fb_get(a_lbls[i]), ft, a_lbls[i], unit)
+                        a_db = lin2unit(fb_get(a_lbls[i]), ft, a_lbls[i], unit)
                         a_targs.append(a)
-                        a_targs_db.append(a_dB)
+                        a_targs_db.append(a_db)
                     except KeyError as e:
                         a_targs.append('')
                         a_targs_db.append('')
@@ -425,7 +425,7 @@ class Input_Info(QWidget):
                 logger.debug("F_test_labels = %s", f_lbls)
 
                 # Calculate frequency response at test frequencies
-                [w_test, a_test] = sig.freqz(bb, aa, 2.0 * pi * f_vals.astype(float))
+                [_, a_test] = sig.freqz(bb, aa, 2.0 * pi * f_vals.astype(float))
 
             (f_min, h_min, f_max, h_max) = _find_min_max(self, 0, 1, unit='V')
             # append frequencies and values for min. and max. filter reponse to
@@ -473,7 +473,7 @@ class Input_Info(QWidget):
             self.tbl_filt_perf.setColumnCount(5)  # number of table columns
 
             self.tbl_filt_perf.setHorizontalHeaderLabels([
-                'f/{0:s}'.format(fb_get('freq_specs_unit')), 'Spec\n(dB)',
+                f"f/{fb_get('freq_specs_unit')}", 'Spec\n(dB)',
                 '|H(f)|\n(dB)', 'Spec', '|H(f)|'])
             self.tbl_filt_perf.setVerticalHeaderLabels(f_lbls)
             for row in range(len(a_test)):
@@ -538,7 +538,7 @@ if __name__ == '__main__':
 
     app = QApplication(sys.argv)
     app.setStyleSheet(QSS.QSS_RC)
-    mainw = Input_Info()
+    mainw = InputInfo()
     app.setActiveWindow(mainw)
     mainw.show()
     sys.exit(app.exec_())
