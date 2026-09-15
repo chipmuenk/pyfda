@@ -660,23 +660,22 @@ def load_filter(self, all_filters: bool = False) -> bool:
     return True
 
 # ------------------------------------------------------------------------------
-def save_filter(self) -> int:
+def save_filter(self, title="Save Filter", all_filters=False) -> int:
     """
     Save current filter as JSON formatted textfile, zipped binary numpy array
-    or pickle object
+    or pickled object
 
     Returns
     -------
-    0 for success, -1 for file cancel or error
+    int:
+        0 for success, 1 for file cancel or error
     """
-    # provide an identifier with version number for pyfda files
-    fb_set('_id', ['pyfda', FILTER_FILE_VERSION])
 
     file_name, file_type = select_file(
         self, title="Save Filter", mode='w', file_types = ("json", "npz", "pkl"))
 
     if not file_name:
-        return -1  # operation cancelled or other error
+        return 1  # operation cancelled or other error
 
     err = False
 
@@ -716,7 +715,7 @@ def save_filter(self) -> int:
         dirs.last_file_dir = os.path.dirname(file_name)  # save new default dir
         dirs.last_file_type = file_type  # save new default file type
         return 0
-    return -1
+    return 1
 
 # ------------------------------------------------------------------------------
 def save_all_filters(self) -> int:
@@ -725,13 +724,15 @@ def save_all_filters(self) -> int:
 
     Returns
     -------
+    int:
+        0 for success, 1 for file cancel or error
     """
 
     file_name, file_type = select_file(
         self, title="Save All Filters", mode='w', file_types = ("json", "npz", "pkl"))
 
     if not file_name:
-        return -1  # operation cancelled or other error
+        return 1  # operation cancelled or other error
 
     err = False
     # create a copy of the filters to be saved that only contains keys of the
@@ -773,19 +774,21 @@ def save_all_filters(self) -> int:
         dirs.last_file_dir = os.path.dirname(file_name)  # save new default dir
         dirs.last_file_type = file_type  # save new default file type
         return 0
-    return -1
+    return 1
 
 # ------------------------------------------------------------------------------
 def verify_file_shape(fil_dict: list[dict] | dict, all_filters) -> int:
     """
-    Verify that the loaded file content is either a list containing 10 dicts (10
-    filters) or a single dict (one filter)
+    Verify that the content of a loaded file is either a list containing 10 dicts (10
+    filters) or a single dict (one filter).
 
     Parameters
     ----------
     fil_dict: list[dict] | dict
+        The filter or filters to be verified
 
     all_filters: bool
+        When True, expect a list of 10 filters, when False, expect a single filter.
 
     Returns
     -------
@@ -799,6 +802,7 @@ def verify_file_shape(fil_dict: list[dict] | dict, all_filters) -> int:
             (`all_filters == True`). This needs to be fixed one hierarchy level up.
 
     """
+    # Is fil_dict a list? Then the list should contain 10 filters and all_filters==True
     if isinstance(fil_dict, list):
         if len(fil_dict) != 10:
             logger.error(
@@ -814,7 +818,7 @@ def verify_file_shape(fil_dict: list[dict] | dict, all_filters) -> int:
         else:
             return 0
 
-    elif type(fil_dict) is dict:
+    elif isinstance(fil_dict, dict):
         if not all_filters:
             return 0  # file contains a single filter -> o.k.
 

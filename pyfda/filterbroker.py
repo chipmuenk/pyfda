@@ -73,7 +73,7 @@ fil_undo = [None] * UNDO_LEN
 def fil_copy(src: str = "ref", dest: str = "all") -> None:
     """
     Copy `'src'` filter to `'dest'` filter where:
-    - `'src'` can be  the reference filter ("ref") or fil[0] ... fil[9] ("0" ... "9") 
+    - `'src'` can be  the reference filter ("ref") or fil[0] ... fil[9] ("0" ... "9")
     - `'dest'` can be all filters ("all") or fil[0] ... fil[9] ("0" ... "9")
     Other source or target destinations give an error.
     """
@@ -499,7 +499,7 @@ def load_cleaned_filter(fil_loaded: dict) -> int:
         logger.warning(err_str)
 
     # sanitize some of the values of the loaded filter dict
-    fil_loaded = sanitize_dict_values(fil_loaded)
+    fil_loaded = sanitize_values(fil_loaded)
 
     if not fil_loaded:
         return 1  # values could not be sanitized, return with an error
@@ -521,7 +521,8 @@ def clean_filter_keys(all_filters: bool = True) -> list[dict] | dict:
     Returns
     -------
     list[dict] | dict
-        The cleaned filter dict(s) with only the keys that are in the reference dict `fil_ref`.
+        The cleaned filter dict or a list of cleaned filter dicts with only the keys from the
+        reference dict `fil_ref`.
     """
     def _clean_dict_i(i: int) -> dict:
         # provide identifier and version number for pyfda files
@@ -545,9 +546,9 @@ def clean_filter_keys(all_filters: bool = True) -> list[dict] | dict:
     return fil_clean
 
 # ---------------------------------------------------------
-def sanitize_dict_values(fil_dict: dict) -> dict | None:
+def sanitize_values(fil_dict: dict) -> dict | None:
     """
-    Sanitize *values* of filter data entries ('sos', 'zpk', 'ba') in filter dictionary,
+    Sanitize *values* for data keys ('sos', 'zpk', 'ba') in filter dictionary,
     they all should be NDArrays. If not, try to correct the data type or try to convert
     them from one of the other data entries. If this does not work, return error code 1.
 
@@ -558,79 +559,75 @@ def sanitize_dict_values(fil_dict: dict) -> dict | None:
 
     Returns
     -------
-    dict | None:
-        dict: dict with verified / cleaned values
-        None: dict contained unrecoverable errors
+    int:
+        0: value had the right type or could be converted
+        1: value had the wrong type or did not exist
 
     """
+    def _sanitize_value(k: str) -> int:
+        """
+       helper function to sanitize the value for a single key
+        """
+        # Check for existence of key k
+        if k not in fil_dict:
+            logger.error("Missing key '%s', cancelling file operation.", k)
+            return 1
+
+        # check whether fil_dict[k] is an iterable
+        if not isinstance(fil_dict[k], (np.ndarray, list, tuple)):
+            logger.error("Unsuitable data type '%s' for '%s', cancelling file operation.",
+                            type(fil_dict[k]).__name__, k)
+            return 1
+
+        # fil_dict[k] is not a numpy array but can be converted:
+        if isinstance(fil_dict[k], (list, tuple)):
+            # convert list / tuple to numpy array
+            fil_dict[k] = iter2ndarray(fil_dict[k])
+
+        # fil_dicts need to be two-dimensional arrays
+        if np.ndim(fil_dict[k]) != 2:
+            return 1
+
+        return 0
+
+    # ---------------------------------------------------------------
     for k in fil_dict:
         # Bytes need to be decoded for py3 to be used as keys later on
         if isinstance(fil_dict[k], bytes):
             fil_dict[k] = fil_dict[k].decode('utf-8')
         if fil_dict[k] is None:
-            logger.warning("fil[%s] is empty!", k)
+            logger.warning("fil[%s] has no value!", k)
 
-    if 'ba' not in fil_dict:
-        logger.error(
-            "Missing key 'ba', cancelling file operation.")
-        return None
+    # Check existence of key and value data type for the following three keys:
+    for k in ('ba', 'zpk', 'sos'):
+        if _sanitize_value(k):
+            logger.error("An error ocurred!!!")
+            return None
 
-    # check whether d['ba'] is an iterable
-    if not isinstance(fil_dict['ba'], (np.ndarray, list, tuple)):
-        logger.error("Unsuitable 'ba' data type '%s', cancelling file operation.",
-                        type(fil_dict['ba']).__name__)
-        return None
-
-    # check whether data has correct dimensions
-    if np.ndim(fil_dict['ba']) != 2 or len(fil_dict['ba'][0]) < 3:
+    # check whether fil_dict['ba'] has 1 or two rows b or b, a
+    if np.shape(fil_dict['ba'])[0] > 2:
         logger.error(
             "Unsuitable shape %s of 'ba' data, cancelling file operation.",
             np.shape(fil_dict['ba']))
         return None
 
-    # d['ba'] is not a numpy array but can be converted
-    if isinstance(fil_dict['ba'], (list, tuple)):
-        # convert list / tuple to numpy array
-        fil_dict['ba'] = iter2ndarray(fil_dict['ba'])
-
-    # check whether d['zpk'] is an NDArray
-    if 'zpk' not in fil_dict:
-        logger.error("Missing key 'zpk', cancelling file operation.")
-        return None
-
-    if not isinstance(fil_dict['zpk'], (np.ndarray, list, tuple)):
-        logger.error("Unsuitable 'zpk' data type '%s', cancelling file operation.",
-                        type(fil_dict['zpk']).__name__)
-        return None
-
-    if np.ndim(fil_dict['zpk']) != 2 or np.shape(fil_dict['zpk'])[0] != 3:
+    # check whether fil_dict['zpk'] has three rows z, p, k
+    if np.shape(fil_dict['zpk'])[0] != 3:
         logger.error(
             "Unsuitable shape %s of 'zpk' data, cancelling file operation.",
             np.shape(fil_dict['zpk']))
         return None
 
-    # d['zpk'] is not a numpy array but can be converted
-    if isinstance(fil_dict['zpk'], (list, tuple)):
-        # convert list / tuple to numpy array
-        fil_dict['zpk'] = iter2ndarray(fil_dict['zpk'])
-
-    # check whether d['sos'] is an NDArray of shape 2 x 6
-    if 'sos' not in fil_dict:
-        logger.error("Missing key 'sos', creating key and empty entry.")
-        fil_dict['sos'] = []
+    # check whether fil_dict['sos'] has 6 rows
+    if np.shape(fil_dict['sos'])[1] != 6:
+        logger.warning("Unsuitable shape %s of 'sos' data, creating empty entry.",
+            np.shape(fil_dict['sos']))
+        return None
 
     if not isinstance(fil_dict['sos'], (np.ndarray, list, tuple)):
         logger.error("Unsuitable 'sos' data type '%s', creating empty entry.",
                         type(fil_dict['sos']).__name__)
-        fil_dict['sos'] = []
-
-    elif np.ndim(fil_dict['sos']) != 2 or np.shape(fil_dict['sos'])[1] != 6:
-        logger.warning("Unsuitable shape %s of 'sos' data, creating empty entry.",
-            np.shape(fil_dict['sos']))
-        fil_dict['sos'] = []
-
-    elif isinstance(fil_dict['sos'], (list, tuple)):
-        fil_dict['sos'] = iter2ndarray(fil_dict['sos'])
+        return None
 
     return fil_dict
 
