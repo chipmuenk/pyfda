@@ -27,7 +27,7 @@ from pyfda.libs.pyfda_num_lib import safe_eval, frmt2cmplx
 from pyfda.libs.pyfda_text_lib import pprint_log
 from pyfda.pyfda_rc import params
 
-from pyfda.input_widgets.input_pz_ui import Input_PZ_UI
+from pyfda.input_widgets.input_pz_ui import InputPZUI
 from pyfda.input_widgets.item_delegate_pz import ItemDelegatePZ
 
 logger = logging.getLogger(__name__)
@@ -54,7 +54,7 @@ class InputPZ(QWidget):
         self.tab_label = "P/Z"
         self.tool_tip = "Display and edit filter poles and zeros."
 
-        self.ui = Input_PZ_UI()  # create the UI control part
+        self.ui = InputPZUI()  # create the UI control part
         self._construct_ui()  # construct the rest of the UI
 
     # -------------------------------------------------------------------------

@@ -25,7 +25,7 @@ from pyfda.pyfda_rc import params
 logger = logging.getLogger(__name__)
 
 # ------------------------------------------------------------------------------
-class Input_PZ_UI(QWidget):
+class InputPZUI(QWidget):
     """
     Create the UI for the InputPZ class
     """
@@ -59,6 +59,7 @@ class Input_PZ_UI(QWidget):
         self.load_save_clipboard = False  # load / save to clipboard or file
 
         self._construct_ui()
+        self._construct_layout()
 
     # -------------------------------------------------------------------------
     def emit(self, dict_sig: dict) -> None:
@@ -93,9 +94,6 @@ class Input_PZ_UI(QWidget):
     def _construct_ui(self) -> None:
         """
         Intitialize the widget, consisting of:
-        - top chkbox row
-        - coefficient table
-        - two bottom rows with action buttons
         """
         self.bfont = QFont()
         self.bfont.setBold(True)
@@ -107,8 +105,7 @@ class Input_PZ_UI(QWidget):
         # ---------------------------------------------
         # UI Elements for controlling the display
         # ---------------------------------------------
-
-        lbl_display = QLabel(to_html("Display:", frmt='bi'), self)
+        self.lbl_display = QLabel(to_html("Display:", frmt='bi'), self)
         self.cmb_pz_frmt = QComboBox(self)
         qcmb_box_populate(
             self.cmb_pz_frmt, self.cmb_pz_frmt_items, self.cmb_pz_frmt_init)
@@ -119,22 +116,11 @@ class Input_PZ_UI(QWidget):
         self.lbl_digits = QLabel("Digits", self)
         self.lbl_digits.setFont(self.bifont)
 
-        lay_h_display = QHBoxLayout()
-        lay_h_display.setContentsMargins(*params['wdg_margins'])
-        lay_h_display.setAlignment(Qt.AlignLeft)
-        lay_h_display.addWidget(lbl_display)
-        lay_h_display.addWidget(self.cmb_pz_frmt)
-        lay_h_display.addWidget(self.spn_digits)
-        lay_h_display.addWidget(self.lbl_digits)
-        lay_h_display.addStretch()
-        frm_display = QFrame(self)
-        frm_display.setLayout(lay_h_display)
-
         # ---------------------------------------------
         # UI Elements for setting the gain
         # ---------------------------------------------
         self.chk_gain = QRadioButton(self, checked=True)
-        lbl_gain = QLabel(to_html("k =", frmt='bi'), self)
+        self.lbl_gain = QLabel(to_html("k =", frmt='bi'), self)
         self.led_gain = QLineEdit(self, objectName="led_gain")
         self.led_gain.setToolTip(
             "<span>Specify gain factor <i>k</i></span>")
@@ -142,25 +128,12 @@ class Input_PZ_UI(QWidget):
         self.led_gain.setEnabled(self.chk_gain.isChecked())
 
         self.chk_h_max = QRadioButton(self)
-        lbl_h_max = QLabel(to_html("|<i>H</i><sub>max</sub>(<i>f</i>)| =", frmt='b'), self)
+        self.lbl_h_max = QLabel(to_html("|<i>H</i><sub>max</sub>(<i>f</i>)| =", frmt='b'), self)
         self.led_h_max = QLineEdit(self, objectName="led_h_max")
         self.led_h_max.setToolTip(
             "<span>Specify maximum of magnitude response.</span>")
         self.led_h_max.setText(str(1.))
         self.led_h_max.setEnabled(self.chk_h_max.isChecked())
-
-        lay_h_gain = QHBoxLayout()
-        lay_h_gain.setContentsMargins(*params['wdg_margins'])
-
-        lay_h_gain.addWidget(self.chk_gain)
-        lay_h_gain.addWidget(lbl_gain)
-        lay_h_gain.addWidget(self.led_gain)
-        lay_h_gain.addWidget(self.chk_h_max)
-        lay_h_gain.addWidget(lbl_h_max)
-        lay_h_gain.addWidget(self.led_h_max)
-        lay_h_gain.addStretch()
-        frm_gain = QFrame(self)
-        frm_gain.setLayout(lay_h_gain)
 
         # ---------------------------------------------
         # UI Elements for loading / storing / manipulating cells and rows
@@ -239,6 +212,65 @@ class Input_PZ_UI(QWidget):
         self.load_save_clipboard = not self.load_save_clipboard  # is inverted next step
         self._set_load_save_icons()  # initialize icon / button settings
 
+        # -------------------------------------------------------------------
+        #   Eps / set zero settings
+        # ---------------------------------------------------------------------
+        self.but_set_zero = QPushButton("= 0", self)
+        self.but_set_zero.setToolTip(
+            "<span>Check whether selected poles / zeros are equal or zero with a "
+            "tolerance of &lt; &epsilon;. "
+            "When nothing is selected, test the whole table.</span>")
+        self.but_set_zero.setIconSize(q_icon_size)
+
+        self.lbl_eps = QLabel(self)
+        self.lbl_eps.setText("<b><i>for &epsilon;</i> &lt;</b>")
+
+        self.led_eps = QLineEdit(self)
+        self.led_eps.setToolTip("Specify absolute tolerance value.")
+
+        # --- set initial values from dict ------------
+        self.spn_digits.setValue(params['FMT_pz'])
+        self.led_eps.setText(str(self.eps))
+
+        # ----------------------------------------------------------------------
+        # LOCAL SIGNALS & SLOTs
+        # ----------------------------------------------------------------------
+        self.but_csv_options.clicked.connect(self._open_csv_win)
+        self.but_file_clipboard.clicked.connect(self._set_load_save_icons)
+
+    # ----------------------------------------------
+    def _construct_layout(self):
+        """
+        Construct the layout, conisting of:
+
+        - top chkbox row
+        - coefficient table
+        - two bottom rows with action buttons
+        """
+        lay_h_display = QHBoxLayout()
+        lay_h_display.setContentsMargins(*params['wdg_margins'])
+        lay_h_display.setAlignment(Qt.AlignLeft)
+        lay_h_display.addWidget(self.lbl_display)
+        lay_h_display.addWidget(self.cmb_pz_frmt)
+        lay_h_display.addWidget(self.spn_digits)
+        lay_h_display.addWidget(self.lbl_digits)
+        lay_h_display.addStretch()
+        frm_display = QFrame(self)
+        frm_display.setLayout(lay_h_display)
+
+        lay_h_gain = QHBoxLayout()
+        lay_h_gain.setContentsMargins(*params['wdg_margins'])
+
+        lay_h_gain.addWidget(self.chk_gain)
+        lay_h_gain.addWidget(self.lbl_gain)
+        lay_h_gain.addWidget(self.led_gain)
+        lay_h_gain.addWidget(self.chk_h_max)
+        lay_h_gain.addWidget(self.lbl_h_max)
+        lay_h_gain.addWidget(self.led_h_max)
+        lay_h_gain.addStretch()
+        frm_gain = QFrame(self)
+        frm_gain.setLayout(lay_h_gain)
+
         lay_h_buttons_pz1 = QHBoxLayout()
         lay_h_buttons_pz1.addWidget(self.but_add_cells)
         lay_h_buttons_pz1.addWidget(self.but_del_cells)
@@ -252,31 +284,12 @@ class Input_PZ_UI(QWidget):
         lay_h_buttons_pz1.addWidget(self.but_csv_options)
         lay_h_buttons_pz1.addStretch()
 
-        # -------------------------------------------------------------------
-        #   Eps / set zero settings
-        # ---------------------------------------------------------------------
-        self.but_set_zero = QPushButton("= 0", self)
-        self.but_set_zero.setToolTip(
-            "<span>Check whether selected poles / zeros are equal or zero with a "
-            "tolerance of &lt; &epsilon;. "
-            "When nothing is selected, test the whole table.</span>")
-        self.but_set_zero.setIconSize(q_icon_size)
-
-        lbl_eps = QLabel(self)
-        lbl_eps.setText("<b><i>for &epsilon;</i> &lt;</b>")
-
-        self.led_eps = QLineEdit(self)
-        self.led_eps.setToolTip("Specify absolute tolerance value.")
-
         lay_h_buttons_pz2 = QHBoxLayout()
         lay_h_buttons_pz2.addWidget(self.but_set_zero)
-        lay_h_buttons_pz2.addWidget(lbl_eps)
+        lay_h_buttons_pz2.addWidget(self.lbl_eps)
         lay_h_buttons_pz2.addWidget(self.led_eps)
         lay_h_buttons_pz2.addStretch()
 
-        # -------------------------------------------------------------------
-        # Now put the _buttons_pz HBoxes into frm_buttons_pz
-        # ---------------------------------------------------------------------
         lay_v_buttons_pz = QVBoxLayout()
         lay_v_buttons_pz.addLayout(lay_h_buttons_pz1)
         lay_v_buttons_pz.addLayout(lay_h_buttons_pz2)
@@ -295,15 +308,6 @@ class Input_PZ_UI(QWidget):
         lay_v_main.addWidget(frm_buttons_pz)
         lay_v_main.addWidget(frm_display)
         self.setLayout(lay_v_main)
-
-        # --- set initial values from dict ------------
-        self.spn_digits.setValue(params['FMT_pz'])
-        self.led_eps.setText(str(self.eps))
-        # ----------------------------------------------------------------------
-        # LOCAL SIGNALS & SLOTs
-        # ----------------------------------------------------------------------
-        self.but_csv_options.clicked.connect(self._open_csv_win)
-        self.but_file_clipboard.clicked.connect(self._set_load_save_icons)
 
     # ------------------------------------------------------------------------------
     def _open_csv_win(self) -> None:
@@ -355,7 +359,7 @@ if __name__ == '__main__':
 
     app = QApplication(sys.argv)
     app.setStyleSheet(QSS.QSS_RC)
-    mainw = Input_PZ_UI()
+    mainw = InputPZUI()
     app.setActiveWindow(mainw)
     mainw.show()
     sys.exit(app.exec_())
