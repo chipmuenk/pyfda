@@ -9,7 +9,7 @@
 """
 JSON encoder for various numeric formats
 """
-# pylint: disable=arguments-renamed
+# pylint: disable=arguments-renamed,too-many-return-statements
 # disable a weird warning
 import json
 import logging
@@ -39,7 +39,7 @@ class JSONNumpyEncoder(json.JSONEncoder):
             return str(obj.real) + "+" + str(obj.imag) + "j"
         if callable(obj):
             logger.warning("Object '%s' not JSON serializable as it is a function.", obj)
-            return str("")
+            return ""
 
         try:
             # The following only raises a TypeError which is caught in the next step
@@ -47,4 +47,4 @@ class JSONNumpyEncoder(json.JSONEncoder):
         except TypeError as e:
             logger.warning(
                 "Object of type '%s' is not JSON serializable.\n%s", type(obj), e)
-            return str("")
+            return ""
