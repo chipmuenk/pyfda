@@ -32,7 +32,7 @@ from pyfda.libs.pyfda_text_lib import to_html, mod_version
 from pyfda.libs.special_functions import lin2unit
 from pyfda.libs.pyfda_qt_lib import emit
 from pyfda.libs.pyfda_qt_classes import PushButton
-from pyfda.pyfda_rc import params
+from pyfda.pyfda_rc import params, QSS
 
 logger = logging.getLogger(__name__)
 
@@ -328,7 +328,7 @@ class InputInfo(QWidget):
         specs are violated, colour the table entry in red.
         """
 
-        def _find_min_max(self, f_start, f_stop, unit='dB'):
+        def _find_min_max(f_start, f_stop, unit='dB'):
             """
             Find minimum and maximum magnitude and the corresponding frequencies
             for the filter defined in the filter dict in a given frequency band
@@ -427,7 +427,7 @@ class InputInfo(QWidget):
                 # Calculate frequency response at test frequencies
                 [_, a_test] = sig.freqz(bb, aa, 2.0 * pi * f_vals.astype(float))
 
-            (f_min, h_min, f_max, h_max) = _find_min_max(self, 0, 1, unit='V')
+            (f_min, h_min, f_max, h_max) = _find_min_max(0, 1, unit='V')
             # append frequencies and values for min. and max. filter reponse to
             # test vector
 
@@ -534,7 +534,7 @@ class InputInfo(QWidget):
 if __name__ == '__main__':
     # Run widget standalone with `python -m pyfda.input_widgets.input_info`
     from pyfda.libs.compat import QApplication
-    from pyfda.pyfda_rc import QSS
+#    from pyfda.pyfda_rc import QSS
 
     app = QApplication(sys.argv)
     app.setStyleSheet(QSS.QSS_RC)
