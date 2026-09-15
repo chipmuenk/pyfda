@@ -16,7 +16,7 @@ import scipy.signal as sig
 # Reference dictionary with available FFT windows, their function names and their properties.
 # When the function name `fn_name` is just a string, it is taken from `scipy.signal.windows`,
 # otherwise it has to be fully qualified name.
-bartlett_info =\
+BARTLETT_INFO =\
     '''<span>
     The Bartlett and triangular windows are similar, except that the end
     point(s) of the Bartlett window are at zero. Its side lobes fall off with
@@ -26,7 +26,7 @@ bartlett_info =\
     hence, its Fourier transform is the product of two (periodic) sinc
     functions, decaying twice as fast as the spectrum of a rectangular window.
     </span>'''
-rectangular_info =\
+RECTANGULAR_INFO =\
     '''<span>
     Boxcar or Rectangular window, best suited for analyzing <br />
     a) <b>coherent signals</b>, i.e. where the window length is an integer number of the
@@ -52,7 +52,7 @@ all_wins_dict_ref = {
         'disp_name': 'Boxcar',
         'fn_name': 'boxcar',
         'id': 'boxcar',
-        'info': rectangular_info,
+        'info': RECTANGULAR_INFO,
         'par': [],
         'par_val': []
          },
@@ -61,7 +61,7 @@ all_wins_dict_ref = {
         'disp_name': 'Rectangular',
         'fn_name': 'boxcar',
         'id': 'rectangular',
-        'info': rectangular_info,
+        'info': RECTANGULAR_INFO,
         'par': [],
         'par_val': []
         },
@@ -86,7 +86,7 @@ all_wins_dict_ref = {
         'disp_name': 'Bartlett',
         'fn_name': 'bartlett',
         'id': 'bartlett',
-        'info': bartlett_info,
+        'info': BARTLETT_INFO,
         'par': [],
         'par_val': []
             },
@@ -126,7 +126,7 @@ all_wins_dict_ref = {
             of up to 125, 180 and 230 dB.
             </span>''',
         'par': [{
-            'name': 'L', 'name_tex': r'$L$', 'list': ['4', '5', '7', '9'],
+            'name': 'n_terms', 'name_tex': r'$n_terms$', 'list': ['4', '5', '7', '9'],
             'tooltip': '<span>Number of cosine terms</span>'}],
         'par_val': ['4']
         },
@@ -359,7 +359,7 @@ all_wins_dict_ref = {
         'disp_name': 'Triangular',
         'fn_name': 'triang',
         'id': 'triang',
-        'info': bartlett_info,
+        'info': BARTLETT_INFO,
         'par': [],
         'par_val': []
         },
@@ -413,22 +413,22 @@ all_wins_dict_ref = {
 
 
 # -------------------------------------------------------------------------------------
-def blackmanharris(N: int, L: str, sym: bool) -> np.ndarray:
+def blackmanharris(N: int, n_terms: str, sym: bool) -> np.ndarray:
     """
-    Define Blackmanharris window for orders 5, 7 and 9. Order 4 is covered by the function
+    Define Blackmanharris window for 5, 7 and 9 terms. Four terms are covered by the function
     with the same name from scipy.signal
     """
-    if L == '4':
+    if n_terms == '4':
         return sig.windows.blackmanharris(N, sym)
 
-    if L == '5':
+    if n_terms == '5':
         # 5 Term Cosine, 125.427 dB, NBW 2.21535 bins, 9.81016 dB gain
         a = [3.232153788877343e-001,
              -4.714921439576260e-001,
              1.755341299601972e-001,
              -2.849699010614994e-002,
              1.261357088292677e-003]
-    elif L == '7':
+    elif n_terms == '7':
         # 7 Term Cosine, 180.468 dB, NBW 2.63025 bins, 11.33355 dB gain
         a = [2.712203605850388e-001,
              -4.334446123274422e-001,
@@ -437,7 +437,7 @@ def blackmanharris(N: int, L: str, sym: bool) -> np.ndarray:
              1.076186730534183e-002,
              -7.700127105808265e-004,
              1.368088305992921e-005]
-    elif L == '9':
+    elif n_terms == '9':
         # 9 Term Cosine, 234.734 dB, NBW 2.98588 bins, 12.45267 dB gain
         a = [2.384331152777942e-001,
              -4.005545348643820e-001,
@@ -450,7 +450,7 @@ def blackmanharris(N: int, L: str, sym: bool) -> np.ndarray:
              1.161808358932861e-007]
     else:
         raise ValueError(
-            f"Only orders L = 4, 5, 7 and 9 are defined for Blackmanharris window, not L = '{L}'"
+            f"Only 4, 5, 7 and 9 terms are defined for Blackmanharris window, not '{n_terms}' terms"
             )
 
     return calc_cosine_window(N, sym, a)
@@ -462,10 +462,10 @@ def calc_cosine_window(N: int, sym: bool, a: list) -> np.ndarray:
     by the list `a`.
     """
     if sym:
-        L = N-1
+        n_terms = N-1
     else:
-        L = N
-    x = np.arange(N) * 2 * np.pi / L
+        n_terms = N
+    x = np.arange(N) * 2 * np.pi / n_terms
     win = a[0]
     for k in range(1, len(a)):
         win += a[k] * np.cos(k*x)
@@ -479,9 +479,9 @@ def calc_cosine_window(N: int, sym: bool, a: list) -> np.ndarray:
 #     """
 
 #     if sym:
-#         L = N-1
+#         n_terms = N-1
 #     else:
-#         L = N
+#         n_terms = N
 #     # x = np.arange(N) * np.pi / (N)
 
 #     geg_ev = scipy.special.eval_gegenbauer
