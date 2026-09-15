@@ -58,6 +58,7 @@ class MA(QWidget):
     method is selected, so initialization is performed in the constructor.
     """
 
+    # Class variables
     FRMT = ('zpk', 'ba') # output format(s) of filter design routines 'zpk' / 'ba' / 'sos'
     HAS_UI = True #: Flag whether the filter class has a UI or not
     info = """
@@ -66,7 +67,9 @@ class MA(QWidget):
     can only be specified via their length and the number of cascaded sections.
 
     The minimum order to obtain a certain attenuation at a given frequency is
-    calculated via the si function.
+    calculated via the sinc function. Specs for the passband are usually not fulfilled
+    with this simple filter.
+
 
     Moving average filters can be implemented very efficiently in hard- and software
     as they require no multiplications but only addition and subtractions. Probably
@@ -215,6 +218,7 @@ class MA(QWidget):
 
         self._dict2ui() # get initial / last setting from dictionary
 
+    #--------------------------------------------------------------------------
     def _dict2ui(self) -> None:
         """
         Reload parameter(s) from filter dictionary (if they exist) and set
@@ -232,7 +236,7 @@ class MA(QWidget):
             if 'normalize' in wdg_fil_par:
                 self.chk_norm.setChecked(wdg_fil_par['normalize'])
 
-
+    #--------------------------------------------------------------------------
     def _ui2dict(self) -> None:
         """
         When line edit field is changed, read the text and convert it to integer.
@@ -245,6 +249,7 @@ class MA(QWidget):
 
         self._store_entries()
 
+    #--------------------------------------------------------------------------
     def _store_entries(self) -> None:
         """
         Store parameter settings in filter dictionary. Called from _ui2dict()
@@ -257,18 +262,18 @@ class MA(QWidget):
         # sig_tx -> select_filter -> filter_specs
         self.emit({'filt_changed': 'ma'})
 
-
+    #--------------------------------------------------------------------------
     def _get_params(self) -> None:
         """
         Retrieve and set filter parameters from the filter dictionary.
         This method fetches the stopband frequency (f_sb) and stopband
         attenuation (a_sb) from the filterbroker.
         """
-        # N is total order, L is number of taps per stage
+        # N is total order, l_taps is number of taps per stage
         self.f_sb  = fb_get('f_sb')
         self.a_sb  = fb_get('a_sb')
 
-
+    #--------------------------------------------------------------------------
     def _save(self) -> None:
         """
         Save MA-filters both in 'zpk' and 'ba' format; no conversion has to be
@@ -290,55 +295,59 @@ class MA(QWidget):
 
         self._store_entries()
 
-
+    #--------------------------------------------------------------------------
     def calc_ma(self, rt: str) -> int:
         """
         Calculate coefficients and P/Z for moving average filter based on
-        filter length L = N + 1 and number of cascaded stages and save the
+        filter length l_taps = N + 1 and number of cascaded stages and save the
         result in the filter dictionary.
         """
-        b = 1.
         k = 1.
-        L = self.delays + 1
-        norm = L
+        l_taps = self.delays + 1  # the number of taps in each section
+        norm = l_taps  # default normalization factor
+        # indices for calculating the twiddle factors exp(-2j * pi * idx / l_taps)
+        idx = np.arange(1, l_taps)  # [1, 2, 3, ... l_taps-1]
+        b0 = np.ones(l_taps)  # zero coefficients per section (dummy definition)
 
         if rt == 'lp':
-            b0 = np.ones(L) #  h[n] = {1; 1; 1; ...}
-            i = np.arange(1, L)
+            b0 = np.ones(l_taps)  # h[n] = {1; 1; 1; ...}
+            idx = np.arange(1, l_taps)  # [1, 2, 3, ... l_taps-1]
+
+            norm = l_taps
 
         elif rt == 'hp':
-            b0 = np.ones(L)
+            b0 = np.ones(l_taps)
             b0[::2] = -1. # h[n] = {1; -1; 1; -1; ...}
 
-            i = np.arange(L)
-            if L % 2 == 0: # even order, remove middle element
-                i = np.delete(i ,round(L/2.))
+            idx = np.arange(l_taps)
+            if l_taps % 2 == 0: # even order, remove middle element
+                idx = np.delete(idx, round(l_taps/2.))
             else: # odd order, shift by 0.5 and remove middle element
-                i = np.delete(i, int(L/2.)) + 0.5
+                idx = np.delete(idx, int(l_taps/2.)) + 0.5
 
-            norm = L
+            norm = l_taps
 
         elif rt == 'bp':
-            # N is even, L is odd
-            b0 = np.ones(L)
+            # N is even, l_taps is odd
+            b0 = np.ones(l_taps)
             b0[1::2] = 0
             b0[::4] = -1 # h[n] = {1; 0; -1; 0; 1; ... }
 
-            L = L + 1
-            i = np.arange(L) # create N + 2 zeros around the unit circle, ...
-            # ... remove first and middle element and rotate by L / 4
-            i = np.delete(i, [0, L // 2]) + L / 4
+            l_taps = l_taps + 1
+            idx = np.arange(l_taps) # create N + 2 zeros around the unit circle, ...
+            # ... remove first and middle element and rotate by adding l_taps / 4
+            idx = np.delete(idx, [0, l_taps // 2]) + l_taps / 4
 
             norm = np.sum(abs(b0))
 
         elif rt == 'bs':
-            # N is even, L is odd
-            b0 = np.ones(L)
+            # N is even, l_taps is odd
+            b0 = np.ones(l_taps)
             b0[1::2] = 0
 
-            L = L + 1
-            i = np.arange(L) # create N + 2 zeros around the unit circle and ...
-            i = np.delete(i, [0, L // 2]) # ... remove first and middle element
+            l_taps = l_taps + 1
+            idx = np.arange(l_taps) # create N + 2 zeros around the unit circle and ...
+            idx = np.delete(idx, [0, l_taps // 2]) # ... remove first and middle element
 
             norm = np.sum(b0)
 
@@ -346,8 +355,11 @@ class MA(QWidget):
             if not popup_warning(None, self.delays*self.stages, "Moving Average"):
                 return -1
 
-        z0 = np.exp(-2j*np.pi*i/L)
-        # calculate filter for multiple cascaded stages
+        z0 = np.exp(-2.j * np.pi * idx / l_taps)
+        # calculate filter for multiple cascaded stages by repeatedly convolving b0 (with
+        # length `l_taps`) with itself. For P/Z form, create multiple zeros by repeating z0.
+        # The poles are all in the origin (= 0) and have the same number as the zeros.
+        b = 1  # initial definition
         for _ in range(self.stages):
             b = np.convolve(b0, b)
         z = np.repeat(z0, self.stages)
@@ -361,12 +373,12 @@ class MA(QWidget):
         gain = zeros_with_val(len(z), k)
 
         # store in class attributes for the _save method
-        self.zpk = np.array([z,p,gain])
+        self.zpk = np.array([z, p, gain])
         self.b = b
         self._save()
         return 0
 
-
+    # ====================== Filter Design Routines ==========================
     def lp_man(self) -> int:
         """
         Design a low-pass Moving Average filter using manual specifications.
@@ -378,6 +390,7 @@ class MA(QWidget):
         self._get_params()
         return self.calc_ma('lp')
 
+    #--------------------------------------------------------------------------
     def lp_min(self) -> int:
         """
         Design a low-pass Moving Average filter with minimum specifications.
@@ -392,6 +405,7 @@ class MA(QWidget):
                                                      np.sin(self.f_sb * np.pi))))
         return self.calc_ma('lp')
 
+    #--------------------------------------------------------------------------
     def hp_man(self) -> int:
         """
         Design a high-pass Moving Average filter using manual specifications.
@@ -403,6 +417,7 @@ class MA(QWidget):
         self._get_params()
         return self.calc_ma('hp')
 
+    #--------------------------------------------------------------------------
     def hp_min(self) -> int:
         """
         Design a high-pass Moving Average filter with minimum specifications.
@@ -417,6 +432,7 @@ class MA(QWidget):
                                               np.sin((0.5 - self.f_sb) * np.pi))))
         return self.calc_ma('hp')
 
+    #--------------------------------------------------------------------------
     def bs_man(self) -> int:
         """
         Design a band-stop Moving Average filter using manual specifications.
@@ -429,6 +445,7 @@ class MA(QWidget):
         self.delays = ceil_odd(self.delays)  # enforce odd order
         return self.calc_ma('bs')
 
+    #--------------------------------------------------------------------------
     def bp_man(self) -> int:
         """
         Design a band-pass Moving Average filter using manual specifications.
@@ -440,7 +457,9 @@ class MA(QWidget):
         self._get_params()
         self.delays = ceil_odd(self.delays)  # enforce odd order
         return self.calc_ma('bp')
-#------------------------------------------------------------------------------
+
+
+# =============================================================================
 if __name__ == '__main__':
     # run module standalone using "python -m pyfda.filter_widgets.ma"
     import sys
