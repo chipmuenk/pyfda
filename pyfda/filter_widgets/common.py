@@ -158,9 +158,10 @@ def remezord(freqs: list, amps: list, rips: list, fs: float = 1.,
     # low-pass or high-pass filters with the specified edges:
     f1 = freqs[0:-1:2]
     f2 = freqs[1::2]
-    L = 0
+    fil_len = 0
     for i in range(len(amps)-1):
-        L = max((L,
+        fil_len = max(
+            (fil_len,
                  remlplen(f1[i], f2[i], rips[i], rips[i+1]),
                  remlplen(0.5-f2[i], 0.5-f1[i], rips[i+1], rips[i])))
 
@@ -172,7 +173,7 @@ def remezord(freqs: list, amps: list, rips: list, fs: float = 1.,
     # ripple and all of the other ripples:
     weight = max(rips) / rips
 
-    return [L, bands, amps, weight]
+    return [fil_len, bands, amps, weight]
 
 # -------------------------------------------------------------------
 def remlplen_herrmann(fp: float, fs: float, dp: float, ds: float) -> int:
