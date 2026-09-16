@@ -22,7 +22,7 @@ import numpy as np
 
 import pyfda.filterbroker as fb
 from pyfda.filterbroker import(
-    fb_get, fb_set, clean_filter_keys, load_cleaned_filter, fil_info, fil_copy)
+    fb_get, fb_set, sanitize_fil_keys, load_cleaned_filter, fil_info, fil_copy)
 from pyfda.filter_factory import call_fil_method
 from pyfda.filter_tree_builder import FilterTreeBuilder as FTB
 from pyfda.input_widgets import (
@@ -679,7 +679,7 @@ def save_filter(self, title="Save Filter", all_filters=False) -> int:
 
     err = False
 
-    fil_clean = clean_filter_keys(all_filters=False)  # create a copy of the filter dict to be saved
+    fil_clean = sanitize_fil_keys(all_filters=False)  # create a copy of the filter dict to be saved
 
     if file_type in {"npz", "pkl"}:
         try:
@@ -737,7 +737,7 @@ def save_all_filters(self) -> int:
     err = False
     # create a copy of the filters to be saved that only contains keys of the
     # reference filter dict and warn of unsupported keys:
-    fil_clean = clean_filter_keys(all_filters=True)
+    fil_clean = sanitize_fil_keys(all_filters=True)
 
     if file_type in {"npz", "pkl"}:
         try:
