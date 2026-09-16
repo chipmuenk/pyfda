@@ -88,7 +88,7 @@ def fil_copy(src: str = "ref", dest: str = "all") -> None:
     if dest == "all":
         for i, _ in enumerate(fil):
             fil[i] = copy.deepcopy(fil_ref)
-            return
+        return
 
     targ_idx = int(dest)
 
