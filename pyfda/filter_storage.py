@@ -18,7 +18,7 @@ import numpy as np
 # fil[0] ... [9] which can be modified by input widgets and design routines
 # -----------------------------------------------------------------------------
 fil_ref = {
-    '_id': [], # a list with the keyword 'pyfda' and the version, e.g. ['pyfda', 1]
+    '_id': ['pyfda', 3], # a list with keyword 'pyfda' and the version nr.
     # amplitude specs (linear units)
     'a_pb': 0.2056717652757185,
     'a_pb2': 0.01,
