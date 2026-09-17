@@ -78,7 +78,7 @@ class ConfigFileParser():
         'PlotTauG': {'name': 'tau_g', 'mod': 'pyfda.plot_widgets.plot_tau_g'},
         'PlotPZ': {'name': 'P / Z', 'mod': 'pyfda.plot_widgets.plot_pz'},
         'PlotTran': {'name': 'h[n]', 'mod': 'pyfda.plot_widgets.plot_tran'},
-        'Plot_3D': {'name': '3D', 'mod': 'pyfda.plot_widgets.plot_3d'}
+        'Plot3D': {'name': '3D', 'mod': 'pyfda.plot_widgets.plot_3d'}
         }
     INPUT_CLASSES_DICT: ClassVar[dict[str, dict[str, str]]] =\
         {

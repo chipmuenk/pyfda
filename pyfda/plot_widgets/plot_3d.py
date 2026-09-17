@@ -34,9 +34,10 @@ from pyfda.pyfda_rc import params
 
 logger = logging.getLogger(__name__)
 
-classes = {'Plot_3D': '3D'}  #: Dict containing class name : display name
+classes = {'Plot3D': '3D'}  #: Dict containing class name : display name
 
-class Plot_3D(QWidget):
+PN_SIZE = 8  # size of P/N symbols
+class Plot3D(QWidget):
     """
     Class for various 3D-plots:
     - lin / log line plot of H(f)
@@ -84,9 +85,9 @@ class Plot_3D(QWidget):
         self.but_log = PushButton(self, "dB", objectName="but_log")
         self.but_log.setToolTip("Logarithmic scale")
 
-        self.but_plot_in_UC = PushButton(self, "|z| < 1 ", checked=True,
-                                         objectName="but_plot_in_UC")
-        self.but_plot_in_UC.setToolTip("Only plot H(z) within the unit circle")
+        self.but_plot_in_uc = PushButton(self, "|z| < 1 ", checked=True,
+                                         objectName="but_plot_in_uc")
+        self.but_plot_in_uc.setToolTip("Only plot H(z) within the unit circle")
 
         self.lbl_bottom = QLabel(to_html("Bottom =", frmt='bi'), self)
         self.led_bottom = QLineEdit(self, objectName="led_bottom")
@@ -163,7 +164,7 @@ class Plot_3D(QWidget):
         # ----------------------------------------------------------------------
         lay_g_controls = QGridLayout()
         lay_g_controls.addWidget(self.but_log, 0, 0)
-        lay_g_controls.addWidget(self.but_plot_in_UC, 1, 0)
+        lay_g_controls.addWidget(self.but_plot_in_uc, 1, 0)
         lay_g_controls.addWidget(self.lbl_top, 0, 2)
         lay_g_controls.addWidget(self.led_top, 0, 4)
         lay_g_controls.addWidget(self.lbl_top_db, 0, 5)
@@ -219,7 +220,7 @@ class Plot_3D(QWidget):
         self.led_bottom.editingFinished.connect(self._log_clicked)
         self.led_top.editingFinished.connect(self._log_clicked)
 
-        self.but_plot_in_UC.clicked.connect(self._init_grid)
+        self.but_plot_in_uc.clicked.connect(self._init_grid)
         self.plt_uc.clicked.connect(self.draw)
         self.but_hf.clicked.connect(self.draw)
         self.but_pz.clicked.connect(self.draw)
@@ -271,7 +272,7 @@ class Plot_3D(QWidget):
         dx = (self.xmax - self.xmin) / steps
         dy = (self.ymax - self.ymin) / steps  # grid size cartesian range
 
-        if self.but_plot_in_UC.isChecked():  # Plot circular range in 3D-Plot
+        if self.but_plot_in_uc.isChecked():  # Plot circular range in 3D-Plot
             [r, phi] = np.meshgrid(np.arange(rmin, rmax, dr),
                                    np.linspace(0, 2 * pi, steps, endpoint=True))
             self.x = r * cos(phi)
@@ -395,7 +396,7 @@ class Plot_3D(QWidget):
         zz = np.array(fb_get('zpk', 0))
         pp = np.array(fb_get('zpk', 1))
 
-        N_FFT = CFP.conf_settings['N_FFT']
+        n_fft = CFP.conf_settings['N_FFT']
 
         alpha = self.dia_alpha.value()/10.
 
@@ -405,7 +406,7 @@ class Plot_3D(QWidget):
 
         # Number of Lines /step size for H(f) stride, mesh, contour3d:
         stride = 10 - self.dia_hatch.value()
-        NL = 3 * self.dia_hatch.value() + 5
+        nl = 3 * self.dia_hatch.value() + 5
 
         surf_enabled = qget_cmb_box(self.cmb_mode_3d, data=False) in {'Surf', 'Contour'}\
             or self.but_contour_2d.isChecked()
@@ -423,7 +424,7 @@ class Plot_3D(QWidget):
         # -----------------------------------------------------------------------------
 
 
-        [w, H] = sig.freqz(bb, aa, worN=N_FFT, whole=True)
+        [_, H] = sig.freqz(bb, aa, worN=n_fft, whole=True)
         H = np.nan_to_num(H)  # replace nans and inf by finite numbers
 
         h_abs = abs(H)
@@ -474,8 +475,8 @@ class Plot_3D(QWidget):
 
         # calculate H(jw)| along the unity circle and |H(z)|, each clipped
         # between bottom and top
-        H_UC = h_mag(bb, aa, self.xy_uc, top, h_min=bottom, log=self.but_log.isChecked())
-        Hmag = h_mag(bb, aa, self.z, top, h_min=bottom, log=self.but_log.isChecked())
+        h_uc = h_mag(bb, aa, self.xy_uc, top, h_min=bottom, log=self.but_log.isChecked())
+        h_mag = h_mag(bb, aa, self.z, top, h_min=bottom, log=self.but_log.isChecked())
 
         # ===============================================================
         # Plot Unit Circle (UC)
@@ -490,25 +491,22 @@ class Plot_3D(QWidget):
         # Plot ||H(f)| along unit circle as 3D-lineplot
         # ===============================================================
         if self.but_hf.isChecked():
-            self.ax3d.plot(self.xy_uc.real, self.xy_uc.imag, H_UC, alpha=0.8, lw=4)
+            self.ax3d.plot(self.xy_uc.real, self.xy_uc.imag, h_uc, alpha=0.8, lw=4)
             # draw once more as dashed white line to improve visibility
-            self.ax3d.plot(self.xy_uc.real, self.xy_uc.imag, H_UC, 'w--', lw=4)
+            self.ax3d.plot(self.xy_uc.real, self.xy_uc.imag, h_uc, 'w--', lw=4)
 
             if stride < 10:  # plot thin vertical line every stride points on the UC
                 for k in range(len(self.xy_uc[::stride])):
                     self.ax3d.plot(
                         [self.xy_uc.real[::stride][k], self.xy_uc.real[::stride][k]],
                         [self.xy_uc.imag[::stride][k], self.xy_uc.imag[::stride][k]],
-                        [np.ones(len(self.xy_uc[::stride]))[k]*bottom, H_UC[::stride][k]],
+                        [np.ones(len(self.xy_uc[::stride]))[k]*bottom, h_uc[::stride][k]],
                         linewidth=1, color=(0.5, 0.5, 0.5))
 
         # ===============================================================
         # Plot Poles and Zeros
         # ===============================================================
         if self.but_pz.isChecked():
-
-            PN_SIZE = 8  # size of P/N symbols
-
             # Plot zero markers at |H(z_i)| = zlevel with "stems":
             self.ax3d.plot(zz.real, zz.imag, ones(len(zz)) * zlevel, 'o',
                markersize=PN_SIZE, markeredgecolor='blue', markeredgewidth=2.0,
@@ -529,7 +527,7 @@ class Plot_3D(QWidget):
         # ===============================================================
 
         m_cb = ScalarMappable(cmap=cmap)  # normalized proxy object that is mappable
-        m_cb.set_array(Hmag)              # for colorbar
+        m_cb.set_array(h_mag)              # for colorbar
 
         # ---------------------------------------------------------------
         # 3D-mesh plot
@@ -538,7 +536,7 @@ class Plot_3D(QWidget):
             # fig_mlab = mlab.figure(fgcolor=(0., 0., 0.), bgcolor=(1, 1, 1))
             # self.ax3d.set_zlim(0,2)
             self.ax3d.plot_wireframe(
-                self.x, self.y, Hmag, rstride=5, cstride=stride,
+                self.x, self.y, h_mag, rstride=5, cstride=stride,
                 linewidth=1, color='gray')
 
         # ---------------------------------------------------------------
@@ -549,25 +547,25 @@ class Plot_3D(QWidget):
 
             if self.but_lighting.isChecked():
                 ls = LightSource(azdeg=0, altdeg=65)  # Create light source object
-                rgb = ls.shade(Hmag, cmap=cmap)  # Shade data, creating an rgb array
+                rgb = ls.shade(h_mag, cmap=cmap)  # Shade data, creating an rgb array
                 cmap_surf = None
             else:
                 rgb = None
                 cmap_surf = cmap
 
-#            s = self.ax3d.plot_surface(self.x, self.y, Hmag,
+#            s = self.ax3d.plot_surface(self.x, self.y, h_mag,
 #                    alpha=OPT_3D_ALPHA, rstride=1, cstride=1, cmap=cmap,
 #                    linewidth=0, antialiased=False, shade=True, facecolors = rgb)
 #            s.set_edgecolor('gray')
             s = self.ax3d.plot_surface(
-                self.x, self.y, Hmag, alpha=alpha, rstride=1, cstride=1, linewidth=0,
+                self.x, self.y, h_mag, alpha=alpha, rstride=1, cstride=1, linewidth=0,
                 antialiased=False, facecolors=rgb, cmap=cmap_surf, shade=True)
             s.set_edgecolor(None)
         # ---------------------------------------------------------------
         # 3D-Contour plot
         # ---------------------------------------------------------------
         elif self.cmb_mode_3d.currentText() == 'Contour':
-            s = self.ax3d.contourf3D(self.x, self.y, Hmag, NL, alpha=alpha, cmap=cmap)
+            s = self.ax3d.contourf3D(self.x, self.y, h_mag, nl, alpha=alpha, cmap=cmap)
 
         # ---------------------------------------------------------------
         # 2D-Contour plot
@@ -576,12 +574,12 @@ class Plot_3D(QWidget):
         # TODO: colormap is created depending on the zdir = 'z' contour plot
         #       -> set limits of (all) other plots manually?
         if self.but_contour_2d.isChecked():
-            self.ax3d.contourf(self.x, self.y, Hmag, NL, zdir='x', offset=self.xmin,
+            self.ax3d.contourf(self.x, self.y, h_mag, nl, zdir='x', offset=self.xmin,
                 cmap=cmap, alpha = alpha)#, vmin = bottom)#, vmax = top, vmin = bottom)
-            self.ax3d.contourf(self.x, self.y, Hmag, NL, zdir='y', offset=self.ymin,
+            self.ax3d.contourf(self.x, self.y, h_mag, nl, zdir='y', offset=self.ymin,
                 cmap=cmap, alpha = alpha)#, vmin = bottom)#, vmax = top, vmin = bottom)
             s = self.ax3d.contourf(
-                self.x, self.y, Hmag, NL, zdir='z', offset=bottom - (top - bottom) * 0.05,
+                self.x, self.y, h_mag, nl, zdir='z', offset=bottom - (top - bottom) * 0.05,
                 cmap=cmap, alpha=alpha)
 
         # plot colorbar for suitable plot modes
@@ -625,7 +623,7 @@ if __name__ == "__main__":
 
     app = QApplication(sys.argv)
     app.setStyleSheet(QSS.QSS_RC)
-    mainw = Plot_3D()
+    mainw = Plot3D()
     app.setActiveWindow(mainw)
     mainw.show()
     sys.exit(app.exec_())
