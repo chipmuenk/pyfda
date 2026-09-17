@@ -50,16 +50,13 @@ from pyfda.libs.pyfda_text_lib import compare_dictionaries
 from pyfda.filter_storage import fil_ref
 
 logger = logging.getLogger(__name__)
+
 # ==========================================================
 # Variables that can be accessed from all modules
 #
 # State of filter design: 'ok', 'changed', 'error', 'active'
 design_filt_state = 'changed'
 # ===========================================================
-# ----------------------------------------------------------------------------------
-# Include this version number as `'_id': ('pyfda', FILTER_FILE_VERSION)` when saving
-# filter files and test for the version when loading filter files.
-FILTER_FILE_VERSION = '3'
 
 UNDO_LEN = 20  # depth of circular undo buffer
 undo_step = 0  # number of undo steps, limited to UNDO_LEN
@@ -84,7 +81,6 @@ def fil_copy(src: str = "ref", dest: str = "all") -> None:
     # does not work because all entries in fil[0] ... fil[9] become references to the same dict
     # `fil_ref`, so that changing one of them changes all of them. By creating a deep copy of
     # fil_ref for each entry in `fil`` individually, this does not happen (???).
-
     if dest == "all":
         for i, _ in enumerate(fil):
             fil[i] = copy.deepcopy(fil_ref)
@@ -99,7 +95,6 @@ def fil_copy(src: str = "ref", dest: str = "all") -> None:
     src_idx = int(src)
     fil[targ_idx] = fil[src_idx]
     return
-
 # -----------------------------------------------------------------------
 def fil_info(idx: int) -> str:
     """
@@ -526,8 +521,6 @@ def sanitize_fil_keys(all_filters: bool = True) -> list[dict] | dict:
         reference dict `fil_ref`.
     """
     def _sanitize_fil_keys_i(i: int) -> dict:
-        # provide identifier and version number for pyfda files
-        fil[i].update({'_id': ['pyfda', FILTER_FILE_VERSION]})
         # only copy the keys that are in the reference dict, remove unsupported keys.
         fil_clean_i = {k:v for k, v in fil[i].items() if k in fil_ref}
         keys_unsupported = [k for k in fil[i] if k not in fil_ref]

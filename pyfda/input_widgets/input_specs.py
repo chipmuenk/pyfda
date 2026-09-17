@@ -20,6 +20,7 @@ import sys
 
 import numpy as np
 
+from pyfda.filter_storage import fil_ref
 import pyfda.filterbroker as fb
 from pyfda.filterbroker import(
     fb_get, fb_set, sanitize_fil_keys, load_cleaned_filter, fil_info, fil_copy)
@@ -42,10 +43,6 @@ from pyfda.pyfda_rc import params
 logger = logging.getLogger(__name__)
 
 # --------------------------------------------------------------------------------------
-# Include this version number as `'_id': ('pyfda', FILTER_FILE_VERSION)` when saving
-# filter files and test for the version when loading filter files.
-FILTER_FILE_VERSION = '3'
-
 classes = {'InputSpecs': 'Specs'}  #: Dict containing class name : display name
 # This is read by `tree_builder._build_widget_class_dicts()` into the dict
 #  `filterbroker.INPUT_CLASSES_DICT` and used to create the widgets in input_tab_widgets.
@@ -435,12 +432,13 @@ class InputSpecs(QWidget):
 
         else:
             # 'Mem <i>', copy fil[i] to fil[0]
-            # fb.fil_copy([int(src)])
-            fb.fil_copy(src=str(src), dest="0" )
+            fb.fil_copy(src=str(src), dest="0")
+            logger.warning("copy %s", src)
 
         # update info string
         self._load_info_text()
         self.led_info.setText(str(fb_get('info')))
+        logger.warning(fb_get('info'))
         self.cmb_filter_load.setCurrentIndex(0)
         self.emit({'data_changed': 'filter_loaded'})
 
@@ -637,12 +635,12 @@ def load_filter(self, all_filters: bool = False) -> bool:
         fb_id = fb_temp
 
     if '_id' not in fb_id or len(fb_id['_id']) != 2 or fb_id['_id'][0] != 'pyfda':
-        msg = "This is no pyfda filter or an outdated file format! Load anyway?"
+        msg = "Missing id 'pyfda', this is no pyfda filter! Load anyway?"
         err = not popup_warning(None, message=msg)
-    elif str(fb_id['_id'][1]) != FILTER_FILE_VERSION:
+    elif str(fb_id['_id'][1]) != fil_ref['_id'][1]:
         msg = (
             f"The filter file has version {fb_id['_id'][1]} instead of "
-            f"required version {FILTER_FILE_VERSION}! Load anyway?")
+            f"required version {fil_ref['_id'][1]}! Load anyway?")
         err = not popup_warning(None, message=msg)
 
     # Handle errors occurring during id test
