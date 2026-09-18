@@ -276,7 +276,7 @@ class AboutWindow(QDialog):
 
 # =============================================================================
 if __name__ == '__main__':
-    # Run widget standalone with `python -m pyfda.input_widgets.input_info_about`
+    # Run widget standalone with `python -m pyfda.input_widgets.about_window`
     import sys
     from pyfda.libs.compat import QApplication
     from pyfda.pyfda_rc import QSS

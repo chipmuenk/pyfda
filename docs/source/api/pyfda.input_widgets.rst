@@ -63,7 +63,7 @@ pyfda.input\_widgets.input\_info module
 pyfda.input\_widgets.input\_info\_about module
 ----------------------------------------------
 
-.. automodule:: pyfda.input_widgets.input_info_about
+.. automodule:: pyfda.input_widgets.about_window
    :members:
    :undoc-members:
    :show-inheritance:
