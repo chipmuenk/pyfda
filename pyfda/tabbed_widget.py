@@ -45,7 +45,7 @@ class TabbedWidget(QWidget):
         self.label = label
         self.use_qscroll_area = use_qscroll_area
         self._construct_ui()
-        self._create_layout()
+        self._construct_layout()
 
     # -------------------------------------------------------------------------
     def emit(self, dict_sig: dict) -> None:
@@ -143,7 +143,7 @@ class TabbedWidget(QWidget):
             logger.debug("Added %d %s widgets:\n%s", self.n_wdg, self.label, inst_wdg_str)
 
     # ------------------------------------------------------------------------------
-    def _create_layout(self) -> None:
+    def _construct_layout(self) -> None:
         """
         Create the layout for the tab_widget component. Depending on `use_qscroll_area`,
         the widget is placed directly or inside a QScrollArea.

@@ -56,7 +56,7 @@ class SelectFilter(QWidget):
         self.setObjectName(objectName)
         self.fc_last = ''  # previous filter class
         self._construct_ui()
-        self._create_layout()
+        self._construct_layout()
         self._set_response_type()  # first time initialization
 
     # -------------------------------------------------------------------------
@@ -190,7 +190,7 @@ class SelectFilter(QWidget):
                 lambda: self._set_filter_order(enb_signal=True))  # Manual Order
 
     # --------------------------------------------------------------------------
-    def _create_layout(self) -> None:
+    def _construct_layout(self) -> None:
         """
         Create the layout for the widget.
         """

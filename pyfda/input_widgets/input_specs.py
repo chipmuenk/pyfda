@@ -105,7 +105,7 @@ class InputSpecs(QWidget):
         self.cmb_filter_save_default = "0"
 
         self._construct_ui()
-        self._create_layout()
+        self._construct_layout()
         self._update_ui()  # first time initialization
         self.start_design_filt()  # design first filter using default values
 
@@ -259,7 +259,7 @@ class InputSpecs(QWidget):
         # ----------------------------------------------------------------------
 
     # --------------------------------------------------------------------------
-    def _create_layout(self) -> None:
+    def _construct_layout(self) -> None:
         """
         Create the layout for the widget.
         """
