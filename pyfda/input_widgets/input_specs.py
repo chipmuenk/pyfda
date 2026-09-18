@@ -10,7 +10,6 @@
 Widget stacking all subwidgets for filter specification and design. The actual
 filter design is started here as well.
 """
-import copy
 import io
 import json
 import logging
@@ -47,7 +46,6 @@ classes = {'InputSpecs': 'Specs'}  #: Dict containing class name : display name
 # This is read by `tree_builder._build_widget_class_dicts()` into the dict
 #  `filterbroker.INPUT_CLASSES_DICT` and used to create the widgets in input_tab_widgets.
 
-# TODO: a lot of methods from other classes are called here, this is very intransparent
 class InputSpecs(QWidget):
     """
     Build widget for entering all filter specs
@@ -603,7 +601,6 @@ def load_filter(self, all_filters: bool = False) -> bool:
             return False
 
     elif file_type == 'json':
-        logger.warning("JSON selected")
         try:
             with io.open(file_name, 'r', encoding='utf-8') as f:  # open in text mode (json files)
                 fb_temp = json.load(f)

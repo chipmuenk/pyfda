@@ -26,7 +26,6 @@ class JSONNumpyEncoder(json.JSONEncoder):
     """
     def default(self, obj: int | float | complex | NDArray) \
         -> int | float | str | list:
-        logger.warning("JSONNumpyEncoder")
         if isinstance(obj, np.integer):
             return int(obj)
         if isinstance(obj, np.floating):
