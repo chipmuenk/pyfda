@@ -200,7 +200,8 @@ def h_mag(num: NDArray, den: NDArray, z: NDArray, h_max: float, h_min: float | N
     """
     den_val = abs(np.polyval(den, z))  # evaluate denominator at z
     num_val = abs(np.polyval(num, z))  # evaluate numerator at z
-    olderr = np.geterr()  # store current floating point error behaviour
+
+    olderr = np.geterr()  # store current numpy floating point error behaviour
     # turn off divide by zero warnings, just return 'inf':
     np.seterr(divide=div_by_0)
 
@@ -273,7 +274,6 @@ def unique_roots(p, tol: float = 1e-3, magsort: bool = False,
     -----
     adapted from scipy.signal.signaltools.py:
     TODO: comparison of real values has several problems (5 * tol ???)
-    TODO: speed improvements
     """
     # ----------------------------------------------------------------
     def cmplx_sort(p):
@@ -353,11 +353,10 @@ def unique_roots(p, tol: float = 1e-3, magsort: bool = False,
             p = p[~tolarr]  # and delete them
     else:
         sameroots = []  # temporary list for roots within the tolerance
-        p, indx = cmplx_sort(p)
+        p, _ = cmplx_sort(p)
         indx = len(mult)-1
         curp = p[0] + 5 * tol  # needed to avoid "self-detection" ?
-        for k in range(len(p)):
-            tr = p[k]
+        for tr in p:
             if abs(tr - curp) < tol:
                 sameroots.append(tr)
                 curp = comproot(sameroots)  # not correct for 'avg'
@@ -523,4 +522,3 @@ def floor_even(x) -> int:
     Return the largest even integer not larger than x. x can be integer or float.
     """
     return round_even(x-1)
-
