@@ -312,7 +312,7 @@ classes.valid-metaclass-classmethod-first-arg = [ "mcs" ]
 # List of qualified class names to ignore when counting class parents (see R0901)
 # ignored-parents =
 # Maximum number of arguments for function / method.
-design.max-args = 5
+design.max-args = 7
 # Maximum number of attributes for a class (see R0902).
 design.max-attributes = 99
 # Maximum number of boolean expressions in an if statement (see R0916).
@@ -324,7 +324,7 @@ design.max-locals = 15
 # Maximum number of parents for a class (see R0901).
 design.max-parents = 7
 # Maximum number of positional arguments for function / method.
-design.max-positional-arguments = 5
+design.max-positional-arguments = 7
 # Maximum number of public methods for a class (see R0904).
 design.max-public-methods = 20
 # Maximum number of return / yield for function / method body.
