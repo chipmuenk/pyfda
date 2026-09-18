@@ -475,8 +475,8 @@ class Plot3D(QWidget):
 
         # calculate H(jw)| along the unity circle and |H(z)|, each clipped
         # between bottom and top
-        h_uc = h_mag(bb, aa, self.xy_uc, top, h_min=bottom, log=self.but_log.isChecked())
-        h_mag = h_mag(bb, aa, self.z, top, h_min=bottom, log=self.but_log.isChecked())
+        h_mag_uc = h_mag(bb, aa, self.xy_uc, top, h_min=bottom, log=self.but_log.isChecked())
+        h_mag_z = h_mag(bb, aa, self.z, top, h_min=bottom, log=self.but_log.isChecked())
 
         # ===============================================================
         # Plot Unit Circle (UC)
@@ -491,16 +491,16 @@ class Plot3D(QWidget):
         # Plot ||H(f)| along unit circle as 3D-lineplot
         # ===============================================================
         if self.but_hf.isChecked():
-            self.ax3d.plot(self.xy_uc.real, self.xy_uc.imag, h_uc, alpha=0.8, lw=4)
+            self.ax3d.plot(self.xy_uc.real, self.xy_uc.imag, h_mag_uc, alpha=0.8, lw=4)
             # draw once more as dashed white line to improve visibility
-            self.ax3d.plot(self.xy_uc.real, self.xy_uc.imag, h_uc, 'w--', lw=4)
+            self.ax3d.plot(self.xy_uc.real, self.xy_uc.imag, h_mag_uc, 'w--', lw=4)
 
             if stride < 10:  # plot thin vertical line every stride points on the UC
                 for k in range(len(self.xy_uc[::stride])):
                     self.ax3d.plot(
                         [self.xy_uc.real[::stride][k], self.xy_uc.real[::stride][k]],
                         [self.xy_uc.imag[::stride][k], self.xy_uc.imag[::stride][k]],
-                        [np.ones(len(self.xy_uc[::stride]))[k]*bottom, h_uc[::stride][k]],
+                        [np.ones(len(self.xy_uc[::stride]))[k]*bottom, h_mag_uc[::stride][k]],
                         linewidth=1, color=(0.5, 0.5, 0.5))
 
         # ===============================================================
@@ -527,7 +527,7 @@ class Plot3D(QWidget):
         # ===============================================================
 
         m_cb = ScalarMappable(cmap=cmap)  # normalized proxy object that is mappable
-        m_cb.set_array(h_mag)              # for colorbar
+        m_cb.set_array(h_mag_z)              # for colorbar
 
         # ---------------------------------------------------------------
         # 3D-mesh plot
@@ -536,7 +536,7 @@ class Plot3D(QWidget):
             # fig_mlab = mlab.figure(fgcolor=(0., 0., 0.), bgcolor=(1, 1, 1))
             # self.ax3d.set_zlim(0,2)
             self.ax3d.plot_wireframe(
-                self.x, self.y, h_mag, rstride=5, cstride=stride,
+                self.x, self.y, h_mag_z, rstride=5, cstride=stride,
                 linewidth=1, color='gray')
 
         # ---------------------------------------------------------------
@@ -547,25 +547,25 @@ class Plot3D(QWidget):
 
             if self.but_lighting.isChecked():
                 ls = LightSource(azdeg=0, altdeg=65)  # Create light source object
-                rgb = ls.shade(h_mag, cmap=cmap)  # Shade data, creating an rgb array
+                rgb = ls.shade(h_mag_z, cmap=cmap)  # Shade data, creating an rgb array
                 cmap_surf = None
             else:
                 rgb = None
                 cmap_surf = cmap
 
-#            s = self.ax3d.plot_surface(self.x, self.y, h_mag,
+#            s = self.ax3d.plot_surface(self.x, self.y, h_mag_z,
 #                    alpha=OPT_3D_ALPHA, rstride=1, cstride=1, cmap=cmap,
 #                    linewidth=0, antialiased=False, shade=True, facecolors = rgb)
 #            s.set_edgecolor('gray')
             s = self.ax3d.plot_surface(
-                self.x, self.y, h_mag, alpha=alpha, rstride=1, cstride=1, linewidth=0,
+                self.x, self.y, h_mag_z, alpha=alpha, rstride=1, cstride=1, linewidth=0,
                 antialiased=False, facecolors=rgb, cmap=cmap_surf, shade=True)
             s.set_edgecolor(None)
         # ---------------------------------------------------------------
         # 3D-Contour plot
         # ---------------------------------------------------------------
         elif self.cmb_mode_3d.currentText() == 'Contour':
-            s = self.ax3d.contourf3D(self.x, self.y, h_mag, nl, alpha=alpha, cmap=cmap)
+            s = self.ax3d.contourf3D(self.x, self.y, h_mag_z, nl, alpha=alpha, cmap=cmap)
 
         # ---------------------------------------------------------------
         # 2D-Contour plot
@@ -574,12 +574,12 @@ class Plot3D(QWidget):
         # TODO: colormap is created depending on the zdir = 'z' contour plot
         #       -> set limits of (all) other plots manually?
         if self.but_contour_2d.isChecked():
-            self.ax3d.contourf(self.x, self.y, h_mag, nl, zdir='x', offset=self.xmin,
+            self.ax3d.contourf(self.x, self.y, h_mag_z, nl, zdir='x', offset=self.xmin,
                 cmap=cmap, alpha = alpha)#, vmin = bottom)#, vmax = top, vmin = bottom)
-            self.ax3d.contourf(self.x, self.y, h_mag, nl, zdir='y', offset=self.ymin,
+            self.ax3d.contourf(self.x, self.y, h_mag_z, nl, zdir='y', offset=self.ymin,
                 cmap=cmap, alpha = alpha)#, vmin = bottom)#, vmax = top, vmin = bottom)
             s = self.ax3d.contourf(
-                self.x, self.y, h_mag, nl, zdir='z', offset=bottom - (top - bottom) * 0.05,
+                self.x, self.y, h_mag_z, nl, zdir='z', offset=bottom - (top - bottom) * 0.05,
                 cmap=cmap, alpha=alpha)
 
         # plot colorbar for suitable plot modes
