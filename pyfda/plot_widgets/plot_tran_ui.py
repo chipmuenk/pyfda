@@ -116,7 +116,7 @@ class PlotTranUI(QWidget):
         self.param = None
 
         self.f_scale = fb_get('f_S')
-        self.t_scale = fb_get('T_S')
+        self.t_scale = fb_get('t_s')
 
         self.cur_win_id = "rectangular"  # set initial window type
 

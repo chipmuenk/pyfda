@@ -128,7 +128,7 @@ class FreqUnits(QWidget):
         self.lbl_units.setFont(bfont)
 
         self.f_s_old = fb_get('f_S')  # store current sampling frequency
-        self.t_s_old = fb_get('T_S')  # store current sampling period
+        self.t_s_old = fb_get('t_s')  # store current sampling period
 
         self.lbl_f_s = QLabel(self)
         self.lbl_f_s.setText(to_html("f_S =", frmt='bi'))
@@ -297,7 +297,7 @@ class FreqUnits(QWidget):
             fb_set({
                 'f_S': f_s_norm_factor,
                 'f_max': f_s_norm_factor,
-                'T_S': 1.,            # always use T_S = 1 for normalized frequencies
+                't_s': 1.,            # always use t_s = 1 for normalized frequencies
                 'freq_locked': False  # Don't lock frequency scaling with normalized frequencies
                 })
             self.but_lock.setIcon(QIcon(':/lock-unlocked.svg'))
@@ -308,11 +308,11 @@ class FreqUnits(QWidget):
             # normalized frequencies
 
             if fb_get('freq_specs_unit') in {"f_S", "f_Ny"}:  # previous setting normalized?
-                # yes, restore prev. f_S and T_S
+                # yes, restore prev. f_S and t_s
                 fb_set(
                     {'f_S': self.f_s_old,
                      'f_max': self.f_s_old,
-                     'T_S': self.t_s_old}
+                     't_s': self.t_s_old}
                 )
 
             # --- try to pick the most suitable unit for f_S --------------
@@ -330,15 +330,15 @@ class FreqUnits(QWidget):
 
             new_idx = qset_cmb_box(self.cmb_f_units, f_unit, caseSensitive=True)
             if new_idx != idx:
-                # sampling frequency unit has been changed, f_S and T_S need to be scaled
+                # sampling frequency unit has been changed, f_S and t_s need to be scaled
                 idx = new_idx
                 f_s_scale = self.f_scale[idx]
                 fb_set('f_S', f_S / f_s_scale)
-                fb_get('T_S', f_s_scale / f_S)
+                fb_get('t_s', f_s_scale / f_S)
                 emit_signal = True
             # -------------------------------------------------------------
             self.f_s_old = fb_get('f_S')
-            self.t_s_old = fb_get('T_S')
+            self.t_s_old = fb_get('t_s')
             self.led_f_s.setText(params['FMT'].format(fb_get('f_S')))
 
             f_label = r"$f$ in " + f_unit + r"$\; \rightarrow$"
@@ -386,7 +386,7 @@ class FreqUnits(QWidget):
                 f_s_tmp = safe_eval(source.text(), fb_get('f_S'), sign='pos')
                 fb_set({
                     'f_S': f_s_tmp,
-                    'T_S': 1./f_s_tmp,
+                    't_s': 1./f_s_tmp,
                     'f_max': f_s_tmp
                     })
 

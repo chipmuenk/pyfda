@@ -277,7 +277,7 @@ class PlotTranStim(QWidget):
         n_last = n_first + n_frame  # calculate last element index
         frm_slc = slice(n_first, n_last)  # current slice
         n = np.arange(n_first, n_last)  #  create frame index vector
-        t = n * fb_get('T_S')  # create time vector
+        t = n * fb_get('t_s')  # create time vector
         noi = 0  # fallback when no noise is selected
         # ====================================================================
 

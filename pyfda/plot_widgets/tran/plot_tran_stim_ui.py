@@ -782,7 +782,7 @@ class PlotTranStimUI(QWidget):
             self.f_scale = self.n_fft
         else:
             self.f_scale = fb_get('f_S')
-        self.t_scale = fb_get('T_S')
+        self.t_scale = fb_get('t_s')
 
         # logger.warning("f_S = %s, prev = %s\nf_scale = %s, f_1 = %s, f_corr = %s",
         #               fb_get('f_S'), fb_get('f_s_prev'), self.f_scale, self.f1, f_corr)

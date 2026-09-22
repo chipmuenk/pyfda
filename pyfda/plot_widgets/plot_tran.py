@@ -1135,8 +1135,8 @@ class PlotTran(QWidget):
         """
         Clear and initialize the axes of the time domain matplotlib widgets
         """
-        # calculate time vector from index n and T_S
-        self.t = self.n * fb_get('T_S')
+        # calculate time vector from index n and t_s
+        self.t = self.n * fb_get('t_s')
 
         # Read out combo boxes with plotting styles and remove the '*' for markers
         self.plt_time_resp = qget_cmb_box(self.ui.cmb_plt_time_resp).replace("*", "")
@@ -1236,7 +1236,7 @@ class PlotTran(QWidget):
                 padtype='line', cval=None)[n_start * I_x: n_end * I_x]
             self.t_interp = np.linspace(
                 self.n[0], self.n[-1] + 1, len(self.n) * I_x,
-                endpoint=False)[n_start * I_x: n_end * I_x] * fb_get('T_S')
+                endpoint=False)[n_start * I_x: n_end * I_x] * fb_get('t_s')
 
 
         t = self.t[n_start:n_end]

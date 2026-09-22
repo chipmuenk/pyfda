@@ -60,7 +60,7 @@ class FilterConfig:
     f_sb2: float = 0.4
     
     N: int = 4  # filter order
-    T_S: float = 1.0  # sample time
+    t_s: float = 1.0  # sample time
     
     # Weights
     w_pb: float = 1.0

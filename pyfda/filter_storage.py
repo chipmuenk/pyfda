@@ -32,7 +32,7 @@ fil_ref = {
     'f_sb': 0.2,
     'f_sb2': 0.4,
     'N': 4,  # filter order
-    'T_S': 1.0,  # sample time
+    't_s': 1.0,  # sample time
     # weights for pass- and stopbands
     'w_pb': 1.0,
     'w_pb2': 1.0,
