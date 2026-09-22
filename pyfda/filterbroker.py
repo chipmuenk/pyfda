@@ -595,7 +595,7 @@ def dict2fil(fil_list: list[dict]) -> None:
     for i, d in enumerate(fil_list):
         fil[i] = d
 
-def fil2dict(all_filters: bool) -> list[dict]:
+def fil2dict() -> list[dict]:
     """ Return the global filter dict `fil` """
     return fil
 
