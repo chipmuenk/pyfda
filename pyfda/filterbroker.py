@@ -61,8 +61,10 @@ UNDO_LEN = 20  # depth of circular undo buffer
 undo_step = 0  # number of undo steps, limited to UNDO_LEN
 undo_ptr = 0  # pointer to current undo memory % UNDO_LEN
 
-  # create empty lists with length 10 for multiple filter designs and undo memory
-fil = [None] * 10  # fil[i] can always be assigned to, fil = ... needs a global statement
+# fil[i] can always be assigned to, fil = ... needs a global statement
+fil = [copy.deepcopy(fil_ref) for _ in range(10)]
+
+# create empty lists with length 10 for undo memory
 fil_undo = [None] * UNDO_LEN
 
 # -----------------------------------------------------------------------
@@ -77,10 +79,16 @@ def fil_copy(src: str = "ref", dest: str = "all") -> None:
     # for f in fil:
     #   f = copy.deepcopy(fil_ref)
     #
-    # does not work because all entries in fil[0] ... fil[9] become references to the same dict
-    # `fil_ref`, so that changing one of them changes all of them. By creating a deep copy of
-    # fil_ref for each entry in `fil`` individually, this does not happen (???).
-    global fil
+    # does not work because the loop variable is a local variable that gets bound to
+    # fil[0] ... fil[10] in turn. The deepcopy operation rebinds local name f to a brand
+    # new dict, the container fil stays untouched.
+    #
+    # fil = [copy.deepcopy(fil_ref)] * 10
+    #
+    # repeats the same object reference 10 times - all slots point to the same dict!
+    #
+    # The code below indexes the list container fil itself, the list is mutated in place.
+    # Calling deepcopy() once per iteration produces 10 independent copies.
     if dest == "all":
         for i, _ in enumerate(fil):
             fil[i] = copy.deepcopy(fil_ref)
@@ -95,10 +103,6 @@ def fil_copy(src: str = "ref", dest: str = "all") -> None:
     src_idx = int(src)
     fil[targ_idx] = fil[src_idx]
     return
-
-# -------------------
-fil_copy()
-# -------------------
 
 # -----------------------------------------------------------------------
 def fil_info(idx: int) -> str:
