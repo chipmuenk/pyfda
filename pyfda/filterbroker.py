@@ -45,7 +45,6 @@ from typing import Iterable
 import numpy as np
 
 from pyfda.libs.pyfda_num_lib import iter2ndarray
-from pyfda.libs.pyfda_text_lib import compare_dictionaries
 
 from pyfda.filter_storage import fil_ref
 
