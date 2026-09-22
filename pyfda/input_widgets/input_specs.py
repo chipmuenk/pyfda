@@ -750,7 +750,7 @@ def verify_file_shape(fil_dict: list[dict], all_filters) -> int:
 
     """
     if not isinstance(fil_dict, list):
-        "Wrong data type '%s', cannot load file.", type(fil_dict)
+        logger.error("Wrong data type '%s', cannot load file.", type(fil_dict))
         return 1
 
     if len(fil_dict) == 1:  # single filter design
