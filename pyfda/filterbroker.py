@@ -81,6 +81,7 @@ def fil_copy(src: str = "ref", dest: str = "all") -> None:
     # does not work because all entries in fil[0] ... fil[9] become references to the same dict
     # `fil_ref`, so that changing one of them changes all of them. By creating a deep copy of
     # fil_ref for each entry in `fil`` individually, this does not happen (???).
+    global fil
     if dest == "all":
         for i, _ in enumerate(fil):
             fil[i] = copy.deepcopy(fil_ref)
@@ -464,20 +465,16 @@ def sanitize_fil_keys(fil_list: list[dict] =  fil) -> list[dict]:
     list[dict]:
         The cleaned filter list of dict(s) with only the keys from the reference dict `fil_ref`.
     """
-    keys_unsupported = []
-    keys_missing = []
-    def _sanitize_fil_keys_i(i: int, keys_unsupported, keys_missing) -> dict:
-        # only copy the keys that are in the reference dict, remove unsupported keys.
-        fil_clean_i = {k: v for k, v in fil_list[i].items() if k in fil_ref}
-        keys_unsupported += [k for k in fil_list[i] if k not in fil_ref]
-        # check for and report missing keys
-        keys_missing += [k for k in fil_ref if k not in fil_list[i]]
+    keys_unsupported = []  # list for unsupported keys
+    keys_missing = []  # list for missing keys
+    fil_clean = [None] * len(fil_list)  # copy of the filter list with cleaned keys
 
-        return fil_clean_i
-
-    fil_clean = [None] * len(fil_list)
     for i in range(len(fil_list)):
-        fil_clean[i] = _sanitize_fil_keys_i(i, keys_unsupported, keys_missing)
+        # only copy the keys that are in the reference dict, remove unsupported keys.
+        fil_clean[i] = {k: v for k, v in fil_list[i].items() if k in fil_ref}
+        # collect unsupported and missing keys
+        keys_unsupported += [k for k in fil_list[i] if k not in fil_ref]
+        keys_missing += [k for k in fil_ref if k not in fil_list[i]]
 
     # convert lists of warnings to sets to remove multiple warnings
     if keys_unsupported:
@@ -589,12 +586,12 @@ def sanitize_fil_values(fil_list: list[dict]) -> list[dict] | None:
         fil_list[i] = d_san
     return fil_list
 
+# -------------------------------------------------------
 def dict2fil(fil_list: list[dict]) -> None:
     """ Copy the dict(s) in the passed list to the global filter dict `fil` """
     global fil
     for i, d in enumerate(fil_list):
         fil[i] = d
-
 
 def fil2dict(all_filters: bool) -> list[dict]:
     """ Return the global filter dict `fil` """

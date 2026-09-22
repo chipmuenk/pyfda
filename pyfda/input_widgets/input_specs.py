@@ -139,8 +139,6 @@ class InputSpecs(QWidget):
                          propagate, first_item(dict_sig))
             return
 
-        # logger.warning(f"SIG_RX: {first_item(dict_sig)}")
-
         if 'specs_changed' in dict_sig:
             if dict_sig['specs_changed'] == 'f_sort':
                 # sort and update the frequency widgets
@@ -352,9 +350,6 @@ class InputSpecs(QWidget):
         # the values are a tuple with the corresponding parameters
         all_widgets = FTB.fil_tree[rt][ft][fc][fo]
 
-        # logger.debug("rt: '%s' - ft: '%s' - fc: '%s' - fo: '%s'", rt, ft, fc, fo)
-        # logger.debug("fil_tree[rt][ft][fc][fo]:\n\t%s", FTB.fil_tree[rt][ft][fc][fo])
-
         # update filter order subwidget, called by select_filter:
         # self.sel_fil.load_filter_order()
 
@@ -408,10 +403,10 @@ class InputSpecs(QWidget):
         # It is disabled for "ManualIIR" and "ManualFIR" filter classes
         self.color_design_button('changed')
 
-    # --------------------------------------------------------------------------
+    # ================= FILTER LOADING AND SAVING ========================================
     def _load_filter(self) -> None:
         """
-        Load filter dict `fil[0]` either from file or from memory and update the info text
+        Load one or all filter dicts `fil` either from file or from memory and update the info text
         via `_load_info_text()` and the widgets via sig_tx: {'data_changed':'filter_loaded'}.
         """
         src = qget_cmb_box(self.cmb_filter_load)
@@ -425,25 +420,39 @@ class InputSpecs(QWidget):
         elif src == "def":  # restore default filter
             fb.fil_copy(src="ref", dest="0" )
 
-        elif src == "def_all":  # Copy defaults to all memories
+        elif src == "def_all":  # restore all filters to default values
             fb.fil_copy(src="ref", dest="all" )
 
         else:
             # 'Mem <i>', copy fil[i] to fil[0]
             fb.fil_copy(src=str(src), dest="0")
-            logger.warning("copy %s", src)
+            logger.warning("copy %s -> 0", src)
 
         # update info string
         self._load_info_text()
-        self.led_info.setText(str(fb_get('info')))
-        logger.warning(fb_get('info'))
         self.cmb_filter_load.setCurrentIndex(0)
         self.emit({'data_changed': 'filter_loaded'})
+        self.color_design_button("ok")
+
+    # --------------------------------------------------------------------------
+    def _load_info_text(self) -> None:
+        """
+        Reload and update info text from global dict `fil[0]`, update tool tipps for load
+        and save combo box and reset 'DESIGN' button
+        """
+        self.led_info.setText(str(fb_get('info')))
+        logger.warning("fb_get: %s\nfil[0]: %s", fb_get('info'), fb.fil[0]['info'])
+        for i in range(1,10):
+            self.cmb_filter_save.setItemData(
+                i + 1, f"Copy -> Mem {i}: {fil_info(i)}", Qt.ToolTipRole)
+            self.cmb_filter_load.setItemData(
+                i + 1, f"Load <- Mem {i}: {fil_info(i)}", Qt.ToolTipRole)
 
     # --------------------------------------------------------------------------
     def _save_filter(self) -> None:
-        """    return _sanitize_fil_values_i(d=fil_dict)
-        Save current filter fil[0] either to file or to one of the memories
+        """
+        Save current filter `fil[0]` either to file or to one of the memories or
+        save all filters `fil` to a file.
         """
         # `dest`` contains the data field of the combo box which is either "file" / "file_all"
         # or the number of the memory location (e.g. "2" for "Mem 2"). This is larger by 1
@@ -462,6 +471,7 @@ class InputSpecs(QWidget):
         else:
             # save fil[0] to selected location
             fil_copy(src="0", dest=dest)
+            logger.warning("copy 0 -> %s", dest)
             # insert info string into new tool tip
             self.cmb_filter_save.setItemData(
                 int(dest) + 1, f"Copy -> Mem {dest}: {self.led_info.text()}", Qt.ToolTipRole)
@@ -469,19 +479,6 @@ class InputSpecs(QWidget):
                 int(dest) + 1, f"Load <- Mem {dest}: {self.led_info.text()}", Qt.ToolTipRole)
         self.cmb_filter_save.setCurrentIndex(0)
 
-    # --------------------------------------------------------------------------
-    def _load_info_text(self) -> None:
-        """
-        Reload and update info text from global dict `fil[0]`, update tool tipps for load
-        and save combo box and reset 'DESIGN' button
-        """
-        self.led_info.setText(str(fb_get('info')))
-        for i in range(1,10):
-            self.cmb_filter_save.setItemData(
-                i + 1, f"Copy -> Mem {i}: {fil_info(i)}", Qt.ToolTipRole)
-            self.cmb_filter_load.setItemData(
-                i + 1, f"Load <- Mem {i}: {fil_info(i)}", Qt.ToolTipRole)
-        self.color_design_button("ok")
 
     # --------------------------------------------------------------------------
     def start_design_filt(self) -> None:
