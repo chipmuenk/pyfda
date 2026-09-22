@@ -684,9 +684,8 @@ def save_filter(self, all_filters: bool, title: str = "Save Filter(s)") -> int:
         return 1  # operation cancelled or other error
 
     err = False
-
-    fil_clean = sanitize_fil_keys(all_filters=all_filters)  # create a copy of the filter dict to be saved
-
+    # create a copy of the filter dict to be saved
+    fil_clean = sanitize_fil_keys()
     if file_type in {"npz", "pkl"}:
         try:
             with io.open(file_name, 'wb') as f:  # open in binary mode
