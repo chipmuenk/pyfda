@@ -62,7 +62,7 @@ undo_step = 0  # number of undo steps, limited to UNDO_LEN
 undo_ptr = 0  # pointer to current undo memory % UNDO_LEN
 
   # create empty lists with length 10 for multiple filter designs and undo memory
-fil = [None] * 10
+fil = [None] * 10  # fil[i] can always be assigned to, fil = ... needs a global statement
 fil_undo = [None] * UNDO_LEN
 
 # -----------------------------------------------------------------------
