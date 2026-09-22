@@ -447,7 +447,7 @@ def _handle_qfrmt_change(keys_tuple: tuple) -> None:
         fil[0]['qfrmt_float_last'] = fil[0]['qfrmt']
 
 # ---------------------------------------------------------
-def sanitize_fil_keys(fil_list: list[dict] =  fil) -> list[dict]:
+def sanitize_fil_keys(fil_list: list[dict] = None) -> list[dict]:
     """
     Test if the keys of the dicts in `fil_list` (default: global list of dicts `fil`) are
     identical to the reference dict `fil_ref`. If not, remove the unsupported keys, add 
@@ -463,6 +463,9 @@ def sanitize_fil_keys(fil_list: list[dict] =  fil) -> list[dict]:
     list[dict]:
         The cleaned filter list of dict(s) with only the keys from the reference dict `fil_ref`.
     """
+    if not fil_list:
+        fil_list = fil
+
     keys_unsupported = []  # list for unsupported keys
     keys_missing = []  # list for missing keys
     fil_clean = [None] * len(fil_list)  # copy of the filter list with cleaned keys
