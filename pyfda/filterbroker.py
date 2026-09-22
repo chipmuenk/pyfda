@@ -592,7 +592,6 @@ def sanitize_fil_values(fil_list: list[dict]) -> list[dict] | None:
 # -------------------------------------------------------
 def dict2fil(fil_list: list[dict]) -> None:
     """ Copy the dict(s) in the passed list to the global filter dict `fil` """
-    global fil
     for i, d in enumerate(fil_list):
         fil[i] = d
 
