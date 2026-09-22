@@ -218,11 +218,10 @@ def set_fx(fx: bool) -> None:
         fb_set('qfrmt', fb_get('qfrmt_float_last'))
 
 # -------------------------
-def fb_get(*keys_tuple: tuple, fil_dict: dict = fil[0], verbose: bool = True)\
-    -> str | int | float | Iterable | dict | None:
+def fb_get(*keys_tuple: tuple, verbose: bool = True) -> str | int | float | Iterable | dict | None:
     """
     Get the value of a key in the global dict `fil[0]`. Multiple arguments
-    access nested dicts:
+    traverse nested dicts:
     fb_get('qfrmt') == fb.fil[0]['qfrmt']
     fb_get('ba', 0) == fb.fil[0]['ba'][0]
 
@@ -230,8 +229,6 @@ def fb_get(*keys_tuple: tuple, fil_dict: dict = fil[0], verbose: bool = True)\
     ----------
     keys_tuple : tuple
         Tuple of keys for traversing the nested dictionary.
-    fil_dict : dict
-        The dictionary to traverse, the default is the global `fil[0]`.
     verbose : bool
         Whether to log errors and warnings, default is True. Setting this to False
         can be used to detect silently whether a key exists in the dictionary
@@ -242,6 +239,7 @@ def fb_get(*keys_tuple: tuple, fil_dict: dict = fil[0], verbose: bool = True)\
         The value of the specified key in the dictionary, or None if the key
         does not exist or a deep copy if keys_tuple is empty.
     """
+    fil_dict = fil[0]
     if not isinstance(keys_tuple, tuple):
         logger.error("A tuple of keys is needed for traversing the filter dict '%s', not a '%s'!",
                      keys_tuple, type(keys_tuple).__name__)
@@ -267,7 +265,7 @@ def fb_get(*keys_tuple: tuple, fil_dict: dict = fil[0], verbose: bool = True)\
 
 # -------------------------
 def fb_set(*keys_tuple: tuple, backup: bool = True, new_key: bool = False,
-           accept_dict: bool = False, fil_dict: dict = fil[0]) -> int:
+           accept_dict: bool = False) -> int:
     """
     Use the individual arguments that have been collected as `keys_tuple` to access a
     nested dict `fil_dict` (default: `fil[0]`) and write the last item in `keys_tuple` to the dict.
@@ -310,6 +308,7 @@ def fb_set(*keys_tuple: tuple, backup: bool = True, new_key: bool = False,
     TypeError
         If `keys_tuple` is not of type Tuple or if it has less than two items
     """
+    fil_dict = fil[0]
 
     logger.debug("tuple_keys: %s", keys_tuple)
 
@@ -364,7 +363,7 @@ def fb_set(*keys_tuple: tuple, backup: bool = True, new_key: bool = False,
         if set_key =='qfrmt':
             # Setting the global quantization format 'qfrmt' can change fixpoint mode, so
             # store the last used fixpoint or float format.
-            _handle_qfrmt_change(keys_tuple, fil_dict)
+            _handle_qfrmt_change(keys_tuple)
 
             # ======== everything ok, finally update dictionary ========
         d[set_key] = set_val  # update key with new value
@@ -389,9 +388,6 @@ def fb_set(*keys_tuple: tuple, backup: bool = True, new_key: bool = False,
 # =================
 # Helper functions
 # =================
-def fb_id() -> None:
-    logger.warning("id(fil) = %d\nid(fil(0)) = %d", id(fil), id(fil[0]))
-
 def _set_new_key(d: dict, set_key: str, set_val: any) -> int:
     """ Create a new key:value pair when flag `new_key` is True """
     if set_key in d:
@@ -434,10 +430,10 @@ def _set_dict_subvalues(keys_tuple: tuple, fil_dict: dict):
         # Call `fb_set()` recursively to set k:v of the sub-dict `set_val`
         # Remove the sub-dict `set_val == keys_tuple[-1]` from `keys_tuple`
         fb_set(*keys_tuple[:-1], k, v, backup=False, new_key=False,
-            accept_dict=False, fil_dict=fil_dict)
+            accept_dict=False)
     return 0
 # --------------
-def _handle_qfrmt_change(keys_tuple: tuple, fil_dict: dict) -> None:
+def _handle_qfrmt_change(keys_tuple: tuple) -> None:
     """
     Setting the global quantization format 'qfrmt' can change fixpoint mode, so
     store the last used fixpoint or float format.
@@ -447,9 +443,9 @@ def _handle_qfrmt_change(keys_tuple: tuple, fil_dict: dict) -> None:
         raise KeyError
 
     if get_fx():  # fixpoint mode, store current fixpoint format
-        fil_dict['qfrmt_fx_last'] = fil_dict['qfrmt']
+        fil[0]['qfrmt_fx_last'] = fil[0]['qfrmt']
     else:  # float mode, store current float format
-        fil_dict['qfrmt_float_last'] = fil_dict['qfrmt']
+        fil[0]['qfrmt_float_last'] = fil[0]['qfrmt']
 
 # ---------------------------------------------------------
 def sanitize_fil_keys(fil_list: list[dict] =  fil) -> list[dict]:
@@ -628,7 +624,7 @@ class _BackupFilterDict():
             self.undo_stp = 0
             return -1
 
-        fil[0] = copy.deepcopy(fil_undo[undo_ptr])
+        fil[0] = copy.deepcopy(fil_undo[self.undo_ptr])
         self.undo_stp -= 1
         self.undo_ptr = (self.undo_ptr + UNDO_LEN - 1) % UNDO_LEN
         return 0

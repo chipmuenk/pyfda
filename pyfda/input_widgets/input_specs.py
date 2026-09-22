@@ -441,9 +441,6 @@ class InputSpecs(QWidget):
         and save combo box and reset 'DESIGN' button
         """
         self.led_info.setText(str(fil_info(0)))
-        fb.fb_id()
-        logger.warning("id = %d\nfil_info(0) = %s\nfb_get: %s\nfil[0]: %s",
-                       id(fb.fil[0]['info']), fil_info(0), fb_get('info'), fb.fil[0]['info'])
         for i in range(1,10):
             self.cmb_filter_save.setItemData(
                 i + 1, f"Copy -> Mem {i}: {fil_info(i)}", Qt.ToolTipRole)
