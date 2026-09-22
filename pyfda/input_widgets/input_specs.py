@@ -22,7 +22,7 @@ import numpy as np
 from pyfda.filter_storage import fil_ref
 import pyfda.filterbroker as fb
 from pyfda.filterbroker import(
-    fb_get, fb_set, sanitize_fil_keys, load_cleaned_filter, fil_info, fil_copy)
+    fb_get, fb_set, sanitize_fil_keys, sanitize_fil_values, dict2fil, fil_info, fil_copy)
 from pyfda.filter_factory import call_fil_method
 from pyfda.filter_tree_builder import FilterTreeBuilder as FTB
 from pyfda.input_widgets import (
@@ -442,7 +442,7 @@ class InputSpecs(QWidget):
 
     # --------------------------------------------------------------------------
     def _save_filter(self) -> None:
-        """
+        """    return _sanitize_fil_values_i(d=fil_dict)
         Save current filter fil[0] either to file or to one of the memories
         """
         # `dest`` contains the data field of the combo box which is either "file" / "file_all"
@@ -452,10 +452,10 @@ class InputSpecs(QWidget):
 
         if dest == "file":
             # save current filter to file
-            save_filter(self)
+            save_filter(self, all_filters=False, title="Save Filter")
         elif dest == "file_all":
             # save all filters
-            save_all_filters(self)
+            save_filter(self, all_filters=True, title="Save All Filters")
         elif dest == "0":
             # filter 0 selected, don't do anything
             return
@@ -472,7 +472,8 @@ class InputSpecs(QWidget):
     # --------------------------------------------------------------------------
     def _load_info_text(self) -> None:
         """
-        Reload info text from global dict `fil[0]` and reset 'DESIGN' button
+        Reload and update info text from global dict `fil[0]`, update tool tipps for load
+        and save combo box and reset 'DESIGN' button
         """
         self.led_info.setText(str(fb_get('info')))
         for i in range(1,10):
@@ -614,6 +615,10 @@ def load_filter(self, all_filters: bool = False) -> bool:
         logger.error('Unknown file type "%s"', file_type)
         return False
 
+    if isinstance(fb_temp, dict):
+        # encapsulate dict in list for unified processing
+        fb_temp = [fb_temp]
+
     # --- Verify loaded file content for correct type and shape ------------------
     ret = verify_file_shape(fb_temp, all_filters)
     if ret == 1:
@@ -626,27 +631,28 @@ def load_filter(self, all_filters: bool = False) -> bool:
 
     # --- Test for correct id and version number ------------------------------
     err = False
-    if isinstance(fb_temp, list):
-        fb_id = fb_temp[0]  # test first slice of all filters for correct id
-    else:
-        fb_id = fb_temp
-
-    if '_id' not in fb_id or len(fb_id['_id']) != 2 or fb_id['_id'][0] != 'pyfda':
+    if '_id' not in fb_temp[0] or len(fb_temp[0]['_id']) != 2 or fb_temp[0]['_id'][0] != 'pyfda':
         msg = "Missing id 'pyfda', this is no pyfda filter! Load anyway?"
         err = not popup_warning(None, message=msg)
-    elif str(fb_id['_id'][1]) != fil_ref['_id'][1]:
+
+    elif fb_temp[0]['_id'][1] != fil_ref['_id'][1]:
         msg = (
-            f"The filter file has version {fb_id['_id'][1]} instead of "
+            f"The filter file has version {fb_temp[0]['_id'][1]} instead of "
             f"required version {fil_ref['_id'][1]}! Load anyway?")
         err = not popup_warning(None, message=msg)
 
-    # Handle errors occurring during id test
-    if err:
+    if err: # answer was 'no'
         return False
-    # clean and copy loaded filter(s) to `fil` dict
-    if load_cleaned_filter(fb_temp) == 1:
-        logger.warning("Error(s) occurred, filter could not be loaded.")
-        return False
+
+    # check for missing or unsupported keys and issue warnings
+    fb_temp = sanitize_fil_keys(fb_temp)
+    # sanitize some of the values of the loaded filter dict
+    fb_temp = sanitize_fil_values(fb_temp)
+    if not fb_temp: # values could not be sanitized, return with an error
+        return 1
+
+    # copy loaded filter(s) to `fil` dict
+    dict2fil(fb_temp)
 
     logger.info('Successfully loaded filter\n\t"%s"', file_name)
     dirs.last_file_name = file_name
@@ -655,10 +661,19 @@ def load_filter(self, all_filters: bool = False) -> bool:
     return True
 
 # ------------------------------------------------------------------------------
-def save_filter(self, title="Save Filter", all_filters=False) -> int:
+def save_filter(self, all_filters: bool, title: str = "Save Filter(s)") -> int:
     """
     Save current filter as JSON formatted textfile, zipped binary numpy array
     or pickled object
+
+    Parameters
+    ----------
+    title : str, optional
+        Dialog window title. The default is "Save Filter(s)".
+
+    all_filters : bool
+        If True, save all filter memory locations, otherwise only the current
+        filter.
 
     Returns
     -------
@@ -667,14 +682,14 @@ def save_filter(self, title="Save Filter", all_filters=False) -> int:
     """
 
     file_name, file_type = select_file(
-        self, title="Save Filter", mode='w', file_types = ("json", "npz", "pkl"))
+        self, title=title, mode='w', file_types = ("json", "npz", "pkl"))
 
     if not file_name:
         return 1  # operation cancelled or other error
 
     err = False
 
-    fil_clean = sanitize_fil_keys(all_filters=False)  # create a copy of the filter dict to be saved
+    fil_clean = sanitize_fil_keys(all_filters=all_filters)  # create a copy of the filter dict to be saved
 
     if file_type in {"npz", "pkl"}:
         try:
@@ -713,73 +728,14 @@ def save_filter(self, title="Save Filter", all_filters=False) -> int:
     return 1
 
 # ------------------------------------------------------------------------------
-def save_all_filters(self) -> int:
-    """
-    Save all filters as JSON formatted textfile, zipped binary numpy array or pickle object
-
-    Returns
-    -------
-    int:
-        0 for success, 1 for file cancel or error
-    """
-
-    file_name, file_type = select_file(
-        self, title="Save All Filters", mode='w', file_types = ("json", "npz", "pkl"))
-
-    if not file_name:
-        return 1  # operation cancelled or other error
-
-    err = False
-    # create a copy of the filters to be saved that only contains keys of the
-    # reference filter dict and warn of unsupported keys:
-    fil_clean = sanitize_fil_keys(all_filters=True)
-
-    if file_type in {"npz", "pkl"}:
-        try:
-            with io.open(file_name, 'wb') as f:  # open in binary mode
-                if file_type == 'npz':
-                    np.savez(f, **fil_clean) # TODO: Doesn't work, this needs to be a mapping
-                else:  # file_type == 'pkl':
-                    pickle.dump(fil_clean, f)  # save in default pickle version
-                    # TODO: Does this work?
-
-        except IOError as e:
-            err = True
-            logger.error('Failed saving "%s"!\n%s', file_name, e)
-
-    elif file_type == 'json':
-        try:
-            with io.open(file_name, 'w') as f:  # open in text mode
-                # first, convert dict containing numpy arrays to a pure json string
-                fb_fil_0_json = json.dumps(fil_clean, cls=JSONNumpyEncoder, indent=2,
-                                        ensure_ascii=False, sort_keys=True )
-                # next, dump the string to a file
-                f.write(fb_fil_0_json)
-
-        except IOError as e:
-            err = True
-            logger.error('Failed saving "%s"!\n%s', file_name, e)
-    else:
-        err = True
-        logger.error('Unknown file type "%s"', file_type)
-
-    if not err:
-        logger.info('Filter saved as\n\t"%s"', file_name)
-        dirs.last_file_name = file_name
-        dirs.last_file_dir = os.path.dirname(file_name)  # save new default dir
-        dirs.last_file_type = file_type  # save new default file type
-        return 0
-    return 1
-
-# ------------------------------------------------------------------------------
-def verify_file_shape(fil_dict: list[dict] | dict, all_filters) -> int:
+def verify_file_shape(fil_dict: list[dict], all_filters) -> int:
     """
     Verify that the content of a loaded file is either a list containing 10 dicts (10
     filters) or a single dict (one filter).
 
     Parameters
     ----------
-    fil_dict: list[dict] | dict
+    fil_dict: list[dict]
         The filter or filters to be verified
 
     all_filters: bool
@@ -789,7 +745,7 @@ def verify_file_shape(fil_dict: list[dict] | dict, all_filters) -> int:
     -------
     int
         0: Successful verification
-        1: Error, filter is unsuitable
+        1: Error, filter cannot be loaded
         2: A list of filter dicts has been passed but a single filter has been requested
             (`all_filters == False`). This needs to be fixed one hierarchy level up.
             by extracting the first filter
@@ -797,34 +753,35 @@ def verify_file_shape(fil_dict: list[dict] | dict, all_filters) -> int:
             (`all_filters == True`). This needs to be fixed one hierarchy level up.
 
     """
-    # Is fil_dict a list? Then the list should contain 10 filters and all_filters==True
-    if isinstance(fil_dict, list):
-        if len(fil_dict) != 10:
-            logger.error(
-                "File contains a list with wrong length = %d != 10 "
-                "which cannot be loaded!", len(fil_dict))
+    if not isinstance(fil_dict, list):
+        "Wrong data type '%s', cannot load file.", type(fil_dict)
+        return 1
+
+    if len(fil_dict) == 1:  # single filter design
+        if all_filters:
+            msg = ("This file contains only one filter! "
+                   "Load as current design (Yes) or abort (No)?")
+            if popup_warning(None, message=msg):  # 'yes' has been pressed
+                # process as single filter, set `all_filters = False` one level higher
+                return 3
+            logger.warning("Cancelling file operation.")
             return 1
+        return 0  # all_filters == False, load list with single filter
+
+    if len(fil_dict) == 10:  # all 10 filter designs
         if not all_filters:
             msg = ("This file contains all 10 memory locations! "
                 "Load the first one as current design (Yes) or abort (No)?")
             if popup_warning(None, message=msg):  # 'yes' has been pressed
                 # extract first filter one level higher
                 return 2
-        else:
-            return 0
+            logger.warning("Cancelling file operation.")
+            return 1
+        return 0
 
-    elif isinstance(fil_dict, dict):
-        if not all_filters:
-            return 0  # file contains a single filter -> o.k.
-
-        msg = ("This file contains only one filter! "
-            "Load as current design (Yes) or abort (No)?")
-        if popup_warning(None, message=msg):  # 'yes' has been pressed
-            # process as single filter, set `all_filters = False` one level higher
-            return 3
-    else:
-        logger.error(
-            "Wrong data type '%s' or shape, cannot load file.", type(fil_dict))
+    logger.error(
+        "File contains a list with wrong length = %d != 1 or 10 "
+        "which cannot be loaded!", len(fil_dict))
     return 1
 
 # ==========================================================================

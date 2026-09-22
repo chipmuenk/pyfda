@@ -95,6 +95,11 @@ def fil_copy(src: str = "ref", dest: str = "all") -> None:
     src_idx = int(src)
     fil[targ_idx] = fil[src_idx]
     return
+
+# -------------------
+fil_copy()
+# -------------------
+
 # -----------------------------------------------------------------------
 def fil_info(idx: int) -> str:
     """
@@ -102,15 +107,7 @@ def fil_info(idx: int) -> str:
     """
     return fil[idx]['info']
 
-
-# -------------------
-fil_copy()
-# -------------------
-
-
 # =============================================================================
-
-# -------------------------
 def _print_dict(keys_tuple: tuple, top_dict_str = "fil[0]") -> str:
     """
     Print a string representation for a nested dictionary, defined by the list
@@ -450,122 +447,68 @@ def _handle_qfrmt_change(keys_tuple: tuple, fil_dict: dict) -> None:
     else:  # float mode, store current float format
         fil_dict['qfrmt_float_last'] = fil_dict['qfrmt']
 
-# -------------------------------------------------------------------------------
-def load_cleaned_filter(fil_loaded: dict) -> int:
-    """
-    Sanitize loaded filter dictionary `fil_loaded` by comparing it to the reference dict `fil_ref`.
-    If keys are missing in the loaded dict, they are copied with their default values from the
-    reference dict. If unsupported keys are found, they are ignored and a warning is issued.
-
-    Parameters
-    ----------
-    fil_loaded : dict
-        The loaded filter dictionary to be sanitized.
-
-    Returns
-    -------
-    int:
-        0: Successful sanitization
-        1: Error occurred during sanitization (e.g. missing keys or unsuitable data type/shape)
-
-
-    """
-    # --- Sanitize *keys* by comparing to reference dict -----------------------
-    key_errs = compare_dictionaries(fil_ref, fil_loaded)
-    key_errs[0].sort()  # keys missing in the loaded dict
-    key_errs[1].sort()  # unsupported keys; keys not in reference dict
-
-    err_str = ""
-    if key_errs[0]:
-        # '\n'.join(...) converts list to multi-line string
-        err_str += (
-            f"\n\tThe following {len(key_errs[0])} key(s) have not been found in "
-            "the loaded dict,\n"\
-            "\tthey are copied with their default values from the reference dict:\n\t\t"
-                + "\n\t\t".join(key_errs[0])
-            )
-    if key_errs[1]:
-        err_str += (
-            f"\n\tThe following {len(key_errs[1])} key(s) are not part of the "
-            "reference dict and have been ignored:\n\t\t"
-            + "\n\t\t".join(key_errs[1])
-        )
-    if err_str != "":
-        logger.warning(err_str)
-
-    # sanitize some of the values of the loaded filter dict
-    fil_loaded = sanitize_fil_values(fil_loaded)
-
-    if not fil_loaded:
-        return 1  # values could not be sanitized, return with an error
-
-    fil[0] = fil_loaded  # update global filter dict with sanitized loaded dict
-    return 0
-
 # ---------------------------------------------------------
-def sanitize_fil_keys(all_filters: bool = True) -> list[dict] | dict:
+def sanitize_fil_keys(fil_list: list[dict] =  fil) -> list[dict]:
     """
-    Test if the keys in the global dict `fil[0]` are identical to the reference dict `fil_ref`.
-    If not, remove the unsupported keys and issue a warning. This is called before exporting
-    the filter(s)
+    Test if the keys of the dicts in `fil_list` (default: global list of dicts `fil`) are
+    identical to the reference dict `fil_ref`. If not, remove the unsupported keys, add 
+    missing key:val pairs from the reference dict and issue warnings.
 
     Parameters
     ----------
-    all_filters : bool
-        If True, clean all filter dicts `fil[0]` ... `fil[9]`, otherwise only clean `fil[0]`.
+    fil_list: dict | list
+        dict to be sanitized
 
     Returns
     -------
-    list[dict] | dict
-        The cleaned filter dict or a list of cleaned filter dicts with only the keys from the
-        reference dict `fil_ref`.
+    list[dict]:
+        The cleaned filter list of dict(s) with only the keys from the reference dict `fil_ref`.
     """
-    def _sanitize_fil_keys_i(i: int) -> dict:
+    keys_unsupported = []
+    keys_missing = []
+    def _sanitize_fil_keys_i(i: int, keys_unsupported, keys_missing) -> dict:
         # only copy the keys that are in the reference dict, remove unsupported keys.
-        fil_clean_i = {k:v for k, v in fil[i].items() if k in fil_ref}
-        keys_unsupported = [k for k in fil[i] if k not in fil_ref]
+        fil_clean_i = {k: v for k, v in fil_list[i].items() if k in fil_ref}
+        keys_unsupported += [k for k in fil_list[i] if k not in fil_ref]
         # check for and report missing keys
-        keys_missing = [k for k in fil_ref if k not in fil[i]]
-        if keys_unsupported:
-            logger.warning(
-                "fil[%d]: The following keys are ignored because they are not part of the\n"
-                "\tfilter reference dict:\n\t%s", i, keys_unsupported)
-        if keys_missing:
-            logger.warning("fil[%d]: The following keys are missing:\n\t%s", i, keys_missing)
+        keys_missing += [k for k in fil_ref if k not in fil_list[i]]
 
         return fil_clean_i
 
-    if all_filters:
-        fil_clean = [None] * 10
-        for i in range(10):
-            fil_clean[i] = _sanitize_fil_keys_i(i)
-    else:
-        fil_clean = _sanitize_fil_keys_i(0)
+    fil_clean = [None] * len(fil_list)
+    for i in range(len(fil_list)):
+        fil_clean[i] = _sanitize_fil_keys_i(i, keys_unsupported, keys_missing)
+
+    # convert lists of warnings to sets to remove multiple warnings
+    if keys_unsupported:
+        logger.warning(
+            "fil_dict[%d]: The following keys are ignored because they are not part of the\n"
+            "\tfilter reference dict:\n\t%s", i, set(keys_unsupported).sorted())
+    if keys_missing:
+        logger.warning(
+            "fil_dict[%d]: The following keys are missing:\n\t%s", i, set(keys_missing).sorted())
 
     return fil_clean
 
 # ---------------------------------------------------------
-def sanitize_fil_values(fil_dict: dict, all_filters: bool = False) -> dict | None:
+def sanitize_fil_values(fil_list: list[dict]) -> list[dict] | None:
     """
-    Sanitize *values* for data keys ('sos', 'zpk', 'ba') in filter dictionary,
+    Sanitize *values* for data keys ('sos', 'zpk', 'ba') in filter dictionary / dictionaries,
     they all should be NDArrays. If not, try to correct the data type or try to convert
     them from one of the other data entries. If this does not work, return error code 1.
 
-    This is called after loading the filter.
-
     Parameters
     ----------
-    fil_dict : dict
-        The filter dict that will be stored as `fil[0]`.
+    fil_list : list[dict]
+        The filter(s) that will be stored in `fil`.
 
     Returns
     -------
-    int:
-        0: value had the right type or could be converted
-        1: value had the wrong type or key did not exist
-
+    list[dict] | None:
+        list of 1 or 10 filter dicts
+        None if value had the wrong type or key did not exist
     """
-    def _sanitize_ndarray(k: str) -> int:
+    def _sanitize_ndarray(fil_dict: dict, k: str) -> int:
         """
        Helper function to sanitize the value for keys with NDArray values
         """
@@ -576,8 +519,9 @@ def sanitize_fil_values(fil_dict: dict, all_filters: bool = False) -> dict | Non
 
         # check whether fil_dict[k] is an iterable
         if not isinstance(fil_dict[k], (np.ndarray, list, tuple)):
-            logger.error("Unsuitable data type '%s' for '%s', cancelling file operation.",
-                            type(fil_dict[k]).__name__, k)
+            logger.error(
+                "Unsuitable data type '%s' for '%s', cancelling file operation.",
+                type(fil_dict[k]).__name__, k)
             return 1
 
         # fil_dict[k] is not a numpy array but can be converted:
@@ -587,53 +531,74 @@ def sanitize_fil_values(fil_dict: dict, all_filters: bool = False) -> dict | Non
 
         # fil_dicts need to be two-dimensional arrays
         if np.ndim(fil_dict[k]) != 2:
+            logger.error("Key '%s' has only %d-dimensional data, cancelling file operation.",
+                         k, np.ndim(fil_dict[k]))
             return 1
 
         return 0
 
     # ---------------------------------------------------------------
-    def _sanitize_fil_values_i(i: int, d: dict):
-        for k in d:
+    def _sanitize_fil_values_i(fil_dict: dict) -> dict:
+        """
+        Sanitize values in a single filter dict
+        """
+        for k in fil_dict:
             # Bytes need to be decoded for py3 to be used as keys later on
-            if isinstance(d[k], bytes):
-                d[k] = d[k].decode('utf-8')
-            if d[k] is None:
+            if isinstance(fil_dict[k], bytes):
+                fil_dict[k] = fil_dict[k].decode('utf-8')
+            if fil_dict[k] is None:
                 logger.warning("fil[%s] has no value!", k)
 
         # Check existence of key and value data type for the following three keys:
         for k in ('ba', 'zpk', 'sos'):
-            if _sanitize_ndarray(k):
-                logger.error("An error ocurred!!!")
+            if _sanitize_ndarray(fil_dict, k):
+                # error messages have been printed in _sanitize_ndarray()
                 return None
 
-        # check whether d['ba'] has 1 or two rows b or b, a
-        if np.shape(d['ba'])[0] > 2:
+        # check whether fil_dict['ba'] has 1 or two rows b or b, a
+        if np.shape(fil_dict['ba'])[0] > 2:
             logger.error(
                 "Unsuitable shape %s of 'ba' data, cancelling file operation.",
-                np.shape(d['ba']))
+                np.shape(fil_dict['ba']))
             return None
 
-        # check whether d['zpk'] has three rows z, p, k
-        if np.shape(d['zpk'])[0] != 3:
+        # check whether fil_dict['zpk'] has three rows z, p, k
+        if np.shape(fil_dict['zpk'])[0] != 3:
             logger.error(
                 "Unsuitable shape %s of 'zpk' data, cancelling file operation.",
-                np.shape(d['zpk']))
+                np.shape(fil_dict['zpk']))
             return None
 
-        # check whether d['sos'] has 6 rows
-        if np.shape(d['sos'])[1] != 6:
+        # check whether fil_dict['sos'] has 6 rows
+        if np.shape(fil_dict['sos'])[1] != 6:
             logger.warning("Unsuitable shape %s of 'sos' data, creating empty entry.",
-                np.shape(d['sos']))
+                np.shape(fil_dict['sos']))
             return None
 
-        if not isinstance(d['sos'], (np.ndarray, list, tuple)):
+        if not isinstance(fil_dict['sos'], (np.ndarray, list, tuple)):
             logger.error("Unsuitable 'sos' data type '%s', creating empty entry.",
-                            type(d['sos']).__name__)
+                            type(fil_dict['sos']).__name__)
             return None
 
-        return d
+        return fil_dict
+    # ------------------------------------
+    for i, d in enumerate(fil_list):
+        d_san = _sanitize_fil_values_i(d)
+        if not d_san:  # an error ocurred
+            return None
+        fil_list[i] = d_san
+    return fil_list
 
-    return _sanitize_fil_values_i(i=0, d=fil_dict)
+def dict2fil(fil_list: list[dict]) -> None:
+    """ Copy the dict(s) in the passed list to the global filter dict `fil` """
+    global fil
+    for i, d in enumerate(fil_list):
+        fil[i] = d
+
+
+def fil2dict(all_filters: bool) -> list[dict]:
+    """ Return the global filter dict `fil` """
+    return fil
 
 # ------------------------------------------------------------------------------
 class _BackupFilterDict():
