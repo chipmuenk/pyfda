@@ -389,6 +389,9 @@ def fb_set(*keys_tuple: tuple, backup: bool = True, new_key: bool = False,
 # =================
 # Helper functions
 # =================
+def fb_id() -> None:
+    logger.warning("id(fil) = %d\nid(fil(0)) = %d", id(fil), id(fil[0]))
+
 def _set_new_key(d: dict, set_key: str, set_val: any) -> int:
     """ Create a new key:value pair when flag `new_key` is True """
     if set_key in d:
