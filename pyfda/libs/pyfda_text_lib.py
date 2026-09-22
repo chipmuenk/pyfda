@@ -305,7 +305,7 @@ def set_dict_defaults(d: dict, default_dict: dict) -> None:
 
 
 # -------------------------------------------------------------------------------
-def compare_dictionaries(
+def compare_dictionaries_recursively(
         ref_dict: dict, new_dict: dict, path: str = "") -> list:
     """
     Compare recursively a nested dictionary `new_dict` to a reference dictionary `ref_dict`.
@@ -340,7 +340,7 @@ def compare_dictionaries(
             new_dict.update({k: ref_dict[k]})
         else:
             if isinstance(ref_dict[k], dict) and isinstance(new_dict[k], dict):
-                key_errs.append(compare_dictionaries(ref_dict[k], new_dict[k], path))
+                key_errs.append(compare_dictionaries_recursively(ref_dict[k], new_dict[k], path))
 
     # emulate slightly inefficient Python 2 way of copying the dict keys to a list
     # to avoid runtime error "dictionary changed size during iteration" due to new_dict.pop(k)
