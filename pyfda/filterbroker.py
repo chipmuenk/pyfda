@@ -52,14 +52,9 @@ logger = logging.getLogger(__name__)
 
 # ==========================================================
 # Variables that can be accessed from all modules
-#
-# State of filter design: 'ok', 'changed', 'error', 'active'
-design_filt_state = 'changed'
 # ===========================================================
 
 UNDO_LEN = 20  # depth of circular undo buffer
-undo_step = 0  # number of undo steps, limited to UNDO_LEN
-undo_ptr = 0  # pointer to current undo memory % UNDO_LEN
 
 # fil[i] can always be assigned to, fil = ... needs a global statement
 fil = [copy.deepcopy(fil_ref) for _ in range(10)]

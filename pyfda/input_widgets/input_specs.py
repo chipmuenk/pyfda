@@ -539,7 +539,6 @@ class InputSpecs(QWidget):
         self.but_design_filt.setDisabled(man)
         if man:
             state = 'ok'
-        fb.design_filt_state = state
         qstyle_widget(self.but_design_filt, state)
 
     # --------------------------------------------------------------------------
