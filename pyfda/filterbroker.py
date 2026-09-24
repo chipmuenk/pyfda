@@ -326,7 +326,7 @@ def fb_set(*keys_tuple: tuple, backup: bool = True, new_key: bool = False,
 
     if len(keys_tuple) < 2:
         if isinstance(keys_tuple[0], dict):  # top-level dict
-            return _set_dict_subvalues(keys_tuple, fil_dict)
+            return _set_dict_subvalues(keys_tuple)
 
         logger.error("Only one parameter '%s'; key *and* value need to be given", keys_tuple)
         raise KeyError
@@ -359,7 +359,7 @@ def fb_set(*keys_tuple: tuple, backup: bool = True, new_key: bool = False,
         # directly to `set_key` which is fast, but risky.
         # --------------------------------------------------------------
         if isinstance(set_val, dict) and not accept_dict:
-            return _set_dict_subvalues(keys_tuple, fil_dict)
+            return _set_dict_subvalues(keys_tuple)
 
         # Set the global quantization format 'qfrmt'.
         # -------------------------------------------------------------------
@@ -421,12 +421,12 @@ def _ensure_type_compatible(d: dict, set_key: str, set_val, keys_tuple: tuple[st
         raise KeyError
 
 # --------------
-def _set_dict_subvalues(keys_tuple: tuple, fil_dict: dict):
+def _set_dict_subvalues(keys_tuple: tuple):
     """
-    `set_val == keys_tuple[-1]` is a dict, iterate over its keys
+    `keys_tuple[-1]` (the value to be set) is a dict, iterate over its keys
     to set the key-value pairs.
     """
-    # get dict to be set from tuple, it's either the last or the only item
+    # Get dict to be set from tuple, it's either the last or the only item
     d = keys_tuple[-1]
 
     for k, v in d.items():
