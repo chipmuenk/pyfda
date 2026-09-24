@@ -486,11 +486,11 @@ def sanitize_fil_keys(fil_list: list[dict] = None) -> list[dict]:
         logger.warning(
             "fil_dict[%d]: The following keys are ignored because they are not part of the\n"
             "\tfilter reference dict:\n\t%s",
-            i, list(set(keys_unsupported)).sorted())
+            i, list(set(keys_unsupported)).sort())
     if keys_missing:
         logger.warning(
             "fil_dict[%d]: The following keys are missing:\n\t%s",
-            i, list(set(keys_missing)).sorted())
+            i, list(set(keys_missing)).sort())
 
     return fil_clean
 
