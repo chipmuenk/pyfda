@@ -96,24 +96,24 @@ class InputPZ(QWidget):
         Construct the UI from the table widget and the control part (`self.ui`),
         initialize the widget and setup signal-slot connections and event filters
         """
-        self.tblPZ = QTableWidget(self, objectName="tblPZ")
-        # self.tblPZ.setEditTriggers(QTableWidget.AllEditTriggers) # make everything editable
-        self.tblPZ.setAlternatingRowColors(True)  # alternating row colors)
+        self.tbl_pz = QTableWidget(self, objectName="tbl_pz")
+        # self.tbl_pz.setEditTriggers(QTableWidget.AllEditTriggers) # make everything editable
+        self.tbl_pz.setAlternatingRowColors(True)  # alternating row colors)
 
         # highlight when selected:
-        self.tblPZ.horizontalHeader().setHighlightSections(True)
-        self.tblPZ.horizontalHeader().setFont(self.ui.bfont)
+        self.tbl_pz.horizontalHeader().setHighlightSections(True)
+        self.tbl_pz.horizontalHeader().setFont(self.ui.bfont)
 
-        self.tblPZ.verticalHeader().setHighlightSections(True)
-        self.tblPZ.verticalHeader().setFont(self.ui.bfont)
-        self.tblPZ.setColumnCount(2)
-        self.tblPZ.setItemDelegate(ItemDelegatePZ(self))
+        self.tbl_pz.verticalHeader().setHighlightSections(True)
+        self.tbl_pz.verticalHeader().setFont(self.ui.bfont)
+        self.tbl_pz.setColumnCount(2)
+        self.tbl_pz.setItemDelegate(ItemDelegatePZ(self))
 
         lay_v_main = QVBoxLayout()
         # the following affects only the first widget (intended here)
         lay_v_main.setAlignment(Qt.AlignTop)
         lay_v_main.addWidget(self.ui)
-        lay_v_main.addWidget(self.tblPZ)
+        lay_v_main.addWidget(self.tbl_pz)
 
         lay_v_main.setContentsMargins(*params['wdg_margins'])
 
@@ -145,14 +145,14 @@ class InputPZ(QWidget):
         self.ui.but_table_export.clicked.connect(self.export_table)
         self.ui.but_table_import.clicked.connect(self._import)
 
-        self.ui.but_set_zero.clicked.connect(self._zero_PZ)
+        self.ui.but_set_zero.clicked.connect(self._zero_pz)
 
         self.ui.led_gain.installEventFilter(self)
         self.ui.led_h_max.installEventFilter(self)
         self.ui.led_eps.editingFinished.connect(self._set_eps)
 
         # ----------------------------------------------------------------------
-        # self.tblPZ.itemSelectionChanged.connect(self._copy_item)
+        # self.tbl_pz.itemSelectionChanged.connect(self._copy_item)
         #
         # Every time a table item is edited, call self._copy_item to copy the
         # item content to self.zpk. This is triggered by the itemChanged signal.
@@ -280,13 +280,13 @@ class InputPZ(QWidget):
         """
         Refresh the table item with the index `row, col` from self.zpk
         """
-        item = self.tblPZ.item(row, col)
+        item = self.tbl_pz.item(row, col)
         if item:  # does item exist?
             item.setText(str(self.zpk[col][row]).strip('()'))
         else:  # no, construct it:
-            self.tblPZ.setItem(row, col, QTableWidgetItem(
+            self.tbl_pz.setItem(row, col, QTableWidgetItem(
                   str(self.zpk[col][row]).strip('()')))
-        self.tblPZ.item(row, col).setTextAlignment(Qt.AlignRight | Qt.AlignCenter)
+        self.tbl_pz.item(row, col).setTextAlignment(Qt.AlignRight | Qt.AlignCenter)
 
     # ------------------------------------------------------------------------------
     def _refresh_table(self) -> None:
@@ -297,29 +297,29 @@ class InputPZ(QWidget):
         TODO:
         - Update zpk[2][0]?
 
-        Called by: dict2ui(), _clear_table(), _zero_PZ(), _delete_cells(),
+        Called by: dict2ui(), _clear_table(), _zero_pz(), _delete_cells(),
                 add_row(), _import()
         """
 
         params['FMT_pz'] = int(self.ui.spn_digits.text())
 
-        self.tblPZ.setVisible(True)
+        self.tbl_pz.setVisible(True)
 
         self.ui.led_gain.setText(
             str(params['FMT'].format(safe_eval(self.zpk[2][0], return_type='auto'))))
 
-        self.tblPZ.setHorizontalHeaderLabels(["Zeros", "Poles"])
-        self.tblPZ.setRowCount(len(self.zpk[0]))
+        self.tbl_pz.setHorizontalHeaderLabels(["Zeros", "Poles"])
+        self.tbl_pz.setRowCount(len(self.zpk[0]))
 
-        self.tblPZ.blockSignals(True)
+        self.tbl_pz.blockSignals(True)
         for col in range(2):
             for row in range(len(self.zpk[col])):
                 self._refresh_table_item(row, col)
-        self.tblPZ.blockSignals(False)
+        self.tbl_pz.blockSignals(False)
 
-        self.tblPZ.resizeColumnsToContents()
-        self.tblPZ.resizeRowsToContents()
-        self.tblPZ.clearSelection()
+        self.tbl_pz.resizeColumnsToContents()
+        self.tbl_pz.resizeRowsToContents()
+        self.tbl_pz.clearSelection()
 
     # ------------------------------------------------------------------------------
     def dict2ui(self) -> None:
@@ -445,7 +445,7 @@ class InputPZ(QWidget):
         - deleting all P/Z pairs
         Finally, the table is refreshed from self.zpk.
         """
-        sel = self._get_selected(self.tblPZ)['idx']  # get selected indices as 2D list
+        sel = self._get_selected(self.tbl_pz)['idx']  # get selected indices as 2D list
         sel_z = [s[1] for s in sel if s[0] == 0]  # list with sel. indices in 'Z' column
         sel_p = [s[1] for s in sel if s[0] == 1]  # list with sel. indices in 'P' column
 
@@ -477,7 +477,7 @@ class InputPZ(QWidget):
             # reconstruct array with new number of rows
             self.zpk = np.array([zeros, poles, gain])
 
-            self._delete_PZ_pairs()
+            self._delete_pz_pairs()
             self._normalize_gain()
             qstyle_widget(self.ui.but_apply, 'changed')
             qstyle_widget(self.ui.but_undo, 'changed')
@@ -489,8 +489,8 @@ class InputPZ(QWidget):
         Add the number of selected rows to the table and fill new cells with
         zeros. If nothing is selected, add one row.
         """
-        row = self.tblPZ.currentRow()
-        sel = len(self._get_selected(self.tblPZ)['rows'])
+        row = self.tbl_pz.currentRow()
+        sel = len(self._get_selected(self.tbl_pz)['rows'])
 
         if sel == 0:  # nothing selected ->
             sel = 1  # add at least one row ...
@@ -509,7 +509,7 @@ class InputPZ(QWidget):
         self.ui.led_eps.setText(str(self.ui.eps))
 
     # ------------------------------------------------------------------------------
-    def _zero_PZ(self) -> None:
+    def _zero_pz(self) -> None:
         """
         Set all P/Zs = 0 with a magnitude less than eps and delete P/Z pairs
         afterwards.
@@ -517,7 +517,7 @@ class InputPZ(QWidget):
         changed = False
         targ_val = 0.
         test_val = 0
-        sel = self._get_selected(self.tblPZ)['idx']  # get all selected indices
+        sel = self._get_selected(self.tbl_pz)['idx']  # get all selected indices
 
         if not sel:  # nothing selected, check all cells
             z_close = np.logical_and(
@@ -540,7 +540,7 @@ class InputPZ(QWidget):
                     self.zpk[i[0]][i[1]] = targ_val
                     changed = True
 
-        self._delete_PZ_pairs()
+        self._delete_pz_pairs()
         self._normalize_gain()
         if changed:
             qstyle_widget(self.ui.but_apply, 'changed')  # mark apply and undo
@@ -548,7 +548,7 @@ class InputPZ(QWidget):
         self._refresh_table()
 
     # ------------------------------------------------------------------------------
-    def _delete_PZ_pairs(self) -> None:
+    def _delete_pz_pairs(self) -> None:
         """
         Find and delete pairs of poles and zeros in self.zpk
         The filter dict and the table have to be updated afterwards.
@@ -631,7 +631,7 @@ class InputPZ(QWidget):
         or to file using a selected format
         """
         text = qtable2csv(
-            self.tblPZ, self.zpk, zpk=True, formatted=self.ui.but_format.isChecked())
+            self.tbl_pz, self.zpk, zpk=True, formatted=self.ui.but_format.isChecked())
         if self.ui.load_save_clipboard:  # data to clipboard:
             dirs.clipboard.setText(text)
         else:

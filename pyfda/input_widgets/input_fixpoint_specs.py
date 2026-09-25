@@ -17,8 +17,6 @@ import os
 import re
 import sys
 
-import numpy as np
-
 from pyfda.libs.compat import (
     Qt, QWidget, QPushButton, QComboBox, QFileDialog, QLabel, QPixmap,
     QVBoxLayout, QHBoxLayout, pyqtSignal, QFrame, QSizePolicy)
@@ -324,14 +322,14 @@ class Input_Fixpoint_Specs(QWidget):
         # The actual filter widget is instantiated / deleted in
         # `self._update_fixp_widget()` later on
 
-        self.layH_fx_wdg = QHBoxLayout()
+        self.lay_h_fx_wdg = QHBoxLayout()
         # left and right: Zero margin, top and bottom: default margin
-        self.layH_fx_wdg.setContentsMargins(0, margins[1], 0, margins[3])
-        # self.layH_fx_wdg.setContentsMargins(*params['wdg_margins'])
+        self.lay_h_fx_wdg.setContentsMargins(0, margins[1], 0, margins[3])
+        # self.lay_h_fx_wdg.setContentsMargins(*params['wdg_margins'])
         wdg_fx_dyn = QWidget(self)
         # The following has no effect?
         # wdg_fx_dyn.setStyleSheet(".QWidget { background-color:none; }")
-        wdg_fx_dyn.setLayout(self.layH_fx_wdg)
+        wdg_fx_dyn.setLayout(self.lay_h_fx_wdg)
 
         # ------------------------------------------------------------------
         #  Initialize fixpoint filter combobox, title and description
@@ -350,12 +348,12 @@ class Input_Fixpoint_Specs(QWidget):
         lay_h_title.addWidget(self.cmb_fx_wdg)
         lay_h_title.addWidget(self.lbl_title)
 
-        layVTitle = QVBoxLayout()
-        layVTitle.addLayout(lay_h_title)
-        layVTitle.addWidget(self.lbl_descr)
+        lay_v_title = QVBoxLayout()
+        lay_v_title.addLayout(lay_h_title)
+        lay_v_title.addWidget(self.lbl_descr)
 
         self.frm_title = QFrame(self)
-        self.frm_title.setLayout(layVTitle)
+        self.frm_title.setLayout(lay_v_title)
         self.frm_title.setContentsMargins(*params['wdg_margins'])
 
         # -----------------------------------------------------------------
@@ -393,10 +391,10 @@ class Input_Fixpoint_Specs(QWidget):
         lay_h_img.setContentsMargins(0, 0, 0, 0)
         lay_h_img.addWidget(self.lbl_fixp_img)  # , Qt.AlignCenter)
         # embedd image into transparent QFrame
-        self.frmImg = QFrame(self)
-        self.frmImg.setObjectName("transparent")
-        self.frmImg.setLayout(lay_h_img)
-        self.frmImg.setContentsMargins(*params['wdg_margins'])
+        self.frm_img = QFrame(self)
+        self.frm_img.setObjectName("transparent")
+        self.frm_img.setLayout(lay_h_img)
+        self.frm_img.setContentsMargins(*params['wdg_margins'])
 
         # -----------------------------------------------------------------
         #       Simulation and export Buttons
@@ -430,7 +428,7 @@ class Input_Fixpoint_Specs(QWidget):
         lay_v_main.addWidget(self.wdg_wq_input)
         lay_v_main.addWidget(wdg_fx_dyn)
         lay_v_main.addWidget(self.wdg_wq_output)
-        lay_v_main.addWidget(self.frmImg)
+        lay_v_main.addWidget(self.frm_img)
         lay_v_main.addStretch()
         lay_v_main.setContentsMargins(*params['wdg_margins'])
 
@@ -641,7 +639,7 @@ class Input_Fixpoint_Specs(QWidget):
                 # is a fixpoint widget loaded?
                 try:
                     # try to remove widget from layout
-                    self.layH_fx_wdg.removeWidget(self.fx_filt_ui)
+                    self.lay_h_fx_wdg.removeWidget(self.fx_filt_ui)
                     # delete QWidget when scope has been left
                     self.fx_filt_ui.deleteLater()
                 except AttributeError as e:
@@ -672,7 +670,7 @@ class Input_Fixpoint_Specs(QWidget):
             self.fx_filt_ui = fx_filt_ui_class()  # instantiate the fixpoint widget
             self.fx_filt_ui.setObjectName('fx_filt_ui')
             # and add it to layout:
-            self.layH_fx_wdg.addWidget(self.fx_filt_ui, stretch=1)
+            self.lay_h_fx_wdg.addWidget(self.fx_filt_ui, stretch=1)
             # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
             self.dict2ui()  # update fixpoint widgets from dictionary
 
@@ -755,7 +753,7 @@ class Input_Fixpoint_Specs(QWidget):
         self.frm_title.setVisible(is_fixp)
         self.wdg_wq_input.setVisible(is_fixp)
         self.wdg_wq_output.setVisible(is_fixp)
-        self.frmImg.setVisible(is_fixp)
+        self.frm_img.setVisible(is_fixp)
         if self.fx_wdg_found:
             self.fx_filt_ui.setVisible(is_fixp)
 
