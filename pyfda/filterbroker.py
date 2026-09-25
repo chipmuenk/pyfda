@@ -446,16 +446,20 @@ def _handle_qfrmt_change(keys_tuple: tuple) -> None:
         fil[0]['qfrmt_float_last'] = fil[0]['qfrmt']
 
 # ---------------------------------------------------------
-def sanitize_fil_keys(fil_list: list[dict] = None) -> list[dict]:
+def sanitize_fil_keys(all_filters: bool = True, fil_list: list[dict] = None) -> list[dict]:
     """
-    Test if the keys of the dicts in `fil_list` (default: global list of dicts `fil`) are
-    identical to the reference dict `fil_ref`. If not, remove the unsupported keys, add 
-    missing key:val pairs from the reference dict and issue warnings.
+    Test if the keys of the dicts in `fil_list` are identical to the reference dict `fil_ref`.
+    If not, remove the unsupported keys, add missing key:val pairs from the reference dict and
+    issue warnings. If `fil_list` is None, use the global filter dict `fil`.
 
     Parameters
     ----------
-    fil_list: dict | list
-        dict to be sanitized
+    all_filters: bool
+        When True (default), sanitize and return the complete list of 10 filters.
+        When False, only sanitize and return the first filter.
+
+    fil_list: list[dict]
+        dict to be sanitized (default: None)
 
     Returns
     -------
@@ -463,7 +467,10 @@ def sanitize_fil_keys(fil_list: list[dict] = None) -> list[dict]:
         The cleaned filter list of dict(s) with only the keys from the reference dict `fil_ref`.
     """
     if not fil_list:
-        fil_list = fil
+        if all_filters:
+            fil_list = fil  # list of all filters
+        else:
+            fil_list = fil[:1]  # list with only the first filtert))
 
     keys_unsupported = []  # list for unsupported keys
     keys_missing = []  # list for missing keys
@@ -476,16 +483,14 @@ def sanitize_fil_keys(fil_list: list[dict] = None) -> list[dict]:
         keys_unsupported += [k for k in fil_list[i] if k not in fil_ref]
         keys_missing += [k for k in fil_ref if k not in fil_list[i]]
 
-    # convert lists of warnings to sets to remove multiple warnings
+    # convert lists of warnings to sets to remove multiple warnings from multiple filter dicts
     if keys_unsupported:
-        logger.warning(
-            "fil_dict[%d]: The following keys are ignored because they are not part of the\n"
-            "\tfilter reference dict:\n\t%s",
-            i, list(set(keys_unsupported)).sort())
+        logger.error(
+            "\n\tThe following keys are ignored, they are not in the filter reference dict:"
+            "\n\t%s", sorted(set(keys_unsupported)))
     if keys_missing:
         logger.warning(
-            "fil_dict[%d]: The following keys are missing:\n\t%s",
-            i, list(set(keys_missing)).sort())
+            "The following keys are missing:\n\t%s", sorted(set(keys_missing)))
 
     return fil_clean
 

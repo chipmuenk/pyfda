@@ -619,7 +619,7 @@ def load_filter(self, all_filters: bool = False) -> bool:
     if ret == 1:
         return False  # unsuitable type / shape
     if ret == 2:
-        fb_temp = fb_temp[0]  # only use the first filter of the list as requested by user
+        fb_temp = fb_temp[:1]  # only use the first filter of the list as requested by user
     elif ret == 3:
         all_filters = False  # filter contains only a dict although 'all filters' had
                              # been selected. User decided to still load the single filter
@@ -640,7 +640,7 @@ def load_filter(self, all_filters: bool = False) -> bool:
         return False
 
     # check for missing or unsupported keys and issue warnings
-    fb_temp = sanitize_fil_keys(fb_temp)
+    fb_temp = sanitize_fil_keys(all_filters, fb_temp)
     # sanitize some of the values of the loaded filter dict
     fb_temp = sanitize_fil_values(fb_temp)
     if not fb_temp: # values could not be sanitized, return with an error
@@ -682,9 +682,14 @@ def save_filter(self, all_filters: bool, title: str = "Save Filter(s)") -> int:
     if not file_name:
         return 1  # operation cancelled or other error
 
+
     err = False
-    # create a copy of the filter dict to be saved
-    fil_clean = sanitize_fil_keys()
+    # copy filter(s) to be saved and clean the keys
+    if all_filters:
+        fil_clean = sanitize_fil_keys()  # use list with all flobal filters
+    else:
+        fil_clean = sanitize_fil_keys(all_filters=False)  # list with first global filter
+
     if file_type in {"npz", "pkl"}:
         try:
             with io.open(file_name, 'wb') as f:  # open in binary mode
