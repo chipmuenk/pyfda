@@ -24,7 +24,7 @@ class TestSequenceFunctions(unittest.TestCase):
         q_dict = {'WI':0, 'WF':3, 'ovfl':'sat', 'quant':'round'}
         fb_set('qfrmt', 'qfrac')
         fb_set('fx_base', 'dec')  # set to fractional format
-        self.myQ = fx.Fixed(q_dict) # instantiate fixpoint object with settings above
+        self.my_q = fx.Fixed(q_dict) # instantiate fixpoint object with settings above
 
         self.y_list = [-1.1, -1.0, -0.5, 0, 0.5, 0.9, 0.99, 1.0, 1.1]
         # list with some invalid strings
@@ -53,11 +53,11 @@ class TestSequenceFunctions(unittest.TestCase):
         """
         fb_set({'qfrmt':'qfrac', 'fx_base':'hex'})  # set to fractional hex format
         q_dict = {'WI':7, 'WF':3, 'ovfl':'none', 'quant':'fix'}
-        self.myQ.set_qdict(q_dict)
-        # self.assertEqual(q_dict, self.myQ.q_obj)
+        self.my_q.set_qdict(q_dict)
+        # self.assertEqual(q_dict, self.my_q.q_obj)
 
-        self.myQ.set_qdict({'WI': 12})
-        self.assertEqual(12, self.myQ.q_dict['WI'])
+        self.my_q.set_qdict({'WI': 12})
+        self.assertEqual(12, self.my_q.q_dict['WI'])
         self.assertEqual('hex', fb_get('fx_base'))
 
     def test_fix_no_ovfl(self):
@@ -69,41 +69,41 @@ class TestSequenceFunctions(unittest.TestCase):
         fb_set('qfrmt', 'qfrac')
         fb_set('fx_base', 'dec')  # set to fractional dec format
         q_dict = {'WI':0, 'WF':3, 'ovfl':'none', 'quant':'none'}
-        self.myQ.set_qdict(q_dict)
+        self.my_q.set_qdict(q_dict)
         # test handling of invalid inputs - scalar inputs
-        yq_list = list(map(self.myQ.fixp, self.y_list_invalid))
+        yq_list = list(map(self.my_q.fixp, self.y_list_invalid))
         yq_list_goal = [0, 0, 123.0, 1.23, 0, 3.21 + 1.23j, 3.21 + 1.23j]
         self.assertEqual(yq_list, yq_list_goal)
         # same in vector format
-        yq_list = list(self.myQ.fixp(self.y_list_invalid))
+        yq_list = list(self.my_q.fixp(self.y_list_invalid))
         yq_list_goal = [0, 0, 123.0, 1.23, 0, 3.21 + 1.23j, 3.21 + 1.23j]
         self.assertListEqual(yq_list, yq_list_goal)
 
         # return fixpoint numbers as float (no saturation, no quantization)
         # use global list
-        yq_list = list(self.myQ.fixp(self.y_list))
+        yq_list = list(self.my_q.fixp(self.y_list))
         yq_list_goal = self.y_list
         self.assertEqual(yq_list, yq_list_goal)
 
         # test scaling with QI and qint
         fb_set('qfrmt', 'qint')  # set to integer format
         q_dict = {'WI': 1}
-        self.myQ.set_qdict(q_dict)
-        yq_list = list(self.myQ.fixp(self.y_list))
+        self.my_q.set_qdict(q_dict)
+        yq_list = list(self.my_q.fixp(self.y_list))
         self.assertEqual(yq_list, yq_list_goal)
 
         # return fixpoint numbers as float (rounding)
         q_dict = {'quant':'round'}
-        self.myQ.set_qdict(q_dict)
-        yq_list = list(self.myQ.fixp(self.y_list))
+        self.my_q.set_qdict(q_dict)
+        yq_list = list(self.my_q.fixp(self.y_list))
         yq_list_goal = [-1.125, -1.0, -0.5, 0, 0.5, 0.875, 1.0, 1.0, 1.125]
         self.assertEqual(yq_list, yq_list_goal)
 
         # return fixpoint numbers as integer (rounding), overflow 'none'
         fb_set('qfrmt', 'qint')  # set to integer format
         q_dict = {'WI':3, 'WF':3, 'ovfl':'none', 'quant':'round'}
-        self.myQ.set_qdict(q_dict)
-        yq_list = list(self.myQ.fixp(self.y_list))
+        self.my_q.set_qdict(q_dict)
+        yq_list = list(self.my_q.fixp(self.y_list))
         yq_list_goal = [-9, -8, -4, 0, 4, 7, 8, 8, 9]
         self.assertEqual(yq_list, yq_list_goal)
 
@@ -115,8 +115,8 @@ class TestSequenceFunctions(unittest.TestCase):
         # wrap around behaviour with 'fix' quantization; fractional representation
         fb_set({'qfrmt': 'qfrac', 'fx_base': 'dec'})  # set to fractional dec. format
         q_dict = {'WI':0, 'WF':2, 'ovfl':'wrap', 'quant':'fix'}
-        self.myQ.set_qdict(q_dict)
-        yq_list = list(self.myQ.fixp(self.y_list))
+        self.my_q.set_qdict(q_dict)
+        yq_list = list(self.my_q.fixp(self.y_list))
         yq_list_goal = [-1.0, -1.0, -0.5, 0.0, 0.5, 0.75, 0.75, -1.0, -1.0]
         self.assertEqual(yq_list, yq_list_goal)
 

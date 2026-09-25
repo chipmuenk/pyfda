@@ -36,7 +36,7 @@ class TestSequenceFunctions(unittest.TestCase):
         fb_set{'qfrmt': 'qfrac', 'fx_base': 'dec'})
         # initialize a pyfda fixpoint quantizer
         q_obj = {'WI':0, 'WF':3, 'ovfl':'sat', 'quant':'round'}
-        self.myQ = fx.Fixed(q_obj) # instantiate fixpoint object with settings above
+        self.my_q = fx.Fixed(q_obj) # instantiate fixpoint object with settings above
 
 
     def tb_dut(self, stimulus, inputs, outputs):
@@ -84,7 +84,7 @@ class TestSequenceFunctions(unittest.TestCase):
         """
         fb_set({'qfrmt': 'qfrac', 'fx_base': 'hex'})
         q_obj = {'WI':7, 'WF':3, 'ovfl':'none', 'quant':'fix'}
-        self.myQ.set_qdict(q_obj)
+        self.my_q.set_qdict(q_obj)
 
     #==========================================================================
     # Test requant routine, this needs a migen class (DUT)
@@ -120,13 +120,13 @@ class TestSequenceFunctions(unittest.TestCase):
         targ_out = np.array([0,1,15,-64,-1,-1,-64,0])
 
         q_out_pyfda = q_out.copy()
-        self.myQ.set_qdict(q_out_pyfda)
+        self.my_q.set_qdict(q_out_pyfda)
 
         self.dut = DUT(q_in, q_out) # pass quantization dicts
         response = self.run_sim(self.stim)
 
         # compare pyfda fixpoint quantization to migen fixpoint quantization:
-        assert_array_equal(self.myQ.fixp(self.stim)[:-1],response[1:])
+        assert_array_equal(self.my_q.fixp(self.stim)[:-1],response[1:])
         # compare target list to migen fixpoint quantization:
         assert_array_equal(targ_out[:-1], response[1:])
 
@@ -141,13 +141,13 @@ class TestSequenceFunctions(unittest.TestCase):
 
         q_out_pyfda = q_out.copy()
         q_out_pyfda.update({'WI':6, 'WF':0}) # use integer representation
-        self.myQ.set_qdict(q_out_pyfda)
+        self.my_q.set_qdict(q_out_pyfda)
 
         self.dut = DUT(q_in, q_out)
         response = self.run_sim(self.stim)
 
         # Throwing away 3 LSBs reduces fixpoint value by a factor of 8
-        assert_array_equal(self.myQ.fixp(self.stim/8)[:-1],response[1:])
+        assert_array_equal(self.my_q.fixp(self.stim/8)[:-1],response[1:])
         # compare target list to migen fixpoint quantization:
         assert_array_equal(targ_out[:-1], response[1:])
 

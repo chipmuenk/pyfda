@@ -349,9 +349,9 @@ class Fixed():
     Define a dictionary with the format options and pass it to the constructor:
 
     >>> q_dict = {'WI':1, 'WF':14, 'ovfl':'sat', 'quant':'round'}
-    >>> myQ = Fixed(q_dict)  # instantiate fixpoint quantizer
-    >>> WI = myQ.q_dict['WI']  # access quantizer parameters
-    >>> myQ.set_qdict({'WF': 13, 'WI': 2})  # update quantizer parameters
+    >>> my_q = Fixed(q_dict)  # instantiate fixpoint quantizer
+    >>> WI = my_q.q_dict['WI']  # access quantizer parameters
+    >>> my_q.set_qdict({'WF': 13, 'WI': 2})  # update quantizer parameters
 
 
     Parameters
@@ -1469,18 +1469,18 @@ if __name__ == '__main__':
     fb_set('qfrmt', 'qfrac')  # set fixpoint format
 
     q_dict = {'WI': 0, 'WF': 3, 'ovfl': 'wrap', 'quant': 'round'}
-    myQ = Fixed(q_dict)  # instantiate fixpoint object with settings above
+    my_q = Fixed(q_dict)  # instantiate fixpoint object with settings above
 
     print("\nTesting float2frmt()\n====================")
     y_list = [-1.1, -1.0, -0.5, 0, 0.5, 0.99, 1.0]
     for y in y_list:
-        print(f"y = {y}\t->\ty_fix = {myQ.float2frmt(y)}")
-    print("myQ.q_dict = ", myQ.q_dict)
+        print(f"y = {y}\t->\ty_fix = {my_q.float2frmt(y)}")
+    print("my_q.q_dict = ", my_q.q_dict)
 
     print("\nTesting frmt2float()\n====================")
     q_dict = {'WI': 3}  # extend range
-    myQ.set_qdict(q_dict)
+    my_q.set_qdict(q_dict)
     dec_list = [-9, -8, -7, -4.0, -3.578, 0, 0.5, 4, 7, 8]
     for dec in dec_list:
-        print(f"y={dec}\t->\ty_fix={myQ.frmt2float(dec)}")
-    print("myQ.q_dict = ", myQ.q_dict)
+        print(f"y={dec}\t->\ty_fix={my_q.frmt2float(dec)}")
+    print("my_q.q_dict = ", my_q.q_dict)
