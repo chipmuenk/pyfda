@@ -1016,16 +1016,16 @@ def save_data_np(file_name: str, file_type: str, data: np.ndarray,
         return -1
     try:
         if file_type == 'wav':
-            f_S_int = int(abs(f_s))
-            if f_S_int == 0:
-                f_S_int = 1
-            if f_s != f_S_int:
+            f_s_int = int(abs(f_s))
+            if f_s_int == 0:
+                f_s_int = 1
+            if f_s != f_s_int:
                 logger.warning(
                     "Only positive integer sampling frequencies can be used for WAV files,\n"
-                    "sampling frequency has been changed to f_S = %d", f_S_int)
+                    "sampling frequency has been changed to f_S = %d", f_s_int)
 
             # audio = data.T  # transpose data, needed?
-            wavfile.write(file_name, f_S_int, data)
+            wavfile.write(file_name, f_s_int, data)
             # To write multiple-channels, use a 2-D array of shape (Nsamples, Nchannels).
 
         elif file_type == 'csv':
