@@ -190,7 +190,7 @@ class PlotTranStimUI(QWidget):
             logger.warning("Stopped infinite loop:\n%s", pprint_log(dict_sig))
             return
         if 'view_changed' in dict_sig:
-            if dict_sig['view_changed'] == 'f_S':
+            if dict_sig['view_changed'] == 'f_s':
                 self.normalize_freqs()
 
 # ------------------------------------------------------------------------------
@@ -751,7 +751,7 @@ class PlotTranStimUI(QWidget):
         Update widget with normalized frequencies and periods if required.
 
         `normalize_freqs()` is called when sampling frequency has been changed
-        via signal ['view_changed':'f_S'] from plot_tran.process_sig_rx
+        via signal ['view_changed':'f_s'] from plot_tran.process_sig_rx
 
         Frequency and time related entries are always stored normalized w.r.t. f_S
         which is loaded from filter dictionary and stored as  `self.f_scale`
@@ -766,7 +766,7 @@ class PlotTranStimUI(QWidget):
 
         f_corr = 1.
         if fb_get('freq_locked'):
-            f_corr = fb_get('f_s_prev') / fb_get('f_S')
+            f_corr = fb_get('f_s_prev') / fb_get('f_s')
             self.f1 *= f_corr
             self.f2 *= f_corr
             self.t1 /= f_corr
@@ -781,11 +781,11 @@ class PlotTranStimUI(QWidget):
             # doesn't work yet, n_fft is not available in this scope.
             self.f_scale = self.n_fft
         else:
-            self.f_scale = fb_get('f_S')
+            self.f_scale = fb_get('f_s')
         self.t_scale = fb_get('t_s')
 
         # logger.warning("f_S = %s, prev = %s\nf_scale = %s, f_1 = %s, f_corr = %s",
-        #               fb_get('f_S'), fb_get('f_s_prev'), self.f_scale, self.f1, f_corr)
+        #               fb_get('f_s'), fb_get('f_s_prev'), self.f_scale, self.f1, f_corr)
 
         # Update and round the display
         # The dict contains entries like    'led_f1': ('f1', 'f_scale'),

@@ -446,7 +446,7 @@ class PlotTranStim(QWidget):
                 "A1": self.ui.a1, "A2": self.ui.a2, "f1": self.ui.f1, "f2": self.ui.f2,
                 "phi1": self.ui.phi1, "phi2": self.ui.phi2,
                 "T1": self.ui.t1, "T2": self.ui.t2, "N1": self.ui.n1, "N2": self.ui.n2,
-                "BW1": self.ui.bw1, "BW2": self.ui.bw2, "f_S": fb_get('f_S'),
+                "BW1": self.ui.bw1, "BW2": self.ui.bw2, "f_S": fb_get('f_s'),
                 "n": n, "t": t, "j": 1j, "pi": np.pi, "e": np.e}
 
             x[frm_slc] = safe_numexpr_eval(self.ui.stim_formula, (n_frame,), param_dict)

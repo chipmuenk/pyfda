@@ -536,7 +536,7 @@ class PlotFFTWin(QDialog):
 
         # calculate the FFT of the window with a zero padding factor
         # of `self.pad` and create the frequency axis
-        self.F = fftfreq(self.n_view * self.pad, d=1. / fb_get('f_S'))
+        self.F = fftfreq(self.n_view * self.pad, d=1. / fb_get('f_s'))
         self.k = fftfreq(self.n_view * self.pad, d=1./(self.n_view))
         self.Win = np.abs(fft(self.win_view, self.n_view * self.pad))
         # calculate the max. amplitude error in the middle of the bin

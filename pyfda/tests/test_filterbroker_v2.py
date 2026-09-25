@@ -17,7 +17,7 @@ class TestFilterConfig:
         config = FilterConfig()
         assert config.N == 4
         assert config.f_c == 0.1
-        assert config.f_S == 1.0
+        assert config.f_s == 1.0
     
     def test_to_dict(self):
         """Test serialization to dict."""
@@ -30,12 +30,12 @@ class TestFilterConfig:
     
     def test_from_dict(self):
         """Test deserialization from dict."""
-        data = {'N': 12, 'f_c': 0.25, 'f_S': 2.0}
+        data = {'N': 12, 'f_c': 0.25, 'f_s': 2.0}
         config = FilterConfig.from_dict(data)
         
         assert config.N == 12
         assert config.f_c == 0.25
-        assert config.f_S == 2.0
+        assert config.f_s == 2.0
 
 
 class TestFilterBrokerBasics:
@@ -188,12 +188,12 @@ class TestBatchSet:
         """Test setting multiple values at once."""
         broker = FilterBroker.get_instance()
         
-        updates = {'N': 8, 'f_c': 0.25, 'f_S': 2.0}
+        updates = {'N': 8, 'f_c': 0.25, 'f_s': 2.0}
         assert broker.batch_set(updates) is True
         
         assert broker.get('N') == 8
         assert broker.get('f_c') == 0.25
-        assert broker.get('f_S') == 2.0
+        assert broker.get('f_s') == 2.0
     
     def test_batch_set_creates_single_undo(self):
         """Test that batch_set creates only one undo entry."""
@@ -295,7 +295,7 @@ class TestSerialization:
         
         assert data['N'] == 12
         assert data['f_c'] == 0.25
-        assert 'f_S' in data
+        assert 'f_s' in data
     
     def test_from_dict(self):
         """Test deserialization from dict."""

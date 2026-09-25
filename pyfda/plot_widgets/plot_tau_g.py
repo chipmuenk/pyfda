@@ -201,7 +201,7 @@ class PlotTauG(QWidget):
         else:
             tau_str = r'$ \tau_g(\mathrm{e}^{\mathrm{j} \Omega})$'\
                 + ' in ' + fb_get('plt_t_unit') + r' $ \rightarrow $'
-            tau_g = tau_g / fb_get('f_S')
+            tau_g = tau_g / fb_get('f_s')
 
         # ---------------------------------------------------------
         self.ax.clear()  # need to clear, doesn't overwrite

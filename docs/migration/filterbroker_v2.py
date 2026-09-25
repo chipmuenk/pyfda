@@ -79,7 +79,7 @@ class FilterConfig:
     w_sb2: float = 1.0
 
     amp_specs_unit: str = 'dB'
-    f_S: float = 1.0  # sampling frequency
+    f_s: float = 1.0  # sampling frequency
     f_s_prev: float = 1.0  # previous sampling frequency
     f_max: float = 1.0
     f_s_scale: float = 1.0

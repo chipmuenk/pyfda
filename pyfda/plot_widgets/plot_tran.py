@@ -479,7 +479,7 @@ class PlotTran(QWidget):
         else:  # invisible
             if 'data_changed' in dict_sig:
                 self.needs_calc = True
-            elif 'view_changed' in dict_sig and dict_sig['view_changed'] == 'f_S':
+            elif 'view_changed' in dict_sig and dict_sig['view_changed'] == 'f_s':
                 self.needs_redraw = [True] * 2
                 # update frequency related widgets (visible or not)
             elif 'ui_local_changed' in dict_sig:
@@ -1457,7 +1457,7 @@ class PlotTran(QWidget):
             win = self.ui.qfft_win_select.calc_window(self.ui.time_nfft_spgr)
 
             f, t, s_xx = sig.spectrogram(
-                s, fb_get('f_S'), window=win,  # ('tukey', 0.25),
+                s, fb_get('f_s'), window=win,  # ('tukey', 0.25),
                 nperseg=self.ui.time_nfft_spgr, noverlap=self.ui.time_ovlp_spgr,
                 nfft=None, return_onesided=fb_get('freq_specs_range_type') == 'half',
                 scaling=scaling, mode=mode, detrend='constant')
@@ -1621,7 +1621,7 @@ class PlotTran(QWidget):
                 # '<i>k</i>' specifies frequencies w.r.t. " + to_html("f_S", frmt = 'i') +
                 # but plots graphs over the frequency index <i>k</i>.</span>",
                 #
-                # k is checked: specify frequencies as indices of the FFT, f_k = k * f_S / N_FFT
+                # k is checked: specify frequencies as indices of the FFT, f_k = k * f_s / N_FFT
                 # Elsewhere (non-transient tabs), k = CFP.conf_settings['N_FFT'] is used for the
                 # calculation of the FFT, it is also used for f_id / h_id here.
                 # In the transient tab, the frequency axes must be scaled according to the number of

@@ -753,11 +753,11 @@ def read_wav_info(file) -> int:
     # Pos. 22: Number of channels
     nchans = str2int(HEADER[22:24])
 
-    # Pos. 24: Sampling rate f_S (4 bytes)
+    # Pos. 24: Sampling rate f_s (4 bytes)
     # f.seek(24)
-    f_S = str2int(HEADER[24:28])
+    f_s = str2int(HEADER[24:28])
 
-    # Pos. 28: Byte rate = f_S * n_chans * Bytes per sample (4 bytes)
+    # Pos. 28: Byte rate = f_s * n_chans * Bytes per sample (4 bytes)
     # byte_rate = str2int(HEADER[28:32])
 
     # Pos. 32: Block align, # of bytes per sample incl. all channels (2 bytes)
@@ -822,10 +822,10 @@ def read_wav_info(file) -> int:
 
     read_wav_info.nchans = nchans  # number of channels
 
-    read_wav_info.f_S = f_S  # sampling rate in Hz
+    read_wav_info.f_s = f_s  # sampling rate in Hz
 
     # duration of the data in milliseconds
-    read_wav_info.ms = read_wav_info.N * 1000 / (f_S * nchans)
+    read_wav_info.ms = read_wav_info.N * 1000 / (f_s * nchans)
 
     return 0
 
@@ -980,7 +980,7 @@ def file2array(file_name: str, file_type: str, fkey: str = "",
 
 # ------------------------------------------------------------------------------
 def save_data_np(file_name: str, file_type: str, data: np.ndarray,
-                 f_S: int = 1, fmt: str = '%f') -> int:
+                 f_s: int = 1, fmt: str = '%f') -> int:
     """
     Save numpy ndarray data to a file in wav or csv format
 
@@ -996,7 +996,7 @@ def save_data_np(file_name: str, file_type: str, data: np.ndarray,
         Data to be saved to a file. The data dtype (uint8, int16, int32, float32)
         determines the bits-per-sample and PCM/float of the WAV file
 
-    f_S : int (optional)
+    f_s : int (optional)
         Sampling frequency (only used for WAV file format), only integer sampling
         frequencies are supported by the WAV format.
 
@@ -1016,10 +1016,10 @@ def save_data_np(file_name: str, file_type: str, data: np.ndarray,
         return -1
     try:
         if file_type == 'wav':
-            f_S_int = int(abs(f_S))
+            f_S_int = int(abs(f_s))
             if f_S_int == 0:
                 f_S_int = 1
-            if f_S != f_S_int:
+            if f_s != f_S_int:
                 logger.warning(
                     "Only positive integer sampling frequencies can be used for WAV files,\n"
                     "sampling frequency has been changed to f_S = %d", f_S_int)
@@ -1047,7 +1047,7 @@ def save_data_np(file_name: str, file_type: str, data: np.ndarray,
         return -1
 
 # ------------------------------------------------------------------------------
-def write_wav_frame(parent: object, file_name: str, data: np.ndarray, f_S: int = 1,
+def write_wav_frame(parent: object, file_name: str, data: np.ndarray, f_s: int = 1,
                     title: str = "Export") -> None:
     """
     Export a frame of data in wav format
@@ -1066,7 +1066,7 @@ def write_wav_frame(parent: object, file_name: str, data: np.ndarray, f_S: int =
     data: np.ndarray
         data to be exported
 
-    f_S: int
+    f_s: int
         Sampling frequency in Hz
 
     title: str
@@ -1099,7 +1099,7 @@ def write_wav_frame(parent: object, file_name: str, data: np.ndarray, f_S: int =
             wf.setnchannels(n_chan)  # pylint: disable=no-member
             # 2 bytes per sample.
             wf.setsampwidth(2)  # pylint: disable=no-member
-            wf.setframerate(f_S)  # pylint: disable=no-member
+            wf.setframerate(f_s)  # pylint: disable=no-member
             # get the raw bytes from the numpy array:
             wf.writeframes(audio.tobytes())  # pylint: disable=no-member
 
@@ -1345,9 +1345,9 @@ def coe_header(title: str) -> str:
     date_frmt = "%d-%B-%Y %H:%M:%S"  # select date format
     unit = fb_get('plt_f_unit')
     if unit in {'f_S', 'f_Ny'}:
-        f_S = ""
+        f_s = ""
     else:
-        f_S = int(fb_get('f_S'))
+        f_s = int(fb_get('f_s'))
     header = (
         "-" * 85 + "\n\n"
         f"{title}\n"
@@ -1357,7 +1357,7 @@ def coe_header(title: str) -> str:
     header += f"Saved:\t{datetime.datetime.now().strftime(date_frmt)}\n\n"
     header += f"Filter type:\t{fb_get('rt')}, {fb_get('fc')} "
     header += f"(Order = {fb_get('N')})\n"
-    header += f"Sample Frequency \tf_S = {f_S} {unit}\n\n"
+    header += f"Sample Frequency \tf_S = {f_s} {unit}\n\n"
     header += "Corner Frequencies:\n"
     for lf, f, la, a in zip(f_lbls, f_vals, a_lbls, a_targs_db, strict=True):
         header += "\t" + lf + " = " + str(f) + " " + unit + " : " + la + " = "

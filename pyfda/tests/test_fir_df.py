@@ -58,7 +58,6 @@ class TestSequenceFunctions(unittest.TestCase):
 
         self.myQ.set_qdict({'WI': 12})
         self.assertEqual(12, self.myQ.q_dict['WI'])
-        self.assertEqual('hex', fb_get()['fx_base'])
         self.assertEqual('hex', fb_get('fx_base'))
 
     def test_fix_no_ovfl(self):

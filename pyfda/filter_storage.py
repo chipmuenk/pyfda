@@ -61,7 +61,7 @@ fil_ref = {
         'sos',
         'pyfda.filter_widgets.ellip'
     ],
-    'f_S': 1.0,
+    'f_s': 1.0,
     'f_s_prev': 1.0,  # previous sampling frequency
     # 'f_s_wav': 16000,  # sampling frequency for wav files
     'f_max': 1.0,

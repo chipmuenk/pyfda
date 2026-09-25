@@ -94,7 +94,7 @@ class TranIO(QWidget):
 
         self.norm = self.ui.led_normalize_default
         self.nr_loops = self.ui.led_nr_loops_default
-        self.f_s_wav = self.f_s_file = fb_get('f_S')
+        self.f_s_wav = self.f_s_file = fb_get('f_s')
 
         self._construct_ui()
 
@@ -117,8 +117,8 @@ class TranIO(QWidget):
         elif 'ui_global_changed' in dict_sig and dict_sig['ui_global_changed'] == 'csv':
             # Set CSV options button according to state of CSV popup handle
             self.ui.but_csv_options.setChecked(dirs.csv_options_handle is not None)
-        elif 'view_changed' in dict_sig and dict_sig['view_changed'] == 'f_S':
-            self.set_f_s_wav(fb_get('f_S') * fb_get('f_s_scale'))
+        elif 'view_changed' in dict_sig and dict_sig['view_changed'] == 'f_s':
+            self.set_f_s_wav(fb_get('f_s') * fb_get('f_s_scale'))
 
     # -----------------------------------------------------------------------------
     def emit(self, dict_sig):
@@ -161,7 +161,7 @@ class TranIO(QWidget):
 
         self.setLayout(lay_v_main)
 
-        self.set_f_s_wav(fb_get('f_S') * fb_get('f_s_scale'))
+        self.set_f_s_wav(fb_get('f_s') * fb_get('f_s_scale'))
 
     # ------------------------------------------------------------------------------
     def set_f_s_wav(self, f_s_wav=None):
@@ -241,7 +241,7 @@ class TranIO(QWidget):
             if self.data_raw is None:  # an error occurred
                 err = True
             else:
-                self.f_s_file = io.read_wav_info.f_S
+                self.f_s_file = io.read_wav_info.f_s
                 self.wl = io.read_wav_info.wl
                 info_str = f" x {io.read_wav_info.sample_format},"
                 self.ui.lbl_f_s_value.setText(str(self.f_s_file))
@@ -385,9 +385,9 @@ class TranIO(QWidget):
 
         self.emit({'data_changed': 'file_io'})
         if self.ui.but_f_s_wav_auto.isChecked():
-            fb_set('f_S', self.f_s_file)
+            fb_set('f_s', self.f_s_file)
             fb_set('freq_specs_unit', 'Hz')
-            self.emit({'view_changed': 'f_S'})
+            self.emit({'view_changed': 'f_s'})
         return
 
     # ------------------------------------------------------------------------------

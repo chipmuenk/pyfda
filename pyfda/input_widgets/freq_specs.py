@@ -170,7 +170,7 @@ class FreqSpecs(QWidget):
         if self.spec_edited:
             f_label = str(event_source.objectName())
             f_value = safe_eval(
-                event_source.text(), self.data_prev, sign='pos') / fb_get('f_S')
+                event_source.text(), self.data_prev, sign='pos') / fb_get('f_s')
             fb_set(f_label, f_value)
             self.sort_dict_freqs()  # sort and update display
             self.emit({'specs_changed': 'f_specs', 'sender_name': f_label})
@@ -232,16 +232,16 @@ class FreqSpecs(QWidget):
     def recalc_freqs(self) -> None:
         """
         Update normalized frequencies when absolute frequencies are locked and
-        update frequency unit. This is called by via signal {'view_changed': 'f_S'}.
+        update frequency unit. This is called by via signal {'view_changed': 'f_s'}.
         """
         if fb_get('freq_locked'):
             for qle in self.qlineedit:
                 f_name = str(qle.objectName()).split(":", 1)
                 f_label = f_name[0]
-                f_value = fb_get(f_label) * fb_get('f_s_prev') / fb_get('f_S')
+                f_value = fb_get(f_label) * fb_get('f_s_prev') / fb_get('f_s')
                 # logger.warning(
-                #     "Updating freq_specs: f_S = %s, f_s_prev = %s\n\t%s: %s",
-                #     fb_get('f_S'), fb_get('f_s_prev'), f_label, f_value)
+                #     "Updating freq_specs: f_s = %s, f_s_prev = %s\n\t%s: %s",
+                #     fb_get('f_s'), fb_get('f_s_prev'), f_label, f_value)
 
                 fb_set(f_label, f_value)
             self.emit({'specs_changed': 'f_specs'})
@@ -269,7 +269,7 @@ class FreqSpecs(QWidget):
         """
         f_name = str(source.objectName()).split(':', 1)
         f_label = f_name[0]
-        f_value = fb_get(f_label) * fb_get('f_S')
+        f_value = fb_get(f_label) * fb_get('f_s')
 
         if source.hasFocus():
             # widget has focus, show full precision
@@ -424,7 +424,7 @@ class FreqSpecs(QWidget):
         ident = [x for x in mult if x > 1]
         if ident:
             logger.warning("Frequencies must differ by at least %.4g",
-                           MIN_FREQ_STEP * fb_get('f_S'))
+                           MIN_FREQ_STEP * fb_get('f_s'))
         self.dict2ui()
 # ------------------------------------------------------------------------------
 if __name__ == '__main__':

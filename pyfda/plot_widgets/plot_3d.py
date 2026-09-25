@@ -430,7 +430,7 @@ class Plot3D(QWidget):
         h_abs = abs(H)
         # h_max = max(h_abs)
         h_min = min(h_abs)
-        # f = w / (2 * pi) * f_S                  # translate w to absolute frequencies
+        # f = w / (2 * pi) * f_s                  # translate w to absolute frequencies
         # f_min = f[np.argmin(h_abs)]
 
         plevel_rel = 1.05  # height of plotted pole position relative to zmax

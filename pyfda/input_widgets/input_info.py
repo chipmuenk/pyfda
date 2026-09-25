@@ -355,7 +355,7 @@ class InputInfo(QWidget):
             bb = fb_get('ba', 0)
             aa = fb_get('ba')[1]
 
-            f_S = fb_get('f_S')
+            f_s = fb_get('f_s')
 
             f_lbls = []
             f_vals = []
@@ -478,7 +478,7 @@ class InputInfo(QWidget):
             self.tbl_filt_perf.setVerticalHeaderLabels(f_lbls)
             for row in range(len(a_test)):
                 self.tbl_filt_perf.setItem(
-                    row, 0, QTableWidgetItem(str(f'{(f_vals[row]*f_S):.4g}')))
+                    row, 0, QTableWidgetItem(str(f'{(f_vals[row]*f_s):.4g}')))
                 self.tbl_filt_perf.setItem(
                     row, 1, QTableWidgetItem(str(f'{-a_targs_db[row]:2.3g}')))
                 self.tbl_filt_perf.setItem(
