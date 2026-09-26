@@ -140,6 +140,12 @@
     <content_attribute id="money-purchasing">none</content_attribute>
     <content_attribute id="money-gambling">none</content_attribute>
   </content_rating>
+  <keywords>
+    <keyword>filter design tool</keyword>
+    <keyword>python filter design</keyword>
+    <keyword>pyfda software</keyword>
+    <keyword>analog filter design</keyword>
+  </keywords>
   
 </component>
 
