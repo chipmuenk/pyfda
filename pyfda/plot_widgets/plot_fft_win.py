@@ -227,7 +227,7 @@ class PlotFFTWin(QDialog):
         self.lbl_n = QLabel(to_html("N =", frmt='bi'))
         self.led_n = QLineEdit(self)
         self.led_n.setText(str(self.n_view))
-        self.led_n.setMaximumWidth(qtext_width(N_x=8))
+        self.led_n.setMaximumWidth(qtext_width(n_x=8))
         self.led_n.setToolTip(
             "<span>Number of window data points to display.</span>")
 
@@ -240,7 +240,7 @@ class PlotFFTWin(QDialog):
         self.led_log_bottom_t = QLineEdit(self)
         self.led_log_bottom_t.setVisible(self.but_log_t.isChecked())
         self.led_log_bottom_t.setText(str(self.bottom_t))
-        self.led_log_bottom_t.setMaximumWidth(qtext_width(N_x=6))
+        self.led_log_bottom_t.setMaximumWidth(qtext_width(n_x=6))
         self.led_log_bottom_t.setToolTip(
             "<span>Minimum display value for log. scale.</span>")
 
@@ -265,7 +265,7 @@ class PlotFFTWin(QDialog):
         self.led_log_bottom_f = QLineEdit(self)
         self.led_log_bottom_f.setVisible(self.but_log_t.isChecked())
         self.led_log_bottom_f.setText(str(self.bottom_f))
-        self.led_log_bottom_f.setMaximumWidth(qtext_width(N_x=6))
+        self.led_log_bottom_f.setMaximumWidth(qtext_width(n_x=6))
         self.led_log_bottom_f.setToolTip(
             "<span>Minimum display value for log. scale.</span>")
 

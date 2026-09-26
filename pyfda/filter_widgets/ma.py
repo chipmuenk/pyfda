@@ -169,7 +169,7 @@ class MA(QWidget):
         self.lbl_delays = QLabel("<b><i>M =</ i></ b>", self)
         self.lbl_delays.setObjectName('wdg_lbl_ma_0')
         self.led_delays = QLineEdit(self)
-        self.led_delays.setMaximumWidth(qtext_width(N_x=8))
+        self.led_delays.setMaximumWidth(qtext_width(n_x=8))
         try:
             self.led_delays.setText(str(fb_get('N')))
         except KeyError:
@@ -182,7 +182,7 @@ class MA(QWidget):
         self.lbl_stages.setObjectName('wdg_lbl_ma_1')
         self.led_stages = QLineEdit(self)
         self.led_stages.setText(str(self.stages))
-        self.led_stages.setMaximumWidth(qtext_width(N_x=8))
+        self.led_stages.setMaximumWidth(qtext_width(n_x=8))
 
         self.led_stages.setObjectName('wdg_led_ma_1')
         self.led_stages.setToolTip("Set number of stages ")

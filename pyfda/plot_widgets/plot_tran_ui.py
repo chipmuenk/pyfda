@@ -195,7 +195,7 @@ class PlotTranUI(QWidget):
         self.prg_wdg = QProgressBar(self)
         self.prg_wdg.setToolTip("Show simulation progress")
         self.prg_wdg.setFixedHeight(but_height)
-        # self.prg_wdg.setFixedWidth(qtext_width(N_x=6))
+        # self.prg_wdg.setFixedWidth(qtext_width(n_x=6))
         self.prg_wdg.setMinimum(0)
         self.prg_wdg.setValue(0)
 
@@ -203,7 +203,7 @@ class PlotTranUI(QWidget):
         self.led_n_start = QLineEdit(self)
         self.led_n_start.setText(str(self.n_start))
         self.led_n_start.setToolTip("<span>First point to plot.</span>")
-        self.led_n_start.setMaximumWidth(qtext_width(N_x=8))
+        self.led_n_start.setMaximumWidth(qtext_width(n_x=8))
 
         self.but_n_auto = PushButtonRT(self, text = "<b><i>N</i> = </b>")
         self.but_n_auto.setCheckable(True)
@@ -217,7 +217,7 @@ class PlotTranUI(QWidget):
         self.led_n_points.setToolTip(
             "<span>Number of data points to plot. "
             "Disable <b><i>N</i> =</b> for manual entry.</span>")
-        self.led_n_points.setMaximumWidth(qtext_width(N_x=8))
+        self.led_n_points.setMaximumWidth(qtext_width(n_x=8))
         # Enable entry field only for manual mode
         self.led_n_points.setEnabled(not self.but_n_auto.isChecked())
 
@@ -229,7 +229,7 @@ class PlotTranUI(QWidget):
             "<span>Frame length; longer frames calculate faster but calculation cannot "
             "be stopped so quickly. "
             "<i>N</i><sub>Frame</sub> = 0 calculates all samples in one frame.</span>")
-        self.led_n_frame.setMaximumWidth(qtext_width(N_x=8))
+        self.led_n_frame.setMaximumWidth(qtext_width(n_x=8))
         self.led_n_frame.setVisible(False)
 
         # This frame is a placeholder that is filled with content in PlotTran()
@@ -395,7 +395,7 @@ class PlotTranUI(QWidget):
         self.lbl_log_bottom_time = QLabel(to_html("min =", frmt='bi'), self)
         self.led_log_bottom_time = QLineEdit(self)
         self.led_log_bottom_time.setText(str(self.bottom_t))
-        self.led_log_bottom_time.setMaximumWidth(qtext_width(N_x=8))
+        self.led_log_bottom_time.setMaximumWidth(qtext_width(n_x=8))
         self.led_log_bottom_time.setToolTip(
             "<span>Minimum display value for time and spectrogram plots with log. scale."
             "</span>")
@@ -520,7 +520,7 @@ class PlotTranUI(QWidget):
 
         self.led_log_bottom_freq = QLineEdit(self)
         self.led_log_bottom_freq.setText(str(self.bottom_f))
-        self.led_log_bottom_freq.setMaximumWidth(qtext_width(N_x=8))
+        self.led_log_bottom_freq.setMaximumWidth(qtext_width(n_x=8))
         self.led_log_bottom_freq.setToolTip(
             "<span>Minimum display value for log. scale.</span>")
         self.led_log_bottom_freq.setVisible(self.but_log_freq.isChecked())

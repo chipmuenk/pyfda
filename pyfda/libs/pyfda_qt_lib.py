@@ -541,10 +541,10 @@ def popup_warning(self, N: int = 0, filter_name: str = "", message: str = "") ->
 
 
 # ----------------------------------------------------------------------------
-def qtext_width(text: str = '', N_x: int = 17, bold: bool = True, font: QFont = None) -> int:
+def qtext_width(text: str = '', n_x: int = 17, bold: bool = True, font: QFont = None) -> int:
     """
     Calculate width of `text` in points`. When `text=``, calculate the width
-    of number `N_x` of characters 'x'.
+    of number `n_x` of characters 'x'.
 
     The actual width of the string is calculated by creating a
     QTextDocument with the passed text and retrieving its `idealWidth()`
@@ -554,8 +554,8 @@ def qtext_width(text: str = '', N_x: int = 17, bold: bool = True, font: QFont = 
     text: str
         string to calculate the width for
 
-    N_x: int
-        When `text == ''`, calculate the width from `N_x * width('x')`
+    n_x: int
+        When `text == ''`, calculate the width from `n_x * width('x')`
 
     bold: bool (default: True)
         When `True`, determine width based on bold font
@@ -577,7 +577,7 @@ def qtext_width(text: str = '', N_x: int = 17, bold: bool = True, font: QFont = 
 
     """
     if text == '':
-        text = "x" * N_x
+        text = "x" * n_x
 
     if font is None:
         font = QFont()

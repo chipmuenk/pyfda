@@ -129,7 +129,7 @@ class PlotPZ(QWidget):
         self.lbl_bottom = QLabel(to_html("Bottom =", frmt='bi'), self)
         self.led_bottom = QLineEdit(self, objectName="led_bottom")
         self.led_bottom.setText(str(self.zmin))
-        self.led_bottom.setMaximumWidth(qtext_width(N_x=8))
+        self.led_bottom.setMaximumWidth(qtext_width(n_x=8))
         self.led_bottom.setToolTip("Minimum display value.")
         self.lbl_bottom_db = QLabel("dB", self)
         self.lbl_bottom_db.setVisible(self.but_log.isChecked())
@@ -138,7 +138,7 @@ class PlotPZ(QWidget):
         self.led_top = QLineEdit(self, objectName="led_top")
         self.led_top.setText(str(self.zmax))
         self.led_top.setToolTip("Maximum display value.")
-        self.led_top.setMaximumWidth(qtext_width(N_x=8))
+        self.led_top.setMaximumWidth(qtext_width(n_x=8))
         self.lbl_top_db = QLabel("dB", self)
         self.lbl_top_db.setVisible(self.but_log.isChecked())
 

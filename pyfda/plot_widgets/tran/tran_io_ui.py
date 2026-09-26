@@ -198,7 +198,7 @@ class TranIOUI(QWidget):
             "when selected.</span>")
         self.lbl_f_s_wav = QLabel(to_html("f_S =", frmt='bi'))
         self.led_f_s_wav = QLineEdit(self)
-        self.led_f_s_wav.setMaximumWidth(qtext_width(N_x=8))
+        self.led_f_s_wav.setMaximumWidth(qtext_width(n_x=8))
         self.led_f_s_wav.setToolTip(
             "<span>Manual f_S for import / export of WAV file (must be integer).</span>")
 
@@ -212,7 +212,7 @@ class TranIOUI(QWidget):
         self.led_scale_to.setToolTip(self.tr("Max. value after normalizing"))
         self.led_scale_to.setText(str(self.led_normalize_default))
         self.led_scale_to.setEnabled(True)
-        self.led_scale_to.setMaximumWidth(qtext_width(N_x=8))
+        self.led_scale_to.setMaximumWidth(qtext_width(n_x=8))
         # self.led_scale_to.setFixedWidth(self.but_scale_to.sizeHint().width())
 
         # ----------- SAVE ------------------------------------------------------------
@@ -244,7 +244,7 @@ class TranIOUI(QWidget):
         self.led_nr_loops.setToolTip(self.tr(
             "<span>Select how many times the signal is looped when saving.</span>"))
         self.led_nr_loops.setText(str(self.led_nr_loops_default))
-        self.led_nr_loops.setMaximumWidth(qtext_width(N_x=8))
+        self.led_nr_loops.setMaximumWidth(qtext_width(n_x=8))
 
         #-------------------------------
         lay_g_io_file = QGridLayout()

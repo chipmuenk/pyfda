@@ -131,7 +131,7 @@ class PlotHf(QWidget):
         self.lbl_log_bottom = QLabel(to_html("min =", 'bi'), self)
         self.led_log_bottom = QLineEdit(self)
         self.led_log_bottom.setText(str(self.log_bottom))
-        self.led_log_bottom.setMaximumWidth(qtext_width(N_x=8))
+        self.led_log_bottom.setMaximumWidth(qtext_width(n_x=8))
         self.led_log_bottom.setToolTip(
             "<span>Minimum display value for dB. scale.</span>")
         self.lbl_log_unit = QLabel("dB", self)

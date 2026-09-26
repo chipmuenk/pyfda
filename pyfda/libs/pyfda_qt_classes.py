@@ -283,17 +283,17 @@ class PushButtonRT(QPushButton):
         self.pad = pad
         if text is not None:
             self.lbl_rtf.setText(text)
-        self.layH_main = QHBoxLayout()
-        self.layH_main.setContentsMargins(pad, 0, pad, 0)  # L, T, R, B
-        self.layH_main.setSpacing(0)
-        self.setLayout(self.layH_main)
+        self.lay_h_main = QHBoxLayout()
+        self.lay_h_main.setContentsMargins(pad, 0, pad, 0)  # L, T, R, B
+        self.lay_h_main.setSpacing(0)
+        self.setLayout(self.lay_h_main)
         # Make QLabel transparent except for painted pixels
         self.lbl_rtf.setAttribute(Qt.WA_TranslucentBackground)
         # Disable the delivery of mouse events to the QLabel widget and its children,
         self.lbl_rtf.setAttribute(Qt.WA_TransparentForMouseEvents)
         self.lbl_rtf.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
         self.lbl_rtf.setTextFormat(Qt.RichText)
-        self.layH_main.addWidget(self.lbl_rtf, Qt.AlignHCenter)
+        self.lay_h_main.addWidget(self.lbl_rtf, Qt.AlignHCenter)
 
         self.setCheckable(checkable)
         self._checkable = checkable

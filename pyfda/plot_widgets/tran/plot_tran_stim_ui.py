@@ -450,7 +450,7 @@ class PlotTranStimUI(QWidget):
         self.led_noi.setToolTip("not initialized")
         self.lbl_noi_par_2 = QLabel("not initialized", self)
         self.led_noi_par = QLineEdit(self, objectName="stim_noi_par")
-        self.led_noi_par.setMaximumWidth(qtext_width(N_x=4))
+        self.led_noi_par.setMaximumWidth(qtext_width(n_x=4))
         lay_h_noi_params = QHBoxLayout()
         lay_h_noi_params.addWidget(self.led_noi)
         lay_h_noi_params.addWidget(self.lbl_noi_par_2)
