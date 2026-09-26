@@ -123,8 +123,8 @@ jobs:
 
     - name: Update Github prerelease latest
       if: success() && github.ref_type != 'tag'
-      # uses: pyTooling/Actions/.github/workflows/PrepareJob.yml@r8
-      uses: pyTooling/Actions/releaser@main
+      uses: pyTooling/Actions/.github/workflows/PrepareJob.yml@r8
+      # uses: pyTooling/Actions/releaser@main deprecated
       with:
         tag: latest
         rm: true
@@ -136,8 +136,8 @@ jobs:
 
     - name: Update versioned release
       if: success() && github.ref_type == 'tag'
-      # uses: pyTooling/Actions/.github/workflows/PrepareJob.yml@r8
-      uses: pyTooling/Actions/releaser@main
+      uses: pyTooling/Actions/.github/workflows/PrepareJob.yml@r8
+      # uses: pyTooling/Actions/releaser@main deprecated
       with:
         tag: ${{ github.ref_name }}
         rm: false

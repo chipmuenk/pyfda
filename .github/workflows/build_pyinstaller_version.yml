@@ -37,10 +37,10 @@ jobs:
     #     echo "${{ github.sha }}" > tag_name.txt
     #     echo "Release latest" > release_name.txt
   
-      # TODO: Use https://github.com/softprops/action-gh-release instead of create_release
     - name: Create Release
       id: create_release
-      uses: actions/create-release@v1
+      uses: softprops/action-gh-release@v3
+      # uses: actions/upload-release-asset@v1 deprecated
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
@@ -51,7 +51,7 @@ jobs:
     - name: Output Release URL File
       run: echo "${{ steps.create_release.outputs.upload_url }}" > release_url.txt
     - name: Save Release URL File for publish
-      uses: actions/upload-artifact@v1
+      uses: actions/upload-artifact@v4
       with:
         name: release_url
         path: release_url.txt
