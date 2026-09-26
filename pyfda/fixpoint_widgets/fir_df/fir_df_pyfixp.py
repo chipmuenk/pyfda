@@ -47,8 +47,8 @@ class FIR_DF_pyfixp():
 
         # create various quantizers and initialize / reset them
         self.Q_b = fx.Fixed(self.p['QCB'])  # transversal coeffs
-        self.Q_mul = fx.Fixed(self.p['QACC'].copy())  # partial products
-        self.Q_acc = fx.Fixed(self.p['QACC'])  # accumulator
+        self.q_mul = fx.Fixed(self.p['QACC'].copy())  # partial products
+        self.q_acc = fx.Fixed(self.p['QACC'])  # accumulator
         self.Q_O = fx.Fixed(self.p['QO'])  # output
 
         self.init(p)
@@ -87,8 +87,8 @@ class FIR_DF_pyfixp():
 
         # update the quantizers
         self.Q_b.set_qdict(self.p['QCB'])  # transversal coeffs.s
-        self.Q_mul.set_qdict(q_mul)  # partial products
-        self.Q_acc.set_qdict(self.p['QACC'])  # accumulator
+        self.q_mul.set_qdict(q_mul)  # partial products
+        self.q_acc.set_qdict(self.p['QACC'])  # accumulator
         self.Q_O.set_qdict(self.p['QO'])  # output
 
         # Quantize coefficients and store them in local attributes
@@ -115,8 +115,8 @@ class FIR_DF_pyfixp():
         Reset register and overflow counters of quantizers
         (but don't reset coefficient quantizers)
         """
-        self.Q_mul.reset_n()
-        self.Q_acc.reset_n()
+        self.q_mul.reset_n()
+        self.q_acc.reset_n()
         self.Q_O.reset_n()
         self.zi = np.zeros(self.L - 1)
 
@@ -168,24 +168,24 @@ class FIR_DF_pyfixp():
         self.zi = np.concatenate((self.zi, x))
 
         for k in range(len(x)):
-            # partial products xb_q at time k, quantized with Q_mul:
-            xb_q = self.Q_mul.fixp(self.zi[k:k + self.L] * self.b_q,
+            # partial products xb_q at time k, quantized with q_mul:
+            xb_q = self.q_mul.fixp(self.zi[k:k + self.L] * self.b_q,
                                    in_frmt=fb_get('qfrmt'), out_frmt=fb_get('qfrmt'))
             # accumulate x_bq to get accu[k]
-            y_q[k] = self.Q_acc.fixp(np.sum(xb_q), in_frmt=fb_get('qfrmt'),
+            y_q[k] = self.q_acc.fixp(np.sum(xb_q), in_frmt=fb_get('qfrmt'),
                                      out_frmt=fb_get('qfrmt'))
 
         self.zi = self.zi[-(self.L-1):]  # store last L-1 inputs (i.e. the L-1 registers)
 
-        # Overflows in Q_mul are added to overflows in Q_Acc, then Q_mul is reset
-        if self.Q_acc.q_dict['N_over'] > 0 or self.Q_mul.q_dict['N_over'] > 0:
+        # Overflows in q_mul are added to overflows in q_acc, then q_mul is reset
+        if self.q_acc.q_dict['N_over'] > 0 or self.q_mul.q_dict['N_over'] > 0:
             logger.warning("Overflows: N_Acc = %d, N_Mul = %d",
-                           self.Q_acc.q_dict['N_over'], self.Q_mul.q_dict['N_over'])
+                           self.q_acc.q_dict['N_over'], self.q_mul.q_dict['N_over'])
 
-        self.Q_acc.q_dict['N_over'] = self.Q_acc.q_dict['N_over'] + self.Q_mul.q_dict['N_over']
-        self.Q_mul.reset_n()
+        self.q_acc.q_dict['N_over'] = self.q_acc.q_dict['N_over'] + self.q_mul.q_dict['N_over']
+        self.q_mul.reset_n()
 
-        return self.Q_O.requant(y_q[:len(x)], self.Q_acc), self.zi
+        return self.Q_O.requant(y_q[:len(x)], self.q_acc), self.zi
 
 
 # ------------------------------------------------------------------------------
@@ -211,8 +211,8 @@ if __name__ == '__main__':
         #    print(f"N_over(Q_I) = {dut.Q_I.N_over}")
         if dut.Q_O.N_over != 0:
             print(f"N_over(Q_O) = {dut.Q_O.N_over}")
-        if dut.Q_mul.N_over != 0:
-            print(f"N_over(Q_mul) = {dut.Q_mul.N_over}")
+        if dut.q_mul.N_over != 0:
+            print(f"N_over(q_mul) = {dut.q_mul.N_over}")
         print(y)
         print("... followed by x = np.zeros(5):")
         y = dut.fxfilter(x=np.zeros(5))

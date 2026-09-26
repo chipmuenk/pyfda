@@ -61,8 +61,8 @@ class FIR_DF_amaranth():
         }
         self.p = p  # parameter dictionary with coefficients etc.
         self.Q_b = fx.Fixed(self.p['QCB'])  # transversal coeffs
-        # self.Q_mul = fx.Fixed(self.p['QACC'].copy())  # partial products
-        # self.Q_acc = fx.Fixed(self.p['QACC'])  # accumulator
+        # self.q_mul = fx.Fixed(self.p['QACC'].copy())  # partial products
+        # self.q_acc = fx.Fixed(self.p['QACC'])  # accumulator
         self.Q_O = fx.Fixed(self.p['QO'])  # output
         self.init(p)
         logger.info("Instantiated fx filter '%s'", self.__class__.__name__)
@@ -103,7 +103,7 @@ class FIR_DF_amaranth():
         # Unpack p and coeff. dict in new dict without modifying p
         d = {**p, **{'ba': b_q}}  # unpack p and coeff. dict in new dict without
         # d = p | {'ba': b_q}  # python 3.9+ only
-        self.mod = mod.FIR_DF_amaranth_mod(d)
+        self.mod = mod.FIRDFAmaranthMod(d)
 
         # Initialize filter memory with passed values zi and fill up with zeros
         # or truncate to filter length
@@ -232,7 +232,7 @@ class FIR_DF_amaranth():
 if __name__ == '__main__':
     # Run widget standalone with
     # `python -m pyfda.fixpoint_widgets.fir_df.fir_df_amaranth`
-    # `python -m pyfda.fixpoint_widgets.fir_df.fir_df_amaranth.FIR_DF_amaranth_mod`
+    # `python -m pyfda.fixpoint_widgets.fir_df.fir_df_amaranth.FIRDFAmaranthMod`
 
     fb_set('qfrmt', 'qint')  # set fixpoint mode
 

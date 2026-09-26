@@ -50,8 +50,8 @@ class IIR_DF1_pyfixp(object):
         self.Q_b = fx.Fixed(self.p['QCB'])  # transversal coeffs.
         self.q_mul_a = fx.Fixed(self.p['QACC'].copy())  # partial products a y
         self.q_mul_b = fx.Fixed(self.p['QACC'].copy())  # partial products b x
-        self.Q_mul = fx.Fixed(self.p['QACC'].copy())  # partial products
-        self.Q_acc = fx.Fixed(self.p['QACC'])  # accumulator
+        self.q_mul = fx.Fixed(self.p['QACC'].copy())  # partial products
+        self.q_acc = fx.Fixed(self.p['QACC'])  # accumulator
         self.Q_O = fx.Fixed(self.p['QO'])  # output
 
         self.init(p)
@@ -97,7 +97,7 @@ class IIR_DF1_pyfixp(object):
         # update the quantizers
         self.Q_a.set_qdict(self.p['QCA'])  # recursive coeffs (a)
         self.Q_b.set_qdict(self.p['QCB'])  # transversal b coeffs (b)
-        self.Q_acc.set_qdict(self.p['QACC'])  # accumulator
+        self.q_acc.set_qdict(self.p['QACC'])  # accumulator
         self.Q_O.set_qdict(self.p['QO'])  # output
 
         # Quantizer dict for partial products yq * aq
@@ -157,7 +157,7 @@ class IIR_DF1_pyfixp(object):
         """
         self.q_mul_a.reset_n()
         self.q_mul_b.reset_n()
-        self.Q_acc.reset_n()
+        self.q_acc.reset_n()
         self.Q_O.reset_n()
         self.zi_a = np.zeros(self.L - 1)
         self.zi_b = np.zeros(self.L - 1)
@@ -259,24 +259,24 @@ class IIR_DF1_pyfixp(object):
 
             # - shift right recursive state (output) register
             # - accumulate partial products `xb_q` and `ya_q`, requantize the results
-            #   to accumulator word formats `Q_acc` and calculate the difference
+            #   to accumulator word formats `q_acc` and calculate the difference
             # - requantize the result to output word format `Q_O`
             # - insert last accumulator value quantized to output format into recursive
             #   (output) state register
             self.zi_a[1:] = self.zi_a[:-1]
             y_q[k] = self.Q_O.requant(
-                (self.Q_acc.requant(np.sum(xb_q), self.q_mul_b)
-                - self.Q_acc.requant(np.sum(ya_q), self.q_mul_a)),
-                                self.Q_acc)
+                (self.q_acc.requant(np.sum(xb_q), self.q_mul_b)
+                - self.q_acc.requant(np.sum(ya_q), self.q_mul_a)),
+                                self.q_acc)
             self.zi_a[0] = y_q[k]
 
         self.zi_b = self.zi_b[-(self.L-1):]  # store last L-1 inputs (i.e. the L-1 registers)
 
-        # Overflows in Q_mul are added to overflows in Q_Acc, then Q_mul is reset
-        if self.Q_acc.N_over > 0 or self.q_mul_a.N_over > 0 or self.q_mul_b.N_over > 0:
+        # Overflows in q_mul are added to overflows in q_acc, then q_mul is reset
+        if self.q_acc.N_over > 0 or self.q_mul_a.N_over > 0 or self.q_mul_b.N_over > 0:
             logger.warning("Overflows: N_Acc = %d, N_Mul_a = %d, N_Mul_b = %d.",
-                           self.Q_acc.N_over, self.q_mul_a.N_over, self.q_mul_b.N_over)
-        self.Q_acc.N_over += self.q_mul_a.N_over + self.q_mul_b.N_over
+                           self.q_acc.N_over, self.q_mul_a.N_over, self.q_mul_b.N_over)
+        self.q_acc.N_over += self.q_mul_a.N_over + self.q_mul_b.N_over
         self.q_mul_a.reset_n()
         self.q_mul_b.reset_n()
 
@@ -309,8 +309,8 @@ if __name__ == '__main__':
         #    print(f"N_over(Q_I) = {dut.Q_I.N_over}")
         if dut.Q_O.N_over != 0:
             print(f"N_over(Q_O) = {dut.Q_O.N_over}")
-        if dut.Q_mul.N_over != 0:
-            print(f"N_over(Q_mul) = {dut.Q_mul.N_over}")
+        if dut.q_mul.N_over != 0:
+            print(f"N_over(q_mul) = {dut.q_mul.N_over}")
         print(y)
         print("... followed by x = np.zeros(5):")
         y = dut.fxfilter(x=np.zeros(5))

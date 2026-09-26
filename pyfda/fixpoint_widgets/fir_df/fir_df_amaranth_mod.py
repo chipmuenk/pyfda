@@ -26,9 +26,9 @@ from pyfda.libs.pyfda_fix_lib_amaranth import requant
 
 logger = logging.getLogger(__name__)
 
-class FIR_DF_amaranth_mod(Elaboratable):
+class FIRDFAmaranthMod(Elaboratable):
     """
-    A synthesizable nMigen FIR filter in Direct Form.
+    A synthesizable Amaranth FIR filter in Direct Form.
 
     Construct fixed point object with parameter dict `p`
 
@@ -81,19 +81,19 @@ class FIR_DF_amaranth_mod(Elaboratable):
         self.b_q = p['ba']
         # logger.warning(f"b_q = {self.b_q}")
         self.L = len(self.b_q)  # filter length = number of coefficients / taps
-        DW = int(np.ceil(np.log2(self.L)))  # word growth
+        delta_w = int(np.ceil(np.log2(self.L)))  # word growth
 
         # Accumulator settings
-        # self.Q_acc = fx.Fixed(p['QACC'])  # accumulator
-        self.W_acc = self.p['QACC']['WI'] + self.p['QACC']['WF'] + 1  # total accu word length
+        # self.q_acc = fx.Fixed(p['QACC'])  # accumulator
+        self.w_acc = self.p['QACC']['WI'] + self.p['QACC']['WF'] + 1  # total accu word length
 
         # Partial products: use accumulator settings and update word length
         # to sum of coefficient and input word lengths
-        self.Q_mul = fx.Fixed(p['QACC'].copy())  # partial products
-        self.Q_mul.set_qdict({'WI': self.p['QI']['WI'] + self.p['QCB']['WI'] + DW,
+        self.q_mul = fx.Fixed(p['QACC'].copy())  # partial products
+        self.q_mul.set_qdict({'WI': self.p['QI']['WI'] + self.p['QCB']['WI'] + delta_w,
              'WF': self.p['QI']['WF'] + self.p['QCB']['WF']})
-        self.W_mul = self.Q_mul.q_dict['WI'] + self.Q_mul.q_dict['WF'] + 1
-        # self.W_mul = 1 + DW + self.p['QI']['WI'] + self.p['QCB']['WI']\
+        self.w_mul = self.q_mul.q_dict['WI'] + self.q_mul.q_dict['WF'] + 1
+        # self.w_mul = 1 + delta_w + self.p['QI']['WI'] + self.p['QCB']['WI']\
         #    + self.p['QI']['WF'] + self.p['QCB']['WF']
 
         # Input and output signal are quantized in FIR_DF_Amaranth()
@@ -125,8 +125,8 @@ class FIR_DF_amaranth_mod(Elaboratable):
         Reset register and overflow counters of quantizers
         (but don't reset coefficient quantizers)
         """
-        self.Q_mul.reset_n()
-        # self.Q_acc.reset_n()
+        self.q_mul.reset_n()
+        # self.q_acc.reset_n()
         # self.Q_O.reset_n()
         self.zi = np.zeros(self.L - 1)
 
@@ -150,13 +150,13 @@ class FIR_DF_amaranth_mod(Elaboratable):
             muls[i] = int(b_q) * sreg
             i += 1
 
-        sum_full = Signal(signed(self.W_mul))  # sum of all multiplication products with
+        sum_full = Signal(signed(self.w_mul))  # sum of all multiplication products with
         m.d.sync += sum_full.eq(reduce(add, muls))  # full product wordlength
 
         # requantize from full partial product wordlength to accumulator format
-        sum_accu = Signal(signed(self.W_acc))
-        m.d.comb += sum_accu.eq(requant(m, sum_full, self.Q_mul.q_dict, self.p['QACC'])[0])
-        # m.d.comb += self.ovfl_acc_o.eq(requant(m, sum_full, self.Q_mul.q_dict, self.p['QACC'])[1])
+        sum_accu = Signal(signed(self.w_acc))
+        m.d.comb += sum_accu.eq(requant(m, sum_full, self.q_mul.q_dict, self.p['QACC'])[0])
+        # m.d.comb += self.ovfl_acc_o.eq(requant(m, sum_full, self.q_mul.q_dict, self.p['QACC'])[1])
 
         # requantize from accumulator format to output width
         m.d.comb += self.o.eq(requant(m, sum_accu, self.p['QACC'], self.p['QO'])[0])
@@ -188,7 +188,7 @@ if __name__ == '__main__':
     Q_I = fx.Fixed(p['QI'])
     Q_O = fx.Fixed(p['QO'])
 
-    dut = FIR_DF_amaranth_mod(p)
+    dut = FIRDFAmaranthMod(p)
 
     def process():
         # input = stimulus
