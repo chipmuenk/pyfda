@@ -59,6 +59,7 @@ class InputPZUI(QWidget):
         self.load_save_clipboard = False  # load / save to clipboard or file
 
         self._construct_ui()
+        self._construct_ui_cells()
         self._construct_layout()
 
     # -------------------------------------------------------------------------
@@ -135,9 +136,11 @@ class InputPZUI(QWidget):
         self.led_h_max.setText(str(1.))
         self.led_h_max.setEnabled(self.chk_h_max.isChecked())
 
-        # ---------------------------------------------
-        # UI Elements for loading / storing / manipulating cells and rows
-        # ---------------------------------------------
+    # ------------------------------------------------------------------------------
+    def _construct_ui_cells(self) -> None:
+        """
+        UI Elements for loading / storing / manipulating cells and rows
+        """
         self.but_format = PushButton(self, icon=QIcon(':/star.svg'), checked=False)
         self.but_format.setToolTip(
             "<span><b>Formatted Data</b><br><br>"
@@ -222,7 +225,7 @@ class InputPZUI(QWidget):
             "When nothing is selected, test the whole table.</span>")
         self.but_set_zero.setIconSize(q_icon_size)
 
-        self.lbl_eps = QLabel(self)
+        self.lbl_eps = QLabel(self)    # ---------------------------------------------
         self.lbl_eps.setText("<b><i>for &epsilon;</i> &lt;</b>")
 
         self.led_eps = QLineEdit(self)
