@@ -328,7 +328,7 @@ class InputInfo(QWidget):
         specs are violated, colour the table entry in red.
         """
 
-        def _find_min_max(f_start, f_stop, unit='dB'):
+        def _find_min_max(f_start, f_stop, bb, aa, unit='dB'):
             """
             Find minimum and maximum magnitude and the corresponding frequencies
             for the filter defined in the filter dict in a given frequency band
@@ -393,9 +393,9 @@ class InputInfo(QWidget):
                 err = [False] * len(f_lbls)  # initialize error list
                 f_vals = []
                 a_targs = []
-                for i in range(len(f_lbls)):
+                for i, f_lbl in enumerate(f_lbls):
                     try:
-                        f = fb_get(f_lbls[i])
+                        f = fb_get(f_lbl)
                         f_vals.append(f)
                     except KeyError as e:
                         f_vals.append('')
@@ -403,7 +403,7 @@ class InputInfo(QWidget):
                         logger.debug(e)
                     try:
                         a = fb_get(a_lbls[i])
-                        a_db = lin2unit(fb_get(a_lbls[i]), ft, a_lbls[i], unit)
+                        a_db = lin2unit(a, ft, a_lbls[i], unit)
                         a_targs.append(a)
                         a_targs_db.append(a_db)
                     except KeyError as e:
@@ -427,9 +427,9 @@ class InputInfo(QWidget):
                 # Calculate frequency response at test frequencies
                 [_, a_test] = sig.freqz(bb, aa, 2.0 * pi * f_vals.astype(float))
 
-            (f_min, h_min, f_max, h_max) = _find_min_max(0, 1, unit='V')
-            # append frequencies and values for min. and max. filter reponse to
-            # test vector
+            (f_min, h_min, f_max, h_max) = _find_min_max(0, 1, bb, aa, unit='V')
+            # append frequencies and values for min. and max. filter reponse derived
+            # from coeefficients bb, aa to test vector
 
             f_lbls += ['Min.', 'Max.']
             # QTableView does not support direct formatting, use QLabel
@@ -449,11 +449,11 @@ class InputInfo(QWidget):
             # build a list with the corresponding target specs:
             a_targs_pass = []
             eps = 1e-3
-            for i in range(len(f_lbls)):
-                if 'pb' in f_lbls[i]:
+            for i, f_lbl in enumerate(f_lbls):
+                if 'pb' in f_lbl:
                     a_targs_pass.append((a_test_db[i] - a_targs_db[i]) < eps)
                     a_test[i] = 1 - abs(a_test[i])
-                elif 'sb' in f_lbls[i]:
+                elif 'sb' in f_lbl:
                     a_targs_pass.append(a_test_db[i] >= a_targs_db[i])
                 else:
                     a_targs_pass.append(True)
@@ -476,7 +476,7 @@ class InputInfo(QWidget):
                 f"f/{fb_get('freq_specs_unit')}", 'Spec\n(dB)',
                 '|H(f)|\n(dB)', 'Spec', '|H(f)|'])
             self.tbl_filt_perf.setVerticalHeaderLabels(f_lbls)
-            for row in range(len(a_test)):
+            for row, test_value in enumerate(a_test):
                 self.tbl_filt_perf.setItem(
                     row, 0, QTableWidgetItem(str(f'{(f_vals[row]*f_s):.4g}')))
                 self.tbl_filt_perf.setItem(
@@ -489,12 +489,12 @@ class InputInfo(QWidget):
                 else:
                     self.tbl_filt_perf.setItem(
                         row, 3, QTableWidgetItem(str(f'{a_targs[row]:2.4f}')))
-                if a_test[row] < 0.01:
+                if test_value < 0.01:
                     self.tbl_filt_perf.setItem(
-                        row, 4, QTableWidgetItem(str(f'{abs(a_test[row]):.3e}')))
+                        row, 4, QTableWidgetItem(str(f'{abs(test_value):.3e}')))
                 else:
                     self.tbl_filt_perf.setItem(
-                        row, 4, QTableWidgetItem(str(f'{abs(a_test[row]):.4f}')))
+                        row, 4, QTableWidgetItem(str(f'{abs(test_value):.4f}')))
 
                 if not a_targs_pass[row]:
                     self.tbl_filt_perf.item(row, 1).setBackground(QtGui.QColor('red'))
