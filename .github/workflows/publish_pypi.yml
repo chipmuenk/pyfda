@@ -69,7 +69,7 @@ jobs:
 
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           # fetch-depth: 0         # fetch complete history for all branches
           ref: main
@@ -78,9 +78,9 @@ jobs:
       # adds it to the PATH
       # Optionally: caches dependencies for pip, pipenv and poetry
       # Registers problem matchers for error output (?)
-      - uses: actions/setup-python@v4
+      - uses: actions/setup-python@v6
         with:
-          python-version: '3.10'
+          python-version: '3.12'
 
       # Install build package and build the pip packages
       - run: |

@@ -23,15 +23,15 @@ jobs:
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v6
 
       # Sets up python3, installing a version of Python or PyPy and (by default) 
       # adds it to the PATH
       # Optionally: caches dependencies for pip, pipenv and poetry
       # Registers problem matchers for error output (?)
-      - uses: actions/setup-python@v4
+      - uses: actions/setup-python@v6
         with:
-          python-version: '3.10'
+          python-version: '3.12'
 
       - name: "Install and upgrade pip, other dependencies and the package from setup.py"
         run: |
