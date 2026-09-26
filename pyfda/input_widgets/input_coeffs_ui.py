@@ -29,7 +29,7 @@ from pyfda.pyfda_rc import params
 logger = logging.getLogger(__name__)
 
 
-class Input_Coeffs_UI(QWidget):
+class InputCoeffsUI(QWidget):
     """
     Create the UI for the Input_Coeffs() class
     """
@@ -383,7 +383,7 @@ if __name__ == '__main__':
 
     app = QApplication(sys.argv)
     app.setStyleSheet(QSS.QSS_RC)
-    mainw = Input_Coeffs_UI()
+    mainw = InputCoeffsUI()
 
     app.setActiveWindow(mainw)
     mainw.show()

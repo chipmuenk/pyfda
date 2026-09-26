@@ -30,7 +30,7 @@ from pyfda.libs.pyfda_sig_lib import zeros_with_val, fil_save
 from pyfda.pyfda_rc import params
 
 from pyfda.input_widgets.item_delegate_coeffs import ItemDelegateCoeffs
-from pyfda.input_widgets.input_coeffs_ui import Input_Coeffs_UI
+from pyfda.input_widgets.input_coeffs_ui import InputCoeffsUI
 
 logger = logging.getLogger(__name__)
 
@@ -76,7 +76,7 @@ class Input_Coeffs(QWidget):
         self.data_changed = True  # initialize flag: filter data has been changed
         self.fx_specs_changed = True  # fixpoint specs have been changed outside
 
-        self.ui = Input_Coeffs_UI()  # create the UI part with buttons etc.
+        self.ui = InputCoeffsUI()  # create the UI part with buttons etc.
 
         # handles to quantization objects (`fx.Fixed()` instances) of coefficient widgets
         self.Q = [self.ui.wdg_wq_coeffs_b.Q,

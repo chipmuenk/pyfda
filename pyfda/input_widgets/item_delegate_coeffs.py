@@ -16,7 +16,7 @@ where the numerator b is the first and the denominator a the second column.
 A local copy is created as `self.parent.ba` of `Input_Coeffs()`where edits are
 stored via `setModelData()`. Changes are only passed back to the original
 `<fil_dict>['ba']` list by `self.parent._save_dict()` when the user presses
-the `Apply` button in the `Input_Coeffs_UI()`.
+the `Apply` button in the `InputCoeffsUI()`.
 
 Coefficients are displayed and stored in a QTableWidget as string objects
 number of rows. The first column contains the numerator b coefficients, the
