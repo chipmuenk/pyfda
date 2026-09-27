@@ -11,7 +11,7 @@ import logging
 from pyfda.libs.pyfda_qt_lib import qget_cmb_box, qset_cmb_box
 from pyfda.libs.compat import (Qt, QPoint, QApplication, QTableWidgetItem)
 from PyQt5.QtTest import QTest, QSignalSpy
-from pyfda.input_widgets.input_coeffs import Input_Coeffs
+from pyfda.input_widgets.input_coeffs import InputCoeffs
 
 app = QApplication(sys.argv)
 
@@ -21,7 +21,7 @@ class FilterCoeffsTest(unittest.TestCase):
 
     def init(self):
         '''Create the GUI'''
-        self.form = Input_Coeffs()
+        self.form = InputCoeffs()
         self.form.show()
         self.ui = self.form.ui
         self.log = logging.getLogger("LOG")

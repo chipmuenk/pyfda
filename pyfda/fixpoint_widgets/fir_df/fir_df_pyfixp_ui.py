@@ -208,7 +208,7 @@ class FirDfPyfixpUI(QWidget):
         been changed.
 
         This is called from one level above by
-        :class:`pyfda.input_widgets.input_fixpoint_specs.Input_Fixpoint_Specs`.
+        :class:`pyfda.input_widgets.input_fixpoint_specs.InputFixpointSpecs`.
         """
         self.wdg_wq_coeffs.dict2ui(fb_get('fxq', 'QCB'))  # update coefficient wordlength
         self.update_accu_settings()   # update accumulator q settings and UI
@@ -220,7 +220,7 @@ class FirDfPyfixpUI(QWidget):
         (except for coefficient quantizers).
 
         This is usually called from one level above by
-        :class:`pyfda.input_widgets.input_fixpoint_specs.Input_Fixpoint_Specs`.
+        :class:`pyfda.input_widgets.input_fixpoint_specs.InputFixpointSpecs`.
         """
         self.wdg_wq_coeffs.update_ovfl_cnt()
         self.wdg_wq_accu.update_ovfl_cnt()

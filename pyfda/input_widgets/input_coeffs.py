@@ -45,9 +45,9 @@ logger = logging.getLogger(__name__)
 #       http://www.ue.eti.pg.gda.pl/~wrona/lab_dsp/cw05/matlab/Help1.pdf
 #       https://stackoverflow.com/questions/68206713/scipy-filter-force-minimal-value-of-sos-coefficient-to-prepare-integer-filter
 
-classes = {'Input_Coeffs': 'b,a'}  #: Dict containing class name : display name
+classes = {'InputCoeffs': 'b,a'}  #: Dict containing class name : display name
 
-class Input_Coeffs(QWidget):
+class InputCoeffs(QWidget):
     """
     Widget with a (sort of) model-view architecture for viewing / editing /
     entering data contained in `self.ba` which is a list of two numpy arrays:
@@ -835,7 +835,7 @@ if __name__ == '__main__':
 
     app = QApplication(sys.argv)
     app.setStyleSheet(QSS.QSS_RC)
-    mainw = Input_Coeffs()
+    mainw = InputCoeffs()
     app.setActiveWindow(mainw)
     mainw.show()
     sys.exit(app.exec_())

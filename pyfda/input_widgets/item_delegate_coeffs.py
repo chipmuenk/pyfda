@@ -8,12 +8,12 @@
 
 """
 This class controls the view of QTableWidget items in a Model-View-Delegate
-architecture of the `Input_Coeffs()` widget. Coefficients of a digital filter
+architecture of the `InputCoeffs()` widget. Coefficients of a digital filter
 can be viewed and edited in various fixpoint and float formats.
 
 Globally, coefficients are stored in the 2D numpy array `<fil_dict>['ba']`
 where the numerator b is the first and the denominator a the second column.
-A local copy is created as `self.parent.ba` of `Input_Coeffs()`where edits are
+A local copy is created as `self.parent.ba` of `InputCoeffs()`where edits are
 stored via `setModelData()`. Changes are only passed back to the original
 `<fil_dict>['ba']` list by `self.parent._save_dict()` when the user presses
 the `Apply` button in the `InputCoeffsUI()`.
@@ -30,7 +30,7 @@ user-defined number base and number of bits.
 The quantizer is an instance of the `fx.Fixed()` class, it is used to
 convert the coefficients to fixed-point format and to display the coefficients
 in the selected format (int, hex, ...). The quantizer is created in the
-`Input_Coeffs` class and passed to this class via the `parent` parameter as
+`InputCoeffs` class and passed to this class via the `parent` parameter as
 `self.Q = [self.parent.ui.wdg_wq_coeffs_b.Q, self.parent.ui.wdg_wq_coeffs_a.Q]`
 """
 from __future__ import annotations
@@ -66,12 +66,12 @@ class ItemDelegateCoeffs(QStyledItemDelegate):
     Editing the table triggers `setModelData()` but does not emit a signal outside
     this class, only the `ui.but_apply` and `ui.but_undo` buttons are highlighted.
     When it is pressed, a signal with `'data_changed':'input_coeffs'` is produced in
-    class `Input_Coeffs`. Additionally, a signal is emitted with `'fx_sim': 'specs_changed'`
+    class `InputCoeffs`. Additionally, a signal is emitted with `'fx_sim': 'specs_changed'`
     """
 
     def __init__(self, parent: Any) -> None:
         """
-        Pass instance `parent` of parent class (Input_Coeffs)
+        Pass instance `parent` of parent class (InputCoeffs)
         """
         super().__init__()
         self.parent = parent  # instance of the parent (not the base) class

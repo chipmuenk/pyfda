@@ -42,9 +42,9 @@ logger = logging.getLogger(__name__)
 
 # ------------------------------------------------------------------------------
 
-classes = {'Input_Fixpoint_Specs': 'Fixpoint'}  #: Dict with class name : display name
+classes = {'InputFixpointSpecs': 'Fixpoint'}  #: Dict with class name : display name
 
-class Input_Fixpoint_Specs(QWidget):
+class InputFixpointSpecs(QWidget):
     """
     Create the widget that holds the dynamically loaded fixpoint filter UI
     """
@@ -551,7 +551,7 @@ class Input_Fixpoint_Specs(QWidget):
 #             self.sig_resize.emit()
 
 #         # Call base class method to continue normal event processing:
-#         return super(Input_Fixpoint_Specs, self).eventFilter(source, event)
+#         return super(InputFixpointSpecs, self).eventFilter(source, event)
 
     # --------------------------------------------------------------------------
     def embed_fixp_img(self, img_file: str) -> QPixmap:
@@ -895,7 +895,7 @@ if __name__ == '__main__':
     fb_set('ft', 'IIR')
     fb_set('fc', 'Ellip')
     FilterTreeBuilder().build_fil_tree()
-    mainw = Input_Fixpoint_Specs()
+    mainw = InputFixpointSpecs()
     app.setActiveWindow(mainw)
     mainw.show()
     sys.exit(app.exec_())

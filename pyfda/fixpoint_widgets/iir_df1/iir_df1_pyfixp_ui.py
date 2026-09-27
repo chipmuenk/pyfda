@@ -315,7 +315,7 @@ class IIR_DF1_pyfixp_UI(QWidget):
         the filter has been changed.
 
         This is called from one level above by
-        :class:`pyfda.input_widgets.input_fixpoint_specs.Input_Fixpoint_Specs`.
+        :class:`pyfda.input_widgets.input_fixpoint_specs.InputFixpointSpecs`.
         """
 
         self.wdg_wq_coeffs_b.dict2ui(fb_get('fxq', 'QCB'))  # update coefficient quantization
@@ -329,7 +329,7 @@ class IIR_DF1_pyfixp_UI(QWidget):
         Update the overflow counters of the UI after simulation has finished.
 
         This is usually called from one level above by
-        :class:`pyfda.input_widgets.input_fixpoint_specs.Input_Fixpoint_Specs`.
+        :class:`pyfda.input_widgets.input_fixpoint_specs.InputFixpointSpecs`.
         """
         self.wdg_wq_coeffs_b.update_ovfl_cnt()
         self.wdg_wq_coeffs_a.update_ovfl_cnt()

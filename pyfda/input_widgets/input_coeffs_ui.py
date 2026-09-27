@@ -31,7 +31,7 @@ logger = logging.getLogger(__name__)
 
 class InputCoeffsUI(QWidget):
     """
-    Create the UI for the Input_Coeffs() class
+    Create the UI for the InputCoeffs() class
     """
     sig_rx = pyqtSignal(dict)  # incoming
     sig_tx = pyqtSignal(dict)  # outgoing
