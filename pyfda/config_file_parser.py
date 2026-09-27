@@ -86,7 +86,6 @@ class ConfigFileParser():
         'InputCoeffs': {'name': 'b,a', 'mod': 'pyfda.input_widgets.input_coeffs'},
         'InputPZ': {'name': 'P/Z', 'mod': 'pyfda.input_widgets.input_pz'},
         'InputInfo': {'name': 'Info', 'mod': 'pyfda.input_widgets.input_info'},
-        'Input_Files': {'name': 'Files', 'mod': 'pyfda.input_widgets.input_files'},
         'InputFixpointSpecs': {'name': 'Fixpoint',
                                 'mod': 'pyfda.input_widgets.input_fixpoint_specs'}
         }

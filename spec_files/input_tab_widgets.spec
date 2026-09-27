@@ -11,7 +11,7 @@ hiddenimports = collect_submodules('scipy.signal')
 hiddenimports += [
     'pyfda.input_widgets.input_specs','pyfda.input_widgets.input_coeffs',
     'pyfda.input_widgets.input_pz','pyfda.input_widgets.input_info',
-    'pyfda.input_widgets.input_files','pyfda.input_widgets.input_fixpoint_specs']
+    'pyfda.input_widgets.input_fixpoint_specs']
 hiddenimports += [
     'pyfda.filter_widgets.equiripple','pyfda.filter_widgets.firwin','pyfda.filter_widgets.ma',
     'pyfda.filter_widgets.equiripple','pyfda.filter_widgets.butterworth','pyfda.filter_widgets.ellip',
