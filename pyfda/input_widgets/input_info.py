@@ -412,8 +412,12 @@ class InputInfo(QWidget):
                         err[i] = True
                         logger.debug(e)
 
-                for i in range(len(f_lbls)):
-                    if err[i]:
+            # The loop deletes entries from f_lbls and parallel lists: Iterate
+            # the indices in reverse so deletions don’t shift the remaining indices:
+            # Bad: for i in range(len(f_lbls)):
+            #           if err[i]:
+                for i, has_error in reversed(list(enumerate(err))):
+                    if has_error:
                         del f_lbls[i]
                         del f_vals[i]
                         del a_lbls[i]
@@ -427,13 +431,11 @@ class InputInfo(QWidget):
                 # Calculate frequency response at test frequencies
                 [_, a_test] = sig.freqz(bb, aa, 2.0 * pi * f_vals.astype(float))
 
-            (f_min, h_min, f_max, h_max) = _find_min_max(0, 1, bb, aa, unit='V')
-            # append frequencies and values for min. and max. filter reponse derived
-            # from coeefficients bb, aa to test vector
+            # Append frequencies and values for min. and max. filter reponse derived
+            # from coeefficients bb, aa to test vector:
+            (f_min, h_min, f_max, h_max) = _find_min_max(0, 0.5, bb, aa, unit='V')
 
             f_lbls += ['Min.', 'Max.']
-            # QTableView does not support direct formatting, use QLabel
-
             f_vals = np.append(f_vals, [f_min, f_max])
             a_targs = np.append(a_targs, [np.nan, np.nan])
             a_targs_db = np.append(a_targs_db, [np.nan, np.nan])
@@ -450,10 +452,10 @@ class InputInfo(QWidget):
             a_targs_pass = []
             eps = 1e-3
             for i, f_lbl in enumerate(f_lbls):
-                if 'pb' in f_lbl:
+                if 'pb' in f_lbl.lower():
                     a_targs_pass.append((a_test_db[i] - a_targs_db[i]) < eps)
                     a_test[i] = 1 - abs(a_test[i])
-                elif 'sb' in f_lbl:
+                elif 'sb' in f_lbl.lower():
                     a_targs_pass.append(a_test_db[i] >= a_targs_db[i])
                 else:
                     a_targs_pass.append(True)
@@ -469,13 +471,16 @@ class InputInfo(QWidget):
                 "passed: %s\n", a_targs,  a_test,  a_test_db, f_vals,
                     a_targs_pass, self.targs_spec_passed)
 
+            # Format and fill table
+            # QTableView does not support direct formatting, QLabel would be needed for subscripts
             self.tbl_filt_perf.setRowCount(len(a_test))  # number of table rows
             self.tbl_filt_perf.setColumnCount(5)  # number of table columns
 
             self.tbl_filt_perf.setHorizontalHeaderLabels([
                 f"f/{fb_get('freq_specs_unit')}", 'Spec\n(dB)',
                 '|H(f)|\n(dB)', 'Spec', '|H(f)|'])
-            self.tbl_filt_perf.setVerticalHeaderLabels(f_lbls)
+
+            self.tbl_filt_perf.setVerticalHeaderLabels(f_lbls)  # add frequency labels
             for row, test_value in enumerate(a_test):
                 self.tbl_filt_perf.setItem(
                     row, 0, QTableWidgetItem(str(f'{(f_vals[row]*f_s):.4g}')))
