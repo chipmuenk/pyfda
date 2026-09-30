@@ -19,7 +19,7 @@ import sys
 import struct
 
 from docutils import __version__ as V_DOC
-from matplotlib import __version__ as V_MPL
+from matplotlib import __version__ as V_MPL  # pylint: disable=no-name-in-module
 import numpy as np
 import numexpr
 import markdown
@@ -72,8 +72,8 @@ except ImportError:
 # Remove module names as keys and return a dict with items like
 #  {'V_MPL':'3.3.1', ...}
 MOD_VERSIONS = {}
-for k in mod_pyfda:
-    MOD_VERSIONS.update(mod_pyfda[k])
+for m in mod_pyfda:
+    MOD_VERSIONS.update(mod_pyfda[m])
 
 CRLF = os.linesep  # Windows: "\r\n", Mac OS: "\r", *nix: "\n"
 
@@ -448,9 +448,9 @@ def pprint_log(d, N: int = 10, tab: str = "\t", debug: bool = False) -> str:
             logger.warning("pprint_log(): Object with ndim = %s cannot be processed.", np.ndim(d))
             return ""
     else:  # scalar, string or None
-        if type(d) is None:
+        if isinstance(d, None):
             s += ('Type: None')
-        elif type(d) is str:
+        elif isinstance(d, str):
             s += (f' Type: str, length = {len(d)}' +  cr + tab + d[: min(N-1, len(d))])
             if len(d) > N-1:
                 s += ' ...'
