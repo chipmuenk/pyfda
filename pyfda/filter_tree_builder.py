@@ -126,6 +126,18 @@ class ParseError(Exception):
     """
 
 
+# Dictionary with translations between short method names and long names for
+# response types - the long name can be changed as you like, but don't change
+# the short name - it is used to construct the filter design method names
+RT_NAMES = {'lp': 'Lowpass', 'hp': 'Highpass', 'bp': 'Bandpass',
+            'bs': 'Bandstop', 'ap': 'Allpass', 'mb': 'Multiband',
+            'hil': 'Hilbert', 'diff': 'Differentiator'}
+
+# Dictionary with translations between short method names and long names for
+# response types
+FT_NAMES = {'iir': 'IIR', 'FIR': 'FIR'}
+
+
 class FilterTreeBuilder():
     """
     Read the config file and construct the `fil_tree` dictionary as a class attribute with
@@ -140,17 +152,6 @@ class FilterTreeBuilder():
     # filter types (ft), filter class (fc) and filter order (fo).
     # This default dictionary is overwritten and frozen during initialization.
 
-    # Dictionary with translations between short method names and long names for
-    # response types - the long name can be changed as you like, but don't change
-    # the short name - it is used to construct the filter design method names
-    RT_NAMES = {'lp': 'Lowpass', 'hp': 'Highpass', 'bp': 'Bandpass',
-                'bs': 'Bandstop', 'ap': 'Allpass', 'mb': 'Multiband',
-                'hil': 'Hilbert', 'diff': 'Differentiator'}
-
-    # Dictionary with translations between short method names and long names for
-    # response types
-    FT_NAMES = {'IIR': 'IIR', 'FIR': 'FIR'}
-
     fil_tree: ClassVar[dict[str, object]] =\
         {
         'lp': {
@@ -160,7 +161,7 @@ class FilterTreeBuilder():
                         'fspecs': ('a', 'f_c'),
                         'wspecs': ('a', 'w_pb', 'w_sb'),
                         'tspecs': ('u', {'frq': ('u', 'f_pb', 'f_sb'),
-                                            'amp': ('u', 'a_pb', 'a_sb')}),
+                                         'amp': ('u', 'a_pb', 'a_sb')}),
                         'msg':    ('a',
                                     'Enter desired filter order <b><i>N</i></b>, corner '
             'frequencies of pass and stop band(s), <b><i>F<sub>PB</sub></i></b>'
@@ -172,7 +173,7 @@ class FilterTreeBuilder():
                         'fspecs': ('d', 'f_c'),
                         'wspecs': ('d', 'w_pb', 'w_sb'),
                         'tspecs': ('a', {'frq': ('a', 'f_pb', 'f_sb'),
-                                            'amp': ('a', 'a_pb', 'a_sb')}),
+                                         'amp': ('a', 'a_pb', 'a_sb')}),
                         'msg':    ('a',
                 'Enter maximum pass band ripple <b><i>A<sub>PB</sub></i></b>, '
                 'minimum stop band attenuation <b><i>A<sub>SB</sub> </i></b>'
@@ -183,17 +184,17 @@ class FilterTreeBuilder():
                         },
                     }
                 },
-            'IIR': {
+            'iir': {
                 'Cheby1': {
                     'man':{'fo':     ('a', 'N'),
                         'fspecs': ('a', 'f_c'),
                         'tspecs': ('u', {'frq': ('u', 'f_pb', 'f_sb'),
-                                            'amp': ('u', 'a_pb', 'a_sb')})
+                                         'amp': ('u', 'a_pb', 'a_sb')})
                         },
                     'min':{'fo':     ('d', 'N'),
                         'fspecs': ('d', 'f_c'),
                         'tspecs': ('a', {'frq': ('a', 'f_pb', 'f_sb'),
-                                            'amp': ('a', 'a_pb', 'a_sb')})
+                                         'amp': ('a', 'a_pb', 'a_sb')})
                         }
                     }
                 }
@@ -205,27 +206,27 @@ class FilterTreeBuilder():
                         'fspecs': ('a', 'f_c'),
                         'wspecs': ('a', 'w_sb', 'w_pb'),
                         'tspecs': ('u', {'frq': ('u', 'f_sb', 'f_pb'),
-                                            'amp': ('u', 'a_sb', 'a_pb')})
+                                         'amp': ('u', 'a_sb', 'a_pb')})
                         },
                     'min':{'fo':     ('d', 'N'),
                         'wspecs': ('d', 'w_sb', 'w_pb'),
                         'fspecs': ('d', 'f_c'),
                         'tspecs': ('a', {'frq': ('a', 'f_sb', 'f_pb'),
-                                            'amp': ('a', 'a_sb', 'a_pb')})
+                                         'amp': ('a', 'a_sb', 'a_pb')})
                         }
                         }
                 },
-            'IIR': {
+            'iir': {
                 'Cheby1': {
                     'man':{'fo':     ('a', 'N'),
                         'fspecs': ('a', 'f_c'),
                         'tspecs': ('u', {'frq': ('u', 'f_sb', 'f_pb'),
-                                            'amp': ('u', 'a_sb', 'a_pb')})
+                                         'amp': ('u', 'a_sb', 'a_pb')})
                         },
                     'min':{'fo':     ('d', 'N'),
                         'fspecs': ('d', 'f_c'),
                         'tspecs': ('a', {'frq': ('a', 'f_sb', 'f_pb'),
-                                            'amp': ('a', 'a_sb', 'a_pb')})
+                                         'amp': ('a', 'a_sb', 'a_pb')})
                         }
                         }
                     }
@@ -237,13 +238,13 @@ class FilterTreeBuilder():
                         'wspecs': ('a', 'w_sb', 'w_pb', 'w_sb2'),
                         'fspecs': ('a', 'f_c', 'f_c2'),
                         'tspecs': ('u', {'frq': ('u', 'f_sb', 'f_pb', 'f_pb2', 'f_sb2'),
-                                            'amp': ('u', 'a_sb', 'a_pb', 'a_sb2')})
+                                         'amp': ('u', 'a_sb', 'a_pb', 'a_sb2')})
                         },
                     'min':{'fo':     ('d', 'N'),
                         'fspecs': ('d', 'f_c', 'f_c2'),
                         'wspecs': ('d', 'w_sb', 'w_pb', 'w_sb2'),
                         'tspecs': ('a', {'frq': ('a', 'f_sb', 'f_pb', 'f_pb2', 'f_sb2'),
-                                            'amp': ('a', 'a_sb', 'a_pb', 'a_sb2')})
+                                         'amp': ('a', 'a_sb', 'a_pb', 'a_sb2')})
                         }
                         }
                     }
@@ -255,20 +256,19 @@ class FilterTreeBuilder():
                         'wspecs': ('a', 'w_pb', 'w_sb', 'w_pb2'),
                         'fspecs': ('a', 'f_c', 'f_c2'),
                         'tspecs': ('u', {'frq': ('u', 'f_pb', 'f_sb', 'f_sb2', 'f_pb2'),
-                                            'amp': ('u', 'a_pb', 'a_sb', 'a_pb2')})
+                                         'amp': ('u', 'a_pb', 'a_sb', 'a_pb2')})
                         },
                     'min':{'fo':     ('d', 'N'),
                         'wspecs': ('d', 'w_pb', 'w_sb', 'w_pb2'),
                         'fspecs': ('d', 'f_c', 'f_c2'),
                         'tspecs': ('a', {'frq': ('a', 'f_pb', 'f_sb', 'f_sb2', 'f_pb2'),
-                                            'amp': ('a', 'a_pb', 'a_sb', 'a_pb2')})
+                                         'amp': ('a', 'a_pb', 'a_sb', 'a_pb2')})
                         }
                             }
                     }
             }
         }
     # --------------------------------------------------------------------------
-
     def __init__(self):
         logger.info("This is TreeBuilder, not doing anything.")
 
@@ -377,14 +377,14 @@ class FilterTreeBuilder():
         Build a dictionary of all filter combinations with the following hierarchy:
 
         response types -> filter types -> filter classes  -> filter order
-        rt (e.g. 'lp')    ft (e.g. 'IIR') fc (e.g. 'cheby1') fo ('min' or 'man')
+        rt (e.g. 'lp')    ft (e.g. 'iir') fc (e.g. 'cheby1') fo ('min' or 'man')
 
         Resulting dictionary for fc for the example above:
 
         .. code-block:: python
 
             'lp':{
-            'IIR':{
+            'iir':{
                  'Cheby1':{
                      'man':{'fo':     ('a','N'),
                             'msg':    ('a', r"<br /><b>Note:</b> Read this!"),
@@ -436,7 +436,7 @@ class FilterTreeBuilder():
 
 # ==============================================================================
 if __name__ == "__main__":
-    # Run widget standalone with `python -m pyfda.tree_builder`
+    # Run widget standalone with `python -m pyfda.filter_tree_builder`
     #
     # Need to start a QApplication to avoid the error
     #  "QWidget: Must construct a QApplication before a QWidget"
@@ -463,4 +463,4 @@ if __name__ == "__main__":
 
     print(f"\nDict type: {type(FilterTreeBuilder.fil_tree['lp']['FIR']['Equiripple']).__name__}\n")
 
-    print('FilterTreeBuilder.fil_tree["BP"] = ', pprint_log(FilterTreeBuilder.fil_tree["BP"]))
+    print("FilterTreeBuilder.fil_tree['bp'] = ", pprint_log(FilterTreeBuilder.fil_tree['bp']))

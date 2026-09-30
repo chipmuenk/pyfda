@@ -22,6 +22,7 @@ from pyfda.libs.compat import (
 from pyfda.filterbroker import fb_get, fb_set
 from pyfda.filter_factory import create_fil_inst, get_fil_inst
 from pyfda.filter_tree_builder import FilterTreeBuilder as FTB
+from pyfda.filter_tree_builder import FT_NAMES, RT_NAMES
 from pyfda.config_file_parser import ConfigFileParser as CFP
 from pyfda.libs.pyfda_num_lib import safe_eval
 from pyfda.libs.pyfda_qt_lib import qget_cmb_box, emit
@@ -129,11 +130,11 @@ class SelectFilter(QWidget):
         # start with response types (LP, HP, ...) and sort them alphabetically
         rt_list = sorted(FTB.fil_tree.keys())
 
-        # Translate short response type ("LP") from fil_tree to displayed names ("Lowpass",
-        # correspondence is defined in pyfda_rc.py) and populate rt combo box
+        # Translate short response type ("lp") from fil_tree to displayed names ("Lowpass") using
+        # RT_NAMES and populate rt combo box with display name and response type
         for rt in rt_list:
             try:
-                self.cmb_response_type.addItem(FTB.RT_NAMES[rt], rt)
+                self.cmb_response_type.addItem(RT_NAMES[rt], rt)
             except KeyError as e:
                 logger.warning(
                   "KeyError: %s has no corresponding full name in FTB.RT_NAMES:\n%s", rt, e)
@@ -145,9 +146,15 @@ class SelectFilter(QWidget):
         self.cmb_response_type.setCurrentIndex(idx)  # set initial index
         rt = qget_cmb_box(self.cmb_response_type)
 
-        # next, populate the filter type combo (IIr, FIR)
+        # Translate short filter type ('iir') from fil_tree to displayed name ('IIR') using
+        # `FT_NAMES` and populate ft type combo with display name and filter type
         for ft in FTB.fil_tree[rt]:
-            self.cmb_filter_type.addItem(FTB.FT_NAMES[ft], ft)
+            try:
+                self.cmb_filter_type.addItem(FT_NAMES[ft], ft)
+            except KeyError as e:
+                logger.warning(
+                  "KeyError: %s has no corresponding full name in FTB.FT_NAMES:\n%s", ft, e)
+
         self.cmb_filter_type.setCurrentIndex(0)  # set initial index
         ft = qget_cmb_box(self.cmb_filter_type)
 
@@ -181,7 +188,7 @@ class SelectFilter(QWidget):
         self.cmb_response_type.currentIndexChanged.connect(
                 lambda: self._set_response_type(enb_signal=True))  # 'lp'
         self.cmb_filter_type.currentIndexChanged.connect(
-                lambda: self._set_filter_type(enb_signal=True))  # 'IIR'
+                lambda: self._set_filter_type(enb_signal=True))  # 'iir'
         self.cmb_filter_class.currentIndexChanged.connect(
                 lambda: self._set_design_method(enb_signal=True))  # 'cheby1'
         self._chk_min_order.clicked.connect(
@@ -274,11 +281,11 @@ class SelectFilter(QWidget):
         self.cmb_filter_type.blockSignals(True)  # don't fire when changed programmatically
         self.cmb_filter_type.clear()
         for ft in FTB.fil_tree[self.rt]:
-            self.cmb_filter_type.addItem(FTB.FT_NAMES[ft], ft)
+            self.cmb_filter_type.addItem(FT_NAMES[ft], ft)
 
-        # Is current filter type (e.g. IIR) in list for new rt?
+        # Is current filter type (e.g. 'iir') in list for new rt?
         if fb_get('ft') in ft_list:
-            ft_idx = self.cmb_filter_type.findText(fb_get('ft'))
+            ft_idx = self.cmb_filter_type.findData(fb_get('ft'))
             self.cmb_filter_type.setCurrentIndex(ft_idx)  # yes, set same ft as before
         else:
             self.cmb_filter_type.setCurrentIndex(0)     # no, set index 0
@@ -311,7 +318,6 @@ class SelectFilter(QWidget):
         self.cmb_filter_class.blockSignals(True)
         self.cmb_filter_class.clear()
         fc_list = []
-
         for fc in sorted(FTB.fil_tree[self.rt][self.ft]):
             self.cmb_filter_class.addItem(CFP.FILTER_CLASSES_DICT[fc]['name'], fc)
             fc_list.append(fc)
