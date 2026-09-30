@@ -649,8 +649,8 @@ class PlotHf(QWidget):
 
         # Linphase settings only makes sense for amplitude plot and
         # for plottin real/imag. part of H, not its magnitude
-        self.but_zerophase.setCheckable(self.unit_a == 'V' and fb_get('ft') == 'FIR')
-        self.but_zerophase.setEnabled(self.unit_a == 'V' and fb_get('ft') == 'FIR')
+        self.but_zerophase.setCheckable(self.unit_a == 'V' and fb_get('ft') == 'fir')
+        self.but_zerophase.setEnabled(self.unit_a == 'V' and fb_get('ft') == 'fir')
 
         self.specs = self.but_specs.isChecked()
 

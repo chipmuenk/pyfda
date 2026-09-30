@@ -69,7 +69,7 @@ class ManualFIR():
 
         # This part contains static information for building the filter tree
 
-        self.ft = 'FIR'
+        self.ft = 'fir'
 
         self.rt_dict = {
             'com':{'man':{'fo': ('d', 'N'),

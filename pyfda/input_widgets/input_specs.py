@@ -342,7 +342,7 @@ class InputSpecs(QWidget):
         Then, the UIs of all subwidgets are updated using their `update_ui()` methods.
         """
         rt = fb_get('rt')  # e.g. 'lp'
-        ft = fb_get('ft')  # e.g. 'FIR'
+        ft = fb_get('ft')  # e.g. 'fir'
         fc = fb_get('fc')  # e.g. 'equiripple'
         fo = fb_get('fo')  # e.g. 'man'
 

@@ -135,7 +135,7 @@ RT_NAMES = {'lp': 'Lowpass', 'hp': 'Highpass', 'bp': 'Bandpass',
 
 # Dictionary with translations between short method names and long names for
 # response types
-FT_NAMES = {'iir': 'IIR', 'FIR': 'FIR'}
+FT_NAMES = {'iir': 'IIR', 'fir': 'FIR'}
 
 
 class FilterTreeBuilder():
@@ -155,7 +155,7 @@ class FilterTreeBuilder():
     fil_tree: ClassVar[dict[str, object]] =\
         {
         'lp': {
-            'FIR': {
+            'fir': {
                 'Equiripple': {
                     'man':{'fo':     ('a', 'N'),
                         'fspecs': ('a', 'f_c'),
@@ -200,7 +200,7 @@ class FilterTreeBuilder():
                 }
             },
         'hp': {
-            'FIR': {
+            'fir': {
                 'Equiripple': {
                     'man':{'fo':     ('a', 'N'),
                         'fspecs': ('a', 'f_c'),
@@ -232,7 +232,7 @@ class FilterTreeBuilder():
                     }
             },
         'bp': {
-            'FIR': {
+            'fir': {
                 'Equiripple': {
                     'man':{'fo':     ('a', 'N'),
                         'wspecs': ('a', 'w_sb', 'w_pb', 'w_sb2'),
@@ -250,7 +250,7 @@ class FilterTreeBuilder():
                     }
                 },
         'bs': {
-            'FIR': {
+            'fir': {
                 'Equiripple': {
                     'man':{'fo':     ('a', 'N'),
                         'wspecs': ('a', 'w_pb', 'w_sb', 'w_pb2'),
@@ -407,7 +407,7 @@ class FilterTreeBuilder():
         if not fil_tree:
             fil_tree = {}
 
-        ft = get_fil_inst().ft                 # get filter type (e.g. 'FIR')
+        ft = get_fil_inst().ft                 # get filter type (e.g. 'fir')
 
         for rt in rt_dict:                     # iterate over all response types
             if rt == 'com':                    # handle common info later
@@ -449,7 +449,7 @@ if __name__ == "__main__":
     # Initialize FilterTreeBuilder class attribute 'fil_tree'
     FilterTreeBuilder().build_fil_tree()
 
-    fil_tree_ref = FilterTreeBuilder.fil_tree['lp']['FIR']['Equiripple']['min']
+    fil_tree_ref = FilterTreeBuilder.fil_tree['lp']['fir']['Equiripple']['min']
     # Test Immutability - the following lines should all raise an exception
     try:
         fil_tree_ref.update({'msg':("hallo",)}) # this would change 'fil_tree'
@@ -457,10 +457,10 @@ if __name__ == "__main__":
         print(f"\nExpected AttributeError on update(): {e}\n")
 
     try:
-        FilterTreeBuilder.fil_tree['lp']['FIR']['Equiripple']['min']['par'] = ("A_1","F_1")
+        FilterTreeBuilder.fil_tree['lp']['fir']['Equiripple']['min']['par'] = ("A_1","F_1")
     except TypeError as e:
         print(f"\nExpected TypeError on item assignment: {e}\n")
 
-    print(f"\nDict type: {type(FilterTreeBuilder.fil_tree['lp']['FIR']['Equiripple']).__name__}\n")
+    print(f"\nDict type: {type(FilterTreeBuilder.fil_tree['lp']['fir']['Equiripple']).__name__}\n")
 
     print("FilterTreeBuilder.fil_tree['bp'] = ", pprint_log(FilterTreeBuilder.fil_tree['bp']))

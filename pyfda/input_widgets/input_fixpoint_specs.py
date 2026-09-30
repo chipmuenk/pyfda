@@ -891,7 +891,7 @@ if __name__ == '__main__':
     app = QApplication(sys.argv)
     app.setStyleSheet(QSS.QSS_RC)
     # change initial settings to FIR
-    # fb_set({'ft': 'FIR', 'fc': 'Equiripple'})
+    # fb_set({'ft': 'fir', 'fc': 'Equiripple'})
     fb_set('ft', 'iir')
     fb_set('fc', 'Ellip')
     FilterTreeBuilder().build_fil_tree()

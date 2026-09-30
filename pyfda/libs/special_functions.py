@@ -35,7 +35,7 @@ def lin2unit(lin_value: float, ft: str, amp_label: str,
              unit: str = 'dB') -> float:
     r"""
     Convert linear amplitude specification to dB or W, depending on filter
-    type ('FIR' or 'iir') and whether the specifications belong to passband
+    type ('fir' or 'iir') and whether the specifications belong to passband
     or stopband. This is determined by checking whether amp_label contains
     the strings 'pb' or 'sb' :
 
@@ -122,7 +122,7 @@ def unit2lin(unit_value: float, ft: str, amp_label: str,
             if lin_value > MAX_IPB_AMP:
                 lin_value = MAX_IPB_AMP
                 msg += "too large, "
-        elif ft == 'FIR':
+        elif ft == 'fir':
             if lin_value > MAX_FPB_AMP:
                 lin_value = MAX_FPB_AMP
                 msg += "too large, "
@@ -135,7 +135,7 @@ def unit2lin(unit_value: float, ft: str, amp_label: str,
             if lin_value > MAX_ISB_AMP:
                 lin_value = MAX_ISB_AMP
                 msg += "too large, "
-        elif ft == 'FIR':
+        elif ft == 'fir':
             if lin_value > MAX_FSB_AMP:
                 lin_value = MAX_FSB_AMP
                 msg += "too large, "

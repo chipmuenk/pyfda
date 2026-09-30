@@ -55,7 +55,7 @@ class Delay(QWidget):
 
         self.N = 5
 
-        self.ft = 'FIR'
+        self.ft = 'fir'
 
         self.rt_dicts = ('com',)
 

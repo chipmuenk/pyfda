@@ -84,7 +84,7 @@ class Firwin(QWidget):
         super().__init__()
 
         self.setObjectName(objectName)
-        self.ft = 'FIR'
+        self.ft = 'fir'
 
         self.alg = "ichige"
 

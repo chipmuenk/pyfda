@@ -329,7 +329,7 @@ class InputCoeffs(QWidget):
             self.tblCoeff.setColumnCount(2)
             self.tblCoeff.setHorizontalHeaderLabels(["b", "a"])
         else:
-            fb_set('ft', 'FIR')
+            fb_set('ft', 'fir')
             self.col = 1
             self.tblCoeff.setColumnCount(1)
             self.tblCoeff.setHorizontalHeaderLabels(["b"])
@@ -382,7 +382,7 @@ class InputCoeffs(QWidget):
         - self.ba[1] -> a coefficients
 
         The table dimensions are set according to the filter type set in
-        `fil[0]['ft']` which is either 'FIR' or 'IIR' and by the number of
+        `fil[0]['ft']` which is either 'fir' or 'iir' and by the number of
         rows in `self.ba`.
 
         Called at the end of nearly every method.

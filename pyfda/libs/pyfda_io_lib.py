@@ -1151,7 +1151,7 @@ def export_fil_data(parent: object, data: str, fkey: str = "", title: str = "Exp
     # TODO: Add CMSIS export for FIR filters
     # TODO: Add fixpoint format export for CMSIS / SOS coefficients
     if fkey == 'ba':
-        if fb_get('ft') == 'FIR':
+        if fb_get('ft') == 'fir':
             file_types += ('coe', 'vhd', 'txt', 'cmsis')
         else:
             file_types += ('cmsis', 'sos')
@@ -1187,7 +1187,7 @@ def export_fil_data(parent: object, data: str, fkey: str = "", title: str = "Exp
                     err = export_coe_vhdl_package(f)
                 elif file_type in {'cmsis', 'sos'} and fb_get('ft') == 'iir':
                     err = export_coe_cmsis_sos(f, file_type, formatted)
-                elif file_type == 'cmsis' and fb_get('ft') == 'FIR':
+                elif file_type == 'cmsis' and fb_get('ft') == 'fir':
                     err = export_coe_cmsis_fir(f, formatted)
                 else:
                     logger.error('Unknown file extension "%s"', file_type)
@@ -1286,7 +1286,7 @@ def coe_header(title: str) -> str:
     a_lbls = []
     a_targs = []
     a_targs_db = []
-    ft = fb_get('ft')  # get filter type ('iir', 'FIR')
+    ft = fb_get('ft')  # get filter type ('iir', 'fir')
     unit = fb_get('amp_specs_unit')
     unit = 'dB'  # fix this for the moment
     # construct pairs of corner frequency and corresponding amplitude

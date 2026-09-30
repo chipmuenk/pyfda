@@ -265,7 +265,7 @@ class PlotPZ(QWidget):
         redraws the pole/zero diagram using the current filter data and
         selected overlay mode.
         """
-        self.but_fir_poles.setVisible(fb_get('ft') == 'FIR')
+        self.but_fir_poles.setVisible(fb_get('ft') == 'fir')
         contour = qget_cmb_box(self.cmb_overlay) in {"contour", "contourf"}
         self.led_bottom.setVisible(contour)
         self.lbl_bottom.setVisible(contour)

@@ -93,7 +93,7 @@ class Equiripple(QWidget):
         self.setObjectName(objectName)
         self.grid_density = 16
 
-        self.ft = 'FIR'
+        self.ft = 'fir'
 
         self.rt_dicts = ('com',)
 

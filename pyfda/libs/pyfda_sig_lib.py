@@ -1202,7 +1202,7 @@ def fil_save(arg: np.ndarray, format_in: str, sender: str, convert: bool = True)
             p = np.zeros(len(z))
             gain = zeros_with_val(len(z))  # create gain vector [1, 0, 0, ...]
             fb_set('zpk', np.array([z, p, gain]))
-            fb_set('ft', 'FIR')
+            fb_set('ft', 'fir')
 
         elif np.ndim(arg) == 2:
             logger.debug("zpk is a two-dim. array with shape '%s'", np.shape(arg))
@@ -1216,7 +1216,7 @@ def fil_save(arg: np.ndarray, format_in: str, sender: str, convert: bool = True)
             if np.any(arg[1]):  # non-zero poles -> IIR
                 fb_set('ft', 'iir')
             else:
-                fb_set('ft', 'FIR')
+                fb_set('ft', 'fir')
         else:
             raise ValueError(f"\t'fil_save()': Unknown 'zpk' format '{arg}'!")
 
@@ -1241,7 +1241,7 @@ def fil_save(arg: np.ndarray, format_in: str, sender: str, convert: bool = True)
         # Determine whether it's a FIR or IIR filter and store the setting
         # Test whether all elements except the first one are zero
         if not np.any(a[1:]):
-            fb_set('ft', 'FIR')
+            fb_set('ft', 'fir')
         else:
             fb_set('ft', 'iir')
 

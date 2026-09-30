@@ -90,7 +90,7 @@ class MA(QWidget):
         self.delays = 12 # number of delays per stage
         self.stages = 1 # number of stages
 
-        self.ft = 'FIR'
+        self.ft = 'fir'
 
         self.rt_dicts = ()
         # Common data for all filter response types:
