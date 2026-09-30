@@ -109,41 +109,27 @@ jobs:
   release:
     name: Release packages
     needs: build
-    runs-on: ubuntu-latest
-    steps:
-    - name: Download all artifacts
-      uses: actions/download-artifact@v7
-      with:
-        path: ./dist
-    # not specifying the file names downloads all artifacts. However,
-    # an individual directory is created for each file identical to its name
+    if: github.ref_type != 'tag'
+    uses: pyTooling/Actions/.github/workflows/PublishReleaseNotes.yml@r8
+    with:
+      tag: latest
+      mode: nightly
+      prerelease: true
+      assets: |
+        pyfdax_win.exe:pyfdax_win.exe:pyfdax_win.exe
+        pyfdax_osx:pyfdax_osx:pyfdax_osx
+        pyfdax_ubuntu:pyfdax_ubuntu:pyfdax_ubuntu
 
-    - name: Display structure of downloaded files
-      run: ls -R
-
-    - name: Update Github prerelease latest
-      if: success() && github.ref_type != 'tag'
-      uses: pyTooling/Actions/.github/workflows/PrepareJob.yml@r8
-      # uses: pyTooling/Actions/releaser@main deprecated
-      with:
-        tag: latest
-        rm: true
-        token: ${{ secrets.GITHUB_TOKEN }}
-        files: |
-          ./dist/pyfdax_win.exe/pyfdax_win.exe
-          ./dist/pyfdax_osx/pyfdax_osx
-          ./dist/pyfdax_ubuntu/pyfdax_ubuntu
-
-    - name: Update versioned release
-      if: success() && github.ref_type == 'tag'
-      uses: pyTooling/Actions/.github/workflows/PrepareJob.yml@r8
-      # uses: pyTooling/Actions/releaser@main deprecated
-      with:
-        tag: ${{ github.ref_name }}
-        rm: false
-        token: ${{ secrets.GITHUB_TOKEN }}
-        files: |
-          ./dist/pyfdax_win.exe/pyfdax_win.exe
-          ./dist/pyfdax_osx/pyfdax_osx
-          ./dist/pyfdax_ubuntu/pyfdax_ubuntu
+  release_versioned:
+    name: Release versioned packages
+    needs: build
+    if: github.ref_type == 'tag'
+    uses: pyTooling/Actions/.github/workflows/PublishReleaseNotes.yml@r8
+    with:
+      tag: ${{ github.ref_name }}
+      mode: release
+      assets: |
+        pyfdax_win.exe:pyfdax_win.exe:pyfdax_win.exe
+        pyfdax_osx:pyfdax_osx:pyfdax_osx
+        pyfdax_ubuntu:pyfdax_ubuntu:pyfdax_ubuntu
 
