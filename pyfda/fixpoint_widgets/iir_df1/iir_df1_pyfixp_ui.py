@@ -26,11 +26,11 @@ from pyfda.fixpoint_widgets.iir_df1.iir_df1_pyfixp import IIR_DF1_pyfixp
 logger = logging.getLogger(__name__)
 
 #  Dict containing {widget class name : display name}
-classes = {'IIR_DF1_pyfixp_UI': 'IIR_DF1 (pyfixp)'}  # widget class name : display name
+classes = {'IIRDF1PyfixpUI': 'IIR_DF1 (pyfixp)'}  # widget class name : display name
 
 
 # =============================================================================
-class IIR_DF1_pyfixp_UI(QWidget):
+class IIRDF1PyfixpUI(QWidget):
     """
     Widget for entering word formats & quantization, also instantiates fixpoint
     filter class :class:`FilterFIR`.
@@ -357,7 +357,7 @@ if __name__ == '__main__':
     app.setStyleSheet(QSS.QSS_RC)
     fb_set('qfrmt', 'qint')  # enable fixpoint mode
 
-    mainw = IIR_DF1_pyfixp_UI()
+    mainw = IIRDF1PyfixpUI()
     app.setActiveWindow(mainw)
     mainw.show()
     sys.exit(app.exec_())

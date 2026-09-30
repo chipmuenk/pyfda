@@ -15,7 +15,7 @@ import numpy as np
 
 from pyfda.filterbroker import fb_set, fb_get
 from pyfda.libs import pyfda_fix_lib as fx
-from pyfda.fixpoint_widgets.fir_df.fir_df_pyfixp import FIR_DF_pyfixp
+from pyfda.fixpoint_widgets.fir_df.fir_df_pyfixp import FIRDFPyfixp
 
 
 class TestSequenceFunctions(unittest.TestCase):
@@ -30,7 +30,7 @@ class TestSequenceFunctions(unittest.TestCase):
         # list with some invalid strings
         self.y_list_invalid = ['1.1.1', 'xxx', '123', '1.23', '', 1.23j + 3.21, '3.21 + 1.23 j']
 
-        self.dut = FIR_DF_pyfixp
+        self.dut = FIRDFPyfixp
 
 #
 #    def test_shuffle(self):

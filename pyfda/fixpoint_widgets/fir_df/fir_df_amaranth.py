@@ -28,7 +28,7 @@ logger = logging.getLogger(__name__)
 
 
 # =============================================================================
-class FIR_DF_amaranth():
+class FIRDFAmaranth():
     """
     A synthesizable direct form FIR filter
 
@@ -250,7 +250,6 @@ if __name__ == '__main__':
 
     p.update({'ba': b_q})
 
-    dut = FIR_DF_amaranth(p)
+    dut = FIRDFAmaranth(p)
     print(dut.fxfilter(Q_I.fixp(np.ones(20), out_frmt='qint')))
     print(dut.fxfilter(Q_I.fixp(np.zeros(20), out_frmt='qint')))
-

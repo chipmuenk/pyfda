@@ -21,7 +21,7 @@ logger = logging.getLogger(__name__)
 
 
 # =============================================================================
-class FIR_DF_pyfixp():
+class FIRDFPyfixp():
     """
     Construct fixed point object with parameter dict `p`
 
@@ -203,7 +203,7 @@ if __name__ == '__main__':
     for frmt in ['qint', 'qfrac']:
         print(f"\nFormat = '{frmt}'")
         fb_set('qfrmt', frmt)  # enable fixpoint mode
-        dut = FIR_DF_pyfixp(p)
+        dut = FIRDFPyfixp(p)
         print("Filter fixpoint response / state variables for input = np.ones(7):")
         x = np.ones(7)
         y = dut.fxfilter(x=x)

@@ -20,7 +20,7 @@ from pyfda.libs.pyfda_text_lib import mod_version, first_item, pprint_log, cmp_v
 from pyfda.libs.pyfda_qt_lib import qget_cmb_box, emit
 
 from pyfda.fixpoint_widgets.fx_wq_ui import FxWqUI
-from .fir_df_amaranth import FIR_DF_amaranth
+from .fir_df_amaranth import FIRDFAmaranth
 
 logger = logging.getLogger(__name__)
 
@@ -62,7 +62,7 @@ class FirDFAmaranthUI(QWidget):
         if _cmp_ver >= 0:
             # Construct an instance of the fixpoint filter using the settings from
             # the 'fxq' quantizer dict
-            self.fx_filt = FIR_DF_amaranth(fb_get('fxq'))
+            self.fx_filt = FIRDFAmaranth(fb_get('fxq'))
             self.update_ovfl_cnt_all()  # initialize all overflow counters / display
         elif _cmp_ver < -1:
             # Amaranth is not installed or version cannot be determined
