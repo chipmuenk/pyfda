@@ -72,8 +72,8 @@ except ImportError:
 # Remove module names as keys and return a dict with items like
 #  {'V_MPL':'3.3.1', ...}
 MOD_VERSIONS = {}
-for m in mod_pyfda:
-    MOD_VERSIONS.update(mod_pyfda[m])
+for _, mod in mod_pyfda.items():
+    MOD_VERSIONS.update(mod)
 
 CRLF = os.linesep  # Windows: "\r\n", Mac OS: "\r", *nix: "\n"
 
@@ -448,7 +448,7 @@ def pprint_log(d, N: int = 10, tab: str = "\t", debug: bool = False) -> str:
             logger.warning("pprint_log(): Object with ndim = %s cannot be processed.", np.ndim(d))
             return ""
     else:  # scalar, string or None
-        if isinstance(d, None):
+        if d is None:
             s += ('Type: None')
         elif isinstance(d, str):
             s += (f' Type: str, length = {len(d)}' +  cr + tab + d[: min(N-1, len(d))])
