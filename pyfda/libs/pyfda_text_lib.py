@@ -45,35 +45,35 @@ PY32_64 = struct.calcsize("P") * 8  # yields 32 or 64, depending on 32 or 64 bit
 V_PY = ".".join(map(str, sys.version_info[:3])) + " (" + str(PY32_64) + " Bit)"
 
 # ================ Required Modules ============================
-MODULES = {'python':       {'V_PY': V_PY},
-           'matplotlib':   {'V_MPL': V_MPL},
-           'Qt5':          {'V_QT': V_QT},
-           'pyqt':         {'V_PYQT': V_PYQT},
-           'numpy':        {'V_NP': np.__version__},
-           'numexpr':      {'V_NUM': numexpr.__version__},
-           'scipy':        {'V_SCI': V_SCI + MKL},
-           'markdown':     {'V_MD': markdown.__version__},
-           'docutils':     {'V_DOC': V_DOC},
-           'mplcursors':   {'V_CUR': V_CUR},
-           }
+mod_pyfda = {'python':       {'V_PY': V_PY},
+             'matplotlib':   {'V_MPL': V_MPL},
+             'Qt5':          {'V_QT': V_QT},
+             'pyqt':         {'V_PYQT': V_PYQT},
+             'numpy':        {'V_NP': np.__version__},
+             'numexpr':      {'V_NUM': numexpr.__version__},
+             'scipy':        {'V_SCI': V_SCI + MKL},
+             'markdown':     {'V_MD': markdown.__version__},
+             'docutils':     {'V_DOC': V_DOC},
+             'mplcursors':   {'V_CUR': V_CUR},
+             }
 
 # ================ Optional Modules ============================
-MODULES.update({'yosys': {'V_YO': dirs.YOSYS_VER}})
+mod_pyfda.update({'yosys': {'V_YO': dirs.YOSYS_VER}})
 
 try:
     from amaranth import __version__ as V_AM
     if V_AM == '':
         V_AM = 'unknown'
-    MODULES.update({'amaranth': {'V_AM': V_AM}})
+    mod_pyfda.update({'amaranth': {'V_AM': V_AM}})
 except ImportError:
-    MODULES.update({'amaranth': {'V_AM': 'n.a.'}})
+    mod_pyfda.update({'amaranth': {'V_AM': 'n.a.'}})
 
 
 # Remove module names as keys and return a dict with items like
 #  {'V_MPL':'3.3.1', ...}
 MOD_VERSIONS = {}
-for k in MODULES.keys():
-    MOD_VERSIONS.update(MODULES[k])
+for k in mod_pyfda:
+    MOD_VERSIONS.update(mod_pyfda[k])
 
 CRLF = os.linesep  # Windows: "\r\n", Mac OS: "\r", *nix: "\n"
 
@@ -177,8 +177,8 @@ def cmp_version(mod: str, version: str) -> int:
         return tuple(map(int, (v.split("."))))
 
     try:  # empty string / module not in list / returned '' as version number
-        if not mod or mod not in MODULES\
-                or list(MODULES[mod].values())[0] in {'', 'n.a.'}:
+        if not mod or mod not in mod_pyfda\
+                or list(mod_pyfda[mod].values())[0] in {'', 'n.a.'}:
             return -2
 
         if dirs.PYINSTALLER:
@@ -186,7 +186,7 @@ def cmp_version(mod: str, version: str) -> int:
             return 1
 
         # get dict value without knowing the key:
-        inst_ver = list(MODULES[mod].values())[0]
+        inst_ver = list(mod_pyfda[mod].values())[0]
         if inst_ver == 'unknown':
             logger.warning(
                 "Version number of module '%s' could not be determined.", mod)
@@ -213,8 +213,8 @@ def mod_version(mod: str = "") -> str:
     their versions sorted alphabetically.
     """
     if mod:
-        if mod in MODULES:
-            return list(MODULES[mod].values())[0]
+        if mod in mod_pyfda:
+            return list(mod_pyfda[mod].values())[0]
 
         return ""
 

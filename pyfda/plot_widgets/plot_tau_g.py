@@ -177,7 +177,7 @@ class PlotTauG(QWidget):
         Draw the figure with new limits, scale etc without recalculating H(f)
         """
         # ========= select frequency range to be displayed =====================
-        # === shift, scale and select: w -> f, H_cplx -> H_c
+        # === shift, scale and select: w -> f, h_cplx -> h_c
         f_max_2 = fb_get('f_max') / 2.
         f = self.w * f_max_2 / np.pi
 

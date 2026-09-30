@@ -205,14 +205,14 @@ def h_mag(num: NDArray, den: NDArray, z: NDArray, h_max: float, h_min: float | N
     # turn off divide by zero warnings, just return 'inf':
     np.seterr(divide=div_by_0)
 
-    H_val = np.nan_to_num(num_val / den_val)  # remove nan and inf
+    h_val = np.nan_to_num(num_val / den_val)  # remove nan and inf
     if log:
-        H_val = 20 * np.log10(H_val)
+        h_val = 20 * np.log10(h_val)
 
     np.seterr(**olderr)  # restore previous floating point error behaviour
 
     # clip result to h_min / h_max
-    return np.clip(H_val, h_min, h_max)
+    return np.clip(h_val, h_min, h_max)
 
 # ------------------------------------------------------------------------------
 def unique_roots(p, tol: float = 1e-3, magsort: bool = False,

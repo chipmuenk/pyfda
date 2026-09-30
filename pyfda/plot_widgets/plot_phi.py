@@ -199,7 +199,7 @@ class PlotPhi(QWidget):
         f_max_2 = fb_get('f_max') / 2.
 
         # ========= select frequency range to be displayed =====================
-        # === shift, scale and select: w -> f, H_cplx -> H_c
+        # === shift, scale and select: w -> f, h_cplx -> h_c
         f = self.w * f_max_2 / np.pi
 
         if fb_get('freq_specs_range_type') == 'sym':
