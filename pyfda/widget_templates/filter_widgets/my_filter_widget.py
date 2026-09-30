@@ -55,7 +55,7 @@ class AllpPZ(QWidget):
 
         self.p = [0.5, 0.5j]
 
-        self.ft = 'IIR'
+        self.ft = 'iir'
 
         # the following defines which subwidgets are "a"ctive, "i"nvisible or "d"eactivated
         self.rt_dicts = ('com',)

@@ -156,7 +156,7 @@ def impz_len(system: list[np.ndarray], zpk: bool = False, level: float = -40) ->
     [dsp_stackexchange_2021]_, [dsp_stackexchange_2022]_.
     """
 
-    if fb_get('ft') == 'IIR':
+    if fb_get('ft') == 'iir':
         if zpk:
             p = system[1]
         else:
@@ -782,7 +782,7 @@ def group_delay(b: np.ndarray, a: np.ndarray = 1, nfft: int = 512, whole: bool =
             if verbose:
                 logger.info("Filter in SOS format, using Shpak algorithm for group delay.")
 
-        elif fb_get('ft') == 'IIR':
+        elif fb_get('ft') == 'iir':
             alg = 'jos'  # TODO: use 'shpak' here as well?
             if verbose:
                 logger.info("IIR filter, using J.O. Smith's algorithm for group delay.")
@@ -1111,19 +1111,19 @@ def calc_ssb_spectrum(A: np.ndarray, mag: bool=False) -> np.ndarray:
 
     Returns
     -------
-    A_SSB : array-like
+    a_ssb : array-like
         single-sided spectrum with half the number of input values
 
     """
     N = len(A)
 
     if mag:
-        A_SSB = np.insert(np.abs(A[1:N//2]) + np.abs(A[-1:(N+1)//2:-1]), 0, A[0])
+        a_ssb = np.insert(np.abs(A[1:N//2]) + np.abs(A[-1:(N+1)//2:-1]), 0, A[0])
     else:
-        A_SSB = np.insert(A[1:N//2] * 2, 0, A[0])
-        # A_SSB = np.insert(A[1:N//2] + A[-1:-(N//2):-1].conj(),0, A[0]) # doesn't work
+        a_ssb = np.insert(A[1:N//2] * 2, 0, A[0])
+        # a_ssb = np.insert(A[1:N//2] + A[-1:-(N//2):-1].conj(),0, A[0]) # doesn't work
 
-    return A_SSB
+    return a_ssb
 
 
 # ------------------------------------------------------------------------------
@@ -1192,7 +1192,7 @@ def fil_save(arg: np.ndarray, format_in: str, sender: str, convert: bool = True)
                 "but has shape '%s'!", np.shape(arg))
             return
         fb_set('sos', arg)
-        fb_set('ft', 'IIR')
+        fb_set('ft', 'iir')
 
     elif format_in == 'zpk':
         if np.ndim(arg) == 1:
@@ -1214,7 +1214,7 @@ def fil_save(arg: np.ndarray, format_in: str, sender: str, convert: bool = True)
 
             fb_set('zpk', arg)
             if np.any(arg[1]):  # non-zero poles -> IIR
-                fb_set('ft', 'IIR')
+                fb_set('ft', 'iir')
             else:
                 fb_set('ft', 'FIR')
         else:
@@ -1243,14 +1243,14 @@ def fil_save(arg: np.ndarray, format_in: str, sender: str, convert: bool = True)
         if not np.any(a[1:]):
             fb_set('ft', 'FIR')
         else:
-            fb_set('ft', 'IIR')
+            fb_set('ft', 'iir')
 
         # equalize if b and a subarrays have different lengths:
         D = len(b) - len(a)
         if D > 0:  # b is longer than a -> fill up a with zeros
             a = np.append(a, np.zeros(D))
         elif D < 0:  # a is longer than b -> fill up b with zeros
-            if fb_get('ft') == 'IIR':
+            if fb_get('ft') == 'iir':
                 b = np.append(b, np.zeros(-D))  # make filter causal, fill up b with zeros
             else:
                 a = a[:D]  # FIR, discard last D elements of a (only zeros anyway)
@@ -1302,7 +1302,7 @@ def fil_convert(format_in: str | set[str]) -> None:
     if 'sos' in format_in:
         # check for bad coeffs before converting IIR filt
         # this is the same defn used by scipy (tolerance of 1e-14)
-        if fb_get('ft') == 'IIR':
+        if fb_get('ft') == 'iir':
             sos = np.absolute(np.asarray(fb_get('sos')))
             n_sections = sos.shape[0]
             for section in range(n_sections):

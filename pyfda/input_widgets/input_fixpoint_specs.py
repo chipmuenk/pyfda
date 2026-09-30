@@ -892,7 +892,7 @@ if __name__ == '__main__':
     app.setStyleSheet(QSS.QSS_RC)
     # change initial settings to FIR
     # fb_set({'ft': 'FIR', 'fc': 'Equiripple'})
-    fb_set('ft', 'IIR')
+    fb_set('ft', 'iir')
     fb_set('fc', 'Ellip')
     FilterTreeBuilder().build_fil_tree()
     mainw = InputFixpointSpecs()

@@ -291,7 +291,7 @@ class PlotPZ(QWidget):
 
         _ = self.zplane(
             z=zpk[0], p=zpk[1], k=zpk[2], plt_ax=self.ax,
-            plt_poles=self.but_fir_poles.isChecked() or fb_get('ft') == 'IIR',
+            plt_poles=self.but_fir_poles.isChecked() or fb_get('ft') == 'iir',
             mps=p_marker[0], mpc=p_marker[1], mzs=z_marker[0], mzc=z_marker[1])
 
         self.ax.xaxis.set_minor_locator(AutoMinorLocator())  # enable minor ticks

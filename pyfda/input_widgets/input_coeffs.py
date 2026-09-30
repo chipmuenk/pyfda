@@ -324,7 +324,7 @@ class InputCoeffs(QWidget):
                 logger.warning("Unknown filter type %s", ftype)
 
         if self.ui.cmb_filter_type.currentText() == 'IIR':
-            fb_set('ft', 'IIR')
+            fb_set('ft', 'iir')
             self.col = 2
             self.tblCoeff.setColumnCount(2)
             self.tblCoeff.setHorizontalHeaderLabels(["b", "a"])
@@ -437,7 +437,7 @@ class InputCoeffs(QWidget):
                 self._refresh_table_item(row, col)
 
         # make a[0] selectable but not editable
-        if fb_get('ft') == 'IIR':
+        if fb_get('ft') == 'iir':
             item = self.tblCoeff.item(0, 1)
             item.setFlags(Qt.ItemIsSelectable | Qt.ItemIsEnabled)
             item.setFont(self.ui.bfont)
@@ -647,7 +647,7 @@ class InputCoeffs(QWidget):
 
         # Switch to manual filter order and 'ManualIIR' resp. 'ManualFIR' filter class
         fb_set('fo', 'man')
-        if fb_get('ft') == 'IIR':
+        if fb_get('ft') == 'iir':
             fb_set('fc', 'ManualIIR')
         else:
             fb_set('fc','ManualFIR')
@@ -702,7 +702,7 @@ class InputCoeffs(QWidget):
             self.ba[1] = np.append(self.ba[1], np.zeros(D))
             # self.quant_coeffs_view()
         elif D < 0:  # a is longer than b
-            if fb_get('ft') == 'IIR':
+            if fb_get('ft') == 'iir':
                 self.ba[0] = np.append(self.ba[0], np.zeros(-D))
             else:
                 self.ba[1] = self.ba[1][:D]  # discard last D elements of a
@@ -758,7 +758,7 @@ class InputCoeffs(QWidget):
 
         if not any(sel):  # nothing selected, append row of zeros after last row
             self.ba = np.insert(self.ba, len(self.ba[0]), 0, axis=1)
-        # elif fb_get('ft') == 'IIR':
+        # elif fb_get('ft') == 'iir':
         else:
             self.ba = np.insert(self.ba, sel_01, 0, axis=1)
         # else:
@@ -806,7 +806,7 @@ class InputCoeffs(QWidget):
                 self.ba[0] = np.where(b_close, targ_val, self.ba[0])
                 changed = True
 
-            if fb_get('ft') == 'IIR':
+            if fb_get('ft') == 'iir':
                 a_close = np.logical_and(
                     np.isclose(self.ba[1], test_val, rtol=0, atol=self.ui.eps),
                     (self.ba[1] != targ_val))

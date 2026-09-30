@@ -86,7 +86,7 @@ class Cheby1():
 
     def __init__(self):
 
-        self.ft = 'IIR'
+        self.ft = 'iir'
 
         c = Common()
         self.rt_dict = c.rt_base_iir
@@ -129,8 +129,8 @@ class Cheby1():
         self.f_c2 = fb_get('f_c2') * 2
         self.f_pb_c = None
 
-        self.a_pb = lin2unit(fb_get('a_pb'), 'IIR', 'a_pb', unit='dB')
-        self.a_sb = lin2unit(fb_get('a_sb'), 'IIR', 'a_sb', unit='dB')
+        self.a_pb = lin2unit(fb_get('a_pb'), 'iir', 'a_pb', unit='dB')
+        self.a_sb = lin2unit(fb_get('a_sb'), 'iir', 'a_sb', unit='dB')
 
 
         # cheby1 filter routines support only one amplitude spec for

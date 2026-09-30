@@ -85,7 +85,7 @@ class Bessel():
 
     def __init__(self):
 
-        self.ft = 'IIR' #: filter type
+        self.ft = 'iir' #: filter type
         self.rt_dict =  {
             'com':{'man':{'fo': ('a', 'N'),
                    'msg':('a', "Enter the filter order <b><i>N</i></b> and the critical "
@@ -159,8 +159,8 @@ class Bessel():
         self.f_c   = fb_get('f_c') * 2
         self.f_c2  = fb_get('f_c2') * 2
 
-        self.a_pb = lin2unit(fb_get('a_pb'), 'IIR', 'a_pb', unit='dB')
-        self.a_sb = lin2unit(fb_get('a_sb'), 'IIR', 'a_sb', unit='dB')
+        self.a_pb = lin2unit(fb_get('a_pb'), 'iir', 'a_pb', unit='dB')
+        self.a_sb = lin2unit(fb_get('a_sb'), 'iir', 'a_sb', unit='dB')
 
         # bessel filter routines support only one amplitude spec for
         # pass- and stop band each

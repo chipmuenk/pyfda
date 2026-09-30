@@ -31,11 +31,11 @@ def db(lin: float | NDArray, power: bool = False) -> float | NDArray:
 
 
 # ------------------------------------------------------------------------------
-def lin2unit(lin_value: float, filt_type: str, amp_label: str,
+def lin2unit(lin_value: float, ft: str, amp_label: str,
              unit: str = 'dB') -> float:
     r"""
     Convert linear amplitude specification to dB or W, depending on filter
-    type ('FIR' or 'IIR') and whether the specifications belong to passband
+    type ('FIR' or 'iir') and whether the specifications belong to passband
     or stopband. This is determined by checking whether amp_label contains
     the strings 'pb' or 'sb' :
 
@@ -55,7 +55,7 @@ def lin2unit(lin_value: float, filt_type: str, amp_label: str,
     """
     if unit == 'dB':
         if 'pb' in amp_label:  # passband
-            if filt_type == 'IIR':
+            if ft == 'iir':
                 unit_value = -20 * log10(1. - lin_value)
             else:
                 unit_value = 20 * log10((1. + lin_value)/(1 - lin_value))
@@ -70,7 +70,7 @@ def lin2unit(lin_value: float, filt_type: str, amp_label: str,
 
 
 # ------------------------------------------------------------------------------
-def unit2lin(unit_value: float, filt_type: str, amp_label: str,
+def unit2lin(unit_value: float, ft: str, amp_label: str,
              unit: str = 'dB') -> float:
     r"""
     Convert amplitude specification in dB or W to linear specs:
@@ -96,7 +96,7 @@ def unit2lin(unit_value: float, filt_type: str, amp_label: str,
     if unit == 'dB':
         try:
             if 'pb' in amp_label:  # passband
-                if filt_type == 'IIR':
+                if ft == 'iir':
                     lin_value = 1. - 10.**(-unit_value / 20.)
                 else:
                     lin_value = (10.**(unit_value / 20.) - 1)\
@@ -118,11 +118,11 @@ def unit2lin(unit_value: float, filt_type: str, amp_label: str,
         if lin_value < MIN_PB_AMP:
             lin_value = MIN_PB_AMP
             msg += "too small, "
-        if filt_type == 'IIR':
+        if ft == 'iir':
             if lin_value > MAX_IPB_AMP:
                 lin_value = MAX_IPB_AMP
                 msg += "too large, "
-        elif filt_type == 'FIR':
+        elif ft == 'FIR':
             if lin_value > MAX_FPB_AMP:
                 lin_value = MAX_FPB_AMP
                 msg += "too large, "
@@ -131,11 +131,11 @@ def unit2lin(unit_value: float, filt_type: str, amp_label: str,
         if lin_value < MIN_SB_AMP:
             lin_value = MIN_SB_AMP
             msg += "too small, "
-        if filt_type == 'IIR':
+        if ft == 'iir':
             if lin_value > MAX_ISB_AMP:
                 lin_value = MAX_ISB_AMP
                 msg += "too large, "
-        elif filt_type == 'FIR':
+        elif ft == 'FIR':
             if lin_value > MAX_FSB_AMP:
                 lin_value = MAX_FSB_AMP
                 msg += "too large, "
@@ -143,7 +143,7 @@ def unit2lin(unit_value: float, filt_type: str, amp_label: str,
     if msg:
         logger.warning(
             "Amplitude spec for %s is %s using %.4g %s instead.", amp_label, msg,
-            lin2unit(lin_value, filt_type=filt_type, amp_label=amp_label, unit=unit), unit)
+            lin2unit(lin_value, ft, amp_label, unit), unit)
     return lin_value
 
 # ------------------------------------------------------------------------------

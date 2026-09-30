@@ -84,7 +84,7 @@ class FilterConfig:
     f_max: float = 1.0
     f_s_scale: float = 1.0
     fc: str = 'Ellip'  # filter class
-    ft: str = 'IIR'  # filter type
+    ft: str = 'iir'  # filter type
     fo: str = 'man'  # filter order: 'man' or 'min'
     rt: str = 'lp'  # filter response type
 

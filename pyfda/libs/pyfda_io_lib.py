@@ -1185,7 +1185,7 @@ def export_fil_data(parent: object, data: str, fkey: str = "", title: str = "Exp
                     err = export_coe_microsemi(f)
                 elif file_type == 'vhd':
                     err = export_coe_vhdl_package(f)
-                elif file_type in {'cmsis', 'sos'} and fb_get('ft') == 'IIR':
+                elif file_type in {'cmsis', 'sos'} and fb_get('ft') == 'iir':
                     err = export_coe_cmsis_sos(f, file_type, formatted)
                 elif file_type == 'cmsis' and fb_get('ft') == 'FIR':
                     err = export_coe_cmsis_fir(f, formatted)
@@ -1286,7 +1286,7 @@ def coe_header(title: str) -> str:
     a_lbls = []
     a_targs = []
     a_targs_db = []
-    ft = fb_get('ft')  # get filter type ('IIR', 'FIR')
+    ft = fb_get('ft')  # get filter type ('iir', 'FIR')
     unit = fb_get('amp_specs_unit')
     unit = 'dB'  # fix this for the moment
     # construct pairs of corner frequency and corresponding amplitude

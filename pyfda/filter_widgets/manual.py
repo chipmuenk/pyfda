@@ -147,7 +147,7 @@ class ManualIIR():
 
         # This part contains static information for building the filter tree
 
-        self.ft = 'IIR'
+        self.ft = 'iir'
 
         self.rt_dict = {
             'com':{'man':{'fo': ('d', 'N'),

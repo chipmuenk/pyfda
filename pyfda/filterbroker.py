@@ -674,7 +674,9 @@ if __name__ == '__main__':
     print('fxq QI WF: ' + str(fb_get('fxq', 'QI', 'WF')))
     fb_set('ft', 'CIC')
     print('ft: ' + str(fb_get('ft')))
+    print("Expected error: Wrong type, should be str:")
     fb_set('ft', 23)  # wrong type, should be str
+    print("Expected error: Key does not exist")
     fb_set('xxx', 13)  # key does not exist
     fb_set('xxx', 13, new_key=True)  # create new key
     print('xxx: ' + str(fb_get('xxx')))  # ... and read it back
@@ -683,10 +685,12 @@ if __name__ == '__main__':
     print('fxq QACC 1: ' + str(fb_get('fxq', 'QACC')))  # ... and read the whole sub-dict
     fb_set('fxq', 'QACC', {'WF': 1, 'WI': 2})  # set a sub-dict
     print('fxq QACC 2: ' + str(fb_get('fxq', 'QACC')))  # ... and read it back
+    print("Expected error: Setting a sub-dict with wrong key 'WA'")
     fb_set('fxq', 'QACC', {'WF': 1, 'WA': 2, 'quant': 'well...'})  # set a sub-dict with wrong key
     print('fxq QACC 3: ' + str(fb_get('fxq', 'QACC')))  # ... and read it back
 
     fb_set('fxq', {'QACC': {'WF': 49, 'WI': 50}})  # set a nested sub-dict
     print('fxq QACC 4: ' + str(fb_get('fxq', 'QACC')))  # ... and read it back
+    print("Expected error: Wrong type for WF (in subdictionary)")
     fb_set('fxq', 'QACC', {'WF': 'a', 'WI': 5, 'N_over': 7})  # wrong type for WF
     print('fxq QACC 5: ' + str(fb_get('fxq', 'QACC')))  # ... and read it back

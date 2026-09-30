@@ -248,11 +248,9 @@ class AmplitudeSpecs(QWidget):
         """
         unit = fb_get('amp_specs_unit')
 
-        filt_type = fb_get('ft')
-
         for qle in self.qlineedit:
             amp_label = str(qle.objectName())
-            amp_value = lin2unit(fb_get(amp_label), filt_type, amp_label, unit=unit)
+            amp_value = lin2unit(fb_get(amp_label), fb_get('ft'), amp_label, unit=unit)
 
             if not qle.hasFocus():
                 # widget has no focus, round the display
@@ -285,11 +283,10 @@ class AmplitudeSpecs(QWidget):
         """
         if self.spec_edited:
             unit = str(self.cmb_units_a.currentText())
-            filt_type = fb_get('ft')
             amp_label = str(source.objectName())
             amp_value = safe_eval(source.text(), self.data_prev, sign='pos')
             is_new_key = amp_label not in fb_get()
-            fb_set(amp_label, unit2lin(amp_value, filt_type, amp_label, unit), new_key=is_new_key)
+            fb_set(amp_label, unit2lin(amp_value, fb_get('ft'), amp_label, unit), new_key=is_new_key)
             self.emit({'specs_changed': 'a_specs'})
             self.spec_edited = False  # reset flag
         self.dict2ui()

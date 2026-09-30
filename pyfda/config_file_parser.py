@@ -610,6 +610,6 @@ if __name__ == "__main__":
     cfp.build_widget_tree()
 
     print('\nINPUT_CLASSES_DICT =\n', pprint_log(ConfigFileParser().INPUT_CLASSES_DICT))
-    print('\nfPLOT_CLASSES_DICT =\n', pprint_log(ConfigFileParser().PLOT_CLASSES_DICT))
+    print('\nPLOT_CLASSES_DICT =\n', pprint_log(ConfigFileParser().PLOT_CLASSES_DICT))
     print('\nFILTER_CLASSES_DICT =\n', pprint_log(ConfigFileParser().FILTER_CLASSES_DICT))
     print('\nFIXPOINT_CLASSES_DICT =\n', pprint_log(ConfigFileParser().FIXPOINT_CLASSES_DICT))

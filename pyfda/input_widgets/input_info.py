@@ -363,7 +363,7 @@ class InputInfo(QWidget):
             a_targs = []
             a_targs_db = []
             a_test = []
-            ft = fb_get('ft')  # get filter type ('IIR', 'FIR')
+            ft = fb_get('ft')  # get filter type ('iir', 'FIR')
             unit = fb_get('amp_specs_unit')
             unit = 'dB'  # fix this for the moment
             # construct pairs of corner frequency and corresponding amplitude
@@ -443,7 +443,7 @@ class InputInfo(QWidget):
             # calculate response of test frequencies in dB
             a_test_db = -20*log10(abs(a_test))
 
-            # get filter type ('IIR', 'FIR') for dB <-> lin conversion
+            # get filter type ('iir', 'FIR') for dB <-> lin conversion
             ft = fb_get('ft')
             # unit = fb_get('amp_specs_unit')
             unit = 'dB'  # make this fixed for the moment
