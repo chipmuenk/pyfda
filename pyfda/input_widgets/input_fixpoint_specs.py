@@ -208,7 +208,7 @@ class InputFixpointSpecs(QWidget):
             self.dict2ui()
         elif 'data_changed' in dict_sig:
             if dict_sig['data_changed'] == 'filter_loaded':
-                self.load_fx_filter()
+                self._load_fx_filter()
                 # TODO: should self._update_filter_cmb() be called here?
                 return
             if dict_sig['data_changed'] == "filter_designed":
@@ -220,7 +220,7 @@ class InputFixpointSpecs(QWidget):
             if 'ui_global_changed' in dict_sig and dict_sig['ui_global_changed']\
                     in {'resized', 'tab'} and self.isVisible():
                 # Widget size has changed / "Fixpoint" tab has been selected -> resize image
-                self.resize_img()
+                self._resize_img()
 
             # =================== DATA CHANGED =====================================
             elif 'data_changed' in dict_sig:
@@ -233,14 +233,14 @@ class InputFixpointSpecs(QWidget):
                 # --------------- init -------------------
                 if dict_sig['fx_sim'] == 'init':
                     # fixpoint simulation has been started externally, e.g. by
-                    # `impz.impz_init()`
+                    # `impz._impz_init()`
                     if not self.fx_wdg_found:
                         logger.error("No fixpoint widget found!")
                         # process this in PlotTran()
                         self.emit({'fx_sim': 'error'})
                         return
                     # initialize fixpoint filter and check for error during initialization
-                    err = self.fx_filt_init()
+                    err = self._fx_filt_init()
                     if err != 0:  # returned an error
                         # process this in PlotTran()
                         self.emit({'fx_sim': 'error'})
@@ -386,7 +386,7 @@ class InputFixpointSpecs(QWidget):
         self.lbl_fixp_img = QLabel("img not set", self)
         # self.lbl_fixp_img.setSizePolicy(QSizePolicy.Minimum, QSizePolicy.Minimum)
 
-        self.embed_fixp_img(self.no_fx_filter_img)
+        self._embed_fixp_img(self.no_fx_filter_img)
         lay_h_img = QHBoxLayout()
         lay_h_img.setContentsMargins(0, 0, 0, 0)
         lay_h_img.addWidget(self.lbl_fixp_img)  # , Qt.AlignCenter)
@@ -450,8 +450,8 @@ class InputFixpointSpecs(QWidget):
         # LOCAL SIGNALS & SLOTs
         # ----------------------------------------------------------------------
         self.cmb_fx_wdg.currentIndexChanged.connect(self._update_fixp_widget)
-        self.but_export_code.clicked.connect(self.export_code)
-        self.cmb_qfrmt.currentIndexChanged.connect(self.qfrmt2ui)
+        self.but_export_code.clicked.connect(self._export_code)
+        self.cmb_qfrmt.currentIndexChanged.connect(self._qfrmt2ui)
 
         # ----------------------------------------------------------------------
         # EVENT FILTER
@@ -459,10 +459,10 @@ class InputFixpointSpecs(QWidget):
         # # monitor events and generate sig_resize event when resized
         # self.lbl_fixp_img.installEventFilter(self)
         # # ... then redraw image when resized
-        # self.sig_resize.connect(self.resize_img)
+        # self.sig_resize.connect(self._resize_img)
 
     # --------------------------------------------------------------------------
-    def load_fx_filter(self) -> None:
+    def _load_fx_filter(self) -> None:
         """
         A new filter has been loaded, create fixpoint filter from scratch.
 
@@ -519,11 +519,11 @@ class InputFixpointSpecs(QWidget):
                     inst_wdg_str += '\t' + class_name + ' : ' + mod_class_name + '\n'
                 except AttributeError as e:
                     logger.warning('Widget "%s":\n%s', class_name, e)
-                    self.embed_fixp_img(self.no_fx_filter_img)
+                    self._embed_fixp_img(self.no_fx_filter_img)
                     continue  # with next `class_name` in for loop
                 except KeyError as e:
                     logger.warning("No fixpoint filter for filter type %s available.",e)
-                    self.embed_fixp_img(self.no_fx_filter_img)
+                    self._embed_fixp_img(self.no_fx_filter_img)
                     continue  # with next `class_name` in for loop
 
             # set passed fx_widget or restore last fx widget if possible
@@ -535,7 +535,7 @@ class InputFixpointSpecs(QWidget):
             self.cmb_fx_wdg.setCurrentIndex(max(idx, 0))
             self.cmb_fx_wdg.blockSignals(False)
         else:  # no fixpoint widget
-            self.embed_fixp_img(self.no_fx_filter_img)
+            self._embed_fixp_img(self.no_fx_filter_img)
         self._update_fixp_widget()
         return inst_wdg_str
 
@@ -554,7 +554,7 @@ class InputFixpointSpecs(QWidget):
 #         return super(InputFixpointSpecs, self).eventFilter(source, event)
 
     # --------------------------------------------------------------------------
-    def embed_fixp_img(self, img_file: str) -> QPixmap:
+    def _embed_fixp_img(self, img_file: str) -> QPixmap:
         """
         Embed `img_file` in png format as `self.img_fixp`
 
@@ -581,7 +581,7 @@ class InputFixpointSpecs(QWidget):
         return self.img_fixp
 
     # --------------------------------------------------------------------------
-    def resize_img(self) -> None:
+    def _resize_img(self) -> None:
         """
         Triggered when `self` (the widget) is selected or resized. The method resizes
         the image inside QLabel to completely fill the label while keeping
@@ -647,8 +647,8 @@ class InputFixpointSpecs(QWidget):
 
             self.fx_wdg_found = False
             self.but_export_code.setVisible(False)
-            self.img_fixp = self.embed_fixp_img(self.no_fx_filter_img)
-            self.resize_img()
+            self.img_fixp = self._embed_fixp_img(self.no_fx_filter_img)
+            self._resize_img()
             self.lbl_title.setText("")
 
             self.fx_filt_ui = None
@@ -691,8 +691,8 @@ class InputFixpointSpecs(QWidget):
                 img_file = os.path.join(file_path, self.fx_filt_ui.img_name)
 
             # ---- instantiate and scale graphic of filter topology ----
-            self.embed_fixp_img(img_file)
-            self.resize_img()
+            self._embed_fixp_img(img_file)
+            self._resize_img()
 
             # ---- set title and description for filter
             self.lbl_title.setText(self.fx_filt_ui.title)
@@ -719,7 +719,7 @@ class InputFixpointSpecs(QWidget):
         self.emit({'fx_sim': 'specs_changed'})
 
     # --------------------------------------------------------------------------
-    def qfrmt2ui(self):
+    def _qfrmt2ui(self):
         """
         Triggered by by a change of index of the combo box `self.cmb_qfrmt`.
 
@@ -761,7 +761,7 @@ class InputFixpointSpecs(QWidget):
         qset_cmb_box(self.cmb_qfrmt, fb_get('qfrmt'), data=True)
         if is_fixp:
             # refresh image in case of switching from float to fix
-            self.resize_img()
+            self._resize_img()
             # update fixpoint widgets from the global filter dict:
             # when loading a filter, a new instance of fil[0] is created, requiring
             # passing a hard update of the filter dict
@@ -776,7 +776,7 @@ class InputFixpointSpecs(QWidget):
                 logger.error("Error using FX filter widget 'dict2ui()' method:\n%s", e)
 
     # --------------------------------------------------------------------------
-    def export_code(self):
+    def _export_code(self):
         """
         Generate implementable code for filter
         """
@@ -820,7 +820,7 @@ class InputFixpointSpecs(QWidget):
                 logger.warning(e)
 
     # --------------------------------------------------------------------------
-    def fx_filt_init(self):
+    def _fx_filt_init(self):
         """
         Wrapper around `self.fx_filt_ui.init_filter()` to catch errors.
         Initialize fix-point filter, reset registers and overflow counters
@@ -841,39 +841,6 @@ class InputFixpointSpecs(QWidget):
             logger.error(
                 'Fixpoint filter reset or instantiation failed\nwith " %s "', e)
             return -1
-
-    # --------------------------------------------------------------------------
-    # def fx_sim_calc_response(self, dict_sig) -> None:
-    #     """
-    #     - Read fixpoint stimulus from `dict_sig` in integer format
-    #     - Pass it to the fixpoint filter which calculates the fixpoint response
-    #     - Store the result in `fx_results` and return. In case of an error,
-    #       `fx_results == None`
-
-    #     Returns
-    #     -------
-    #     None
-    #     """
-    #     try:
-    #         # Run fixpoint simulation and store the results as integer values:
-    #         fx_results = self.fx_filt_ui.fxfilter(dict_sig['fx_stimulus'])
-
-    #         if len(fx_results) == 0:
-    #             logger.error("Fixpoint simulation returned empty results!")
-
-    #     except ValueError as e:
-    #         logger.error("Simulator error %s", e)
-    #         fx_results = None
-
-    #     except AssertionError as e:
-    #         logger.error(
-    #             'Fixpoint simulation failed for dict\n%s\n\twith msg. " %s "' \
-    #             '\n\tStimuli: Shape %s of type %s'
-    #             '\n\tResponse: Shape %s of type "%s"',
-    #             pprint_log(dict_sig), e,
-    #             np.shape(dict_sig["fx_stimulus"]), dict_sig["fx_stimulus"].dtype,
-    #             np.shape(fx_results), type(fx_results))
-    #         fx_results = None
 
 
 ###############################################################################

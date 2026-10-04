@@ -104,7 +104,7 @@ class PlotTran(QWidget):
         # initialize UI for fixpoint or float simulation
         self.update_fx_settings()
 
-        self.impz_init()  # initial calculation of stimulus and response and drawing
+        self._impz_init()  # initial calculation of stimulus and response and drawing
 
     # -----------------------------------------------------------------------
     def emit(self, dict_sig: dict) -> None:
@@ -181,7 +181,7 @@ class PlotTran(QWidget):
         self.tab_stim_w.addTab(self.tran_io_wdg, QIcon(":/file.svg"), "")
         self.tab_stim_w.setTabToolTip(1, "File I/O")
 
-        self.resize_stim_tab_widget()
+        self._resize_stim_tab_widget()
 
         # All the following do not reflect QSS settings always yields w = 30.
         # Try {font.pixelSize()} ?
@@ -215,8 +215,8 @@ class PlotTran(QWidget):
         self.ui.sig_tx.connect(self.process_sig_rx)
         self.stim_wdg.sig_tx.connect(self.process_sig_rx)
         self.tran_io_wdg.sig_tx.connect(self.process_sig_rx)
-        self.mplwidget_t.mpl_toolbar.sig_tx.connect(self.process_sig_rx_t)
-        self.mplwidget_f.mpl_toolbar.sig_tx.connect(self.process_sig_rx_f)
+        self.mplwidget_t.mpl_toolbar.sig_tx.connect(self._process_sig_rx_t)
+        self.mplwidget_f.mpl_toolbar.sig_tx.connect(self._process_sig_rx_f)
         # self.mplwidget.mpl_toolbar.enable_plot(state = False) # disable initially
 
         # When user has selected a different local tab, trigger a redraw of current tab
@@ -224,12 +224,12 @@ class PlotTran(QWidget):
         # ---------------------------------------------------------------------
         # UI SIGNALS & SLOTs
         # ---------------------------------------------------------------------
-        self.tab_stim_w.currentChanged.connect(self.resize_stim_tab_widget)
+        self.tab_stim_w.currentChanged.connect(self._resize_stim_tab_widget)
         # --- run control ---
         self.ui.cmb_sim_select.currentIndexChanged.connect(self.update_fx_settings)
-        self.ui.but_run.clicked.connect(self.impz_init)
-        self.ui.but_auto_run.clicked.connect(self.calc_auto)
-        self.stim_wdg.ui.but_file_io.clicked.connect(self.set_n_to_file_len)
+        self.ui.but_run.clicked.connect(self._impz_init)
+        self.ui.but_auto_run.clicked.connect(self._calc_auto)
+        self.stim_wdg.ui.but_file_io.clicked.connect(self._set_n_to_file_len)
         # --- time domain plotting --------------------------------------------
         self.ui.cmb_plt_time_resp.currentIndexChanged.connect(self.draw)
         self.ui.cmb_plt_time_stim.currentIndexChanged.connect(self.draw)
@@ -269,20 +269,7 @@ class PlotTran(QWidget):
         self.draw(arg)  # pass button state to draw()
 
     # -----------------------------------------------------------------------
-    def toggle_stim_options(self) -> None:
-        """
-        Toggle visibility of stimulus options, depending on the state of the
-        "Stimuli" button
-        """
-        self.tab_stim_w.setVisible(
-            qget_cmb_box(self.ui.cmb_ui_select) in {"stim", "plot_stim"})
-        self.ui.wdg_ctrl_freq.setVisible(
-            qget_cmb_box(self.ui.cmb_ui_select) in {"plot", "plot_stim"})
-        self.ui.wdg_ctrl_time.setVisible(
-            qget_cmb_box(self.ui.cmb_ui_select) in {"plot", "plot_stim"})
-
-    # -----------------------------------------------------------------------
-    def set_ui_level(self, ui_level: int) -> None:
+    def _set_ui_level(self, ui_level: int) -> None:
         """
         Sync time and frequency subwidget and set their ui display level
         """
@@ -312,7 +299,7 @@ class PlotTran(QWidget):
             logger.warning("Undefined 'ui_level = %d!", ui_level)
 
     # -----------------------------------------------------------------------
-    def resize_stim_tab_widget(self) -> None:
+    def _resize_stim_tab_widget(self) -> None:
         """
         Resize active tab of stimulus Tab widget to fit the height of the contained
         widget. This is triggered by:
@@ -337,14 +324,14 @@ class PlotTran(QWidget):
         self.tab_stim_w.setMinimumHeight(max(height, min_height))
 
     # -----------------------------------------------------------------------
-    def process_sig_rx_t(self, dict_sig: dict | None = None) -> None:
+    def _process_sig_rx_t(self, dict_sig: dict | None = None) -> None:
         """
         Special treatment for signals coming from TIME plot navigation toolbar
         """
         # cycle ui level
         if 'mpl_toolbar' in dict_sig and dict_sig['mpl_toolbar'] == 'ui_level':
             # read out ui level directly
-            self.set_ui_level(self.mplwidget_t.mpl_toolbar.a_ui_level)
+            self._set_ui_level(self.mplwidget_t.mpl_toolbar.a_ui_level)
         # redraw plot when it has become enabled
         elif dict_sig['mpl_toolbar'] == 'enable_plot'\
                 and self.mplwidget_t.mpl_toolbar.plot_enabled:
@@ -353,14 +340,14 @@ class PlotTran(QWidget):
             self.process_sig_rx(dict_sig)
 
     # -----------------------------------------------------------------------
-    def process_sig_rx_f(self, dict_sig: dict | None = None) -> None:
+    def _process_sig_rx_f(self, dict_sig: dict | None = None) -> None:
         """
         Special treatment for signals coming from FREQ plot navigation toolbar
         """
         # cycle ui level
         if 'mpl_toolbar' in dict_sig and dict_sig['mpl_toolbar'] == 'ui_level':
             # read out ui level directly
-            self.set_ui_level(self.mplwidget_f.mpl_toolbar.a_ui_level)
+            self._set_ui_level(self.mplwidget_f.mpl_toolbar.a_ui_level)
         # redraw plot when it has become enabled
         elif dict_sig['mpl_toolbar'] == 'enable_plot'\
                 and self.mplwidget_f.mpl_toolbar.plot_enabled:
@@ -396,7 +383,7 @@ class PlotTran(QWidget):
                 # - update run button style to 'changed'
                 # - if widget is visible and autorun is selected,
                 #     initialize fixpoint widget and
-                #     start simulation via `calc_auto` -> `self.impz_init()`
+                #     start simulation via `_calc_auto` -> `self._impz_init()`
                 self.needs_calc = True  # force recalculation
                 self.error = False      # reset error flag
                 # set cmb box for fixpoint / float simulation and update ui:
@@ -407,7 +394,7 @@ class PlotTran(QWidget):
                 qstyle_widget(self.ui.but_run, 'changed')
                 self.ui.but_run.setIcon(QIcon(":/play.svg"))
                 if self.isVisible():
-                    self.calc_auto() # call impz_init() if autorun is selected
+                    self._calc_auto() # call _impz_init() if autorun is selected
 
             # --------------- 'start_fx_response_calculation' ---------
             elif dict_sig['fx_sim'] == 'start_fx_response_calculation':
@@ -455,11 +442,11 @@ class PlotTran(QWidget):
                 # Highlight "RUN" button
                 self.ui.but_run.setIcon(QIcon(":/play.svg"))
                 qstyle_widget(self.ui.but_run, 'changed')
-                self.impz_init()
+                self._impz_init()
 
             elif 'mpl_toolbar' in dict_sig:
                 if dict_sig['mpl_toolbar'] == 'home':
-                    self.zoom_home()
+                    self._zoom_home()
                     self.needs_redraw[self.tab_mpl_w.currentIndex()] = False
 
             elif 'ui_local_changed' in dict_sig:
@@ -471,7 +458,7 @@ class PlotTran(QWidget):
                     self.needs_calc = True
                     # make file data available to stimulus widget:
                     self.file_io()
-                    self.impz_init()
+                    self._impz_init()
 
             elif 'view_changed' in dict_sig or any(self.needs_redraw):
                 self.draw()  # redraw a.o. changed axes scaling
@@ -487,7 +474,7 @@ class PlotTran(QWidget):
                 self.needs_calc = True
 
     # -----------------------------------------------------------------------
-    def set_n_to_file_len(self) -> None:
+    def _set_n_to_file_len(self) -> None:
         """
         Check status of file_io widget:
         - if no file is loaded, do nothing. This shouldn't happen (check to be sure ...)
@@ -533,19 +520,19 @@ class PlotTran(QWidget):
     # =======================================================================
     # Simulation: Calculate stimulus, response and draw them
     # =======================================================================
-    def calc_auto(self) -> None:
+    def _calc_auto(self) -> None:
         """
         Triggered when checkbox "Autorun" is clicked or specs have been edited,
         requiring a recalculation.
 
         When Autorun has been pushed (`but_auto_run.isChecked() == True`) and
-        calculation is required, automatically run `impz_init()`.
+        calculation is required, automatically run `_impz_init()`.
         """
         if self.ui.but_auto_run.isChecked() and self.needs_calc:
-            self.impz_init()
+            self._impz_init()
 
     # -----------------------------------------------------------------------
-    def impz_init(self, arg: bool | None = None) -> None:
+    def _impz_init(self, arg: bool | None = None) -> None:
         """
         Initialize transient simulation.
 
@@ -562,7 +549,7 @@ class PlotTran(QWidget):
             - `_construct_ui()` during initialization
             - Pressing "Run" button, passing button state as a bool
             - `self.ui.cmb_sim_select` when changing between fixpoint and float mode
-            - `self.calc_auto()` when activating "Autorun"
+            - `self._calc_auto()` when activating "Autorun"
             - Autorun (when something relevant in the UI has been updated)
             - signal ``{'fx_sim' : 'specs_changed'}``
 
@@ -577,8 +564,8 @@ class PlotTran(QWidget):
               quantizer and emit `{'fx_sim':'init'}`
         """
 
-        # logger.info("impz_init")
-        self.resize_stim_tab_widget()
+        # logger.info("_impz_init")
+        self._resize_stim_tab_widget()
         # allow scaling the frequency response from pure impulse (no DC, noise or file)
         # button is only visible for impulse-shaped stimuli
         self.ui.but_freq_norm_impz.setEnabled(
@@ -692,7 +679,7 @@ class PlotTran(QWidget):
 
         Triggered by:
 
-        - `self.impz_init()` (floating point)
+        - `self._impz_init()` (floating point)
         -  Fixpoint widget, requesting "start_fx_response_calculation"
             via `process_rx_signal()` (fixpoint filter)
         """
@@ -814,7 +801,7 @@ class PlotTran(QWidget):
         """
         `arg` can have the following types, triggered by:
 
-        - `None`: from `__init__()`, `impz_init()` or `process_sig_rx()` when
+        - `None`: from `__init__()`, `_impz_init()` or `process_sig_rx()` when
             {dict_sig['fx_sim'] == 'specs_changed'} was received. Read the state of
             `get_fx()` and update combobox correspondingly
         - int 0 or 1 from `self.ui.cmb_sim_select` when index was changed
@@ -843,7 +830,7 @@ class PlotTran(QWidget):
             set_fx(qget_cmb_box(self.ui.cmb_sim_select) == 'fixpoint')
             self.emit({'fx_sim': 'specs_changed'})
             self.needs_calc = True
-            self.calc_auto()  # run simulation if autostart has been selected
+            self._calc_auto()  # run simulation if autostart has been selected
 
         # Direct call with argument: Set UI and `set_fx()` accord. to `arg`
         # elif arg in {'float', 'fixpoint'}:
@@ -989,10 +976,10 @@ class PlotTran(QWidget):
 
         if idx == 0 and self.needs_redraw[0]\
                 and self.mplwidget_t.mpl_toolbar.plot_enabled:
-            self.draw_time(n_start=self.ui.n_start, n_end=self.ui.n_end)
+            self._draw_time(n_start=self.ui.n_start, n_end=self.ui.n_end)
         elif idx == 1 and self.needs_redraw[1]\
                 and self.mplwidget_f.mpl_toolbar.plot_enabled:
-            self.draw_freq()
+            self._draw_freq()
 
     # ----------------------------------------------------------------------
     def _spgr_ui2params(self) -> None:
@@ -1174,7 +1161,7 @@ class PlotTran(QWidget):
             ax.yaxis.set_minor_locator(AutoMinorLocator())
 
     # ------------------------------------------------------------------------
-    def draw_time(self, n_start: int = 0, n_end: int = 0) -> None:
+    def _draw_time(self, n_start: int = 0, n_end: int = 0) -> None:
         """
         (Re-)draw the time domain mplwidget
         """
@@ -1225,18 +1212,18 @@ class PlotTran(QWidget):
         else:
             x_q = None
 
-        # Create finer grid for plotting interpolated waveforms
+        # Create finer grid for plotting interpolated waveforms with interpolation factor i_x
         if self.ui.chk_plt_time_stim_interp.isChecked():
-            I_x = 20
-            # self.t_interp = np.linspace(self.t[0], self.t[-1], (len(self.t) - 1) * I_x + 1)
+            i_x = 20
+            # self.t_interp = np.linspace(self.t[0], self.t[-1], (len(self.t) - 1) * i_x + 1)
             # self.x_interp = np.interp(self.t_interp, self.t, self.x, left=None, right=None,
             #                      period=None)
             self.x_interp = sig.resample_poly(
-                self.x, I_x, 1, axis=0, window=('kaiser', 5.0),
-                padtype='line', cval=None)[n_start * I_x: n_end * I_x]
+                self.x, i_x, 1, axis=0, window=('kaiser', 5.0),
+                padtype='line', cval=None)[n_start * i_x: n_end * i_x]
             self.t_interp = np.linspace(
-                self.n[0], self.n[-1] + 1, len(self.n) * I_x,
-                endpoint=False)[n_start * I_x: n_end * I_x] * fb_get('t_s')
+                self.n[0], self.n[-1] + 1, len(self.n) * i_x,
+                endpoint=False)[n_start * i_x: n_end * i_x] * fb_get('t_s')
 
 
         t = self.t[n_start:n_end]
@@ -1569,7 +1556,7 @@ class PlotTran(QWidget):
         self.calc_fft()
 
     # ------------------------------------------------------------------------
-    def draw_freq(self) -> None:
+    def _draw_freq(self) -> None:
         """
         (Re-)draw the frequency domain mplwidget
         """
@@ -2041,15 +2028,15 @@ class PlotTran(QWidget):
 #        self.mplwidget_t.redraw()
 
      # -------------------------------------------------------------------------
-    def zoom_home(self) -> None:
+    def _zoom_home(self) -> None:
         """
         Zoom to home settings
         """
         idx = self.tab_mpl_w.currentIndex()
         if idx == 0:  # time plot widget
-            self.draw_time()
+            self._draw_time()
         else:
-            self.draw_freq()
+            self._draw_freq()
 
 # ------------------------------------------------------------------------------
 
