@@ -110,13 +110,7 @@ def scatter(x, y, ax, label: str = "", mkr_fmt: dict = None) -> lines.Line2D:
     return ax.scatter(x, y, s=ms*ms, label=label, **mkr_fmt_cp)
 
 
-def no_plot(x, y, ax=None, bottom=0, label=None, **kwargs) -> None:
-    """
-    Don't plot anything - dummy method needed for plot factory
-    """
-
 # ------------------------------------------------------------------------------
-
 class MplWidget(QWidget):
     """
     Construct a subwidget consisting of a Matplotlib canvas and a subclassed
@@ -910,11 +904,6 @@ class MplToolbar(NavigationToolbar):
             Set to True when the trigger was a CTRL+C keypress and the Control modifier
             has to be blanked out. For a mouse event ALT and META modifiers are blanked out.
         """
-        # TODO:  when this method is called for the first time, the following error occurs
-        # *after* the method has been executed:
-        # layout_engine.py:271: RuntimeWarning: divide by zero encountered in scalar divide
-        #    h_pad = self._params['h_pad'] / height
-        # Maybe the figure is empty and the height is zero, causing a divide by zero warning?
 
         try:
             modifiers = QtWidgets.QApplication.keyboardModifiers()

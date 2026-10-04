@@ -553,26 +553,16 @@ class Plot3D(QWidget):
                 rgb = None
                 cmap_surf = cmap
 
-#            s = self.ax3d.plot_surface(self.x, self.y, h_mag_z,
-#                    alpha=OPT_3D_ALPHA, rstride=1, cstride=1, cmap=cmap,
-#                    linewidth=0, antialiased=False, shade=True, facecolors = rgb)
-#            s.set_edgecolor('gray')
             s = self.ax3d.plot_surface(
                 self.x, self.y, h_mag_z, alpha=alpha, rstride=1, cstride=1, linewidth=0,
                 antialiased=False, facecolors=rgb, cmap=cmap_surf, shade=True)
-            s.set_edgecolor(None)
+            s.set_edgecolor(None)  # 'gray'?
         # ---------------------------------------------------------------
         # 3D-Contour plot
         # ---------------------------------------------------------------
         elif self.cmb_mode_3d.currentText() == 'Contour':
             s = self.ax3d.contourf3D(self.x, self.y, h_mag_z, nl, alpha=alpha, cmap=cmap)
 
-        # ---------------------------------------------------------------
-        # 2D-Contour plot
-        # TODO: zdir = x / y delivers unexpected results -> rather plot max(H)
-        #       along the other axis?
-        # TODO: colormap is created depending on the zdir = 'z' contour plot
-        #       -> set limits of (all) other plots manually?
         if self.but_contour_2d.isChecked():
             self.ax3d.contourf(self.x, self.y, h_mag_z, nl, zdir='x', offset=self.xmin,
                 cmap=cmap, alpha = alpha)#, vmin = bottom)#, vmax = top, vmin = bottom)
