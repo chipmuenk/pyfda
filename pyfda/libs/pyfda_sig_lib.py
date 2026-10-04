@@ -22,86 +22,9 @@ logger = logging.getLogger(__name__)
 
 
 # ------------------------------------------------------------------------------
-
-def impz(b: np.ndarray, a: np.ndarray | float = 1, FS: float = 1, N: int = 0,
-         step: bool = False) -> tuple[np.ndarray, np.ndarray]:
-    """
-    Calculate impulse response of a discrete time filter, specified by
-    numerator coefficients b and denominator coefficients a of the system
-    function H(z).
-
-    When only b is given, the impulse response of the transversal (FIR)
-    filter specified by b is calculated.
-
-    Parameters
-    ----------
-    b :  array_like
-        Numerator coefficients (transversal part of filter)
-
-    a :  array_like (optional, default = 1 for FIR-filter)
-        Denominator coefficients (recursive part of filter)
-
-    FS : float (optional, default: FS = 1)
-        Sampling frequency.
-
-    N :  float (optional)
-        Number of calculated points.
-        Default: N = len(b) for FIR filters, N = 100 for IIR filters
-
-    step : bool (optional, default False)
-        return the step response instead of the impulse response
-
-    Returns
-    -------
-    hn : ndarray
-        impulse or step response with length N (see above)
-    td : ndarray
-        contains the time steps with same length as hn
-
-
-    Examples
-    --------
-    >>> b = [1,2,3] # Coefficients of H(z) = 1 + 2 z^2 + 3 z^3
-    >>> h, n = dsp_lib.impz(b)
-    """
-    a = np.asarray(a)
-    b = np.asarray(b)
-
-    if len(a) == 1:
-        if len(b) == 1:
-            raise TypeError(
-                'No proper filter coefficients: len(a) = len(b) = 1 !')
-        IIR = False
-    else:
-        if len(b) == 1:
-            IIR = True
-        # Test whether all elements except first are zero
-        elif not np.any(a[1:]) and a[0] != 0:
-            #  same as:   elif np.all(a[1:] == 0) and a[0] <> 0:
-            IIR = False
-        else:
-            IIR = True
-
-    if N == 0:  # set number of data points automatically
-        if IIR:
-            N = impz_len([b, a])
-        else:
-            N = len(b)  # FIR: N = number of coefficients
-
-    impulse = np.zeros(N)
-    impulse[0] = 1.0  # create dirac impulse as input signal
-    hn = np.array(sig.lfilter(b, a, impulse))  # calculate impulse response
-    td = np.arange(len(hn)) / FS
-
-    if step:  # calculate step response
-        hn = np.cumsum(hn)
-
-    return hn, td
-
-# ------------------------------------------------------------------------------
 def impz_len(system: list[np.ndarray], zpk: bool = False, level: float = -40) -> int:
     r"""
-    Calculate length of impulse response for FIR and IIR filters.
+    Estimate length of impulse response for FIR and IIR filters.
 
     Parameters
     ----------
