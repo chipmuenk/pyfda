@@ -420,15 +420,11 @@ class Plot3D(QWidget):
         # scalarMap = cmx.ScalarMappable(norm=cNorm, cmap=jet)
 
         # -----------------------------------------------------------------------------
-        # Calculate H(w) along the upper half of unity circle
+        # Calculate H(f) along the upper half of unity circle
         # -----------------------------------------------------------------------------
 
-
-        [_, H] = sig.freqz(bb, aa, worN=n_fft, whole=True)
-        H = np.nan_to_num(H)  # replace nans and inf by finite numbers
-
-        h_abs = abs(H)
-        # h_max = max(h_abs)
+        [_, h_f] = sig.freqz(bb, aa, worN=n_fft, whole=True)
+        h_abs = abs(np.nan_to_num(h_f))  # replace nans and inf by finite numbers
         h_min = min(h_abs)
         # f = w / (2 * pi) * f_s                  # translate w to absolute frequencies
         # f_min = f[np.argmin(h_abs)]
@@ -511,16 +507,19 @@ class Plot3D(QWidget):
             self.ax3d.plot(zz.real, zz.imag, ones(len(zz)) * zlevel, 'o',
                markersize=PN_SIZE, markeredgecolor='blue', markeredgewidth=2.0,
                 markerfacecolor='none')
-            for k in range(len(zz)):  # plot zero "stems"
-                self.ax3d.plot([zz[k].real, zz[k].real], [zz[k].imag, zz[k].imag],
-                            [bottom, zlevel], linewidth=1, color='b')
+            # Plot "stems" from zlevel down to bottom
+            # for k in range(len(zz)):
+            for _, z in enumerate(zz):
+                self.ax3d.plot([z.real, z.real], [z.imag, z.imag],
+                               [bottom, zlevel], linewidth=1, color='b')
 
-            # Plot the poles at |H(z_p)| = plevel with "stems":
+            # Plot the poles at |H(z_p)| = plevel:
             self.ax3d.plot(np.real(pp), np.imag(pp), plevel_top,
               'x', markersize=PN_SIZE, markeredgewidth=2.0, markeredgecolor='red')
-            for k in range(len(pp)):  # plot pole "stems"
-                self.ax3d.plot([pp[k].real, pp[k].real], [pp[k].imag, pp[k].imag],
-                            [plevel_btm, plevel_top], linewidth=1, color='r')
+            # Plot pole "stems"
+            for _, p in enumerate(pp):
+                self.ax3d.plot([p.real, p.real], [p.imag, p.imag],
+                               [plevel_btm, plevel_top], linewidth=1, color='r')
 
         # ===============================================================
         # 3D-Plots of |H(z)| clipped between |H(z)| = top
