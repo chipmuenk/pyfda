@@ -399,11 +399,11 @@ class PlotTran(QWidget):
             # --------------- 'start_fx_response_calculation' ---------
             elif dict_sig['fx_sim'] == 'start_fx_response_calculation':
                 # The fixpoint widget has been initialized and starts the fx simulation
-                # via `self.impz()` if the widget is visible. The handle to the fixpoint
+                # via `self.tran()` if the widget is visible. The handle to the fixpoint
                 # simulation method has been passed via `dict_sig['fxfilter_func']`
                 self.fxfilter = dict_sig['fxfilter_func']
                 if self.isVisible():
-                    self.impz()
+                    self.tran()
                 return
 
             # --------------- ERROR in fixpoint simulation ------------
@@ -654,7 +654,7 @@ class PlotTran(QWidget):
 
                 # initialize FX filter and get a handle for `fxfilter()` function
                 self.emit({'fx_sim': 'init'})
-                return  # process_sig_rx() directly calls impz() in next step
+                return  # process_sig_rx() directly calls tran() in next step
 
             # Initialize filter memory with zeros, for either cascaded structure (sos)
             # or direct form
@@ -670,10 +670,10 @@ class PlotTran(QWidget):
                     return
                 self.zi = np.zeros(max(len(self.aa), len(self.bb)) - 1)
             # calculate float impulse response:
-            self.impz()
+            self.tran()
 
     # -----------------------------------------------------------------------
-    def impz(self) -> None:
+    def tran(self) -> None:
         """
         Calculate floating point / fixpoint response and redraw it
 
@@ -684,7 +684,7 @@ class PlotTran(QWidget):
             via `process_rx_signal()` (fixpoint filter)
         """
         while self.n_first < self.ui.n_end:
-            # logger.info("impz(): Calculating frame "
+            # logger.info("tran(): Calculating frame "
             #             f"{int(np.ceil(self.n_first / self.ui.n_frame)) + 1} of "
             #             f"{int(np.ceil(self.ui.n_end / self.ui.n_frame))}")
             # The last frame could be shorter than self.ui.n_frame:
@@ -753,7 +753,7 @@ class PlotTran(QWidget):
     # -----------------------------------------------------------------------
     def impz_finish(self) -> None:
         """
-        Do some housekeeping, resetting and drawing when `self.impz()`
+        Do some housekeeping, resetting and drawing when `self.tran()`
         has finished:
 
         - Calculate step error if selected
