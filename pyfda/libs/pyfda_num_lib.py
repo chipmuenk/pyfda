@@ -117,36 +117,46 @@ def np_shape(data):
 
 
 # -----------------------------------------------------------------------------
-def iter2ndarray(iterable: np.ndarray | list | tuple, dtype=complex) -> np.ndarray | None:
+def iter2ndarray(iter: np.ndarray | list | tuple, dtype=complex) -> np.ndarray | None:
     """
-    Convert an iterable (tuple, list, dict) to a numpy ndarray, egalizing
-    different lengths of sub-iterables by adding zeros. This prevents
-    problems with inhomogeneous arrays.
+    Convert an iterable (tuple, list, dict) to a numpy ndarray, egalizing different lengths
+    of sub-iterables by adding zeros (only works for an iterables of iterables one level deep).
+    This allows conversion of inhomogeneous (different length of sub-iterables) iterables to
+    arrays.
 
-    Return ndarray or None
+    Arguments
+    ---------
+    iter: tuple | list | np.ndarray
+        An iterable, usually of other subiterables
+
+
+    Returns
+    -------
+    ndarray | None
+        iterable, converted to a 2D numpy ndarray or None when conversion failed
     """
-    if isinstance(iterable, np.ndarray):
+    if isinstance(iter, np.ndarray):
         # no need to convert argument
-        return iterable
+        return iter
 
-    if isinstance(iterable, (tuple, list)):
+    if isinstance(iter, (tuple, list)):
         arrs = []  # empty list for sub-arrays
         max_l = 0  # maximum length of sub-arrays
-        for i in range(len(iterable)):
-            if np.isscalar(iterable[i]):
-                arrs.append(np.array([iterable[i]]))
+        for i, arr in enumerate(iter):
+            if np.isscalar(arr):
+                arrs.append(np.array([arr]))  # convert arr to list of length 1 and append
             else:
-                arrs.append(np.array(iterable[i]))
+                arrs.append(np.array(arr))  # append iterable directly
             max_l = max(max_l, len(arrs[i]))
 
-        # equalize lengths of sub-arrays by filling up with zeros and convert to arrays
-        for i in range(len(iterable)):
+        # equalize lengths of sub-arrays `arrs[i]` by filling up with zeros and convert to arrays
+        for i in range(len(iter)):
             arrs[i] = np.asarray(np.append(arrs[i], np.zeros(max_l - len(arrs[i]))))
 
-        # convert list of arrays to two-dimensional array
+        # remove nan's and convert list of arrays to two-dimensional array
         return np.nan_to_num(np.array(arrs, dtype=dtype))
 
-    logger.error("Unsupported type '{type(iterable)}' of %s for conversion to ndarray.", iterable)
+    logger.error("Unsupported type '{type(iter)}' of %s for conversion to ndarray.", iter)
     return None
 
 
@@ -425,7 +435,7 @@ def safe_eval(expr, alt_expr=0, return_type: str = 'float', sign: str = ''
 
                 if return_type == 'cmplx':
                     result = ex_num.item()
-                elif return_type == '' or return_type == 'auto':
+                elif return_type in {'', 'auto'}:
                     result = np.real_if_close(ex_num).item()
                 else:  # return_type == 'float' or 'int'
                     result = ex_num.real.item()
@@ -509,10 +519,12 @@ def expand_lim(ax, eps_x: float, eps_y: float = None) -> None:
 
 
 # ------------------------------------------------------------------------------
-def format_ticks(ax, xy: str, scale: float = 1., format: str = "%.1f") -> None:
+def format_ticks(ax, xy: str, scale: float = 1., frmt: str = "%.1f") -> None:
     """
     Reformat numbers at x or y - axis. The scale can be changed to display
     e.g. MHz instead of Hz. The number format can be changed as well.
+
+    This is currently unused!
 
     Parameters
     ----------
@@ -525,7 +537,7 @@ def format_ticks(ax, xy: str, scale: float = 1., format: str = "%.1f") -> None:
     scale : float (default: 1.)
             rescaling factor for the axes
 
-    format : string (default: %.1f)
+    frmt : string (default: %.1f)
              define C-style number formats
 
     Returns
@@ -541,21 +553,20 @@ def format_ticks(ax, xy: str, scale: float = 1., format: str = "%.1f") -> None:
 
     Two decimal places for numbers on x- and y-axis
 
-    >>> format_ticks('xy',1., format = "%.2f")
+    >>> format_ticks('xy',1., frmt = "%.2f")
 
     """
-    if xy == 'x' or xy == 'xy':
+    if xy in {'x', 'xy'}:
         # get location and content of xticks
         # locx,labelx = ax.get_xticks(), ax.get_xticklabels()
         locx = ax.get_xticks()
         ax.set_xticks(locx)
-        ax.set_xtticklabels([format % x for x in locx*scale])
-        # ax.set_xticks(locx, map(lambda x: format % x, locx*scale))
+        ax.set_xtticklabels([frmt % x for x in locx*scale])
 
-    if xy == 'y' or xy == 'xy':
+    if xy in {'y', 'xy'}:
         locy = ax.get_yticks()  # get location and content of xticks
         ax.set_yticks(locy)
-        ax.set_yticklabels([format % y for y in locy*scale])
+        ax.set_yticklabels([frmt % y for y in locy*scale])
 
 # ------------------------------------------------------------------------------
 if __name__ == '__main__':
