@@ -108,9 +108,11 @@ class QVLine(QFrame):
 
 class PushButton(QPushButton):
     """
-    Convenience class for creating a checkable QPushButton with attribute `checked` that
-    reflects the checked state of the button and can be used for QSS styling via the
-    `style_button()` method.
+    Convenience class for creating a checkable QPushButton with attribute `checked`
+    that reflects the button state and can be styled via `style_button()`.
+
+    When `rich_text=True`, a transparent QLabel is used inside the button so HTML/
+    rich-text labels can be displayed without duplicating the toggle logic.
 
     Parameters
     ----------
@@ -118,7 +120,7 @@ class PushButton(QPushButton):
         Parent widget of the button.
 
     text : str, optional
-        Text for button (default: empty string).
+        Text for the button (default: empty string).
 
     icon : QIcon, optional
         Icon for button. Either `text` or `icon` must be defined.
@@ -132,12 +134,19 @@ class PushButton(QPushButton):
     objectName : str, optional
         Object name to set on the widget (useful for styling and testing).
 
+    rich_text : bool, optional
+        If True, render the button text with a QLabel using rich text.
+
+    pad : int, optional
+        Left/right padding in pixels used when `rich_text=True`.
+
     **kwargs
         Additional keyword arguments forwarded to `QPushButton`.
     """
 
     def __init__(self, parent: QtWidgets.QWidget = None, text: str = "", icon: QIcon = None,
-                 checkable: bool = True, checked: bool = False, objectName: str = "", **kwargs):
+                 checkable: bool = True, checked: bool = False, objectName: str = "",
+                 rich_text: bool = False, pad: int = 5, **kwargs):
 
         if parent is not None:
             super().__init__(parent, **kwargs)
@@ -146,8 +155,24 @@ class PushButton(QPushButton):
 
         self.setObjectName(objectName)
 
-        if icon is None:
-            super().setText(text.strip())
+        self.rich_text = bool(rich_text)
+        self.lbl_rtf = None
+        self.pad = pad
+
+        if self.rich_text:
+            self.lbl_rtf = QLabel(self)
+            self.lbl_rtf.setText(text if text is not None else "")
+            self.lbl_rtf.setAttribute(Qt.WA_TranslucentBackground)
+            self.lbl_rtf.setAttribute(Qt.WA_TransparentForMouseEvents)
+            self.lbl_rtf.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+            self.lbl_rtf.setTextFormat(Qt.RichText)
+            self.lay_h_main = QHBoxLayout()
+            self.lay_h_main.setContentsMargins(pad, 0, pad, 0)  # L, T, R, B
+            self.lay_h_main.setSpacing(0)
+            self.setLayout(self.lay_h_main)
+            self.lay_h_main.addWidget(self.lbl_rtf, Qt.AlignHCenter)
+        elif icon is None:
+            super().setText(text.strip() if isinstance(text, str) else text)
         else:
             self.setIcon(icon)
 
@@ -161,198 +186,28 @@ class PushButton(QPushButton):
             self._checked = False
 
         self.style_button()
-
-        self.installEventFilter(self)
-
-    def isChecked(self) -> bool:
-        """
-        Get the checked state of the button.
-
-        Returns
-        -------
-        bool
-            The current checked state of the button from attribute `checked`.
-        """
-        return self._checked
-
-    def setChecked(self, checked: bool) -> None:
-        """
-        Set the checked state of the button and update its visual style.
-
-        Parameters
-        ----------
-        checked : bool
-            New checked state. Ignored when the button is not checkable.
-        """
-        if self._checkable:
-            self._checked = checked
-            self.style_button()
-
-    def setCheckable(self, checkable: bool) -> None:
-        """
-        Enable or disable the button's checkable behavior.
-
-        Parameters
-        ----------
-        checkable : bool
-            When False, the button is made non-checkable and its checked state
-            is cleared.
-        """
-        self._checkable = checkable
-        if not self._checkable:
-            self.setChecked(False)
-            self._checked = False
-            self.style_button()
-
-    def eventFilter(self, source: QtCore.QObject, event: QEvent) -> bool:
-        """
-        Intercept events targeted at the button to handle toggle behavior on
-        mouse press events when the button is checkable.
-
-        Parameters
-        ----------
-        source : QtCore.QObject
-            Object that generated the event.
-        event : QEvent
-            The event instance to process.
-
-        Returns
-        -------
-        bool
-            The return value of the base class `eventFilter`.
-        """
-        if event.type() == QEvent.MouseButtonPress:
-            if self.isEnabled() and self._checkable and event.button() == Qt.LeftButton:
-                # signal is passed to base class where "self.toggle()" is performed
-                self._checked = not self._checked
-                self.style_button()
-        # Call base class method to continue normal event processing:
-        return super().eventFilter(source, event)
-
-    def style_button(self) -> None:
-        """
-        Apply the visual style for the button based on its `checked` state.
-
-        Uses `qstyle_widget` with the properties defined in the application's
-        stylesheet to reflect states like 'highlight' or 'normal'.
-        """
-        if self._checked:
-            qstyle_widget(self, "highlight")
-        else:
-            qstyle_widget(self, "normal")
-
-class PushButtonRT(QPushButton):
-    """
-    Subclass QPushButton using QLabel to render rich text.
-
-    Parameters
-    ----------
-    parent : QWidget, optional
-        Parent widget of the button.
-
-    text : str, optional
-        Text for the button (default: empty string).
-
-    pad : int, optional
-        Left/right padding in pixels applied around the label (default: 5).
-
-    checkable : bool, optional
-        Whether button is checkable (default: True).
-
-    checked : bool, optional
-        Whether initial state is checked (default: False).
-
-    objectName : str, optional
-        Object name to set on the widget.
-
-    **kwargs
-        Additional keyword arguments forwarded to `QPushButton`.
-    """
-
-    def __init__(self, parent: QtWidgets.QWidget=None, text: str = "", pad: int = 5,
-                 checkable: bool = True, checked: bool = False, objectName: str = "", **kwargs):
-
-        if parent is not None:
-            super().__init__(parent, **kwargs)
-        else:
-            super().__init__(**kwargs)
-
-        self.setObjectName(objectName)
-
-        self.lbl_rtf = QLabel(self)
-        self.pad = pad
-        if text is not None:
-            self.lbl_rtf.setText(text)
-        self.lay_h_main = QHBoxLayout()
-        self.lay_h_main.setContentsMargins(pad, 0, pad, 0)  # L, T, R, B
-        self.lay_h_main.setSpacing(0)
-        self.setLayout(self.lay_h_main)
-        # Make QLabel transparent except for painted pixels
-        self.lbl_rtf.setAttribute(Qt.WA_TranslucentBackground)
-        # Disable the delivery of mouse events to the QLabel widget and its children,
-        self.lbl_rtf.setAttribute(Qt.WA_TransparentForMouseEvents)
-        self.lbl_rtf.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
-        self.lbl_rtf.setTextFormat(Qt.RichText)
-        self.lay_h_main.addWidget(self.lbl_rtf, Qt.AlignHCenter)
-
-        self.setCheckable(checkable)
-        self._checkable = checkable
-        if self._checkable:
-            self.setChecked(checked)
-            self._checked = checked
-        else:
-            self.setChecked(False)
-            self._checked = False
-
-        self.style_button()
-
         self.installEventFilter(self)
 
     def setText(self, text: str) -> None:
-        """
-        Set the text for the QLabel inside the button and update its geometry.
-
-        Parameters
-        ----------
-        text : str
-            The text to set for the QLabel.
-        """
-        self.lbl_rtf.setText(text)
-        self.updateGeometry()
+        """Set the text, using a rich-text label when enabled."""
+        if self.rich_text and self.lbl_rtf is not None:
+            self.lbl_rtf.setText(text)
+            self.updateGeometry()
+            return
+        super().setText(text.strip() if isinstance(text, str) else text)
 
     def isChecked(self) -> bool:
-        """
-        Get the checked state of the button.
-
-        Returns
-        -------
-        bool
-            The current checked state of the button from attribute `checked`.
-        """
+        """Return the internal checked state of the button."""
         return self._checked
 
     def setChecked(self, checked: bool) -> None:
-        """
-        Set the checked state of the button and update its style.
-
-        Parameters
-        ----------
-        checked : bool
-            The new checked state of the button.
-        """
+        """Set the checked state and update the visual style."""
         if self._checkable:
             self._checked = checked
             self.style_button()
 
     def setCheckable(self, checkable: bool) -> None:
-        """
-        Set whether the button is checkable and update its state accordingly.
-
-        Parameters
-        ----------
-        checkable : bool
-            Whether the button should be checkable.
-        """
+        """Enable or disable the button's checkable behavior."""
         self._checkable = checkable
         if not self._checkable:
             self.setChecked(False)
@@ -360,67 +215,58 @@ class PushButtonRT(QPushButton):
             self.style_button()
 
     def eventFilter(self, source: QtCore.QObject, event: QEvent) -> bool:
-        """
-        Handle events for the button, such as mouse button presses.
-
-        Parameters
-        ----------
-        source : QtCore.QObject
-            The source object of the event.
-        event : QEvent
-            The event to process.
-
-        Returns
-        -------
-        bool
-            True if the event was handled, False otherwise.
-        """
+        """Handle the check toggle on mouse press for checkable buttons."""
         if event.type() == QEvent.MouseButtonPress:
             if self.isEnabled() and self._checkable and event.button() == Qt.LeftButton:
                 # signal is passed to base class where "self.toggle()" is performed
                 self._checked = not self._checked
                 self.style_button()
-        # Call base class method to continue normal event processing:
         return super().eventFilter(source, event)
 
     def style_button(self) -> None:
-        """
-        Apply the appropriate style to the button and its QLabel based on the checked state.
-        """
+        """Apply the style for the normal and highlighted state."""
         if self._checked:
             qstyle_widget(self, "highlight")
-            qstyle_widget(self.lbl_rtf, "highlight")
+            if self.lbl_rtf is not None:
+                qstyle_widget(self.lbl_rtf, "highlight")
         else:
             qstyle_widget(self, "normal")
-            qstyle_widget(self.lbl_rtf, "normal")
+            if self.lbl_rtf is not None:
+                qstyle_widget(self.lbl_rtf, "normal")
 
     def sizeHint(self) -> QtCore.QSize:
-        """
-        Provide a size hint for the button based on the QLabel's size and padding.
-
-        Returns
-        -------
-        QtCore.QSize
-            The recommended size for the button.
-        """
+        """Return a size hint that includes the rich-text label padding."""
         s = super().sizeHint()
-        w = self.lbl_rtf.sizeHint()
-        s.setWidth(w.width() + 2 * self.pad)
+        if self.lbl_rtf is not None:
+            w = self.lbl_rtf.sizeHint()
+            s.setWidth(w.width() + 2 * self.pad)
         return s
 
     def minimumSizeHint(self) -> QtCore.QSize:
-        """
-        Provide a minimum size hint for the button based on the QLabel's size and padding.
-
-        Returns
-        -------
-        QtCore.QSize
-            The minimum recommended size for the button.
-        """
-        s = super().sizeHint()
-        w = self.lbl_rtf.sizeHint()
-        s.setWidth(w.width() + 2 * self.pad)
+        """Return a minimum size hint that includes the rich-text label padding."""
+        s = super().minimumSizeHint()
+        if self.lbl_rtf is not None:
+            w = self.lbl_rtf.sizeHint()
+            s.setWidth(w.width() + 2 * self.pad)
         return s
+
+
+class PushButtonRT(PushButton):
+    """Backward-compatible rich-text button alias for existing call sites."""
+
+    def __init__(self, parent: QtWidgets.QWidget = None, text: str = "", pad: int = 5,
+                 checkable: bool = True, checked: bool = False, objectName: str = "",
+                 **kwargs):
+        super().__init__(
+            parent=parent,
+            text=text,
+            checkable=checkable,
+            checked=checked,
+            objectName=objectName,
+            rich_text=True,
+            pad=pad,
+            **kwargs,
+        )
 
 
 class RotatedButton(QPushButton):

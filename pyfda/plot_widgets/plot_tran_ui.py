@@ -532,7 +532,7 @@ class PlotTranUI(QWidget):
         qcmb_box_populate(self.cmb_freq_display, self.cmb_freq_display_items,
                           self.cmb_freq_display_item)
 
-        self.but_hf_id = PushButtonRT(self, to_html("H_id", frmt="bi"), objectName="but_hf_id")
+        self.but_hf_id = PushButton(self, to_html("H_id", frmt="bi"), rich_text = True, objectName="but_hf_id")
         self.but_hf_id.setToolTip("<span>Show ideal frequency response, calculated "
                                "from the filter coefficients.</span>")
 
