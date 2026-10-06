@@ -51,6 +51,7 @@ class Plot3D(QWidget):
         super().__init__()
         self.zmin = 0
         self.zmax = 4
+        self.zmax_db = 20 * log10(self.zmax)
         self.zmin_db = -80
         self.cmap_default = 'RdYlBu'
         self.data_changed = True  # flag whether data has changed
