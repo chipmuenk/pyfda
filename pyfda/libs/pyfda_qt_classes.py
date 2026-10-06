@@ -271,7 +271,7 @@ class PushButtonRT(PushButton):
 
 class RotatedButton(QPushButton):
     """
-    ##### Currently Unused #####
+    ##### currently unused #####
     Create a rotated QPushButton
 
     Taken from
@@ -371,7 +371,7 @@ class RotatedButton(QPushButton):
 
 class QLabelVert(QLabel):
     """
-    ##### Currently Unused #####
+    ##### currently unused #####
 
     Create a vertical label.
 

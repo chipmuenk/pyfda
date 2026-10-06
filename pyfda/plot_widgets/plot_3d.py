@@ -14,8 +14,6 @@ import logging
 from matplotlib.cm  import ScalarMappable  # Colormap
 from matplotlib import colormaps
 from matplotlib.colors import LightSource
-# from mpl_toolkits.mplot3d import Axes3D  # needed for matplotlib < 3.2
-# Axes3D = Axes3D  # prevent auto-deletion by IDE (Axes3D is never referenced)
 import numpy as np
 from numpy import pi, ones, sin, cos, log10
 import scipy.signal as sig
@@ -60,6 +58,7 @@ class Plot3D(QWidget):
         self.tab_label = "3D"
 
         self._construct_ui()
+        self._init_grid()  # initialize grid and do initial plot
 
 # ------------------------------------------------------------------------------
     def process_sig_rx(self, dict_sig=None):
@@ -206,8 +205,6 @@ class Plot3D(QWidget):
         self.mplwidget.mpl_toolbar.a_he.info = "manual/plot_3d.html"
         self.mplwidget.mpl_toolbar.a_ui_num_levels = 2
         self.setLayout(self.mplwidget.lay_v_main_mpl)
-
-        self._init_grid()  # initialize grid and do initial plot
 
         # ----------------------------------------------------------------------
         # GLOBAL SIGNALS & SLOTs

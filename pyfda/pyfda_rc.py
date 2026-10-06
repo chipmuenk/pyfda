@@ -36,6 +36,8 @@ logger = logging.getLogger(__name__)
 # #############################################################################
 MPL_MS = 8  # base size for matplotlib markers
 # Various parameters for calculation, plotting and UI
+MRG = 1  # default margin for widgets in px (unit is set by QPageLayout.Points, .Millimeter etc)
+# use QMarginF for float values, QMargins for int values
 params = {
     'FMT': '{:.3g}',  # format string for QLineEdit fields
     'CSV': {  # format options and parameters for CSV-files and clipboard
@@ -54,8 +56,8 @@ params = {
     'FMT_pz': 5,      # number of digits for Pole/Zero table
     'P_Marker': [MPL_MS, 'r'],  # size and color for poles' marker
     'Z_Marker': [MPL_MS, 'b'],  # size and color for zeros' marker
-    'wdg_margins': (2, 1, 2, 0),  # (R, T, L, B) widget margins
-    'wdg_margins_spc': (2, 2, 2, 2),  # widget margins with more vertical spacing
+    'wdg_margins': (2*MRG, MRG, 2*MRG, 0),  # (R, T, L, B) widget margins
+    'wdg_margins_spc': (2*MRG, 2*MRG, 2*MRG, 2*MRG),  # widget margins with more vertical spacing
     'wdg_margins_0': (0, 0, 0, 0),  # set margins to zero
     'mpl_margins': (0, 0, 0, 0),  # margins around matplotlib widgets
     'mpl_hatch_border': {'linewidth': 1.0, 'color': 'blue', 'linestyle': '--'},
