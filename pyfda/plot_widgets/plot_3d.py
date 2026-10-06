@@ -59,6 +59,7 @@ class Plot3D(QWidget):
         self.tab_label = "3D"
 
         self._construct_ui()
+        self._construct_layout()
         self._init_grid()  # initialize grid and do initial plot
 
 # ------------------------------------------------------------------------------
@@ -80,7 +81,7 @@ class Plot3D(QWidget):
             if 'data_changed' in dict_sig:
                 self.data_changed = True
 
-# ------------------------------------------------------------------------------
+    # ------------------------------------------------------------------------------
     def _construct_ui(self):
         self.but_log = PushButton(self, "dB", objectName="but_log")
         self.but_log.setToolTip("Logarithmic scale")
@@ -160,8 +161,46 @@ class Plot3D(QWidget):
         self.but_contour_2d.setToolTip("Plot 2D-contours at z =0")
 
         # ----------------------------------------------------------------------
-        # LAYOUT for UI widgets
+        # mplwidget
         # ----------------------------------------------------------------------
+        # This is the plot pane widget, encompassing the other widgets
+        self.mplwidget = MplWidget(self)
+        self.mplwidget.mpl_toolbar.a_he.setEnabled(True)
+        self.mplwidget.mpl_toolbar.a_he.info = "manual/plot_3d.html"
+        self.mplwidget.mpl_toolbar.a_ui_num_levels = 2
+
+        # ----------------------------------------------------------------------
+        # GLOBAL SIGNALS & SLOTs
+        # ----------------------------------------------------------------------
+        self.sig_rx.connect(self.process_sig_rx)
+        # ----------------------------------------------------------------------
+        # LOCAL SIGNALS & SLOTs
+        # ----------------------------------------------------------------------
+        self.but_log.clicked.connect(self._log_clicked)
+        self.led_bottom.editingFinished.connect(self._log_clicked)
+        self.led_top.editingFinished.connect(self._log_clicked)
+
+        self.but_plot_in_uc.clicked.connect(self._init_grid)
+        self.plt_uc.clicked.connect(self.draw)
+        self.but_hf.clicked.connect(self.draw)
+        self.but_pz.clicked.connect(self.draw)
+        self.cmb_mode_3d.currentIndexChanged.connect(self.draw)
+        self.but_colbar.clicked.connect(self.draw)
+
+        self.cmb_colormap.currentIndexChanged.connect(self.draw)
+        self.but_colormap_r.clicked.connect(self.draw)
+
+        self.but_lighting.clicked.connect(self.draw)
+        self.dia_alpha.valueChanged.connect(self.draw)
+        self.dia_hatch.valueChanged.connect(self.draw)
+        self.but_contour_2d.clicked.connect(self.draw)
+
+        self.mplwidget.mpl_toolbar.sig_tx.connect(self.process_sig_rx)
+        # self.mplwidget.mpl_toolbar.enable_plot(state = False) # disable initially
+
+    # ------------------------------------------------------------------------------
+    def _construct_layout(self):
+        """ define layout for UI widgets """
         lay_g_controls = QGridLayout()
         lay_g_controls.addWidget(self.but_log, 0, 0)
         lay_g_controls.addWidget(self.but_plot_in_uc, 1, 0)
@@ -195,46 +234,11 @@ class Plot3D(QWidget):
         self.frm_controls = QFrame(self, objectName="frm_controls")
         self.frm_controls.setLayout(lay_g_controls)
 
-        # ----------------------------------------------------------------------
-        # mplwidget
-        # ----------------------------------------------------------------------
-        # This is the plot pane widget, encompassing the other widgets
-        self.mplwidget = MplWidget(self)
+        # Add the control frame to the main layout of the mplwidget
         self.mplwidget.lay_v_main_mpl.addWidget(self.frm_controls)
         self.mplwidget.lay_v_main_mpl.setContentsMargins(*params['mpl_margins'])
-        self.mplwidget.mpl_toolbar.a_he.setEnabled(True)
-        self.mplwidget.mpl_toolbar.a_he.info = "manual/plot_3d.html"
-        self.mplwidget.mpl_toolbar.a_ui_num_levels = 2
         self.setLayout(self.mplwidget.lay_v_main_mpl)
 
-        # ----------------------------------------------------------------------
-        # GLOBAL SIGNALS & SLOTs
-        # ----------------------------------------------------------------------
-        self.sig_rx.connect(self.process_sig_rx)
-        # ----------------------------------------------------------------------
-        # LOCAL SIGNALS & SLOTs
-        # ----------------------------------------------------------------------
-        self.but_log.clicked.connect(self._log_clicked)
-        self.led_bottom.editingFinished.connect(self._log_clicked)
-        self.led_top.editingFinished.connect(self._log_clicked)
-
-        self.but_plot_in_uc.clicked.connect(self._init_grid)
-        self.plt_uc.clicked.connect(self.draw)
-        self.but_hf.clicked.connect(self.draw)
-        self.but_pz.clicked.connect(self.draw)
-        self.cmb_mode_3d.currentIndexChanged.connect(self.draw)
-        self.but_colbar.clicked.connect(self.draw)
-
-        self.cmb_colormap.currentIndexChanged.connect(self.draw)
-        self.but_colormap_r.clicked.connect(self.draw)
-
-        self.but_lighting.clicked.connect(self.draw)
-        self.dia_alpha.valueChanged.connect(self.draw)
-        self.dia_hatch.valueChanged.connect(self.draw)
-        self.but_contour_2d.clicked.connect(self.draw)
-
-        self.mplwidget.mpl_toolbar.sig_tx.connect(self.process_sig_rx)
-        # self.mplwidget.mpl_toolbar.enable_plot(state = False) # disable initially
 
 # ------------------------------------------------------------------------------
     def _init_cmb_colormap(self, cmap_init):
