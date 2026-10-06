@@ -248,12 +248,12 @@ class IIRDF1PyfixpUI(QWidget):
         `fb_get('fxq', 'QCA')` and the UI is updated.
         """
         try:
-            WI_A = int(np.ceil(np.log2((np.abs(np.max(fb_get('ba', 1)))))))
+            wi_a = int(np.ceil(np.log2((np.abs(np.max(fb_get('ba', 1)))))))
         except OverflowError:
-            WI_A = 0
+            wi_a = 0
             logger.warning("Overflow error in calculation of word length.")
 
-        fb_set('fxq', 'QCA', 'WI', WI_A)
+        fb_set('fxq', 'QCA', 'WI', wi_a)
         # update quantizer settings and UI
         self.wdg_wq_coeffs_a.dict2ui(fb_get('fxq', 'QCA'))
 
@@ -266,11 +266,11 @@ class IIRDF1PyfixpUI(QWidget):
         `fb_get('fxq', 'QCB')` and the UI is updated.
         """
         try:
-            WI_B = int(np.ceil(np.log2((np.abs(np.max(fb_get('ba', 0)))))))
+            wi_b = int(np.ceil(np.log2((np.abs(np.max(fb_get('ba', 0)))))))
         except OverflowError:
-            WI_B = 0
+            wi_b = 0
             logger.warning("Overflow error in calculation of word length.")
-        fb_set('fxq', 'QCB', 'WI', max(WI_B, 0))
+        fb_set('fxq', 'QCB', 'WI', max(wi_b, 0))
         # update quantizer settings and UI
         self.wdg_wq_coeffs_b.dict2ui(fb_get('fxq', 'QCB'))
 

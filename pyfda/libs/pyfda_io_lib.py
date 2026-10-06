@@ -1505,7 +1505,7 @@ def export_coe_vhdl_package(f: TextIO) -> bool:
 
 
 # ------------------------------------------------------------------------------
-def export_coe_TI(f: TextIO) -> None:
+def _export_coe_ti(f: TextIO) -> None:
     """
     Save FIR filter coefficients in TI coefficient format
     Coefficient have to be specified by an identifier 'b0 ... b191' followed
