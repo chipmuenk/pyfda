@@ -49,20 +49,20 @@ class FilterCoeffsTest(unittest.TestCase):
             self.assertTrue(ret > -1, "String not contained in combo box")  # assert that arg exists in combo box
 
     def set_table_value(self, col, row, val):
-        item = self.form.tblCoeff.item(row, col)
+        item = self.form.tbl_coeff.item(row, col)
         if False:  #item:  # does item exist?
             item.setText(str(val))
         else:  # no, construct it:
-            self.form.tblCoeff.setItem(row, col, QTableWidgetItem(str(val)))
-            self.log.warning(f"Write table, return = {type(self.form.tblCoeff.item(row, col))})")
+            self.form.tbl_coeff.setItem(row, col, QTableWidgetItem(str(val)))
+            self.log.warning(f"Write table, return = {type(self.form.tbl_coeff.item(row, col))})")
             self.log.warning(f"Row, col = {row, col})")
-            self.log.warning(f"Row, col = {self.form.tblCoeff.rowCount(), self.form.tblCoeff.columnCount()})")
-        #item_text = self.form.tblCoeff.item(1,1).text()
+            self.log.warning(f"Row, col = {self.form.tbl_coeff.rowCount(), self.form.tbl_coeff.columnCount()})")
+        #item_text = self.form.tbl_coeff.item(1,1).text()
         #self.log.warning(f"Write table, return = {type(item_text)})")
         return
 
     def get_table_value(self, col, row):
-        return str(self.form.tblCoeff.item(row, col))
+        return str(self.form.tbl_coeff.item(row, col))
 
     def set_lineedit_value(self, edit_wdg, arg):
         edit_wdg.clear()
@@ -102,9 +102,9 @@ class FilterCoeffsTest(unittest.TestCase):
         self.assertEqual(qget_cmb_box(self.ui.cmb_fx_base, data=False).lower(), 'float64')
         self.assertEqual(self.ui.but_set_zero.text(), "= 0")
 
-        self.assertEqual(self.form.tblCoeff.rowCount(), 3)
-        self.assertEqual(self.form.tblCoeff.columnCount(), 1)
-        self.assertEqual(self.form.tblCoeff.item(0, 0).text(), "1")
+        self.assertEqual(self.form.tbl_coeff.rowCount(), 3)
+        self.assertEqual(self.form.tbl_coeff.columnCount(), 1)
+        self.assertEqual(self.form.tbl_coeff.item(0, 0).text(), "1")
         self.log.warning("test_defaults finished")
 
 # ------------------------------------------------------------------------------
@@ -121,15 +121,15 @@ class FilterCoeffsTest(unittest.TestCase):
         QTest.qWait(1000)
         self.assertEqual(qget_cmb_box(self.ui.cmb_filter_type, data=False), "IIR")
         # https://vicrucann.github.io/tutorials/qttest-signals-qtreewidget/
-        self.assertEqual(self.form.tblCoeff.rowCount(), 3)
-        self.assertEqual(self.form.tblCoeff.columnCount(), 2)
-        item_10 = self.form.tblCoeff.item(0, 1)  # row, col
+        self.assertEqual(self.form.tbl_coeff.rowCount(), 3)
+        self.assertEqual(self.form.tbl_coeff.columnCount(), 2)
+        item_10 = self.form.tbl_coeff.item(0, 1)  # row, col
         self.assertEqual(float(item_10.text()), 1)
 
         self.set_cmb_box(self.ui.cmb_filter_type, 'FIR')
 
-        self.assertEqual(self.form.tblCoeff.rowCount(), 3)
-        self.assertEqual(self.form.tblCoeff.columnCount(), 1)
+        self.assertEqual(self.form.tbl_coeff.rowCount(), 3)
+        self.assertEqual(self.form.tbl_coeff.columnCount(), 1)
         self.log.warning("test_cmb_filter_type finished")
 
 # ==============================================================================
@@ -148,9 +148,9 @@ class FilterCoeffsTest(unittest.TestCase):
         self.assertEqual(self.get_cmb_box(self.ui.cmb_quant), 'floor')
         self.assertEqual(self.ui.but_set_zero.text(), "= 0")
 
-        self.assertEqual(self.form.tblCoeff.rowCount(), 3)
-        self.assertEqual(self.form.tblCoeff.columnCount(), 1)
-        self.assertEqual(self.form.tblCoeff.item(0, 0).text(), "1")
+        self.assertEqual(self.form.tbl_coeff.rowCount(), 3)
+        self.assertEqual(self.form.tbl_coeff.columnCount(), 1)
+        self.assertEqual(self.form.tbl_coeff.item(0, 0).text(), "1")
         self.log.warning("test_fixpoint_defaults finished")
 
 # ------------------------------------------------------------------------------
@@ -159,15 +159,15 @@ class FilterCoeffsTest(unittest.TestCase):
         self.init()
         self.set_cmb_box(self.ui.cmb_filter_type, 'IIR')
 
-        item_10 = self.form.tblCoeff.item(1, 0)  # row, col
+        item_10 = self.form.tbl_coeff.item(1, 0)  # row, col
         self.assertEqual(item_10.text(), "1")
 
         # Push <Delete Table> Button with the left mouse button
         QTest.mouseClick(self.ui.but_clear, Qt.LeftButton)
 
-        self.assertEqual(float(self.form.tblCoeff.item(1, 0).text()), 0)
-        self.assertEqual(self.form.tblCoeff.rowCount(), 2)
-        self.assertEqual(self.form.tblCoeff.columnCount(), 2)
+        self.assertEqual(float(self.form.tbl_coeff.item(1, 0).text()), 0)
+        self.assertEqual(self.form.tbl_coeff.rowCount(), 2)
+        self.assertEqual(self.form.tbl_coeff.columnCount(), 2)
         self.log.warning("test_but_clear finished")
 
 # ------------------------------------------------------------------------------
@@ -180,24 +180,24 @@ class FilterCoeffsTest(unittest.TestCase):
         self.init()
         self.initialize_form()
         self.initialize_fixpoint_format()
-        self.assertEqual(self.form.tblCoeff.isVisible(), True)
-        self.assertEqual(self.form.tblCoeff.isEnabled(), True)
-        x = self.form.tblCoeff.columnViewportPosition(0)
-        y = self.form.tblCoeff.rowViewportPosition(1)
-        QTest.mouseClick(self.form.tblCoeff.viewport(), Qt.LeftButton,
+        self.assertEqual(self.form.tbl_coeff.isVisible(), True)
+        self.assertEqual(self.form.tbl_coeff.isEnabled(), True)
+        x = self.form.tbl_coeff.columnViewportPosition(0)
+        y = self.form.tbl_coeff.rowViewportPosition(1)
+        QTest.mouseClick(self.form.tbl_coeff.viewport(), Qt.LeftButton,
                          Qt.NoModifier, QPoint(x, y))
         QTest.keyClicks(QApplication.instance().focusWidget(), "13", delay=100)
         # QTest.keyClick(QApplication.instance().focusWidget(), Qt.Key_Return, delay=1000)
         QTest.mouseClick(self.ui.but_apply, Qt.LeftButton)
         QTest.qWait(1000)
         # self.set_table_value(1, 0, 25)  # row, col, value
-        self.assertEqual(self.form.tblCoeff.item(0, 0).text(), "1.0")
-        self.assertEqual(self.form.tblCoeff.item(1, 0).text(), "0.0078125")
+        self.assertEqual(self.form.tbl_coeff.item(0, 0).text(), "1.0")
+        self.assertEqual(self.form.tbl_coeff.item(1, 0).text(), "0.0078125")
         # self.assertEqual(self.get_table_value(1, 0), "1")
 
         # self.assertEqual(self.get_table_value(1, 1), "15")
 
-        # self.assertEqual(self.form.tblCoeff.rowCount(), 2)
+        # self.assertEqual(self.form.tbl_coeff.rowCount(), 2)
         self.log.warning("test_write_table finished")
 
 #    def test_shuffle(self):

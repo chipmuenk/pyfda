@@ -627,7 +627,7 @@ class InputPZ(QWidget):
     # --------------------------------------------------------------------------
     def export_table(self) -> None:
         """
-        Export data from coefficient table `self.tblCoeff` to clipboard in CSV format
+        Export data from coefficient table `self.tbl_coeff` to clipboard in CSV format
         or to file using a selected format
         """
         text = qtable2csv(

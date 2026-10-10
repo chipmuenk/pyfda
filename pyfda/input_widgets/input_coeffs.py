@@ -143,22 +143,22 @@ class InputCoeffs(QWidget):
         # ---------------------------------------------------------------------
         #   Coefficient table widget
         # ---------------------------------------------------------------------
-        self.tblCoeff = QTableWidget(self)
-        self.tblCoeff.setAlternatingRowColors(True)
+        self.tbl_coeff = QTableWidget(self)
+        self.tbl_coeff.setAlternatingRowColors(True)
         # highlight section of header when a corresponding cell is selected
-        self.tblCoeff.horizontalHeader().setHighlightSections(True)
-        self.tblCoeff.horizontalHeader().setFont(self.ui.bfont)
+        self.tbl_coeff.horizontalHeader().setHighlightSections(True)
+        self.tbl_coeff.horizontalHeader().setFont(self.ui.bfont)
 
-#        self.tblCoeff.QItemSelectionModel.Clear
-        self.tblCoeff.setDragEnabled(True)
-#        self.tblCoeff.setDragDropMode(QAbstractItemView.InternalMove) # doesn't work
-        self.tblCoeff.setItemDelegate(ItemDelegateCoeffs(self))
+#        self.tbl_coeff.QItemSelectionModel.Clear
+        self.tbl_coeff.setDragEnabled(True)
+#        self.tbl_coeff.setDragDropMode(QAbstractItemView.InternalMove) # doesn't work
+        self.tbl_coeff.setItemDelegate(ItemDelegateCoeffs(self))
 
         # ============== Main UI Layout =====================================
         lay_v_main = QVBoxLayout()
         lay_v_main.setAlignment(Qt.AlignTop)  # only affects the first widget (intended)
         lay_v_main.addWidget(self.ui)
-        lay_v_main.addWidget(self.tblCoeff)
+        lay_v_main.addWidget(self.tbl_coeff)
         lay_v_main.setContentsMargins(*params['wdg_margins'])
         self.setLayout(lay_v_main)
 
@@ -287,7 +287,7 @@ class InputCoeffs(QWidget):
         - Save quantized `self.ba` to filter dict (in `_save_dict()`). This emits
           {'data_changed': 'input_coeffs'}
         """
-        idx = qget_selected(self.tblCoeff)['idx']  # get all selected indices
+        idx = qget_selected(self.tbl_coeff)['idx']  # get all selected indices
         # returns e.g. [[0, 0], [0, 6]]
         if not idx:  # nothing selected, quantize all elements
             self.ba[0] = self.Q[0].frmt2float(self.ba_q[0])
@@ -326,13 +326,13 @@ class InputCoeffs(QWidget):
         if self.ui.cmb_filter_type.currentText() == 'IIR':
             fb_set('ft', 'iir')
             self.col = 2
-            self.tblCoeff.setColumnCount(2)
-            self.tblCoeff.setHorizontalHeaderLabels(["b", "a"])
+            self.tbl_coeff.setColumnCount(2)
+            self.tbl_coeff.setHorizontalHeaderLabels(["b", "a"])
         else:
             fb_set('ft', 'fir')
             self.col = 1
-            self.tblCoeff.setColumnCount(1)
-            self.tblCoeff.setHorizontalHeaderLabels(["b"])
+            self.tbl_coeff.setColumnCount(1)
+            self.tbl_coeff.setHorizontalHeaderLabels(["b"])
             self.ba[1] = np.zeros_like(self.ba[1])  # enforce FIR filter
             self.ba[1][0] = 1.
 
@@ -347,13 +347,13 @@ class InputCoeffs(QWidget):
         Refresh the table item with the index `row, col` from `self.ba_q`
         and color it according to overflow conditions
         """
-        item = self.tblCoeff.item(row, col)
+        item = self.tbl_coeff.item(row, col)
 
         if item:  # does item exist?
             item.setText(str(self.ba_q[col][row]).strip('()'))
         else:  # no, construct it:
             item = QTableWidgetItem(str(self.ba_q[col][row]).strip('()'))
-            self.tblCoeff.setItem(row, col, item)
+            self.tbl_coeff.setItem(row, col, item)
 
         brush = QBrush(Qt.SolidPattern)
         brush.setColor(QColor(255, 255, 255, 0))  # transparent white
@@ -410,27 +410,27 @@ class InputCoeffs(QWidget):
         # check whether filter is FIR and only needs one column
         if fb_get('ft') == 'FIR':
             self.num_cols = 1
-            self.tblCoeff.setColumnCount(1)
-            self.tblCoeff.setHorizontalHeaderLabels(["b"])
+            self.tbl_coeff.setColumnCount(1)
+            self.tbl_coeff.setHorizontalHeaderLabels(["b"])
             qset_cmb_box(self.ui.cmb_filter_type, 'FIR')
             self.ui.wdg_wq_coeffs_a.setVisible(False)  # always hide a coeffs for FIR
         else:
             self.num_cols = 2
-            self.tblCoeff.setColumnCount(2)
-            self.tblCoeff.setHorizontalHeaderLabels(["b", "a"])
+            self.tbl_coeff.setColumnCount(2)
+            self.tbl_coeff.setHorizontalHeaderLabels(["b", "a"])
             qset_cmb_box(self.ui.cmb_filter_type, 'IIR')
             # hide all q-settings for float:
             self.ui.wdg_wq_coeffs_a.setVisible(not is_float)
 
             self.ba[1][0] = 1.0  # restore a[0] = 1 of denominator polynome
 
-        self.tblCoeff.setRowCount(self.num_rows)
-        self.tblCoeff.setColumnCount(self.num_cols)
+        self.tbl_coeff.setRowCount(self.num_rows)
+        self.tbl_coeff.setColumnCount(self.num_cols)
         # Create strings for index column (vertical header), starting with "0"
         idx_str = [str(n) for n in range(self.num_rows)]
-        self.tblCoeff.setVerticalHeaderLabels(idx_str)
+        self.tbl_coeff.setVerticalHeaderLabels(idx_str)
         # ----------------------------------
-        self.tblCoeff.blockSignals(True)
+        self.tbl_coeff.blockSignals(True)
 
         for col in range(self.num_cols):
             for row in range(self.num_rows):
@@ -438,15 +438,15 @@ class InputCoeffs(QWidget):
 
         # make a[0] selectable but not editable
         if fb_get('ft') == 'iir':
-            item = self.tblCoeff.item(0, 1)
+            item = self.tbl_coeff.item(0, 1)
             item.setFlags(Qt.ItemIsSelectable | Qt.ItemIsEnabled)
             item.setFont(self.ui.bfont)
 
-        self.tblCoeff.blockSignals(False)
+        self.tbl_coeff.blockSignals(False)
         # ---------------------------------
-        self.tblCoeff.resizeColumnsToContents()
-        self.tblCoeff.resizeRowsToContents()
-        self.tblCoeff.clearSelection()
+        self.tbl_coeff.resizeColumnsToContents()
+        self.tbl_coeff.resizeRowsToContents()
+        self.tbl_coeff.clearSelection()
 
     # --------------------------------------------------------------------------
     def load_dict(self) -> None:
@@ -472,11 +472,11 @@ class InputCoeffs(QWidget):
     # --------------------------------------------------------------------------
     def export_table(self) -> None:
         """
-        Export data from coefficient table `self.tblCoeff` to clipboard / file in
+        Export data from coefficient table `self.tbl_coeff` to clipboard / file in
         CSV format.
         """
         text = qtable2csv(
-            self.tblCoeff, self.ba, formatted=self.ui.but_format.isChecked())
+            self.tbl_coeff, self.ba, formatted=self.ui.but_format.isChecked())
         if self.ui.load_save_clipboard:
             # clipboard is selected as export target
             dirs.clipboard.setText(text)
@@ -718,7 +718,7 @@ class InputCoeffs(QWidget):
         When nothing is selected, delete the last row.
         Finally, refresh the table
         """
-        sel = qget_selected(self.tblCoeff)['sel']  # get indices of all selected cells
+        sel = qget_selected(self.tbl_coeff)['sel']  # get indices of all selected cells
 
         if not any(sel) and len(self.ba[0]) > 0:  # nothing selected, delete last row
             self.ba = np.delete(self.ba, -1, axis=1)
@@ -750,7 +750,7 @@ class InputCoeffs(QWidget):
         Refresh QTableWidget.
         """
         # get indices of all selected cells
-        sel = qget_selected(self.tblCoeff)['sel']
+        sel = qget_selected(self.tbl_coeff)['sel']
 
         # merge selections in both columns, remove duplicates and sort
         sel_01 = sorted(set(sel[0]).union(set(sel[1])))
@@ -789,7 +789,7 @@ class InputCoeffs(QWidget):
         and refresh QTableWidget
         """
         self._set_eps()
-        idx = qget_selected(self.tblCoeff)['idx']  # get all selected indices
+        idx = qget_selected(self.tbl_coeff)['idx']  # get all selected indices
 
         test_val = 0.  # value against which array is tested
         targ_val = 0.  # value which is set when condition is true
