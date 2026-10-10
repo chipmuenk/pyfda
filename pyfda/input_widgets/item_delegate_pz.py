@@ -85,6 +85,8 @@ class ItemDelegatePZ(QStyledItemDelegate):
         editor:  instance of e.g. QLineEdit (default)
         index:   instance of QModelIndex
         options: instance of QStyleOptionViewItemV4
+
+        Same for all other delegates.
         """
         line_edit = QLineEdit(parent)
         H = int(round(line_edit.sizeHint().height()))

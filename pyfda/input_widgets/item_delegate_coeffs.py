@@ -139,6 +139,8 @@ class ItemDelegateCoeffs(QStyledItemDelegate):
 
         This is used a.o. by `pyfda_io_lib.qtable2csv()` and  `libs.pyfda_fix_lib`
         to read out a table in text mode, e.g. `text = table.itemDelegate().text(item)`
+
+        Same for all other delegates.
         """
         return str(self.displayText(item.text(), QtCore.QLocale()))
 
@@ -230,12 +232,12 @@ class ItemDelegateCoeffs(QStyledItemDelegate):
         """
 
         # check for different editor environments if needed and provide a default:
-#        if isinstance(editor, QtGui.QTextEdit):
-#            model.setData(index, editor.toPlainText())
-#        elif isinstance(editor, QComboBox):
-#            model.setData(index, editor.currentText())
-#        else:
-#            super(ItemDelegate, self).setModelData(editor, model, index)
+        # if isinstance(editor, QtGui.QTextEdit):
+        #    model.setData(index, editor.toPlainText())
+        # elif isinstance(editor, QComboBox):
+        #    model.setData(index, editor.currentText())
+        # else:
+        #    super(ItemDelegate, self).setModelData(editor, model, index)
         if not get_fx():
             data = safe_eval(
                 str(editor.text()), self.parent.ba[index.column()][index.row()],
