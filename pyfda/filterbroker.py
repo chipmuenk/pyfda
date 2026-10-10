@@ -14,7 +14,7 @@ Dynamic parameters and settings are exchanged via the dictionaries in this file.
 Importing ``filterbroker.py`` runs the module once, defining all module variables
 which have a global scope like class variables.
 
-The entries in the global dict `fil[0]` contain the current filter design parameters, they
+The entries in the global dict `_fil[0]` contain the current filter design parameters, they
 can be accessed and modified via the getter and setter `fb_get()` and `fb_set()`.
 
 The entries in this file are only used as initial / default entries and to
@@ -56,8 +56,8 @@ logger = logging.getLogger(__name__)
 
 UNDO_LEN = 20  # depth of circular undo buffer
 
-# fil[i] can always be assigned to, fil = ... needs a global statement
-fil = [copy.deepcopy(fil_ref) for _ in range(10)]
+# _fil[i] can always be assigned to, _fil = ... needs a global statement
+_fil = [copy.deepcopy(fil_ref) for _ in range(10)]
 
 # create empty lists with length 10 for undo memory
 fil_undo = [None] * UNDO_LEN
@@ -66,37 +66,37 @@ fil_undo = [None] * UNDO_LEN
 def fil_copy(src: str = "ref", dest: str = "all") -> None:
     """
     Copy `'src'` filter to `'dest'` filter where:
-    - `'src'` can be  the reference filter ("ref") or fil[0] ... fil[9] ("0" ... "9")
-    - `'dest'` can be all filters ("all") or fil[0] ... fil[9] ("0" ... "9")
+    - `'src'` can be  the reference filter ("ref") or _fil[0] ... _fil[9] ("0" ... "9")
+    - `'dest'` can be all filters ("all") or _fil[0] ... _fil[9] ("0" ... "9")
     Other source or target destinations give an error.
     """
 
-    # for f in fil:
+    # for f in _fil:
     #   f = copy.deepcopy(fil_ref)
     #
     # does not work because the loop variable is a local variable that gets bound to
-    # fil[0] ... fil[10] in turn. The deepcopy operation rebinds local name f to a brand
-    # new dict, the container fil stays untouched.
+    # _fil[0] ... _fil[10] in turn. The deepcopy operation rebinds local name f to a brand
+    # new dict, the container _fil stays untouched.
     #
-    # fil = [copy.deepcopy(fil_ref)] * 10
+    # _fil = [copy.deepcopy(fil_ref)] * 10
     #
     # repeats the same object reference 10 times - all slots point to the same dict!
     #
-    # The code below indexes the list container fil itself, the list is mutated in place.
+    # The code below indexes the list container _fil itself, the list is mutated in place.
     # Calling deepcopy() once per iteration produces 10 independent copies.
     if dest == "all":
-        for i, _ in enumerate(fil):
-            fil[i] = copy.deepcopy(fil_ref)
+        for i, _ in enumerate(_fil):
+            _fil[i] = copy.deepcopy(fil_ref)
         return
 
     targ_idx = int(dest)
 
     if src == "ref":
-        fil[targ_idx] = copy.deepcopy(fil_ref)
+        _fil[targ_idx] = copy.deepcopy(fil_ref)
         return
 
     src_idx = int(src)
-    fil[targ_idx] = fil[src_idx]
+    _fil[targ_idx] = _fil[src_idx]
     return
 
 # -----------------------------------------------------------------------
@@ -104,10 +104,10 @@ def fil_info(idx: int) -> str:
     """
     Return filter info string
     """
-    return fil[idx]['info']
+    return _fil[idx]['info']
 
 # =============================================================================
-def _print_dict(keys_tuple: tuple, top_dict_str = "fil[0]") -> str:
+def _print_dict(keys_tuple: tuple, top_dict_str = "_fil[0]") -> str:
     """
     Print a string representation for a nested dictionary, defined by the list
     or tuple of strings `keys_tuple`. This is used to issue meaningful error messages.
@@ -126,7 +126,7 @@ def _print_dict(keys_tuple: tuple, top_dict_str = "fil[0]") -> str:
 
     Example
     -------
-    keys_tuple = ('fxq', 'QCA', 'WF') returns "fil[0]['fxq']['QCA']['WF']"
+    keys_tuple = ('fxq', 'QCA', 'WF') returns "_fil[0]['fxq']['QCA']['WF']"
 
     """
     if not keys_tuple or not isinstance(keys_tuple, tuple):
@@ -218,10 +218,10 @@ def set_fx(fx: bool) -> None:
 # -------------------------
 def fb_get(*keys_tuple: tuple, verbose: bool = True) -> str | int | float | Iterable | dict | None:
     """
-    Get the value of a key in the global dict `fil[0]`. Multiple arguments
+    Get the value of a key in the global dict `_fil[0]`. Multiple arguments
     traverse nested dicts:
-    fb_get('qfrmt') == fb.fil[0]['qfrmt']
-    fb_get('ba', 0) == fb.fil[0]['ba'][0]
+    fb_get('qfrmt') == fb._fil[0]['qfrmt']
+    fb_get('ba', 0) == fb._fil[0]['ba'][0]
 
     Parameters
     ----------
@@ -237,7 +237,7 @@ def fb_get(*keys_tuple: tuple, verbose: bool = True) -> str | int | float | Iter
         The value of the specified key in the dictionary, or None if the key
         does not exist or a deep copy if keys_tuple is empty.
     """
-    fil_dict = fil[0]
+    fil_dict = _fil[0]
     if not isinstance(keys_tuple, tuple):
         logger.error("A tuple of keys is needed for traversing the filter dict '%s', not a '%s'!",
                      keys_tuple, type(keys_tuple).__name__)
@@ -266,12 +266,12 @@ def fb_set(*keys_tuple: tuple, backup: bool = True, new_key: bool = False,
            accept_dict: bool = False) -> int:
     """
     Use the individual arguments that have been collected as `keys_tuple` to access a
-    nested dict `fil_dict` (default: `fil[0]`) and write the last item in `keys_tuple` to the dict.
+    nested dict `fil_dict` (default: `_fil[0]`) and write the last item in `keys_tuple` to the dict.
 
     Example:
-    fb_set('fxq', 'QCA', 'WF', 12) is equivalent to `fil[0]['fxq']['QCA']['WF'] = 12`
+    fb_set('fxq', 'QCA', 'WF', 12) is equivalent to `_fil[0]['fxq']['QCA']['WF'] = 12`
     fb_set('fxq', 'QCA', {'WF': 15, 'WI': 0}) is equivalent to
-            `fil[0]['fxq']['QCA']['WF'] = 15` and `fil[0]['fxq']['QCA']['WI'] = 0`
+            `_fil[0]['fxq']['QCA']['WF'] = 15` and `_fil[0]['fxq']['QCA']['WI'] = 0`
 
     Parameters
     ----------
@@ -306,7 +306,7 @@ def fb_set(*keys_tuple: tuple, backup: bool = True, new_key: bool = False,
     TypeError
         If `keys_tuple` is not of type Tuple or if it has less than two items
     """
-    fil_dict = fil[0]
+    fil_dict = _fil[0]
 
     logger.debug("tuple_keys: %s", keys_tuple)
 
@@ -441,16 +441,16 @@ def _handle_qfrmt_change(keys_tuple: tuple) -> None:
         raise KeyError
 
     if get_fx():  # fixpoint mode, store current fixpoint format
-        fil[0]['qfrmt_fx_last'] = fil[0]['qfrmt']
+        _fil[0]['qfrmt_fx_last'] = _fil[0]['qfrmt']
     else:  # float mode, store current float format
-        fil[0]['qfrmt_float_last'] = fil[0]['qfrmt']
+        _fil[0]['qfrmt_float_last'] = _fil[0]['qfrmt']
 
 # ---------------------------------------------------------
 def sanitize_fil_keys(all_filters: bool = True, fil_list: list[dict] = None) -> list[dict]:
     """
     Test if the keys of the dicts in `fil_list` are identical to the reference dict `fil_ref`.
     If not, remove the unsupported keys, add missing key:val pairs from the reference dict and
-    issue warnings. If `fil_list` is None, use the global filter dict `fil`.
+    issue warnings. If `fil_list` is None, use the global filter dict `_fil`.
 
     Parameters
     ----------
@@ -468,9 +468,9 @@ def sanitize_fil_keys(all_filters: bool = True, fil_list: list[dict] = None) -> 
     """
     if not fil_list:
         if all_filters:
-            fil_list = fil  # list of all filters
+            fil_list = _fil  # list of all filters
         else:
-            fil_list = fil[:1]  # list with only the first filtert))
+            fil_list = _fil[:1]  # list with only the first filtert))
 
     keys_unsupported = []  # list for unsupported keys
     keys_missing = []  # list for missing keys
@@ -504,7 +504,7 @@ def sanitize_fil_values(fil_list: list[dict]) -> list[dict] | None:
     Parameters
     ----------
     fil_list : list[dict]
-        The filter(s) that will be stored in `fil`.
+        The filter(s) that will be stored in `_fil`.
 
     Returns
     -------
@@ -551,7 +551,7 @@ def sanitize_fil_values(fil_list: list[dict]) -> list[dict] | None:
             if isinstance(fil_dict[k], bytes):
                 fil_dict[k] = fil_dict[k].decode('utf-8')
             if fil_dict[k] is None:
-                logger.warning("fil[%s] has no value!", k)
+                logger.warning("_fil[%s] has no value!", k)
 
         # Check existence of key and value data type for the following three keys:
         for k in ('ba', 'zpk', 'sos'):
@@ -595,18 +595,18 @@ def sanitize_fil_values(fil_list: list[dict]) -> list[dict] | None:
 
 # -------------------------------------------------------
 def dict2fil(fil_list: list[dict]) -> None:
-    """ Copy the dict(s) in the passed list to the global filter dict `fil` """
+    """ Copy the dict(s) in the passed list to the global filter dict `_fil` """
     for i, d in enumerate(fil_list):
-        fil[i] = d
+        _fil[i] = d
 
 def fil2dict() -> list[dict]:
-    """ Return the global filter dict `fil` """
-    return fil
+    """ Return the global filter dict `_fil` """
+    return _fil
 
 # ------------------------------------------------------------------------------
 class _BackupFilterDict():
     """
-    Back up and restore the global filter dict `fil[0]`.
+    Back up and restore the global filter dict `_fil[0]`.
 
     """
     def __init__(self):
@@ -617,7 +617,7 @@ class _BackupFilterDict():
 
     def restore_fil(self) -> int:
         """
-        Restore current global dict `fil[0]` from undo memory `fil_undo`
+        Restore current global dict `_fil[0]` from undo memory `fil_undo`
 
         Returns
         -------
@@ -631,7 +631,7 @@ class _BackupFilterDict():
             self.undo_stp = 0
             return -1
 
-        fil[0] = copy.deepcopy(fil_undo[self.undo_ptr])
+        _fil[0] = copy.deepcopy(fil_undo[self.undo_ptr])
         self.undo_stp -= 1
         self.undo_ptr = (self.undo_ptr + UNDO_LEN - 1) % UNDO_LEN
         return 0
@@ -639,7 +639,7 @@ class _BackupFilterDict():
     # -------------------------
     def backup_fil(self) -> int:
         """
-        Store current global dict `fil[0]` to undo memory `fil_undo`
+        Store current global dict `_fil[0]` to undo memory `fil_undo`
 
         Returns
         -------
@@ -652,7 +652,7 @@ class _BackupFilterDict():
         self.undo_stp = min(self.undo_stp, UNDO_LEN)
         # increase buffer pointer, allowing for circular wrap around
         self.undo_ptr = (self.undo_ptr + 1) % UNDO_LEN
-        fil_undo[self.undo_ptr] = copy.deepcopy(fil[0])
+        fil_undo[self.undo_ptr] = copy.deepcopy(_fil[0])
         logger.debug("Undo ptr = %s", self.undo_ptr)
         return self.undo_stp
 
