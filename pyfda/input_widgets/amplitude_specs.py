@@ -286,7 +286,8 @@ class AmplitudeSpecs(QWidget):
             amp_label = str(source.objectName())
             amp_value = safe_eval(source.text(), self.data_prev, sign='pos')
             is_new_key = amp_label not in fb_get()
-            fb_set(amp_label, unit2lin(amp_value, fb_get('ft'), amp_label, unit), new_key=is_new_key)
+            fb_set(amp_label, unit2lin(amp_value, fb_get('ft'), amp_label, unit),
+                   new_key=is_new_key)
             self.emit({'specs_changed': 'a_specs'})
             self.spec_edited = False  # reset flag
         self.dict2ui()
