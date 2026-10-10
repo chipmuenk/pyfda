@@ -39,13 +39,13 @@ from typing import Any
 
 from pyfda.filterbroker import fb_get, get_fx
 
+from PyQt5.QtCore import QModelIndex, QLocale
+from PyQt5.QtWidgets import QStyleOptionViewItem, QWidget
+
 from pyfda.libs.compat import Qt, QtCore, QLineEdit, QSize, QStyledItemDelegate, QColor, QBrush
 from pyfda.libs.pyfda_num_lib import safe_eval
 from pyfda.libs.pyfda_qt_lib import qstyle_widget
 from pyfda.pyfda_rc import params
-
-from PyQt5.QtCore import QModelIndex, QLocale
-from PyQt5.QtWidgets import QStyleOptionViewItem, QWidget
 
 # TODO: Fixpoint coefficients do not properly convert complex -> float when saving
 #       the filter?

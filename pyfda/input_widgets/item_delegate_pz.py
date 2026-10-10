@@ -13,14 +13,14 @@ from __future__ import annotations
 
 from typing import Any
 
+from PyQt5.QtCore import QModelIndex, QLocale
+from PyQt5.QtWidgets import QStyleOptionViewItem, QWidget
+
 from pyfda.libs.compat import (
     QtCore, QLineEdit, QBrush, QColor, QSize, QStyledItemDelegate, Qt)
 from pyfda.libs.pyfda_qt_lib import qstyle_widget
 from pyfda.libs.pyfda_num_lib import frmt2cmplx
 from pyfda.pyfda_rc import params
-
-from PyQt5.QtCore import QModelIndex, QLocale
-from PyQt5.QtWidgets import QStyleOptionViewItem, QWidget
 
 class ItemDelegatePZ(QStyledItemDelegate):
     """
