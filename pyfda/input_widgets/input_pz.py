@@ -466,11 +466,11 @@ class InputPZ(QWidget):
             self._clear_table()
         else:
             # test and equalize if P and Z array have different lengths:
-            D = len(zeros) - len(poles)
-            if D > 0:
-                poles = np.append(poles, np.zeros(D))
-            elif D < 0:
-                zeros = np.append(zeros, np.zeros(-D))
+            delta_len = len(zeros) - len(poles)
+            if delta_len > 0:
+                poles = np.append(poles, np.zeros(delta_len))
+            elif delta_len < 0:
+                zeros = np.append(zeros, np.zeros(-delta_len))
 
             gain = zeros_with_val(max(len(poles), len(zeros)), k)
 
