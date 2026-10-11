@@ -696,7 +696,7 @@ class InputPZ(QWidget):
         # sanitize zpk; test and equalize if P and Z lists have different lengths,
         # convert gain to a vector wth same length as zpk[0]
         zpk_arr = zpk2array(zpk)
-        if type(zpk_arr) is not np.ndarray:  # an error has ocurred, error string is returned
+        if not isinstance(zpk_arr, np.ndarray):  # an error has ocurred, error string is returned
             logger.error(zpk_arr)
             qstyle_widget(self.ui.but_apply, 'error')
             qstyle_widget(self.ui.but_undo, 'changed')  #
