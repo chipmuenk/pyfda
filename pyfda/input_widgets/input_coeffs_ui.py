@@ -67,6 +67,7 @@ class InputCoeffsUI(QWidget):
         self.load_save_clipboard = False  # load / save to clipboard or file
 
         self._construct_ui()
+        self._construct_layout()
 
     # -------------------------------------------------------------------------
     def emit(self, dict_sig):
@@ -110,11 +111,10 @@ class InputCoeffsUI(QWidget):
         self.bifont.setItalic(True)
 #        q_icon_size = QSize(20, 20) # optional, size is derived from butEnable
 
-        # ---------------------------------------------
-        #
-        # UI Elements for controlling the display
-        # ---------------------------------------------
-        lbl_display = QLabel(to_html("Display:", frmt='bi'), self)
+        # -----------------------------------------------------------------
+        # -> lay_h_display: fx display format, digits, quantize button
+        # -----------------------------------------------------------------
+        self.lbl_display = QLabel(to_html("Display:", frmt='bi'), self)
         self.cmb_qfrmt = QComboBox(self)
         qcmb_box_populate(self.cmb_qfrmt, self.cmb_qfrmt_items,
                           self.cmb_qfrmt_default)
@@ -141,36 +141,12 @@ class InputCoeffsUI(QWidget):
         q_icon_size = self.but_quant.iconSize()  # <- comment this for manual sizing
         self.but_quant.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
 
-        # layH_q_frmt = QHBoxLayout()
-        # layH_q_frmt.addWidget(self.cmb_qfrmt)
-        # layH_q_frmt.addWidget(self.but_quant)
-        # layH_q_frmt.setContentsMargins(5, 0, 0, 0)  # 5 pixels extra left space
-        # self.frm_q_frmt = QFrame(self)
-        # self.frm_q_frmt.setLayout(layH_q_frmt)
-
-        lay_h_display = QHBoxLayout()
-        lay_h_display.setContentsMargins(*params['wdg_margins'])
-        lay_h_display.setAlignment(Qt.AlignLeft)
-        lay_h_display.addWidget(lbl_display)
-        lay_h_display.addWidget(self.cmb_qfrmt)
-        lay_h_display.addWidget(self.spn_digits)
-        lay_h_display.addWidget(self.lbl_digits)
-        lay_h_display.addWidget(self.cmb_fx_base)
-        lay_h_display.addWidget(self.but_quant)
-        lay_h_display.addStretch()
-
-        frm_display = QFrame(self)
-        frm_display.setLayout(lay_h_display)
-
-        #######################################################################
-        # frm_buttons_coeffs
+        # ----------------------------------------------------------------------
+        # -> lay_h_buttons_coeffs1: edit table, apply / undo, import / export
         #
         # This frame contains all buttons for manipulating coefficients
         # -----------------------------------------------------------------
-        # lay_h_buttons_coeffs1
-        #
-        # UI Elements for loading / storing / manipulating cells and rows
-        # -----------------------------------------------------------------
+
         self.cmb_filter_type = QComboBox(self, objectName="comboFilterType")
         self.cmb_filter_type.setToolTip(
             "<span>Select between IIR and FIR filter for manual entry. "
@@ -251,6 +227,73 @@ class InputCoeffsUI(QWidget):
         self.load_save_clipboard = not self.load_save_clipboard  # is inverted next step
         self._set_load_save_icons()  # initialize icon / button settings
 
+        # ---------------------------------------------------------------------
+        # -> lay_h_buttons_coeffs2: eps / set zero settings
+        # ---------------------------------------------------------------------
+        self.but_set_zero = QPushButton("= 0", self)
+        self.but_set_zero.setToolTip(
+            "<span>Set selected coefficients = 0 with a magnitude &lt; &epsilon;. "
+            "When nothing is selected, test the whole table.</span>")
+        self.but_set_zero.setIconSize(q_icon_size)
+
+        self.lbl_eps = QLabel(self)
+        self.lbl_eps.setText("<b><i>for b, a</i> &lt;</b>")
+
+        self.led_eps = QLineEdit(self)
+        self.led_eps.setToolTip("Specify tolerance value.")
+
+        # ---------------------------------------------------------------------
+        # -> lay_v_main: widget for coefficient quantization settings
+        # ---------------------------------------------------------------------
+        self.wdg_wq_coeffs_b = FxWqUI(
+            fb_get('fxq', 'QCB'), objectName='fx_ui_wq_coeffs_b',
+            label='<b>Coeff. Quantization <i>b<sub>I.F&nbsp;</sub></i>:</b>',
+            msb_lsb_vis='max')
+        # -------------------
+        self.wdg_wq_coeffs_a = FxWqUI(
+            fb_get('fxq', 'QCA'), objectName='fx_ui_wq_coeffs_a',
+            label='<b>Coeff. Quantization <i>a<sub>I.F&nbsp;</sub></i>:</b>',
+            msb_lsb_vis='max')
+
+        # --- set initial values from dict ------------
+        self.spn_digits.setValue(params['FMT_ba'])
+        self.led_eps.setText(str(self.eps))
+
+        # -----------------------------------------------------------------
+        # LOCAL SIGNALS & SLOTs
+        # -----------------------------------------------------------------
+        self.but_csv_options.clicked.connect(self._open_csv_win)
+        self.but_file_clipboard.clicked.connect(self._set_load_save_icons)
+
+    # ---------------------------------------------------------------------
+    def _construct_layout(self) -> None:
+        """
+        Construct the layout of the widget, consisting of:
+        - top chkbox row
+        - coefficient table
+        - two bottom rows with action buttons
+        """
+
+        # -----------------------------------------------------------------
+        # lay_h_display: fx display format, digits, quantize button
+        # -----------------------------------------------------------------
+        lay_h_display = QHBoxLayout()
+        lay_h_display.setContentsMargins(*params['wdg_margins'])
+        lay_h_display.setAlignment(Qt.AlignLeft)
+        lay_h_display.addWidget(self.lbl_display)
+        lay_h_display.addWidget(self.cmb_qfrmt)
+        lay_h_display.addWidget(self.spn_digits)
+        lay_h_display.addWidget(self.lbl_digits)
+        lay_h_display.addWidget(self.cmb_fx_base)
+        lay_h_display.addWidget(self.but_quant)
+        lay_h_display.addStretch()
+
+        frm_display = QFrame(self)
+        frm_display.setLayout(lay_h_display)
+
+        # ---------------------------------------------------------------------
+        # lay_h_buttons_coeffs1: edit table, apply / undo, import / export
+        # ---------------------------------------------------------------------
         lay_h_buttons_coeffs1 = QHBoxLayout()
         lay_h_buttons_coeffs1.addWidget(self.cmb_filter_type)
         lay_h_buttons_coeffs1.addWidget(self.but_add_cells)
@@ -265,31 +308,17 @@ class InputCoeffsUI(QWidget):
         lay_h_buttons_coeffs1.addWidget(self.but_csv_options)
         lay_h_buttons_coeffs1.addStretch()
 
-        # ----------------------------------------------------------------------
-        # lay_h_buttons_coeffs2
-        #
-        # Eps / set zero settings
         # ---------------------------------------------------------------------
-        self.but_set_zero = QPushButton("= 0", self)
-        self.but_set_zero.setToolTip(
-            "<span>Set selected coefficients = 0 with a magnitude &lt; &epsilon;. "
-            "When nothing is selected, test the whole table.</span>")
-        self.but_set_zero.setIconSize(q_icon_size)
-
-        lbl_eps = QLabel(self)
-        lbl_eps.setText("<b><i>for b, a</i> &lt;</b>")
-
-        self.led_eps = QLineEdit(self)
-        self.led_eps.setToolTip("Specify tolerance value.")
-
+        # lay_h_buttons_coeffs2: eps / set zero settings
+        # ---------------------------------------------------------------------
         lay_h_buttons_coeffs2 = QHBoxLayout()
         lay_h_buttons_coeffs2.addWidget(self.but_set_zero)
-        lay_h_buttons_coeffs2.addWidget(lbl_eps)
+        lay_h_buttons_coeffs2.addWidget(self.lbl_eps)
         lay_h_buttons_coeffs2.addWidget(self.led_eps)
         lay_h_buttons_coeffs2.addStretch()
 
-        # -------------------------------------------------------------------
-        # Collect lay_h_buttons_coeffs in frm_buttons_coeffs
+        # ---------------------------------------------------------------------
+        # lay_v_buttons: Collect lay_h_buttons_coeffs* in frm_buttons_coeffs
         # ---------------------------------------------------------------------
         lay_v_buttons_coeffs = QVBoxLayout()
         lay_v_buttons_coeffs.addLayout(lay_h_buttons_coeffs1)
@@ -298,23 +327,10 @@ class InputCoeffsUI(QWidget):
         # This frame encompasses all Quantization Settings
         self.frm_buttons_coeffs = QFrame(self)
         self.frm_buttons_coeffs.setLayout(lay_v_buttons_coeffs)
-        #######################################################################
 
-        # -------------------
-        self.wdg_wq_coeffs_b = FxWqUI(
-            fb_get('fxq', 'QCB'), objectName='fx_ui_wq_coeffs_b',
-            label='<b>Coeff. Quantization <i>b<sub>I.F&nbsp;</sub></i>:</b>',
-            msb_lsb_vis='max')
-        # -------------------
-        self.wdg_wq_coeffs_a = FxWqUI(
-            fb_get('fxq', 'QCA'), objectName='fx_ui_wq_coeffs_a',
-            label='<b>Coeff. Quantization <i>a<sub>I.F&nbsp;</sub></i>:</b>',
-            msb_lsb_vis='max')
-
-        #######################################################################
-        # ########################  Main UI Layout ############################
-        #######################################################################
-
+        # ---------------------------------------------------------------------
+        #  Main UI Layout
+        # ---------------------------------------------------------------------
         lay_v_main = QVBoxLayout()
         lay_v_main.setContentsMargins(*params['wdg_margins'])
         # the following affects only the first widget (intended here)
@@ -324,18 +340,6 @@ class InputCoeffsUI(QWidget):
         lay_v_main.addWidget(self.wdg_wq_coeffs_b)
         lay_v_main.addWidget(self.wdg_wq_coeffs_a)
         self.setLayout(lay_v_main)
-        #######################################################################
-
-        # --- set initial values from dict ------------
-        self.spn_digits.setValue(params['FMT_ba'])
-        self.led_eps.setText(str(self.eps))
-
-        # ----------------------------------------------------------------------
-        # LOCAL SIGNALS & SLOTs
-        # ----------------------------------------------------------------------
-        self.but_csv_options.clicked.connect(self._open_csv_win)
-        self.but_file_clipboard.clicked.connect(self._set_load_save_icons)
-
     # --------------------------------------------------------------------------
     def _open_csv_win(self) -> None:
         """
