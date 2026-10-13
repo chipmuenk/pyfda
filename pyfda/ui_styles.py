@@ -395,10 +395,9 @@ QSS_TAB_BAR = """
     QTabBar::tab::left{
         border-bottom-left-radius: 0.1em;
         /* width: 26px; */
-        width: 1.5em;
+        width: 1.3em;
         margin-right: -0.2em;
         padding: 0.1em;
-        padding-right: 0.1em;
     }
 
     /* separate styling for stimuli / audio widget with icons @ tabs  */
