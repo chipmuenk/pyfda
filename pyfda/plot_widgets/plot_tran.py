@@ -99,6 +99,7 @@ class PlotTran(QWidget):
         self.tran_io_wdg = TranIO(self)
 
         self._construct_ui()
+        self._connect_signals()
 
         # --------------------------------------------
         # initialize UI for fixpoint or float simulation
@@ -204,6 +205,11 @@ class PlotTran(QWidget):
         self.setLayout(lay_v_main)
         self.updateGeometry()
 
+    # -----------------------------------------------------------------------
+    def _connect_signals(self) -> None:
+        """
+        Connect signals and slots of the widget and its subwidgets
+        """
         # ----------------------------------------------------------------------
         # GLOBAL SIGNALS & SLOTs
         # ----------------------------------------------------------------------
@@ -257,7 +263,6 @@ class PlotTran(QWidget):
         self.ui.but_freq_norm_impz.clicked.connect(self.draw)
         self.ui.but_freq_index_k.clicked.connect(self._update_index_k)
         self.ui.but_freq_show_info.clicked.connect(self.draw)
-        # --- subwidgets
 
     # -----------------------------------------------------------------------
     def _update_index_k(self, arg) -> None:
