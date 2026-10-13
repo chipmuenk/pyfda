@@ -403,11 +403,8 @@ QSS_TAB_BAR = """
 
     /* separate styling for stimuli / audio widget with icons @ tabs  */
     QTabWidget#tab_stim_w QTabBar::tab{
-        width: 1.5em;
-        height: 1.5em;
-        margin-right: -0.2em;
-        /*padding: 0;
-        margin: 0;*/
+        padding-top: 0;
+        padding-bottom: 0;
     }
 
     /* small gap above vertical mplwidget tabs */
