@@ -44,7 +44,7 @@ class FilterCoeffsTest(unittest.TestCase):
         else:
             # insure that cmbbox always fires an index changed signal
             # cmb_wdg.setCurrentIndex(-1)
-            ret = qset_cmb_box(cmb_wdg, arg, fireSignals=True)
+            ret = qset_cmb_box(cmb_wdg, arg, fire_signals=True)
             # self.log.warning(f"return {ret}-{arg}")
             self.assertTrue(ret > -1, "String not contained in combo box")  # assert that arg exists in combo box
 

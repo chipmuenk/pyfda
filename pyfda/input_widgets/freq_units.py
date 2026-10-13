@@ -259,7 +259,7 @@ class FreqUnits(QWidget):
             self.led_f_s.setText(str(fb_get('f_s')))
             # Load freq. unit setting from dict
             idx = qset_cmb_box(self.cmb_f_units, fb_get('freq_specs_unit'),
-                               caseSensitive=True)
+                               case_sensitive=True)
             if idx == -1:
                 logger.warning(
                     "Unknown frequency unit %s, using 'f_S'.",
@@ -267,7 +267,7 @@ class FreqUnits(QWidget):
                 )
             # Load Frequency range type (0 ... f_S/2 etc.) from dict
             qset_cmb_box(self.cmb_f_range, fb_get('freq_specs_range_type'),
-                         data=True, fireSignals=True)
+                         data=True, fire_signals=True)
 
         f_unit = qget_cmb_box(self.cmb_f_units, data=False)  # selected frequency unit,
         idx = self.cmb_f_units.currentIndex()  # its index
@@ -328,7 +328,7 @@ class FreqUnits(QWidget):
             else:
                 f_unit = "mHz"
 
-            new_idx = qset_cmb_box(self.cmb_f_units, f_unit, caseSensitive=True)
+            new_idx = qset_cmb_box(self.cmb_f_units, f_unit, case_sensitive=True)
             if new_idx != idx:
                 # sampling frequency unit has been changed, f_s and t_s need to be scaled
                 idx = new_idx
