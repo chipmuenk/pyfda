@@ -145,7 +145,8 @@ class PlotFFTWin(QDialog):
         self.all_wins_dict = self.qfft_win_select.all_wins_dict
 
         self._construct_ui()
-        self._construct_layout()
+        self._construct_layout_control()
+        self._construct_layout_main()
         self.calc_win_draw()
 
     # -------------------------------------------------------------------------
@@ -277,8 +278,8 @@ class PlotFFTWin(QDialog):
             "</span>")
 
     # ------------------------------------------------------------------------------
-    def _construct_layout(self):
-        """Construct the layout for the FFT window plot. """
+    def _construct_layout_control(self):
+        """Construct the layout for the control widgets. """
         # ----------------------------------------------------------------------
         #               ### frm_controls ###
         #
@@ -329,27 +330,7 @@ class PlotFFTWin(QDialog):
         self.frm_controls = QFrame(self, objectName="frm_controls")
         self.frm_controls.setLayout(lay_v_controls)
 
-        # ----------------------------------------------------------------------
-        #               ### mplwidget ###
-        #
-        # Layout lay_v_main_mpl (VBox) is defined within MplWidget, additional
-        # widgets can be added below the matplotlib widget (here: self.frm_controls)
-        #
-        # ----------------------------------------------------------------------
-        self.mplwidget = MplWidget(self)
-        self.mplwidget.lay_v_main_mpl.addWidget(self.frm_controls)
-        self.mplwidget.lay_v_main_mpl.setContentsMargins(0, 0, 0, 0)
-
-        # self.mplwidget.mpl_toolbar.a_he.setEnabled(False)  # enable help menu
-        self.mplwidget.mpl_toolbar.a_he.info = "manual/plot_fft_win.html"  # TODO: missing!
-        self.mplwidget.mpl_toolbar.a_ui_num_levels = 3 # number of ui levels
-
-        # ----------------------------------------------------------------------
-        #               ### frm_info ###
-        #
-        # This widget encompasses the text info box and the table with window
-        # parameters.
-        # ----------------------------------------------------------------------
+        # construct and initialize the table with window properties
         self.tbl_win_props = QTableWidget(self.tbl_rows, self.tbl_cols, self)
         self.tbl_win_props.setAlternatingRowColors(True)
         # Auto-resize of table can be set using the header (although it is invisible)
@@ -371,6 +352,28 @@ class PlotFFTWin(QDialog):
 
         self._construct_table(self.tbl_rows, self.tbl_cols, " ")
 
+    # ------------------------------------------------------------------------------
+    def _construct_layout_main(self):
+        """
+        Construct the layout for the main widget which is a splitter, encompassing the matplotlib widget,
+        the control frame and the info frame.
+        """
+        ### mplwidget ###
+        #
+        # Layout lay_v_main_mpl (VBox) is defined within MplWidget, additional
+        # widgets are added below the matplotlib widget (here: self.frm_controls)
+
+        self.mplwidget = MplWidget(self)
+        self.mplwidget.lay_v_main_mpl.addWidget(self.frm_controls)
+        self.mplwidget.lay_v_main_mpl.setContentsMargins(0, 0, 0, 0)
+
+        # self.mplwidget.mpl_toolbar.a_he.setEnabled(False)  # enable help menu
+        self.mplwidget.mpl_toolbar.a_he.info = "manual/plot_fft_win.html"  # TODO: missing!
+        self.mplwidget.mpl_toolbar.a_ui_num_levels = 3 # number of ui levels
+
+        # ----------------------------------------------------------------------
+        ### frm_info: combine info box and table with window parameters
+        #
         self.txt_info_box = QTextBrowser(self)
 
         lay_v_info = QVBoxLayout(self)
@@ -381,11 +384,8 @@ class PlotFFTWin(QDialog):
         self.frm_info.setLayout(lay_v_info)
 
         # ----------------------------------------------------------------------
-        #               ### splitter ###
+        ### splitter: combine all subwidgets
         #
-        # This widget encompasses all subwidgets
-        # ----------------------------------------------------------------------
-
         splitter = QSplitter(self)
         splitter.setOrientation(Qt.Vertical)
         splitter.addWidget(self.mplwidget)

@@ -108,9 +108,15 @@ class TranIOUI(QWidget):
         # construct widgets for saving data files
         self._construct_ui_save()
         # layout the widgets
-        self._construct_layout()
-        # initialize data format dependent widgets
+        self._construct_layout_grid()
+        # construct main layout for the whole widget
+        self._construct_layout_main()
+        # initialize visibility of widgets
         self.set_ui_visibility()
+        # ------ Local signal-slot-connections
+        self.cmb_file_format.currentIndexChanged.connect(self.set_ui_visibility)
+        self.cmb_data_format.currentIndexChanged.connect(self.set_ui_visibility)
+        self.but_f_s_wav_auto.clicked.connect(self.set_ui_visibility)
 
     # -------------------------------------------------------------------------
     def _construct_ui_load(self):
@@ -227,8 +233,8 @@ class TranIOUI(QWidget):
         self.led_nr_loops.setMaximumWidth(qtext_width(n_x=8))
 
     # -------------------------------------------------------------------------
-    def _construct_layout(self):
-
+    def _construct_layout_grid(self):
+        """ layout the widgets in a grid """
         lay_h_f_s = QHBoxLayout()
         lay_h_f_s.addWidget(self.lbl_f_s)
         lay_h_f_s.addWidget(self.lbl_f_s_value)
@@ -240,8 +246,6 @@ class TranIOUI(QWidget):
         self.frm_f_s.setContentsMargins(0, 0, 0, 0)
         self.frm_f_s.setVisible(False)
 
-        line1 = QVLine(width=10)
-
         lay_h_file_fmt_options = QHBoxLayout()
         lay_h_file_fmt_options.addWidget(self.but_csv_options)
         lay_h_file_fmt_options.addWidget(self.but_int_as_float)
@@ -249,10 +253,6 @@ class TranIOUI(QWidget):
         lay_h_lbl_led_f_s_wav = QHBoxLayout()
         lay_h_lbl_led_f_s_wav.addWidget(self.lbl_f_s_wav)
         lay_h_lbl_led_f_s_wav.addWidget(self.led_f_s_wav)
-
-        line2 = QVLine(width=1)
-
-        line3 = QVLine(width=5)
 
         lay_g_io_file = QGridLayout()
         i = 0
@@ -274,7 +274,7 @@ class TranIOUI(QWidget):
         lay_g_io_file.addWidget(self.lbl_chan_import, 0, i)
         lay_g_io_file.addWidget(self.cmb_chan_import, 1, i)
         i += 1
-        lay_g_io_file.addWidget(line1, 0, i, 2, 1)
+        lay_g_io_file.addWidget(QVLine(width=10), 0, i, 2, 1)
         # ---- FILE FORMAT
         i += 1
         lay_g_io_file.addWidget(self.cmb_file_format, 0, i)
@@ -285,13 +285,13 @@ class TranIOUI(QWidget):
         lay_g_io_file.addLayout(lay_h_lbl_led_f_s_wav, 1, i)
         # ---- SCALE TO
         i += 1
-        lay_g_io_file.addWidget(line2, 0, i, 2, 1)
+        lay_g_io_file.addWidget(QVLine(width=1), 0, i, 2, 1)
         i += 1
         lay_g_io_file.addWidget(self.but_scale_to, 0, i)
         lay_g_io_file.addWidget(self.led_scale_to, 1, i)
         # ---- SAVE FILE
         i += 1
-        lay_g_io_file.addWidget(line3, 0, i, 2, 1)
+        lay_g_io_file.addWidget(QVLine(width=5), 0, i, 2, 1)
         i += 1
         lay_g_io_file.addWidget(self.but_save, 0, i, 2, 1)
         i += 1
@@ -308,16 +308,19 @@ class TranIOUI(QWidget):
         lay_g_io_file.addWidget(self.led_nr_loops, 1, i)
         #
         lay_g_io_file.setColumnStretch(i+1, 1)
-        # --------
+
+        self.wdg_ctrl_io_file = QWidget(self)
+        self.wdg_ctrl_io_file.setLayout(lay_g_io_file)
+        self.wdg_ctrl_io_file.setContentsMargins(0, 0, 0, 0)
+
+    # -------------------------------------------------------------------------
+    def _construct_layout_main(self):
+            # --------
         lay_h_title_io_file = QHBoxLayout()
         lay_h_title_io_file.addWidget(self.lbl_title_io_file)
         self.wdg_title_io_file = QWidget(self)
         self.wdg_title_io_file.setLayout(lay_h_title_io_file)
         self.wdg_title_io_file.setContentsMargins(0, 0, 0, 0)
-
-        self.wdg_ctrl_io_file = QWidget(self)
-        self.wdg_ctrl_io_file.setLayout(lay_g_io_file)
-        self.wdg_ctrl_io_file.setContentsMargins(0, 0, 0, 0)
 
         lay_h_io = QHBoxLayout()
         lay_h_io.addWidget(self.wdg_title_io_file)
@@ -328,10 +331,6 @@ class TranIOUI(QWidget):
         self.wdg_top.setLayout(lay_h_io)
         self.wdg_top.setContentsMargins(0, 0, 0, 0)
         self.wdg_top.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Minimum)
-        # ------ Local signal-slot-connections
-        self.cmb_file_format.currentIndexChanged.connect(self.set_ui_visibility)
-        self.cmb_data_format.currentIndexChanged.connect(self.set_ui_visibility)
-        self.but_f_s_wav_auto.clicked.connect(self.set_ui_visibility)
 
     # -------------------------------------------------------------------------
     def set_ui_visibility(self):
