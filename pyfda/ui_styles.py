@@ -388,8 +388,8 @@ QSS_TAB_BAR = """
         border-top-right-radius: 0.2em;
         min-width: 2em;
         margin-bottom: -0.2em;
-        padding: 0.2em;
-        padding-bottom: 0.4em;
+        padding: 0.1em;
+        padding-bottom: 0.3em;
         }
 
     QTabBar::tab::left{
