@@ -165,15 +165,19 @@ class PlotTranUI(QWidget):
             ("re_im", "Re. / Imag.", "<span>Real and imaginary part of spectrum.</span>")
         ]
 
-        self._construct_ui()
+        self._construct_ui_run()
+        self._construct_ui_time()
+        self._construct_ui_freq()
+
 #        self._enable_stim_widgets()
         self.update_n(emit_signal=False)  # also updates window function and win_dict
 #        self._update_noi()
 
-    def _construct_ui(self):
-        # ----------- ---------------------------------------------------
-        # Run control widgets
-        # ---------------------------------------------------------------
+    # -------------------------------------------------------------------------
+    def _construct_ui_run(self):
+        """
+        Construct run control widgets
+        """
         self.but_auto_run = PushButton(self, "Auto", objectName="but_auto_run")
         self.but_auto_run.setToolTip("<span>Update response automatically when "
                                      "parameters have been changed.</span>")
@@ -304,11 +308,12 @@ class PlotTranUI(QWidget):
 
         self.wdg_ctrl_run = QWidget(self)
         self.wdg_ctrl_run.setLayout(lay_h_ctrl_run)
-        # --- end of run control ----------------------------------------
 
-        # ----------- ---------------------------------------------------
-        # Controls for time domain
-        # ---------------------------------------------------------------
+    # -------------------------------------------------------------------------
+    def _construct_ui_time(self):
+        """
+        Controls for time domain
+        """
         self.lbl_title_plot_time = QLabel("Plots:", objectName="large")
 
         self.lbl_plt_time_stim = QLabel(to_html("Stim. x", frmt='bi'), self)
@@ -481,11 +486,12 @@ class PlotTranUI(QWidget):
 
         self.wdg_ctrl_time_spgr.setVisible(self.plt_time_spgr != "none")
 
-        # ---- end time domain ------------------
+    # -------------------------------------------------------------------------
+    def _construct_ui_freq(self):
+        """
+        Controls for frequency domain
+        """
 
-        # ---------------------------------------------------------------
-        # Controls for frequency domain
-        # ---------------------------------------------------------------
         self.lbl_title_plot_freq = QLabel("Plots:", objectName="large")
         #
         self.lbl_plt_freq_stim = QLabel(to_html("Stim. X", frmt='bi'), self)
@@ -532,7 +538,8 @@ class PlotTranUI(QWidget):
         qcmb_box_populate(self.cmb_freq_display, self.cmb_freq_display_items,
                           self.cmb_freq_display_item)
 
-        self.but_hf_id = PushButton(self, to_html("H_id", frmt="bi"), rich_text = True, objectName="but_hf_id")
+        self.but_hf_id = PushButton(self, to_html("H_id", frmt="bi"), rich_text = True,
+                                    objectName="but_hf_id")
         self.but_hf_id.setToolTip("<span>Show ideal frequency response, calculated "
                                "from the filter coefficients.</span>")
 
