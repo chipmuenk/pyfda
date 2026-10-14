@@ -104,6 +104,7 @@ class TranIOUI(QWidget):
 
         super().__init__()
         self._construct_ui()
+        self._construct_layout()
 
     # -------------------------------------------------------------------------
     def _construct_ui(self):
@@ -136,19 +137,9 @@ class TranIOUI(QWidget):
         self.lbl_shape = QLabel(to_html("Shape:", frmt="b"))
         self.lbl_shape_actual = QLabel("None")
 
-        lbl_f_s = QLabel(to_html("f_S =", frmt="bi"))
+        self.lbl_f_s = QLabel(to_html("f_S =", frmt="bi"))
         self.lbl_f_s_value = QLabel("None")
-        lbl_f_s_unit = QLabel("Hz")
-        lay_h_f_s = QHBoxLayout()
-        lay_h_f_s.addWidget(lbl_f_s)
-        lay_h_f_s.addWidget(self.lbl_f_s_value)
-        lay_h_f_s.addWidget(lbl_f_s_unit)
-        lay_h_f_s.addStretch()
-        lay_h_f_s.setContentsMargins(0, 0, 0, 0)
-        self.frm_f_s = QFrame(self)
-        self.frm_f_s.setLayout(lay_h_f_s)
-        self.frm_f_s.setContentsMargins(0, 0, 0, 0)
-        self.frm_f_s.setVisible(False)
+        self.lbl_f_s_unit = QLabel("Hz")
 
         self.line0 = QVLine(width=1)
         self.line0.setVisible(False)
@@ -159,8 +150,6 @@ class TranIOUI(QWidget):
             self.cmb_chan_import, self.cmb_chan_import_items,
             self.cmb_chan_import_init)
         self.cmb_chan_import.setVisible(False)
-
-        line1 = QVLine(width=10)
 
         self.lbl_wordlength = QLabel(to_html("W =", frmt="bi"))
         self.lbl_wordlength_value = QLabel("None")
@@ -187,9 +176,6 @@ class TranIOUI(QWidget):
         self.but_int_as_float.setToolTip(
             "<span>Represent <i>W</i> bit integer WAV formats as float when importing "
             "and exporting so that 1.0 is equivalent to 2<sup>W</sup>.</span>")
-        lay_h_file_fmt_options = QHBoxLayout()
-        lay_h_file_fmt_options.addWidget(self.but_csv_options)
-        lay_h_file_fmt_options.addWidget(self.but_int_as_float)
 
         self.but_f_s_wav_auto = PushButtonRT(
             self, text="<b>Auto <i>f<sub>S</sub></i></b>", checked=True)
@@ -202,11 +188,6 @@ class TranIOUI(QWidget):
         self.led_f_s_wav.setToolTip(
             "<span>Manual f_S for import / export of WAV file (must be integer).</span>")
 
-        lay_h_lbl_led_f_s_wav = QHBoxLayout()
-        lay_h_lbl_led_f_s_wav.addWidget(self.lbl_f_s_wav)
-        lay_h_lbl_led_f_s_wav.addWidget(self.led_f_s_wav)
-
-        line2 = QVLine(width=1)
         # ----------- SCALE ------------------------------------------------------------
         self.led_scale_to = QLineEdit()
         self.led_scale_to.setToolTip(self.tr("Max. value after normalizing"))
@@ -216,7 +197,6 @@ class TranIOUI(QWidget):
         # self.led_scale_to.setFixedWidth(self.but_scale_to.sizeHint().width())
 
         # ----------- SAVE ------------------------------------------------------------
-        line3 = QVLine(width=5)
         self.but_save = QPushButton("Save:", objectName="large")
         self.but_save.setSizePolicy(QSizePolicy.Expanding,
                                       QSizePolicy.Expanding)
@@ -246,7 +226,34 @@ class TranIOUI(QWidget):
         self.led_nr_loops.setText(str(self.led_nr_loops_default))
         self.led_nr_loops.setMaximumWidth(qtext_width(n_x=8))
 
-        #-------------------------------
+    # -------------------------------------------------------------------------
+    def _construct_layout(self):
+
+        lay_h_f_s = QHBoxLayout()
+        lay_h_f_s.addWidget(self.lbl_f_s)
+        lay_h_f_s.addWidget(self.lbl_f_s_value)
+        lay_h_f_s.addWidget(self.lbl_f_s_unit)
+        lay_h_f_s.addStretch()
+        lay_h_f_s.setContentsMargins(0, 0, 0, 0)
+        self.frm_f_s = QFrame(self)
+        self.frm_f_s.setLayout(lay_h_f_s)
+        self.frm_f_s.setContentsMargins(0, 0, 0, 0)
+        self.frm_f_s.setVisible(False)
+
+        line1 = QVLine(width=10)
+
+        lay_h_file_fmt_options = QHBoxLayout()
+        lay_h_file_fmt_options.addWidget(self.but_csv_options)
+        lay_h_file_fmt_options.addWidget(self.but_int_as_float)
+
+        lay_h_lbl_led_f_s_wav = QHBoxLayout()
+        lay_h_lbl_led_f_s_wav.addWidget(self.lbl_f_s_wav)
+        lay_h_lbl_led_f_s_wav.addWidget(self.led_f_s_wav)
+
+        line2 = QVLine(width=1)
+
+        line3 = QVLine(width=5)
+
         lay_g_io_file = QGridLayout()
         i = 0
         # ---- LOAD FILE
