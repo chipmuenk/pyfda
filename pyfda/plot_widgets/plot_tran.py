@@ -181,17 +181,10 @@ class PlotTran(QWidget):
 
         self.tab_stim_w.addTab(self.tran_io_wdg, QIcon(":/file.svg"), "")
         self.tab_stim_w.setTabToolTip(1, "File I/O")
-
+        # initial sizing of stimulus tab widget to fit the height of the contained widget
         self._resize_stim_tab_widget()
-
-        # All the following do not reflect QSS settings always yields w = 30.
-        # Try {font.pixelSize()} ?
-        # tab_w = self.tab_stim_w.tabBar().geometry().height()
-        # tab_w2 = self.tab_stim_w.tabBar().height()
-        # The following works somewhat under Windwos, but crashes under Linux
-        # tab_w2 = self.tab_stim_w.tabBar().tabSizeHint(0).width()
-        # logger.warning(f"w={tab_w}, w2={tab_w2}")
-        tab_w = int(round(25 * params['screen']['scaling']))  # TODO: hacky ...
+        # get width of tab for setting icon size
+        tab_w = int(self.tab_stim_w.tabBar().minimumSizeHint().width() * 0.8)
         self.tab_stim_w.setIconSize(QSize(tab_w, tab_w))
         # ----------------------------------------------------------------------
         # ---------------- GLOBAL LAYOUT ---------------------------------------
@@ -312,21 +305,7 @@ class PlotTran(QWidget):
         - changed tab in the stimulus tab widget (signal-slot)
         - an 'ui-changed' - signal (`process_signal_rx()`)
         """
-        # logger.warning(f"width = {self.tab_stim_w.tabBar().width()}, "
-        #                f"height = {self.tab_stim_w.tabBar().height()}")
-        # logger.warning(f"w = {self.tab_mpl_w.tabBar().width()}, "
-        #                f"height = {self.tab_mpl_w.tabBar().height()}")
-        # tabBar height is also the width / hight of the tab icons
-
-        min_height = self.tab_stim_w.tabBar().height()
-        # logger.warning(f"min hint = {self.stim_wdg.minimumSizeHint()}, min_height = {min_height}")
-        if self.tab_stim_w.currentWidget() is None:
-            logger.warning("no embedded widget!")
-            height = 0
-        else:
-            height = self.tab_stim_w.currentWidget().minimumSizeHint().height()
-        self.tab_stim_w.setMaximumHeight(max(height, min_height))
-        self.tab_stim_w.setMinimumHeight(max(height, min_height))
+        self.tab_stim_w.setFixedHeight(self.tab_stim_w.currentWidget().minimumSizeHint().height())
 
     # -----------------------------------------------------------------------
     def _process_sig_rx_t(self, dict_sig: dict | None = None) -> None:
@@ -570,7 +549,7 @@ class PlotTran(QWidget):
         """
 
         # logger.info("_impz_init")
-        self._resize_stim_tab_widget()
+        #self._resize_stim_tab_widget()
         # allow scaling the frequency response from pure impulse (no DC, noise or file)
         # button is only visible for impulse-shaped stimuli
         self.ui.but_freq_norm_impz.setEnabled(
