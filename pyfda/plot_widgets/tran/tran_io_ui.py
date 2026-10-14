@@ -103,20 +103,20 @@ class TranIOUI(QWidget):
         self.led_nr_loops_default = 1
 
         super().__init__()
-        self._construct_ui()
+        # construct widgets for loading data files
+        self._construct_ui_load()
+        # construct widgets for saving data files
+        self._construct_ui_save()
+        # layout the widgets
         self._construct_layout()
+        # initialize data format dependent widgets
+        self.set_ui_visibility()
 
     # -------------------------------------------------------------------------
-    def _construct_ui(self):
-        # =====================================================================
-        # Controls
-        # =====================================================================
+    def _construct_ui_load(self):
+        """ widgets for loading data files """
         self.lbl_title_io_file = QLabel("File:", objectName="large")
-        # ----------------------------------------------------------------------
-        # Main Widget
-        # ----------------------------------------------------------------------
 
-        # ----------- LOAD ------------------------------------------------------------
         self.but_select = PushButton(self, "Select", checkable=False, objectName="large")
         self.but_select.setSizePolicy(QSizePolicy.Expanding,
                                     QSizePolicy.Expanding)
@@ -125,8 +125,7 @@ class TranIOUI(QWidget):
                     "it yet.</span>"))
 
         self.but_load = QPushButton("Load:", objectName="large")
-        self.but_load.setSizePolicy(QSizePolicy.Expanding,
-                                    QSizePolicy.Expanding)
+        self.but_load.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
         self.but_load.setToolTip(
             self.tr("<span>Load / unload selected file.</span>"))
         self.but_load.setEnabled(False)
@@ -159,8 +158,7 @@ class TranIOUI(QWidget):
             self.tr("<span>When activated, scale maximum of data to the value below "
                     "before saving and after loading.</span>"))
         self.but_scale_to.setEnabled(True)
-        self.but_scale_to.setSizePolicy(QSizePolicy.Expanding,
-                                    QSizePolicy.Expanding)
+        self.but_scale_to.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
 
         # ----------- FILE FORMAT -------------------------------------------
         self.cmb_file_format = QComboBox()
@@ -196,7 +194,9 @@ class TranIOUI(QWidget):
         self.led_scale_to.setMaximumWidth(qtext_width(n_x=8))
         # self.led_scale_to.setFixedWidth(self.but_scale_to.sizeHint().width())
 
-        # ----------- SAVE ------------------------------------------------------------
+    # -------------------------------------------------------------------------
+    def _construct_ui_save(self):
+        """ widgets for saving data files"""
         self.but_save = QPushButton("Save:", objectName="large")
         self.but_save.setSizePolicy(QSizePolicy.Expanding,
                                       QSizePolicy.Expanding)
@@ -309,7 +309,6 @@ class TranIOUI(QWidget):
         #
         lay_g_io_file.setColumnStretch(i+1, 1)
         # --------
-
         lay_h_title_io_file = QHBoxLayout()
         lay_h_title_io_file.addWidget(self.lbl_title_io_file)
         self.wdg_title_io_file = QWidget(self)
@@ -333,8 +332,6 @@ class TranIOUI(QWidget):
         self.cmb_file_format.currentIndexChanged.connect(self.set_ui_visibility)
         self.cmb_data_format.currentIndexChanged.connect(self.set_ui_visibility)
         self.but_f_s_wav_auto.clicked.connect(self.set_ui_visibility)
-        # inizialize data format dependent widgets
-        self.set_ui_visibility()
 
     # -------------------------------------------------------------------------
     def set_ui_visibility(self):
