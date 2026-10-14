@@ -145,6 +145,7 @@ class PlotFFTWin(QDialog):
         self.all_wins_dict = self.qfft_win_select.all_wins_dict
 
         self._construct_ui()
+        self._construct_layout()
         self.calc_win_draw()
 
     # -------------------------------------------------------------------------
@@ -214,7 +215,7 @@ class PlotFFTWin(QDialog):
         else:
             logger.error("Cannot process dict_sig: %s", dict_sig)
 
-# ------------------------------------------------------------------------------
+    # ------------------------------------------------------------------------------
     def _construct_ui(self):
         """
         Intitialize the widget, consisting of:
@@ -275,6 +276,9 @@ class PlotFFTWin(QDialog):
             "<span>Display frequencies in bins or multiples of &Delta;<i>f = f<sub>S </sub>/N</i>."
             "</span>")
 
+    # ------------------------------------------------------------------------------
+    def _construct_layout(self):
+        """Construct the layout for the FFT window plot. """
         # ----------------------------------------------------------------------
         #               ### frm_controls ###
         #
@@ -402,7 +406,6 @@ class PlotFFTWin(QDialog):
         self.ax = self.mplwidget.fig.subplots(nrows=1, ncols=2)
         self.ax_t = self.ax[0]
         self.ax_f = self.ax[1]
-        self.calc_win_draw()  # initial calculation and drawing
 
         # ----------------------------------------------------------------------
         # GLOBAL SIGNALS & SLOTs
@@ -536,33 +539,33 @@ class PlotFFTWin(QDialog):
 
         # calculate the FFT of the window with a zero padding factor
         # of `self.pad` and create the frequency axis
-        self.F = fftfreq(self.n_view * self.pad, d=1. / fb_get('f_s'))
+        self.f = fftfreq(self.n_view * self.pad, d=1. / fb_get('f_s'))
         self.k = fftfreq(self.n_view * self.pad, d=1./(self.n_view))
-        self.Win = np.abs(fft(self.win_view, self.n_view * self.pad))
+        self.win = np.abs(fft(self.win_view, self.n_view * self.pad))
         # calculate the max. amplitude error in the middle of the bin
-        self.max_a_err = self.Win[self.pad // 2] / (self.n_view * self.cgain)
+        self.max_a_err = self.win[self.pad // 2] / (self.n_view * self.cgain)
 
         # Correct gain for periodic signals (coherent gain)
         if self.but_norm_f.isChecked():
-            self.Win /= (self.n_view * self.cgain)
+            self.win /= (self.n_view * self.cgain)
 
         # calculate frequency of first zero and maximum sidelobe level,
         # argrelmin() returns an array with indices of relative minima
-        first_zero = argrelmin(self.Win[:(self.n_view*self.pad)//2])
+        first_zero = argrelmin(self.win[:(self.n_view*self.pad)//2])
 
         if np.shape(first_zero)[1] > 0:
             first_zero = first_zero[0][0]
-            self.first_zero_f = self.F[first_zero]
+            self.first_zero_f = self.f[first_zero]
             self.first_zero_idx = first_zero / float(self.pad)
             self.sidelobe_level = np.max(
-                self.Win[first_zero:(self.n_view*self.pad)//2])
+                self.win[first_zero:(self.n_view*self.pad)//2])
         else:
             self.first_zero_f = np.nan
             self.sidelobe_level = 0
 
         mainlobe_3db_idx = (
-            np.abs(self.Win[:len(self.F*self.pad)//2] - self.Win[0]/np.sqrt(2))).argmin()
-        self.mainlobe_3db_freq = self.F[mainlobe_3db_idx]
+            np.abs(self.win[:len(self.f*self.pad)//2] - self.win[0]/np.sqrt(2))).argmin()
+        self.mainlobe_3db_freq = self.f[mainlobe_3db_idx]
         self.mainlobe_3db_idx = mainlobe_3db_idx / float(self.pad)
 
         self.update_view()
@@ -639,13 +642,13 @@ class PlotFFTWin(QDialog):
             self.ax_t.plot(self.n, self.win_view)
 
         if self.but_half_f.isChecked():
-            F = self.F[:len(self.F*self.pad)//2]
-            k = self.k[:len(self.F*self.pad)//2]
-            Win = self.Win[:len(self.F*self.pad)//2]
+            f = self.f[:len(self.f*self.pad)//2]
+            k = self.k[:len(self.f*self.pad)//2]
+            win = self.win[:len(self.f*self.pad)//2]
         else:
-            F = fftshift(self.F)
+            f = fftshift(self.f)
             k = fftshift(self.k)
-            Win = fftshift(self.Win)
+            win = fftshift(self.win)
 
         if self.but_bin_f.isChecked():
             self.ax_f.set_xlabel(r"$k \; \rightarrow$")
@@ -660,7 +663,7 @@ class PlotFFTWin(QDialog):
             self.mainlobe_3db_unit = "bins"
         else:
             self.ax_f.set_xlabel(fb_get('plt_f_label'))
-            x = F
+            x = f
 
             self.but_bin_f.setText("<b>&Delta; <i>f</i></b>")
             self.nenbw_disp = 10 * np.log10(self.nenbw)
@@ -672,7 +675,7 @@ class PlotFFTWin(QDialog):
 
         if self.but_log_f.isChecked():
             self.ax_f.plot(x, np.maximum(
-                20 * np.log10(np.abs(Win)), self.bottom_f))
+                20 * np.log10(np.abs(win)), self.bottom_f))
 
             self.cgain_disp = 20 * np.log10(self.cgain)
             self.sidelobe_level_disp = 20 * np.log10(self.sidelobe_level)
@@ -680,7 +683,7 @@ class PlotFFTWin(QDialog):
             self.cgain_unit = "dB"
             self.max_a_err_unit = "dB"
         else:
-            self.ax_f.plot(x, Win)
+            self.ax_f.plot(x, win)
 
             self.cgain_disp = self.cgain
             self.cgain_unit = ""
@@ -700,13 +703,13 @@ class PlotFFTWin(QDialog):
 
         param_txt = ""
         if fb_get(*self.cur_win_dict_name, 'par_val'):
-            if type(fb_get(*self.cur_win_dict_name, 'par_val')[0]) == str:
+            if isinstance(fb_get(*self.cur_win_dict_name, 'par_val')[0], str):
                 p1 = fb_get(*self.cur_win_dict_name, 'par_val')[0]
             else:
                 p1 = f"{fb_get(*self.cur_win_dict_name, 'par_val')[0]:.3g}"
             param_txt = f" ({self.all_wins_dict[cur_id]['par'][0]['name_tex']} = {p1})"
         if len(fb_get(*self.cur_win_dict_name, 'par_val')) > 1:
-            if type(fb_get(*self.cur_win_dict_name, 'par_val')[1]) in {str}:
+            if isinstance(fb_get(*self.cur_win_dict_name, 'par_val')[1], str):
                 p2 = fb_get(*self.cur_win_dict_name, 'par_val')[1]
             else:
                 p2 = f"{fb_get(*self.cur_win_dict_name, 'par_val')[1]:.3g}"
