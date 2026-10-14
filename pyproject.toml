@@ -243,10 +243,12 @@ basic.function-naming-style = "snake_case"
 # style. If left empty, function names will be checked with the set naming style.
 # function-rgx =
 # Good variable names which should always be accepted, separated by a comma.
+# This also includes Qt method names for overloading
 # basic.good-names = [ "i", "j", "k", "ex", "Run", "_" ]
 basic.good-names = ["i", "j", "k", "N", "x", "X", "y", "Y", "z", "ex", "_",
                     "eventFilter", "closeEvent", "initStyleOption", "displayText",
-                    "createEditor", "setEditorData", "setModelData"]
+                    "createEditor", "setEditorData", "setModelData", "sizeHint",
+                    "minimumSizeHint", "setCheckable", "isChecked", "setChecked"]
 # Good variable names regexes, separated by a comma. If names match any regex,
 # they will always be accepted
 # good-names-rgxs =
