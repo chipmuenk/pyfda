@@ -104,13 +104,13 @@ class PlotHf(QWidget):
         self.lbl_show_h_abs = QLabel(to_html('| H |', frmt='b'))
         self.chk_show_h_abs = QCheckBox(self)
         self.chk_show_h_abs.setChecked(True)
-        self.chk_show_h_abs.setToolTip("Show magnitude of H(F)")
+        self.chk_show_h_abs.setToolTip("Show magnitude of H(f)")
         self.lbl_show_h_re = QLabel(to_html('re{H}&nbsp;', frmt='b'))
         self.chk_show_h_re = QCheckBox(self)
-        self.chk_show_h_re.setToolTip("Show real part of H(F)")
+        self.chk_show_h_re.setToolTip("Show real part of H(f)")
         self.lbl_show_h_im = QLabel(to_html('im{H}', frmt='b'))
         self.chk_show_h_im = QCheckBox(self)
-        self.chk_show_h_im.setToolTip("Show imaginary part of H(F)")
+        self.chk_show_h_im.setToolTip("Show imaginary part of H(f)")
 
         lay_g_show_h = QGridLayout()
         lay_g_show_h.addWidget(self.lbl_show_h_abs, 0, 0)
@@ -523,11 +523,11 @@ class PlotHf(QWidget):
 
                 self.ax_i.set_xlim(fb_get('freq_specs_range'))
                 if self.chk_show_h_abs.isChecked():
-                    self.ax_i.plot(self.F, self.h_plt_abs,  label=r'$|H(F)|$')
+                    self.ax_i.plot(self.f, self.h_plt_abs,  label=r'$|H(f)|$')
                 if self.chk_show_h_re.isChecked():
-                    self.ax_i.plot(self.F, self.h_plt_re, label=r'$\Re\{H(F)\}$')
+                    self.ax_i.plot(self.f, self.h_plt_re, label=r'$\Re\{H(f)\}$')
                 if self.chk_show_h_im.isChecked():
-                    self.ax_i.plot(self.F, self.h_plt_im, label=r'$\Im\{H(F)\}$')
+                    self.ax_i.plot(self.f, self.h_plt_im, label=r'$\Im\{H(f)\}$')
 
             if self.cmb_inset.currentIndex() == 1: # edit / navigate inset
                 self.ax_i.set_navigate(True)
@@ -580,18 +580,18 @@ class PlotHf(QWidget):
             # an array full of nans
             phi = np.angle(np.nan_to_num(self.h_c))
         # -----------------------------------------------------------
-            self.ax_p.plot(self.F, np.unwrap(phi)*scale,
-                           'g-.', label=r"$\angle\,H(F)$")
+            self.ax_p.plot(self.f, np.unwrap(phi)*scale,
+                           'g-.', label=r"$\angle\,H(f)$")
         # -----------------------------------------------------------
             self.ax_p.set_ylabel(phi_str)
 
     #------------------------------------------------------------------------------
     def calc_hf(self):
         """
-        (Re-)Calculate the complex frequency response H_cmplx(W) (complex)
-        for W = 0 ... 2 pi:
+        (Re-)Calculate the complex frequency response h_cmplx(w) (complex)
+        for w = 0 ... 2 pi:
         """
-        self.W, self.h_cmplx = sig.freqz(
+        self.w, self.h_cmplx = sig.freqz(
             fb_get('ba', 0), fb_get('ba', 1),
             worN=CFP.conf_settings['N_FFT'], whole=True, fs=2*np.pi)
 
@@ -634,7 +634,7 @@ class PlotHf(QWidget):
         else:
             a_max = 1
 
-        if np.all(self.W) is None:  # H(f) has not been calculated yet
+        if np.all(self.w) is None:  # H(f) has not been calculated yet
             self.calc_hf()
 
         if self.cmb_units_a.currentText() == 'Auto':
@@ -667,24 +667,24 @@ class PlotHf(QWidget):
         f_lim = fb_get('freq_specs_range')
 
         # ========= select frequency range to be displayed =====================
-        # === shift, scale and select: W -> F, H_cplx -> h_c
-        self.F = self.W / (2 * np.pi) * self.f_max
+        # === shift, scale and select: w -> f, h_cplx -> h_c
+        self.f = self.w / (2 * np.pi) * self.f_max
 
         if fb_get('freq_specs_range_type') == 'sym':
-            # shift H and F by f_S/2
+            # shift H and f by f_S/2
             self.h_c = np.fft.fftshift(self.h_cmplx)
-            self.F -= self.f_max/2.
+            self.f -= self.f_max/2.
         elif fb_get('freq_specs_range_type') == 'half':
-            # only use the first half of H and F
+            # only use the first half of H and f
             self.h_c = self.h_cmplx[0:CFP.conf_settings['N_FFT']//2]
-            self.F = self.F[0:CFP.conf_settings['N_FFT']//2]
+            self.f = self.f[0:CFP.conf_settings['N_FFT']//2]
         else:  # fb_get('freq_specs_range_type') == 'whole'
-            # use H and F as calculated
+            # use H and f as calculated
             self.h_c = self.h_cmplx
 
         # remove linear phase if button is checked
         if self.but_zerophase.isChecked():
-            self.h_c = self.h_c * np.exp(1j * self.W[0:len(self.F)] * fb_get('N')/2.)
+            self.h_c = self.h_c * np.exp(1j * self.w[0:len(self.f)] * fb_get('N')/2.)
 
         h_str = r'$H(\mathrm{e}^{\mathrm{j} \Omega})$'
 
@@ -701,7 +701,7 @@ class PlotHf(QWidget):
                     self.h_plt_abs = np.abs(self.h_c)
                 elif self.unit_a == 'W':
                     self.h_plt_abs =  np.abs(self.h_c) * np.abs(self.h_c)
-                self.ax.plot(self.F, self.h_plt_abs, label = '$|H(F)|$')
+                self.ax.plot(self.f, self.h_plt_abs, label = '$|H(f)|$')
             if self.chk_show_h_re.isChecked():
                 if self.unit_a == 'dB':
                     self.h_plt_re = np.maximum(20*np.log10(np.abs(self.h_c.real)), self.log_bottom)
@@ -709,7 +709,7 @@ class PlotHf(QWidget):
                     self.h_plt_re = self.h_c.real
                 elif self.unit_a == 'W':
                     self.h_plt_re =  self.h_c.real * self.h_c.real
-                self.ax.plot(self.F, self.h_plt_re, label = r'$\Re\{H(F)\}$')
+                self.ax.plot(self.f, self.h_plt_re, label = r'$\Re\{H(f)\}$')
             if self.chk_show_h_im.isChecked():
                 if self.unit_a == 'dB':
                     self.h_plt_im = np.maximum(20*np.log10(np.abs(self.h_c.imag)), self.log_bottom)
@@ -717,7 +717,7 @@ class PlotHf(QWidget):
                     self.h_plt_im = self.h_c.imag
                 elif self.unit_a == 'W':
                     self.h_plt_im =  self.h_c.imag * self.h_c.imag
-                self.ax.plot(self.F, self.h_plt_im, label = r'$\Im\{H(F)\}$')
+                self.ax.plot(self.f, self.h_plt_im, label = r'$\Im\{H(f)\}$')
 
             # calculate limits for selected curves depending on selected unit
             if self.unit_a == 'dB':
@@ -740,7 +740,7 @@ class PlotHf(QWidget):
                 h_str +=' in V ' + r'$\rightarrow $'
                 self.ax.axhline(linewidth=1, color='k') # horizontal line at 0
 
-            else: # unit is W
+            else: # unit is 'W'
                 a_lim = [0, (1.03 + a_max)**2.]
                 h_str += ' in W ' + r'$\rightarrow $'
 
