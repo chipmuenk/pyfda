@@ -394,7 +394,6 @@ QSS_TAB_BAR = """
 
     QTabBar::tab::left{
         border-bottom-left-radius: 0.1em;
-        /* width: 26px; */
         width: 1.3em;
         margin-right: -0.2em;
         padding: 0.1em;
@@ -404,6 +403,9 @@ QSS_TAB_BAR = """
     QTabWidget#tab_stim_w QTabBar::tab{
         padding-top: 0;
         padding-bottom: 0;
+        margin-top: 0;
+        margin-bottom: 0;
+        height: 1.3em;
     }
 
     /* small gap above vertical mplwidget tabs */
