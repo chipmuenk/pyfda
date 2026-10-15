@@ -209,7 +209,6 @@ class InputFixpointSpecs(QWidget):
         elif 'data_changed' in dict_sig:
             if dict_sig['data_changed'] == 'filter_loaded':
                 self._load_fx_filter()
-                # TODO: should self._update_filter_cmb() be called here?
                 return
             if dict_sig['data_changed'] == "filter_designed":
                 # New filter has been designed, update list of available filter topologies
@@ -717,20 +716,15 @@ class InputFixpointSpecs(QWidget):
         if self.fx_wdg_found:
             self.fx_filt_ui.setVisible(is_fixp)
 
-        # set combobox from dictionary
+        # set combobox from fil dictionary
         qset_cmb_box(self.cmb_qfrmt, fb_get('qfrmt'), data=True)
         if is_fixp:
             # refresh image in case of switching from float to fix
             self._resize_img()
-            # update fixpoint widgets from the global filter dict:
-            # when loading a filter, a new instance of fil[0] is created, requiring
-            # passing a hard update of the filter dict
-            # TODO: FX - is this still correct?
+            # update fixpoint widgets from the global filter dict
             self.wdg_wq_input.dict2ui(fb_get('fxq', 'QI'))
             self.wdg_wq_output.dict2ui(fb_get('fxq', 'QO'))
             try:
-                # this uses the global filter dict as well but it is reinstantiated
-                # when loading a filter, using the new instance
                 self.fx_filt_ui.dict2ui()
             except AttributeError as e:
                 logger.error("Error using FX filter widget 'dict2ui()' method:\n%s", e)
