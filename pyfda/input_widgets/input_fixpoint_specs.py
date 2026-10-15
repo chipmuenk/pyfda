@@ -574,7 +574,7 @@ class InputFixpointSpecs(QWidget):
         else:  # widget parent is TabbedWidget()
             wdg_w = self.width()
         # Qt.SmoothTransformation improves the quality of the scaled image
-        img_scaled = self.img_fixp.scaledToWidth(wdg_w, Qt.SmoothTransformation)
+        img_scaled = self.img_fixp.scaledToWidth(wdg_w - 10, Qt.SmoothTransformation)
 
         self.lbl_fixp_img.setPixmap(img_scaled)
 
