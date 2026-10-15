@@ -197,6 +197,15 @@ class TabbedWidget(QWidget):
         This filter stops and restarts a one-shot timer for every resize event.
         When the timer generates a timeout after 500 ms, ``{'ui_global_changed': 'resized'}``
         is emitted by the timer. This prevents too frequent resize operations.
+
+        The input TabbedWidget is created with use_qscroll_area=True in pyfda_class.py,
+        so it does not install its own resize-event filter and timer; that setup is only
+        for the non-scroll-area path in tabbed_widget.py.
+
+        The plot TabbedWidget does use that timer. When the splitter moves, it emits
+        'ui_global_changed': 'resized'; pyfda_class.py forwards the plot widget’s signal
+        to the input widget. So the resize notification does reach InputFixpointSpecs,
+        and its handler calls _resize_img() (input_fixpoint_specs.py).
         """
         if isinstance(source, QTabWidget):
             if event.type() == QEvent.Resize:
