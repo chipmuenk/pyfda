@@ -179,7 +179,6 @@ class InputFixpointSpecs(QWidget):
 
         else:
             logger.error("Unknown key/value in 'dict_sig':\n%s", pprint_log(dict_sig))
-        return
 
 # ------------------------------------------------------------------------------
     def process_sig_rx(self, dict_sig: dict = None) -> None:
@@ -413,16 +412,16 @@ class InputFixpointSpecs(QWidget):
         lay_h_fx_btns.addWidget(self.cmb_qfrmt)
         lay_h_fx_btns.addWidget(self.but_export_code)
 
-        frm_hdl_btns = QFrame(self)
-        frm_hdl_btns.setLayout(lay_h_fx_btns)
-        frm_hdl_btns.setContentsMargins(*params['wdg_margins'])
+        self.frm_hdl_btns = QFrame(self)
+        self.frm_hdl_btns.setLayout(lay_h_fx_btns)
+        self.frm_hdl_btns.setContentsMargins(*params['wdg_margins'])
 
         # -------------------------------------------------------------
         #       Top level layout
         # -------------------------------------------------------------
         lay_v_main = QVBoxLayout()
         lay_v_main.addWidget(self.frm_title)
-        lay_v_main.addWidget(frm_hdl_btns)
+        lay_v_main.addWidget(self.frm_hdl_btns)
         lay_v_main.addWidget(self.wdg_wq_input)
         lay_v_main.addWidget(wdg_fx_dyn)
         lay_v_main.addWidget(self.wdg_wq_output)
