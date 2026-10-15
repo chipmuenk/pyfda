@@ -382,8 +382,9 @@ class InputFixpointSpecs(QWidget):
         # Dynamically updated image of filter topology (label as placeholder)
         # --------------------------------------------------------------------
         self.lbl_fixp_img = QLabel("img not set", self)
-        # self.lbl_fixp_img.setSizePolicy(QSizePolicy.Minimum, QSizePolicy.Minimum)
-
+        # ignore the size policy of the image, otherwise the image is not scaled to the
+        # available width of the parent widget:
+        self.lbl_fixp_img.setSizePolicy(QSizePolicy.Ignored, QSizePolicy.Preferred)
         self._embed_fixp_img(self.no_fx_filter_img)
         lay_h_img = QHBoxLayout()
         lay_h_img.setContentsMargins(0, 0, 0, 0)
