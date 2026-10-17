@@ -383,7 +383,7 @@ class Equiripple(QWidget):
                                      [self.a_sb, self.a_pb], fs = 1, alg = self.alg)
         # A is always [0, 1] for HP filters
 
-        # self.n_fil = ceil_odd(N)  # enforce odd order
+        # self.n_fil = ceil_odd(n_fil)  # enforce odd order
         fb_set('w_sb', W[0])
         fb_set('w_pb', W[1])
         if self.n_fil % 2 == 0: # even order

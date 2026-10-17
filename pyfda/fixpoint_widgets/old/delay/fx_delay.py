@@ -144,13 +144,13 @@ class Delay(Module):
         # ------------- Define I/Os -------------------------------------------
         self.WI = p['QI']['WI'] + p['QI']['WF'] + 1
         self.WO = p['QO']['WI'] + p['QO']['WF'] + 1
-        N = len(p['b']) - 1 # number of coefficients = Order + 1
+        n_del = len(p['b']) - 1 # number of coefficients = Order + 1
         # ------------- Define I/Os -------------------------------------------
         self.i = Signal((self.WI, True)) # input signal
         self.o = Signal((self.WO, True)) # output signal
 
         src = self.i
-        for c in range(N):
+        for c in range(n_del):
             sreg = Signal((self.WI, True)) # registers for input signal
             self.sync += sreg.eq(src)
             src = sreg

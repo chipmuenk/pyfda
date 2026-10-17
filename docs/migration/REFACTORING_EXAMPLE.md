@@ -403,11 +403,11 @@ mock_broker.set.assert_called()
 
 # FROM:
 from pyfda import filterbroker as fb
-N = fb.fb_get('n_fil')
+n_fil = fb.fb_get('n_fil')
 
 # TO:
 from pyfda.filterbroker_v2 import FilterBroker
-N = FilterBroker.get_instance().get('n_fil')
+n_fil = FilterBroker.get_instance().get('n_fil')
 
 # OR for better design:
 class MyWidget:

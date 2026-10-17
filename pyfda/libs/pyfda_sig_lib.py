@@ -41,7 +41,7 @@ def impz_len(system: list[np.ndarray], zpk: bool = False, level: float = -40) ->
 
     Returns
     -------
-    N: int
+    n_impz: int
         The length of the impulse response.
 
     Notes
@@ -68,7 +68,7 @@ def impz_len(system: list[np.ndarray], zpk: bool = False, level: float = -40) ->
 
     .. math::
 
-        N \approx -level/20 * \ln(10) \tau
+        n_impz \approx -level/20 * \ln(10) \tau
 
     When poles are specified (`zpk == True`), it is of course easy to find the
     dominant pole. When coefficients of the system are specified, poles can be
@@ -87,30 +87,29 @@ def impz_len(system: list[np.ndarray], zpk: bool = False, level: float = -40) ->
         if max(abs(p)) >= 1:
             logger.warning(
                 "Unstable system with one or more poles outside the unit circle!")
-            N = 100
+            n_impz = 100
         else:
             # only use dominant pole with for calculation and
             # estimate limit when impulse response has dropped to `level`
-            N = int(round(abs(level)/20 * np.log(10)  / (1 - max(np.abs(p)))))
+            n_impz = int(round(abs(level)/20 * np.log(10)  / (1 - max(np.abs(p)))))
     else:
         # FIR: length of impulse response = number of coefficients or order + 1
         if zpk:
-            N = len(system[0]) + 1
+            n_impz = len(system[0]) + 1
         else:
-            N = len(system[0])
-    return N
+            n_impz = len(system[0])
+    return n_impz
 
 # --------------------------------------------------------------------------
-def zeros_with_val(N: int, val: float = 1., pos: int = 0) -> np.ndarray:
+def zeros_with_val(n_zeros: int, val: float = 1., pos: int = 0) -> np.ndarray:
     """
-    Create a 1D array of `N` zeros where the element at position `pos` has the
-    value `val`. Returns `[1. 0, 0, ...] when no argument except the length is
-    given.
+    Create a 1D array of `n_zeros` zeros and set the element at position `pos` to
+    value `val`. Returns `[1. 0, 0, ...] when no argument except the length is given.
 
     Parameters
     ----------
 
-    N: int
+    n_zeros: int
         number of elements
     val: scalar
         value to be inserted at position `pos` (default: 1)
@@ -122,10 +121,10 @@ def zeros_with_val(N: int, val: float = 1., pos: int = 0) -> np.ndarray:
     arr: np.ndarray
        Array with zeros except for element at position `pos`
     """
-    if pos >= N or -pos > N:
+    if pos >= n_zeros or -pos > n_zeros:
         raise IndexError
 
-    a = np.zeros(N, dtype=type(val))
+    a = np.zeros(n_zeros, dtype=type(val))
     a[pos] = val
     return a
 
@@ -1013,7 +1012,7 @@ def calc_ssb_spectrum(A: np.ndarray, mag: bool=False) -> np.ndarray:
     Hence, the magnitudes of both halves are summed (for `mag=True`), yielding
     the magnitude spectrum.
 
-    When len(A) is even, A[N//2] represents half the sampling frequency
+    When `len_a` = len(A) is even, A[len_a//2] represents half the sampling frequency
     and is discarded (Q: also for the power calculation?).
 
     Parameters
@@ -1038,13 +1037,13 @@ def calc_ssb_spectrum(A: np.ndarray, mag: bool=False) -> np.ndarray:
         single-sided spectrum with half the number of input values
 
     """
-    N = len(A)
+    len_a = len(A)
 
     if mag:
-        a_ssb = np.insert(np.abs(A[1:N//2]) + np.abs(A[-1:(N+1)//2:-1]), 0, A[0])
+        a_ssb = np.insert(np.abs(A[1:len_a//2]) + np.abs(A[-1:(len_a+1)//2:-1]), 0, A[0])
     else:
-        a_ssb = np.insert(A[1:N//2] * 2, 0, A[0])
-        # a_ssb = np.insert(A[1:N//2] + A[-1:-(N//2):-1].conj(),0, A[0]) # doesn't work
+        a_ssb = np.insert(A[1:len_a//2] * 2, 0, A[0])
+        # a_ssb = np.insert(A[1:len_a//2] + A[-1:-(len_a//2):-1].conj(),0, A[0]) # doesn't work
 
     return a_ssb
 

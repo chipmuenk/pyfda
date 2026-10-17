@@ -235,14 +235,14 @@ class QFFTWinCmbBox(QWidget):
         return win_err  # error flag, UI (window combo box) needs to be updated
 
 # ------------------------------------------------------------------------------
-    def calc_window(self, N: int, win_id: str = "", sym: bool = False) -> np.ndarray:
+    def calc_window(self, n_win: int, win_id: str = "", sym: bool = False) -> np.ndarray:
         # logger.error(f"{self.objectName()}: calc_window({win_id})")
         """
-        Calculate the selected window function with `N` points.
+        Calculate the selected window function with `n_win` points.
 
         Parameters
         ----------
-        N : int
+        n_win : int
             Number of data points
 
         win_id : str, optional
@@ -261,7 +261,7 @@ class QFFTWinCmbBox(QWidget):
         Returns
         -------
         win_fnct : ndarray
-            The window function with `N` data points (should be normalized to 1).
+            The window function with `n_win` data points (should be normalized to 1).
             Additionally, the normalized equivalent noise bandwidth is calculated and
             stored as `self.all_wins_dict['nenbw']` as well as the
             correlated gain `self.all_wins_dict['cgain']`.
@@ -284,13 +284,13 @@ class QFFTWinCmbBox(QWidget):
         try:
             if fn_name == 'dpss':
                 w = scipy.signal.windows.dpss(
-                    N, self.all_wins_dict[win_id]['par_val'][0], sym=sym)
+                    n_win, self.all_wins_dict[win_id]['par_val'][0], sym=sym)
             elif n_par == 0:
-                w = self.win_fnct(N, sym=sym)
+                w = self.win_fnct(n_win, sym=sym)
             elif n_par == 1:
-                w = self.win_fnct(N, self.all_wins_dict[win_id]['par_val'][0], sym=sym)
+                w = self.win_fnct(n_win, self.all_wins_dict[win_id]['par_val'][0], sym=sym)
             elif n_par == 2:
-                w = self.win_fnct(N, self.all_wins_dict[win_id]['par_val'][0],
+                w = self.win_fnct(n_win, self.all_wins_dict[win_id]['par_val'][0],
                              self.all_wins_dict[win_id]['par_val'][1], sym=sym)
             else:
                 logger.error("%d parameters are not supported for windows at the moment!", n_par)
@@ -303,10 +303,10 @@ class QFFTWinCmbBox(QWidget):
             self.err = True
             logger.warning('Falling back to rectangular window.')
             self.set_window_name("rectangular")
-            w = np.ones(N)
+            w = np.ones(n_win)
 
-        nenbw = N * np.sum(np.square(w)) / (np.square(np.sum(w)))
-        cgain = np.sum(w) / N  # coherent gain / DC average
+        nenbw = n_win * np.sum(np.square(w)) / (np.square(np.sum(w)))
+        cgain = np.sum(w) / n_win  # coherent gain / DC average
 
         self.all_wins_dict.update({'nenbw': nenbw, 'cgain': cgain})
 

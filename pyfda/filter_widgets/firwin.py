@@ -496,7 +496,7 @@ class Firwin(QWidget):
 
         Returns
         -------
-        N : int
+        n_min : int
             Minimum filter order
 
         See also http://www.mikroe.com/chapters/view/72/chapter-2-fir-filters/
@@ -506,15 +506,15 @@ class Firwin(QWidget):
         # delta_A = np.sqrt(A[0] * A[1])
 
         if fb_get('filter_widgets', 'firwin', 'id') == "kaiser":
-            N, beta = sig.kaiserord(20 * np.log10(np.abs(fb_get('a_sb'))), delta_f)
+            n_min, beta = sig.kaiserord(20 * np.log10(np.abs(fb_get('a_sb'))), delta_f)
             self.all_wins_dict["kaiser"]["par"][0]["val"] = beta
             self.qfft_win_select.led_win_par_0.setText(str(beta))
             self.qfft_win_select.ui2dict_params()  # pass changed parameter to other widgets
         else:
-            N = remezord(
+            n_min = remezord(
                 F, W, A, fs=1, alg=alg)[0]
         self.emit({'view_changed': 'fft_win_type'}, sig_name='sig_tx_local')
-        return N
+        return n_min
 
     def lp_min(self) -> int:
         """ Design a low-pass FIR filter with minimum order using the window method."""
@@ -542,9 +542,9 @@ class Firwin(QWidget):
     def hp_min(self) -> int:
         """ Design a high-pass FIR filter with minimum order using the window method."""
         self._get_params()
-        N = self._firwin_ord([self.f_sb, self.f_pb], [0, 1],
+        n_min = self._firwin_ord([self.f_sb, self.f_pb], [0, 1],
                              [self.a_sb, self.a_pb], alg=self.alg)
-        self.n_fil = round_odd(N)  # enforce odd order
+        self.n_fil = round_odd(n_min)  # enforce odd order
         if not self._test_n():
             return -1
         fb_set('f_c', (self.f_sb + self.f_pb)/2)  # average calculated f_pb and f_sb
@@ -593,9 +593,9 @@ class Firwin(QWidget):
     def bs_min(self) -> int:
         """ Design a band-stop FIR filter with minimum order using the window method."""
         self._get_params()
-        N = remezord([self.f_pb, self.f_sb, self.f_sb2, self.f_pb2], [1, 0, 1],
+        n_min = remezord([self.f_pb, self.f_sb, self.f_sb2, self.f_pb2], [1, 0, 1],
                      [self.a_pb, self.a_sb, self.a_pb2], fs=1, alg=self.alg)[0]
-        self.n_fil = round_odd(N)  # enforce odd order
+        self.n_fil = round_odd(n_min)  # enforce odd order
         if not self._test_n():
             return -1
         fb_set('f_c', (self.f_sb + self.f_pb) / 2)  # average calculated f_pb and f_sb

@@ -469,7 +469,7 @@ class PlotTran(QWidget):
             logger.warning("No data loaded, you shouldn't see this message!")
         # File is loaded, copy file length to n_end
         else:
-            # copy number of data points to N, disable N_auto, enable lineedit for N
+            # copy number of data points to n_data, disable n_auto, enable lineedit for n_data
             self.ui.update_n(n_end = self.tran_io_wdg.n_data)
             self.ui.but_n_auto.setChecked(False)
             self.ui.led_N_points.setEnabled(True)
@@ -480,7 +480,7 @@ class PlotTran(QWidget):
         Check status of file_io widget:
 
         - if no file is loaded, do nothing and return 0, disable `cmb_file_io` and
-          the option to transfer the number of samples to N
+          the option to transfer the number of samples to n_data
         - else map the file data to `self.stim_wdg.x_file` to make it accessible
            from the stimulus widget. If `cmb_file_io == `use`, disable the widget to
            modify stimuli
@@ -860,13 +860,13 @@ class PlotTran(QWidget):
         from `self.ui.all_wins_dict['win']`.
         """
         # calculate FFT of stimulus / response
-        N = self.ui.n_data
-        win = self.ui.qfft_win_select.calc_window(N) / self.ui.all_wins_dict['cgain']
+        n_data = self.ui.n_data
+        win = self.ui.qfft_win_select.calc_window(n_data) / self.ui.all_wins_dict['cgain']
         if self.x is None:
-            self.x_fft = np.zeros(N)  # dummy result
+            self.x_fft = np.zeros(n_data)  # dummy result
             logger.warning("Stimulus is 'None', FFT cannot be calculated.")
         elif len(self.x) < self.ui.n_end:
-            self.x_fft = np.zeros(N)  # dummy result
+            self.x_fft = np.zeros(n_data)  # dummy result
             logger.warning("Length of stimulus is %d < N = %d, FFT cannot be calculated.",
                            len(self.x), self.ui.n_end)
         else:
@@ -1359,7 +1359,7 @@ class PlotTran(QWidget):
                     2 * self.ui.time_nfft_spgr - self.ui.time_ovlp_spgr, self.ui.n_data)
             if self.ui.time_nfft_spgr > self.ui.n_data:
                 logger.warning(
-                    "NFFT per segment = %d is larger than number N of data points %d, "
+                    "NFFT per segment = %d is larger than number of data points %d, "
                     "setting NFFT = N.", self.ui.time_nfft_spgr, self.ui.n_data)
                 self.ui.time_nfft_spgr = self.ui.n_data
             if self.ui.time_ovlp_spgr >= self.ui.time_nfft_spgr:

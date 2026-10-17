@@ -269,7 +269,7 @@ class MA(QWidget):
         This method fetches the stopband frequency (f_sb) and stopband
         attenuation (a_sb) from the filterbroker.
         """
-        # N is total order, l_taps is number of taps per stage
+        # n_fil is total order, l_taps is number of taps per stage
         self.f_sb  = fb_get('f_sb')
         self.a_sb  = fb_get('a_sb')
 
@@ -299,7 +299,7 @@ class MA(QWidget):
     def calc_ma(self, rt: str) -> int:
         """
         Calculate coefficients and P/Z for moving average filter based on
-        filter length l_taps = N + 1 and number of cascaded stages and save the
+        filter length l_taps = n_fil + 1 and number of cascaded stages and save the
         result in the filter dictionary.
         """
         k = 1.
@@ -328,25 +328,25 @@ class MA(QWidget):
             norm = l_taps
 
         elif rt == 'bp':
-            # N is even, l_taps is odd
+            # n_fil is even, l_taps is odd
             b0 = np.ones(l_taps)
             b0[1::2] = 0
             b0[::4] = -1 # h[n] = {1; 0; -1; 0; 1; ... }
 
             l_taps = l_taps + 1
-            idx = np.arange(l_taps) # create N + 2 zeros around the unit circle, ...
+            idx = np.arange(l_taps) # create n_fil + 2 zeros around the unit circle, ...
             # ... remove first and middle element and rotate by adding l_taps / 4
             idx = np.delete(idx, [0, l_taps // 2]) + l_taps / 4
 
             norm = np.sum(abs(b0))
 
         elif rt == 'bs':
-            # N is even, l_taps is odd
+            # n_fil is even, l_taps is odd
             b0 = np.ones(l_taps)
             b0[1::2] = 0
 
             l_taps = l_taps + 1
-            idx = np.arange(l_taps) # create N + 2 zeros around the unit circle and ...
+            idx = np.arange(l_taps) # create n_fil + 2 zeros around the unit circle and ...
             idx = np.delete(idx, [0, l_taps // 2]) # ... remove first and middle element
 
             norm = np.sum(b0)
