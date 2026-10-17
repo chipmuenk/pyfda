@@ -25,12 +25,12 @@ class TestFilterConfig:
         config.N = 8
         data = config.to_dict()
         
-        assert data['N'] == 8
+        assert data['n_fil'] == 8
         assert 'f_c' in data
     
     def test_from_dict(self):
         """Test deserialization from dict."""
-        data = {'N': 12, 'f_c': 0.25, 'f_s': 2.0}
+        data = {'n_fil': 12, 'f_c': 0.25, 'f_s': 2.0}
         config = FilterConfig.from_dict(data)
         
         assert config.N == 12
@@ -56,15 +56,15 @@ class TestFilterBrokerBasics:
         broker = FilterBroker.get_instance()
         
         # Test set and get
-        assert broker.set('N', 8) is True
-        assert broker.get('N') == 8
+        assert broker.set('n_fil', 8) is True
+        assert broker.get('n_fil') == 8
         
         # Test multiple sets
         assert broker.set('f_c', 0.25) is True
         assert broker.get('f_c') == 0.25
         
         # Original value unchanged
-        assert broker.get('N') == 8
+        assert broker.get('n_fil') == 8
     
     def test_get_nonexistent_key(self):
         """Test getting nonexistent key."""
@@ -87,11 +87,11 @@ class TestFilterBrokerBasics:
         broker = FilterBroker.get_instance()
         
         # __setitem__
-        broker['N'] = 10
-        assert broker['N'] == 10
+        broker['n_fil'] = 10
+        assert broker['n_fil'] == 10
         
         # __contains__
-        assert 'N' in broker
+        assert 'n_fil' in broker
         assert 'invalid' not in broker
 
 
@@ -106,23 +106,23 @@ class TestUndoRedo:
         """Test basic undo functionality."""
         broker = FilterBroker.get_instance()
         
-        broker.set('N', 5)
-        broker.set('N', 10)
+        broker.set('n_fil', 5)
+        broker.set('n_fil', 10)
         
-        assert broker.get('N') == 10
+        assert broker.get('n_fil') == 10
         assert broker.undo() is True
-        assert broker.get('N') == 5
+        assert broker.get('n_fil') == 5
     
     def test_simple_redo(self):
         """Test basic redo functionality."""
         broker = FilterBroker.get_instance()
         
-        broker.set('N', 5)
+        broker.set('n_fil', 5)
         broker.undo()
         
-        assert broker.get('N') == 4  # default value
+        assert broker.get('n_fil') == 4  # default value
         assert broker.redo() is True
-        assert broker.get('N') == 5
+        assert broker.get('n_fil') == 5
     
     def test_undo_empty_stack(self):
         """Test undo with empty stack."""
@@ -143,7 +143,7 @@ class TestUndoRedo:
         assert broker.can_undo() is False
         assert broker.can_redo() is False
         
-        broker.set('N', 8)
+        broker.set('n_fil', 8)
         assert broker.can_undo() is True
         assert broker.can_redo() is False
         
@@ -157,7 +157,7 @@ class TestUndoRedo:
         
         # Fill undo stack beyond limit
         for i in range(FilterBroker.UNDO_LEN + 5):
-            broker.set('N', i, backup=True)
+            broker.set('n_fil', i, backup=True)
         
         # Stack should be limited
         assert len(broker._undo_stack) <= FilterBroker.UNDO_LEN
@@ -166,13 +166,13 @@ class TestUndoRedo:
         """Test that setting a value clears redo stack."""
         broker = FilterBroker.get_instance()
         
-        broker.set('N', 5)
-        broker.set('N', 10)
+        broker.set('n_fil', 5)
+        broker.set('n_fil', 10)
         broker.undo()
         
         assert broker.can_redo() is True
         
-        broker.set('N', 15)  # This should clear redo stack
+        broker.set('n_fil', 15)  # This should clear redo stack
         
         assert broker.can_redo() is False
 
@@ -188,10 +188,10 @@ class TestBatchSet:
         """Test setting multiple values at once."""
         broker = FilterBroker.get_instance()
         
-        updates = {'N': 8, 'f_c': 0.25, 'f_s': 2.0}
+        updates = {'n_fil': 8, 'f_c': 0.25, 'f_s': 2.0}
         assert broker.batch_set(updates) is True
         
-        assert broker.get('N') == 8
+        assert broker.get('n_fil') == 8
         assert broker.get('f_c') == 0.25
         assert broker.get('f_s') == 2.0
     
@@ -199,12 +199,12 @@ class TestBatchSet:
         """Test that batch_set creates only one undo entry."""
         broker = FilterBroker.get_instance()
         
-        updates = {'N': 8, 'f_c': 0.25}
+        updates = {'n_fil': 8, 'f_c': 0.25}
         broker.batch_set(updates)
         
         # Undo should restore both values
         broker.undo()
-        assert broker.get('N') == 4  # default
+        assert broker.get('n_fil') == 4  # default
         assert broker.get('f_c') == 0.1  # default
 
 
@@ -224,10 +224,10 @@ class TestSubscriptions:
             changes.append((key, old_val, new_val))
         
         broker.subscribe(track_change)
-        broker.set('N', 8)
+        broker.set('n_fil', 8)
         
         assert len(changes) == 1
-        assert changes[0] == ('N', 4, 8)
+        assert changes[0] == ('n_fil', 4, 8)
     
     def test_multiple_subscribers(self):
         """Test multiple subscribers."""
@@ -243,7 +243,7 @@ class TestSubscriptions:
         
         broker.subscribe(track1)
         broker.subscribe(track2)
-        broker.set('N', 8)
+        broker.set('n_fil', 8)
         
         assert len(changes1) == 1
         assert len(changes2) == 1
@@ -257,11 +257,11 @@ class TestSubscriptions:
             changes.append((key, old_val, new_val))
         
         broker.subscribe(track_change)
-        broker.set('N', 8)
+        broker.set('n_fil', 8)
         assert len(changes) == 1
         
         broker.unsubscribe(track_change)
-        broker.set('N', 10)
+        broker.set('n_fil', 10)
         assert len(changes) == 1  # No new change
     
     def test_no_notification_on_same_value(self):
@@ -273,7 +273,7 @@ class TestSubscriptions:
             changes.append((key, old_val, new_val))
         
         broker.subscribe(track_change)
-        broker.set('N', 4)  # Set to same value
+        broker.set('n_fil', 4)  # Set to same value
         
         assert len(changes) == 0
 
@@ -288,19 +288,19 @@ class TestSerialization:
     def test_to_dict(self):
         """Test serialization to dict."""
         broker = FilterBroker.get_instance()
-        broker.set('N', 12)
+        broker.set('n_fil', 12)
         broker.set('f_c', 0.25)
         
         data = broker.to_dict()
         
-        assert data['N'] == 12
+        assert data['n_fil'] == 12
         assert data['f_c'] == 0.25
         assert 'f_s' in data
     
     def test_from_dict(self):
         """Test deserialization from dict."""
         broker1 = FilterBroker.get_instance()
-        broker1.set('N', 12)
+        broker1.set('n_fil', 12)
         broker1.set('f_c', 0.25)
         
         # Save state
@@ -311,23 +311,23 @@ class TestSerialization:
         broker2 = FilterBroker.get_instance()
         broker2.from_dict(data)
         
-        assert broker2.get('N') == 12
+        assert broker2.get('n_fil') == 12
         assert broker2.get('f_c') == 0.25
     
     def test_reset_to_defaults(self):
         """Test resetting to default values."""
         broker = FilterBroker.get_instance()
-        broker.set('N', 12)
+        broker.set('n_fil', 12)
         broker.set('f_c', 0.25)
         
         broker.reset_to_defaults()
         
-        assert broker.get('N') == 4
+        assert broker.get('n_fil') == 4
         assert broker.get('f_c') == 0.1
         
         # Can undo the reset
         assert broker.undo() is True
-        assert broker.get('N') == 12
+        assert broker.get('n_fil') == 12
 
 
 class TestBackwardCompatibility:
@@ -341,18 +341,18 @@ class TestBackwardCompatibility:
         """Test legacy fb_get function."""
         from docs.migration.filterbroker_v2 import fb_get
         
-        result = fb_get('N')
+        result = fb_get('n_fil')
         assert result == 4  # default value
     
     def test_fb_set_legacy(self):
         """Test legacy fb_set function."""
         from docs.migration.filterbroker_v2 import fb_set
         
-        result = fb_set('N', 8)
+        result = fb_set('n_fil', 8)
         assert result == 0  # success
         
         broker = FilterBroker.get_instance()
-        assert broker.get('N') == 8
+        assert broker.get('n_fil') == 8
     
     def test_fb_get_without_args(self):
         """Test fb_get without arguments returns dict."""
@@ -360,7 +360,7 @@ class TestBackwardCompatibility:
         
         data = fb_get()
         assert isinstance(data, dict)
-        assert 'N' in data
+        assert 'n_fil' in data
 
 
 class TestEdgeCases:
@@ -374,9 +374,9 @@ class TestEdgeCases:
         """Test set with backup=False."""
         broker = FilterBroker.get_instance()
         
-        broker.set('N', 8, backup=False)
+        broker.set('n_fil', 8, backup=False)
         
-        assert broker.get('N') == 8
+        assert broker.get('n_fil') == 8
         assert broker.can_undo() is False
     
     def test_set_without_notify(self):
@@ -388,10 +388,10 @@ class TestEdgeCases:
             changes.append((key, old_val, new_val))
         
         broker.subscribe(track_change)
-        broker.set('N', 8, notify=False)
+        broker.set('n_fil', 8, notify=False)
         
         assert len(changes) == 0
-        assert broker.get('N') == 8
+        assert broker.get('n_fil') == 8
 
 
 if __name__ == '__main__':

@@ -109,7 +109,7 @@ class Ellip():
         """
         # Frequencies are normalized to f_Nyq = f_S/2, ripple specs are in dB
         self.analog = False # set to True for analog filters
-        self.N     = fb_get('N')
+        self.N     = fb_get('n_fil')
         self.f_pb  = fb_get('f_pb') * 2
         self.f_sb  = fb_get('f_sb') * 2
         self.f_c   = fb_get('f_c')  * 2
@@ -160,14 +160,14 @@ class Ellip():
                 # HP or LP - single  corner frequency
                 fb_set('f_pb', self.f_pb_c / 2.)
                 fb_set('f_c', self.f_pb_c / 2.)
-                fb_set('N', self.N)
+                fb_set('n_fil', self.N)
             else:
                 # BP or BS - two corner frequencies; order needs to be doubled
                 fb_set('f_pb', self.f_pb_c[0] / 2.)
                 fb_set('f_c', self.f_pb_c[0] / 2.)
                 fb_set('f_pb2', self.f_pb_c[1] / 2.)
                 fb_set('f_c2', self.f_pb_c[1] / 2.)
-                fb_set('N', self.N * 2)
+                fb_set('n_fil', self.N * 2)
         return 0
 
     #------------------------------------------------------------------------------

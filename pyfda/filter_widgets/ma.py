@@ -98,13 +98,13 @@ class MA(QWidget):
         # (common data comes first):
 
         self.rt_dict = {
-            'com':{'man':{'fo': ('d', 'N'),
+            'com':{'man':{'fo': ('d', 'n_fil'),
                           'msg':('a',
                    "Enter desired order (= delays) <b><i>M</i></b> per stage and"
                     " the number of <b>stages</b>. Target frequencies and amplitudes"
                     " are only used for comparison, not for the design itself.")
                         },
-                    'min':{'fo': ('d', 'N'),
+                    'min':{'fo': ('d', 'n_fil'),
                           'msg':('a',
                    "Enter desired attenuation <b><i>A<sub>SB</sub></i></b> at "
                    "the corner of the stop band <b><i>F<sub>SB</sub></i></b>. "
@@ -171,7 +171,7 @@ class MA(QWidget):
         self.led_delays = QLineEdit(self)
         self.led_delays.setMaximumWidth(qtext_width(n_x=8))
         try:
-            self.led_delays.setText(str(fb_get('N')))
+            self.led_delays.setText(str(fb_get('n_fil')))
         except KeyError:
             self.led_delays.setText(str(self.delays))
         self.led_delays.setObjectName('wdg_led_ma_0')
@@ -290,7 +290,7 @@ class MA(QWidget):
 
         # always update filter dict and LineEdit, in case the design algorithm
         # has changed the number of delays:
-        fb_set('N', self.delays * self.stages) # updated filter order
+        fb_set('n_fil', self.delays * self.stages) # updated filter order
         self.led_delays.setText(str(self.delays)) # updated number of delays
 
         self._store_entries()

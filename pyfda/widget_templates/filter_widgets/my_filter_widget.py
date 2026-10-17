@@ -60,7 +60,7 @@ class AllpPZ(QWidget):
         # the following defines which subwidgets are "a"ctive, "i"nvisible or "d"eactivated
         self.rt_dicts = ('com',)
         self.rt_dict = {
-            'com': {'man': {'fo':('d', 'N'),
+            'com': {'man': {'fo':('d', 'n_fil'),
                             'msg':('a',
                                 "<span>Enter poles  <b><i>p</i></b> for allpass function,"
                                 "zeros will be calculated.</span>")
@@ -187,7 +187,7 @@ class AllpPZ(QWidget):
         logger.info(arg)
         fil_save(arg, self.FRMT, __name__)
 
-        fb_set('N', len(self.p))
+        fb_set('n_fil', len(self.p))
 
 
     #--------------------------------------------------------------------------

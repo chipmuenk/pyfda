@@ -98,7 +98,7 @@ class Equiripple(QWidget):
         self.rt_dicts = ('com',)
 
         self.rt_dict = {
-            'com': {'man': {'fo':('a', 'N'),
+            'com': {'man': {'fo':('a', 'n_fil'),
                             'msg':('a',
                                 "<span>Enter desired filter order <b><i>N</i></b>, corner "
                                 "frequencies of pass and stop band(s), <b><i>F<sub>PB</sub>"
@@ -107,7 +107,7 @@ class Equiripple(QWidget):
                                 "</sup>) to specify how well the bands are approximated."
                                 "</span>")
                             },
-                    'min': {'fo':('d', 'N'),
+                    'min': {'fo':('d', 'n_fil'),
                             'msg': ('a',
                                 "<span>Enter the maximum pass band ripple <b><i>A<sub>PB</sub>"
                                 "</i></b>, minimum stop band attenuation <b><i>A<sub>SB</sub></i>"
@@ -252,7 +252,7 @@ class Equiripple(QWidget):
         Translate parameters from the passed dictionary to instance
         parameters, scaling / transforming them if needed.
         """
-        self.N     = fb_get('N') + 1  # remez algorithms expects number of taps
+        self.N     = fb_get('n_fil') + 1  # remez algorithms expects number of taps
                                         # which is larger by one than the order!!
         self.f_pb  = fb_get('f_pb')
         self.f_sb  = fb_get('f_sb')
@@ -297,7 +297,7 @@ class Equiripple(QWidget):
         fil_save(arg, self.FRMT, __name__)
 
         if fb_get('fo') == 'min':
-            fb_set('N', self.N - 1)  # yes, update filterbroker
+            fb_set('n_fil', self.N - 1)  # yes, update filterbroker
         return 0
 
     def lp_man(self) -> int:

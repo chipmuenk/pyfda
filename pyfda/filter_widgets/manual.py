@@ -72,7 +72,7 @@ class ManualFIR():
         self.ft = 'fir'
 
         self.rt_dict = {
-            'com':{'man':{'fo': ('d', 'N'),
+            'com':{'man':{'fo': ('d', 'n_fil'),
                           'msg': msg_man}
                         },
             'lp': {'man':{'tspecs': ('u', {'frq':('u','f_pb','f_sb'),
@@ -106,7 +106,7 @@ class ManualFIR():
     #     Translate parameters from the filter dictionary to instance
     #     parameters, scaling / transforming them if needed.
     #     """
-    #     self.N     = fb_get('N')
+    #     self.N     = fb_get('n_fil')
     #     self.f_pb  = fb_get('f_pb')
     #     self.f_sb  = fb_get('f_sb')
     #     self.f_pb2 = fb_get('f_pb2')
@@ -150,7 +150,7 @@ class ManualIIR():
         self.ft = 'iir'
 
         self.rt_dict = {
-            'com':{'man':{'fo': ('d', 'N'),
+            'com':{'man':{'fo': ('d', 'n_fil'),
                           'msg': msg_man}
                         },
             'lp': {'man':{'tspecs': ('u', {'frq':('u','f_pb','f_sb'),
@@ -184,7 +184,7 @@ class ManualIIR():
     #     Translate parameters from the passed dictionary to instance
     #     parameters, scaling / transforming them if needed.
     #     """
-    #     self.N     = fb_get('N')
+    #     self.N     = fb_get('n_fil')
     #     self.f_pb  = fb_get('f_pb')
     #     self.f_sb  = fb_get('f_sb')
     #     self.f_pb2 = fb_get('f_pb2')

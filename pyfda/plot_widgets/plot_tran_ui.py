@@ -654,7 +654,7 @@ class PlotTranUI(QWidget):
         Parameters
         ==========
         emit_signal: bool
-            When `emit_signal==True` (default), fire `{'ui_local_changed': 'N'}` to update
+            When `emit_signal==True` (default), fire `{'ui_local_changed': 'n_fil'}` to update
             the FFT window and the `plot_tran` widgets. In contrast to `view_changed`,
             this also forces a calculation of the transient response.
 
@@ -716,7 +716,7 @@ class PlotTranUI(QWidget):
         if emit_signal:
             # use `'ui_local_changed'` as this triggers recalculation of the
             #  transient response
-            self.emit({'ui_local_changed': 'N'})
+            self.emit({'ui_local_changed': 'n_fil'})
 
     # ------------------------------------------------------------------------------
     def toggle_fft_wdg(self):

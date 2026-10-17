@@ -17,10 +17,10 @@ from pyfda import filterbroker as fb
 class OldFilterWidget:
     def get_filter_order(self):
         # Tightly coupled to global state
-        return fb.fb_get('N')
+        return fb.fb_get('n_fil')
     
     def set_filter_specs(self, order, freq):
-        fb.fb_set('N', order)
+        fb.fb_set('n_fil', order)
         fb.fb_set('f_c', freq)
     
     def undo_last_change(self):
@@ -42,11 +42,11 @@ class NewFilterWidget:
         self.broker = broker or FilterBroker.get_instance()
     
     def get_filter_order(self) -> int:
-        return self.broker.get('N')
+        return self.broker.get('n_fil')
     
     def set_filter_specs(self, order: int, freq: float) -> bool:
         # Batch operation = single undo entry
-        return self.broker.batch_set({'N': order, 'f_c': freq})
+        return self.broker.batch_set({'n_fil': order, 'f_c': freq})
     
     def undo_last_change(self) -> bool:
         return self.broker.undo()
@@ -62,7 +62,7 @@ class NewFilterWidget:
 def test_old_widget():
     widget = OldFilterWidget()
     result = widget.get_filter_order()
-    # Problem: What if another test changed fb.fil[0]['N']?
+    # Problem: What if another test changed fb.fil[0]['n_fil']?
     # Test is not isolated!
     assert result == 4  # Might fail due to global state
 """
@@ -82,7 +82,7 @@ def test_new_widget():
     
     # Isolated test!
     assert result == 8
-    mock_broker.get.assert_called_once_with('N')
+    mock_broker.get.assert_called_once_with('n_fil')
 
 
 # ============================================================================
@@ -96,7 +96,7 @@ from pyfda import filterbroker as fb
 
 class OldFilterDesigner:
     def design_lowpass(self):
-        order = fb.fb_get('N')
+        order = fb.fb_get('n_fil')
         freq = fb.fb_get('f_c')
 
         # Design filter
@@ -132,7 +132,7 @@ class NewFilterDesigner:
     def design_lowpass(self) -> bool:
         """Design lowpass filter with current parameters."""
         try:
-            order = self.broker.get('N')
+            order = self.broker.get('n_fil')
             freq = self.broker.get('f_c')
             
             if not self._validate_params(order, freq):
@@ -166,7 +166,7 @@ class NewFilterDesigner:
     
     def _on_param_changed(self, key: str, old_val, new_val):
         """Called when any filter parameter changes."""
-        if key in ['N', 'f_c', 'ft', 'rt']:
+        if key in ['n_fil', 'f_c', 'ft', 'rt']:
             print(f"Parameter {key} changed: {old_val} -> {new_val}")
             # Could trigger automatic redesign here
             # self.design_lowpass()
@@ -178,7 +178,7 @@ def test_new_designer():
     # Create mock broker
     mock_broker = MagicMock(spec=FilterBroker)
     mock_broker.get.side_effect = lambda key: {
-        'N': 8,
+        'n_fil': 8,
         'f_c': 0.25
     }.get(key)
     mock_broker.set.return_value = True
@@ -272,7 +272,7 @@ class OldFilterUI:
         self.ui = ui_manager
 
     def on_order_changed(self, new_order):
-        fb.fb_set('N', new_order)
+        fb.fb_set('n_fil', new_order)
         # Manually update all dependent UI elements
         self.ui.update_freq_response()
         self.ui.update_filter_plot()
@@ -311,7 +311,7 @@ class NewFilterUI:
     
     def on_order_changed(self, new_order: int):
         """Called when user changes filter order."""
-        self.broker.set('N', new_order)
+        self.broker.set('n_fil', new_order)
         # No manual update calls needed!
     
     def on_frequency_changed(self, new_freq: float):
@@ -348,11 +348,11 @@ STEP 2: Get broker instance
   NEW: broker = FilterBroker.get_instance()
 
 STEP 3: Replace fb_get/fb_set calls
-  OLD: value = fb.fb_get('N')
-  NEW: value = broker.get('N')
+  OLD: value = fb.fb_get('n_fil')
+  NEW: value = broker.get('n_fil')
   
-  OLD: fb.fb_set('N', 5)
-  NEW: broker.set('N', 5)
+  OLD: fb.fb_set('n_fil', 5)
+  NEW: broker.set('n_fil', 5)
 
 STEP 4: Replace undo/redo calls
   OLD: fb.backup_fil() / fb.restore_fil()

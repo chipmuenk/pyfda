@@ -119,7 +119,7 @@ class Cheby1():
         """
         self.analog = False # set to True for analog filters
 
-        self.N     = fb_get('N')
+        self.N     = fb_get('n_fil')
         # Frequencies are normalized to f_Nyq = f_S/2, ripple specs are in dB
         self.f_pb  = fb_get('f_pb') * 2
         self.f_sb  = fb_get('f_sb') * 2
@@ -170,11 +170,11 @@ class Cheby1():
         if fb_get('fo') == 'min':
             if fb_get('rt') in {'lp', 'hp'}:
                 fb_set('f_c', self.f_pb_c / 2.) # HP or LP - single  corner frequency
-                fb_set('N', self.N)
+                fb_set('n_fil', self.N)
             else: # BP or BS - two corner frequencies
                 fb_set('f_c', self.f_pb_c[0] / 2.)
                 fb_set('f_c2', self.f_pb_c[1] / 2.)
-                fb_set('N', self.N * 2)
+                fb_set('n_fil', self.N * 2)
         return 0
 
     #------------------------------------------------------------------------------

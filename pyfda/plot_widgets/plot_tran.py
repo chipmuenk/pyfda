@@ -464,7 +464,7 @@ class PlotTran(QWidget):
         - if no file is loaded, do nothing. This shouldn't happen (check to be sure ...)
         - else set n_end = len(file_data) in the UI
         """
-        if not hasattr(self.tran_io_wdg, 'N') or self.tran_io_wdg.N == 0:
+        if not hasattr(self.tran_io_wdg, 'n_fil') or self.tran_io_wdg.N == 0:
             self.ui.frm_file_io.setEnabled(False)
             logger.warning("No data loaded, you shouldn't see this message!")
         # File is loaded, copy file length to n_end

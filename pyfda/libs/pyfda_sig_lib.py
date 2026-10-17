@@ -1178,7 +1178,7 @@ def fil_save(arg: np.ndarray, format_in: str, sender: str, convert: bool = True)
             else:
                 a = a[:D]  # FIR, discard last D elements of a (only zeros anyway)
 
-        fb_set('N', len(b) - 1)  # correct filter order accordingly
+        fb_set('n_fil', len(b) - 1)  # correct filter order accordingly
         fb_set('ba', np.asarray([np.array(b, dtype=complex), np.array(a, dtype=complex)]))
 
     else:

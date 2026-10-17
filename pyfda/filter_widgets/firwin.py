@@ -267,7 +267,7 @@ class Firwin(QWidget):
              'win_len': 32  # window length for window viewer
             }
             """
-        self.N = fb_get('N')
+        self.N = fb_get('n_fil')
 
         try:
             # Get window id from filter dict
@@ -310,7 +310,7 @@ class Firwin(QWidget):
         Translate parameters from the passed dictionary to instance
         parameters, scaling / transforming them if needed.
         """
-        self.N     = fb_get('N')
+        self.N     = fb_get('n_fil')
         self.f_pb  = fb_get('f_pb')
         self.f_sb  = fb_get('f_sb')
         self.f_pb2 = fb_get('f_pb2')
@@ -527,7 +527,7 @@ class Firwin(QWidget):
         fb_set('f_c', (self.f_sb + self.f_pb)/2)  # average calculated f_pb and f_sb
         self._save(self.firwin(self.N, fb_get('f_c'), nyq=0.5,
                                window=self.qfft_win_select.calc_window(self.N, sym=True)))
-        fb_set('N', self.N)  # update filterbroker with calculated order
+        fb_set('n_fil', self.N)  # update filterbroker with calculated order
         return 0
 
     def lp_man(self) -> int:
@@ -550,7 +550,7 @@ class Firwin(QWidget):
         fb_set('f_c', (self.f_sb + self.f_pb)/2)  # average calculated f_pb and f_sb
         self._save(self.firwin(self.N, fb_get('f_c'), pass_zero=False, nyq=0.5,
                                window=self.qfft_win_select.calc_window(self.N, sym=True)))
-        fb_set('N', self.N)  # update filterbroker with calculated order
+        fb_set('n_fil', self.N)  # update filterbroker with calculated order
         return 0
 
     def hp_man(self) -> int:
@@ -577,7 +577,7 @@ class Firwin(QWidget):
         self._save(self.firwin(self.N, [fb_get('f_c'), fb_get('f_c2')], nyq=0.5,
                                pass_zero=False,
                                window=self.qfft_win_select.calc_window(self.N, sym=True)))
-        fb_set('N', self.N)  # update filterbroker with calculated order
+        fb_set('n_fil', self.N)  # update filterbroker with calculated order
         return 0
 
     def bp_man(self) -> int:
@@ -603,7 +603,7 @@ class Firwin(QWidget):
         self._save(self.firwin(self.N, [fb_get('f_c'), fb_get('f_c2')],
                                window=self.qfft_win_select.calc_window(self.N, sym=True),
                                pass_zero=True, nyq=0.5))
-        fb_set('N', self.N)  # update filterbroker with calculated order
+        fb_set('n_fil', self.N)  # update filterbroker with calculated order
         return 0
 
     def bs_man(self) -> int:

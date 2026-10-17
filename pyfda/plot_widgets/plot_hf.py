@@ -684,7 +684,7 @@ class PlotHf(QWidget):
 
         # remove linear phase if button is checked
         if self.but_zerophase.isChecked():
-            self.h_c = self.h_c * np.exp(1j * self.w[0:len(self.f)] * fb_get('N')/2.)
+            self.h_c = self.h_c * np.exp(1j * self.w[0:len(self.f)] * fb_get('n_fil')/2.)
 
         h_str = r'$H(\mathrm{e}^{\mathrm{j} \Omega})$'
 

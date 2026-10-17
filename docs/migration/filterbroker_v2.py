@@ -21,8 +21,8 @@ USAGE:
     broker = FilterBroker.get_instance()
 
     # Type-safe access
-    order = broker.get('N')
-    broker.set('N', 8)
+    order = broker.get('n_fil')
+    broker.set('n_fil', 8)
     broker.undo()
 
     # Subscribe to changes
@@ -151,8 +151,8 @@ class FilterBroker:
     broker = FilterBroker.get_instance()
 
     # Get/set values
-    order = broker.get('N')
-    broker.set('N', 8)
+    order = broker.get('n_fil')
+    broker.set('n_fil', 8)
 
     # Undo/redo
     broker.undo()
@@ -163,7 +163,7 @@ class FilterBroker:
 
     # Dependency injection (recommended)
     def design_filter(broker: FilterBroker):
-        order = broker.get('N')
+        order = broker.get('n_fil')
         # ... use broker in function
     """
 
@@ -215,7 +215,7 @@ class FilterBroker:
         Parameters
         ----------
         key : str
-            Configuration key (e.g., 'N', 'f_c')
+            Configuration key (e.g., 'n_fil', 'f_c')
         default : Any, optional
             Default value if key doesn't exist
 
@@ -227,7 +227,7 @@ class FilterBroker:
         Examples
         --------
         >>> broker = FilterBroker.get_instance()
-        >>> order = broker.get('N')  # Returns int
+        >>> order = broker.get('n_fil')  # Returns int
         >>> freq = broker.get('f_c')  # Returns float
         """
         if not hasattr(self._config, key):
@@ -264,7 +264,7 @@ class FilterBroker:
 
         Examples
         --------
-        >>> broker.set('N', 8)
+        >>> broker.set('n_fil', 8)
         True
         >>> broker.set('invalid_key', 5)
         False
@@ -314,7 +314,7 @@ class FilterBroker:
 
         Examples
         --------
-        >>> broker.batch_set({'N': 8, 'f_c': 0.25})
+        >>> broker.batch_set({'n_fil': 8, 'f_c': 0.25})
         True
         """
         if not updates:
@@ -460,15 +460,15 @@ class FilterBroker:
     # ========================================================================
 
     def __getitem__(self, key: str) -> Any:
-        """Allow dict-like access: broker['N']"""
+        """Allow dict-like access: broker['n_fil']"""
         return self.get(key)
 
     def __setitem__(self, key: str, value: Any):
-        """Allow dict-like assignment: broker['N'] = 5"""
+        """Allow dict-like assignment: broker['n_fil'] = 5"""
         self.set(key, value)
 
     def __contains__(self, key: str) -> bool:
-        """Allow 'in' operator: 'N' in broker"""
+        """Allow 'in' operator: 'n_fil' in broker"""
         return hasattr(self._config, key)
 
     def __repr__(self) -> str:
@@ -486,11 +486,11 @@ def fb_get(*key_list, fil_dict=None, verbose: bool = True) -> Any:
     DEPRECATED: New code should use FilterBroker.get_instance().get()
 
     OLD CODE continues to work:
-        result = fb_get('N')
+        result = fb_get('n_fil')
 
     NEW CODE should use:
         broker = FilterBroker.get_instance()
-        result = broker.get('N')
+        result = broker.get('n_fil')
     """
     broker = FilterBroker.get_instance()
 
@@ -514,11 +514,11 @@ def fb_set(*key_list, backup: bool = True, new_key: bool = False) -> int:
     DEPRECATED: New code should use FilterBroker.get_instance().set()
 
     OLD CODE continues to work:
-        fb_set('N', 5)
+        fb_set('n_fil', 5)
 
     NEW CODE should use:
         broker = FilterBroker.get_instance()
-        broker.set('N', 5)
+        broker.set('n_fil', 5)
 
     Returns
     -------

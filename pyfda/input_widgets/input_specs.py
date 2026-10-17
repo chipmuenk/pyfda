@@ -495,6 +495,9 @@ class InputSpecs(QWidget):
         logger.info(
             "Start filter design using method\n\t'%s.%s%s'",
             fb_get('fc'), fb_get('rt'), fb_get('fo'))
+        logger.info(
+            "Local params: \n\t'%s.%s%s'", self.sel_fil.fc, self.sel_fil.rt, self.sel_fil.fo
+        )
 
         # ----------------------------------------------------------------------
         # A globally accessible instance of selected filter class fc
@@ -505,8 +508,12 @@ class InputSpecs(QWidget):
         # type (e.g. 'lp') and the filter order (e.g. 'man'), giving e.g. 'LPman'.
         # The filter is designed by passing the specs in fil[0] to the method,
         # resulting in e.g. cheby1.LPman() and writing coefficients, P/Z etc. back to fil[0].
-
-        err = call_fil_method(fb_get('rt') + '_' +fb_get('fo'), fc=fb_get('fc'))
+        fb_set({'fc': self.sel_fil.fc,
+                'fo': self.sel_fil.fo,
+                'ft': self.sel_fil.ft,
+                'rt': self.sel_fil.rt,
+                'n_fil': self.sel_fil.n_fil})
+        err = call_fil_method(fb_get('rt') + '_' + fb_get('fo'), fc=fb_get('fc'))
         # this is the same as e.g.
         # from pyfda.filter_design import ellip
         # inst = ellip.ellip()
@@ -524,7 +531,7 @@ class InputSpecs(QWidget):
             self.color_design_button("ok")
 
             self.emit({'data_changed': 'filter_designed'})
-            logger.info("Designed filter with order = %s", str(fb_get('N')))
+            logger.info("Designed filter with order = %s", str(fb_get('n_fil')))
 
 
     def color_design_button(self, state: str) -> None:

@@ -80,10 +80,10 @@ class Butter():
         self.ft = 'iir'
 
         self.rt_dict =  {
-            'com':{'man':{'fo': ('a', 'N'),
+            'com':{'man':{'fo': ('a', 'n_fil'),
                    'msg':('a', "Enter the filter order <b><i>N</i></b> and the -3 dB corner "
                                "frequency(ies) <b><i>F<sub>C</sub></i></b> &nbsp; .")},
-                   'min':{'fo': ('d', 'N'),
+                   'min':{'fo': ('d', 'n_fil'),
                           'msg':('a',
                    "Enter maximum pass band ripple <b><i>A<sub>PB</sub></i></b>, "
                     "minimum stop band attenuation <b><i>A<sub>SB</sub> </i></b>"
@@ -143,7 +143,7 @@ class Butter():
         parameters, scaling / transforming them if needed.
         """
         self.analog = False # set to True for analog filters
-        self.N     = fb_get('N')
+        self.N     = fb_get('n_fil')
         # Frequencies are normalized to f_Nyq = f_S/2, ripple specs are in dB
         self.f_pb  = fb_get('f_pb') * 2
         self.f_sb  = fb_get('f_sb') * 2
@@ -194,12 +194,12 @@ class Butter():
             if fb_get('rt') in {'lp', 'hp'}:
                 # HP or LP - single  corner frequency:
                 fb_set('f_c', self.f_pb_c / 2.)
-                fb_set('N', self.N)
+                fb_set('n_fil', self.N)
             else:
                 # BP or BS - two corner frequencies:
                 fb_set('f_c', self.f_pb_c[0] / 2.)
                 fb_set('f_c2', self.f_pb_c[1] / 2.)
-                fb_set('N', self.N * 2)
+                fb_set('n_fil', self.N * 2)
         return 0
 
     #------------------------------------------------------------------------------

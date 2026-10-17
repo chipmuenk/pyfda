@@ -642,7 +642,7 @@ class InputCoeffs(QWidget):
         """
         Save the coefficient register `self.ba` to the filter dict as `fil[0]['ba']`.
         """
-        fb_set('N', max(len(self.ba[0]), len(self.ba[1])) - 1)
+        fb_set('n_fil', max(len(self.ba[0]), len(self.ba[1])) - 1)
 
         # Switch to manual filter order and 'ManualIIR' resp. 'ManualFIR' filter class
         fb_set('fo', 'man')

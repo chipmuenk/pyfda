@@ -17,8 +17,8 @@ class Common():
     """
     def __init__(self):
         self.rt_base_iir = {
-            'com': {'man': {'fo': ('a', 'N')},
-                    'min': {'fo': ('d', 'N'),
+            'com': {'man': {'fo': ('a', 'n_fil')},
+                    'min': {'fo': ('d', 'n_fil'),
                             'msg': (
                               'a',
                     "Enter maximum pass band ripple <b><i>A<sub>PB</sub></i></b>, "

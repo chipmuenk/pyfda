@@ -157,7 +157,7 @@ class FilterTreeBuilder():
         'lp': {
             'fir': {
                 'Equiripple': {
-                    'man':{'fo':     ('a', 'N'),
+                    'man':{'fo' : ('a', 'n_fil'),
                         'fspecs': ('a', 'f_c'),
                         'wspecs': ('a', 'w_pb', 'w_sb'),
                         'tspecs': ('u', {'frq': ('u', 'f_pb', 'f_sb'),
@@ -169,7 +169,7 @@ class FilterTreeBuilder():
             'value <b><i>W</i></b>&nbsp; for each band.'
                                     )
                             },
-                    'min':{'fo':     ('d', 'N'),
+                    'min':{'fo' : ('d', 'n_fil'),
                         'fspecs': ('d', 'f_c'),
                         'wspecs': ('d', 'w_pb', 'w_sb'),
                         'tspecs': ('a', {'frq': ('a', 'f_pb', 'f_sb'),
@@ -186,12 +186,12 @@ class FilterTreeBuilder():
                 },
             'iir': {
                 'Cheby1': {
-                    'man':{'fo':     ('a', 'N'),
+                    'man':{'fo' : ('a', 'n_fil'),
                         'fspecs': ('a', 'f_c'),
                         'tspecs': ('u', {'frq': ('u', 'f_pb', 'f_sb'),
                                          'amp': ('u', 'a_pb', 'a_sb')})
                         },
-                    'min':{'fo':     ('d', 'N'),
+                    'min':{'fo' : ('d', 'n_fil'),
                         'fspecs': ('d', 'f_c'),
                         'tspecs': ('a', {'frq': ('a', 'f_pb', 'f_sb'),
                                          'amp': ('a', 'a_pb', 'a_sb')})
@@ -202,13 +202,13 @@ class FilterTreeBuilder():
         'hp': {
             'fir': {
                 'Equiripple': {
-                    'man':{'fo':     ('a', 'N'),
+                    'man':{'fo' : ('a', 'n_fil'),
                         'fspecs': ('a', 'f_c'),
                         'wspecs': ('a', 'w_sb', 'w_pb'),
                         'tspecs': ('u', {'frq': ('u', 'f_sb', 'f_pb'),
                                          'amp': ('u', 'a_sb', 'a_pb')})
                         },
-                    'min':{'fo':     ('d', 'N'),
+                    'min':{'fo' : ('d', 'n_fil'),
                         'wspecs': ('d', 'w_sb', 'w_pb'),
                         'fspecs': ('d', 'f_c'),
                         'tspecs': ('a', {'frq': ('a', 'f_sb', 'f_pb'),
@@ -218,12 +218,12 @@ class FilterTreeBuilder():
                 },
             'iir': {
                 'Cheby1': {
-                    'man':{'fo':     ('a', 'N'),
+                    'man':{'fo' : ('a', 'n_fil'),
                         'fspecs': ('a', 'f_c'),
                         'tspecs': ('u', {'frq': ('u', 'f_sb', 'f_pb'),
                                          'amp': ('u', 'a_sb', 'a_pb')})
                         },
-                    'min':{'fo':     ('d', 'N'),
+                    'min':{'fo' : ('d', 'n_fil'),
                         'fspecs': ('d', 'f_c'),
                         'tspecs': ('a', {'frq': ('a', 'f_sb', 'f_pb'),
                                          'amp': ('a', 'a_sb', 'a_pb')})
@@ -234,13 +234,13 @@ class FilterTreeBuilder():
         'bp': {
             'fir': {
                 'Equiripple': {
-                    'man':{'fo':     ('a', 'N'),
+                    'man':{'fo' : ('a', 'n_fil'),
                         'wspecs': ('a', 'w_sb', 'w_pb', 'w_sb2'),
                         'fspecs': ('a', 'f_c', 'f_c2'),
                         'tspecs': ('u', {'frq': ('u', 'f_sb', 'f_pb', 'f_pb2', 'f_sb2'),
                                          'amp': ('u', 'a_sb', 'a_pb', 'a_sb2')})
                         },
-                    'min':{'fo':     ('d', 'N'),
+                    'min':{'fo' : ('d', 'n_fil'),
                         'fspecs': ('d', 'f_c', 'f_c2'),
                         'wspecs': ('d', 'w_sb', 'w_pb', 'w_sb2'),
                         'tspecs': ('a', {'frq': ('a', 'f_sb', 'f_pb', 'f_pb2', 'f_sb2'),
@@ -252,13 +252,13 @@ class FilterTreeBuilder():
         'bs': {
             'fir': {
                 'Equiripple': {
-                    'man':{'fo':     ('a', 'N'),
+                    'man':{'fo' : ('a', 'n_fil'),
                         'wspecs': ('a', 'w_pb', 'w_sb', 'w_pb2'),
                         'fspecs': ('a', 'f_c', 'f_c2'),
                         'tspecs': ('u', {'frq': ('u', 'f_pb', 'f_sb', 'f_sb2', 'f_pb2'),
                                          'amp': ('u', 'a_pb', 'a_sb', 'a_pb2')})
                         },
-                    'min':{'fo':     ('d', 'N'),
+                    'min':{'fo' : ('d', 'n_fil'),
                         'wspecs': ('d', 'w_pb', 'w_sb', 'w_pb2'),
                         'fspecs': ('d', 'f_c', 'f_c2'),
                         'tspecs': ('a', {'frq': ('a', 'f_pb', 'f_sb', 'f_sb2', 'f_pb2'),
@@ -349,24 +349,24 @@ class FilterTreeBuilder():
         .. code-block:: python
 
             self.rt_dict = {
-                     'lp': {'man':{'fo':     ('a','N'),
+                     'lp': {'man':{'fo':     ('a','n_fil'),
                                    'msg':    ('a', r"<br /><b>Note:</b> Read this!"),
                                    'fspecs': ('a','f_c'),
                                    'tspecs': ('u', {'frq':('u','f_pb','f_sb'),
                                                     'amp':('u','a_pb','a_sb')})
                                   },
-                           'min':{'fo':     ('d','N'),
+                           'min':{'fo':     ('d','n_fil'),
                                   'fspecs': ('d','f_c'),
                                   'tspecs': ('a', {'frq':('a','f_pb','f_sb'),
                                                    'amp':('a','a_pb','a_sb')})
                                 }
                           },
-                    'hp': {'man':{'fo':     ('a','N'),
+                    'hp': {'man':{'fo':     ('a','n_fil'),
                                   'fspecs': ('a','f_c'),
                                   'tspecs': ('u', {'frq':('u','f_sb','f_pb'),
                                                    'amp':('u','a_sb','a_pb')})
                                  },
-                           'min':{'fo':     ('d','N'),
+                           'min':{'fo':     ('d','n_fil'),
                                   'fspecs': ('d','f_c'),
                                   'tspecs': ('a', {'frq':('a','f_sb','f_pb'),
                                                    'amp':('a','a_sb','a_pb')})
@@ -386,13 +386,13 @@ class FilterTreeBuilder():
             'lp':{
             'iir':{
                  'Cheby1':{
-                     'man':{'fo':     ('a','N'),
+                     'man':{'fo':     ('a','n_fil'),
                             'msg':    ('a', r"<br /><b>Note:</b> Read this!"),
                             'fspecs': ('a','f_c'),
                             'tspecs': ('u', {'frq':('u','f_pb','f_sb'),
                                              'amp':('u','a_pb','a_sb')})
                             },
-                     'min':{'fo':     ('d','N'),
+                     'min':{'fo':     ('d','n_fil'),
                             'fspecs': ('d','f_c'),
                             'tspecs': ('a', {'frq':('a','f_pb','f_sb'),
                                              'amp':('a','a_pb','a_sb')})

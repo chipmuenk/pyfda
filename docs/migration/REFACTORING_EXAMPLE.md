@@ -6,8 +6,8 @@ Your current `filterbroker.py` uses module-level globals:
 ```python
 # Current code
 from pyfda import filterbroker as fb
-value = fb_get('N')
-fb_set('N', 5)
+value = fb_get('n_fil')
+fb_set('n_fil', 5)
 ```
 
 **Issues:**
@@ -97,13 +97,13 @@ class FilterBroker:
     
     Usage:
         broker = FilterBroker()
-        broker.get('N')  # type-safe, with validation
-        broker.set('N', 5)
+        broker.get('n_fil')  # type-safe, with validation
+        broker.set('n_fil', 5)
         broker.undo()
         
     For dependency injection:
         def process_filter(broker: FilterBroker):
-            order = broker.get('N')
+            order = broker.get('n_fil')
             ...
     """
     _instance = None
@@ -140,7 +140,7 @@ class FilterBroker:
         Parameters
         ----------
         key : str
-            Configuration key (e.g., 'N', 'f_c')
+            Configuration key (e.g., 'n_fil', 'f_c')
         default : Any
             Default value if key doesn't exist
         
@@ -271,11 +271,11 @@ class FilterBroker:
     # ========================================================================
     
     def __getitem__(self, key: str) -> Any:
-        """Allow dict-like access: broker['N']"""
+        """Allow dict-like access: broker['n_fil']"""
         return self.get(key)
     
     def __setitem__(self, key: str, value: Any):
-        """Allow dict-like assignment: broker['N'] = 5"""
+        """Allow dict-like assignment: broker['n_fil'] = 5"""
         self.set(key, value)
     
     def __repr__(self) -> str:
@@ -292,10 +292,10 @@ def fb_get(*key_list) -> Any:
     
     NEW CODE should use:
         broker = FilterBroker.get_instance()
-        broker.get('N')
+        broker.get('n_fil')
     
     OLD CODE continues to work:
-        fb_get('N')
+        fb_get('n_fil')
     """
     broker = FilterBroker.get_instance()
     if len(key_list) == 0:
@@ -313,10 +313,10 @@ def fb_set(*key_list, backup: bool = True, new_key: bool = False) -> int:
     
     NEW CODE should use:
         broker = FilterBroker.get_instance()
-        broker.set('N', 5)
+        broker.set('n_fil', 5)
     
     OLD CODE continues to work:
-        fb_set('N', 5)
+        fb_set('n_fil', 5)
     """
     broker = FilterBroker.get_instance()
     if len(key_list) < 2:
@@ -337,8 +337,8 @@ def fb_set(*key_list, backup: bool = True, new_key: bool = False) -> int:
 from pyfda import filterbroker as fb
 
 # Direct global access
-order = fb.fb_get('N')
-fb.fb_set('N', 8)
+order = fb.fb_get('n_fil')
+fb.fb_set('n_fil', 8)
 fb.backup_fil()  # manual undo management
 fb.restore_fil()
 ```
@@ -351,8 +351,8 @@ from pyfda.filterbroker_v2 import FilterBroker
 broker = FilterBroker.get_instance()
 
 # Type-safe access
-order = broker.get('N')  # IDE knows valid keys
-broker.set('N', 8)  # Automatic undo tracking
+order = broker.get('n_fil')  # IDE knows valid keys
+broker.set('n_fil', 8)  # Automatic undo tracking
 broker.undo()
 broker.redo()
 
@@ -373,7 +373,7 @@ class FilterDesigner:
         # Much easier to test: pass mock broker in tests
     
     def design_filter(self):
-        order = self.broker.get('N')
+        order = self.broker.get('n_fil')
         freq = self.broker.get('f_c')
         # ... design logic ...
         self.broker.set('ba', coefficients)
@@ -403,11 +403,11 @@ mock_broker.set.assert_called()
 
 # FROM:
 from pyfda import filterbroker as fb
-N = fb.fb_get('N')
+N = fb.fb_get('n_fil')
 
 # TO:
 from pyfda.filterbroker_v2 import FilterBroker
-N = FilterBroker.get_instance().get('N')
+N = FilterBroker.get_instance().get('n_fil')
 
 # OR for better design:
 class MyWidget:
@@ -430,26 +430,26 @@ def test_get_set():
     broker = FilterBroker()
     
     # Test set and get
-    broker.set('N', 8)
-    assert broker.get('N') == 8
+    broker.set('n_fil', 8)
+    assert broker.get('n_fil') == 8
     
     # Test type mismatch
-    result = broker.set('N', 'invalid')
+    result = broker.set('n_fil', 'invalid')
     assert result is False
 
 def test_undo_redo():
     """Test undo/redo functionality."""
     broker = FilterBroker()
     
-    broker.set('N', 5)
-    broker.set('N', 10)
+    broker.set('n_fil', 5)
+    broker.set('n_fil', 10)
     
-    assert broker.get('N') == 10
+    assert broker.get('n_fil') == 10
     broker.undo()
-    assert broker.get('N') == 5
+    assert broker.get('n_fil') == 5
     
     broker.redo()
-    assert broker.get('N') == 10
+    assert broker.get('n_fil') == 10
 
 def test_subscription():
     """Test change notifications."""
@@ -460,15 +460,15 @@ def test_subscription():
         changes.append((key, old_val, new_val))
     
     broker.subscribe(track_change)
-    broker.set('N', 6)
+    broker.set('n_fil', 6)
     
     assert len(changes) == 1
-    assert changes[0] == ('N', 4, 6)
+    assert changes[0] == ('n_fil', 4, 6)
 
 def test_serialization():
     """Test save/load functionality."""
     broker = FilterBroker()
-    broker.set('N', 12)
+    broker.set('n_fil', 12)
     broker.set('f_c', 0.25)
     
     # Save
@@ -478,7 +478,7 @@ def test_serialization():
     broker2 = FilterBroker()
     broker2.from_dict(data)
     
-    assert broker2.get('N') == 12
+    assert broker2.get('n_fil') == 12
     assert broker2.get('f_c') == 0.25
 ```
 

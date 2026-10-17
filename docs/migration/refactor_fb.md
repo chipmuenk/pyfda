@@ -73,8 +73,8 @@ Benefits: Type safety, automatic validation, serialization support, IDE autocomp
 
 ```python
 with FilterContext() as ctx:
-    ctx.set('N', 4)
-    result = ctx.get('N')
+    ctx.set('n_fil', 4)
+    result = ctx.get('n_fil')
 ```
 
 Benefits: Clearer lifetime management, easier testing.
@@ -168,12 +168,12 @@ Four concrete before/after examples:
 ```python
 # OLD: Tightly coupled, hard to test
 def get_order():
-    return fb.fb_get('N')
+    return fb.fb_get('n_fil')
 
 # NEW: Dependency injected, testable
 def get_order(broker: FilterBroker = None):
     broker = broker or FilterBroker.get_instance()
-    return broker.get('N')
+    return broker.get('n_fil')
 
 # Testing: OLD (broken by global state)
 # Testing: NEW (100% isolated with mock)

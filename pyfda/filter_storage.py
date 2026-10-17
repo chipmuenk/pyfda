@@ -31,7 +31,7 @@ fil_ref = {
     'f_pb2': 0.3,
     'f_sb': 0.2,
     'f_sb2': 0.4,
-    'N': 4,  # filter order
+    'n_fil': 4,  # filter order
     't_s': 1.0,  # sample time
     # weights for pass- and stopbands
     'w_pb': 1.0,

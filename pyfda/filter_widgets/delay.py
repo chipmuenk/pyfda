@@ -60,7 +60,7 @@ class Delay(QWidget):
         self.rt_dicts = ('com',)
 
         self.rt_dict = {
-            'com': {'man': {'fo':('a', 'N'),
+            'com': {'man': {'fo':('a', 'n_fil'),
                             'msg':('a',
                                 "<span>Enter desired number of delays <b><i>N</i></b>.</span>")
                             },
@@ -124,8 +124,8 @@ class Delay(QWidget):
                                       sign="poszero", return_type='int')
         self.led_delay.setText(str(self.N))
 
-        fb_set('wdg_fil', 'N', self.N)  # store in filter dictionary
-        # fb_set('filter_widgets', 'delay', {'N': self.N})  # store in filter widgets dict
+        fb_set('wdg_fil', 'n_fil', self.N)  # store in filter dictionary
+        # fb_set('filter_widgets', 'delay', {'n_fil': self.N})  # store in filter widgets dict
 
         # sig_tx -> select_filter -> filter_specs
         self.emit({'filt_changed': 'delay'})
@@ -137,8 +137,8 @@ class Delay(QWidget):
         and when the filter is loaded from disk.
         """
         wdg_fil_par = fb_get('filter_widgets', 'delay', verbose=False)
-        if wdg_fil_par and 'N' in wdg_fil_par:
-            self.N = wdg_fil_par['N']
+        if wdg_fil_par and 'n_fil' in wdg_fil_par:
+            self.N = wdg_fil_par['n_fil']
             self.led_delay.setText(str(self.N))
 
     def _get_params(self) -> None:
@@ -146,7 +146,7 @@ class Delay(QWidget):
         Translate parameters from the passed dictionary to instance
         parameters, scaling / transforming them if needed.
         """
-        self.N = fb_get('N')  # filter order is translated to numb. of delays
+        self.N = fb_get('n_fil')  # filter order is translated to numb. of delays
 
     def _test_n(self) -> bool:
         """

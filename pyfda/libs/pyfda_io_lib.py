@@ -1356,7 +1356,7 @@ def coe_header(title: str) -> str:
         {datetime.datetime.fromtimestamp(int(fb_get('timestamp'))).strftime(date_frmt)}\n"
     header += f"Saved:\t{datetime.datetime.now().strftime(date_frmt)}\n\n"
     header += f"Filter type:\t{fb_get('rt')}, {fb_get('fc')} "
-    header += f"(Order = {fb_get('N')})\n"
+    header += f"(Order = {fb_get('n_fil')})\n"
     header += f"Sample Frequency \tf_S = {f_s} {unit}\n\n"
     header += "Corner Frequencies:\n"
     for lf, f, la, a in zip(f_lbls, f_vals, a_lbls, a_targs_db, strict=True):

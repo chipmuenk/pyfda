@@ -87,10 +87,10 @@ class Bessel():
 
         self.ft = 'iir' #: filter type
         self.rt_dict =  {
-            'com':{'man':{'fo': ('a', 'N'),
+            'com':{'man':{'fo': ('a', 'n_fil'),
                    'msg':('a', "Enter the filter order <b><i>N</i></b> and the critical "
                                "frequency or frequencies <b><i>F<sub>C</sub></i></b> .")},
-                   'min':{'fo': ('d', 'N'),
+                   'min':{'fo': ('d', 'n_fil'),
                           'msg':('a',
                    "Enter maximum pass band ripple <b><i>A<sub>PB</sub></i></b>, "
                     "minimum stop band attenuation <b><i>A<sub>SB</sub> </i></b>"
@@ -149,7 +149,7 @@ class Bessel():
         Translate parameters from the passed dictionary to instance
         parameters, scaling / transforming them if needed.
         """
-        self.N = fb_get('N')
+        self.N = fb_get('n_fil')
 
         self.f_pb  = fb_get('f_pb') * 2 # Frequencies are normalized to f_Nyq
         self.f_sb  = fb_get('f_sb') * 2
@@ -196,14 +196,14 @@ class Bessel():
             return -1
         fil_save(arg, self.FRMT, __name__)
 
-        fb_set('N', self.N) # always save, might have been limited by _test_n
+        fb_set('n_fil', self.N) # always save, might have been limited by _test_n
         if fb_get('fo') == 'min':
             if fb_get('rt') in {'lp', 'hp'}:
                 fb_set('f_c', self.f_pb_c / 2.) # HP or LP - single  corner frequency
             else: # BP or BS - two corner frequencies; order needs to be doubled
                 fb_set('f_c', self.f_pb_c[0] / 2.)
                 fb_set('f_c2', self.f_pb_c[1] / 2.)
-                fb_set('N', self.N * 2)
+                fb_set('n_fil', self.N * 2)
         return 0
 
     # LP: f_pb < f_sb
