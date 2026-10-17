@@ -106,7 +106,7 @@ class ManualFIR():
     #     Translate parameters from the filter dictionary to instance
     #     parameters, scaling / transforming them if needed.
     #     """
-    #     self.N     = fb_get('n_fil')
+    #     self.n_fil     = fb_get('n_fil')
     #     self.f_pb  = fb_get('f_pb')
     #     self.f_sb  = fb_get('f_sb')
     #     self.f_pb2 = fb_get('f_pb2')
@@ -184,7 +184,7 @@ class ManualIIR():
     #     Translate parameters from the passed dictionary to instance
     #     parameters, scaling / transforming them if needed.
     #     """
-    #     self.N     = fb_get('n_fil')
+    #     self.n_fil     = fb_get('n_fil')
     #     self.f_pb  = fb_get('f_pb')
     #     self.f_sb  = fb_get('f_sb')
     #     self.f_pb2 = fb_get('f_pb2')

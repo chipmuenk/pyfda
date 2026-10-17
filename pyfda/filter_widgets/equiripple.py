@@ -252,7 +252,7 @@ class Equiripple(QWidget):
         Translate parameters from the passed dictionary to instance
         parameters, scaling / transforming them if needed.
         """
-        self.N     = fb_get('n_fil') + 1  # remez algorithms expects number of taps
+        self.n_fil     = fb_get('n_fil') + 1  # remez algorithms expects number of taps
                                         # which is larger by one than the order!!
         self.f_pb  = fb_get('f_pb')
         self.f_sb  = fb_get('f_sb')
@@ -271,8 +271,8 @@ class Equiripple(QWidget):
         Warn the user if the calculated order is too high for a reasonable filter
         design.
         """
-        if self.N > 2000:
-            return popup_warning(self, self.N, "Equiripple")
+        if self.n_fil > 2000:
+            return popup_warning(self, self.n_fil, "Equiripple")
         return True
 
     def _save(self, arg) -> int:
@@ -297,7 +297,7 @@ class Equiripple(QWidget):
         fil_save(arg, self.FRMT, __name__)
 
         if fb_get('fo') == 'min':
-            fb_set('n_fil', self.N - 1)  # yes, update filterbroker
+            fb_set('n_fil', self.n_fil - 1)  # yes, update filterbroker
         return 0
 
     def lp_man(self) -> int:
@@ -313,19 +313,19 @@ class Equiripple(QWidget):
         - Other keys required by `_get_params`.
 
         Returns:
-            int: Returns -1 if the filter order (`self.N`) is too high or another error occurs,
+            int: Returns -1 if the filter order (`self.n_fil`) is too high or another error occurs,
                 otherwise the designed filter coefficients are saved in the filter dict.
 
         Notes:
             - The method `_get_params` is used to extract parameters from the filter dictionary.
-            - The method `_test_n` is used to validate the filter order (`self.N`).
+            - The method `_test_n` is used to validate the filter order (`self.n_fil`).
             - The filter design uses a normalized frequency range [0, 0.5].
             - The `grid_density` attribute controls the density of the frequency grid
               used in the Remez algorithm.
         """
         self._get_params()
         return self._save(
-            remez(self.N,[0, self.f_pb, self.f_sb, 0.5], [1, 0],
+            remez(self.n_fil,[0, self.f_pb, self.f_sb, 0.5], [1, 0],
                   weight = [fb_get('w_pb'), fb_get('w_sb')], fs = 1,
                   grid_density = self.grid_density))
     def lp_min(self) -> int:
@@ -348,13 +348,13 @@ class Equiripple(QWidget):
             filter coefficients are saved in the filter dictionary using `fb_set()`.
         """
         self._get_params()
-        (self.N, F, A, W) = remezord([self.f_pb, self.f_sb], [1, 0],
+        (self.n_fil, F, A, W) = remezord([self.f_pb, self.f_sb], [1, 0],
                                      [self.a_pb, self.a_sb], fs = 1, alg = self.alg)
         # A is always [1, 0] for LP filters
         fb_set('w_pb', W[0])
         fb_set('w_sb', W[1])
         return self._save(
-            remez(self.N, F, A, weight = W, fs = 1, grid_density = self.grid_density))
+            remez(self.n_fil, F, A, weight = W, fs = 1, grid_density = self.grid_density))
 
     def hp_man(self) -> int:
         """
@@ -362,14 +362,14 @@ class Equiripple(QWidget):
         For more details, see the `lp_man` method.
         """
         self._get_params()
-        if self.N % 2 == 0: # even order, use odd symmetry (type III)
+        if self.n_fil % 2 == 0: # even order, use odd symmetry (type III)
             return self._save(
-                remez(self.N,[0, self.f_sb, self.f_pb, 0.5], [0, 1],
+                remez(self.n_fil,[0, self.f_sb, self.f_pb, 0.5], [0, 1],
                       weight = [fb_get('w_sb'), fb_get('w_pb')], fs = 1,
                       type = 'hilbert', grid_density = self.grid_density))
         # odd order,
         return self._save(
-            remez(self.N,[0, self.f_sb, self.f_pb, 0.5], [0, 1],
+            remez(self.n_fil,[0, self.f_sb, self.f_pb, 0.5], [0, 1],
                     weight = [fb_get('w_sb'), fb_get('w_pb')], fs = 1,
                     type = 'bandpass', grid_density = self.grid_density))
 
@@ -379,20 +379,20 @@ class Equiripple(QWidget):
         For more details, see the `lp_min` method.
         """
         self._get_params()
-        (self.N, F, A, W) = remezord([self.f_sb, self.f_pb], [0, 1],
+        (self.n_fil, F, A, W) = remezord([self.f_sb, self.f_pb], [0, 1],
                                      [self.a_sb, self.a_pb], fs = 1, alg = self.alg)
         # A is always [0, 1] for HP filters
 
-        # self.N = ceil_odd(N)  # enforce odd order
+        # self.n_fil = ceil_odd(N)  # enforce odd order
         fb_set('w_sb', W[0])
         fb_set('w_pb', W[1])
-        if self.N % 2 == 0: # even order
+        if self.n_fil % 2 == 0: # even order
             return self._save(
-                remez(self.N, F, A, weight = W, fs = 1, type = 'hilbert',
+                remez(self.n_fil, F, A, weight = W, fs = 1, type = 'hilbert',
                       grid_density = self.grid_density))
         # odd order
         return self._save(
-            remez(self.N, F, A, weight = W, fs = 1, type = 'bandpass',
+            remez(self.n_fil, F, A, weight = W, fs = 1, type = 'bandpass',
                     grid_density = self.grid_density))
 
     # For BP and BS, f_pb and f_sb have two elements each
@@ -403,7 +403,7 @@ class Equiripple(QWidget):
         """
         self._get_params()
         return self._save(
-            remez(self.N, [0, self.f_sb, self.f_pb, self.f_pb2, self.f_sb2, 0.5], [0, 1, 0],
+            remez(self.n_fil, [0, self.f_sb, self.f_pb, self.f_pb2, self.f_sb2, 0.5], [0, 1, 0],
                   weight = [fb_get('w_sb'), fb_get('w_pb'), fb_get('w_sb2')], fs = 1,
                   grid_density = self.grid_density))
 
@@ -413,14 +413,14 @@ class Equiripple(QWidget):
         For more details, see the `lp_min` method.
         """
         self._get_params()
-        (self.N, F, A, W) = remezord([self.f_sb, self.f_pb, self.f_pb2, self.f_sb2], [0, 1, 0],
+        (self.n_fil, F, A, W) = remezord([self.f_sb, self.f_pb, self.f_pb2, self.f_sb2], [0, 1, 0],
                                      [self.a_sb, self.a_pb, self.a_sb2], fs = 1, alg = self.alg)
         # A is always [0, 1, 0] for BP filters
         fb_set('w_sb', W[0])
         fb_set('w_pb', W[1])
         fb_set('w_sb2', W[2])
         return self._save(
-            remez(self.N, F, A, weight = W, fs = 1, grid_density = self.grid_density))
+            remez(self.n_fil, F, A, weight = W, fs = 1, grid_density = self.grid_density))
 
     def bs_man(self) -> int:
         """
@@ -428,9 +428,9 @@ class Equiripple(QWidget):
         For more details, see the `lp_man` method.
         """
         self._get_params()
-        self.N = round_odd(self.N) # enforce odd order
+        self.n_fil = round_odd(self.n_fil) # enforce odd order
         return self._save(
-            remez(self.N,[0, self.f_pb, self.f_sb, self.f_sb2, self.f_pb2, 0.5], [1, 0, 1],
+            remez(self.n_fil,[0, self.f_pb, self.f_sb, self.f_sb2, self.f_pb2, 0.5], [1, 0, 1],
                   weight = [fb_get('w_pb'), fb_get('w_sb'), fb_get('w_pb2')], fs = 1,
                   grid_density = self.grid_density))
 
@@ -440,14 +440,14 @@ class Equiripple(QWidget):
         For more details, see the `lp_min` method.
         """
         self._get_params()
-        (self.N, F, A, W) = remezord([self.f_pb, self.f_sb, self.f_sb2, self.f_pb2], [1, 0, 1],
+        (self.n_fil, F, A, W) = remezord([self.f_pb, self.f_sb, self.f_sb2, self.f_pb2], [1, 0, 1],
                                 [self.a_pb, self.a_sb, self.a_pb2], fs = 1, alg = self.alg)
         # A is always [1, 0, 1] for BS filters
         fb_set('w_pb', W[0])
         fb_set('w_sb', W[1])
         fb_set('w_pb2', W[2])
         return self._save(
-            remez(self.N, F, A, weight = W, fs = 1, grid_density = self.grid_density))
+            remez(self.n_fil, F, A, weight = W, fs = 1, grid_density = self.grid_density))
 
     def hil_man(self) -> int:
         """
@@ -457,7 +457,7 @@ class Equiripple(QWidget):
         """
         self._get_params()
         return self._save(
-            remez(self.N,[0, self.f_sb, self.f_pb, self.f_pb2, self.f_sb2, 0.5], [0, 1, 0],
+            remez(self.n_fil,[0, self.f_sb, self.f_pb, self.f_pb2, self.f_sb2, 0.5], [0, 1, 0],
                   weight = [fb_get('w_sb'), fb_get('w_pb'), fb_get('w_sb2')], fs = 1,
                   type = 'hilbert', grid_density = self.grid_density))
 
@@ -466,7 +466,7 @@ class Equiripple(QWidget):
         Design a FIR differentiator with given order using the Remez exchange algorithm.
         """
         self._get_params()
-        self.N = ceil_even(self.N) # enforce even order
+        self.n_fil = ceil_even(self.n_fil) # enforce even order
         if self.f_pb < 0.1:
             logger.warning(
                 "Relative bandwidth %s for pass band is too low, "
@@ -476,7 +476,7 @@ class Equiripple(QWidget):
             self.emit({'specs_changed': 'equiripple'})
 
         return self._save(
-            remez(self.N, [0, self.f_pb], [np.pi * fb_get('w_pb')], fs = 1,
+            remez(self.n_fil, [0, self.f_pb], [np.pi * fb_get('w_pb')], fs = 1,
                   type = 'differentiator', grid_density = self.grid_density))
 
 #------------------------------------------------------------------------------

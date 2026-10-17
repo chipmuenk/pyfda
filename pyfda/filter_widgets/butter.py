@@ -143,7 +143,7 @@ class Butter():
         parameters, scaling / transforming them if needed.
         """
         self.analog = False # set to True for analog filters
-        self.N     = fb_get('n_fil')
+        self.n_fil     = fb_get('n_fil')
         # Frequencies are normalized to f_Nyq = f_S/2, ripple specs are in dB
         self.f_pb  = fb_get('f_pb') * 2
         self.f_sb  = fb_get('f_sb') * 2
@@ -169,8 +169,8 @@ class Butter():
         Warn the user if the calculated order is too high for a reasonable filter
         design.
         """
-        if self.N > 25:
-            return popup_warning(None, self.N, "Butterworth")
+        if self.n_fil > 25:
+            return popup_warning(None, self.n_fil, "Butterworth")
         return True
 
     #--------------------------------------------------------------------------
@@ -194,12 +194,12 @@ class Butter():
             if fb_get('rt') in {'lp', 'hp'}:
                 # HP or LP - single  corner frequency:
                 fb_set('f_c', self.f_pb_c / 2.)
-                fb_set('n_fil', self.N)
+                fb_set('n_fil', self.n_fil)
             else:
                 # BP or BS - two corner frequencies:
                 fb_set('f_c', self.f_pb_c[0] / 2.)
                 fb_set('f_c2', self.f_pb_c[1] / 2.)
-                fb_set('n_fil', self.N * 2)
+                fb_set('n_fil', self.n_fil * 2)
         return 0
 
     #------------------------------------------------------------------------------
@@ -212,31 +212,31 @@ class Butter():
     def lp_min(self) -> int:
         """Butterworth LP filter, minimum order"""
         self._get_params()
-        self.N, self.f_pb_c = buttord(
+        self.n_fil, self.f_pb_c = buttord(
             self.f_pb, self.f_sb, self.a_pb, self.a_sb, analog = self.analog)
         return self._save(
-            butter(self.N, self.f_pb_c, btype='low', analog=self.analog, output=self.FRMT))
+            butter(self.n_fil, self.f_pb_c, btype='low', analog=self.analog, output=self.FRMT))
 
     def lp_man(self) -> int:
         """Butterworth LP filter, fixed order"""
         self._get_params()
         return self._save(
-            butter(self.N, self.f_c, btype='low', analog=self.analog, output=self.FRMT))
+            butter(self.n_fil, self.f_c, btype='low', analog=self.analog, output=self.FRMT))
 
     # HP: f_sb < f_pb -------------------------------------------------------
     def hp_min(self) -> int:
         """Butterworth HP filter, minimum order"""
         self._get_params()
-        self.N, self.f_pb_c = buttord(
+        self.n_fil, self.f_pb_c = buttord(
             self.f_pb,self.f_sb, self.a_pb, self.a_sb, analog = self.analog)
         return self._save(
-            butter(self.N, self.f_pb_c, btype='highpass', analog=self.analog, output=self.FRMT))
+            butter(self.n_fil, self.f_pb_c, btype='highpass', analog=self.analog, output=self.FRMT))
 
     def hp_man(self) -> int:
         """Butterworth HP filter, fixed order"""
         self._get_params()
         return self._save(
-            butter(self.N, self.f_pb, btype='highpass', analog=self.analog, output=self.FRMT))
+            butter(self.n_fil, self.f_pb, btype='highpass', analog=self.analog, output=self.FRMT))
 
 
     # For BP and BS, F_xx have two elements each,  A_xx only have one element.
@@ -247,28 +247,28 @@ class Butter():
     def bp_min(self) -> int:
         """Butterworth BP filter, minimum order"""
         self._get_params()
-        self.N, self.f_pb_c = buttord(
+        self.n_fil, self.f_pb_c = buttord(
             [self.f_pb, self.f_pb2], [self.f_sb, self.f_sb2], self.a_pb, self.a_sb,
             analog = self.analog)
         return self._save(
-            butter(self.N, self.f_pb_c, btype='bandpass', analog=self.analog, output=self.FRMT))
+            butter(self.n_fil, self.f_pb_c, btype='bandpass', analog=self.analog, output=self.FRMT))
 
     def bp_man(self) -> int:
         """Butterworth BP filter, fixed order"""
         self._get_params()
         return self._save(
-            butter(self.N//2, [self.f_c, self.f_c2], btype='bandpass',
+            butter(self.n_fil//2, [self.f_c, self.f_c2], btype='bandpass',
                    analog=self.analog, output=self.FRMT))
 
     # BS: f_sb[0] > f_pb[0], f_sb[1] < f_pb[1] --------------------------------
     def bs_min(self) -> int:
         """Butterworth BS filter, minimum order"""
         self._get_params()
-        self.N, self.f_pb_c = buttord(
+        self.n_fil, self.f_pb_c = buttord(
             [self.f_pb, self.f_pb2], [self.f_sb, self.f_sb2], self.a_pb, self.a_sb,
             analog = self.analog)
         return self._save(
-            butter(self.N, self.f_pb_c, btype='bandstop', analog=self.analog, output=self.FRMT))
+            butter(self.n_fil, self.f_pb_c, btype='bandstop', analog=self.analog, output=self.FRMT))
 
     def bs_man(self) -> int:
         """Butterworth BS filter, fixed order"""
@@ -276,7 +276,7 @@ class Butter():
         if not self._test_n():
             return -1
         return self._save(
-            butter(self.N//2, [self.f_c, self.f_c2], btype='bandstop',
+            butter(self.n_fil//2, [self.f_c, self.f_c2], btype='bandstop',
                    analog=self.analog, output=self.FRMT))
 #------------------------------------------------------------------------------
 

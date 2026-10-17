@@ -53,7 +53,7 @@ class Delay(QWidget):
     def __init__(self):
         super().__init__()
 
-        self.N = 5
+        self.n_fil = 5
 
         self.ft = 'fir'
 
@@ -91,7 +91,7 @@ class Delay(QWidget):
         self.lbl_delay = QLabel("Delays", self)
         self.lbl_delay.setObjectName('wdg_lbl_delays')
         self.led_delay = QLineEdit(self)
-        self.led_delay.setText(str(self.N))
+        self.led_delay.setText(str(self.n_fil))
         self.led_delay.setObjectName('wdg_led_delay')
         self.led_delay.setToolTip("Number of delays, N > 0 produces poles, N < 0 zeros.")
 
@@ -120,12 +120,12 @@ class Delay(QWidget):
         When line edit field is changed, read the text and convert it to integer.
         Store parameter settings in filter dictionary.
         """
-        self.N = safe_eval(self.led_delay.text(), self.N,
+        self.n_fil = safe_eval(self.led_delay.text(), self.n_fil,
                                       sign="poszero", return_type='int')
-        self.led_delay.setText(str(self.N))
+        self.led_delay.setText(str(self.n_fil))
 
-        fb_set('wdg_fil', 'n_fil', self.N)  # store in filter dictionary
-        # fb_set('filter_widgets', 'delay', {'n_fil': self.N})  # store in filter widgets dict
+        fb_set('wdg_fil', 'n_fil', self.n_fil)  # store in filter dictionary
+        # fb_set('filter_widgets', 'delay', {'n_fil': self.n_fil})  # store in filter widgets dict
 
         # sig_tx -> select_filter -> filter_specs
         self.emit({'filt_changed': 'delay'})
@@ -138,23 +138,23 @@ class Delay(QWidget):
         """
         wdg_fil_par = fb_get('filter_widgets', 'delay', verbose=False)
         if wdg_fil_par and 'n_fil' in wdg_fil_par:
-            self.N = wdg_fil_par['n_fil']
-            self.led_delay.setText(str(self.N))
+            self.n_fil = wdg_fil_par['n_fil']
+            self.led_delay.setText(str(self.n_fil))
 
     def _get_params(self) -> None:
         """
         Translate parameters from the passed dictionary to instance
         parameters, scaling / transforming them if needed.
         """
-        self.N = fb_get('n_fil')  # filter order is translated to numb. of delays
+        self.n_fil = fb_get('n_fil')  # filter order is translated to numb. of delays
 
     def _test_n(self) -> bool:
         """
         Warn the user if the calculated order is too high for a reasonable filter
         design.
         """
-        if self.N > 2000:
-            return popup_warning(self, self.N, "Delay")
+        if self.n_fil > 2000:
+            return popup_warning(self, self.n_fil, "Delay")
         return True
 
     def _save(self, arg=None) -> None:
@@ -164,8 +164,8 @@ class Delay(QWidget):
         filter dictionary.
         """
         if arg is None:
-            arg = np.zeros(self.N)
-            #arg =[[0], np.zeros(self.N), 1] # crashes coeff tab
+            arg = np.zeros(self.n_fil)
+            #arg =[[0], np.zeros(self.n_fil), 1] # crashes coeff tab
         fil_save(arg, self.FRMT, __name__)
 
     def ap_man(self) -> int:
