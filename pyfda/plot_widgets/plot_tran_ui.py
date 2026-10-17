@@ -87,7 +87,7 @@ class PlotTranUI(QWidget):
 
         # initial settings
         self.n_start = 0
-        self.N = 100
+        self.n_data = 100
         self.n_frame_user = 0
         self.n_frame = 0
 
@@ -217,7 +217,7 @@ class PlotTranUI(QWidget):
             "length of impulse response.</span>")
         # self.lbl_n_points = QLabel(to_html("N", frmt='bi') + " =", self)
         self.led_n_points = QLineEdit(self)
-        self.led_n_points.setText(str(self.N))
+        self.led_n_points.setText(str(self.n_data))
         self.led_n_points.setToolTip(
             "<span>Number of data points to plot. "
             "Disable <b><i>N</i> =</b> for manual entry.</span>")
@@ -648,7 +648,7 @@ class PlotTranUI(QWidget):
     # -------------------------------------------------------------------------
     def update_n(self, emit_signal=True, n_end=0):
         """
-        Update values for `self.N`, `self.n_start` and `self.n_end` from the
+        Update values for `self.n_data`, `self.n_start` and `self.n_end` from the
         corresponding QLineEditWidgets.
 
         Parameters
@@ -678,7 +678,7 @@ class PlotTranUI(QWidget):
                                  return_type='int', sign='poszero')
 
         # Read value for number of data points to be plotted from UI
-        self.N = safe_eval(self.led_n_points.text(), self.N,
+        self.n_data = safe_eval(self.led_n_points.text(), self.n_data,
                                 return_type='int', sign='pos')
 
         if n_end > 0: # specified max. number of data points, e.g. by file io
@@ -691,15 +691,15 @@ class PlotTranUI(QWidget):
 
             self.n_end = n_end
             # calculate number of data points to be plotted
-            self.N = self.n_end - self.n_start
+            self.n_data = self.n_end - self.n_start
         else:
             if self.but_n_auto.isChecked():  # automatic calculation
-                self.N = impz_len(fb_get('ba'), level=-40)
+                self.n_data = impz_len(fb_get('ba'), level=-40)
 
             # total number of points to be calculated: n_end = N + n_start
-            self.n_end = self.N + self.n_start
+            self.n_end = self.n_data + self.n_start
 
-        self.led_n_points.setText(str(self.N))  # update widget
+        self.led_n_points.setText(str(self.n_data))  # update widget
 
         # read number of data points per frame from UI
         self.n_frame_user = safe_eval(self.led_n_frame.text(), self.n_frame_user,

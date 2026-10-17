@@ -226,7 +226,7 @@ class TranIO(QWidget):
 
         self.unload_data()  # reset load and normalize button
 
-        self.N = None
+        self.n_data = None
         self.nchans = None
         self.wl = None
 
@@ -273,10 +273,10 @@ class TranIO(QWidget):
             return -1
 
         if np.ndim(self.data_raw) == 1:
-            self.N = len(self.data_raw)
+            self.n_data = len(self.data_raw)
             self.nchans = 1
         else:
-            self.N = np.shape(self.data_raw)[0]
+            self.n_data = np.shape(self.data_raw)[0]
             self.nchans = np.shape(self.data_raw)[1]
 
         if self.nchans > 2:
@@ -294,7 +294,7 @@ class TranIO(QWidget):
             self.ui.cmb_chan_import.setVisible(True)
 
         self.ui.lbl_shape_actual.setText(
-            f"{self.nchans} x {self.N}{info_str}")
+            f"{self.nchans} x {self.n_data}{info_str}")
         return 0
 
     # ------------------------------------------------------------------------------

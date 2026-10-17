@@ -420,7 +420,7 @@ class Fixed():
     MAX : float
         largest representable value, `self.MAX = 2 * self.MSB - self.LSB`
 
-    N : integer
+    n_data : integer
         total number of simulation data points
 
     N_over_neg : integer
@@ -476,7 +476,7 @@ class Fixed():
         self.MAX = 2 * self.MSB - self.LSB
         self.MIN = -2 * self.MSB
 
-        self.N = 0
+        self.n_data = 0
 
         # test if all passed keys of quantizer object are valid
         self.verify_q_dict_keys(q_dict)
@@ -694,22 +694,22 @@ class Fixed():
 
             if np.issubdtype(y.dtype, np.number):
                 # numpy number type (usual case), proceed with test for complex value
-                self.N += y.size
+                self.n_data += y.size
             elif y.dtype.kind in {'U', 'S'}:  # string or unicode
                 try:
                     y = y.astype(np.float64)  # try to convert to float
-                    self.N += y.size
+                    self.n_data += y.size
                 except (TypeError, ValueError):
                     try:
                         np.char.replace(y, ' ', '')  # remove all whitespace
                         y = y.astype(complex)  # try to convert to complex
-                        self.N += y.size * 2
+                        self.n_data += y.size * 2
                     # try converting elements recursively:
                     except (TypeError, ValueError):
                         yq = np.asarray([
                             self.fixp(y_scalar, in_frmt=in_frmt, out_frmt=out_frmt)
                             for y_scalar in y])
-                        self.N += y.size
+                        self.n_data += y.size
                         return yq
             else:
                 logger.error("Argument '%s' is of type '%s',\n"
@@ -736,7 +736,7 @@ class Fixed():
                         logger.error("'%s' cannot be converted to a number.", y)
                         y = 0.0
             over_pos = over_neg = yq = 0
-            self.N += 1
+            self.n_data += 1
 
         # convert pseudo-complex (imag = 0) to real
         y = np.real_if_close(y)
@@ -859,7 +859,7 @@ class Fixed():
         # self.N_over_pos = 0
         # self.N_over_neg = 0
         self.N_over = 0
-        self.N = 0
+        self.n_data = 0
 
     # --------------------------------------------------------------------------
     def requant(self, x_i, QI):
