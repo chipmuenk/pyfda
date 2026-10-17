@@ -20,7 +20,7 @@ from pyfda.libs.pyfda_text_lib import to_html
 from pyfda.libs.pyfda_qt_lib import (
     qget_cmb_box, qcmb_box_populate,
     qcmb_box_add_items, qcmb_box_del_item, qtext_width)
-from pyfda.libs.pyfda_qt_classes import QVLine, PushButton, PushButtonRT
+from pyfda.libs.pyfda_qt_classes import QVLine, PushButton
 
 logger = logging.getLogger(__name__)
 
@@ -181,8 +181,9 @@ class TranIOUI(QWidget):
             "<span>Represent <i>W</i> bit integer WAV formats as float when importing "
             "and exporting so that 1.0 is equivalent to 2<sup>W</sup>.</span>")
 
-        self.but_f_s_wav_auto = PushButtonRT(
-            self, text="<b>Auto <i>f<sub>S</sub></i></b>", checked=True)
+        # ----------- f_S wav options -------------------------------------------
+        self.but_f_s_wav_auto = PushButton(
+            self, text="<b>Auto <i>f<sub>S</sub></i></b>", checked=True, rich_text=True)
         self.but_f_s_wav_auto.setToolTip(
             "<span>Copy pyfda sampling frequency to WAV file during export "
             "when selected.</span>")
@@ -190,7 +191,19 @@ class TranIOUI(QWidget):
         self.led_f_s_wav = QLineEdit(self)
         self.led_f_s_wav.setMaximumWidth(qtext_width(n_x=8))
         self.led_f_s_wav.setToolTip(
-            "<span>Manual f_S for import / export of WAV file (must be integer).</span>")
+            "<span>Manual <i>f</i><sub>S</sub> in Hz for import / export of WAV file "
+            "(must be integer).</span>")
+
+        lay_h_f_s = QHBoxLayout()
+        lay_h_f_s.addWidget(self.lbl_f_s)
+        lay_h_f_s.addWidget(self.lbl_f_s_value)
+        lay_h_f_s.addWidget(self.lbl_f_s_unit)
+        lay_h_f_s.addStretch()
+        lay_h_f_s.setContentsMargins(0, 0, 0, 0)
+        self.frm_f_s = QFrame(self)
+        self.frm_f_s.setLayout(lay_h_f_s)
+        self.frm_f_s.setContentsMargins(0, 0, 0, 0)
+        self.frm_f_s.setVisible(False)
 
         # ----------- SCALE ------------------------------------------------------------
         self.led_scale_to = QLineEdit()
@@ -235,17 +248,6 @@ class TranIOUI(QWidget):
     # -------------------------------------------------------------------------
     def _construct_layout_grid(self):
         """ layout the widgets in a grid """
-        lay_h_f_s = QHBoxLayout()
-        lay_h_f_s.addWidget(self.lbl_f_s)
-        lay_h_f_s.addWidget(self.lbl_f_s_value)
-        lay_h_f_s.addWidget(self.lbl_f_s_unit)
-        lay_h_f_s.addStretch()
-        lay_h_f_s.setContentsMargins(0, 0, 0, 0)
-        self.frm_f_s = QFrame(self)
-        self.frm_f_s.setLayout(lay_h_f_s)
-        self.frm_f_s.setContentsMargins(0, 0, 0, 0)
-        self.frm_f_s.setVisible(False)
-
         lay_h_file_fmt_options = QHBoxLayout()
         lay_h_file_fmt_options.addWidget(self.but_csv_options)
         lay_h_file_fmt_options.addWidget(self.but_int_as_float)
