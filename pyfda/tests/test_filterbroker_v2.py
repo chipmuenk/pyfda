@@ -15,14 +15,14 @@ class TestFilterConfig:
     def test_default_values(self):
         """Test that default values are initialized correctly."""
         config = FilterConfig()
-        assert config.N == 4
+        assert config.n_fil == 4
         assert config.f_c == 0.1
         assert config.f_s == 1.0
     
     def test_to_dict(self):
         """Test serialization to dict."""
         config = FilterConfig()
-        config.N = 8
+        config.n_fil = 8
         data = config.to_dict()
         
         assert data['n_fil'] == 8
@@ -33,7 +33,7 @@ class TestFilterConfig:
         data = {'n_fil': 12, 'f_c': 0.25, 'f_s': 2.0}
         config = FilterConfig.from_dict(data)
         
-        assert config.N == 12
+        assert config.n_fil == 12
         assert config.f_c == 0.25
         assert config.f_s == 2.0
 
