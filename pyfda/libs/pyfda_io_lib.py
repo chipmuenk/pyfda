@@ -690,7 +690,7 @@ def read_csv_info_large(filename):
     # file is ok, copy local variables to function attributes
     read_csv_info_large.row_mode = row_mode
     read_csv_info_large.file_size = file_size
-    read_csv_info_large.N = N
+    read_csv_info_large.n_data = N
     read_csv_info_large.nchans = nchans
     read_csv_info_large.info_str = f"{transpose} '{lineterminator}' # '{delimiter}'"
 
@@ -818,14 +818,14 @@ def read_wav_info(file) -> int:
     read_wav_info.wl = bits_per_sample // 8  # Wordlength in bytes
 
     # Pos. 40 or 42: Total number of samples per channel
-    read_wav_info.N = str2int(f.read(4)) // (nchans * read_wav_info.wl)
+    read_wav_info.n_data = str2int(f.read(4)) // (nchans * read_wav_info.wl)
 
     read_wav_info.nchans = nchans  # number of channels
 
     read_wav_info.f_s = f_s  # sampling rate in Hz
 
     # duration of the data in milliseconds
-    read_wav_info.ms = read_wav_info.N * 1000 / (f_s * nchans)
+    read_wav_info.ms = read_wav_info.n_data * 1000 / (f_s * nchans)
 
     return 0
 

@@ -464,13 +464,13 @@ class PlotTran(QWidget):
         - if no file is loaded, do nothing. This shouldn't happen (check to be sure ...)
         - else set n_end = len(file_data) in the UI
         """
-        if not hasattr(self.tran_io_wdg, 'n_fil') or self.tran_io_wdg.N == 0:
+        if not hasattr(self.tran_io_wdg, 'n_fil') or self.tran_io_wdg.n_data == 0:
             self.ui.frm_file_io.setEnabled(False)
             logger.warning("No data loaded, you shouldn't see this message!")
         # File is loaded, copy file length to n_end
         else:
             # copy number of data points to N, disable N_auto, enable lineedit for N
-            self.ui.update_n(n_end = self.tran_io_wdg.N)
+            self.ui.update_n(n_end = self.tran_io_wdg.n_data)
             self.ui.but_n_auto.setChecked(False)
             self.ui.led_N_points.setEnabled(True)
 
@@ -860,7 +860,7 @@ class PlotTran(QWidget):
         from `self.ui.all_wins_dict['win']`.
         """
         # calculate FFT of stimulus / response
-        N = self.ui.N
+        N = self.ui.n_data
         win = self.ui.qfft_win_select.calc_window(N) / self.ui.all_wins_dict['cgain']
         if self.x is None:
             self.x_fft = np.zeros(N)  # dummy result
@@ -873,18 +873,18 @@ class PlotTran(QWidget):
             # multiply the  time signal with window function
             x_win = self.x[self.ui.n_start:self.ui.n_end] * win
             # calculate absolute value and scale by N_FFT
-            self.x_fft = np.fft.fft(x_win) / self.ui.N
+            self.x_fft = np.fft.fft(x_win) / self.ui.n_data
             # self.x_fft[0] = self.x_fft[0] * np.sqrt(2) # correct value at DC
 
             if get_fx() and hasattr(self, "q_i"):
                 # same for fixpoint simulation
                 x_q_win = self.q_i.fixp(self.x[self.ui.n_start:self.ui.n_end])\
                     * win
-                self.x_q_fft = np.fft.fft(x_q_win) / self.ui.N
+                self.x_q_fft = np.fft.fft(x_q_win) / self.ui.n_data
                 # self.x_q_fft[0] = self.x_q_fft[0] * np.sqrt(2) # correct value at DC
 
         if self.y is None or len(self.y) < self.ui.n_end:
-            self.y_fft = np.zeros(self.ui.N)  # dummy result
+            self.y_fft = np.zeros(self.ui.n_data)  # dummy result
             if self.y is None:
                 logger.warning("Transient response is 'None', FFT cannot be calculated.")
             else:
@@ -893,11 +893,11 @@ class PlotTran(QWidget):
                     "calculated.", len(self.y), self.ui.n_end)
         else:
             y_win = self.y[self.ui.n_start:self.ui.n_end] * win
-            self.y_fft = np.fft.fft(y_win) / self.ui.N
+            self.y_fft = np.fft.fft(y_win) / self.ui.n_data
             # self.y_fft[0] = self.y_fft[0] * np.sqrt(2) # correct value at DC
 
         # if self.ui.chk_win_freq.isChecked():
-        #    self.win_fft = np.abs(np.fft.fft(win)) / self.ui.N
+        #    self.win_fft = np.abs(np.fft.fft(win)) / self.ui.n_data
 
         self.needs_redraw[1] = True   # redraw of frequency widget needed
 
@@ -1308,10 +1308,10 @@ class PlotTran(QWidget):
         if self.ui.chk_win_time.isChecked():
             if self.ui.but_log_time.isChecked():
                 win = np.maximum(
-                    20 * np.log10(abs(self.ui.qfft_win_select.calc_window(self.ui.N))),
+                    20 * np.log10(abs(self.ui.qfft_win_select.calc_window(self.ui.n_data))),
                     self.ui.bottom_t)
             else:
-                win = self.ui.qfft_win_select.calc_window(self.ui.N)
+                win = self.ui.qfft_win_select.calc_window(self.ui.n_data)
             h_r.append(self.ax_r.plot(
                 t, win, c="gray",
                 label=fb_get('tran_freq_win', 'disp_name'))[0])
@@ -1353,15 +1353,15 @@ class PlotTran(QWidget):
 
         # --------------- Spectrogram -----------------------------------------
         if self.spgr:
-            if 2 * self.ui.time_nfft_spgr - self.ui.time_ovlp_spgr > self.ui.N:
+            if 2 * self.ui.time_nfft_spgr - self.ui.time_ovlp_spgr > self.ui.n_data:
                 logger.warning(
                     "Only one segment is calculated since 2 NFFT - N_OVLP = %d > N = %d",
-                    2 * self.ui.time_nfft_spgr - self.ui.time_ovlp_spgr, self.ui.N)
-            if self.ui.time_nfft_spgr > self.ui.N:
+                    2 * self.ui.time_nfft_spgr - self.ui.time_ovlp_spgr, self.ui.n_data)
+            if self.ui.time_nfft_spgr > self.ui.n_data:
                 logger.warning(
                     "NFFT per segment = %d is larger than number N of data points %d, "
-                    "setting NFFT = N.", self.ui.time_nfft_spgr, self.ui.N)
-                self.ui.time_nfft_spgr = self.ui.N
+                    "setting NFFT = N.", self.ui.time_nfft_spgr, self.ui.n_data)
+                self.ui.time_nfft_spgr = self.ui.n_data
             if self.ui.time_ovlp_spgr >= self.ui.time_nfft_spgr:
                 logger.warning("N_OVLP must be less than NFFT, setting N_OVLP = 0.")
                 self.ui.time_ovlp_spgr = 0
@@ -1596,9 +1596,9 @@ class PlotTran(QWidget):
                 # Elsewhere (non-transient tabs), k = CFP.conf_settings['N_FFT'] is used for the
                 # calculation of the FFT, it is also used for f_id / h_id here.
                 # In the transient tab, the frequency axes must be scaled according to the number of
-                # frequency points self.ui.N
-                f_range = [frq * self.ui.N / fb_get('f_max') for frq in f_range]
-                f_max = self.ui.N
+                # frequency points self.ui.n_data
+                f_range = [frq * self.ui.n_data / fb_get('f_max') for frq in f_range]
+                f_max = self.ui.n_data
             else:
                 f_max = fb_get('f_max')
 
@@ -1607,7 +1607,7 @@ class PlotTran(QWidget):
                                    worN=CFP.conf_settings['N_FFT'], whole=True, fs=f_max)
 
             # frequency vector for FFT-based frequency plots:
-            f = np.fft.fftfreq(self.ui.N, d=1. / f_max)
+            f = np.fft.fftfreq(self.ui.n_data, d=1. / f_max)
 
             # -----------------------------------------------------------------
             # Scale frequency response and calculate power
@@ -1621,7 +1621,7 @@ class PlotTran(QWidget):
                 and self.ui.but_freq_norm_impz.isEnabled()\
                     and self.ui.but_freq_norm_impz.isChecked():
                 freq_resp = True  # calculate frequency response from impulse response
-                scale_impz = self.ui.N * self.ui.all_wins_dict['cgain']\
+                scale_impz = self.ui.n_data * self.ui.all_wins_dict['cgain']\
                     * self.stim_wdg.ui.scale_impz
                 if fb_get('tran_freq_win', 'id') not in\
                         {'boxcar', 'rectangular'}:
@@ -1691,13 +1691,13 @@ class PlotTran(QWidget):
             elif onesided:
                 # display 0 ... f_S/2 -> only use the first half of x_fft_disp, y_fft_disp and f
                 if plt_response:
-                    y_fft_disp = y_fft_disp[0:self.ui.N//2]
+                    y_fft_disp = y_fft_disp[0:self.ui.n_data//2]
                 if plt_stimulus:
-                    x_fft_disp = x_fft_disp[0:self.ui.N//2]
+                    x_fft_disp = x_fft_disp[0:self.ui.n_data//2]
                 if plt_stimulus_q:
-                    x_q_fft_disp = x_q_fft_disp[0:self.ui.N//2]
+                    x_q_fft_disp = x_q_fft_disp[0:self.ui.n_data//2]
 
-                f = f[0:self.ui.N//2]
+                f = f[0:self.ui.n_data//2]
                 f_id = f_id[0:CFP.conf_settings['N_FFT']//2]
                 h_id = h_id[0:CFP.conf_settings['N_FFT']//2]
 
@@ -1990,7 +1990,7 @@ class PlotTran(QWidget):
 
             if self.ui.but_log_freq.isChecked():
                 # scale second axis for noise power
-                corr = 10*np.log10(self.ui.N) - nenbw  # nenbw is in dB
+                corr = 10*np.log10(self.ui.n_data) - nenbw  # nenbw is in dB
                 mn, mx = self.ax_f1.get_ylim()
                 self.ax_f1_noise.set_ylim(mn+corr, mx+corr)
                 self.ax_f1_noise.set_ylabel(r'$P_N$ in dBW')
