@@ -430,13 +430,13 @@ def csv2array(f: TextIO) -> np.ndarray[str] | None:
 
     Read data as it is, splitting each row into the column items when:
 
-    - `CSV_dict['orientation'] == cols` or
-    - `CSV_dict['orientation'] == auto` and cols <= rows:
+    - `csv_dict['orientation'] == cols` or
+    - `csv_dict['orientation'] == auto` and cols <= rows:
 
     Transpose data when:
 
-    - `CSV_dict['orientation'] == rows` or
-    - `CSV_dict['orientation'] == auto` and cols > rows:
+    - `csv_dict['orientation'] == rows` or
+    - `csv_dict['orientation'] == auto` and cols > rows:
 
     `np.shape(data)` returns rows, columns
 
@@ -477,24 +477,24 @@ def csv2array(f: TextIO) -> np.ndarray[str] | None:
     # Get CSV parameter settings
     # ------------------------------------------------------------------------------
     csv2array.info_str = ""  # initialize function attribute
-    CSV_dict = params['CSV']
+    csv_dict = params['CSV']
     try:
-        header = CSV_dict['header'].lower()
+        header = csv_dict['header'].lower()
         if header in {'auto', 'on', 'off'}:
             pass
         else:
             header = 'auto'
             logger.warning(
-                "Unknown key '%s' for CSV_dict['header'], using %s instead.",
-                CSV_dict['header'], header)
+                "Unknown key '%s' for csv_dict['header'], using %s instead.",
+                csv_dict['header'], header)
 
-        if CSV_dict['orientation'].lower() not in {'auto', 'cols', 'rows'}:
+        if csv_dict['orientation'].lower() not in {'auto', 'cols', 'rows'}:
             logger.error(
-                "Unknown key '%s' for CSV_dict['orientation'], using column mode.",
-                CSV_dict['orientation'])
+                "Unknown key '%s' for csv_dict['orientation'], using column mode.",
+                csv_dict['orientation'])
 
-        tab = CSV_dict['delimiter'].lower()
-        cr = CSV_dict['lineterminator'].lower()
+        tab = csv_dict['delimiter'].lower()
+        cr = csv_dict['lineterminator'].lower()
 
     except KeyError as e:
         logger.error("Dict 'params':\n%s.", e)
@@ -706,128 +706,128 @@ def read_wav_info(file) -> int:
     # https://stackoverflow.com/questions/7833807/get-wav-file-length-or-duration
     # http://soundfile.sapp.org/doc/WaveFormat/
     # https://ccrma.stanford.edu/courses/422/projects/WaveFormat/
-    def str2int(s: str) -> int:
-        """ convert argument from str `s` in little endian format to int """
+    def bytes2int(_bytes: bytes) -> int:
+        """ convert argument from bytes `_bytes` in little endian format to unsigned int """
         num = 0
-        for i in range(len(s)):
-            num = num + ord(s[i]) * pow(256, i)
+        for i, b in enumerate(_bytes):
+            num = num + b * pow(256, i)
         return num
 
-    f = open(file,'r', encoding='latin-1')
-    # Get the file size in bytes
-    file_size = os.path.getsize(file)
-    if file_size < 44:  # minimum length for WAV file due to header
-        logger.error("Not a wav file: Filesize is only %d bytes!", file_size)
-        return -1
-    HEADER = f.read(44)  # read complete header
-
-    RIFF = HEADER[:4]  # file pos. 0
-    WAVE = HEADER[8:12]  # pos. 8
-    if RIFF != "RIFF" or WAVE != "WAVE":
-        logger.error("Not a wav file: 'RIFF' or 'WAVE' id missing in file header.")
-        return -1
-
-    # Pos. 12: String 'fmt ' marks beginning of format subchunk
-    FMT = HEADER[12:16]  # f.read(4)
-    if FMT != "fmt ":  # pos. 12
-        logger.error("Invalid format header '%s' instead of 'fmt'!", FMT)
-        return -1
-
-    # Pos. 16: Size of subchunk with format infos in bytes, 16 for Int., 18 for float
-    fmt_chnk_size1 = str2int(HEADER[16:20])
-    if fmt_chnk_size1 not in {16, 18}:
-        logger.error("Invalid size %s of format subchunk!", fmt_chnk_size1)
-        return -1
-
-    # Pos. 20: Audio encoding format, must be 1 for uncompressed PCM
-    encoding = str2int(HEADER[20:22])
-    if encoding == 1:
-        sample_format = 'int'  # Integer PCM
-    elif encoding == 3:
-        sample_format = 'float'  # IEEE Float PCM
-    else:
-        logger.error("Invalid audio encoding %s, only uncompressed PCM supported!", encoding)
-        sample_format = ""
-        return -1
-
-    # Pos. 22: Number of channels
-    nchans = str2int(HEADER[22:24])
-
-    # Pos. 24: Sampling rate f_s (4 bytes)
-    # f.seek(24)
-    f_s = str2int(HEADER[24:28])
-
-    # Pos. 28: Byte rate = f_s * n_chans * Bytes per sample (4 bytes)
-    # byte_rate = str2int(HEADER[28:32])
-
-    # Pos. 32: Block align, # of bytes per sample incl. all channels (2 bytes)
-    # block_align = str2int(HEADER[32:34])
-
-    # Pos. 34: Bits per sample, wl = wordlength in bytes (2 bytes)
-    bits_per_sample = str2int(HEADER[34:36])
-
-    if sample_format == 'float':
-        # Format subchunk is 18 bytes long for float samples, hence file pointer
-        # has to be advanced by two bytes
-
-        # ###################### FACT Subchunk ###################################
-        # The fact chunk indicates how many sample frames are in the file. For
-        # integer formats the tag it’s optional; otherwise it’s required. For float
-        # PCM, calculation is performed exactly as for integer PCM, hence, it is not
-        # evaluated here.
-        # f.seek(38)
-        # FACT = f.read(12)
-        f.seek(50)
-    else:
-        f.seek(36)
-
-    # ###################### DATA Subchunk #######################################
-    # String 'data' marks beginning of data subchunk
-    DATA = f.read(4)
-    if DATA != "data":
-        logger.error("Invalid data header '%s' instead of 'data'!", DATA)
-        return -1
-
-    # -- Function attributes that are accessible from outside
-    # ------------------------------------------------------------
-    read_wav_info.file_size = file_size
-
-    if sample_format == "int":
-        if bits_per_sample == 8:
-            read_wav_info.sample_format = "uint8"
-        elif bits_per_sample == 16:
-            read_wav_info.sample_format = "int16"
-        elif bits_per_sample == 24:
-            read_wav_info.sample_format = "int24"
-        elif bits_per_sample == 32:
-            read_wav_info.sample_format = "int32"
-        else:
-            logger.error("Unsupported integer sample format with %d "
-                         "bits per sample.", bits_per_sample)
+    with open(file, 'rb') as f:
+        # Get the file size in bytes
+        file_size = os.path.getsize(file)
+        if file_size < 44:  # minimum length for WAV file due to header
+            logger.error("Not a wav file: Filesize is only %d bytes!", file_size)
             return -1
-    else:
-        if bits_per_sample == 32:
-            read_wav_info.sample_format = "Float32"
-        elif bits_per_sample == 64:
-            read_wav_info.sample_format = "Float64"
-        else:
-            logger.error("Unsupported float sample format with %d "
-                         "bits per sample.", bits_per_sample)
+        header = f.read(44)  # read complete header
+
+        riff = header[:4]  # file pos. 0
+        wave = header[8:12]  # pos. 8
+        if riff != b"RIFF" or wave != b"WAVE":
+            logger.error("Not a wav file: 'RIFF' or 'WAVE' id missing in file header.")
             return -1
 
-    read_wav_info.wl = bits_per_sample // 8  # Wordlength in bytes
+        # Pos. 12: String 'fmt ' marks beginning of format subchunk
+        frmt = header[12:16]  # f.read(4)
+        if frmt != b"fmt ":  # pos. 12
+            logger.error("Invalid format header '%s' instead of 'fmt '!", frmt)
+            return -1
 
-    # Pos. 40 or 42: Total number of samples per channel
-    read_wav_info.n_data = str2int(f.read(4)) // (nchans * read_wav_info.wl)
+        # Pos. 16: Size of subchunk with format infos in bytes, 16 for Int., 18 for float
+        fmt_chnk_size1 = bytes2int(header[16:20])
+        if fmt_chnk_size1 not in {16, 18}:
+            logger.error("Invalid size %s of format subchunk!", fmt_chnk_size1)
+            return -1
 
-    read_wav_info.nchans = nchans  # number of channels
+        # Pos. 20: Audio encoding format, must be 1 for uncompressed PCM
+        encoding = bytes2int(header[20:22])
+        if encoding == 1:
+            sample_format = 'int'  # Integer PCM
+        elif encoding == 3:
+            sample_format = 'float'  # IEEE Float PCM
+        else:
+            logger.error("Invalid audio encoding %s, only uncompressed PCM supported!", encoding)
+            sample_format = ""
+            return -1
 
-    read_wav_info.f_s = f_s  # sampling rate in Hz
+        # Pos. 22: Number of channels
+        nchans = bytes2int(header[22:24])
 
-    # duration of the data in milliseconds
-    read_wav_info.ms = read_wav_info.n_data * 1000 / (f_s * nchans)
+        # Pos. 24: Sampling rate f_s (4 bytes)
+        # f.seek(24)
+        f_s = bytes2int(header[24:28])
 
-    return 0
+        # Pos. 28: Byte rate = f_s * n_chans * Bytes per sample (4 bytes)
+        # byte_rate = bytes2int(header[28:32])
+
+        # Pos. 32: Block align, # of bytes per sample incl. all channels (2 bytes)
+        # block_align = bytes2int(header[32:34])
+
+        # Pos. 34: Bits per sample, wl = wordlength in bytes (2 bytes)
+        bits_per_sample = bytes2int(header[34:36])
+
+        if sample_format == 'float':
+            # Format subchunk is 18 bytes long for float samples, hence file pointer
+            # has to be advanced by two bytes
+
+            # ###################### FACT Subchunk ###################################
+            # The fact chunk indicates how many sample frames are in the file. For
+            # integer formats the tag it’s optional; otherwise it’s required. For float
+            # PCM, calculation is performed exactly as for integer PCM, hence, it is not
+            # evaluated here.
+            # f.seek(38)
+            # FACT = f.read(12)
+            f.seek(50)
+        else:
+            f.seek(36)
+
+        # ###################### DATA Subchunk #######################################
+        # String 'data' marks beginning of data subchunk
+        data = f.read(4)
+        if data != b"data":
+            logger.error("Invalid data header '%s' instead of 'data'!", data)
+            return -1
+
+        # -- Function attributes that are accessible from outside
+        # ------------------------------------------------------------
+        read_wav_info.file_size = file_size
+
+        if sample_format == "int":
+            if bits_per_sample == 8:
+                read_wav_info.sample_format = "uint8"
+            elif bits_per_sample == 16:
+                read_wav_info.sample_format = "int16"
+            elif bits_per_sample == 24:
+                read_wav_info.sample_format = "int24"
+            elif bits_per_sample == 32:
+                read_wav_info.sample_format = "int32"
+            else:
+                logger.error("Unsupported integer sample format with %d "
+                             "bits per sample.", bits_per_sample)
+                return -1
+        else:
+            if bits_per_sample == 32:
+                read_wav_info.sample_format = "Float32"
+            elif bits_per_sample == 64:
+                read_wav_info.sample_format = "Float64"
+            else:
+                logger.error("Unsupported float sample format with %d "
+                             "bits per sample.", bits_per_sample)
+                return -1
+
+        read_wav_info.wl = bits_per_sample // 8  # Wordlength in bytes
+
+        # Pos. 40 or 42: Total number of samples per channel
+        read_wav_info.n_data = bytes2int(f.read(4)) // (nchans * read_wav_info.wl)
+
+        read_wav_info.nchans = nchans  # number of channels
+
+        read_wav_info.f_s = f_s  # sampling rate in Hz
+
+        # duration of the data in milliseconds
+        read_wav_info.ms = read_wav_info.n_data * 1000 / (f_s * nchans)
+
+        return 0
 
 # ------------------------------------------------------------------------------
 def file2array(file_name: str, file_type: str, fkey: str = "",
@@ -922,7 +922,7 @@ def file2array(file_name: str, file_type: str, fkey: str = "",
                 # 2D otherwise (n_chans, n_samples)
 
             elif file_type in {'csv', 'txt'}:
-                with open(file_name, 'r', newline=None) as f:
+                with open(file_name, 'r', newline=None, encoding='utf-8') as f:
                     data_arr = csv2array(f)
                     file2array.info_str = csv2array.info_str
                     if data_arr is None:
@@ -1315,9 +1315,9 @@ def coe_header(title: str) -> str:
         err = [False] * len(f_lbls)  # initialize error list
         f_vals = []
         a_targs = []
-        for i in range(len(f_lbls)):
+        for i, f_lbl in enumerate(f_lbls):
             try:
-                f = fb_get(f_lbls[i])
+                f = fb_get(f_lbl)
                 f_vals.append(f)
             except KeyError as e:
                 f_vals.append('')
@@ -1334,7 +1334,7 @@ def coe_header(title: str) -> str:
                 err[i] = True
                 logger.debug(e)
 
-        for i in range(len(f_lbls)):
+        for i, _ in reversed(list(enumerate(f_lbls))):
             if err[i]:
                 del f_lbls[i]
                 del f_vals[i]
