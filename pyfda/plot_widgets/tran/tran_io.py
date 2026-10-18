@@ -385,8 +385,8 @@ class TranIO(QWidget):
 
         self.emit({'data_changed': 'file_io'})
         if self.ui.but_f_s_wav_auto.isChecked():
-            fb_set('f_s', self.f_s_file)
-            fb_set('freq_specs_unit', 'Hz')
+            fb_set({'f_s': float(self.f_s_file),
+                    'freq_specs_unit': 'Hz'})
             self.emit({'view_changed': 'f_s'})
         return
 
