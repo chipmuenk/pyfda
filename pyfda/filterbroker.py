@@ -50,10 +50,6 @@ from pyfda.filter_storage import fil_ref
 
 logger = logging.getLogger(__name__)
 
-# ==========================================================
-# Variables that can be accessed from all modules
-# ===========================================================
-
 UNDO_LEN = 20  # depth of circular undo buffer
 
 # _fil[i] can always be assigned to, _fil = ... needs a global statement
@@ -84,6 +80,8 @@ def fil_copy(src: str = "ref", dest: str = "all") -> None:
     #
     # The code below indexes the list container _fil itself, the list is mutated in place.
     # Calling deepcopy() once per iteration produces 10 independent copies.
+
+    # copy the reference filter to all filters
     if dest == "all":
         for i, _ in enumerate(_fil):
             _fil[i] = copy.deepcopy(fil_ref)
@@ -91,10 +89,12 @@ def fil_copy(src: str = "ref", dest: str = "all") -> None:
 
     targ_idx = int(dest)
 
+    # copy the reference filter to the selected slot
     if src == "ref":
         _fil[targ_idx] = copy.deepcopy(fil_ref)
         return
 
+    # copy the selected filter to the selected slot
     src_idx = int(src)
     _fil[targ_idx] = _fil[src_idx]
     return
@@ -290,8 +290,6 @@ def fb_set(*keys_tuple: tuple, backup: bool = False, new_key: bool = False,
         Allow a dictionary to be stored as a value in the filter dict, this speeds up storing
         complex data but is dangerous because the keys of the new dict might be different from
         the old dict (default: False).
-    fil_dict : dict
-        The dictionary to traverse.
 
     Returns
     -------
@@ -634,6 +632,7 @@ class _BackupFilterDict():
         _fil[0] = copy.deepcopy(_fil_undo[self.undo_ptr])
         self.undo_stp -= 1
         self.undo_ptr = (self.undo_ptr + UNDO_LEN - 1) % UNDO_LEN
+        logger.warning("Restore undo: Undo ptr = %s, id = %s", self.undo_ptr, id(_fil_undo))
         return 0
 
     # -------------------------
@@ -653,7 +652,7 @@ class _BackupFilterDict():
         # increase buffer pointer, allowing for circular wrap around
         self.undo_ptr = (self.undo_ptr + 1) % UNDO_LEN
         _fil_undo[self.undo_ptr] = copy.deepcopy(_fil[0])
-        logger.debug("Undo ptr = %s", self.undo_ptr)
+        logger.warning("Backup:Undo ptr = %s, id = %s", self.undo_ptr, id(_fil_undo))
         return self.undo_stp
 
 # -------------------------------------------------
