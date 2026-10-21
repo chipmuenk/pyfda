@@ -478,7 +478,6 @@ class InputSpecs(QWidget):
                 int(dest) + 1, f"Load <- Mem {dest}: {self.led_info.text()}", Qt.ToolTipRole)
         self.cmb_filter_save.setCurrentIndex(0)
 
-
     # --------------------------------------------------------------------------
     def start_design_filt(self) -> None:
         """
@@ -520,11 +519,7 @@ class InputSpecs(QWidget):
         # inst.lp_min()
         # -----------------------------------------------------------------------
 
-        if err > 0:
-            self.color_design_button("error")
-        elif err == -1:  # filter design cancelled by user
-            return
-        else:
+        if err == 0:
             # Update filter order in case it has been changed by the
             # design algorithm and emit {'data_changed': 'filter_designed'}
             self.sel_fil.load_filter_order()
@@ -532,8 +527,14 @@ class InputSpecs(QWidget):
 
             self.emit({'data_changed': 'filter_designed'})
             logger.info("Designed filter with order = %s", str(fb_get('n_fil')))
+        else:
+            fb.restore_fil()  # restore filter dict from backup
 
+            if err > 0:
+                self.color_design_button("error")
+            # elif err == -1:  # filter design cancelled by user
 
+    # --------------------------------------------------------------------------
     def color_design_button(self, state: str) -> None:
         """
         Color the >> DESIGN FILTER << button according to the filter design state
