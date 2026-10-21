@@ -60,7 +60,7 @@ UNDO_LEN = 20  # depth of circular undo buffer
 _fil = [copy.deepcopy(fil_ref) for _ in range(10)]
 
 # create empty lists with length 10 for undo memory
-fil_undo = [None] * UNDO_LEN
+_fil_undo = [None] * UNDO_LEN
 
 # -----------------------------------------------------------------------
 def fil_copy(src: str = "ref", dest: str = "all") -> None:
@@ -617,7 +617,7 @@ class _BackupFilterDict():
 
     def restore_fil(self) -> int:
         """
-        Restore current global dict `_fil[0]` from undo memory `fil_undo`
+        Restore current global dict `_fil[0]` from undo memory `_fil_undo`
 
         Returns
         -------
@@ -631,7 +631,7 @@ class _BackupFilterDict():
             self.undo_stp = 0
             return -1
 
-        _fil[0] = copy.deepcopy(fil_undo[self.undo_ptr])
+        _fil[0] = copy.deepcopy(_fil_undo[self.undo_ptr])
         self.undo_stp -= 1
         self.undo_ptr = (self.undo_ptr + UNDO_LEN - 1) % UNDO_LEN
         return 0
@@ -639,7 +639,7 @@ class _BackupFilterDict():
     # -------------------------
     def backup_fil(self) -> int:
         """
-        Store current global dict `_fil[0]` to undo memory `fil_undo`
+        Store current global dict `_fil[0]` to undo memory `_fil_undo`
 
         Returns
         -------
@@ -652,7 +652,7 @@ class _BackupFilterDict():
         self.undo_stp = min(self.undo_stp, UNDO_LEN)
         # increase buffer pointer, allowing for circular wrap around
         self.undo_ptr = (self.undo_ptr + 1) % UNDO_LEN
-        fil_undo[self.undo_ptr] = copy.deepcopy(_fil[0])
+        _fil_undo[self.undo_ptr] = copy.deepcopy(_fil[0])
         logger.debug("Undo ptr = %s", self.undo_ptr)
         return self.undo_stp
 
