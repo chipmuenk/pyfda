@@ -262,7 +262,7 @@ def fb_get(*keys_tuple: tuple, verbose: bool = True) -> str | int | float | Iter
     return ret
 
 # -------------------------
-def fb_set(*keys_tuple: tuple, backup: bool = True, new_key: bool = False,
+def fb_set(*keys_tuple: tuple, backup: bool = False, new_key: bool = False,
            accept_dict: bool = False) -> int:
     """
     Use the individual arguments that have been collected as `keys_tuple` to access a
@@ -280,7 +280,7 @@ def fb_set(*keys_tuple: tuple, backup: bool = True, new_key: bool = False,
         last element is the value to be set. Hence, this element is not used for traversing
         the dictionary.
     backup : bool
-        Whether the previous state of the filter dict should be backed up (default: True)
+        Whether the previous state of the filter dict should be backed up (default: False)
     new_key : bool
         Whether a new key:value pair should be added to the dictionary (default: False).
         If False, an error is generated if the key does not exist, if True, a new key:value pair

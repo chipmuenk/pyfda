@@ -512,7 +512,7 @@ class InputSpecs(QWidget):
                 'fo': self.sel_fil.fo,
                 'ft': self.sel_fil.ft,
                 'rt': self.sel_fil.rt,
-                'n_fil': self.sel_fil.n_fil})
+                'n_fil': self.sel_fil.n_fil}, backup=True)  # store current filter specs in fil[0] and backup
         err = call_fil_method(fb_get('rt') + '_' + fb_get('fo'), fc=fb_get('fc'))
         # this is the same as e.g.
         # from pyfda.filter_design import ellip
