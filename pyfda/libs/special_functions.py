@@ -216,7 +216,7 @@ def h_mag(num: NDArray, den: NDArray, z: NDArray, h_max: float, h_min: float | N
 
 # ------------------------------------------------------------------------------
 def unique_roots(p, tol: float = 1e-3, magsort: bool = False,
-                 rtype: str = 'min', rdist: str = 'euclidian'):
+                 rtype: str = 'min', rdist: str = 'euclidian') -> tuple[NDArray, NDArray]:
     """
     Determine unique roots and their multiplicities from a list of roots.
 
@@ -245,9 +245,9 @@ def unique_roots(p, tol: float = 1e-3, magsort: bool = False,
 
     Returns
     -------
-    pout : list
+    pout : NDArray
         The list of unique roots, sorted from low to high (only for real roots).
-    mult : list
+    mult : NDArray
         The multiplicity of each root.
 
     Notes
@@ -327,12 +327,12 @@ def unique_roots(p, tol: float = 1e-3, magsort: bool = False,
     tol = abs(tol)
     p = np.atleast_1d(p)  # convert p to at least 1D array
     if len(p) == 0:
-        return pout, mult
+        return np.array([]), np.array([])
 
     if len(p) == 1:
         pout = p
         mult = [1]
-        return pout, mult
+        return np.array([p[0]]), np.array([1])
 
     # handle lists / arrays
     pout = p[np.isnan(p)].tolist()  # copy nan elements to pout, convert to list
