@@ -472,10 +472,10 @@ def comb_bl(t: NDArray) -> NDArray:
     # Get sampling frequency from timebase
     # Sum all multiple sine waves up to the Nyquist frequency:
     fs = 1 / (t[1] - t[0])
-    N = int(fs * pi) + 1
-    for h in range(1, N):
+    num_sine_waves = int(fs * pi) + 1
+    for h in range(1, num_sine_waves):
         y += cos(h * t)
-    y /= N
+    y /= num_sine_waves
     return y
 
 # ------------------------------------------------------------------------------
