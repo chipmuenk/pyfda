@@ -613,6 +613,7 @@ class _BackupFilterDict():
         self.undo_stp = 0
         self.undo_ptr = 0  # pointer to current undo memory % UNDO_LEN
 
+    # -------------------------
     def restore_fil(self) -> int:
         """
         Restore current global dict `_fil[0]` from undo memory `_fil_undo`
@@ -630,9 +631,11 @@ class _BackupFilterDict():
             return -1
 
         _fil[0] = copy.deepcopy(_fil_undo[self.undo_ptr])
+        logger.warning(fb_get('rt') + '_' + fb_get('fo') + " filter restored from undo memory")
         self.undo_stp -= 1
         self.undo_ptr = (self.undo_ptr + UNDO_LEN - 1) % UNDO_LEN
-        logger.warning("Restore undo: Undo ptr = %s, id = %s", self.undo_ptr, id(_fil_undo))
+        logger.warning("Restore undo: Undo ptr = %s, id = %s / %s", self.undo_ptr, id(_fil_undo[1]), id(_fil_undo[2]))
+        # self.emit({'data_changed': 'filter_loaded'})
         return 0
 
     # -------------------------
@@ -652,7 +655,8 @@ class _BackupFilterDict():
         # increase buffer pointer, allowing for circular wrap around
         self.undo_ptr = (self.undo_ptr + 1) % UNDO_LEN
         _fil_undo[self.undo_ptr] = copy.deepcopy(_fil[0])
-        logger.warning("Backup:Undo ptr = %s, id = %s", self.undo_ptr, id(_fil_undo))
+        logger.warning("Backup: Undo ptr = %s, id = %s / %s", self.undo_ptr, id(_fil_undo[1]), id(_fil_undo[2]))
+        logger.warning(fb_get('rt') + '_' + fb_get('fo') + " filter backed up to undo memory")
         return self.undo_stp
 
 # -------------------------------------------------

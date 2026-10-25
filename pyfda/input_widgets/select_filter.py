@@ -195,7 +195,7 @@ class SelectFilter(QWidget):
         self.cmb_filter_type.currentIndexChanged.connect(
                 lambda: self._set_filter_type(enb_signal=True))  # 'iir'
         self.cmb_filter_class.currentIndexChanged.connect(
-                lambda: self._set_design_method(enb_signal=True))  # 'cheby1'
+                lambda: self._set_filter_class(enb_signal=True))  # 'cheby1'
         self._chk_min_order.clicked.connect(
                 lambda: self._set_filter_order(enb_signal=True))  # Min. Order
         self._led_order_n.editingFinished.connect(
@@ -278,9 +278,10 @@ class SelectFilter(QWidget):
         If previous filter type (FIR, IIR, ...) exists for new rt, set the
         filter type combo box to the old setting
         """
-        # Read current setting of comboBox as string and store it in the filter dict
+        # Read current setting of comboBox as string and store it in `self.rt`
         self.rt = qget_cmb_box(self.cmb_response_type)
-        fb_set('rt', self.rt)
+        logger.warning("Response type changed to: %s", self.rt)
+        # fb_set('rt', self.rt)
 
         # Get list of available filter types for new rt
         ft_list = list(FTB.fil_tree[self.rt].keys())  # conversion to list needed for Py3
@@ -306,16 +307,15 @@ class SelectFilter(QWidget):
     # --------------------------------------------------------------------------
     def _set_filter_type(self, enb_signal: bool = False) -> None:
         """"
-        Triggered when cmb_filter_type (IIR, FIR, ...) is changed:
-        - read filter type ft and copy it to fil[0]['ft'] and self.ft
+        Triggered when cmb_filter_type ('iir', 'fir', ...) is changed:
+        - read filter type ft and copy it to `self.ft`
         - (re)construct design method combo, adding
           displayed text (e.g. "Chebyshev 1") and hidden data (e.g. "cheby1")
         """
         # Read out current setting of comboBox and convert to string
         self.ft = qget_cmb_box(self.cmb_filter_type)
-        fb_set('ft', self.ft)
-
-        logger.debug("SelectFilter.set_filter_type triggered: %s", self.ft)
+        logger.warning("Filter type changed to: %s", self.ft)
+        # fb_set('ft', self.ft)
 
         # ---------------------------------------------------------------
         # Get all available design methods for new ft from fil_tree and
@@ -330,9 +330,9 @@ class SelectFilter(QWidget):
             self.cmb_filter_class.addItem(CFP.FILTER_CLASSES_DICT[fc]['name'], fc)
             fc_list.append(fc)
 
-        logger.debug("fc_list: %s\n%s", fc_list, fb_get('fc'))
+        logger.warning("fc_list / old + new fc: %s\n%s + %s", fc_list, fb_get('fc'), self.fc)
 
-        # Does new ft also provide the previous design method (e.g. ellip)?
+        # Does new ft also provide the previous filter class (e.g. ellip)?
         # Has filter been instantiated?
         if fb_get('fc') in fc_list and get_fil_inst():
             # yes, set same fc as before
@@ -345,19 +345,19 @@ class SelectFilter(QWidget):
 
         self.cmb_filter_class.blockSignals(False)
 
-        self._set_design_method(enb_signal)
+        self._set_filter_class(enb_signal)
 
     # --------------------------------------------------------------------------
-    def _set_design_method(self, enb_signal: bool = False) -> None:
+    def _set_filter_class(self, enb_signal: bool = False) -> None:
         """
         Triggered when cmb_filter_class (cheby1, ...) is changed:
-        - read design method fc and copy it to fil[0]
+        - read filter class fc and copy it to fil[0]
         - create / update filter instance fil_inst of fc class
         - update dynamic widgets (if fc has changed and if there are any)
         - call load filter order
         """
         self.fc = qget_cmb_box(self.cmb_filter_class)
-        fb_set('fc', self.fc)
+        # fb_set('fc', self.fc)
 
         if self.fc != self.fc_last:  # fc has changed:
 

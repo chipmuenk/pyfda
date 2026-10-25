@@ -500,7 +500,7 @@ class InputSpecs(QWidget):
 
         # ----------------------------------------------------------------------
         # A globally accessible instance of selected filter class fc
-        # has been instantiated in filter_factory.set_design_method, now
+        # has been instantiated in `filter_factory.create_fil_inst()`, now
         # call the method specified in the filter dict fil[0].
 
         # The name of the instance method is constructed from the response
