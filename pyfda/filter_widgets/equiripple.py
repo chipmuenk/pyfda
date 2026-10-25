@@ -348,13 +348,13 @@ class Equiripple(QWidget):
             filter coefficients are saved in the filter dictionary using `fb_set()`.
         """
         self._get_params()
-        (self.n_fil, F, A, W) = remezord([self.f_pb, self.f_sb], [1, 0],
+        (self.n_fil, f, amp, w) = remezord([self.f_pb, self.f_sb], [1, 0],
                                      [self.a_pb, self.a_sb], fs = 1, alg = self.alg)
-        # A is always [1, 0] for LP filters
-        fb_set('w_pb', W[0])
-        fb_set('w_sb', W[1])
+        # amp is always [1, 0] for LP filters
+        fb_set('w_pb', w[0])
+        fb_set('w_sb', w[1])
         return self._save(
-            remez(self.n_fil, F, A, weight = W, fs = 1, grid_density = self.grid_density))
+            remez(self.n_fil, f, amp, weight = w, fs = 1, grid_density = self.grid_density))
 
     def hp_man(self) -> int:
         """
@@ -379,20 +379,20 @@ class Equiripple(QWidget):
         For more details, see the `lp_min` method.
         """
         self._get_params()
-        (self.n_fil, F, A, W) = remezord([self.f_sb, self.f_pb], [0, 1],
+        (self.n_fil, f, amp, w) = remezord([self.f_sb, self.f_pb], [0, 1],
                                      [self.a_sb, self.a_pb], fs = 1, alg = self.alg)
-        # A is always [0, 1] for HP filters
+        # amp is always [0, 1] for HP filters
 
         # self.n_fil = ceil_odd(n_fil)  # enforce odd order
-        fb_set('w_sb', W[0])
-        fb_set('w_pb', W[1])
+        fb_set('w_sb', w[0])
+        fb_set('w_pb', w[1])
         if self.n_fil % 2 == 0: # even order
             return self._save(
-                remez(self.n_fil, F, A, weight = W, fs = 1, type = 'hilbert',
+                remez(self.n_fil, f, amp, weight = w, fs = 1, type = 'hilbert',
                       grid_density = self.grid_density))
         # odd order
         return self._save(
-            remez(self.n_fil, F, A, weight = W, fs = 1, type = 'bandpass',
+            remez(self.n_fil, f, amp, weight = w, fs = 1, type = 'bandpass',
                     grid_density = self.grid_density))
 
     # For BP and BS, f_pb and f_sb have two elements each
@@ -413,14 +413,14 @@ class Equiripple(QWidget):
         For more details, see the `lp_min` method.
         """
         self._get_params()
-        (self.n_fil, F, A, W) = remezord([self.f_sb, self.f_pb, self.f_pb2, self.f_sb2], [0, 1, 0],
+        (self.n_fil, f, amp, w) = remezord([self.f_sb, self.f_pb, self.f_pb2, self.f_sb2], [0, 1, 0],
                                      [self.a_sb, self.a_pb, self.a_sb2], fs = 1, alg = self.alg)
-        # A is always [0, 1, 0] for BP filters
-        fb_set('w_sb', W[0])
-        fb_set('w_pb', W[1])
-        fb_set('w_sb2', W[2])
+        # amp is always [0, 1, 0] for BP filters
+        fb_set('w_sb', w[0])
+        fb_set('w_pb', w[1])
+        fb_set('w_sb2', w[2])
         return self._save(
-            remez(self.n_fil, F, A, weight = W, fs = 1, grid_density = self.grid_density))
+            remez(self.n_fil, f, amp, weight = w, fs = 1, grid_density = self.grid_density))
 
     def bs_man(self) -> int:
         """
@@ -440,14 +440,14 @@ class Equiripple(QWidget):
         For more details, see the `lp_min` method.
         """
         self._get_params()
-        (self.n_fil, F, A, W) = remezord([self.f_pb, self.f_sb, self.f_sb2, self.f_pb2], [1, 0, 1],
+        (self.n_fil, f, amp, w) = remezord([self.f_pb, self.f_sb, self.f_sb2, self.f_pb2], [1, 0, 1],
                                 [self.a_pb, self.a_sb, self.a_pb2], fs = 1, alg = self.alg)
-        # A is always [1, 0, 1] for BS filters
-        fb_set('w_pb', W[0])
-        fb_set('w_sb', W[1])
-        fb_set('w_pb2', W[2])
+        # amp is always [1, 0, 1] for BS filters
+        fb_set('w_pb', w[0])
+        fb_set('w_sb', w[1])
+        fb_set('w_pb2', w[2])
         return self._save(
-            remez(self.n_fil, F, A, weight = W, fs = 1, grid_density = self.grid_density))
+            remez(self.n_fil, f, amp, weight = w, fs = 1, grid_density = self.grid_density))
 
     def hil_man(self) -> int:
         """
