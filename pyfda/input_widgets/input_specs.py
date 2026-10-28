@@ -329,21 +329,21 @@ class InputSpecs(QWidget):
         (min / man) has been changed as this usually requires a different set of
         frequency and amplitude specs.
 
-        At this time, the actual filter object instance has been created from
+        By this time, the actual filter object instance has been created from
         the name of the design method (e.g. 'cheby1') in select_filter.py.
         Its handle has been stored in `fb.fil_inst`.
 
-        The dict fil[0] with the current filter info is read, then general information
+        The current filter info is read from  attributes of `select_filter`, general information
         for the selected filter type and order (min/man) is gathered from
         the filter tree [FTB.fil_tree], i.e. which parameters are needed, which
         widgets are visible and which message shall be displayed.
 
-        Then, the UIs of all subwidgets are updated using their `update_ui()` methods.
+        Finally, the UIs of all subwidgets are updated using their `update_ui()` methods.
         """
-        rt = fb_get('rt')  # e.g. 'lp'
-        ft = fb_get('ft')  # e.g. 'fir'
-        fc = fb_get('fc')  # e.g. 'equiripple'
-        fo = fb_get('fo')  # e.g. 'man'
+        rt = self.sel_fil.rt  # e.g. 'lp'
+        ft = self.sel_fil.ft  # e.g. 'fir'
+        fc = self.sel_fil.fc  # e.g. 'equiripple'
+        fo = self.sel_fil.fo  # e.g. 'man'
 
         # the keys of the all_widgets dict are the names of the subwidgets,
         # the values are a tuple with the corresponding parameters
@@ -502,15 +502,17 @@ class InputSpecs(QWidget):
         # has been instantiated in `filter_factory.create_fil_inst()`, now
         # call the method specified in the filter dict fil[0].
 
-        # The name of the instance method is constructed from the response
-        # type (e.g. 'lp') and the filter order (e.g. 'man'), giving e.g. 'LPman'.
-        # The filter is designed by passing the specs in fil[0] to the method,
-        # resulting in e.g. cheby1.LPman() and writing coefficients, P/Z etc. back to fil[0].
+        # store current filter specs in fil[0] and backup
         fb_set({'fc': self.sel_fil.fc,
                 'fo': self.sel_fil.fo,
                 'ft': self.sel_fil.ft,
                 'rt': self.sel_fil.rt,
-                'n_fil': self.sel_fil.n_fil}, backup=True)  # store current filter specs in fil[0] and backup
+                'n_fil': self.sel_fil.n_fil}, backup=True)
+
+        # The name of the instance method is constructed from the response
+        # type (e.g. 'lp') and the filter order (e.g. 'man'), giving e.g. 'LPman'.
+        # The filter is designed by passing the specs in fil[0] to the method,
+        # resulting in e.g. cheby1.LPman() and writing coefficients, P/Z etc. back to fil[0]
         err = call_fil_method(fb_get('rt') + '_' + fb_get('fo'), fc=fb_get('fc'))
         # this is the same as e.g.
         # from pyfda.filter_design import ellip

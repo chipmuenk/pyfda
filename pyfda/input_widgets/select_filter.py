@@ -178,7 +178,7 @@ class SelectFilter(QWidget):
         self._chk_min_order.setToolTip(
             "<span>Minimum filter order / # of taps is determined automatically.</span>")
         self._lbl_order_n = QLabel("<b><i>N =</i></b>")
-        self._led_order_n = QLineEdit(str(fb_get('n_fil')), self)
+        self._led_order_n = QLineEdit(str(self.n_fil), self)
         self._led_order_n.setToolTip("Filter order (# of taps - 1).")
 
         # ----------------------------------------------------------------------
@@ -267,8 +267,13 @@ class SelectFilter(QWidget):
 
         It is called directly from input_specs.py
         """
-        # find index for response type:
-        rt_idx = self.cmb_response_type.findData(fb_get('rt'))
+        self.rt = fb_get('rt')  # e.g. 'lp'
+        self.ft = fb_get('ft')  # e.g. 'fir'
+        self.fc = fb_get('fc')  # e.g. 'equiripple'
+        self.fo = fb_get('fo')  # e.g. 'man'
+        self.n_fil = fb_get('n_fil')
+        # find index for response type, set combo box and start updating all other combo boxes:
+        rt_idx = self.cmb_response_type.findData(self.rt)
         self.cmb_response_type.setCurrentIndex(rt_idx)
         self._set_response_type()
 
@@ -284,7 +289,6 @@ class SelectFilter(QWidget):
         # Read current setting of comboBox as string and store it in `self.rt`
         self.rt = qget_cmb_box(self.cmb_response_type)
         logger.warning("Response type changed to: %s", self.rt)
-        # fb_set('rt', self.rt)
 
         # Get list of available filter types for new rt
         ft_list = list(FTB.fil_tree[self.rt].keys())  # conversion to list needed for Py3
@@ -318,7 +322,6 @@ class SelectFilter(QWidget):
         # Read out current setting of comboBox and convert to string
         self.ft = qget_cmb_box(self.cmb_filter_type)
         logger.warning("Filter type changed to: %s", self.ft)
-        # fb_set('ft', self.ft)
 
         # ---------------------------------------------------------------
         # Get all available design methods for new ft from fil_tree and
@@ -335,12 +338,12 @@ class SelectFilter(QWidget):
 
         logger.warning("fc_list / old + new fc: %s\n%s + %s", fc_list, fb_get('fc'), self.fc)
 
-        # Does new ft also provide the previous filter class (e.g. ellip)?
+        # Does new ft also provide the previous filter class (`self.fc`, e.g. ellip) ?
         # Has filter been instantiated?
-        if fb_get('fc') in fc_list and get_fil_inst():
+        if self.fc in fc_list and get_fil_inst():
             # yes, set same fc as before
             fc_idx = self.cmb_filter_class.findText(
-                CFP.FILTER_CLASSES_DICT[fb_get('fc')]['name'])
+                CFP.FILTER_CLASSES_DICT[self.fc]['name'])
             logger.debug("fc_idx : %s", fc_idx)
             self.cmb_filter_class.setCurrentIndex(fc_idx)
         else:
@@ -360,8 +363,6 @@ class SelectFilter(QWidget):
         - call load filter order
         """
         self.fc = qget_cmb_box(self.cmb_filter_class)
-        # fb_set('fc', self.fc)
-
         if self.fc != self.fc_last:  # fc has changed:
 
             # when filter has been changed, try to destroy dynamic widgets of last fc:
@@ -378,9 +379,9 @@ class SelectFilter(QWidget):
 
             # Check whether new design method also provides the old filter order method.
             # If yes, don't change it, else set first available filter order method.
-            if fb_get('fo') not in FTB.fil_tree[self.rt][self.ft][self.fc].keys():
+            if self.fo not in FTB.fil_tree[self.rt][self.ft][self.fc].keys():
                 # explicit list(dict.keys()) needed for Python 3
-                fb_set('fo', list(FTB.fil_tree[self.rt][self.ft][self.fc].keys())[0])
+                self.fo = list(FTB.fil_tree[self.rt][self.ft][self.fc].keys())[0]
 
             # ===================================================================
             # logger.debug("selFilter = %s"
@@ -406,15 +407,12 @@ class SelectFilter(QWidget):
         """
         # collect dict_keys of available filter order [fo] methods for selected
         # design method [fc] from fil_tree (explicit list() needed for Python 3)
-        fo_dict = FTB.fil_tree[fb_get('rt')][fb_get('ft')][fb_get('fc')]
+        fo_dict = FTB.fil_tree[self.rt][self.ft][self.fc]
         fo_list = list(fo_dict.keys())
 
-        # is currently selected fo setting available for (new) fc ?
-        if fb_get('fo') in fo_list:
-            self.fo = fb_get('fo')  # keep current setting
-        else:
+        # Is new fc not contained in currently selected fo setting?
+        if self.fo not in fo_list:
             self.fo = fo_list[0]  # use first list entry from filterTree
-            fb_set('fo', self.fo)  # and update fo method
 
         # check whether fo widget is active, disabled or invisible
         if 'fo' in fo_dict[self.fo] and len(fo_dict[self.fo]['fo']) > 1:
@@ -428,8 +426,8 @@ class SelectFilter(QWidget):
         self._lbl_order_n.setVisible(status in {'a', 'd'})
 
         # Determine which subwidgets are __enabled__
-        self._chk_min_order.setChecked(fb_get('fo') == 'min')
-        self._led_order_n.setText(str(fb_get('n_fil')))
+        self._chk_min_order.setChecked(self.fo == 'min')
+        self._led_order_n.setText(str(self.n_fil))
         self._led_order_n.setEnabled(not self._chk_min_order.isChecked() and status == 'a')
         self._lbl_order_n.setEnabled(not self._chk_min_order.isChecked() and status == 'a')
 
@@ -440,7 +438,7 @@ class SelectFilter(QWidget):
     def _set_filter_order(self, enb_signal: bool = False) -> None:
         """
         Triggered when either _led_order_n or _chk_min_order are edited:
-        - copy settings to fil[0]
+        - copy widget settings to self.fo and self.n_fil
         - emit 'filt_changed' if enb_signal is True
         """
         # Determine which subwidgets are _enabled_
@@ -449,26 +447,23 @@ class SelectFilter(QWidget):
             self._lbl_order_n.setEnabled(not self._chk_min_order.isChecked())
 
             if self._chk_min_order.isChecked() is True:
-                # update in case N has been changed outside this class
+                # update in case N has been changed outside this class in the filter class
                 self._led_order_n.setText(str(fb_get('n_fil')))
-                fb_set('fo', 'min')
-                # self.fo = 'min'
+                self.fo = 'min'
 
             else:
-                fb_set('fo', 'man')
-                # self.fo = 'man'
+                self.fo = 'man'
 
         else:
             self._lbl_order_n.setEnabled(self.fo == 'man')
             self._led_order_n.setEnabled(self.fo == 'man')
 
-        # read manual filter order, convert to positive integer and store it
-        # in filter dictionary.
+        # read manual filter order, clean / convert to positive integer, store it in self.n_fil
+        # and update widget (n_fil might have changed while cleaning)
         self.n_fil = safe_eval(
-            self._led_order_n.text(), fb_get('n_fil'), return_type='int', sign='pos')
+            self._led_order_n.text(), self.n_fil, return_type='int', sign='pos')
 
         self._led_order_n.setText(str(self.n_fil))
-        fb_set('n_fil', self.n_fil)
 
         if enb_signal:
             logger.debug("Emit 'filt_changed'")
