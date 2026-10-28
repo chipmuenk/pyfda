@@ -646,10 +646,11 @@ class _BackupFilterDict(QObject):
             return -1
 
         _fil[0] = copy.deepcopy(_fil_undo[self.undo_ptr])
-        logger.warning(fb_get('rt') + '_' + fb_get('fo') + " filter restored from undo memory")
+        logger.warning("%s_%s filter restored from undo memory", fb_get('rt'), fb_get('fo'))
         self.undo_stp -= 1
         self.undo_ptr = (self.undo_ptr + UNDO_LEN - 1) % UNDO_LEN
-        logger.warning("Restore undo: Undo ptr = %s, id = %s / %s", self.undo_ptr, id(_fil_undo[1]), id(_fil_undo[2]))
+        logger.warning("Restore undo: Undo ptr = %s, id = %s / %s",
+                       self.undo_ptr, id(_fil_undo[1]), id(_fil_undo[2]))
         self.emit({'data_changed': 'filter_loaded'})
         return 0
 
@@ -670,8 +671,9 @@ class _BackupFilterDict(QObject):
         # increase buffer pointer, allowing for circular wrap around
         self.undo_ptr = (self.undo_ptr + 1) % UNDO_LEN
         _fil_undo[self.undo_ptr] = copy.deepcopy(_fil[0])
-        logger.warning("Backup: Undo ptr = %s, id = %s / %s", self.undo_ptr, id(_fil_undo[1]), id(_fil_undo[2]))
-        logger.warning(fb_get('rt') + '_' + fb_get('fo') + " filter backed up to undo memory")
+        logger.warning("Backup: Undo ptr = %s, id = %s / %s",
+                       self.undo_ptr, id(_fil_undo[1]), id(_fil_undo[2]))
+        logger.warning("%s_%s filter backed up to undo memory", fb_get('rt'), fb_get('fo'))
         return self.undo_stp
 
 # -------------------------------------------------

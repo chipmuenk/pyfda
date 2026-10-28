@@ -40,7 +40,7 @@ class IIRDF1PyfixpUI(QWidget):
     def __init__(self):
         super().__init__()
 
-        self.title = ("<b>Direct-Form 1 (DF1) IIR Filter</b>")
+        self.title = "<b>Direct-Form 1 (DF1) IIR Filter</b>"
         self.description = ("Topology with one accumulator, more robust against "
                             "overflows than DF2. Only suitable for low-order filters.")
         self.img_name = "iir_df1.png"
@@ -319,7 +319,6 @@ class IIRDF1PyfixpUI(QWidget):
 
         self.wdg_wq_coeffs_b.dict2ui(fb_get('fxq', 'QCB'))  # update coefficient quantization
         self.wdg_wq_coeffs_a.dict2ui(fb_get('fxq', 'QCA'))  # settings
-        # TODO: In the past, only 'QCB' was passed directly - why?!
         self.update_accu_settings()   # update accumulator settings and UI
 
     # --------------------------------------------------------------------------
