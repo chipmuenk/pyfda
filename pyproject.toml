@@ -248,7 +248,8 @@ basic.function-naming-style = "snake_case"
 basic.good-names = ["i", "j", "k", "x", "X", "y", "Y", "z", "ex", "_",
                     "eventFilter", "closeEvent", "initStyleOption", "displayText",
                     "createEditor", "setEditorData", "setModelData", "sizeHint",
-                    "minimumSizeHint", "setCheckable", "isChecked", "setChecked"]
+                    "minimumSizeHint", "setCheckable", "isChecked", "setChecked",
+                    "paintEvent"]
 # Good variable names regexes, separated by a comma. If names match any regex,
 # they will always be accepted
 # good-names-rgxs =
