@@ -178,11 +178,11 @@ class FIRDFPyfixp():
         self.zi = self.zi[-(self.L-1):]  # store last L-1 inputs (i.e. the L-1 registers)
 
         # Overflows in q_mul are added to overflows in q_acc, then q_mul is reset
-        if self.q_acc.q_dict['N_over'] > 0 or self.q_mul.q_dict['N_over'] > 0:
+        if self.q_acc.q_dict['n_over'] > 0 or self.q_mul.q_dict['n_over'] > 0:
             logger.warning("Overflows: N_Acc = %d, N_Mul = %d",
-                           self.q_acc.q_dict['N_over'], self.q_mul.q_dict['N_over'])
+                           self.q_acc.q_dict['n_over'], self.q_mul.q_dict['n_over'])
 
-        self.q_acc.q_dict['N_over'] = self.q_acc.q_dict['N_over'] + self.q_mul.q_dict['N_over']
+        self.q_acc.q_dict['n_over'] = self.q_acc.q_dict['n_over'] + self.q_mul.q_dict['n_over']
         self.q_mul.reset_n()
 
         return self.Q_O.requant(y_q[:len(x)], self.q_acc), self.zi
@@ -195,7 +195,7 @@ if __name__ == '__main__':
 
     fb_set('ba', np.array([1.1, 2.2, 3.3, 2, 1], []))  # example coefficients
     p = {'QCB': {'WI': 2, 'WF': 5, 'w_a_m': 'a',
-                'ovfl': 'wrap', 'quant': 'floor', 'N_over': 0},
+                'ovfl': 'wrap', 'quant': 'floor', 'n_over': 0},
          'QACC': {'WI': 6, 'WF': 3, 'ovfl': 'wrap', 'quant': 'round'},
          'QI': {'WI': 2, 'WF': 3, 'ovfl': 'sat', 'quant': 'round'},
          'QO': {'WI': 6, 'WF': 3, 'ovfl': 'wrap', 'quant': 'round'}
@@ -207,12 +207,12 @@ if __name__ == '__main__':
         print("Filter fixpoint response / state variables for input = np.ones(7):")
         x = np.ones(7)
         y = dut.fxfilter(x=x)
-        # if dut.Q_I.N_over != 0:
-        #    print(f"N_over(Q_I) = {dut.Q_I.N_over}")
-        if dut.Q_O.N_over != 0:
-            print(f"N_over(Q_O) = {dut.Q_O.N_over}")
-        if dut.q_mul.N_over != 0:
-            print(f"N_over(q_mul) = {dut.q_mul.N_over}")
+        # if dut.Q_I.n_over != 0:
+        #    print(f"n_over(Q_I) = {dut.Q_I.n_over}")
+        if dut.Q_O.n_over != 0:
+            print(f"n_over(Q_O) = {dut.Q_O.n_over}")
+        if dut.q_mul.n_over != 0:
+            print(f"n_over(q_mul) = {dut.q_mul.n_over}")
         print(y)
         print("... followed by x = np.zeros(5):")
         y = dut.fxfilter(x=np.zeros(5))

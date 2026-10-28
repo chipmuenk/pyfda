@@ -709,5 +709,5 @@ if __name__ == '__main__':
     fb_set('fxq', {'QACC': {'WF': 49, 'WI': 50}})  # set a nested sub-dict
     print('fxq QACC 4: ' + str(fb_get('fxq', 'QACC')))  # ... and read it back
     print("Expected error: Wrong type for WF (in subdictionary)")
-    fb_set('fxq', 'QACC', {'WF': 'a', 'WI': 5, 'N_over': 7})  # wrong type for WF
+    fb_set('fxq', 'QACC', {'WF': 'a', 'WI': 5, 'n_over': 7})  # wrong type for WF
     print('fxq QACC 5: ' + str(fb_get('fxq', 'QACC')))  # ... and read it back

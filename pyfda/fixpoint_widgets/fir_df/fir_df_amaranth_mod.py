@@ -175,7 +175,7 @@ if __name__ == '__main__':
     set_fx(True)  # enable fixpoint mode
 
     p = {'QCB': {'WI': 2, 'WF': 5, 'w_a_m': 'a',
-                'ovfl': 'wrap', 'quant': 'floor', 'N_over': 0},
+                'ovfl': 'wrap', 'quant': 'floor', 'n_over': 0},
          'QACC': {'WI': 6, 'WF': 3, 'ovfl': 'wrap', 'quant': 'round'},
          'QI': {'WI': 2, 'WF': 3, 'ovfl': 'sat', 'quant': 'round'},
          'QO': {'WI': 6, 'WF': 3, 'ovfl': 'wrap', 'quant': 'round'}

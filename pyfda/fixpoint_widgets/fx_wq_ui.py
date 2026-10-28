@@ -371,7 +371,7 @@ class FxWqUI(QWidget):
         # -------
         # frm = inspect.stack()[1]
         # logger.warning(f"update: {id(self)}|{id(self.q_dict)}:"
-        #              f"{self.q_dict['N_over']} "
+        #              f"{self.q_dict['n_over']} "
         #              f"{inspect.getmodule(frm[0]).__name__.split('.')[-1]}."
         #              f"{frm[3]}:{frm[2]}")
 
@@ -379,16 +379,16 @@ class FxWqUI(QWidget):
             self.lbl_ovfl_count.setVisible(True)
             self.lbl_ovfl_count.setEnabled(False)
             self.lbl_ovfl_count.setText(to_html("<b>&nbsp;&nbsp; -----</b>"))
-        elif self.count_ovfl_vis == 'auto' and self.Q.q_dict['N_over'] == 0:
+        elif self.count_ovfl_vis == 'auto' and self.Q.q_dict['n_over'] == 0:
             self.lbl_ovfl_count.setVisible(False)
         elif self.count_ovfl_vis == 'on' or\
-                self.count_ovfl_vis == 'auto' and self.Q.q_dict['N_over'] > 0:
+                self.count_ovfl_vis == 'auto' and self.Q.q_dict['n_over'] > 0:
 
             self.lbl_ovfl_count.setVisible(True)
             self.lbl_ovfl_count.setText(
                 to_html(
-                    f"<b><i>&nbsp;&nbsp;N_ov </i>= {self.Q.q_dict['N_over']}</b>"))
-            if self.Q.q_dict['N_over'] == 0:
+                    f"<b><i>&nbsp;&nbsp;N_ov </i>= {self.Q.q_dict['n_over']}</b>"))
+            if self.Q.q_dict['n_over'] == 0:
                 qstyle_widget(self.lbl_ovfl_count, "normal")
             else:
                 qstyle_widget(self.lbl_ovfl_count, "error")
@@ -465,7 +465,7 @@ class FxWqUI(QWidget):
             q_dict = self.q_dict  # update UI from instance / global qdict
         else:
             for k in q_dict:
-                if k not in {'quant', 'ovfl', 'WI', 'WF', 'w_a_m', 'N_over'}:
+                if k not in {'quant', 'ovfl', 'WI', 'WF', 'w_a_m', 'n_over'}:
                     logger.warning("Unknown quantization dict key '%s'", k)
 
         # Update all non-numeric instance quantization dict entries from passed `q_dict`

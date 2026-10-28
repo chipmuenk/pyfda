@@ -210,8 +210,8 @@ class FIRDFAmaranth():
         self.sim.add_process(self.process)
         self.sim.run()
 
-        # Currently doesn't work, output signal is quantized afterwards, resetting 'N_over'
-        # fb_set('fxq', 'QO', 'N_over', 13)  # doesn't work, output signal is quantized
+        # Currently doesn't work, output signal is quantized afterwards, resetting 'n_over'
+        # fb_set('fxq', 'QO', 'n_over', 13)  # doesn't work, output signal is quantized
 
         # logger.warning("y = %s", self.Q_O.fixp(
         #                self.output, in_frmt='qint', out_frmt=fb_get('qfrmt')))
@@ -237,7 +237,7 @@ if __name__ == '__main__':
     fb_set('qfrmt', 'qint')  # set fixpoint mode
 
     p = {'QCB': {'WI': 2, 'WF': 5, 'w_a_m': 'a',
-                'ovfl': 'wrap', 'quant': 'floor', 'N_over': 0},
+                'ovfl': 'wrap', 'quant': 'floor', 'n_over': 0},
          'QACC': {'WI': 6, 'WF': 3, 'ovfl': 'wrap', 'quant': 'round'},
          'QI': {'WI': 2, 'WF': 3, 'ovfl': 'sat', 'quant': 'round'},
          'QO': {'WI': 6, 'WF': 3, 'ovfl': 'wrap', 'quant': 'round'}

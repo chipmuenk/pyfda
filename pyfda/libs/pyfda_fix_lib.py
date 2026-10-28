@@ -379,7 +379,7 @@ class Fixed():
       - 'sat' : saturate at minimum / maximum value
       - 'none': no overflow; the integer word length is ignored
 
-    * **N_over** : integer
+    * **n_over** : integer
         total number of overflows (should be considered as read-only
         except for when an external quantizer is used)
 
@@ -468,7 +468,7 @@ class Fixed():
         Construct `Fixed` object with dict `q_dict`
         """
         # read valid keys and default values for quantization dict from filterbroker
-        # e.g. {'WI': 0, 'WF': 15, 'w_a_m': 'm', 'quant': 'round', 'ovfl': 'sat', 'N_over': 0}
+        # e.g. {'WI': 0, 'WF': 15, 'w_a_m': 'm', 'quant': 'round', 'ovfl': 'sat', 'n_over': 0}
         self.q_dict_default = fb_get('fxq', 'QACC')
         # these attributes are calculated and should be regarded as read-only
         self.lsb = 2. ** -self.q_dict_default['WF']
@@ -646,7 +646,7 @@ class Fixed():
 
         >>> aq = myQa.fixp(a) # quantize input signal
         >>> plt.plot(a, aq) # plot quantized vs. original signal
-        >>> print(myQa.q_dict('N_over'), "overflows!") # print number of overflows
+        >>> print(myQa.q_dict('n_over'), "overflows!") # print number of overflows
 
         >>> # Convert output to same format as input:
         >>> b = np.arange(200, dtype = np.int16)
@@ -804,7 +804,7 @@ class Fixed():
 
         if self.q_dict['ovfl'] == 'none':
             # set all overflow flags to zero
-            self.N_over = 0  # self.N_over_neg = self.N_over_pos =
+            self.n_over = 0  # self.N_over_neg = self.N_over_pos =
         else:
             # Bool. vectors with '1' for every neg./pos overflow:
             over_neg = yq < MIN
@@ -814,7 +814,7 @@ class Fixed():
             # No. of pos. / neg. / all overflows occured since last reset:
             # self.N_over_neg += np.sum(over_neg)
             # self.N_over_pos += np.sum(over_pos)
-            self.N_over += np.sum(over_neg) + np.sum(over_pos)
+            self.n_over += np.sum(over_neg) + np.sum(over_pos)
 
             # Replace overflows with Min/Max-Values (saturation):
             if self.q_dict['ovfl'] == 'sat':
@@ -829,7 +829,7 @@ class Fixed():
                 raise Exception(
                     f"""Unknown overflow type "{self.q_dict['ovfl']:s}"!""")
 
-        self.q_dict.update({'N_over': self.N_over})
+        self.q_dict.update({'n_over': self.n_over})
 
         # ======================================================================
         # (4) : OUTPUT SCALING
@@ -852,12 +852,12 @@ class Fixed():
         frm = inspect.stack()[1]
         logger.debug("'reset_N' called from %s.%s():%s.",
              inspect.getmodule(frm[0]).__name__.split('.')[-1], frm[3], frm[2])
-        self.q_dict.update({'N_over': 0})
+        self.q_dict.update({'n_over': 0})
 
         self.ovr_flag = 0
         # self.N_over_pos = 0
         # self.N_over_neg = 0
-        self.N_over = 0
+        self.n_over = 0
         self.n_data = 0
 
     # --------------------------------------------------------------------------

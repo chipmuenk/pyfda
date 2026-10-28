@@ -167,7 +167,7 @@ def requant(mod: Module, sig_i: Signal, QI: dict, QO: dict) -> Signal:
         if QO['ovfl'] != 'wrap':
             logger.error("Unknown output overflow method <%s>,\n"
                         "\tusing <wrap> instead.", {QO['ovfl']})
-    # QO['N_over'] = 15  # TODO: this passes the value to the quantizer, but it's a dummy
+    # QO['n_over'] = 15  # TODO: this passes the value to the quantizer, but it's a dummy
     return sig_o, ovfl_o
 
 
