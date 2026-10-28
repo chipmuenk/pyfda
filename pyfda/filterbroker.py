@@ -43,8 +43,10 @@ import logging
 from typing import Iterable
 
 import numpy as np
+from pyfda.libs.compat import pyqtSignal, QObject
 
 from pyfda.libs.pyfda_num_lib import iter2ndarray
+from pyfda.libs.pyfda_qt_lib import emit
 
 from pyfda.filter_storage import fil_ref
 
@@ -602,16 +604,29 @@ def fil2dict() -> list[dict]:
     return _fil
 
 # ------------------------------------------------------------------------------
-class _BackupFilterDict():
+class _BackupFilterDict(QObject):
     """
-    Back up and restore the global filter dict `_fil[0]`.
+    Class to provide mechanism for backing up and restoring the global filter dict `_fil[0]`.
 
+    sig_tx({'filt_changed'}) is emitted when the global dict is restored.
     """
+    # class variables (shared between instances if more than one exists)
+    sig_tx = pyqtSignal(object)  # outgoing
+
     def __init__(self):
+        super().__init__()
         # undo step, limited to 0 ... UNDO_LEN. This prevents exceeding the available
         # UNDO_LEN memories and trying to restore more than the stored copies
         self.undo_stp = 0
         self.undo_ptr = 0  # pointer to current undo memory % UNDO_LEN
+
+    # -------------------------------------------------------------------------
+    def emit(self, dict_sig) -> None:
+        """
+        Access imported function `emit()` as instance method, passing `self`
+        with its attributes
+        """
+        emit(self, dict_sig)
 
     # -------------------------
     def restore_fil(self) -> int:
@@ -635,7 +650,7 @@ class _BackupFilterDict():
         self.undo_stp -= 1
         self.undo_ptr = (self.undo_ptr + UNDO_LEN - 1) % UNDO_LEN
         logger.warning("Restore undo: Undo ptr = %s, id = %s / %s", self.undo_ptr, id(_fil_undo[1]), id(_fil_undo[2]))
-        # self.emit({'data_changed': 'filter_loaded'})
+        self.emit({'data_changed': 'filter_loaded'})
         return 0
 
     # -------------------------
@@ -660,11 +675,10 @@ class _BackupFilterDict():
         return self.undo_stp
 
 # -------------------------------------------------
-_backup_filter_dict = _BackupFilterDict()
 # import this from other modules
-backup_fil = _backup_filter_dict.backup_fil
-restore_fil = _backup_filter_dict.restore_fil
-# -------------------------------------------------
+backup_filter_dict = _BackupFilterDict()
+backup_fil = backup_filter_dict.backup_fil
+restore_fil = backup_filter_dict.restore_fil
 
 # ===============================================================================================
 

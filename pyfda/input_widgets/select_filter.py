@@ -19,7 +19,7 @@ from pyfda.libs.compat import (
     QWidget, QLabel, QLineEdit, QComboBox, QFrame,
     QCheckBox, QVBoxLayout, QHBoxLayout, pyqtSignal)
 
-from pyfda.filterbroker import fb_get, fb_set
+from pyfda.filterbroker import fb_get, fb_set, backup_filter_dict
 from pyfda.filter_factory import create_fil_inst, get_fil_inst
 from pyfda.filter_tree_builder import FilterTreeBuilder as FTB
 from pyfda.filter_tree_builder import FT_NAMES, RT_NAMES
@@ -186,6 +186,7 @@ class SelectFilter(QWidget):
         # ----------------------------------------------------------------------
         # connect incoming signals to process_sig_rx and other widgets?!
         self.sig_rx.connect(self.process_sig_rx)
+        backup_filter_dict.sig_tx.connect(self.process_sig_rx)
 
         # ------------------------------------------------------------
         # LOCAL SIGNALS & SLOTS
