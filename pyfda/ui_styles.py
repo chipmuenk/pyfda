@@ -274,6 +274,7 @@ QSS_COMMON = """
     /* Dynamic fixpoint widget */
     #fx_filt_ui .QFrame {background-color: lightblue;}
     #fx_filt_ui QFrame {color: black;}
+    #fx_filt_ui QFrame *[state="error"] {color: white;}
 
     QRadioButton::indicator{
         background-color: transparent; border-radius:5px;} /*width:8px; height:8px;
