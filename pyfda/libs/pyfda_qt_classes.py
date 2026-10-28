@@ -390,13 +390,13 @@ class QLabelVert(QLabel):
     orientation : str, optional
         Orientation of the label; currently 'west' (default) is supported.
 
-    forceWidth : bool, optional
+    force_width : bool, optional
         Reserved for future use; if True, forces width handling (default True).
     """
 
-    def __init__(self, text: str, orientation: str = 'west', forceWidth: bool = True):
+    def __init__(self, text: str, orientation: str = 'west', force_width: bool = True):
         QLabel.__init__(self, text)
-        # self.forceWidth = forceWidth
+        # self.force_width = force_width
         self.orientation = orientation
         # self.setOrientation(orientation)
 
