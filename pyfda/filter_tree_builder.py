@@ -196,6 +196,18 @@ class FilterTreeBuilder():
                         'tspecs': ('a', {'frq': ('a', 'f_pb', 'f_sb'),
                                          'amp': ('a', 'a_pb', 'a_sb')})
                         }
+                    },
+                'Ellip': {
+                    'man':{'fo' : ('a', 'n_fil'),
+                        'fspecs': ('a', 'f_c'),
+                        'tspecs': ('u', {'frq': ('u', 'f_pb', 'f_sb'),
+                                         'amp': ('u', 'a_pb', 'a_sb')})
+                        },
+                    'min':{'fo' : ('d', 'n_fil'),
+                        'fspecs': ('d', 'f_c'),
+                        'tspecs': ('a', {'frq': ('a', 'f_pb', 'f_sb'),
+                                         'amp': ('a', 'a_pb', 'a_sb')})
+                        }
                     }
                 }
             },
@@ -218,6 +230,18 @@ class FilterTreeBuilder():
                 },
             'iir': {
                 'Cheby1': {
+                    'man':{'fo' : ('a', 'n_fil'),
+                        'fspecs': ('a', 'f_c'),
+                        'tspecs': ('u', {'frq': ('u', 'f_sb', 'f_pb'),
+                                         'amp': ('u', 'a_sb', 'a_pb')})
+                        },
+                    'min':{'fo' : ('d', 'n_fil'),
+                        'fspecs': ('d', 'f_c'),
+                        'tspecs': ('a', {'frq': ('a', 'f_sb', 'f_pb'),
+                                         'amp': ('a', 'a_sb', 'a_pb')})
+                        }
+                        },
+                'Cheby2': {
                     'man':{'fo' : ('a', 'n_fil'),
                         'fspecs': ('a', 'f_c'),
                         'tspecs': ('u', {'frq': ('u', 'f_sb', 'f_pb'),
