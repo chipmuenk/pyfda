@@ -149,7 +149,6 @@ class InputSpecs(QWidget):
             # Changing the filter design requires updating UI because number or
             # kind of input fields changes -> reload filter parameters and _update_ui
             self._update_ui()
-            self.sel_fil.dict2ui()
             # Update state of "DESIGN FILTER" button
             # It is disabled for "ManualIIR" and "ManualFIR" filter classes
             self.color_design_button('changed')
