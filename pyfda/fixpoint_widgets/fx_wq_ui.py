@@ -268,7 +268,7 @@ class FxWqUI(QWidget):
         self.msb_lsb_vis = ui_dict['msb_lsb_vis']
 
         # -------------------------------------------------------------------
-        # MSB / LSB size
+        # MSB / LSB values
         # ---------------------------------------------------------------------
         self.lbl_msb = QLabel(self)
         self.lbl_msb.setText("undefined")
@@ -518,8 +518,8 @@ class FxWqUI(QWidget):
             self.led_wi.setToolTip("Total number of bits")
             self.lbl_sep2.setVisible(True)
 
-            LSB = 1.
-            MSB = 2. ** (self.Q.q_dict['WI'] + self.Q.q_dict['WF'] - 1)
+            lsb = 1.
+            msb = 2. ** (self.Q.q_dict['WI'] + self.Q.q_dict['WF'] - 1)
         elif fb_get('qfrmt') == "qfrac":
             self.lbl_sep1.setText(to_html(".", frmt='b'))
             self.led_wf.setToolTip("Number of fractional bits")
@@ -527,8 +527,8 @@ class FxWqUI(QWidget):
             self.led_wi.setToolTip("Number of integer bits")
             self.lbl_sep2.setVisible(False)
 
-            LSB = 2 ** -self.Q.q_dict['WF']
-            MSB = 2. ** (self.Q.q_dict['WI'] - 1)
+            lsb = 2 ** -self.Q.q_dict['WF']
+            msb = 2. ** (self.Q.q_dict['WI'] - 1)
         else:
             logger.error("Unknown quantization format '%s'", fb_get('qfrmt'))
 
@@ -545,18 +545,18 @@ class FxWqUI(QWidget):
             self.lbl_lsb.setVisible(True)
             self.lbl_msb.setText(
                 "<b><i>&nbsp;&nbsp;Max</i><sub>10</sub> = </b>"
-                f"{2. * MSB - LSB:.{params['FMT_ba']}g}")
+                f"{2. * msb - lsb:.{params['FMT_ba']}g}")
             self.lbl_lsb.setText(
-                f"<b><i>LSB</i><sub>10</sub> = </b>{LSB:.{params['FMT_ba']}g}")
+                f"<b><i>LSB</i><sub>10</sub> = </b>{lsb:.{params['FMT_ba']}g}")
         elif self.msb_lsb_vis == 'msb':
             # Show MSB and LSB data
             self.lbl_msb.setVisible(True)
             self.lbl_lsb.setVisible(True)
             self.lbl_msb.setText(
                 "<b><i>&nbsp;&nbsp;MSB</i><sub>10</sub> = </b>"
-                f"{MSB:.{params['FMT_ba']}g}")
+                f"{msb:.{params['FMT_ba']}g}")
             self.lbl_lsb.setText(
-                f"<b><i>LSB</i><sub>10</sub> = </b>{LSB:.{params['FMT_ba']}g}")
+                f"<b><i>LSB</i><sub>10</sub> = </b>{lsb:.{params['FMT_ba']}g}")
         else:
             logger.error("Unknown option msb_lsb_vis = '%s'", self.msb_lsb_vis)
 

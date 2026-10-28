@@ -408,17 +408,17 @@ class Fixed():
         (see above). This dictionary is updated here and can be accessed from
         outside.
 
-    LSB : float
-        value of LSB (smallest quantization step), `self.LSB = 2 ** -q_dict['WF']`
+    lsb : float
+        value of LSB (smallest quantization step), `self.lsb = 2 ** -q_dict['WF']`
 
-    MSB : float
-        value of most significant bit (MSB),  `self.MSB = 2 ** (q_dict['WI'] - 1)`
+    msb : float
+        value of most significant bit (MSB),  `self.msb = 2 ** (q_dict['WI'] - 1)`
 
     MIN : float
-        most negative representable value, `self.MIN = -2 * self.MSB`
+        most negative representable value, `self.MIN = -2 * self.msb`
 
     MAX : float
-        largest representable value, `self.MAX = 2 * self.MSB - self.LSB`
+        largest representable value, `self.MAX = 2 * self.msb - self.lsb`
 
     n_data : integer
         total number of simulation data points
@@ -471,10 +471,10 @@ class Fixed():
         # e.g. {'WI': 0, 'WF': 15, 'w_a_m': 'm', 'quant': 'round', 'ovfl': 'sat', 'N_over': 0}
         self.q_dict_default = fb_get('fxq', 'QACC')
         # these attributes are calculated and should be regarded as read-only
-        self.LSB = 2. ** -self.q_dict_default['WF']
-        self.MSB = 2. ** (self.q_dict_default['WI'] - 1)
-        self.MAX = 2 * self.MSB - self.LSB
-        self.MIN = -2 * self.MSB
+        self.lsb = 2. ** -self.q_dict_default['WF']
+        self.msb = 2. ** (self.q_dict_default['WI'] - 1)
+        self.MAX = 2 * self.msb - self.lsb
+        self.MIN = -2 * self.msb
 
         self.n_data = 0
 
@@ -529,7 +529,7 @@ class Fixed():
         Update the instance fx quantization dict `self.q_dict` from passed dict `d`:
 
         * Sanitize `WI` and `WF`
-        * Calculate attributes `MSB`, `LSB`, `MIN` and `MAX`
+        * Calculate attributes `msb`, `lsb`, `MIN` and `MAX`
         * Calculate number of places needed for printing from `qfrmt`,`fx_base` and `W`
           and store it as attribute `self.places`
 
@@ -549,19 +549,18 @@ class Fixed():
         # total word length W = WI + WF + 1 (sign bit)
         W = self.q_dict['WI'] + self.q_dict['WF'] + 1
 
-        # Calculate min., max., LSB and MSB from word lengths
+        # Calculate min., max., lsb and msb from word lengths
         if fb_get('qfrmt') == 'qint':
-            # LSB = 1, MSB = 2 ** (W - 1)
-            self.LSB = 1
-            self.MSB = 2 ** (W - 1)
+            self.lsb = 1
+            self.msb = 2 ** (W - 1)
         elif fb_get('qfrmt') == 'qfrac':
-            self.LSB = 2. ** -self.q_dict['WF']
-            self.MSB = 2. ** (self.q_dict['WI'] - 1)
+            self.lsb = 2. ** -self.q_dict['WF']
+            self.msb = 2. ** (self.q_dict['WI'] - 1)
         else:
             logger.error('Non-fixpoint format "%s"!', fb_get('qfrmt'))
 
-        self.MAX =  2. * self.MSB - self.LSB
-        self.MIN = -2. * self.MSB
+        self.MAX =  2. * self.msb - self.lsb
+        self.MIN = -2. * self.msb
 
         # Calculate required number of places for different bases from total
         # number of bits:
@@ -595,19 +594,19 @@ class Fixed():
         - input_coeffs: uses both methods above when quantizing coefficients
 
         Saturation / two's complement wrapping happens outside the range +/- MSB,
-        requantization (round, floor, fix, ...) is applied on the ratio `y / LSB`.
+        requantization (round, floor, fix, ...) is applied on the ratio `y / lsb`.
 
         **Fractional number format WI.WF** (`fb_get('qfrmt') == 'qfrac'`):
-        `LSB =  2 ** -WF`
+        `lsb =  2 ** -WF`
 
-        - Multiply float input by `1 / self.LSB = 2**WF`, obtaining integer scale
+        - Multiply float input by `1 / self.lsb = 2**WF`, obtaining integer scale
         - Quantize
-        - Scale back by multiplying with `self.LSB` to restore fractional point
+        - Scale back by multiplying with `self.lsb` to restore fractional point
         - Find pos. and neg. overflows and replace them by wrapped or saturated
           values
 
         **Integer number format W = 1 + WI + WF** (`fb_get('qfrmt') == 'qint'`):
-        `LSB = 1`
+        `lsb = 1`
 
         - Multiply float input by `2 ** WF` to obtain integer scale
         - Quantize and treat overflows in integer scale
@@ -635,7 +634,7 @@ class Fixed():
         -------
         yq: float scalar or ndarray
             with the same shape as `y`, in the range
-            `-2 * self.MSB` ... `2 * self.MSB - self.LSB`
+            `-2 * self.msb` ... `2 * self.msb - self.lsb`
 
         Examples
         --------
@@ -652,7 +651,7 @@ class Fixed():
         >>> # Convert output to same format as input:
         >>> b = np.arange(200, dtype = np.int16)
         >>> btype = np.result_type(b)
-        >>> # MSB = 2**7, LSB = 2**(-2):
+        >>> # msb = 2**7, lsb = 2**(-2):
         >>> q_obj_b = {'WI':7, 'WF':2, 'ovfl':'wrap', 'quant':'round'}
         >>> myQb = Fixed(q_obj_b) # instantiate fixed-point object myQb
         >>> bq = myQb.fixp(b)
@@ -751,7 +750,7 @@ class Fixed():
 
         # ======================================================================
         # (2) : QUANTIZATION
-        #       For `in_frmt=='qfrac'`, multiply by 2**WF = 1/LSB to obtain an
+        #       For `in_frmt=='qfrac'`, multiply by 2**WF = 1/lsb to obtain an
         #       intermediate format with quantization step size of 1.
         #       Next, apply selected quantization method to convert
         #       floating point inputs to "fixpoint integers".
@@ -778,7 +777,7 @@ class Fixed():
                 H = synthesizeNTF(order=3, osr=64, opt=1)
                 # Calculate DSM stream and shift/scale it from -1 ... +1 to
                 # 0 ... 1 sequence
-                yq = (simulateDSM(y*self.LSB, H)[0]+1)/(2*self.LSB)
+                yq = (simulateDSM(y*self.lsb, H)[0]+1)/(2*self.lsb)
                 # returns four ndarrays:
                 # v: quantizer output (-1 or 1)
                 # xn: modulator states.
@@ -795,13 +794,13 @@ class Fixed():
 
         # ========================================================================
         # (3) : OVERFLOW / SATURATION
-        #       Handle Overflow / saturation w.r.t. to the MSB = 2 ** (W - 2),
-        #       returning a result in the range MIN = -2*MSB ... + 2*MSB-LSB = MAX
+        #       Handle Overflow / saturation w.r.t. to the msb = 2 ** (W - 2),
+        #       returning a result in the range MIN = -2*msb ... + 2*msb-lsb = MAX
         # ========================================================================
-        LSB = 1
-        MSB = 1 << (self.q_dict['WI'] + self.q_dict['WF'] - 1)  # 2 ** (W - 2)
-        MAX = 2 * MSB - LSB  # 2 ** (W - 1) - 1
-        MIN = - 2 * MSB
+        lsb = 1
+        msb = 1 << (self.q_dict['WI'] + self.q_dict['WF'] - 1)  # 2 ** (W - 2)
+        MAX = 2 * msb - lsb  # 2 ** (W - 1) - 1
+        MIN = - 2 * msb
 
         if self.q_dict['ovfl'] == 'none':
             # set all overflow flags to zero
@@ -824,8 +823,8 @@ class Fixed():
             # Replace overflows by two's complement wraparound (wrap)
             elif self.q_dict['ovfl'] == 'wrap':
                 yq = np.where(
-                    over_pos | over_neg, yq - 4. * MSB * np.trunc(
-                        (np.sign(yq) * 2 * MSB + yq) / (4 * MSB)), yq)
+                    over_pos | over_neg, yq - 4. * msb * np.trunc(
+                        (np.sign(yq) * 2 * msb + yq) / (4 * msb)), yq)
             else:
                 raise Exception(
                     f"""Unknown overflow type "{self.q_dict['ovfl']:s}"!""")
@@ -1361,7 +1360,7 @@ class Fixed():
 
         elif fb_get('fx_base') in {'bin', 'oct', 'hex'}:
             # represent fixpoint number as integer in the range -2**(W-1) ... 2**(W-1)
-            y_fix_int = np.int64(np.round(y_fix / self.LSB))
+            y_fix_int = np.int64(np.round(y_fix / self.lsb))
             W = self.q_dict['WI'] + self.q_dict['WF'] + 1
             # convert to (array of) string with 2's complement binary
             y_bin_str = binary_repr(y_fix_int, W)
