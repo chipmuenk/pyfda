@@ -55,14 +55,16 @@ class SelectFilter(QWidget):
         super().__init__()
 
         self.setObjectName(objectName)
-        self.fc_last = ''  # previous filter class
-        self._construct_ui()
-        self._construct_layout()
         self.rt = fb_get('rt')
         self.ft = fb_get('ft')
         self.fc = fb_get('fc')
         self.fo = fb_get('fo')
         self.n_fil = fb_get('n_fil')
+        self.fc_last = ''  # previous filter class
+
+        self._construct_ui()
+        self._construct_layout()
+
         self._set_response_type()  # first time initialization
 
     # -------------------------------------------------------------------------
