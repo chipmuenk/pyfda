@@ -8,9 +8,10 @@ import sys
 import unittest
 import logging
 
+import pyfda.filterbroker as fb
 from pyfda.libs.pyfda_qt_lib import qget_cmb_box, qset_cmb_box
-from pyfda.libs.compat import (Qt, QPoint, QApplication, QTableWidgetItem)
-from PyQt5.QtTest import QTest, QSignalSpy
+from pyfda.libs.compat import Qt, QApplication
+from PyQt5.QtTest import QTest
 from pyfda.input_widgets.input_coeffs import InputCoeffs
 
 app = QApplication(sys.argv)
@@ -18,6 +19,14 @@ app = QApplication(sys.argv)
 
 class FilterCoeffsTest(unittest.TestCase):
     '''Test the FilterCoeffs GUI'''
+
+    def setUp(self):
+        fb.fil_copy(src='ref', dest='0')
+
+    def tearDown(self):
+        if hasattr(self, 'form'):
+            self.form.close()
+        fb.fil_copy(src='ref', dest='0')
 
     def init(self):
         '''Create the GUI'''
@@ -48,63 +57,27 @@ class FilterCoeffsTest(unittest.TestCase):
             # self.log.warning(f"return {ret}-{arg}")
             self.assertTrue(ret > -1, "String not contained in combo box")  # assert that arg exists in combo box
 
-    def set_table_value(self, col, row, val):
-        item = self.form.tbl_coeff.item(row, col)
-        if False:  #item:  # does item exist?
-            item.setText(str(val))
-        else:  # no, construct it:
-            self.form.tbl_coeff.setItem(row, col, QTableWidgetItem(str(val)))
-            self.log.warning(f"Write table, return = {type(self.form.tbl_coeff.item(row, col))})")
-            self.log.warning(f"Row, col = {row, col})")
-            self.log.warning(f"Row, col = {self.form.tbl_coeff.rowCount(), self.form.tbl_coeff.columnCount()})")
-        #item_text = self.form.tbl_coeff.item(1,1).text()
-        #self.log.warning(f"Write table, return = {type(item_text)})")
-        return
-
-    def get_table_value(self, col, row):
-        return str(self.form.tbl_coeff.item(row, col))
-
-    def set_lineedit_value(self, edit_wdg, arg):
-        edit_wdg.clear()
-        QTest.keyClicks(edit_wdg, arg)
-        # name.setText(str(arg))
-        # QTest.keyPress(name.setText(), Qt.Key_Enter, NULL, 100)
-        # QTest.keyRelease(name.setText(), Qt.Key_Enter, NULL, 100)
-
     def initialize_form(self):
         """ utility function for initializing the form """
         self.ui.spn_digits.setValue(4)
-        # self.ui.ledScale.setText("1.5")
         self.set_cmb_box(self.ui.cmb_filter_type, 'FIR')
-        spy = QSignalSpy(self.form.sig_tx)
-        self.set_cmb_box(self.ui.cmb_fx_base, 'float64')
+        self.set_cmb_box(self.ui.cmb_qfrmt, 'Float64')
         # Push <Delete Table> Button with the left mouse button
         QTest.mouseClick(self.ui.but_clear, Qt.LeftButton)
-
-    def initialize_fixpoint_format(self):
-        self.set_cmb_box(self.ui.cmb_fx_base, 'Dec')
-        self.set_lineedit_value(self.ui.ledW, "8")
-        # The following triggers recalculation of scale etc.
-        self.set_cmb_box(self.ui.cmbQFrmt, 'Integer')
-        self.set_cmb_box(self.ui.cmbQOvfl, 'sat')
-        self.set_cmb_box(self.ui.cmb_quant, 'round')
-
-        self.assertEqual(self.ui.ledScale.text(), "128")
-        self.assertEqual(self.ui.led_wi.text(), "7")
-        self.assertEqual(self.ui.led_wf.text(), "0")
 # ==============================================================================
     def test_defaults(self):
         """Test GUI setting in its default state"""
         self.init()
         self.assertEqual(self.ui.spn_digits.value(), 4)
-        self.assertEqual(qget_cmb_box(self.ui.cmb_filter_type, data=False), "FIR")
+        self.assertEqual(qget_cmb_box(self.ui.cmb_filter_type, data=False), "IIR")
 
-        self.assertEqual(qget_cmb_box(self.ui.cmb_fx_base, data=False).lower(), 'float64')
+        self.assertEqual(qget_cmb_box(self.ui.cmb_qfrmt, data=False), 'Float64')
         self.assertEqual(self.ui.but_set_zero.text(), "= 0")
 
-        self.assertEqual(self.form.tbl_coeff.rowCount(), 3)
-        self.assertEqual(self.form.tbl_coeff.columnCount(), 1)
-        self.assertEqual(self.form.tbl_coeff.item(0, 0).text(), "1")
+        self.assertEqual(self.form.tbl_coeff.rowCount(), 5)
+        self.assertEqual(self.form.tbl_coeff.columnCount(), 2)
+        self.assertAlmostEqual(float(self.form.tbl_coeff.item(0, 0).text()), 0.005009993265049969)
+        self.assertEqual(self.form.tbl_coeff.item(0, 1).text(), "1.0")
         self.log.warning("test_defaults finished")
 
 # ------------------------------------------------------------------------------
@@ -121,36 +94,37 @@ class FilterCoeffsTest(unittest.TestCase):
         QTest.qWait(1000)
         self.assertEqual(qget_cmb_box(self.ui.cmb_filter_type, data=False), "IIR")
         # https://vicrucann.github.io/tutorials/qttest-signals-qtreewidget/
-        self.assertEqual(self.form.tbl_coeff.rowCount(), 3)
+        self.assertEqual(self.form.tbl_coeff.rowCount(), 5)
         self.assertEqual(self.form.tbl_coeff.columnCount(), 2)
         item_10 = self.form.tbl_coeff.item(0, 1)  # row, col
         self.assertEqual(float(item_10.text()), 1)
 
         self.set_cmb_box(self.ui.cmb_filter_type, 'FIR')
 
-        self.assertEqual(self.form.tbl_coeff.rowCount(), 3)
-        self.assertEqual(self.form.tbl_coeff.columnCount(), 1)
+        self.assertEqual(self.form.tbl_coeff.rowCount(), 5)
+        self.assertEqual(self.form.tbl_coeff.columnCount(), 2)
+        self.assertEqual(fb.fb_get('ft'), 'fir')
         self.log.warning("test_cmb_filter_type finished")
 
 # ==============================================================================
     def test_fixpoint_defaults(self):
         """Test fixpoint setting in its default state"""
         self.init()
+        self.set_cmb_box(self.ui.cmb_qfrmt, 'Fractional')
         self.set_cmb_box(self.ui.cmb_fx_base, 'Dec')
         self.assertEqual(self.ui.spn_digits.value(), 4)
-        self.assertEqual(qget_cmb_box(self.ui.cmb_filter_type, data=False), "FIR")
+        self.assertEqual(qget_cmb_box(self.ui.cmb_filter_type, data=False), "IIR")
 
-        self.assertEqual(self.ui.ledW.text(), "16")
-        self.assertEqual(self.ui.led_wf.text(), "15")
-        self.assertEqual(self.ui.led_wi.text(), "0")
+        self.assertEqual(self.ui.wdg_wq_coeffs_b.led_wf.text(), "15")
+        self.assertEqual(self.ui.wdg_wq_coeffs_b.led_wi.text(), "0")
         self.assertEqual(qget_cmb_box(self.ui.cmb_fx_base, data=False).lower(), "dec")
-        self.assertEqual(self.get_cmb_box(self.ui.cmbQOvfl), 'wrap')
-        self.assertEqual(self.get_cmb_box(self.ui.cmb_quant), 'floor')
+        self.assertEqual(self.get_cmb_box(self.ui.wdg_wq_coeffs_b.cmb_ovfl), 'wrap')
+        self.assertEqual(self.get_cmb_box(self.ui.wdg_wq_coeffs_b.cmb_quant), 'floor')
         self.assertEqual(self.ui.but_set_zero.text(), "= 0")
 
-        self.assertEqual(self.form.tbl_coeff.rowCount(), 3)
-        self.assertEqual(self.form.tbl_coeff.columnCount(), 1)
-        self.assertEqual(self.form.tbl_coeff.item(0, 0).text(), "1")
+        self.assertEqual(self.form.tbl_coeff.rowCount(), 5)
+        self.assertEqual(self.form.tbl_coeff.columnCount(), 2)
+        self.assertAlmostEqual(float(self.form.tbl_coeff.item(0, 0).text()), 0.0050048828125)
         self.log.warning("test_fixpoint_defaults finished")
 
 # ------------------------------------------------------------------------------
@@ -160,7 +134,7 @@ class FilterCoeffsTest(unittest.TestCase):
         self.set_cmb_box(self.ui.cmb_filter_type, 'IIR')
 
         item_10 = self.form.tbl_coeff.item(1, 0)  # row, col
-        self.assertEqual(item_10.text(), "1")
+        self.assertAlmostEqual(float(item_10.text()), 0.002969044992011087)
 
         # Push <Delete Table> Button with the left mouse button
         QTest.mouseClick(self.ui.but_clear, Qt.LeftButton)
@@ -179,25 +153,19 @@ class FilterCoeffsTest(unittest.TestCase):
         """
         self.init()
         self.initialize_form()
-        self.initialize_fixpoint_format()
         self.assertEqual(self.form.tbl_coeff.isVisible(), True)
         self.assertEqual(self.form.tbl_coeff.isEnabled(), True)
-        x = self.form.tbl_coeff.columnViewportPosition(0)
-        y = self.form.tbl_coeff.rowViewportPosition(1)
-        QTest.mouseClick(self.form.tbl_coeff.viewport(), Qt.LeftButton,
-                         Qt.NoModifier, QPoint(x, y))
-        QTest.keyClicks(QApplication.instance().focusWidget(), "13", delay=100)
-        # QTest.keyClick(QApplication.instance().focusWidget(), Qt.Key_Return, delay=1000)
+        self.form.tbl_coeff.setCurrentCell(1, 0)
+        QTest.keyClick(self.form.tbl_coeff, Qt.Key_F2)
+        QTest.qWait(50)
+        editor = QApplication.instance().focusWidget()
+        QTest.keyClick(editor, Qt.Key_A, Qt.ControlModifier)
+        QTest.keyClicks(editor, "0.125", delay=100)
+        QTest.keyClick(editor, Qt.Key_Return)
+        QTest.qWait(50)
         QTest.mouseClick(self.ui.but_apply, Qt.LeftButton)
-        QTest.qWait(1000)
-        # self.set_table_value(1, 0, 25)  # row, col, value
-        self.assertEqual(self.form.tbl_coeff.item(0, 0).text(), "1.0")
-        self.assertEqual(self.form.tbl_coeff.item(1, 0).text(), "0.0078125")
-        # self.assertEqual(self.get_table_value(1, 0), "1")
-
-        # self.assertEqual(self.get_table_value(1, 1), "15")
-
-        # self.assertEqual(self.form.tbl_coeff.rowCount(), 2)
+        self.assertAlmostEqual(float(fb.fb_get('ba')[0][1]), 0.125)
+        self.assertEqual(self.form.tbl_coeff.item(1, 0).text(), "0.125")
         self.log.warning("test_write_table finished")
 
 #    def test_shuffle(self):

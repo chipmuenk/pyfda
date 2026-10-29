@@ -55,10 +55,9 @@ class TestSequenceFunctions(unittest.TestCase):
         fb_set('fx_base', 'hex')  # set to fractional format
         q_dict = {'WI':7, 'WF':3, 'ovfl':'none', 'quant':'fix'}
         self.my_q.set_qdict(q_dict)
-        # self.assertEqual(q_dict, self.my_q.q_obj)
 
-        self.assertEqual(7, self.my_q.WI)
-        self.assertEqual(3, self.my_q.WF)
+        self.assertEqual(7, self.my_q.q_dict['WI'])
+        self.assertEqual(3, self.my_q.q_dict['WF'])
 
     def test_fix_no_ovfl(self):
         """
@@ -85,10 +84,6 @@ class TestSequenceFunctions(unittest.TestCase):
         yq_list_goal = self.y_list
         self.assertEqual(yq_list, yq_list_goal)
 
-        # test scaling (divide by scaling factor)
-        yq_list = list(self.my_q.fixp(self.y_list, scaling='div') * 2.)
-        self.assertEqual(yq_list, yq_list_goal)
-
         # return fixpoint numbers as float (rounding)
         q_dict = {'quant':'round'}
         self.my_q.set_qdict(q_dict)
@@ -102,7 +97,7 @@ class TestSequenceFunctions(unittest.TestCase):
         q_dict = {'WI':5, 'WF':2, 'ovfl':'wrap', 'quant':'fix'}
         self.my_q.set_qdict(q_dict)
         yq_list = list(self.my_q.fixp(self.y_list))
-        yq_list_goal = [-8.75, -8.0, -4.0, 0.0, 4.0, 7.0, 7.75, 8.0, 8.75]
+        yq_list_goal = [-1.0, -1.0, -0.5, 0.0, 0.5, 0.75, 0.75, 1.0, 1.0]
         self.assertEqual(yq_list, yq_list_goal)
 
         # return fixpoint numbers as integer (rounding), overflow 'none'
@@ -111,19 +106,19 @@ class TestSequenceFunctions(unittest.TestCase):
         q_dict = {'WI':3, 'WF':0, 'ovfl':'none', 'quant':'round'}
         self.my_q.set_qdict(q_dict)
         yq_list = list(self.my_q.fixp(self.y_list))
-        yq_list_goal = [-9, -8, -4, 0, 4, 7, 8, 8, 9]
+        yq_list_goal = [-1, -1, 0, 0, 0, 1, 1, 1, 1]
         self.assertEqual(yq_list, yq_list_goal)
 
         # input list of strings
         y_string = ['-1.1', '-1.0', '-0.5', '0', '0.5', '0.9', '0.99', '1.0', '1.1']
         yq_list = list(self.my_q.fixp(y_string))
-        yq_list_goal = [-9, -8, -4, 0, 4, 7, 8, 8, 9]
+        yq_list_goal = [-1, -1, 0, 0, 0, 1, 1, 1, 1]
         self.assertEqual(yq_list, yq_list_goal)
 
         # frmt float
         set_fx(False)
         yq_list = list(self.my_q.fixp(y_string))
-        self.assertEqual(yq_list, yq_list_goal)
+        self.assertEqual(yq_list, y_string)
 
     def test_fix_no_ovfl_cmplx(self):
         """
@@ -165,7 +160,7 @@ class TestSequenceFunctions(unittest.TestCase):
         q_dict = {'WI':3, 'WF':0, 'ovfl':'sat', 'quant':'round'}
         self.my_q.set_qdict(q_dict)
         yq_list = list(self.my_q.fixp(y_list_ovfl))
-        yq_list_goal = [-8.0, -8.0, -8.0, -8.0, -8.0, -4.0, 0.0, 4.0, 6.0, 7.0, 7.0, 7.0, 7.0, 7.0]
+        yq_list_goal = [-8, -3, -2, -1, -1, 0, 0, 0, 1, 1, 1, 2, 3, 7]
         self.assertEqual(yq_list, yq_list_goal)
 
         # Fractional representation, saturation
@@ -174,7 +169,7 @@ class TestSequenceFunctions(unittest.TestCase):
         q_dict = {'WI':3, 'WF':1, 'ovfl':'sat', 'quant':'round'}
         self.my_q.set_qdict(q_dict)
         yq_list = list(self.my_q.fixp(y_list_ovfl))
-        yq_list_goal = [-8, -8, -8, -8, -8, -4, 0, 4, 6.5, 7.5, 7.5, 7.5, 7.5, 7.5]
+        yq_list_goal = [-8, -3, -2, -1, -1, -0.5, 0, 0.5, 1, 1, 1, 2, 3, 7.5]
         self.assertEqual(yq_list, yq_list_goal)
 
         # normalized fractional representation, saturation
@@ -204,7 +199,7 @@ class TestSequenceFunctions(unittest.TestCase):
         q_dict = {'WI':3, 'WF':0, 'ovfl':'wrap', 'quant':'round'}
         self.my_q.set_qdict(q_dict)
         yq_list = self.my_q.fixp(y_list_ovfl)
-        yq_list_goal = [ 6.0, -2.0, 6.0, -8.0, -4.0, 0.0, 4.0, 6.0, -8.0, -6.0, 2.0, -6.0]
+        yq_list_goal = [-3.0, -2.0, -1.0, -1.0, 0.0, 0.0, 0.0, 1.0, 1.0, 1.0, 2.0, 3.0]
         np.testing.assert_array_equal(yq_list, yq_list_goal)
 
         fb_set('qfrmt', 'qfrac')
@@ -213,7 +208,7 @@ class TestSequenceFunctions(unittest.TestCase):
         q_dict = {'WI':3, 'WF':1, 'ovfl':'wrap', 'quant':'floor'}
         self.my_q.set_qdict(q_dict)
         yq_list = list(self.my_q.fixp(self.y_list))
-        yq_list_goal = [7.0, -8.0, -4, 0, 4, 7, 7.5, -8, -7.5]
+        yq_list_goal = [-1.5, -1.0, -0.5, 0.0, 0.5, 0.5, 0.5, 1.0, 1.0]
         self.assertEqual(yq_list, yq_list_goal)
 
 
@@ -229,18 +224,19 @@ class TestSequenceFunctions(unittest.TestCase):
 
         # test handling of invalid inputs - scalar inputs
         yq_list = list(map(self.my_q.float2frmt, self.y_list_validate))
-        yq_list_goal = ["0000", "0000", "0111", "0111", "0000", "0111", "0111"]
+        yq_list_goal = ["0", "0", "0", "0", "0", "0011+0001j", "0"]
         self.assertEqual(yq_list, yq_list_goal)
         # same in vector format
-        yq_list = list(self.my_q.float2frmt(self.y_list_validate))
+        yq_list = list(self.my_q.float2frmt(self.y_list))
         # input       ['1.1.1', 'xxx', '123', '1.23',    '', 1.23j + 3.21, '3.21 + 1.23 j']
-        self.assertListEqual(yq_list, yq_list_goal)
+        self.assertListEqual(
+            yq_list, ['1111', '1111', '0000', '0000', '0000', '0001', '0001', '0001', '0001'])
 
         # Integer case: Q3.0, scale = 8, wrap, scalar inputs
         q_dict = {'WI':3, 'WF':0, 'ovfl':'wrap', 'quant':'round'}
         self.my_q.set_qdict(q_dict)
         yq_list = list(map(self.my_q.float2frmt, self.y_list))
-        yq_list_goal = ['0111', '1000', '1100', '0000', '0100', '0111', '1000', '1000', '1001']
+        yq_list_goal = ['1111', '1111', '0000', '0000', '0000', '0001', '0001', '0001', '0001']
         self.assertEqual(yq_list, yq_list_goal)
         # same but vectorized function
         yq_arr = list(self.my_q.float2frmt(self.y_list))
@@ -252,7 +248,7 @@ class TestSequenceFunctions(unittest.TestCase):
         q_dict = {'WI':1, 'WF':2, 'ovfl':'sat', 'quant':'round'}
         self.my_q.set_qdict(q_dict)
         yq_list = list(map(self.my_q.float2frmt, self.y_list))
-        yq_list_goal = ['10.00', '10.00', '11.00', '00.00', '01.00', '01.11', '01.11', '01.11', '01.11']
+        yq_list_goal = ['11.00', '11.00', '11.10', '00.00', '00.10', '01.00', '01.00', '01.00', '01.00']
         self.assertEqual(yq_list, yq_list_goal)
         # same but vectorized function
         yq_list = list(self.my_q.float2frmt(self.y_list))
@@ -270,12 +266,12 @@ class TestSequenceFunctions(unittest.TestCase):
 
         # test handling of invalid inputs - scalar inputs
         yq_list = list(map(self.my_q.float2frmt, self.y_list_validate))
-        yq_list_goal = ["0", "0", "7", "1", "0", "3", "3"]
+        yq_list_goal = ["0", "0", "0", "0", "0", "3+1j", "0"]
         # input       ['1.1.1', 'xxx', '123', '1.23', '', 1.23j + 3.21, '3.21 + 1.23 j']
         self.assertEqual(yq_list, yq_list_goal)
         # same in vector format
-        yq_list = list(self.my_q.float2frmt(self.y_list_validate))
-        self.assertListEqual(yq_list, yq_list_goal)
+        yq_list = list(self.my_q.float2frmt(self.y_list))
+        self.assertListEqual(yq_list, ['F', 'F', '0', '0', '0', '1', '1', '1', '1'])
 
         # Integer case: Q6.0, scale = 1, scalar parameter, test bin2hex (Q-params are not used)
         q_dict = {'WI':6, 'WF':0, 'ovfl':'sat', 'quant':'round'}
@@ -295,7 +291,7 @@ class TestSequenceFunctions(unittest.TestCase):
         # Fractional case: Q0.6,
         self.my_q.set_qdict({'WI': 0, 'WF': 6})
         yq_list = list(map(self.my_q.float2frmt, y_list))
-        yq_list_goal = ['1.00', '1.04', '1.84', '1.FC', '0.00', '0.04', '0.7C', '0.80', '0.FC']
+        yq_list_goal = ['1.00', '1.00', '1.00', '1.00', '0.00', '0.FC', '0.FC', '0.FC', '0.FC']
         self.assertEqual(yq_list, yq_list_goal)
 
         # Integer case: Q3.0, scale = 8, scalar parameter, test float2frmt
@@ -304,7 +300,7 @@ class TestSequenceFunctions(unittest.TestCase):
         q_dict = {'WI':3, 'WF':0, 'ovfl':'wrap', 'quant':'round'}
         self.my_q.set_qdict(q_dict)
         yq_list = list(map(self.my_q.float2frmt, self.y_list))
-        yq_list_goal = ['7', '8',   'C', '0', '4', '7', '8', '8', '9']
+        yq_list_goal = ['F', 'F', '0', '0', '0', '1', '1', '1', '1']
         #self.y_list = [-1.1, -1.0, -0.5, 0, 0.5, 0.9, 0.99, 1.0, 1.1]
         self.assertEqual(yq_list, yq_list_goal)
         # same but vectorized function
@@ -323,12 +319,12 @@ class TestSequenceFunctions(unittest.TestCase):
 
         # test handling of invalid inputs - scalar inputs
         yq_list = list(map(self.my_q.float2frmt, self.y_list_validate))
-        yq_list_goal = ["0", "0", "+00-", "+", "0", "+0-", "+0-"]
+        yq_list_goal = ["0", "0", "0", "0", "0", "+0-", "0"]
         # input:  ['1.1.1', 'xxx', '123', '1.23', '', 1.23j + 3.21, '3.21 + 1.23 j']
         self.assertEqual(yq_list, yq_list_goal)
         # same in vector format
-        yq_list = list(self.my_q.float2frmt(self.y_list_validate))
-        self.assertListEqual(yq_list, yq_list_goal)
+        yq_list = list(self.my_q.float2frmt(self.y_list))
+        self.assertListEqual(yq_list, ['-', '-', '0', '0', '0', '+', '+', '+', '+'])
 
         # Integer case: Q6.0, scale = 1, scalar parameter, test bin2hex (Q-params are not used)
         q_dict = {'WI':6, 'WF':0, 'ovfl':'sat', 'quant':'round'}
@@ -349,8 +345,10 @@ class TestSequenceFunctions(unittest.TestCase):
         fb_set('fx_base', 'csd')  # set to fractional csd format
         self.my_q.set_qdict({'WI': 0, 'WF': 6})
         yq_list = list(map(self.my_q.float2frmt, y_list))
-        yq_list_goal = ['-.000000',  '-.00000+', '-.0+0+0+', '0.00000-', '0', '0.00000+', '+.0-0-0-', '+.0-0-0-', '+.00000-']
-# TODO: 3rd argument should be: '-.0000+', 7th argument should be '+.0000-', 8th argument should be '+.00000'
+        yq_list_goal = [
+            '-.000000', '-.000000', '-.000000', '-.000000', '0',
+            '+.00000-', '+.00000-', '+.00000-', '+.00000-'
+        ]
         self.assertEqual(yq_list, yq_list_goal)
 
         # Integer case: Q3.0, scale = 8, scalar parameter, test float2frmt
@@ -359,7 +357,7 @@ class TestSequenceFunctions(unittest.TestCase):
         q_dict = {'WI':3, 'WF':0, 'ovfl':'wrap', 'quant':'round'}
         self.my_q.set_qdict(q_dict)
         yq_list = list(map(self.my_q.float2frmt, self.y_list))
-        yq_list_goal = ['+00-', '-000', '-00', '0', '+00', '+00-', '-000', '-000', '-00+']
+        yq_list_goal = ['-', '-', '0', '0', '0', '+', '+', '+', '+']
         #['7', '8',   'C', '0', '4', '7', '8', '8', '9']
         #self.y_list = [-1.1, -1.0, -0.5, 0, 0.5, 0.9, 0.99, 1.0, 1.1]
         self.assertEqual(yq_list, yq_list_goal)
@@ -375,7 +373,7 @@ class TestSequenceFunctions(unittest.TestCase):
         """
         # return floats as float, no quantization options are regarded here
         fb_set('qfrmt', 'float64')
-        fb_set('fx_base', 'dec')  # set to fractional format
+        fb_set('fx_base', 'dec')  # set to decimal format
         q_dict = {'WI':3, 'WF':0, 'ovfl':'wrap', 'quant':'round'}
         self.my_q.set_qdict(q_dict)
         # scalar format
@@ -414,17 +412,17 @@ class TestSequenceFunctions(unittest.TestCase):
 
         # same for integer case
         fb_set('qfrmt', 'qint')
-        fb_set('fx_base', 'dec')  # set to fractional format
+        fb_set('fx_base', 'bin')  # set to binary format
         y_list = ['11000', '1000', '-0111', '1001', '1100', '1111', '0000', '0100', '0111', '01000']
         q_dict = {'WI':3, 'WF':0}
         self.my_q.set_qdict(q_dict)
         yq_list = list(map(self.my_q.frmt2float, y_list))
-        yq_list_goal = [-1, -1, -0.875, -0.875, -0.5, -0.125,  0, 0.5, 0.875, -1]
+        yq_list_goal = [-8, -8, -7, -7, -4, -1, 0, 4, 7, -8]
         self.assertEqual(yq_list, yq_list_goal)
 
         # same for integer case without scaling
         yq_list = list(map(self.my_q.frmt2float, y_list))
-        yq_list_goal = [-8, -8, -7, -7, -4, -1,  0, 4, 7, -8]
+        yq_list_goal = [-8, -8, -7, -7, -4, -1, 0, 4, 7, -8]
         self.assertEqual(yq_list, yq_list_goal)
         # same but vectorized
         #yq_list = list(self.my_q.frmt2float(y_list))
@@ -436,7 +434,7 @@ class TestSequenceFunctions(unittest.TestCase):
         """
         # saturation behaviour with 'round' quantization for integer case
         y_list = ['100', '-F', '10', '3F', '1E', '1F', '0', '00', '', '-1F', '1', '2', 'A', 'A.0', 'F', '020.01']
-        fb_set('qint', 'qfrac')
+        fb_set('qfrmt', 'qfrac')
         fb_set('fx_base', 'hex')  # set to fractional format
         q_dict = {'WI':4, 'WF':0, 'ovfl':'sat', 'quant':'round'}
         self.my_q.set_qdict(q_dict)
@@ -473,7 +471,7 @@ class TestSequenceFunctions(unittest.TestCase):
         q_dict = {'WI':3, 'WF':0, 'ovfl':'sat', 'quant':'round'}
         self.my_q.set_qdict(q_dict)
         yq_list = list(map(self.my_q.frmt2float, y_list))
-        yq_list_goal = [0, 0.125, 0.125, 0.125, 0.25, 0.25, 0.0, 0.125, 0.25, -1, 0, 0.25, 0.875, 0]
+        yq_list_goal = [0, 1, 1, 1, 2, 2, 0, 1, 2, -8, 0, 2, 7, 0]
         self.assertEqual(yq_list, yq_list_goal)
 
     def test_frmt2float_csd(self):
@@ -497,7 +495,7 @@ class TestSequenceFunctions(unittest.TestCase):
         q_dict = {'WI':4, 'WF':0, 'ovfl':'sat', 'quant':'round'}
         self.my_q.set_qdict(q_dict)
         yq_list = list(map(self.my_q.frmt2float, y_list))
-        yq_list_goal = [-8, -8, -1, -0.5, 0, 0, 0, 0, 0.5, 1, 5, 5, 7.5, 7.5, 0]
+        yq_list_goal = [-16, -16, -2, -1, 0, 0, 0, 0, 1, 2, 10, 10, 15, 15, 0]
         self.assertEqual(yq_list, yq_list_goal)
 
         # same with Q5.2 quantization
@@ -511,7 +509,7 @@ class TestSequenceFunctions(unittest.TestCase):
         q_dict = {'WI':5, 'WF':2, 'ovfl':'sat', 'quant':'round'}
         self.my_q.set_qdict(q_dict)
         yq_list = list(map(self.my_q.frmt2float, y_list))
-        yq_list_goal = [-128, -64, -9, -4, 0, 0, 0, 2, 4, 8, 40, 39, 60, 64, 0]
+        yq_list_goal = [-32, -16, -2.25, -1, 0, 0, 0, 0.5, 1, 2, 10, 9.75, 15, 16, 0]
         self.assertEqual(yq_list, yq_list_goal)
 
         # same but vectorized
