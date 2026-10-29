@@ -132,8 +132,6 @@ class TestSequenceFunctions(unittest.TestCase):
         self.my_q.set_qdict(q_dict)
         # test handling of complex inputs - scalar inputs
         yq_list = list(map(self.my_q.fixp, self.y_list_cmplx))
-        # self.y_list_cmplx = [-1.1j + 0.1, -1.0 - 0.3j, -0.5-0.5j, 0j, 0.5j, 0.9, 0.99+0.3j, 1j, 1.1]
-        #                    [(0.1-1.1j), (-1-0.3j), (-0.5-0.5j), 0.0, 0.5j, 0.9, (0.99+0.3j), 1j, 1.1]
         yq_list_goal = [0.1 - 1.1j, -1.0 - 0.3j, -0.5 - 0.5j, 0.0, 0.5j, 0.9, 0.99 + 0.3j, 1j, 1.1]
         self.assertEqual(yq_list, yq_list_goal)
         # same in array format

@@ -88,9 +88,9 @@ class TestSequenceFunctions(unittest.TestCase):
     def test_empty(self): # ret-value to be discussed
         """ empty input"""
         roots_in = []
-        roots_goal = [],[]
+        roots_goal = np.array([]), np.array([])  # , dtype=np.float64), np.array([], dtype=np.float64)
         roots_out = FuT(roots_in)
-        self.assertEqual(roots_out,roots_goal)
+        self.assertTrue(np.array_equal(roots_out, roots_goal))
 
 
     def test_single_root(self):
