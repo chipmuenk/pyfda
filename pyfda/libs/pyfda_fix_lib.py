@@ -423,12 +423,6 @@ class Fixed():
     n_data : integer
         total number of simulation data points
 
-    N_over_neg : integer
-        number of negative overflows (commented out)
-
-    N_over_pos : integer
-        number of positive overflows (commented out)
-
     ovr_flag: integer or integer array (same shape as input argument)
         overflow flag, meaning:
 
@@ -488,6 +482,8 @@ class Fixed():
 
         # create a reference to the dict passed during construction as instance attribute
         self.q_dict = q_dict
+        # self.WI = self.q_dict['WI']
+        # self.WF = self.q_dict['WF']
 
         self.set_qdict({})  # trigger calculation of parameters
         self.reset_n()       # initialize overflow-counter
@@ -803,17 +799,15 @@ class Fixed():
         MIN = - 2 * msb
 
         if self.q_dict['ovfl'] == 'none':
-            # set all overflow flags to zero
-            self.n_over = 0  # self.N_over_neg = self.N_over_pos =
+            # set overflow counter to zero
+            self.n_over = 0
         else:
             # Bool. vectors with '1' for every neg./pos overflow:
             over_neg = yq < MIN
             over_pos = yq > MAX
             # create flag / array of flags for pos. / neg. overflows
             self.ovr_flag = over_pos.astype(int) - over_neg.astype(int)
-            # No. of pos. / neg. / all overflows occured since last reset:
-            # self.N_over_neg += np.sum(over_neg)
-            # self.N_over_pos += np.sum(over_pos)
+            # No. of overflows occured since last reset:
             self.n_over += np.sum(over_neg) + np.sum(over_pos)
 
             # Replace overflows with Min/Max-Values (saturation):
