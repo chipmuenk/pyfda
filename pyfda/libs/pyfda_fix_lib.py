@@ -590,7 +590,7 @@ class Fixed():
         This is used a.o. by the following methods / classes:
 
         - `frmt2float()`: always returns a float with RWV
-        - `float2frmt()`: starts with RWV, passes on the scaling argument
+        - `float2frmt()`: starts with RWV (float) and returns a str in the requested format
         - input_coeffs: uses both methods above when quantizing coefficients
 
         Saturation / two's complement wrapping happens outside the range +/- MSB,
