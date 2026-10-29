@@ -317,6 +317,7 @@ class MplWidget(QWidget):
         """
         if self.mpl_toolbar.a_cr.isChecked():
             if hasattr(self, "cursors"):  # dangling references to old cursors?
+                # pylint: disable=access-member-before-definition
                 for c in self.cursors:
                     c.remove()         # yes, remove them!
             self.cursors = []
