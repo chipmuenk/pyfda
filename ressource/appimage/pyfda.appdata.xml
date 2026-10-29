@@ -18,4 +18,10 @@
 	<provides>
 		<id>pyfda.desktop</id>
 	</provides>
+	<keywords>
+		<keyword>filter design tool</keyword>
+		<keyword>python filter design</keyword>
+		<keyword>pyfda software</keyword>
+		<keyword>analog filter design</keyword>
+	</keywords>
 </component>
