@@ -855,8 +855,6 @@ class Fixed():
         self.q_dict.update({'n_over': 0})
 
         self.ovr_flag = 0
-        # self.N_over_pos = 0
-        # self.N_over_neg = 0
         self.n_over = 0
         self.n_data = 0
 
@@ -951,7 +949,7 @@ class Fixed():
         return self.fixp(x_i_frac, out_frmt=fb_get('qfrmt'))
 
     # --------------------------------------------------------------------------
-    def frmt2float(self, y):
+    def frmt2float(self, y: np.ndarray | float | str) -> NDArray | float:
         """
         Return floating point representation for fixpoint `y` (scalar or array)
         given in format `fb_get('fx_base')`.
@@ -1243,7 +1241,7 @@ class Fixed():
         return 0.0
 
     # --------------------------------------------------------------------------
-    def float2frmt(self, y) -> str | float | NDArray:
+    def float2frmt(self, y: np.ndarray | float) -> str | float | NDArray[np.float64]:
         """
         Convert an array or single value of float / complex / string to a quantized
         representation in one of the formats float / int / bin / hex / csd.
