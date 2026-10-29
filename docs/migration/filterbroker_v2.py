@@ -69,7 +69,7 @@ class FilterConfig:
     f_sb: float = 0.2
     f_sb2: float = 0.4
 
-    N: int = 4  # filter order
+    n_fil: int = 4  # filter order
     t_s: float = 1.0  # sample time
 
     # Weights for pass- and stopbands
@@ -107,7 +107,7 @@ class FilterConfig:
     # These will need special handling in serialize/deserialize
     ba: Any = field(default_factory=lambda: np.array([[1], [1]]))
     sos: Any = field(default_factory=lambda: np.array([[1, 0, 0, 1, 0, 0]]))
-    zpk: Any = field(default_factory=lambda: np.array([[], [], [1]]))
+    zpk: Any = field(default_factory=lambda: np.array([[], [], []]))  # np.array([[], [], []]))
     creator: list = field(default_factory=lambda: ['sos', 'pyfda.filter_widgets.ellip'])
     _id: list = field(default_factory=list)
 
