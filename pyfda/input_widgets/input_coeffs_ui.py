@@ -28,6 +28,37 @@ from pyfda.pyfda_rc import params
 
 logger = logging.getLogger(__name__)
 
+CMB_FILTER_TYPE_ITEMS = [
+    "<span>Select between IIR and FIR filter for manual entry. "
+    "Changing the type reloads the filter from the filter dict.</span>",
+    ('fir', "FIR", "<span>Finite Impulse Response filter</span>"),
+    ('iir', "IIR", "<span>Infinite Impulse Response filter</span>")
+    ]
+CMB_FILTER_TYPE_DEFAULT = 'fir'
+
+CMB_QFRMT_ITEMS = [
+    "<span>Quantization format for coefficients (only affects "
+    "display, not stored values).</span>",
+    ('float64', "Float64", "<span>Full precision floating point format</span>"),
+    ('float32', "Float32", "<span>Single precision floating point format</span>"),
+    ('qint', "Integer", "<span>Integer format with <i>WI</i> + 1 bits "
+        "(range -2<sup>WI</sup> ... 2<sup>WI</sup> - 1)</span>"),
+    ('qfrac', "Fractional",
+        "<span>General fractional format with <i>WI</i> + <i>WF</i> + 1 bits "
+        "(range -2<sup>WI</sup> ... 2<sup>WI</sup> - 2<sup>WF</sup>).</span>")
+    ]
+CMB_QFRMT_DEFAULT = 'float64'
+
+CMB_FX_BASE_ITEMS = [
+    "<span>Select the coefficient fixpoint display format.</span>",
+    ('dec', "Dec", "<span>Fixpoint coefficients in decimal format</span>"),
+    ('hex', "Hex", "<span>Fixpoint coefficients in hexadecimal format</span>"),
+    ('bin', "Bin", "<span>Fixpoint coefficients in binary format</span>"),
+    ('oct', "Oct", "<span>Fixpoint coefficients in octal format</span>"),
+    ('csd', "CSD", "<span>Fixpoint coefficients in Canonically Signed Digit "
+        "(ternary logic) format</span>")
+    ]
+CMB_FX_BASE_DEFAULT = "dec"
 
 class InputCoeffsUI(QWidget):
     """
@@ -39,30 +70,6 @@ class InputCoeffsUI(QWidget):
     def __init__(self):
         super().__init__()
         self.eps = 1.e-6  # initialize tolerance value
-
-        self.cmb_qfrmt_items = [
-            "<span>Quantization format for coefficients (only affects "
-            "display, not stored values).</span>",
-            ('float64', "Float64", "<span>Full precision floating point format</span>"),
-            ('float32', "Float32", "<span>Single precision floating point format</span>"),
-            ('qint', "Integer", "<span>Integer format with <i>WI</i> + 1 bits "
-             "(range -2<sup>WI</sup> ... 2<sup>WI</sup> - 1)</span>"),
-            ('qfrac', "Fractional",
-             "<span>General fractional format with <i>WI</i> + <i>WF</i> + 1 bits "
-             "(range -2<sup>WI</sup> ... 2<sup>WI</sup> - 2<sup>WF</sup>).</span>")
-            ]
-        self.cmb_qfrmt_default = 'float64'
-
-        self.cmb_fx_base_items = [
-            "<span>Select the coefficient fixpoint display format.</span>",
-            ('dec', "Dec", "<span>Fixpoint coefficients in decimal format</span>"),
-            ('hex', "Hex", "<span>Fixpoint coefficients in hexadecimal format</span>"),
-            ('bin', "Bin", "<span>Fixpoint coefficients in binary format</span>"),
-            ('oct', "Oct", "<span>Fixpoint coefficients in octal format</span>"),
-            ('csd', "CSD", "<span>Fixpoint coefficients in Canonically Signed Digit "
-             "(ternary logic) format</span>")
-            ]
-        self.cmb_fx_base_default = "dec"
 
         self.load_save_clipboard = False  # load / save to clipboard or file
 
@@ -116,13 +123,11 @@ class InputCoeffsUI(QWidget):
         # -----------------------------------------------------------------
         self.lbl_display = QLabel(to_html("Display:", frmt='bi'), self)
         self.cmb_qfrmt = QComboBox(self)
-        qcmb_box_populate(self.cmb_qfrmt, self.cmb_qfrmt_items,
-                          self.cmb_qfrmt_default)
+        qcmb_box_populate(self.cmb_qfrmt, CMB_QFRMT_ITEMS, CMB_QFRMT_DEFAULT)
         self.cmb_qfrmt.setSizeAdjustPolicy(QComboBox.AdjustToContents)
 
         self.cmb_fx_base = QComboBox(self)
-        qcmb_box_populate(self.cmb_fx_base, self.cmb_fx_base_items,
-                          self.cmb_fx_base_default)
+        qcmb_box_populate(self.cmb_fx_base, CMB_FX_BASE_ITEMS, CMB_FX_BASE_DEFAULT)
 
         self.spn_digits = QSpinBox(self)
         self.spn_digits.setRange(0, 20)
@@ -148,10 +153,7 @@ class InputCoeffsUI(QWidget):
         # -----------------------------------------------------------------
 
         self.cmb_filter_type = QComboBox(self, objectName="comboFilterType")
-        self.cmb_filter_type.setToolTip(
-            "<span>Select between IIR and FIR filter for manual entry. "
-            "Changing the type reloads the filter from the filter dict.</span>")
-        self.cmb_filter_type.addItems(['FIR', 'IIR'])
+        qcmb_box_populate(self.cmb_filter_type, CMB_FILTER_TYPE_ITEMS, CMB_FILTER_TYPE_DEFAULT)
         self.cmb_filter_type.setSizeAdjustPolicy(QComboBox.AdjustToContents)
 
         self.but_add_cells = QPushButton(self)
