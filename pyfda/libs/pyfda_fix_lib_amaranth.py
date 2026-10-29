@@ -104,8 +104,8 @@ def requant(mod: Module, sig_i: Signal, QI: dict, QO: dict) -> Signal:
     dWI = WI_I - WO_I       # difference of integer lengths
 
     # max. resp. min, output values
-    MIN_o = - 1 << (WO - 1)
-    MAX_o = -MIN_o - 1
+    min_o = - 1 << (WO - 1)
+    max_o = -min_o - 1
 
     # intermediate signal with requantized fractional part
     sig_i_q = Signal(signed(max(WI, WO)))
@@ -147,14 +147,14 @@ def requant(mod: Module, sig_i: Signal, QI: dict, QO: dict) -> Signal:
         mod.d.comb += ovfl_o.eq(0)
     elif QO['ovfl'] == 'sat':
         with mod.If(sig_i_q[-1] == 1):
-            with mod.If(sig_i_q < MIN_o):
-                mod.d.comb += sig_o.eq(MIN_o)
+            with mod.If(sig_i_q < min_o):
+                mod.d.comb += sig_o.eq(min_o)
                 mod.d.comb += ovfl_o.eq(1)
             with mod.Else():
                 mod.d.comb += sig_o.eq(sig_i_q)
                 mod.d.comb += ovfl_o.eq(0)
-        with mod.Elif(sig_i_q > MAX_o):  # sig_i_q[-1] == 0
-            mod.d.comb += sig_o.eq(MAX_o)
+        with mod.Elif(sig_i_q > max_o):  # sig_i_q[-1] == 0
+            mod.d.comb += sig_o.eq(max_o)
             mod.d.comb += ovfl_o.eq(1)
         with mod.Else():
             mod.d.comb += sig_o.eq(sig_i_q)
