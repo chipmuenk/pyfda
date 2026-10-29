@@ -180,7 +180,7 @@ class InputCoeffs(QWidget):
         self.ui.but_table_export.clicked.connect(self.export_table)
         self.ui.but_table_import.clicked.connect(self._import)
 
-        self.ui.cmb_filter_type.currentIndexChanged.connect(self._filter_type)
+        self.ui.cmb_filter_type.currentIndexChanged.connect(self._set_filter_type)
 
         self.ui.but_del_cells.clicked.connect(self._delete_cells)
         self.ui.but_add_cells.clicked.connect(self._add_cells)
@@ -309,21 +309,21 @@ class InputCoeffs(QWidget):
         qstyle_widget(self.ui.but_undo, 'changed')
 
     # --------------------------------------------------------------------------
-    def _filter_type(self, ftype: set) -> None:
+    def _set_filter_type(self, ftype: str) -> None:
         """
-        Get / set 'FIR' and 'IIR' filter from cmb_filter_type combobox and set filter
+        Set filter type ('fir' or 'iir') filter from cmb_filter_type combobox and set filter
             dict and table properties accordingly.
 
         When argument fil_type is not None, set the combobox accordingly.
 
         Reload from filter dict unless ftype is specified [does this make sense?!]
         """
-        if ftype in {'FIR', 'IIR'}:
+        if ftype in {'fir', 'iir'}:
             ret = qset_cmb_box(self.ui.cmb_filter_type, ftype)
             if ret == -1:
                 logger.warning("Unknown filter type %s", ftype)
 
-        if self.ui.cmb_filter_type.currentText() == 'IIR':
+        if self.ui.cmb_filter_type.currentData() == 'iir':
             fb_set('ft', 'iir')
             self.col = 2
             self.tbl_coeff.setColumnCount(2)
@@ -412,13 +412,13 @@ class InputCoeffs(QWidget):
             self.num_cols = 1
             self.tbl_coeff.setColumnCount(1)
             self.tbl_coeff.setHorizontalHeaderLabels(["b"])
-            qset_cmb_box(self.ui.cmb_filter_type, 'FIR')
+            qset_cmb_box(self.ui.cmb_filter_type, 'fir', data=True)
             self.ui.wdg_wq_coeffs_a.setVisible(False)  # always hide a coeffs for FIR
         else:
             self.num_cols = 2
             self.tbl_coeff.setColumnCount(2)
             self.tbl_coeff.setHorizontalHeaderLabels(["b", "a"])
-            qset_cmb_box(self.ui.cmb_filter_type, 'IIR')
+            qset_cmb_box(self.ui.cmb_filter_type, 'iir', data=True)
             # hide all q-settings for float:
             self.ui.wdg_wq_coeffs_a.setVisible(not is_float)
 
@@ -546,10 +546,10 @@ class InputCoeffs(QWidget):
                     if num_rows > 1:
                         self.ba[1].append(data_str[c][1])
             if num_rows > 1:
-                self._filter_type(ftype='IIR')
+                self._set_filter_type(ftype='iir')
             else:
                 self.ba[1] = zeros_with_val(len(self.ba[0]))
-                self._filter_type(ftype='FIR')
+                self._set_filter_type(ftype='fir')
         else:
             if formatted_import:
                 self.ba[0] =\
@@ -563,10 +563,10 @@ class InputCoeffs(QWidget):
                         [self.Q[1].frmt2float(s) for s in data_str[1]]
                 else:
                     self.ba[1] = data_str[1]
-                self._filter_type(ftype='IIR')
+                self._set_filter_type(ftype='iir')
             else:
                 self.ba[1] = zeros_with_val(len(self.ba[0]))
-                self._filter_type(ftype='FIR')
+                self._set_filter_type(ftype='fir')
 
         logger.warning("Type of self.ba[0]: %s", type(self.ba[0]))
         logger.warning("Contents of self.ba: %s", self.ba)
