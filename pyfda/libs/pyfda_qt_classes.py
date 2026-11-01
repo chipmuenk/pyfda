@@ -372,57 +372,6 @@ class RotatedButton(QPushButton):
         return options
 
 
-class QLabelVert(QLabel):
-    """
-    ##### currently unused #####
-
-    Create a vertical label.
-
-    Adapted from
-    https://pyqtgraph.readthedocs.io/en/latest/_modules/pyqtgraph/widgets/VerticalLabel.html
-
-    https://stackoverflow.com/questions/34080798/pyqt-draw-a-vertical-label
-
-    check https://stackoverflow.com/questions/29892203/draw-rich-text-with-qpainter
-
-    Parameters
-    ----------
-    text : str
-        Label text to display (will be drawn rotated).
-
-    orientation : str, optional
-        Orientation of the label; currently 'west' (default) is supported.
-
-    """
-
-    def __init__(self, text: str, orientation: str = 'west'):
-        QLabel.__init__(self, text)
-        self.orientation = orientation
-
-    def paintEvent(self, ev: QEvent) -> None:
-        """
-        Handle the paint event to draw the rotated label.
-
-        Parameters
-        ----------
-        ev : QEvent
-            The paint event to process.
-        """
-        # p = QtGui.QPainter(self)
-        # p.setPen(QtCore.Qt.black)
-        p = QtGui.QPainter(self)
-        p.rotate(-90)
-        rgn = QtCore.QRect(-self.height(), 0, self.height(), self.width())
-        # align = self.alignment()  # use alignment of original widget
-        align = QtCore.Qt.AlignVCenter | QtCore.Qt.AlignHCenter
-        # p.translate(0, -1 * self.width())
-
-        # Draw plain text in `rgn` with alignment `align`
-        self.hint = p.drawText(rgn, align, self.text())
-        p.drawText(rgn, align, self.text())  # returns (height, width)
-        # p.drawControl()
-        p.end()
-
     def sizeHint(self) -> QtCore.QSize:
         """
         Provide a size hint for the label based on its dimensions.
