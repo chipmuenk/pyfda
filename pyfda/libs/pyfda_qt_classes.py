@@ -323,18 +323,6 @@ class RotatedButton(QPushButton):
         size.transpose()
         return size
 
-    def sizeHint(self) -> QtCore.QSize:
-        """
-        Provide the size hint for the rotated button.
-
-        Returns
-        -------
-        QtCore.QSize
-            The recommended size for the button.
-        """
-        size = super().sizeHint()
-        size.transpose()
-        return size
 
     def get_style_options(self) -> QtWidgets.QStyleOptionButton:
         """
@@ -371,32 +359,20 @@ class RotatedButton(QPushButton):
         options.iconSize = self.iconSize()
         return options
 
-
+ 
     def sizeHint(self) -> QtCore.QSize:
         """
-        Provide a size hint for the label based on its dimensions.
+        Provide the size hint for the rotated button.
 
         Returns
         -------
-        QSize
-            The recommended size for the label.
+        QtCore.QSize
+            The recommended size for the button.
         """
         size = super().sizeHint()
         size.transpose()
         return size
-
-    def minimumSizeHint(self) -> QtCore.QSize:
-        """
-        Provide a minimum size hint for the label based on its dimensions.
-
-        Returns
-        -------
-        QSize
-            The minimum recommended size for the label.
-        """
-        size = super().minimumSizeHint()
-        size.transpose()
-        return size
+ 
 
 # ==============================================================================
 
