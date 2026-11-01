@@ -46,10 +46,10 @@ class FIRDFPyfixp():
         self.p = p
 
         # create various quantizers and initialize / reset them
-        self.Q_b = fx.Fixed(self.p['QCB'])  # transversal coeffs
+        self.q_b = fx.Fixed(self.p['QCB'])  # transversal coeffs
         self.q_mul = fx.Fixed(self.p['QACC'].copy())  # partial products
         self.q_acc = fx.Fixed(self.p['QACC'])  # accumulator
-        self.Q_O = fx.Fixed(self.p['QO'])  # output
+        self.q_o = fx.Fixed(self.p['QO'])  # output
 
         self.init(p)
         logger.info("Instantiated fx filter")
@@ -86,14 +86,14 @@ class FIRDFPyfixp():
         q_mul = p['QACC'].copy()
 
         # update the quantizers
-        self.Q_b.set_qdict(self.p['QCB'])  # transversal coeffs.s
+        self.q_b.set_qdict(self.p['QCB'])  # transversal coeffs.s
         self.q_mul.set_qdict(q_mul)  # partial products
         self.q_acc.set_qdict(self.p['QACC'])  # accumulator
-        self.Q_O.set_qdict(self.p['QO'])  # output
+        self.q_o.set_qdict(self.p['QO'])  # output
 
         # Quantize coefficients and store them in local attributes
         # This also resets the overflow counters.
-        self.b_q = fx.quant_coeffs(fb_get('ba')[0], self.Q_b)
+        self.b_q = fx.quant_coeffs(fb_get('ba')[0], self.q_b)
 
         self.L = len(self.b_q)  # filter length = number of taps
 
@@ -117,7 +117,7 @@ class FIRDFPyfixp():
         """
         self.q_mul.reset_n()
         self.q_acc.reset_n()
-        self.Q_O.reset_n()
+        self.q_o.reset_n()
         self.zi = np.zeros(self.L - 1)
 
     # ---------------------------------------------------------
@@ -185,7 +185,7 @@ class FIRDFPyfixp():
         self.q_acc.q_dict['n_over'] = self.q_acc.q_dict['n_over'] + self.q_mul.q_dict['n_over']
         self.q_mul.reset_n()
 
-        return self.Q_O.requant(y_q[:len(x)], self.q_acc), self.zi
+        return self.q_o.requant(y_q[:len(x)], self.q_acc), self.zi
 
 
 # ------------------------------------------------------------------------------
@@ -207,10 +207,10 @@ if __name__ == '__main__':
         print("Filter fixpoint response / state variables for input = np.ones(7):")
         x = np.ones(7)
         y = dut.fxfilter(x=x)
-        # if dut.Q_I.n_over != 0:
-        #    print(f"n_over(Q_I) = {dut.Q_I.n_over}")
-        if dut.Q_O.n_over != 0:
-            print(f"n_over(Q_O) = {dut.Q_O.n_over}")
+        # if dut.q_i.n_over != 0:
+        #    print(f"n_over(q_i) = {dut.q_i.n_over}")
+        if dut.q_o.n_over != 0:
+            print(f"n_over(q_o) = {dut.q_o.n_over}")
         if dut.q_mul.n_over != 0:
             print(f"n_over(q_mul) = {dut.q_mul.n_over}")
         print(y)

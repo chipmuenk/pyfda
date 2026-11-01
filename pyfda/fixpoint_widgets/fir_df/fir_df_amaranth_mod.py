@@ -127,7 +127,7 @@ class FIRDFAmaranthMod(Elaboratable):
         """
         self.q_mul.reset_n()
         # self.q_acc.reset_n()
-        # self.Q_O.reset_n()
+        # self.q_o.reset_n()
         self.zi = np.zeros(self.L - 1)
 
     # ---------------------------------------------------------
@@ -181,12 +181,12 @@ if __name__ == '__main__':
          'QO': {'WI': 6, 'WF': 3, 'ovfl': 'wrap', 'quant': 'round'}
          }
 
-    Q_b = fx.Fixed(p['QCB'])  # quantizer for transversal coeffs
-    b_q = fx.quant_coeffs([1, 2, 3, 2, 1], Q_b, out_frmt="qint")
+    q_b = fx.Fixed(p['QCB'])  # quantizer for transversal coeffs
+    b_q = fx.quant_coeffs([1, 2, 3, 2, 1], q_b, out_frmt="qint")
     p.update({'ba': b_q})
 
-    Q_I = fx.Fixed(p['QI'])
-    Q_O = fx.Fixed(p['QO'])
+    q_i = fx.Fixed(p['QI'])
+    q_o = fx.Fixed(p['QO'])
 
     dut = FIRDFAmaranthMod(p)
 
@@ -205,7 +205,7 @@ if __name__ == '__main__':
     sim.add_clock(1/48000)
 
 
-    stimulus = Q_I.fixp(np.ones(20), out_frmt='qint')
+    stimulus = q_i.fixp(np.ones(20), out_frmt='qint')
     sim.add_process(process)
     # sim.run()
     # This remembers sreg from last run!

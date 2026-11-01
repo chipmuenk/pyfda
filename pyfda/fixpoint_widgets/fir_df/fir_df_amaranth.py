@@ -60,10 +60,10 @@ class FIRDFAmaranth():
                  'tooltip': 'Generate Verilog code for the filter'}
         }
         self.p = p  # parameter dictionary with coefficients etc.
-        self.Q_b = fx.Fixed(self.p['QCB'])  # transversal coeffs
+        self.q_b = fx.Fixed(self.p['QCB'])  # transversal coeffs
         # self.q_mul = fx.Fixed(self.p['QACC'].copy())  # partial products
         # self.q_acc = fx.Fixed(self.p['QACC'])  # accumulator
-        self.Q_O = fx.Fixed(self.p['QO'])  # output
+        self.q_o = fx.Fixed(self.p['QO'])  # output
         self.init(p)
         logger.info("Instantiated fx filter '%s'", self.__class__.__name__)
 
@@ -95,7 +95,7 @@ class FIRDFAmaranth():
         if not get_fx():
             return
 
-        b_q = fx.quant_coeffs(fb_get('ba', 0), self.Q_b, out_frmt="qint")
+        b_q = fx.quant_coeffs(fb_get('ba', 0), self.q_b, out_frmt="qint")
         self.L = len(b_q)
 
         self.reset()
@@ -151,7 +151,7 @@ class FIRDFAmaranth():
         Reset register and overflow counters of quantizers
         (but don't reset coefficient quantizers)
         """
-        self.Q_O.reset_n()
+        self.q_o.reset_n()
         self.zi = np.zeros(self.L - 1)
 
     # ---------------------------------------------------------
@@ -213,11 +213,11 @@ class FIRDFAmaranth():
         # Currently doesn't work, output signal is quantized afterwards, resetting 'n_over'
         # fb_set('fxq', 'QO', 'n_over', 13)  # doesn't work, output signal is quantized
 
-        # logger.warning("y = %s", self.Q_O.fixp(
+        # logger.warning("y = %s", self.q_o.fixp(
         #                self.output, in_frmt='qint', out_frmt=fb_get('qfrmt')))
         # N_ovfl_acc = sum(self.ovfl_acc)
         # logger.error(f"N_ovfl_acc = {self.ovfl_acc}")
-        return self.Q_O.fixp(self.output, in_frmt='qint', out_frmt=fb_get('qfrmt')), self.zi
+        return self.q_o.fixp(self.output, in_frmt='qint', out_frmt=fb_get('qfrmt')), self.zi
 
 # ------------------------------------------------------------------------------
     def to_verilog(self, **kwargs):
@@ -243,13 +243,13 @@ if __name__ == '__main__':
          'QO': {'WI': 6, 'WF': 3, 'ovfl': 'wrap', 'quant': 'round'}
          }
 
-    Q_b = fx.Fixed(p['QCB'])  # quantizer for transversal coeffs
-    b_q = fx.quant_coeffs([1, 2, 3, 2, 1], Q_b, out_frmt="qint")
-    Q_I = fx.Fixed(p['QI'])
-    Q_O = fx.Fixed(p['QO'])
+    q_b = fx.Fixed(p['QCB'])  # quantizer for transversal coeffs
+    b_q = fx.quant_coeffs([1, 2, 3, 2, 1], q_b, out_frmt="qint")
+    q_i = fx.Fixed(p['QI'])
+    q_o = fx.Fixed(p['QO'])
 
     p.update({'ba': b_q})
 
     dut = FIRDFAmaranth(p)
-    print(dut.fxfilter(Q_I.fixp(np.ones(20), out_frmt='qint')))
-    print(dut.fxfilter(Q_I.fixp(np.zeros(20), out_frmt='qint')))
+    print(dut.fxfilter(q_i.fixp(np.ones(20), out_frmt='qint')))
+    print(dut.fxfilter(q_i.fixp(np.zeros(20), out_frmt='qint')))

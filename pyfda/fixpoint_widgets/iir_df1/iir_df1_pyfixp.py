@@ -46,13 +46,13 @@ class IIR_DF1_pyfixp(object):
         self.p = p
 
         # create various quantizers and initialize / reset them
-        self.Q_a = fx.Fixed(self.p['QCA'])  # recursive coeffs
-        self.Q_b = fx.Fixed(self.p['QCB'])  # transversal coeffs.
+        self.q_a = fx.Fixed(self.p['QCA'])  # recursive coeffs
+        self.q_b = fx.Fixed(self.p['QCB'])  # transversal coeffs.
         self.q_mul_a = fx.Fixed(self.p['QACC'].copy())  # partial products a y
         self.q_mul_b = fx.Fixed(self.p['QACC'].copy())  # partial products b x
         self.q_mul = fx.Fixed(self.p['QACC'].copy())  # partial products
         self.q_acc = fx.Fixed(self.p['QACC'])  # accumulator
-        self.Q_O = fx.Fixed(self.p['QO'])  # output
+        self.q_o = fx.Fixed(self.p['QO'])  # output
 
         self.init(p)
         logger.info("Instantiated fx filter")
@@ -95,10 +95,10 @@ class IIR_DF1_pyfixp(object):
         self.p = p  # update parameter dictionary with coefficients etc.
 
         # update the quantizers
-        self.Q_a.set_qdict(self.p['QCA'])  # recursive coeffs (a)
-        self.Q_b.set_qdict(self.p['QCB'])  # transversal b coeffs (b)
+        self.q_a.set_qdict(self.p['QCA'])  # recursive coeffs (a)
+        self.q_b.set_qdict(self.p['QCB'])  # transversal b coeffs (b)
         self.q_acc.set_qdict(self.p['QACC'])  # accumulator
-        self.Q_O.set_qdict(self.p['QO'])  # output
+        self.q_o.set_qdict(self.p['QO'])  # output
 
         # Quantizer dict for partial products yq * aq
         DW_a = int(np.ceil(np.log2(len(self.p['QCA']))))  # word growth
@@ -116,8 +116,8 @@ class IIR_DF1_pyfixp(object):
 
         # Quantize coefficients and store them in local attributes
         # This also resets the overflow counters.
-        self.a_q = fx.quant_coeffs(fb_get('ba', 1), self.Q_a, recursive=True)
-        self.b_q = fx.quant_coeffs(fb_get('ba', 0), self.Q_b)
+        self.a_q = fx.quant_coeffs(fb_get('ba', 1), self.q_a, recursive=True)
+        self.b_q = fx.quant_coeffs(fb_get('ba', 0), self.q_b)
 
         if np.iscomplexobj(self.a_q):
             self.a_q = self.a_q.real
@@ -158,7 +158,7 @@ class IIR_DF1_pyfixp(object):
         self.q_mul_a.reset_n()
         self.q_mul_b.reset_n()
         self.q_acc.reset_n()
-        self.Q_O.reset_n()
+        self.q_o.reset_n()
         self.zi_a = np.zeros(self.L - 1)
         self.zi_b = np.zeros(self.L - 1)
 
@@ -260,11 +260,11 @@ class IIR_DF1_pyfixp(object):
             # - shift right recursive state (output) register
             # - accumulate partial products `xb_q` and `ya_q`, requantize the results
             #   to accumulator word formats `q_acc` and calculate the difference
-            # - requantize the result to output word format `Q_O`
+            # - requantize the result to output word format `q_o`
             # - insert last accumulator value quantized to output format into recursive
             #   (output) state register
             self.zi_a[1:] = self.zi_a[:-1]
-            y_q[k] = self.Q_O.requant(
+            y_q[k] = self.q_o.requant(
                 (self.q_acc.requant(np.sum(xb_q), self.q_mul_b)
                 - self.q_acc.requant(np.sum(ya_q), self.q_mul_a)),
                                 self.q_acc)
@@ -305,10 +305,10 @@ if __name__ == '__main__':
         print("Filter fixpoint response / state variables for input = np.ones(7):")
         x = np.ones(7)
         y = dut.fxfilter(x=x)
-        # if dut.Q_I.n_over != 0:
-        #    print(f"n_over(Q_I) = {dut.Q_I.n_over}")
-        if dut.Q_O.n_over != 0:
-            print(f"n_over(Q_O) = {dut.Q_O.n_over}")
+        # if dut.q_i.n_over != 0:
+        #    print(f"n_over(q_i) = {dut.q_i.n_over}")
+        if dut.q_o.n_over != 0:
+            print(f"n_over(q_o) = {dut.q_o.n_over}")
         if dut.q_mul.n_over != 0:
             print(f"n_over(q_mul) = {dut.q_mul.n_over}")
         print(y)
