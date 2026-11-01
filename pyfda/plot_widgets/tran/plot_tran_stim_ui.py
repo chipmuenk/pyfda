@@ -21,7 +21,7 @@ from pyfda.libs.pyfda_text_lib import to_html, pprint_log
 from pyfda.filterbroker import fb_get
 from pyfda.libs.pyfda_qt_lib import (
     qcmb_box_populate, qget_cmb_box, qtext_width, qstyle_widget, emit)
-from pyfda.libs.pyfda_qt_classes import QVLine, PushButton, PushButtonRT
+from pyfda.libs.pyfda_qt_classes import QVLine, PushButton
 # FMT string for QLineEdit fields, e.g. '{:.3g}'
 from pyfda.pyfda_rc import params
 
@@ -309,7 +309,7 @@ class PlotTranStimUI(QWidget):
         self.but_step_err.setCheckable(True)
         self.but_step_err.setChecked(False)
         #
-        self.but_file_io = PushButtonRT(self, "&larr;", checkable=False)
+        self.but_file_io = PushButton(self, "&larr;", rich_text=True, checkable=False)
         self.but_file_io.setToolTip(
             "<span>Use file length as number of data points.</span>")
         self.lbl_file_io = QLabel(to_html("&nbsp;File IO", frmt='bi'))
