@@ -9,7 +9,6 @@
 """
 Widget for displaying and modifying filter coefficients
 """
-import copy
 import logging
 import sys
 
@@ -43,7 +42,8 @@ logger = logging.getLogger(__name__)
 # TODO: Filters need to be scaled properly, see e.g.
 #       http://radio.feld.cvut.cz/matlab/toolbox/filterdesign/normalize.html
 #       http://www.ue.eti.pg.gda.pl/~wrona/lab_dsp/cw05/matlab/Help1.pdf
-#       https://stackoverflow.com/questions/68206713/scipy-filter-force-minimal-value-of-sos-coefficient-to-prepare-integer-filter
+#       https://stackoverflow.com/questions/68206713/scipy-filter-force-minimal-value-of-sos-\
+#               coefficient-to-prepare-integer-filter
 
 classes = {'InputCoeffs': 'b,a'}  #: Dict containing class name : display name
 
@@ -695,16 +695,16 @@ class InputCoeffs(QWidget):
             self.ba.append(np.array(1))
             a_len = 1
 
-        D = len(self.ba[0]) - a_len
+        delta_l = len(self.ba[0]) - a_len
 
-        if D > 0:  # b is longer than a
-            self.ba[1] = np.append(self.ba[1], np.zeros(D))
+        if delta_l > 0:  # b is longer than a
+            self.ba[1] = np.append(self.ba[1], np.zeros(delta_l))
             # self.quant_coeffs_view()
-        elif D < 0:  # a is longer than b
+        elif delta_l < 0:  # a is longer than b
             if fb_get('ft') == 'iir':
-                self.ba[0] = np.append(self.ba[0], np.zeros(-D))
+                self.ba[0] = np.append(self.ba[0], np.zeros(-delta_l))
             else:
-                self.ba[1] = self.ba[1][:D]  # discard last D elements of a
+                self.ba[1] = self.ba[1][:delta_l]  # discard last delta_l elements of a
         self.quant_coeffs_view()
 
     # ------------------------------------------------------------------------------
