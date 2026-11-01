@@ -193,7 +193,7 @@ class PushButton(QPushButton):
         self.installEventFilter(self)
 
     def setText(self, text: str) -> None:
-        """Set the text, using a rich-text label when enabled."""
+        """Overload original setText to handle rich-text label."""
         if self.rich_text and self.lbl_rtf is not None:
             self.lbl_rtf.setText(text)
             self.updateGeometry()
@@ -292,9 +292,8 @@ class RotatedButton(QPushButton):
         The orientation of the button, default is "west".
     """
 
-    def init(self, text: str, parent: QtWidgets.QWidget, orientation: str = "west") -> None:
-
-        super().init(text, parent)
+    def __init__(self, text: str, parent: QtWidgets.QWidget, orientation: str = "west") -> None:
+        super().__init__(text, parent)
         self.orientation = orientation
 
     def paintEvent(self, event: QEvent) -> None:
@@ -309,7 +308,7 @@ class RotatedButton(QPushButton):
         painter = QtWidgets.QStylePainter(self)
         painter.rotate(90)
         painter.translate(0, -1 * self.width())
-        painter.drawControl(QtWidgets.QStyle.CE_PushButton, self.getSyleOptions())
+        painter.drawControl(QtWidgets.QStyle.CE_PushButton, self.get_style_options())
 
     def minimumSizeHint(self) -> QtCore.QSize:
         """
@@ -337,7 +336,7 @@ class RotatedButton(QPushButton):
         size.transpose()
         return size
 
-    def getSyleOptions(self) -> QtWidgets.QStyleOptionButton:
+    def get_style_options(self) -> QtWidgets.QStyleOptionButton:
         """
         Retrieve the style options for the rotated button.
 
@@ -394,20 +393,11 @@ class QLabelVert(QLabel):
     orientation : str, optional
         Orientation of the label; currently 'west' (default) is supported.
 
-    force_width : bool, optional
-        Reserved for future use; if True, forces width handling (default True).
     """
 
-    def __init__(self, text: str, orientation: str = 'west', force_width: bool = True):
+    def __init__(self, text: str, orientation: str = 'west'):
         QLabel.__init__(self, text)
-        # self.force_width = force_width
         self.orientation = orientation
-        # self.setOrientation(orientation)
-
-    # def setOrientation(self, o):
-    #     self.orientation = o
-    #     self.update()
-    #     self.updateGeometry()
 
     def paintEvent(self, ev: QEvent) -> None:
         """
