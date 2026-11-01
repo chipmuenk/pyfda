@@ -224,7 +224,7 @@ class MplWidget(QWidget):
         Save x- and y-limits of all axes in self.limits when zoom is unlocked
         """
         if not self.mpl_toolbar.a_zo_locked:
-            for ax in self.fig.axes:
+            for ax in self.fig.axes:  # pylint: disable=not-an-iterable
                 self.limits = ax.axis()  # save old limits
 
     # ------------------------------------------------------------------------------
@@ -322,7 +322,7 @@ class MplWidget(QWidget):
                     c.remove()         # yes, remove them!
             self.cursors = []
 
-            for ax in self.fig.axes:
+            for ax in self.fig.axes:  # pylint: disable=not-an-iterable
                 if ax.__class__.__name__ in {"AxesSubplot", "Axes3DSubplot",
                                              "Axes", "Axes3D"}:
                     self.cursors.append(mplcursors.cursor(ax, hover=False, multiple=True))
