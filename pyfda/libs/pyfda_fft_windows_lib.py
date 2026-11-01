@@ -413,7 +413,7 @@ all_wins_dict_ref = {
 
 
 # -------------------------------------------------------------------------------------
-def blackmanharris(N: int, n_terms: str, sym: bool) -> np.ndarray:
+def blackmanharris(n_fft: int, n_terms: str, sym: bool) -> np.ndarray:
     """
     Define Blackmanharris window for 5, 7 and 9 terms. Four terms are covered by the function
     with the same name from scipy.signal
@@ -453,19 +453,19 @@ def blackmanharris(N: int, n_terms: str, sym: bool) -> np.ndarray:
             f"Only 4, 5, 7 and 9 terms are defined for Blackmanharris window, not '{n_terms}' terms"
             )
 
-    return calc_cosine_window(N, sym, a)
+    return calc_cosine_window(n_fft, sym, a)
 
 # -------------------------------------------------------------------------------------
-def calc_cosine_window(N: int, sym: bool, a: list) -> np.ndarray:
+def calc_cosine_window(n_terms_raw: int, sym: bool, a: list) -> np.ndarray:
     """
     Return window based on cosine functions with amplitudes specified
     by the list `a`.
     """
     if sym:
-        n_terms = N-1
+        n_terms = n_terms_raw-1
     else:
-        n_terms = N
-    x = np.arange(N) * 2 * np.pi / n_terms
+        n_terms = n_terms_raw
+    x = np.arange(n_terms_raw) * 2 * np.pi / n_terms
     win = a[0]
     for k in range(1, len(a)):
         win += a[k] * np.cos(k*x)
