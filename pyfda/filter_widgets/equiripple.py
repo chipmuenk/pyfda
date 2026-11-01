@@ -413,8 +413,9 @@ class Equiripple(QWidget):
         For more details, see the `lp_min` method.
         """
         self._get_params()
-        (self.n_fil, f, amp, w) = remezord([self.f_sb, self.f_pb, self.f_pb2, self.f_sb2], [0, 1, 0],
-                                     [self.a_sb, self.a_pb, self.a_sb2], fs = 1, alg = self.alg)
+        (self.n_fil, f, amp, w) = remezord(
+            [self.f_sb, self.f_pb, self.f_pb2, self.f_sb2], [0, 1, 0],
+            [self.a_sb, self.a_pb, self.a_sb2], fs = 1, alg = self.alg)
         # amp is always [0, 1, 0] for BP filters
         fb_set('w_sb', w[0])
         fb_set('w_pb', w[1])
@@ -440,8 +441,9 @@ class Equiripple(QWidget):
         For more details, see the `lp_min` method.
         """
         self._get_params()
-        (self.n_fil, f, amp, w) = remezord([self.f_pb, self.f_sb, self.f_sb2, self.f_pb2], [1, 0, 1],
-                                [self.a_pb, self.a_sb, self.a_pb2], fs = 1, alg = self.alg)
+        (self.n_fil, f, amp, w) = remezord(
+            [self.f_pb, self.f_sb, self.f_sb2, self.f_pb2], [1, 0, 1],
+            [self.a_pb, self.a_sb, self.a_pb2], fs = 1, alg = self.alg)
         # amp is always [1, 0, 1] for BS filters
         fb_set('w_pb', w[0])
         fb_set('w_sb', w[1])
