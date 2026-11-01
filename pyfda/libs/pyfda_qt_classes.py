@@ -20,6 +20,7 @@ logger = logging.getLogger(__name__)
 
 
 # ----------------------------------------------------------------------------
+# pylint: disable=too-few-public-methods
 class EventTypes:
     """
     https://stackoverflow.com/questions/62196835/how-to-get-string-name-for-qevent-in-pyqt5
@@ -55,6 +56,7 @@ class EventTypes:
             return f"UnknownEvent:{event}"
 
 # ----------------------------------------------------------------------------
+# pylint: disable=too-few-public-methods
 class QHLine(QFrame):
     """
     Create a thin horizontal line utilizing the HLine property of QFrames.
@@ -75,7 +77,8 @@ class QHLine(QFrame):
         self.setFrameShadow(QFrame.Plain)
         self.setLineWidth(width)
 
-
+# ----------------------------------------------------------------------------
+# pylint: disable=too-few-public-methods
 class QVLine(QFrame):
     """
     Create a thin vertical line utilizing the HLine property of QFrames.
@@ -106,6 +109,7 @@ class QVLine(QFrame):
             "border-left-style: solid; border-color: grey;")
 
 
+# ----------------------------------------------------------------------------
 class PushButton(QPushButton):
     """
     Convenience class for creating a checkable QPushButton with attribute `checked`
