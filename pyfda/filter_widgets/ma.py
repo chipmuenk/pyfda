@@ -33,6 +33,8 @@ API version info
     2.3: Add `HAS_UI` attribute to filter classes
 
 """
+import logging
+
 import numpy as np
 
 from pyfda.libs.compat import (QWidget, QLabel, QLineEdit, pyqtSignal, QCheckBox,
@@ -42,6 +44,8 @@ from pyfda.libs.pyfda_num_lib import safe_eval
 from pyfda.libs.special_functions import ceil_odd
 from pyfda.libs.pyfda_qt_lib import popup_warning, qtext_width, emit
 from pyfda.libs.pyfda_sig_lib import zeros_with_val, fil_save, fil_convert
+
+logger = logging.getLogger(__name__)
 
 __version__ = "2.3"
 
