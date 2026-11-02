@@ -20,7 +20,7 @@ logger = logging.getLogger(__name__)
 
 
 # =============================================================================
-class IIR_DF1_pyfixp(object):
+class IIRDF1Pyfixp():
     """
     Construct fixed point object with parameter dict `p`
 
@@ -101,17 +101,17 @@ class IIR_DF1_pyfixp(object):
         self.q_o.set_qdict(self.p['QO'])  # output
 
         # Quantizer dict for partial products yq * aq
-        DW_a = int(np.ceil(np.log2(len(self.p['QCA']))))  # word growth
+        dw_a = int(np.ceil(np.log2(len(self.p['QCA']))))  # word growth
         # word format for sum of partial products a_i * y_i
         self.q_mul_a.set_qdict(
-            {'WI': self.p['QO']['WI'] + self.p['QCA']['WI'] + DW_a,
+            {'WI': self.p['QO']['WI'] + self.p['QCA']['WI'] + dw_a,
              'WF': self.p['QO']['WF'] + self.p['QCA']['WF']})
 
         # Quantizer dict for partial products xq * bq
-        DW_b = int(np.ceil(np.log2(len(self.p['QCB']))))  # word growth
+        dw_b = int(np.ceil(np.log2(len(self.p['QCB']))))  # word growth
         # word format for sum of partial products b_i * x_i
         self.q_mul_b.set_qdict(
-            {'WI': self.p['QI']['WI'] + self.p['QCB']['WI'] + DW_b,
+            {'WI': self.p['QI']['WI'] + self.p['QCB']['WI'] + dw_b,
              'WF': self.p['QI']['WF'] + self.p['QCB']['WF']})
 
         # Quantize coefficients and store them in local attributes
@@ -301,7 +301,7 @@ if __name__ == '__main__':
     for frmt in ['qint', 'qfrac']:
         print(f"\nFormat = '{frmt}'")
         fb_set('qfrmt', frmt)  # enable fixpoint mode
-        dut = IIR_DF1_pyfixp(p)
+        dut = IIRDF1Pyfixp(p)
         print("Filter fixpoint response / state variables for input = np.ones(7):")
         x = np.ones(7)
         y = dut.fxfilter(x=x)
@@ -315,4 +315,3 @@ if __name__ == '__main__':
         print("... followed by x = np.zeros(5):")
         y = dut.fxfilter(x=np.zeros(5))
         print(y)
-

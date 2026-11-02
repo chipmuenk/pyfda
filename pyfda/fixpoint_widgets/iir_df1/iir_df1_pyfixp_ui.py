@@ -20,7 +20,7 @@ from pyfda.libs.pyfda_qt_lib import qget_cmb_box, emit
 from pyfda.libs.compat import QWidget, QVBoxLayout, pyqtSignal
 from pyfda.fixpoint_widgets.fx_wq_ui import FxWqUI
 
-from pyfda.fixpoint_widgets.iir_df1.iir_df1_pyfixp import IIR_DF1_pyfixp
+from pyfda.fixpoint_widgets.iir_df1.iir_df1_pyfixp import IIRDF1Pyfixp
 
 logger = logging.getLogger(__name__)
 
@@ -70,7 +70,7 @@ class IIRDF1PyfixpUI(QWidget):
         self._construct_ui()
         # Construct an instance of the fixpoint filter using the settings from
         # the 'fxq' quantizer dict:
-        self.fx_filt = IIR_DF1_pyfixp(fb_get('fxq'))
+        self.fx_filt = IIRDF1Pyfixp(fb_get('fxq'))
         self.update_ovfl_cnt_all()  # initialize all overflow counters / display
 
     # -------------------------------------------------------------------------
