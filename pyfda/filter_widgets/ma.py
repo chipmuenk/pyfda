@@ -226,7 +226,7 @@ class MA(QWidget):
     def _dict2ui(self) -> None:
         """
         Reload parameter(s) from filter dictionary (if they exist) and set
-        corresponding UI elements. dict2filter_params() is called upon initialization
+        corresponding UI elements. Called upon initialization
         and when the filter is loaded from disk.
         """
         if 'ma' in fb_get('filter_widgets'):
@@ -243,11 +243,12 @@ class MA(QWidget):
     #--------------------------------------------------------------------------
     def _ui2dict(self) -> None:
         """
-        When line edit field is changed, read the text and convert it to integer.
+        When a line edit field is changed, read the text and convert it to integer.
         Store the values in the corresponding attributes.
         """
         self.delays = safe_eval(self.led_delays.text(), self.delays, return_type='int', sign='pos')
         self.led_delays.setText(str(self.delays))
+
         self.stages = safe_eval(self.led_stages.text(), self.stages, return_type='int', sign='pos')
         self.led_stages.setText(str(self.stages))
 
@@ -263,6 +264,8 @@ class MA(QWidget):
                                         'stages': self.stages,
                                         'normalize': self.chk_norm.isChecked()},
                                         accept_dict = True)
+        fb_set('n_fil', self.delays * self.stages) # update filter order in filter dict
+
         # sig_tx -> select_filter -> filter_specs
         self.emit({'filt_changed': 'ma'})
 
