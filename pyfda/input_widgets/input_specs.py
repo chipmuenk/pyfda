@@ -543,8 +543,11 @@ class InputSpecs(QWidget):
         - "ok": filter designed and up to date with specs
         - "changed": specs have been changed and filter needs to be re-designed
         - "error": filter design failed with current specs
+
+        When the filter class is "ManualIIR" or "ManualFIR", the button is disabled
+        and the state is set to "ok" as no design is required.
         """
-        man = "manual" in fb_get('fc').lower()
+        man = "manual" in self.sel_fil.fc.lower()
         self.but_design_filt.setDisabled(man)
         if man:
             state = 'ok'
