@@ -359,7 +359,7 @@ class PlotHf(QWidget):
                 ax.fill_between(f_lim_lor, min(a_lim_lor), a_lim_lor, **hatch)
 
         if self.unit_a == 'dB':
-            if fb_get('ft') == "FIR":
+            if fb_get('ft') == 'fir':
                 a_pb_max  = db(1 + self.a_pb)
                 a_pb2_max = db(1 + self.a_pb2)
             else: # IIR dB
@@ -379,7 +379,7 @@ class PlotHf(QWidget):
                 exp = 1.
             else: # self.unit_a == 'W':
                 exp = 2.
-            if fb_get('ft') == "FIR":
+            if fb_get('ft') == 'fir':
                 a_pb_max  = (1 + self.a_pb)**exp
                 a_pb2_max = (1 + self.a_pb2)**exp
             else: # IIR lin
@@ -554,12 +554,9 @@ class PlotHf(QWidget):
         Draw phase on second y-axis in the axes system passed as the argument
         """
         if hasattr(self, 'ax_p'):
+            # pylint: disable=access-member-before-definition
             self.mplwidget.fig.delaxes(self.ax_p)
             del self.ax_p
-        # try:
-        #     self.mplwidget.fig.delaxes(self.ax_p)
-        # except (KeyError, AttributeError):
-        #     pass
 
         if self.but_phase.isChecked():
             self.ax_p = ax.twinx()  # second axes system with same x-axis for phase
