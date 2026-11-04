@@ -1,0 +1,264 @@
+{
+    "name": "python3-requirements",
+    "buildsystem": "simple",
+    "build-commands": [],
+    "modules": [
+        {
+            "name": "python3-numpy",
+            "buildsystem": "simple",
+            "build-commands": [
+                "pip3 install --verbose --exists-action=i --no-index --find-links=\"file://${PWD}\" --prefix=${FLATPAK_DEST} \"numpy<2.0\" --no-build-isolation"
+            ],
+            "sources": [
+                {
+                    "type": "file",
+                    "url": "https://files.pythonhosted.org/packages/65/6e/09db70a523a96d25e115e71cc56a6f9031e7b8cd166c1ac8438307c14058/numpy-1.26.4.tar.gz",
+                    "sha256": "2a02aba9ed12e4ac4eb3ea9421c420301a0c6460d9830d74a9df87efa4912010"
+                }
+            ]
+        },
+        {
+            "name": "python3-scipy",
+            "buildsystem": "simple",
+            "build-commands": [
+                "pip3 install --verbose --exists-action=i --no-index --find-links=\"file://${PWD}\" --prefix=${FLATPAK_DEST} \"scipy>=1.2.0\" --no-build-isolation"
+            ],
+            "sources": [
+                {
+                    "type": "file",
+                    "url": "https://files.pythonhosted.org/packages/65/6e/09db70a523a96d25e115e71cc56a6f9031e7b8cd166c1ac8438307c14058/numpy-1.26.4.tar.gz",
+                    "sha256": "2a02aba9ed12e4ac4eb3ea9421c420301a0c6460d9830d74a9df87efa4912010"
+                },
+                {
+                    "type": "file",
+                    "url": "https://files.pythonhosted.org/packages/62/11/4d44a1f274e002784e4dbdb81e0ea96d2de2d1045b2132d5af62cc31fd28/scipy-1.14.1.tar.gz",
+                    "sha256": "5a275584e726026a5699459aa72f828a610821006228e841b94275c4a7c08417"
+                }
+            ]
+        },
+        {
+            "name": "python3-matplotlib",
+            "buildsystem": "simple",
+            "build-commands": [
+                "pip3 install --verbose --exists-action=i --no-index --find-links=\"file://${PWD}\" --prefix=${FLATPAK_DEST} \"matplotlib>=3.3\" --no-build-isolation"
+            ],
+            "sources": [
+                {
+                    "type": "file",
+                    "url": "https://files.pythonhosted.org/packages/25/c2/fc7193cc5383637ff390a712e88e4ded0452c9fbcf84abe3de5ea3df1866/contourpy-1.3.1.tar.gz",
+                    "sha256": "dfd97abd83335045a913e3bcc4a09c0ceadbe66580cf573fe961f4a825efa699"
+                },
+                {
+                    "type": "file",
+                    "url": "https://files.pythonhosted.org/packages/e7/05/c19819d5e3d95294a6f5947fb9b9629efb316b96de511b418c53d245aae6/cycler-0.12.1-py3-none-any.whl",
+                    "sha256": "85cef7cff222d8644161529808465972e51340599459b8ac3ccbac5a854e0d30"
+                },
+                {
+                    "type": "file",
+                    "url": "https://files.pythonhosted.org/packages/d7/4e/053fe1b5c0ce346c0a9d0557492c654362bafb14f026eae0d3ee98009152/fonttools-4.55.0.tar.gz",
+                    "sha256": "7636acc6ab733572d5e7eec922b254ead611f1cdad17be3f0be7418e8bfaca71"
+                },
+                {
+                    "type": "file",
+                    "url": "https://files.pythonhosted.org/packages/85/4d/2255e1c76304cbd60b48cee302b66d1dde4468dc5b1160e4b7cb43778f2a/kiwisolver-1.4.7.tar.gz",
+                    "sha256": "9893ff81bd7107f7b685d3017cc6583daadb4fc26e4a888350df530e41980a60"
+                },
+                {
+                    "type": "file",
+                    "url": "https://files.pythonhosted.org/packages/9e/d8/3d7f706c69e024d4287c1110d74f7dabac91d9843b99eadc90de9efc8869/matplotlib-3.9.2.tar.gz",
+                    "sha256": "96ab43906269ca64a6366934106fa01534454a69e471b7bf3d79083981aaab92"
+                },
+                {
+                    "type": "file",
+                    "url": "https://files.pythonhosted.org/packages/65/6e/09db70a523a96d25e115e71cc56a6f9031e7b8cd166c1ac8438307c14058/numpy-1.26.4.tar.gz",
+                    "sha256": "2a02aba9ed12e4ac4eb3ea9421c420301a0c6460d9830d74a9df87efa4912010"
+                },
+                {
+                    "type": "file",
+                    "url": "https://files.pythonhosted.org/packages/88/ef/eb23f262cca3c0c4eb7ab1933c3b1f03d021f2c48f54763065b6f0e321be/packaging-24.2-py3-none-any.whl",
+                    "sha256": "09abb1bccd265c01f4a3aa3f7a7db064b36514d2cba19a2f694fe6150451a759"
+                },
+                {
+                    "type": "file",
+                    "url": "https://files.pythonhosted.org/packages/a5/26/0d95c04c868f6bdb0c447e3ee2de5564411845e36a858cfd63766bc7b563/pillow-11.0.0.tar.gz",
+                    "sha256": "72bacbaf24ac003fea9bff9837d1eedb6088758d41e100c1552930151f677739"
+                },
+                {
+                    "type": "file",
+                    "url": "https://files.pythonhosted.org/packages/be/ec/2eb3cd785efd67806c46c13a17339708ddc346cbb684eade7a6e6f79536a/pyparsing-3.2.0-py3-none-any.whl",
+                    "sha256": "93d9577b88da0bbea8cc8334ee8b918ed014968fd2ec383e868fb8afb1ccef84"
+                },
+                {
+                    "type": "file",
+                    "url": "https://files.pythonhosted.org/packages/ec/57/56b9bcc3c9c6a792fcbaf139543cee77261f3651ca9da0c93f5c1221264b/python_dateutil-2.9.0.post0-py2.py3-none-any.whl",
+                    "sha256": "a8b2bc7bffae282281c8140a97d3aa9c14da0b136dfe83f850eea9a5f7470427"
+                }
+            ]
+        },
+        {
+            "name": "python3-docutils",
+            "buildsystem": "simple",
+            "build-commands": [
+                "pip3 install --verbose --exists-action=i --no-index --find-links=\"file://${PWD}\" --prefix=${FLATPAK_DEST} \"docutils\" --no-build-isolation"
+            ],
+            "sources": [
+                {
+                    "type": "file",
+                    "url": "https://files.pythonhosted.org/packages/8f/d7/9322c609343d929e75e7e5e6255e614fcc67572cfd083959cdef3b7aad79/docutils-0.21.2-py3-none-any.whl",
+                    "sha256": "dafca5b9e384f0e419294eb4d2ff9fa826435bf15f15b7bd45723e8ad76811b2"
+                }
+            ]
+        },
+        {
+            "name": "python3-nose",
+            "buildsystem": "simple",
+            "build-commands": [
+                "pip3 install --verbose --exists-action=i --no-index --find-links=\"file://${PWD}\" --prefix=${FLATPAK_DEST} \"nose\" --no-build-isolation"
+            ],
+            "sources": [
+                {
+                    "type": "file",
+                    "url": "https://files.pythonhosted.org/packages/15/d8/dd071918c040f50fa1cf80da16423af51ff8ce4a0f2399b7bf8de45ac3d9/nose-1.3.7-py3-none-any.whl",
+                    "sha256": "9ff7c6cc443f8c51994b34a667bbcf45afd6d945be7477b52e97516fd17c53ac"
+                }
+            ]
+        },
+        {
+            "name": "python3-mplcursors",
+            "buildsystem": "simple",
+            "build-commands": [
+                "pip3 install --verbose --exists-action=i --no-index --find-links=\"file://${PWD}\" --prefix=${FLATPAK_DEST} \"mplcursors\" --no-build-isolation"
+            ],
+            "sources": [
+                {
+                    "type": "file",
+                    "url": "https://files.pythonhosted.org/packages/25/c2/fc7193cc5383637ff390a712e88e4ded0452c9fbcf84abe3de5ea3df1866/contourpy-1.3.1.tar.gz",
+                    "sha256": "dfd97abd83335045a913e3bcc4a09c0ceadbe66580cf573fe961f4a825efa699"
+                },
+                {
+                    "type": "file",
+                    "url": "https://files.pythonhosted.org/packages/e7/05/c19819d5e3d95294a6f5947fb9b9629efb316b96de511b418c53d245aae6/cycler-0.12.1-py3-none-any.whl",
+                    "sha256": "85cef7cff222d8644161529808465972e51340599459b8ac3ccbac5a854e0d30"
+                },
+                {
+                    "type": "file",
+                    "url": "https://files.pythonhosted.org/packages/d7/4e/053fe1b5c0ce346c0a9d0557492c654362bafb14f026eae0d3ee98009152/fonttools-4.55.0.tar.gz",
+                    "sha256": "7636acc6ab733572d5e7eec922b254ead611f1cdad17be3f0be7418e8bfaca71"
+                },
+                {
+                    "type": "file",
+                    "url": "https://files.pythonhosted.org/packages/85/4d/2255e1c76304cbd60b48cee302b66d1dde4468dc5b1160e4b7cb43778f2a/kiwisolver-1.4.7.tar.gz",
+                    "sha256": "9893ff81bd7107f7b685d3017cc6583daadb4fc26e4a888350df530e41980a60"
+                },
+                {
+                    "type": "file",
+                    "url": "https://files.pythonhosted.org/packages/9e/d8/3d7f706c69e024d4287c1110d74f7dabac91d9843b99eadc90de9efc8869/matplotlib-3.9.2.tar.gz",
+                    "sha256": "96ab43906269ca64a6366934106fa01534454a69e471b7bf3d79083981aaab92"
+                },
+                {
+                    "type": "file",
+                    "url": "https://files.pythonhosted.org/packages/c7/a4/070512af1bbf73de4d2648bbfc355619abf27dd468dba6dae35805a05b43/mplcursors-0.6-py3-none-any.whl",
+                    "sha256": "2d900267848378987c46ad2504ea484e274adbb596a71547c5c95d2b4f520a56"
+                },
+                {
+                    "type": "file",
+                    "url": "https://files.pythonhosted.org/packages/65/6e/09db70a523a96d25e115e71cc56a6f9031e7b8cd166c1ac8438307c14058/numpy-1.26.4.tar.gz",
+                    "sha256": "2a02aba9ed12e4ac4eb3ea9421c420301a0c6460d9830d74a9df87efa4912010"
+                },
+                {
+                    "type": "file",
+                    "url": "https://files.pythonhosted.org/packages/88/ef/eb23f262cca3c0c4eb7ab1933c3b1f03d021f2c48f54763065b6f0e321be/packaging-24.2-py3-none-any.whl",
+                    "sha256": "09abb1bccd265c01f4a3aa3f7a7db064b36514d2cba19a2f694fe6150451a759"
+                },
+                {
+                    "type": "file",
+                    "url": "https://files.pythonhosted.org/packages/a5/26/0d95c04c868f6bdb0c447e3ee2de5564411845e36a858cfd63766bc7b563/pillow-11.0.0.tar.gz",
+                    "sha256": "72bacbaf24ac003fea9bff9837d1eedb6088758d41e100c1552930151f677739"
+                },
+                {
+                    "type": "file",
+                    "url": "https://files.pythonhosted.org/packages/be/ec/2eb3cd785efd67806c46c13a17339708ddc346cbb684eade7a6e6f79536a/pyparsing-3.2.0-py3-none-any.whl",
+                    "sha256": "93d9577b88da0bbea8cc8334ee8b918ed014968fd2ec383e868fb8afb1ccef84"
+                },
+                {
+                    "type": "file",
+                    "url": "https://files.pythonhosted.org/packages/ec/57/56b9bcc3c9c6a792fcbaf139543cee77261f3651ca9da0c93f5c1221264b/python_dateutil-2.9.0.post0-py2.py3-none-any.whl",
+                    "sha256": "a8b2bc7bffae282281c8140a97d3aa9c14da0b136dfe83f850eea9a5f7470427"
+                }
+            ]
+        },
+        {
+            "name": "python3-numexpr",
+            "buildsystem": "simple",
+            "build-commands": [
+                "pip3 install --verbose --exists-action=i --no-index --find-links=\"file://${PWD}\" --prefix=${FLATPAK_DEST} \"numexpr>=2.8.8\" --no-build-isolation"
+            ],
+            "sources": [
+                {
+                    "type": "file",
+                    "url": "https://files.pythonhosted.org/packages/21/67/c7415cf04ebe418193cfd6595ae03e3a64d76dac7b9c010098b39cc7992e/numexpr-2.10.2.tar.gz",
+                    "sha256": "b0aff6b48ebc99d2f54f27b5f73a58cb92fde650aeff1b397c71c8788b4fff1a"
+                },
+                {
+                    "type": "file",
+                    "url": "https://files.pythonhosted.org/packages/65/6e/09db70a523a96d25e115e71cc56a6f9031e7b8cd166c1ac8438307c14058/numpy-1.26.4.tar.gz",
+                    "sha256": "2a02aba9ed12e4ac4eb3ea9421c420301a0c6460d9830d74a9df87efa4912010"
+                }
+            ]
+        },
+        {
+            "name": "python3-amaranth",
+            "buildsystem": "simple",
+            "build-commands": [
+                "pip3 install --verbose --exists-action=i --no-index --find-links=\"file://${PWD}\" --prefix=${FLATPAK_DEST} \"amaranth[builtin-yosys]\" --no-build-isolation"
+            ],
+            "sources": [
+                {
+                    "type": "file",
+                    "url": "https://files.pythonhosted.org/packages/b2/97/5d42485e71dfc078108a86d6de8fa46db44a1a9295e89c5d6d4a06e23a62/markupsafe-3.0.2.tar.gz",
+                    "sha256": "ee55d3edf80167e48ea11a923c7386f4669df67d7994554387f84e7d8b0a2bf0"
+                },
+                {
+                    "type": "file",
+                    "url": "https://files.pythonhosted.org/packages/3a/8d/889014b45ecf68727d8c8c1d88d5b858f0b43a42c5b1e51fa2c875ffd4d5/amaranth-0.5.3-py3-none-any.whl",
+                    "sha256": "6a3cfda5951b7503858f8b2167106c794edc8d5c2989c010eaef949d329e6548"
+                },
+                {
+                    "type": "file",
+                    "url": "https://files.pythonhosted.org/packages/30/09/1e102c9b255698c1c916f751a00889aae9baf04a7ba0b2d80ec38b63fae5/amaranth_yosys-0.40.0.0.post101-py3-none-any.whl",
+                    "sha256": "bff95e5f1caa06e39cbd5b3c782a28f9a12158c379b708a70baeaa5a19184337"
+                },
+                {
+                    "type": "file",
+                    "url": "https://files.pythonhosted.org/packages/e1/6a/4604f9ae2fa62ef47b9de2fa5ad599589d28c9fd1d335f32759813dfa91e/importlib_resources-6.4.5-py3-none-any.whl",
+                    "sha256": "ac29d5f956f01d5e4bb63102a5a19957f1b9175e45649977264a1416783bb717"
+                },
+                {
+                    "type": "file",
+                    "url": "https://files.pythonhosted.org/packages/31/80/3a54838c3fb461f6fec263ebf3a3a41771bd05190238de3486aae8540c36/jinja2-3.1.4-py3-none-any.whl",
+                    "sha256": "bc5dd2abb727a5319567b7a813e6a2e7318c39f4f487cfe6c89c6f9c7d25197d"
+                },
+                {
+                    "type": "file",
+                    "url": "https://files.pythonhosted.org/packages/ce/b1/31f454a2ac0d23b0a47283d115f0af4abe2a1ea391f5ccb223e02d685b82/jschon-0.11.1-py3-none-any.whl",
+                    "sha256": "2350e8b6747b17358022960f91208bea70de448b914827af3184d30e20500f0f"
+                },
+                {
+                    "type": "file",
+                    "url": "https://files.pythonhosted.org/packages/8d/6d/24f67ec6cbe90ffca470f3c31e24f3d21124abc5b690398ab34a54bd3070/pyvcd-0.4.1-py2.py3-none-any.whl",
+                    "sha256": "3a4c71d4dce741f1155a2ed11a6278390a0816293068f6162ad9658d20f75578"
+                },
+                {
+                    "type": "file",
+                    "url": "https://files.pythonhosted.org/packages/ff/9a/9afaade874b2fa6c752c36f1548f718b5b83af81ed9b76628329dab81c1b/rfc3986-2.0.0-py2.py3-none-any.whl",
+                    "sha256": "50b1502b60e289cb37883f3dfd34532b8873c7de9f49bb546641ce9cbd256ebd"
+                },
+                {
+                    "type": "file",
+                    "url": "https://files.pythonhosted.org/packages/ad/53/0d3ff22eaf74f79af74834d2630a20ddd48754bce84520891b3bceb8d045/wasmtime-27.0.2-py3-none-any.whl",
+                    "sha256": "a1248d0e024651284a6b81bfde34ca6a8efc1a0ec09675fd3148845febdc71c8"
+                }
+            ]
+        }
+    ]
+}
