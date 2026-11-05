@@ -30,6 +30,42 @@ from pyfda.plot_widgets.plot_fft_win import PlotFFTWin
 
 logger = logging.getLogger(__name__)
 
+# ------------------------------------------------------------------------------
+# Define the data / text / tooltip for the comboboxes in the UI
+# ------------------------------------------------------------------------------
+# combobox fixpoint / floating point simulation
+CMB_SIM_SELECT_ITEMS = [
+    "<span>Simulate floating-point or fixpoint response.</span>",
+    ('float', "Float", "floating point simulation"),
+    ('fixpoint', "Fixpoint", "fixpoint simulation")
+]
+
+CMB_TIME_SPGR_ITEMS = [
+    "<span>Show Spectrogram for selected signal.</span>",
+    ("none", "None", ""),
+    ("xn", "x[n]", "input"),
+    ("xqn", "x_q[n]", "quantized input"),
+    ("yn", "y[n]", "output")
+]
+
+CMB_MODE_SPGR_TIME_ITEMS = [
+    "<span>Spectrogram display mode.</span>",
+    ("psd", "PSD",
+     "<span>Power Spectral Density, either per bin or referred to "
+     "<i>f<sub>S</sub></i></span>"),
+    ("magnitude", "Mag.", "Signal magnitude"),
+    ("angle", "Angle", "Phase, wrapped to &pm; &pi;"),
+    ("phase", "Phase", "Phase (unwrapped)")
+]
+
+CMB_FREQ_DISPLAY_ITEMS = [
+    "<span>Select how to display the spectrum.</span>",
+    ("mag", "Magnitude", "<span>Spectral magnitude</span>"),
+    ("mag_phi", "Mag. / Phase", "<span>Magnitude and phase.</span>"),
+    ("re_im", "Re. / Imag.", "<span>Real and imaginary part of spectrum.</span>")
+]
+
+
 class PlotTranUI(QWidget):
     """
     Create the UI for the PlotTran class
@@ -78,12 +114,14 @@ class PlotTranUI(QWidget):
                 self.emit(dict_sig)
 
     # ------------------------------------------------------------------------
-    def __init__(self):
+    def __init__(self) -> None:
+        """
+        Initialize the widget, consisting of:
+        - run control bar
+        - time domain plot controls
+        - frequency domain plot controls
+        """
         super().__init__()
-        # Intitialize the widget, consisting of:
-        # - top chkbox row
-        # - coefficient table
-        # - two bottom rows with action buttons
 
         # initial settings
         self.n_start = 0
@@ -120,14 +158,16 @@ class PlotTranUI(QWidget):
 
         self.cur_win_id = "rectangular"  # set initial window type
 
-        # combobox fixpoint / floating point simulation
-        self.cmb_sim_select_items = [
-            "<span>Simulate floating-point or fixpoint response.</span>",
-            ('float', "Float", "floating point simulation"),
-            ('fixpoint', "Fixpoint", "fixpoint simulation")
-        ]
+        self._construct_ui()
+        self.update_n(emit_signal=False)  # also updates window function and win_dict
 
-        # data / icon / tooltipp (none) for plotting styles
+    # -------------------------------------------------------------------------
+    def _construct_ui(self) -> None:
+        """
+        Construct the user interface for run, time and frequency controls
+        and connect signals
+        """
+        # data / icon / tooltip (none) for plotting styles
         self.plot_styles_list = [
             ("Plot style"),
             ("none", QIcon(":/plot_style-none"), "off"),
@@ -140,43 +180,24 @@ class PlotTranUI(QWidget):
             ("steps*", QIcon(":/plot_style-steps-mkr"), "steps + markers")
         ]
 
-        self.cmb_time_spgr_items = [
-            "<span>Show Spectrogram for selected signal.</span>",
-            ("none", "None", ""),
-            ("xn", "x[n]", "input"),
-            ("xqn", "x_q[n]", "quantized input"),
-            ("yn", "y[n]", "output")
-        ]
-
-        self.cmb_mode_spgr_time_items = [
-            "<span>Spectrogram display mode.</span>",
-            ("psd", "PSD",
-             "<span>Power Spectral Density, either per bin or referred to "
-             "<i>f<sub>S</sub></i></span>"),
-            ("magnitude", "Mag.", "Signal magnitude"),
-            ("angle", "Angle", "Phase, wrapped to &pm; &pi;"),
-            ("phase", "Phase", "Phase (unwrapped)")
-        ]
-
-        self.cmb_freq_display_items = [
-            "<span>Select how to display the spectrum.</span>",
-            ("mag", "Magnitude", "<span>Spectral magnitude</span>"),
-            ("mag_phi", "Mag. / Phase", "<span>Magnitude and phase.</span>"),
-            ("re_im", "Re. / Imag.", "<span>Real and imaginary part of spectrum.</span>")
-        ]
-
         self._construct_ui_run()
         self._construct_ui_time()
         self._construct_ui_freq()
-
-#        self._enable_stim_widgets()
-        self.update_n(emit_signal=False)  # also updates window function and win_dict
-#        self._update_noi()
+        self._connect_signals()
 
     # -------------------------------------------------------------------------
-    def _construct_ui_run(self):
+    def _construct_ui_run(self) -> None:
         """
-        Construct run control widgets
+        Construct run control widgets and layout
+        """
+        self._construct_ui_run_sim()
+        self._construct_ui_run_fft()
+        self._construct_layout_run()
+
+    # -------------------------------------------------------------------------
+    def _construct_ui_run_sim(self) -> None:
+        """
+        Construct simulation run, sample count, file I/O and complex warning widgets
         """
         self.but_auto_run = PushButton(self, "Auto", objectName="but_auto_run")
         self.but_auto_run.setToolTip("<span>Update response automatically when "
@@ -193,7 +214,7 @@ class PlotTranUI(QWidget):
         self.but_run.setEnabled(True)
 
         self.cmb_sim_select = QComboBox(self)
-        qcmb_box_populate(self.cmb_sim_select, self.cmb_sim_select_items,
+        qcmb_box_populate(self.cmb_sim_select, CMB_SIM_SELECT_ITEMS,
                           self.cmb_sim_select_init)
 
         self.prg_wdg = QProgressBar(self)
@@ -209,7 +230,7 @@ class PlotTranUI(QWidget):
         self.led_n_start.setToolTip("<span>First point to plot.</span>")
         self.led_n_start.setMaximumWidth(qtext_width(n_x=8))
 
-        self.but_n_auto = PushButtonRT(self, text = "<b><i>N</i> = </b>")
+        self.but_n_auto = PushButtonRT(self, text="<b><i>N</i> = </b>")
         self.but_n_auto.setCheckable(True)
         self.but_n_auto.setChecked(True)
         self.but_n_auto.setToolTip(
@@ -241,7 +262,6 @@ class PlotTranUI(QWidget):
         self.frm_file_io.setContentsMargins(0, 0, 0, 0)
         self.frm_file_io.setEnabled(False)
 
-        self.lbl_stim_cmplx_warn = QLabel(self)
         self.lbl_stim_cmplx_warn = QLabel(to_html("Cmplx!", frmt='b'), self)
         self.lbl_stim_cmplx_warn.setToolTip(
             '<span>Signal is complex valued; '
@@ -249,6 +269,13 @@ class PlotTranUI(QWidget):
 
         self.lbl_stim_cmplx_warn.setStyleSheet("border : 1px solid grey")
         qstyle_widget(self.lbl_stim_cmplx_warn, "changed")
+
+    # -------------------------------------------------------------------------
+    def _construct_ui_run_fft(self) -> None:
+        """
+        Construct FFT window selection and fixpoint range widgets for run control bar
+        """
+        but_height = self.but_auto_run.sizeHint().height()
 
         self.but_fft_wdg = PushButton(self, icon=QIcon(":/fft.svg"))
         self.but_fft_wdg.setIconSize(QSize(but_height, but_height))
@@ -258,13 +285,14 @@ class PlotTranUI(QWidget):
         self.but_fft_wdg.setCheckable(True)
         self.but_fft_wdg.setChecked(False)
 
-        self.qfft_win_select = QFFTWinCmbBox(fb_get('tran_freq_win'),
-            app='spec', objectName='qfft_win_select')
+        self.qfft_win_select = QFFTWinCmbBox(
+            fb_get('tran_freq_win'), app='spec', objectName='qfft_win_select')
         self.all_wins_dict = self.qfft_win_select.all_wins_dict
 
         # instantiate FFT window with default windows dict
-        self.win_viewer = PlotFFTWin(cur_win_dict_name=('tran_freq_win',),
-            app='spec', all_wins_dict=self.all_wins_dict, sym=False,
+        self.win_viewer = PlotFFTWin(
+            cur_win_dict_name=('tran_freq_win',), app='spec',
+            all_wins_dict=self.all_wins_dict, sym=False,
             title="pyfda Spectral Window Viewer", object_name="tran_win_viewer")
         # create handle to window to hide it during the "quit" dialogue,
         # hide window initially, this is modeless i.e. a non-blocking popup window
@@ -274,11 +302,16 @@ class PlotTranUI(QWidget):
         self.lbl_fx_range = QLabel(to_html("FX Range:", frmt='b'))
         self.chk_fx_range_x = QCheckBox("X", objectName="chk_fx_range_x")
         self.chk_fx_range_x.setToolTip(
-             "<span>Display stimulus fixpoint range (---).</span>")
+            "<span>Display stimulus fixpoint range (---).</span>")
         self.chk_fx_range_y = QCheckBox("Y", objectName="chk_fx_range_y")
         self.chk_fx_range_y.setToolTip(
-             "<span>Display response fixpoint range (-.-).</span>")
+            "<span>Display response fixpoint range (-.-).</span>")
 
+    # -------------------------------------------------------------------------
+    def _construct_layout_run(self) -> None:
+        """
+        Construct layout for run control widgets
+        """
         lay_h_ctrl_run = QHBoxLayout()
         lay_h_ctrl_run.addWidget(self.but_auto_run)
         lay_h_ctrl_run.addWidget(self.but_run)
@@ -310,9 +343,18 @@ class PlotTranUI(QWidget):
         self.wdg_ctrl_run.setLayout(lay_h_ctrl_run)
 
     # -------------------------------------------------------------------------
-    def _construct_ui_time(self):
+    def _construct_ui_time(self) -> None:
         """
-        Controls for time domain
+        Construct controls and layout for time domain
+        """
+        self._construct_ui_time_plot()
+        self._construct_ui_time_spgr()
+        self._construct_layout_time()
+
+    # -------------------------------------------------------------------------
+    def _construct_ui_time_plot(self) -> None:
+        """
+        Construct plot style and window controls for time domain
         """
         self.lbl_title_plot_time = QLabel("Plots:", objectName="large")
 
@@ -325,7 +367,8 @@ class PlotTranUI(QWidget):
 
         self.lbl_plt_time_stim_interp = QLabel(
             to_html("&nbsp;&nbsp;x(t)", frmt='bi'), self)
-        self.chk_plt_time_stim_interp = QCheckBox(self, objectName="chk_plt_time_stim_interp")
+        self.chk_plt_time_stim_interp = QCheckBox(
+            self, objectName="chk_plt_time_stim_interp")
         self.chk_plt_time_stim_interp.setChecked(False)
         self.chk_plt_time_stim_interp.setToolTip(
             '<span>Plot interpolated pseudo-analog stimulus "<i>x</i>(<i>t</i>)", '
@@ -339,7 +382,7 @@ class PlotTranUI(QWidget):
         self.cmb_plt_time_stmq.setToolTip("<span>Plot style for <em>fixpoint</em> "
                                           "(quantized) stimulus.</span>")
 
-        lbl_plt_time_resp = QLabel(
+        self.lbl_plt_time_resp = QLabel(
             to_html("&nbsp;&nbsp;Resp. y", frmt='bi'), self)
         self.cmb_plt_time_resp = QComboBox(self)
         qcmb_box_populate(
@@ -354,21 +397,23 @@ class PlotTranUI(QWidget):
             '<span>Plot FFT windowing function.</span>')
         self.chk_win_time.setChecked(False)
 
-        line1 = QVLine()
-        line2 = QVLine(width=5)
-
         self.but_log_time = PushButtonRT(self, "dB", objectName="but_log_time")
         self.but_log_time.setToolTip(
             "<span>Logarithmic scale for y-axis.</span>")
 
-        lbl_plt_time_spgr = QLabel(to_html("Spectrogram", frmt='bi'))
+    # -------------------------------------------------------------------------
+    def _construct_ui_time_spgr(self) -> None:
+        """
+        Construct spectrogram and log-bottom controls for time domain
+        """
+        self.lbl_plt_time_spgr = QLabel(to_html("Spectrogram", frmt='bi'))
         self.cmb_plt_time_spgr = QComboBox(self)
         qcmb_box_populate(
-            self.cmb_plt_time_spgr, self.cmb_time_spgr_items, self.plt_time_spgr)
+            self.cmb_plt_time_spgr, CMB_TIME_SPGR_ITEMS, self.plt_time_spgr)
 
         self.cmb_mode_spgr_time = QComboBox(self)
         qcmb_box_populate(
-            self.cmb_mode_spgr_time, self.cmb_mode_spgr_time_items, self.mode_spgr_time)
+            self.cmb_mode_spgr_time, CMB_MODE_SPGR_TIME_ITEMS, self.mode_spgr_time)
 
         self.lbl_byfs_spgr_time = QLabel(
             to_html("&nbsp;per f_S", frmt='b'), self)
@@ -410,14 +455,11 @@ class PlotTranUI(QWidget):
         self.led_log_bottom_time.setVisible(
             self.lbl_log_bottom_time.isVisible())
 
-        # self.lbl_colorbar_time = QLabel(to_html("&nbsp;Col.bar", frmt='b'), self)
-        # self.lbl_colorbar_time.setVisible(spgr_en)
-        # self.chk_colorbar_time = QCheckBox(self)
-        # self.chk_colorbar_time.setObjectName("chk_colorbar_time")
-        # self.chk_colorbar_time.setToolTip("<span>Enable colorbar</span>")
-        # self.chk_colorbar_time.setChecked(True)
-        # self.chk_colorbar_time.setVisible(spgr_en)
-
+    # -------------------------------------------------------------------------
+    def _construct_layout_time(self) -> None:
+        """
+        Construct layout for time domain controls
+        """
         lay_h_ctrl_time_0 = QHBoxLayout()
         lay_h_ctrl_time_0.addWidget(self.lbl_title_plot_time)
 
@@ -426,28 +468,22 @@ class PlotTranUI(QWidget):
         lay_h_ctrl_time_1.addWidget(self.cmb_plt_time_stim)
         lay_h_ctrl_time_1.addWidget(self.lbl_plt_time_stim_interp)
         lay_h_ctrl_time_1.addWidget(self.chk_plt_time_stim_interp)
-#
         lay_h_ctrl_time_1.addWidget(self.lbl_plt_time_stmq)
         lay_h_ctrl_time_1.addWidget(self.cmb_plt_time_stmq)
-        #
-        lay_h_ctrl_time_1.addWidget(lbl_plt_time_resp)
+        lay_h_ctrl_time_1.addWidget(self.lbl_plt_time_resp)
         lay_h_ctrl_time_1.addWidget(self.cmb_plt_time_resp)
-        #
         lay_h_ctrl_time_1.addWidget(self.lbl_win_time)
         lay_h_ctrl_time_1.addWidget(self.chk_win_time)
         lay_h_ctrl_time_1.addSpacing(5)
-        lay_h_ctrl_time_1.addWidget(line1)
+        lay_h_ctrl_time_1.addWidget(QVLine())
         lay_h_ctrl_time_1.addSpacing(5)
-        #
         lay_h_ctrl_time_1.addWidget(self.lbl_log_bottom_time)
         lay_h_ctrl_time_1.addWidget(self.led_log_bottom_time)
         lay_h_ctrl_time_1.addWidget(self.but_log_time)
-
         lay_h_ctrl_time_1.addSpacing(5)
-        lay_h_ctrl_time_1.addWidget(line2)
+        lay_h_ctrl_time_1.addWidget(QVLine(width=5))
         lay_h_ctrl_time_1.addSpacing(5)
-        #
-        lay_h_ctrl_time_1.addWidget(lbl_plt_time_spgr)
+        lay_h_ctrl_time_1.addWidget(self.lbl_plt_time_spgr)
         lay_h_ctrl_time_1.addWidget(self.cmb_plt_time_spgr)
         lay_h_ctrl_time_1.addStretch(10)
 
@@ -482,18 +518,25 @@ class PlotTranUI(QWidget):
 
         self.wdg_ctrl_time = QWidget(self, objectName="transparent")
         self.wdg_ctrl_time.setLayout(lay_g_ctrl_time)
-        self.wdg_ctrl_time.setContentsMargins(0, 0, 0, 0) # (*rc.params['wdg_margins'])
+        self.wdg_ctrl_time.setContentsMargins(0, 0, 0, 0)  # (*rc.params['wdg_margins'])
 
         self.wdg_ctrl_time_spgr.setVisible(self.plt_time_spgr != "none")
 
     # -------------------------------------------------------------------------
-    def _construct_ui_freq(self):
+    def _construct_ui_freq(self) -> None:
         """
-        Controls for frequency domain
+        Construct controls and layout for frequency domain
         """
+        self._construct_ui_freq_plot()
+        self._construct_layout_freq()
 
+    # -------------------------------------------------------------------------
+    def _construct_ui_freq_plot(self) -> None:
+        """
+        Construct plot style and display controls for frequency domain
+        """
         self.lbl_title_plot_freq = QLabel("Plots:", objectName="large")
-        #
+
         self.lbl_plt_freq_stim = QLabel(to_html("Stim. X", frmt='bi'), self)
         self.cmb_plt_freq_stim = QComboBox(self)
         qcmb_box_populate(
@@ -509,7 +552,7 @@ class PlotTranUI(QWidget):
         self.cmb_plt_freq_stmq.setToolTip(
             "<span>Plot style for <em>fixpoint</em> (quantized) stimulus.</span>")
 
-        lbl_plt_freq_resp = QLabel(
+        self.lbl_plt_freq_resp = QLabel(
             to_html("&nbsp;Resp. Y", frmt='bi'), self)
         self.cmb_plt_freq_resp = QComboBox(self)
         qcmb_box_populate(
@@ -517,7 +560,8 @@ class PlotTranUI(QWidget):
         self.cmb_plt_freq_resp.setToolTip(
             "<span>Plot style for response.</span>")
 
-        self.but_log_freq = PushButtonRT(self, text="dB", checked=True, objectName="but_log_freq")
+        self.but_log_freq = PushButtonRT(
+            self, text="dB", checked=True, objectName="but_log_freq")
         self.but_log_freq.setToolTip(
             "<span>Logarithmic scale for y-axis.</span>")
 
@@ -535,13 +579,13 @@ class PlotTranUI(QWidget):
             self.bottom_f = 0
 
         self.cmb_freq_display = QComboBox(self, objectName="cmb_freq_display")
-        qcmb_box_populate(self.cmb_freq_display, self.cmb_freq_display_items,
+        qcmb_box_populate(self.cmb_freq_display, CMB_FREQ_DISPLAY_ITEMS,
                           self.cmb_freq_display_item)
 
-        self.but_hf_id = PushButton(self, to_html("H_id", frmt="bi"), rich_text = True,
+        self.but_hf_id = PushButton(self, to_html("H_id", frmt="bi"), rich_text=True,
                                     objectName="but_hf_id")
         self.but_hf_id.setToolTip("<span>Show ideal frequency response, calculated "
-                               "from the filter coefficients.</span>")
+                                  "from the filter coefficients.</span>")
 
         self.but_freq_norm_impz = PushButtonRT(
             self, text="<b><i>E<sub>X</sub></i> = 1</b>", checked=True,
@@ -557,35 +601,35 @@ class PlotTranUI(QWidget):
             "<span>Show signal power in legend.</span>")
 
         self.but_freq_index_k = PushButtonRT(
-            self, text = "<i>k</i>", checked=fb_get("tab_yn", "display_index_k"),
+            self, text="<i>k</i>", checked=fb_get("tab_yn", "display_index_k"),
             objectName="but_freq_index_k")
         self.but_freq_index_k.setToolTip(
             "<span>Show FFT indices instead of frequencies.</span>")
 
+    # -------------------------------------------------------------------------
+    def _construct_layout_freq(self) -> None:
+        """
+        Construct layout for frequency domain controls
+        """
         lay_h_ctrl_freq_0 = QHBoxLayout()
         lay_h_ctrl_freq_0.addWidget(self.lbl_title_plot_freq)
 
         lay_h_ctrl_freq_1 = QHBoxLayout()
         lay_h_ctrl_freq_1.addWidget(self.lbl_plt_freq_stim)
         lay_h_ctrl_freq_1.addWidget(self.cmb_plt_freq_stim)
-        #
         lay_h_ctrl_freq_1.addWidget(self.lbl_plt_freq_stmq)
         lay_h_ctrl_freq_1.addWidget(self.cmb_plt_freq_stmq)
-        #
-        lay_h_ctrl_freq_1.addWidget(lbl_plt_freq_resp)
+        lay_h_ctrl_freq_1.addWidget(self.lbl_plt_freq_resp)
         lay_h_ctrl_freq_1.addWidget(self.cmb_plt_freq_resp)
-        #
         lay_h_ctrl_freq_1.addSpacing(5)
         lay_h_ctrl_freq_1.addWidget(self.but_hf_id)
         lay_h_ctrl_freq_1.addSpacing(5)
-        #
         lay_h_ctrl_freq_1.addWidget(self.lbl_log_bottom_freq)
         lay_h_ctrl_freq_1.addWidget(self.led_log_bottom_freq)
         lay_h_ctrl_freq_1.addWidget(self.but_log_freq)
         lay_h_ctrl_freq_1.addSpacing(5)
         lay_h_ctrl_freq_1.addWidget(self.cmb_freq_display)
         lay_h_ctrl_freq_1.addSpacing(5)
-
         lay_h_ctrl_freq_1.addWidget(self.but_freq_norm_impz)
         lay_h_ctrl_freq_1.addSpacing(5)
         lay_h_ctrl_freq_1.addWidget(self.but_freq_index_k)
@@ -609,8 +653,12 @@ class PlotTranUI(QWidget):
         self.wdg_ctrl_freq = QWidget(self, objectName="transparent")
         self.wdg_ctrl_freq.setLayout(lay_g_ctrl_freq)
         self.wdg_ctrl_freq.setContentsMargins(0, 0, 0, 0)  # (*rc.params['wdg_margins'])
-        # ---- end Frequency Domain ------------------
 
+    # -------------------------------------------------------------------------
+    def _connect_signals(self) -> None:
+        """
+        Connect global and local signals & slots
+        """
         # ----------------------------------------------------------------------
         # GLOBAL SIGNALS & SLOTs
         # ----------------------------------------------------------------------
