@@ -192,18 +192,18 @@ class MplWidget(QWidget):
         #                     QEvent.KeyRelease}:
         #     logger.info(self.event_types.as_string(event.type()))
         if event.type() == QEvent.KeyPress:
-            key = event.key()
+            key_pressed = event.key()
             # logger.warning(key)
             # check for "normal" keys, skip x and y (used as mouse modifiers)
-            if key < 256 and key != 88 and key != 89:
+            if key_pressed < 256 and key_pressed != 88 and key_pressed != 89:
                 modifiers = event.modifiers()
                 # meta = modifiers & Qt.AltModifier == Qt.AltModifier\
                 #     or modifiers & Qt.MetaModifier == Qt.MetaModifier
                 ctrl = modifiers & Qt.ControlModifier == Qt.ControlModifier
                 # shift = modifiers & Qt.ShiftModifier == Qt.ShiftModifier
 
-                # logger.warning(f"Key = {key}, meta = {meta}, ctrl = {ctrl}, shift = {shift}")
-                if key == 67 and ctrl:  # "ctrl-c"
+                # logger.warning(f"Key = {key_pressed}, meta = {meta}, ctrl = {ctrl}, shift = {shift}")
+                if key_pressed == 67 and ctrl:  # "ctrl-c"
                     self.mpl_toolbar.mpl2clip(key_event=True)
 
         # elif event.type() == QtGui.QMouseEvent.MouseButtonPress:
