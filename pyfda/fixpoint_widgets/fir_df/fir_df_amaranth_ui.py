@@ -179,7 +179,7 @@ class FirDFAmaranthUI(QWidget):
             if dict_sig['sender_name'] == 'fx_ui_wq_fir_df_accu':  # accu format updated
                 cmb_w = qget_cmb_box(self.wdg_wq_accu.cmb_w)
                 if cmb_w in {'f', 'a'}\
-                        or dict_sig['ui_local_changed'] in {'WF', 'WI'}:
+                        or dict_sig['ui_local_changed'] in {'WF', 'wi'}:
                     self.update_accu_settings()
                 elif cmb_w == 'm':  # switched to manual, don't do anything
                     # self.wdg_wq_accu.dict2ui()?
@@ -223,8 +223,8 @@ class FirDFAmaranthUI(QWidget):
         if qget_cmb_box(self.wdg_wq_accu.cmb_w) in {'f', 'a'}:
             fb_set('fxq', 'QACC', 'WF', fb_get('fxq', 'QI', 'WF')\
                 + fb_get('fxq', 'QCB', 'WF'))
-            fb_set('fxq', 'QACC', 'WI', fb_get('fxq', 'QI', 'WI')\
-                + fb_get('fxq', 'QCB', 'WI') + a_coeff)
+            fb_set('fxq', 'QACC', 'wi', fb_get('fxq', 'QI', 'wi')\
+                + fb_get('fxq', 'QCB', 'wi') + a_coeff)
 
         # update UI and Q.q_dict (quantization settings) from filter dict
         self.wdg_wq_accu.dict2ui(fb_get('fxq')['QACC'])

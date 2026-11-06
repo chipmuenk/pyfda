@@ -348,10 +348,10 @@ class Fixed():
 
     Define a dictionary with the format options and pass it to the constructor:
 
-    >>> q_dict = {'WI':1, 'WF':14, 'ovfl':'sat', 'quant':'round'}
+    >>> q_dict = {'wi':1, 'WF':14, 'ovfl':'sat', 'quant':'round'}
     >>> my_q = Fixed(q_dict)  # instantiate fixpoint quantizer
-    >>> WI = my_q.q_dict['WI']  # access quantizer parameters
-    >>> my_q.set_qdict({'WF': 13, 'WI': 2})  # update quantizer parameters
+    >>> WI = my_q.q_dict['wi']  # access quantizer parameters
+    >>> my_q.set_qdict({'WF': 13, 'wi': 2})  # update quantizer parameters
 
 
     Parameters
@@ -359,7 +359,7 @@ class Fixed():
     q_dict : dict
         define quantization options with the following keys
 
-    * **'WI'** : number of integer bits, default: 0
+    * **'wi'** : number of integer bits, default: 0
 
     * **'WF'** : number of fractional bits; default: 15
 
@@ -412,7 +412,7 @@ class Fixed():
         value of LSB (smallest quantization step), `self.lsb = 2 ** -q_dict['WF']`
 
     msb : float
-        value of most significant bit (MSB),  `self.msb = 2 ** (q_dict['WI'] - 1)`
+        value of most significant bit (MSB),  `self.msb = 2 ** (q_dict['wi'] - 1)`
 
     MIN : float
         most negative representable value, `self.MIN = -2 * self.msb`
@@ -452,7 +452,7 @@ class Fixed():
     >>> yq = quantize(q_dsp, y)
 
     **PYTHON**
-    >>> q_dsp = {'WI':0, 'WF': 15, 'quant':'round', 'ovfl':'wrap'}
+    >>> q_dsp = {'wi':0, 'WF': 15, 'quant':'round', 'ovfl':'wrap'}
     >>> my_q = Fixed(q_dsp)
     >>> yq = my_q.fixp(y)
     """
@@ -462,11 +462,11 @@ class Fixed():
         Construct `Fixed` object with dict `q_dict`
         """
         # read valid keys and default values for quantization dict from filterbroker
-        # e.g. {'WI': 0, 'WF': 15, 'w_a_m': 'm', 'quant': 'round', 'ovfl': 'sat', 'n_over': 0}
+        # e.g. {'wi': 0, 'WF': 15, 'w_a_m': 'm', 'quant': 'round', 'ovfl': 'sat', 'n_over': 0}
         self.q_dict_default = fb_get('fxq', 'QACC')
         # these attributes are calculated and should be regarded as read-only
         self.lsb = 2. ** -self.q_dict_default['WF']
-        self.msb = 2. ** (self.q_dict_default['WI'] - 1)
+        self.msb = 2. ** (self.q_dict_default['wi'] - 1)
         self.MAX = 2 * self.msb - self.lsb
         self.MIN = -2 * self.msb
 
@@ -482,7 +482,7 @@ class Fixed():
 
         # create a reference to the dict passed during construction as instance attribute
         self.q_dict = q_dict
-        # self.WI = self.q_dict['WI']
+        # self.WI = self.q_dict['wi']
         # self.WF = self.q_dict['WF']
 
         self.set_qdict({})  # trigger calculation of parameters
@@ -539,11 +539,11 @@ class Fixed():
             return
 
         # sanitize WI and WF
-        self.q_dict['WI'] = int(self.q_dict['WI'])
+        self.q_dict['wi'] = int(self.q_dict['wi'])
         self.q_dict['WF'] = abs(int(self.q_dict['WF']))
 
         # total word length W = WI + WF + 1 (sign bit)
-        W = self.q_dict['WI'] + self.q_dict['WF'] + 1
+        W = self.q_dict['wi'] + self.q_dict['WF'] + 1
 
         # Calculate min., max., lsb and msb from word lengths
         if fb_get('qfrmt') == 'qint':
@@ -551,7 +551,7 @@ class Fixed():
             self.msb = 2 ** (W - 1)
         elif fb_get('qfrmt') == 'qfrac':
             self.lsb = 2. ** -self.q_dict['WF']
-            self.msb = 2. ** (self.q_dict['WI'] - 1)
+            self.msb = 2. ** (self.q_dict['wi'] - 1)
         else:
             logger.error('Non-fixpoint format "%s"!', fb_get('qfrmt'))
 
@@ -635,7 +635,7 @@ class Fixed():
         Examples
         --------
 
-        >>> q_obj_a = {'WI':1, 'WF':6, 'ovfl':'sat', 'quant':'round'}
+        >>> q_obj_a = {'wi':1, 'WF':6, 'ovfl':'sat', 'quant':'round'}
         >>> myQa = Fixed(q_obj_a) # instantiate fixed-point object myQa
         >>> myQa.reset_n()  # reset overflow counter
         >>> a = np.arange(0,5, 0.05) # create input signal
@@ -648,7 +648,7 @@ class Fixed():
         >>> b = np.arange(200, dtype = np.int16)
         >>> btype = np.result_type(b)
         >>> # msb = 2**7, lsb = 2**(-2):
-        >>> q_obj_b = {'WI':7, 'WF':2, 'ovfl':'wrap', 'quant':'round'}
+        >>> q_obj_b = {'wi':7, 'WF':2, 'ovfl':'wrap', 'quant':'round'}
         >>> myQb = Fixed(q_obj_b) # instantiate fixed-point object myQb
         >>> bq = myQb.fixp(b)
         >>> bq = bq.astype(btype) # restore original variable type
@@ -794,7 +794,7 @@ class Fixed():
         #       returning a result in the range MIN = -2*msb ... + 2*msb-lsb = MAX
         # ========================================================================
         lsb = 1
-        msb = 1 << (self.q_dict['WI'] + self.q_dict['WF'] - 1)  # 2 ** (W - 2)
+        msb = 1 << (self.q_dict['wi'] + self.q_dict['WF'] - 1)  # 2 ** (W - 2)
         MAX = 2 * msb - lsb  # 2 ** (W - 1) - 1
         MIN = - 2 * msb
 
@@ -872,9 +872,9 @@ class Fixed():
             signal to be requantized with quantization format defined in quantizer QI
 
         QI: quantizer
-            Quantizer for input word, only the keys 'WI' and 'WF' for integer
+            Quantizer for input word, only the keys 'wi' and 'WF' for integer
             and fractional wordlength are evaluated.
-            `QI.q_dict['WI'] = 2` and `QI.q_dict['WF'] = 13` e.g. define Q-Format '2.13'
+            `QI.q_dict['wi'] = 2` and `QI.q_dict['WF'] = 13` e.g. define Q-Format '2.13'
             with 2 integer, 13 fractional bits and 1 implied sign bit = 16 bits total.
 
         Returns
@@ -928,11 +928,11 @@ class Fixed():
           bits with the sign bit.
         """
 
-        WI_F = QI.q_dict['WF']  # number of fractional bits of input signal
+        wi_f = QI.q_dict['WF']  # number of fractional bits of input signal
 
         # Convert input signal to fractional format if needed for aligning at fractional point
         if fb_get('qfrmt') == 'qint':
-            x_i_frac = x_i / (1 << WI_F)
+            x_i_frac = x_i / (1 << wi_f)
         elif fb_get('qfrmt') == 'qfrac':
             x_i_frac = x_i
         else:
@@ -1015,7 +1015,7 @@ class Fixed():
 
         - format is taken from the global `fb_get('fx_base')`
         - maximum wordlength is determined from the local quantization dict keys
-          `self.q_dict['WI']` and `self.q_dict['WF']`
+          `self.q_dict['wi']` and `self.q_dict['WF']`
         - negative numbers can be represented by a '-' sign or in two's complement
         - represented numbers may be fractional and / or complex.
         - the result is divided by 2**WF for `fb_get('qfrmt') == 'qint'` in `fixp()`
@@ -1159,9 +1159,9 @@ class Fixed():
         elif frmt in {'hex', 'bin', 'oct'}:
             neg_sign = False
             if fb_get('qfrmt') == 'qint':
-                W = self.q_dict['WI'] + self.q_dict['WF'] + 1
+                W = self.q_dict['wi'] + self.q_dict['WF'] + 1
             elif fb_get('qfrmt') == 'qfrac':
-                W = self.q_dict['WI'] + 1
+                W = self.q_dict['wi'] + 1
             else:
                 logger.error("Non-fixpoint format '%s'!", fb_get('qfrmt')   )
                 return 0.0
@@ -1243,7 +1243,7 @@ class Fixed():
         Called a.o. by `itemDelegate.displayText()` for on-the-fly number
         conversion. Returns fixpoint representation for `y` (scalar or array-like)
         with numeric format `self.frmt` and a total wordlength of
-        `W = self.q_dict['WI'] + self.q_dict['WF'] + 1` bits.
+        `W = self.q_dict['wi'] + self.q_dict['WF'] + 1` bits.
         The result has the same shape as `y`.
 
         The float is always quantized / saturated using `self.fixp()` before it is
@@ -1353,15 +1353,15 @@ class Fixed():
         elif fb_get('fx_base') in {'bin', 'oct', 'hex'}:
             # represent fixpoint number as integer in the range -2**(W-1) ... 2**(W-1)
             y_fix_int = np.int64(np.round(y_fix / self.lsb))
-            W = self.q_dict['WI'] + self.q_dict['WF'] + 1
+            W = self.q_dict['wi'] + self.q_dict['WF'] + 1
             # convert to (array of) string with 2's complement binary
             y_bin_str = binary_repr(y_fix_int, W)
 
             if fb_get('qfrmt') == 'qint':
-                WI = self.q_dict['WI'] + self.q_dict['WF'] + 1
+                WI = self.q_dict['wi'] + self.q_dict['WF'] + 1
                 # TODO: Is the "+ 1" correct?
             elif fb_get('qfrmt') == 'qfrac':
-                WI = self.q_dict['WI']
+                WI = self.q_dict['wi']
             else:
                 raise Exception("Unknown fixpoint format '%s'!", fb_get('qfrmt'))
 
@@ -1459,7 +1459,7 @@ if __name__ == '__main__':
 
     fb_set('qfrmt', 'qfrac')  # set fixpoint format
 
-    q_dict = {'WI': 0, 'WF': 3, 'ovfl': 'wrap', 'quant': 'round'}
+    q_dict = {'wi': 0, 'WF': 3, 'ovfl': 'wrap', 'quant': 'round'}
     my_q = Fixed(q_dict)  # instantiate fixpoint object with settings above
 
     print("\nTesting float2frmt()\n====================")
@@ -1469,7 +1469,7 @@ if __name__ == '__main__':
     print("my_q.q_dict = ", my_q.q_dict)
 
     print("\nTesting frmt2float()\n====================")
-    q_dict = {'WI': 3}  # extend range
+    q_dict = {'wi': 3}  # extend range
     my_q.set_qdict(q_dict)
     dec_list = [-9, -8, -7, -4.0, -3.578, 0, 0.5, 4, 7, 8]
     for dec in dec_list:

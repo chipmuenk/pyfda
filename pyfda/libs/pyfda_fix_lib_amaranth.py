@@ -31,13 +31,13 @@ def requant(mod: Module, sig_i: Signal, QI: dict, QO: dict) -> Signal:
         Signal to be requantized
 
     QI: dict
-        Quantization dict for input word, only the keys 'WI' and 'WF' for integer
-        and fractional wordlength are evaluated. QI['WI'] = 2 and QI['WF'] = 13
+        Quantization dict for input word, only the keys 'wi' and 'WF' for integer
+        and fractional wordlength are evaluated. QI['wi'] = 2 and QI['WF'] = 13
         e.g. define Q-Format '2.13'  with 2 integer, 13 fractional bits and 1 implied
         sign bit = 16 bits total.
 
     QO: dict
-        Quantization dict for output word format; the keys 'WI' and 'WF' for
+        Quantization dict for output word format; the keys 'wi' and 'WF' for
         integer and fractional wordlength are evaluated as well as the keys 'quant'
         and 'ovfl' describing requantization and overflow behaviour.
 
@@ -92,16 +92,16 @@ def requant(mod: Module, sig_i: Signal, QI: dict, QO: dict) -> Signal:
         bits with the sign bit.
 
     """
-    WI_I = QI['WI']         # number of integer bits (input signal)
-    WI_F = QI['WF']         # number of fractional bits (input signal)
-    WI   = WI_I + WI_F + 1  # total word length (input signal)
+    wi_i = QI['wi']         # number of integer bits (input signal)
+    wi_f = QI['WF']         # number of fractional bits (input signal)
+    WI   = wi_i + wi_f + 1  # total word length (input signal)
 
-    WO_I = QO['WI']         # number of integer bits (output signal)
-    WO_F = QO['WF']         # number of fractional bits (output signal)
-    WO   = WO_I + WO_F + 1  # total word length (output signal)
+    wo_i = QO['wi']         # number of integer bits (output signal)
+    wo_f = QO['WF']         # number of fractional bits (output signal)
+    WO   = wo_i + wo_f + 1  # total word length (output signal)
 
-    dWF = WI_F - WO_F       # difference of fractional lengths
-    dWI = WI_I - WO_I       # difference of integer lengths
+    dWF = wi_f - wo_f       # difference of fractional lengths
+    dWI = wi_i - wo_i       # difference of integer lengths
 
     # max. resp. min, output values
     min_o = - 1 << (WO - 1)
@@ -139,7 +139,7 @@ def requant(mod: Module, sig_i: Signal, QI: dict, QO: dict) -> Signal:
     # -----------------------------------------------------------------------
     # Requantize integer part
     # -----------------------------------------------------------------------
-    if dWI < 0:  # WI_I < WO_I, sign extend integer part (prepend copies of sign bit)
+    if dWI < 0:  # wi_i < wo_i, sign extend integer part (prepend copies of sign bit)
         mod.d.comb += sig_o.eq(Cat(sig_i_q, sig_i_q[-1].replicate(-dWI)))
         mod.d.comb += ovfl_o.eq(0)
     elif dWI == 0:  # WI = WO, don't change integer part

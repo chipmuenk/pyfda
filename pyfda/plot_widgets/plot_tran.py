@@ -931,19 +931,19 @@ class PlotTran(QWidget):
                     self.scale_iq = 1
                     self.scale_o = 1 << fb_get('fxq', 'QO', 'WF')
 
-                    self.fx_min_x = - (1 << (fb_get('fxq', 'QI', 'WI')
+                    self.fx_min_x = - (1 << (fb_get('fxq', 'QI', 'wi')
                                      + fb_get('fxq', 'QI', 'WF')))
                     self.fx_max_x = -self.fx_min_x - 1
-                    self.fx_min_y = - (1 << (fb_get('fxq', 'QO', 'WI')
+                    self.fx_min_y = - (1 << (fb_get('fxq', 'QO', 'wi')
                                      + fb_get('fxq', 'QO', 'WF')))
                     self.fx_max_y = -self.fx_min_y - 1
                 elif fb_get('qfrmt') == 'qfrac':
                     # display values scaled as "real world (float) values"
                     self.scale_i = self.scale_iq = self.scale_o = 1
-                    self.fx_min_x = -(1 << fb_get('fxq', 'QI', 'WI'))
+                    self.fx_min_x = -(1 << fb_get('fxq', 'QI', 'wi'))
                     self.fx_max_x = -self.fx_min_x\
                         - 1. / (1 << fb_get('fxq', 'QI', 'WF'))
-                    self.fx_min_y = -(1 << fb_get('fxq', 'QO', 'WI'))
+                    self.fx_min_y = -(1 << fb_get('fxq', 'QO', 'wi'))
                     self.fx_max_y = -self.fx_min_y -\
                         1. / (1 << fb_get('fxq', 'QO', 'WF'))
                 else:

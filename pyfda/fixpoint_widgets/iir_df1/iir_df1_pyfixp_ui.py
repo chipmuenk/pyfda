@@ -167,7 +167,7 @@ class IIRDF1PyfixpUI(QWidget):
 
             # changes in accu widget
             if dict_sig['sender_name'] == 'fx_ui_wq_iir_df1_accu':  # accu format updated
-                if ui_changed in {'cmb_w', 'WF', 'WI'}:
+                if ui_changed in {'cmb_w', 'WF', 'wi'}:
                     cmb_w = qget_cmb_box(self.wdg_wq_accu.cmb_w)
                     if cmb_w == 'm':
                         if ui_changed == 'cmb_w':
@@ -186,7 +186,7 @@ class IIRDF1PyfixpUI(QWidget):
 
             # changes in coeffs 'a' widget
             elif dict_sig['sender_name'] == 'fx_ui_wq_iir_df1_coeffs_a':
-                if ui_changed in {'cmb_w', 'WF', 'WI'}:
+                if ui_changed in {'cmb_w', 'WF', 'wi'}:
                     cmb_w = qget_cmb_box(self.wdg_wq_coeffs_a.cmb_w)
                     if cmb_w == 'm':
                         if ui_changed == 'cmb_w':
@@ -209,7 +209,7 @@ class IIRDF1PyfixpUI(QWidget):
 
             # changes in coeffs 'b' widget
             elif dict_sig['sender_name'] == 'fx_ui_wq_iir_df1_coeffs_b':
-                if ui_changed in {'cmb_w', 'WF', 'WI'}:
+                if ui_changed in {'cmb_w', 'WF', 'wi'}:
                     cmb_w = qget_cmb_box(self.wdg_wq_coeffs_b.cmb_w)
                     if cmb_w == 'm':
                         if ui_changed == 'cmb_w':
@@ -253,7 +253,7 @@ class IIRDF1PyfixpUI(QWidget):
             wi_a = 0
             logger.warning("Overflow error in calculation of word length.")
 
-        fb_set('fxq', 'QCA', 'WI', wi_a)
+        fb_set('fxq', 'QCA', 'wi', wi_a)
         # update quantizer settings and UI
         self.wdg_wq_coeffs_a.dict2ui(fb_get('fxq', 'QCA'))
 
@@ -270,7 +270,7 @@ class IIRDF1PyfixpUI(QWidget):
         except OverflowError:
             wi_b = 0
             logger.warning("Overflow error in calculation of word length.")
-        fb_set('fxq', 'QCB', 'WI', max(wi_b, 0))
+        fb_set('fxq', 'QCB', 'wi', max(wi_b, 0))
         # update quantizer settings and UI
         self.wdg_wq_coeffs_b.dict2ui(fb_get('fxq', 'QCB'))
 
@@ -298,9 +298,9 @@ class IIRDF1PyfixpUI(QWidget):
                 fb_get('fxq', 'QI', 'WF') + fb_get('fxq', 'QCB', 'WF'),
                 fb_get('fxq', 'QO', 'WF') + fb_get('fxq', 'QCA', 'WF')))
 
-            fb_set('fxq', 'QACC', 'WI', max(
-                fb_get('fxq', 'QI', 'WI') + fb_get('fxq', 'QCB', 'WI'),
-                fb_get('fxq', 'QO', 'WI') + fb_get('fxq', 'QCA', 'WI')))
+            fb_set('fxq', 'QACC', 'wi', max(
+                fb_get('fxq', 'QI', 'wi') + fb_get('fxq', 'QCB', 'wi'),
+                fb_get('fxq', 'QO', 'wi') + fb_get('fxq', 'QCA', 'wi')))
 
         # update UI and Q.q_dict (quantization settings) from filter dict
         self.wdg_wq_accu.dict2ui(fb_get('fxq', 'QACC'))

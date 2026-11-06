@@ -194,11 +194,11 @@ if __name__ == '__main__':
     # `python -m pyfda.fixpoint_widgets.fir_df.fir_df_pyfixp`
 
     fb_set('ba', np.array([1.1, 2.2, 3.3, 2, 1], []))  # example coefficients
-    p = {'QCB': {'WI': 2, 'WF': 5, 'w_a_m': 'a',
+    p = {'QCB': {'wi': 2, 'WF': 5, 'w_a_m': 'a',
                 'ovfl': 'wrap', 'quant': 'floor', 'n_over': 0},
-         'QACC': {'WI': 6, 'WF': 3, 'ovfl': 'wrap', 'quant': 'round'},
-         'QI': {'WI': 2, 'WF': 3, 'ovfl': 'sat', 'quant': 'round'},
-         'QO': {'WI': 6, 'WF': 3, 'ovfl': 'wrap', 'quant': 'round'}
+         'QACC': {'wi': 6, 'WF': 3, 'ovfl': 'wrap', 'quant': 'round'},
+         'QI': {'wi': 2, 'WF': 3, 'ovfl': 'sat', 'quant': 'round'},
+         'QO': {'wi': 6, 'WF': 3, 'ovfl': 'wrap', 'quant': 'round'}
          }
     for frmt in ['qint', 'qfrac']:
         print(f"\nFormat = '{frmt}'")

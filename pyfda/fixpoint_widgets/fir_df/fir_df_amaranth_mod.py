@@ -85,15 +85,15 @@ class FIRDFAmaranthMod(Elaboratable):
 
         # Accumulator settings
         # self.q_acc = fx.Fixed(p['QACC'])  # accumulator
-        self.w_acc = self.p['QACC']['WI'] + self.p['QACC']['WF'] + 1  # total accu word length
+        self.w_acc = self.p['QACC']['wi'] + self.p['QACC']['WF'] + 1  # total accu word length
 
         # Partial products: use accumulator settings and update word length
         # to sum of coefficient and input word lengths
         self.q_mul = fx.Fixed(p['QACC'].copy())  # partial products
-        self.q_mul.set_qdict({'WI': self.p['QI']['WI'] + self.p['QCB']['WI'] + delta_w,
+        self.q_mul.set_qdict({'wi': self.p['QI']['wi'] + self.p['QCB']['wi'] + delta_w,
              'WF': self.p['QI']['WF'] + self.p['QCB']['WF']})
-        self.w_mul = self.q_mul.q_dict['WI'] + self.q_mul.q_dict['WF'] + 1
-        # self.w_mul = 1 + delta_w + self.p['QI']['WI'] + self.p['QCB']['WI']\
+        self.w_mul = self.q_mul.q_dict['wi'] + self.q_mul.q_dict['WF'] + 1
+        # self.w_mul = 1 + delta_w + self.p['QI']['wi'] + self.p['QCB']['wi']\
         #    + self.p['QI']['WF'] + self.p['QCB']['WF']
 
         # Input and output signal are quantized in FIR_DF_Amaranth()
@@ -112,8 +112,8 @@ class FIRDFAmaranthMod(Elaboratable):
                 self.zi = zi[:self.L - 1]
 
         # ------------- Define I/Os for amaranth module ---------------------------
-        self.WI = p['QI']['WI'] + p['QI']['WF'] + 1  # total input word length
-        self.WO = p['QO']['WI'] + p['QO']['WF'] + 1  # total output word length
+        self.WI = p['QI']['wi'] + p['QI']['WF'] + 1  # total input word length
+        self.WO = p['QO']['wi'] + p['QO']['WF'] + 1  # total output word length
         self.i = Signal(signed(self.WI))  # input signal
         self.o = Signal(signed(self.WO))  # output signal
         # self.ovfl_acc_o = Signal()  # requantization overflow bit accumulator
@@ -174,11 +174,11 @@ if __name__ == '__main__':
 
     set_fx(True)  # enable fixpoint mode
 
-    p = {'QCB': {'WI': 2, 'WF': 5, 'w_a_m': 'a',
+    p = {'QCB': {'wi': 2, 'WF': 5, 'w_a_m': 'a',
                 'ovfl': 'wrap', 'quant': 'floor', 'n_over': 0},
-         'QACC': {'WI': 6, 'WF': 3, 'ovfl': 'wrap', 'quant': 'round'},
-         'QI': {'WI': 2, 'WF': 3, 'ovfl': 'sat', 'quant': 'round'},
-         'QO': {'WI': 6, 'WF': 3, 'ovfl': 'wrap', 'quant': 'round'}
+         'QACC': {'wi': 6, 'WF': 3, 'ovfl': 'wrap', 'quant': 'round'},
+         'QI': {'wi': 2, 'WF': 3, 'ovfl': 'sat', 'quant': 'round'},
+         'QO': {'wi': 6, 'WF': 3, 'ovfl': 'wrap', 'quant': 'round'}
          }
 
     q_b = fx.Fixed(p['QCB'])  # quantizer for transversal coeffs

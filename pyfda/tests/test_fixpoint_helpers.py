@@ -26,8 +26,8 @@ except ImportError:
 class TestSequenceFunctions(unittest.TestCase):
 
     def setUp(self):
-        self.q_in =  {'WI':0, 'WF':15, 'ovfl':'wrap', 'quant':'round'}
-        self.q_out = {'WI':0, 'WF':15, 'ovfl':'wrap', 'quant':'round'}
+        self.q_in =  {'wi':0, 'WF':15, 'ovfl':'wrap', 'quant':'round'}
+        self.q_out = {'wi':0, 'WF':15, 'ovfl':'wrap', 'quant':'round'}
         if HAS_MIGEN:
             self.dut = DUT(self.q_in, self.q_out)
 
@@ -35,7 +35,7 @@ class TestSequenceFunctions(unittest.TestCase):
 
         fb_set{'qfrmt': 'qfrac', 'fx_base': 'dec'})
         # initialize a pyfda fixpoint quantizer
-        q_obj = {'WI':0, 'WF':3, 'ovfl':'sat', 'quant':'round'}
+        q_obj = {'wi':0, 'WF':3, 'ovfl':'sat', 'quant':'round'}
         self.my_q = fx.Fixed(q_obj) # instantiate fixpoint object with settings above
 
 
@@ -83,7 +83,7 @@ class TestSequenceFunctions(unittest.TestCase):
         Check whether parameters are written correctly to the fixpoint instance
         """
         fb_set({'qfrmt': 'qfrac', 'fx_base': 'hex'})
-        q_obj = {'WI':7, 'WF':3, 'ovfl':'none', 'quant':'fix'}
+        q_obj = {'wi':7, 'WF':3, 'ovfl':'none', 'quant':'fix'}
         self.my_q.set_qdict(q_obj)
 
     #==========================================================================
@@ -114,9 +114,9 @@ class TestSequenceFunctions(unittest.TestCase):
         is shortened by 3 bits.
         """
         # Input quantization format, range: -512 ... 511:
-        q_in =  {'WI':9, 'WF':0, 'ovfl':'wrap', 'quant':'round'}
+        q_in =  {'wi':9, 'WF':0, 'ovfl':'wrap', 'quant':'round'}
         # Output quantization format, range: -64 ... 63:
-        q_out = {'WI':6, 'WF':0, 'ovfl':'wrap', 'quant':'round'}
+        q_out = {'wi':6, 'WF':0, 'ovfl':'wrap', 'quant':'round'}
         targ_out = np.array([0,1,15,-64,-1,-1,-64,0])
 
         q_out_pyfda = q_out.copy()
@@ -135,12 +135,12 @@ class TestSequenceFunctions(unittest.TestCase):
         Test rescaling for fixpoint fractional representation when 3 fractional
         bits are thrown away.
         """
-        q_in =  {'WI':0, 'WF':9, 'ovfl':'wrap', 'quant':'round'}
-        q_out = {'WI':0, 'WF':6, 'ovfl':'wrap', 'quant':'round'}
+        q_in =  {'wi':0, 'WF':9, 'ovfl':'wrap', 'quant':'round'}
+        q_out = {'wi':0, 'WF':6, 'ovfl':'wrap', 'quant':'round'}
         targ_out = np.array([0,0,2,8,0,0,-8,0])
 
         q_out_pyfda = q_out.copy()
-        q_out_pyfda.update({'WI':6, 'WF':0}) # use integer representation
+        q_out_pyfda.update({'wi':6, 'WF':0}) # use integer representation
         self.my_q.set_qdict(q_out_pyfda)
 
         self.dut = DUT(q_in, q_out)
