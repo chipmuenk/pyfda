@@ -141,7 +141,7 @@ class Delay(Module):
     def __init__(self):
         # ------------- Define I/O wordlengths --------------------------------
         self.WI = fb_get('fxq', 'QI', 'wi') + fb_get('fxq', 'QI', 'wf') + 1
-        self.WO = fb_get('fxq', 'QO', 'wi') + fb_get('fxq', 'QO', 'wf') + 1
+        self.WO = fb_get('fxq', 'q_o', 'wi') + fb_get('fxq', 'q_o', 'wf') + 1
         N = len(p['b']) - 1 # number of coefficients = Order + 1
         # ------------- Define I/Os for amaranth ------------------------------
         self.i = Signal((self.WI, True)) # input signal
@@ -154,7 +154,7 @@ class Delay(Module):
             src = sreg
 
         # rescale for output width
-        self.comb += self.o.eq(requant(self, src, p['QI'], p['QO']))
+        self.comb += self.o.eq(requant(self, src, p['QI'], p['q_o']))
 
 #------------------------------------------------------------------------------
 

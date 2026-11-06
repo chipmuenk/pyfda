@@ -49,7 +49,7 @@ class FIRDFPyfixp():
         self.q_b = fx.Fixed(self.p['QCB'])  # transversal coeffs
         self.q_mul = fx.Fixed(self.p['QACC'].copy())  # partial products
         self.q_acc = fx.Fixed(self.p['QACC'])  # accumulator
-        self.q_o = fx.Fixed(self.p['QO'])  # output
+        self.q_o = fx.Fixed(self.p['q_o'])  # output
 
         self.init(p)
         logger.info("Instantiated fx filter")
@@ -89,7 +89,7 @@ class FIRDFPyfixp():
         self.q_b.set_qdict(self.p['QCB'])  # transversal coeffs.s
         self.q_mul.set_qdict(q_mul)  # partial products
         self.q_acc.set_qdict(self.p['QACC'])  # accumulator
-        self.q_o.set_qdict(self.p['QO'])  # output
+        self.q_o.set_qdict(self.p['q_o'])  # output
 
         # Quantize coefficients and store them in local attributes
         # This also resets the overflow counters.
@@ -198,7 +198,7 @@ if __name__ == '__main__':
                 'ovfl': 'wrap', 'quant': 'floor', 'n_over': 0},
          'QACC': {'wi': 6, 'wf': 3, 'ovfl': 'wrap', 'quant': 'round'},
          'QI': {'wi': 2, 'wf': 3, 'ovfl': 'sat', 'quant': 'round'},
-         'QO': {'wi': 6, 'wf': 3, 'ovfl': 'wrap', 'quant': 'round'}
+         'q_o': {'wi': 6, 'wf': 3, 'ovfl': 'wrap', 'quant': 'round'}
          }
     for frmt in ['qint', 'qfrac']:
         print(f"\nFormat = '{frmt}'")

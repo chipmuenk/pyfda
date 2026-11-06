@@ -143,7 +143,7 @@ class Delay(Module):
         p = fb_get('fxq')
         # ------------- Define I/Os -------------------------------------------
         self.WI = p['QI']['wi'] + p['QI']['wf'] + 1
-        self.WO = p['QO']['wi'] + p['QO']['wf'] + 1
+        self.WO = p['q_o']['wi'] + p['q_o']['wf'] + 1
         n_del = len(p['b']) - 1 # number of coefficients = Order + 1
         # ------------- Define I/Os -------------------------------------------
         self.i = Signal((self.WI, True)) # input signal
@@ -156,7 +156,7 @@ class Delay(Module):
             src = sreg
 
         # rescale for output width
-        self.comb += self.o.eq(requant(self, src, p['QI'], p['QO']))
+        self.comb += self.o.eq(requant(self, src, p['QI'], p['q_o']))
 
 #------------------------------------------------------------------------------
 

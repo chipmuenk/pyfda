@@ -929,13 +929,13 @@ class PlotTran(QWidget):
                     # in the range +/- 2 ** (WI + WF)
                     self.scale_i = 1 << fb_get('fxq', 'QI', 'wf')
                     self.scale_iq = 1
-                    self.scale_o = 1 << fb_get('fxq', 'QO', 'wf')
+                    self.scale_o = 1 << fb_get('fxq', 'q_o', 'wf')
 
                     self.fx_min_x = - (1 << (fb_get('fxq', 'QI', 'wi')
                                      + fb_get('fxq', 'QI', 'wf')))
                     self.fx_max_x = -self.fx_min_x - 1
-                    self.fx_min_y = - (1 << (fb_get('fxq', 'QO', 'wi')
-                                     + fb_get('fxq', 'QO', 'wf')))
+                    self.fx_min_y = - (1 << (fb_get('fxq', 'q_o', 'wi')
+                                     + fb_get('fxq', 'q_o', 'wf')))
                     self.fx_max_y = -self.fx_min_y - 1
                 elif fb_get('qfrmt') == 'qfrac':
                     # display values scaled as "real world (float) values"
@@ -943,9 +943,9 @@ class PlotTran(QWidget):
                     self.fx_min_x = -(1 << fb_get('fxq', 'QI', 'wi'))
                     self.fx_max_x = -self.fx_min_x\
                         - 1. / (1 << fb_get('fxq', 'QI', 'wf'))
-                    self.fx_min_y = -(1 << fb_get('fxq', 'QO', 'wi'))
+                    self.fx_min_y = -(1 << fb_get('fxq', 'q_o', 'wi'))
                     self.fx_max_y = -self.fx_min_y -\
-                        1. / (1 << fb_get('fxq', 'QO', 'wf'))
+                        1. / (1 << fb_get('fxq', 'q_o', 'wf'))
                 else:
                     logger.error("Undefined qfrmt = '%s'!", fb_get('qfrmt'))
 

@@ -63,7 +63,7 @@ class FIRDFAmaranth():
         self.q_b = fx.Fixed(self.p['QCB'])  # transversal coeffs
         # self.q_mul = fx.Fixed(self.p['QACC'].copy())  # partial products
         # self.q_acc = fx.Fixed(self.p['QACC'])  # accumulator
-        self.q_o = fx.Fixed(self.p['QO'])  # output
+        self.q_o = fx.Fixed(self.p['q_o'])  # output
         self.init(p)
         logger.info("Instantiated fx filter '%s'", self.__class__.__name__)
 
@@ -211,7 +211,7 @@ class FIRDFAmaranth():
         self.sim.run()
 
         # Currently doesn't work, output signal is quantized afterwards, resetting 'n_over'
-        # fb_set('fxq', 'QO', 'n_over', 13)  # doesn't work, output signal is quantized
+        # fb_set('fxq', 'q_o', 'n_over', 13)  # doesn't work, output signal is quantized
 
         # logger.warning("y = %s", self.q_o.fixp(
         #                self.output, in_frmt='qint', out_frmt=fb_get('qfrmt')))
@@ -240,13 +240,13 @@ if __name__ == '__main__':
                 'ovfl': 'wrap', 'quant': 'floor', 'n_over': 0},
          'QACC': {'wi': 6, 'wf': 3, 'ovfl': 'wrap', 'quant': 'round'},
          'QI': {'wi': 2, 'wf': 3, 'ovfl': 'sat', 'quant': 'round'},
-         'QO': {'wi': 6, 'wf': 3, 'ovfl': 'wrap', 'quant': 'round'}
+         'q_o': {'wi': 6, 'wf': 3, 'ovfl': 'wrap', 'quant': 'round'}
          }
 
     q_b = fx.Fixed(p['QCB'])  # quantizer for transversal coeffs
     b_q = fx.quant_coeffs([1, 2, 3, 2, 1], q_b, out_frmt="qint")
     q_i = fx.Fixed(p['QI'])
-    q_o = fx.Fixed(p['QO'])
+    q_o = fx.Fixed(p['q_o'])
 
     p.update({'ba': b_q})
 

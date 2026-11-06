@@ -52,7 +52,7 @@ class IIRDF1Pyfixp():
         self.q_mul_b = fx.Fixed(self.p['QACC'].copy())  # partial products b x
         self.q_mul = fx.Fixed(self.p['QACC'].copy())  # partial products
         self.q_acc = fx.Fixed(self.p['QACC'])  # accumulator
-        self.q_o = fx.Fixed(self.p['QO'])  # output
+        self.q_o = fx.Fixed(self.p['q_o'])  # output
 
         self.init(p)
         logger.info("Instantiated fx filter")
@@ -98,14 +98,14 @@ class IIRDF1Pyfixp():
         self.q_a.set_qdict(self.p['QCA'])  # recursive coeffs (a)
         self.q_b.set_qdict(self.p['QCB'])  # transversal b coeffs (b)
         self.q_acc.set_qdict(self.p['QACC'])  # accumulator
-        self.q_o.set_qdict(self.p['QO'])  # output
+        self.q_o.set_qdict(self.p['q_o'])  # output
 
         # Quantizer dict for partial products yq * aq
         dw_a = int(np.ceil(np.log2(len(self.p['QCA']))))  # word growth
         # word format for sum of partial products a_i * y_i
         self.q_mul_a.set_qdict(
-            {'wi': self.p['QO']['wi'] + self.p['QCA']['wi'] + dw_a,
-             'wf': self.p['QO']['wf'] + self.p['QCA']['wf']})
+            {'wi': self.p['q_o']['wi'] + self.p['QCA']['wi'] + dw_a,
+             'wf': self.p['q_o']['wf'] + self.p['QCA']['wf']})
 
         # Quantizer dict for partial products xq * bq
         dw_b = int(np.ceil(np.log2(len(self.p['QCB']))))  # word growth
@@ -294,7 +294,7 @@ if __name__ == '__main__':
                 'ovfl': 'wrap', 'quant': 'floor', 'n_over': 0},
          'QACC': {'wi': 4, 'wf': 3, 'ovfl': 'wrap', 'quant': 'round'},
          'QI': {'wi': 2, 'wf': 3, 'ovfl': 'sat', 'quant': 'round'},
-         'QO': {'wi': 5, 'wf': 3, 'ovfl': 'wrap', 'quant': 'round'}
+         'q_o': {'wi': 5, 'wf': 3, 'ovfl': 'wrap', 'quant': 'round'}
          }
 
 

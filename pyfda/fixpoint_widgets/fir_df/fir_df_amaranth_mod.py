@@ -113,7 +113,7 @@ class FIRDFAmaranthMod(Elaboratable):
 
         # ------------- Define I/Os for amaranth module ---------------------------
         self.WI = p['QI']['wi'] + p['QI']['wf'] + 1  # total input word length
-        self.WO = p['QO']['wi'] + p['QO']['wf'] + 1  # total output word length
+        self.WO = p['q_o']['wi'] + p['q_o']['wf'] + 1  # total output word length
         self.i = Signal(signed(self.WI))  # input signal
         self.o = Signal(signed(self.WO))  # output signal
         # self.ovfl_acc_o = Signal()  # requantization overflow bit accumulator
@@ -159,8 +159,8 @@ class FIRDFAmaranthMod(Elaboratable):
         # m.d.comb += self.ovfl_acc_o.eq(requant(m, sum_full, self.q_mul.q_dict, self.p['QACC'])[1])
 
         # requantize from accumulator format to output width
-        m.d.comb += self.o.eq(requant(m, sum_accu, self.p['QACC'], self.p['QO'])[0])
-        # m.d.comb += self.ovfl_out_o.eq(requant(m, sum_accu, self.p['QACC'], self.p['QO'])[1])
+        m.d.comb += self.o.eq(requant(m, sum_accu, self.p['QACC'], self.p['q_o'])[0])
+        # m.d.comb += self.ovfl_out_o.eq(requant(m, sum_accu, self.p['QACC'], self.p['q_o'])[1])
 
         return m   # return result as list of integers
 
@@ -178,7 +178,7 @@ if __name__ == '__main__':
                 'ovfl': 'wrap', 'quant': 'floor', 'n_over': 0},
          'QACC': {'wi': 6, 'wf': 3, 'ovfl': 'wrap', 'quant': 'round'},
          'QI': {'wi': 2, 'wf': 3, 'ovfl': 'sat', 'quant': 'round'},
-         'QO': {'wi': 6, 'wf': 3, 'ovfl': 'wrap', 'quant': 'round'}
+         'q_o': {'wi': 6, 'wf': 3, 'ovfl': 'wrap', 'quant': 'round'}
          }
 
     q_b = fx.Fixed(p['QCB'])  # quantizer for transversal coeffs
@@ -186,7 +186,7 @@ if __name__ == '__main__':
     p.update({'ba': b_q})
 
     q_i = fx.Fixed(p['QI'])
-    q_o = fx.Fixed(p['QO'])
+    q_o = fx.Fixed(p['q_o'])
 
     dut = FIRDFAmaranthMod(p)
 

@@ -107,13 +107,13 @@ fil_ref = {
     # Settings for quantization subwidgets
     # ---------------------------------------------------------------------------
     #  Sub-dicts for quantization of
-    #   'QI':input, 'QO': output, 'QCA': coeffs a, 'QCB': coeffs b, 'QACC': accumulator
+    #   'QI':input, 'q_o': output, 'QCA': coeffs a, 'QCB': coeffs b, 'QACC': accumulator
     #    (more subwidgets can be added by fixpoint widget if needed)
     #  Keys:
     #   'n_over': number of overflows during last quantization process
     #   'wf': fractional bits, 'wi': integer bits
     #   'ovfl': overflow behaviour, 'quant': quantizer behaviour
-    #   'w_a_m': word length automatic / manual calculation (not needed for 'QI', 'QO')
+    #   'w_a_m': word length automatic / manual calculation (not needed for 'QI', 'q_o')
     'fxq':{
         # accumulator quantization
         'QACC': {
@@ -152,7 +152,7 @@ fil_ref = {
             'w_a_m': 'm'
         },
         # output quantization
-        'QO': {
+        'q_o': {
             'n_over': 0,
             'wf': 15,
             'wi': 0,

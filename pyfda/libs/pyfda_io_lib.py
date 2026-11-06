@@ -1453,7 +1453,7 @@ def export_coe_vhdl_package(f: TextIO) -> bool:
         logger.error("Fractional numbers are only supported for floats!")
         return True
 
-    WO = fb_get('fxq', 'QO','wi') + fb_get('fxq', 'QO', 'wf') + 1
+    WO = fb_get('fxq', 'q_o','wi') + fb_get('fxq', 'q_o', 'wf') + 1
 
     if fb_get('fx_base') == 'dec' or not get_fx():
         pre = ""
