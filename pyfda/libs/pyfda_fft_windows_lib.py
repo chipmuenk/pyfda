@@ -419,7 +419,7 @@ def blackmanharris(n_fft: int, n_terms: str, sym: bool) -> np.ndarray:
     with the same name from scipy.signal
     """
     if n_terms == '4':
-        return sig.windows.blackmanharris(N, sym)
+        return sig.windows.blackmanharris(n_fft, sym)
 
     if n_terms == '5':
         # 5 Term Cosine, 125.427 dB, NBW 2.21535 bins, 9.81016 dB gain
