@@ -1376,7 +1376,7 @@ def export_coe_xilinx(f: TextIO) -> bool:
     """
     qc = fx.Fixed(fb_get('fxq', 'QCB'))  # instantiate fixpoint object
 
-    if qc.q_dict['WF'] != 0  and fb_get('qfrmt') != 'qint':
+    if qc.q_dict['wf'] != 0  and fb_get('qfrmt') != 'qint':
         logger.error("Fractional formats are not supported!")
         return True
 
@@ -1400,7 +1400,7 @@ def export_coe_xilinx(f: TextIO) -> bool:
 
     exp_str += f"\nRadix = {coe_radix};\n"
       # quantized wordlength
-    exp_str += f"Coefficient_width = {qc.q_dict['wi'] + qc.q_dict['WF'] + 1};\n"
+    exp_str += f"Coefficient_width = {qc.q_dict['wi'] + qc.q_dict['wf'] + 1};\n"
     coeff_str = "CoefData = "
     for b in bq:
         coeff_str += str(b) + ",\n"
@@ -1421,7 +1421,7 @@ def export_coe_microsemi(f: TextIO) -> bool:
     """
     qc = fx.Fixed(fb_get('fxq', 'QCB'))  # instantiate fixpoint object
 
-    if qc.q_dict['WF'] != 0  and fb_get('qfrmt') != 'qint':
+    if qc.q_dict['wf'] != 0  and fb_get('qfrmt') != 'qint':
         logger.error("Fractional formats are not supported!")
         return True
 
@@ -1449,11 +1449,11 @@ def export_coe_vhdl_package(f: TextIO) -> bool:
     the number base and the quantized coefficients (decimal or hex integer).
     """
     qc = fx.Fixed(fb_get('fxq', 'QCB'))  # instantiate fixpoint object
-    if fb_get('qfrmt') == 'qfrac' and qc.q_dict['WF'] != 0:
+    if fb_get('qfrmt') == 'qfrac' and qc.q_dict['wf'] != 0:
         logger.error("Fractional numbers are only supported for floats!")
         return True
 
-    WO = fb_get('fxq', 'QO','wi') + fb_get('fxq', 'QO', 'WF') + 1
+    WO = fb_get('fxq', 'QO','wi') + fb_get('fxq', 'QO', 'wf') + 1
 
     if fb_get('fx_base') == 'dec' or not get_fx():
         pre = ""

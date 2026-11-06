@@ -140,8 +140,8 @@ class Delay_wdg(QWidget):
 class Delay(Module):
     def __init__(self):
         # ------------- Define I/O wordlengths --------------------------------
-        self.WI = fb_get('fxq', 'QI', 'wi') + fb_get('fxq', 'QI', 'WF') + 1
-        self.WO = fb_get('fxq', 'QO', 'wi') + fb_get('fxq', 'QO', 'WF') + 1
+        self.WI = fb_get('fxq', 'QI', 'wi') + fb_get('fxq', 'QI', 'wf') + 1
+        self.WO = fb_get('fxq', 'QO', 'wi') + fb_get('fxq', 'QO', 'wf') + 1
         N = len(p['b']) - 1 # number of coefficients = Order + 1
         # ------------- Define I/Os for amaranth ------------------------------
         self.i = Signal((self.WI, True)) # input signal

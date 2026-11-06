@@ -167,7 +167,7 @@ class IIRDF1PyfixpUI(QWidget):
 
             # changes in accu widget
             if dict_sig['sender_name'] == 'fx_ui_wq_iir_df1_accu':  # accu format updated
-                if ui_changed in {'cmb_w', 'WF', 'wi'}:
+                if ui_changed in {'cmb_w', 'wf', 'wi'}:
                     cmb_w = qget_cmb_box(self.wdg_wq_accu.cmb_w)
                     if cmb_w == 'm':
                         if ui_changed == 'cmb_w':
@@ -186,7 +186,7 @@ class IIRDF1PyfixpUI(QWidget):
 
             # changes in coeffs 'a' widget
             elif dict_sig['sender_name'] == 'fx_ui_wq_iir_df1_coeffs_a':
-                if ui_changed in {'cmb_w', 'WF', 'wi'}:
+                if ui_changed in {'cmb_w', 'wf', 'wi'}:
                     cmb_w = qget_cmb_box(self.wdg_wq_coeffs_a.cmb_w)
                     if cmb_w == 'm':
                         if ui_changed == 'cmb_w':
@@ -209,7 +209,7 @@ class IIRDF1PyfixpUI(QWidget):
 
             # changes in coeffs 'b' widget
             elif dict_sig['sender_name'] == 'fx_ui_wq_iir_df1_coeffs_b':
-                if ui_changed in {'cmb_w', 'WF', 'wi'}:
+                if ui_changed in {'cmb_w', 'wf', 'wi'}:
                     cmb_w = qget_cmb_box(self.wdg_wq_coeffs_b.cmb_w)
                     if cmb_w == 'm':
                         if ui_changed == 'cmb_w':
@@ -294,9 +294,9 @@ class IIRDF1PyfixpUI(QWidget):
         #     return
 
         if qget_cmb_box(self.wdg_wq_accu.cmb_w) == 'a':
-            fb_set('fxq', 'QACC', 'WF', max(
-                fb_get('fxq', 'QI', 'WF') + fb_get('fxq', 'QCB', 'WF'),
-                fb_get('fxq', 'QO', 'WF') + fb_get('fxq', 'QCA', 'WF')))
+            fb_set('fxq', 'QACC', 'wf', max(
+                fb_get('fxq', 'QI', 'wf') + fb_get('fxq', 'QCB', 'wf'),
+                fb_get('fxq', 'QO', 'wf') + fb_get('fxq', 'QCA', 'wf')))
 
             fb_set('fxq', 'QACC', 'wi', max(
                 fb_get('fxq', 'QI', 'wi') + fb_get('fxq', 'QCB', 'wi'),

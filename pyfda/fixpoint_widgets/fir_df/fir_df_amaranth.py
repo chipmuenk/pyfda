@@ -203,7 +203,7 @@ class FIRDFAmaranth():
 
         # convert stimulus to integer
         if fb_get('qfrmt') == 'qfrac':
-            self.input = x * (1 << self.p['QI']['WF'])
+            self.input = x * (1 << self.p['QI']['wf'])
         else:
             self.input = x
         # logger.warning(f"stim = {self.input}")
@@ -236,11 +236,11 @@ if __name__ == '__main__':
 
     fb_set('qfrmt', 'qint')  # set fixpoint mode
 
-    p = {'QCB': {'wi': 2, 'WF': 5, 'w_a_m': 'a',
+    p = {'QCB': {'wi': 2, 'wf': 5, 'w_a_m': 'a',
                 'ovfl': 'wrap', 'quant': 'floor', 'n_over': 0},
-         'QACC': {'wi': 6, 'WF': 3, 'ovfl': 'wrap', 'quant': 'round'},
-         'QI': {'wi': 2, 'WF': 3, 'ovfl': 'sat', 'quant': 'round'},
-         'QO': {'wi': 6, 'WF': 3, 'ovfl': 'wrap', 'quant': 'round'}
+         'QACC': {'wi': 6, 'wf': 3, 'ovfl': 'wrap', 'quant': 'round'},
+         'QI': {'wi': 2, 'wf': 3, 'ovfl': 'sat', 'quant': 'round'},
+         'QO': {'wi': 6, 'wf': 3, 'ovfl': 'wrap', 'quant': 'round'}
          }
 
     q_b = fx.Fixed(p['QCB'])  # quantizer for transversal coeffs

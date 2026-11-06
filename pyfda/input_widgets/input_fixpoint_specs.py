@@ -133,7 +133,7 @@ class InputFixpointSpecs(QWidget):
                 return
 
             if dict_sig['ui_local_changed']\
-                    not in {'wi', 'WF', 'ovfl', 'quant', 'cmb_w', 'but_lock'}:
+                    not in {'wi', 'wf', 'ovfl', 'quant', 'cmb_w', 'but_lock'}:
                 logger.warning("Unknown value '%s' for key 'ui_local_changed'",
                                dict_sig['ui_local_changed'])
                 return
@@ -153,7 +153,7 @@ class InputFixpointSpecs(QWidget):
                     # button lock was activated or wordlength settings have been changed
                     # with active lock -> copy input settings to output
                     fb_set('fxq', 'QO', 'wi', fb_get('fxq', 'QI', 'wi'))
-                    fb_set('fxq', 'QO', 'WF', fb_get('fxq', 'QI', 'WF'))
+                    fb_set('fxq', 'QO', 'wf', fb_get('fxq', 'QI', 'wf'))
 
             elif dict_sig['sender_name'] == 'fx_ui_wq_output':
                 # Output fixpoint format has been changed: Update filter dict with the
@@ -166,7 +166,7 @@ class InputFixpointSpecs(QWidget):
                     # button lock was activated or wordlength settings have been changed
                     # with active lock -> copy output settings to input
                     fb_set('fxq', 'QI', 'wi', fb_get('fxq', 'QO', 'wi'))
-                    fb_set('fxq', 'QI', 'WF', fb_get('fxq', 'QO', 'WF'))
+                    fb_set('fxq', 'QI', 'wf', fb_get('fxq', 'QO', 'wf'))
 
             else:
                 logger.error("Unknown wdg_name / sender_name '%s' in dict_sig:\n%s",

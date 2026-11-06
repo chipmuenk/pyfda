@@ -128,7 +128,7 @@ def _print_dict(keys_tuple: tuple, top_dict_str = "_fil[0]") -> str:
 
     Example
     -------
-    keys_tuple = ('fxq', 'QCA', 'WF') returns "_fil[0]['fxq']['QCA']['WF']"
+    keys_tuple = ('fxq', 'QCA', 'wf') returns "_fil[0]['fxq']['QCA']['wf']"
 
     """
     if not keys_tuple or not isinstance(keys_tuple, tuple):
@@ -271,9 +271,9 @@ def fb_set(*keys_tuple: tuple, backup: bool = False, new_key: bool = False,
     nested dict `fil_dict` (default: `_fil[0]`) and write the last item in `keys_tuple` to the dict.
 
     Example:
-    fb_set('fxq', 'QCA', 'WF', 12) is equivalent to `_fil[0]['fxq']['QCA']['WF'] = 12`
-    fb_set('fxq', 'QCA', {'WF': 15, 'wi': 0}) is equivalent to
-            `_fil[0]['fxq']['QCA']['WF'] = 15` and `_fil[0]['fxq']['QCA']['wi'] = 0`
+    fb_set('fxq', 'QCA', 'wf', 12) is equivalent to `_fil[0]['fxq']['QCA']['wf'] = 12`
+    fb_set('fxq', 'QCA', {'wf': 15, 'wi': 0}) is equivalent to
+            `_fil[0]['fxq']['QCA']['wf'] = 15` and `_fil[0]['fxq']['QCA']['wi'] = 0`
 
     Parameters
     ----------
@@ -689,8 +689,8 @@ if __name__ == '__main__':
     logging.basicConfig()  # setup a basic logger
 
     print('zpk: ' + str(fb_get('zpk', 0)))
-    print('fxq QACC WF: ' + str(fb_get('fxq', 'QACC', 'WF')))
-    print('fxq QI WF: ' + str(fb_get('fxq', 'QI', 'WF')))
+    print('fxq QACC WF: ' + str(fb_get('fxq', 'QACC', 'wf')))
+    print('fxq QI WF: ' + str(fb_get('fxq', 'QI', 'wf')))
     fb_set('ft', 'CIC')
     print('ft: ' + str(fb_get('ft')))
     print("Expected error: Wrong type, should be str:")
@@ -699,17 +699,17 @@ if __name__ == '__main__':
     fb_set('xxx', 13)  # key does not exist
     fb_set('xxx', 13, new_key=True)  # create new key
     print('xxx: ' + str(fb_get('xxx')))  # ... and read it back
-    fb_set('fxq', 'QACC', 'WF', 12)  # set a key within a sub-dict
-    print('fxq QACC WF: ' + str(fb_get('fxq', 'QACC', 'WF')))  # ... and read it back
+    fb_set('fxq', 'QACC', 'wf', 12)  # set a key within a sub-dict
+    print('fxq QACC WF: ' + str(fb_get('fxq', 'QACC', 'wf')))  # ... and read it back
     print('fxq QACC 1: ' + str(fb_get('fxq', 'QACC')))  # ... and read the whole sub-dict
-    fb_set('fxq', 'QACC', {'WF': 1, 'wi': 2})  # set a sub-dict
+    fb_set('fxq', 'QACC', {'wf': 1, 'wi': 2})  # set a sub-dict
     print('fxq QACC 2: ' + str(fb_get('fxq', 'QACC')))  # ... and read it back
     print("Expected error: Setting a sub-dict with wrong key 'WA'")
-    fb_set('fxq', 'QACC', {'WF': 1, 'WA': 2, 'quant': 'well...'})  # set a sub-dict with wrong key
+    fb_set('fxq', 'QACC', {'wf': 1, 'WA': 2, 'quant': 'well...'})  # set a sub-dict with wrong key
     print('fxq QACC 3: ' + str(fb_get('fxq', 'QACC')))  # ... and read it back
 
-    fb_set('fxq', {'QACC': {'WF': 49, 'wi': 50}})  # set a nested sub-dict
+    fb_set('fxq', {'QACC': {'wf': 49, 'wi': 50}})  # set a nested sub-dict
     print('fxq QACC 4: ' + str(fb_get('fxq', 'QACC')))  # ... and read it back
     print("Expected error: Wrong type for WF (in subdictionary)")
-    fb_set('fxq', 'QACC', {'WF': 'a', 'wi': 5, 'n_over': 7})  # wrong type for WF
+    fb_set('fxq', 'QACC', {'wf': 'a', 'wi': 5, 'n_over': 7})  # wrong type for WF
     print('fxq QACC 5: ' + str(fb_get('fxq', 'QACC')))  # ... and read it back

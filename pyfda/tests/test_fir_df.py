@@ -21,7 +21,7 @@ from pyfda.fixpoint_widgets.fir_df.fir_df_pyfixp import FIRDFPyfixp
 class TestSequenceFunctions(unittest.TestCase):
 
     def setUp(self):
-        q_dict = {'wi':0, 'WF':3, 'ovfl':'sat', 'quant':'round'}
+        q_dict = {'wi':0, 'wf':3, 'ovfl':'sat', 'quant':'round'}
         fb_set('qfrmt', 'qfrac')
         fb_set('fx_base', 'dec')  # set to fractional format
         self.my_q = fx.Fixed(q_dict) # instantiate fixpoint object with settings above
@@ -52,7 +52,7 @@ class TestSequenceFunctions(unittest.TestCase):
         Check whether parameters are written correctly to the fixpoint instance
         """
         fb_set({'qfrmt':'qfrac', 'fx_base':'hex'})  # set to fractional hex format
-        q_dict = {'wi':7, 'WF':3, 'ovfl':'none', 'quant':'fix'}
+        q_dict = {'wi':7, 'wf':3, 'ovfl':'none', 'quant':'fix'}
         self.my_q.set_qdict(q_dict)
         # self.assertEqual(q_dict, self.my_q.q_obj)
 
@@ -68,7 +68,7 @@ class TestSequenceFunctions(unittest.TestCase):
         # return fixpoint numbers as float (no saturation, no quantization)
         fb_set('qfrmt', 'qfrac')
         fb_set('fx_base', 'dec')  # set to fractional dec format
-        q_dict = {'wi':0, 'WF':3, 'ovfl':'none', 'quant':'none'}
+        q_dict = {'wi':0, 'wf':3, 'ovfl':'none', 'quant':'none'}
         self.my_q.set_qdict(q_dict)
         # test handling of invalid inputs - scalar inputs
         yq_list = list(map(self.my_q.fixp, self.y_list_invalid))
@@ -101,7 +101,7 @@ class TestSequenceFunctions(unittest.TestCase):
 
         # return fixpoint numbers as integer (rounding), overflow 'none'
         fb_set('qfrmt', 'qint')  # set to integer format
-        q_dict = {'wi':3, 'WF':3, 'ovfl':'none', 'quant':'round'}
+        q_dict = {'wi':3, 'wf':3, 'ovfl':'none', 'quant':'round'}
         self.my_q.set_qdict(q_dict)
         yq_list = list(self.my_q.fixp(self.y_list))
         yq_list_goal = [-9, -8, -4, 0, 4, 7, 8, 8, 9]
@@ -114,7 +114,7 @@ class TestSequenceFunctions(unittest.TestCase):
         """
         # wrap around behaviour with 'fix' quantization; fractional representation
         fb_set({'qfrmt': 'qfrac', 'fx_base': 'dec'})  # set to fractional dec. format
-        q_dict = {'wi':0, 'WF':2, 'ovfl':'wrap', 'quant':'fix'}
+        q_dict = {'wi':0, 'wf':2, 'ovfl':'wrap', 'quant':'fix'}
         self.my_q.set_qdict(q_dict)
         yq_list = list(self.my_q.fixp(self.y_list))
         yq_list_goal = [-1.0, -1.0, -0.5, 0.0, 0.5, 0.75, 0.75, -1.0, -1.0]

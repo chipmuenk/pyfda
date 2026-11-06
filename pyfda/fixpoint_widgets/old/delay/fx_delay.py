@@ -142,8 +142,8 @@ class Delay(Module):
     def __init__(self):
         p = fb_get('fxq')
         # ------------- Define I/Os -------------------------------------------
-        self.WI = p['QI']['wi'] + p['QI']['WF'] + 1
-        self.WO = p['QO']['wi'] + p['QO']['WF'] + 1
+        self.WI = p['QI']['wi'] + p['QI']['wf'] + 1
+        self.WO = p['QO']['wi'] + p['QO']['wf'] + 1
         n_del = len(p['b']) - 1 # number of coefficients = Order + 1
         # ------------- Define I/Os -------------------------------------------
         self.i = Signal((self.WI, True)) # input signal

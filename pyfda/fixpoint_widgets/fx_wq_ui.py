@@ -149,7 +149,7 @@ class FxWqUI(QWidget):
         # TODO: Is passing q_dict by reference a bug or not?
 
         # default settings for q_dict
-        # q_dict_default = {'wi': 0, 'WF': 15, 'w_a_m': 'm', 'quant': 'round',
+        # q_dict_default = {'wi': 0, 'wf': 15, 'w_a_m': 'm', 'quant': 'round',
         #                   'ovfl': 'sat'}
         # make a deep copy of passed dictionary to prevent messing it up
         # self.q_dict = copy.deepcopy(q_dict)
@@ -255,7 +255,7 @@ class FxWqUI(QWidget):
         self.lbl_sep2 = QLabel(to_html(')', frmt='b'), self)
         self.lbl_sep2.setVisible(False)
 
-        self.led_wf = QLineEdit(self, objectName="WF")
+        self.led_wf = QLineEdit(self, objectName='wf')
         self.led_wf.setToolTip(ui_dict['wf_tip'])
         self.led_wf.setMaxLength(ui_dict['wf_len'])  # maximum of 2 digits
         self.led_wf.setFixedWidth(ui_dict['max_led_width'])  # width of lineedit in points
@@ -312,7 +312,7 @@ class FxWqUI(QWidget):
         # INITIAL SETTINGS OF UI AND FIXPOINT QUANTIZATION OBJECT
         # ----------------------------------------------------------------------
         WI = int(self.q_dict['wi'])
-        WF = int(self.q_dict['WF'])
+        WF = int(self.q_dict['wf'])
         # W = WI + WF + 1
         self.led_wi.setText(str(WI))
         self.led_wf.setText(str(WF))
@@ -407,7 +407,7 @@ class FxWqUI(QWidget):
         Emit a signal with `{'ui_local_changed': <objectName of the sender>}`.
         """
         # read, sanitize and write back to UI fractional part WF
-        WF = int(safe_eval(self.led_wf.text(), self.Q.q_dict['WF'], return_type="int",
+        WF = int(safe_eval(self.led_wf.text(), self.Q.q_dict['wf'], return_type="int",
                            sign='poszero'))
         self.led_wf.setText(str(WF))
 
@@ -433,7 +433,7 @@ class FxWqUI(QWidget):
 
         # update quantizer dict and derived quantities like W and reset counters
         self.Q.set_qdict(
-            {'ovfl': ovfl, 'quant': quant, 'wi': WI, 'WF': WF, 'w_a_m': w_a_m})
+            {'ovfl': ovfl, 'quant': quant, 'wi': WI, 'wf': WF, 'w_a_m': w_a_m})
         # update global filter dict
         self.q_dict.update(self.Q.q_dict)
         # update display of WI and WF depending on fixpoint mode
@@ -465,7 +465,7 @@ class FxWqUI(QWidget):
             q_dict = self.q_dict  # update UI from instance / global qdict
         else:
             for k in q_dict:
-                if k not in {'quant', 'ovfl', 'wi', 'WF', 'w_a_m', 'n_over'}:
+                if k not in {'quant', 'ovfl', 'wi', 'wf', 'w_a_m', 'n_over'}:
                     logger.warning("Unknown quantization dict key '%s'", k)
 
         # Update all non-numeric instance quantization dict entries from passed `q_dict`
@@ -491,7 +491,7 @@ class FxWqUI(QWidget):
         self.led_wi.setText(str(WI))
 
         WF = safe_eval(
-            q_dict['WF'], self.Q.q_dict['WF'], return_type="int", sign='poszero')
+            q_dict['wf'], self.Q.q_dict['wf'], return_type="int", sign='poszero')
         self.led_wf.setText(str(WF))
 
         self.Q.set_qdict(q_dict)  # update quantization object and derived parameters
@@ -514,12 +514,12 @@ class FxWqUI(QWidget):
         elif fb_get('qfrmt') == 'qint':
             self.lbl_sep1.setText(to_html("(", frmt='b'))
             self.led_wf.setToolTip("Scale factor 2<sup>-WF</sup>")
-            self.led_wi.setText(str(self.Q.q_dict['wi'] + self.Q.q_dict['WF'] + 1))
+            self.led_wi.setText(str(self.Q.q_dict['wi'] + self.Q.q_dict['wf'] + 1))
             self.led_wi.setToolTip("Total number of bits")
             self.lbl_sep2.setVisible(True)
 
             lsb = 1.
-            msb = 2. ** (self.Q.q_dict['wi'] + self.Q.q_dict['WF'] - 1)
+            msb = 2. ** (self.Q.q_dict['wi'] + self.Q.q_dict['wf'] - 1)
         elif fb_get('qfrmt') == "qfrac":
             self.lbl_sep1.setText(to_html(".", frmt='b'))
             self.led_wf.setToolTip("Number of fractional bits")
@@ -527,12 +527,12 @@ class FxWqUI(QWidget):
             self.led_wi.setToolTip("Number of integer bits")
             self.lbl_sep2.setVisible(False)
 
-            lsb = 2 ** -self.Q.q_dict['WF']
+            lsb = 2 ** -self.Q.q_dict['wf']
             msb = 2. ** (self.Q.q_dict['wi'] - 1)
         else:
             logger.error("Unknown quantization format '%s'", fb_get('qfrmt'))
 
-        self.led_wf.setText(str(self.Q.q_dict['WF']))
+        self.led_wf.setText(str(self.Q.q_dict['wf']))
 
 
         if self.msb_lsb_vis == 'off' or not get_fx():

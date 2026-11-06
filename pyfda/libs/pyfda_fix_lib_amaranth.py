@@ -31,13 +31,13 @@ def requant(mod: Module, sig_i: Signal, QI: dict, QO: dict) -> Signal:
         Signal to be requantized
 
     QI: dict
-        Quantization dict for input word, only the keys 'wi' and 'WF' for integer
-        and fractional wordlength are evaluated. QI['wi'] = 2 and QI['WF'] = 13
+        Quantization dict for input word, only the keys 'wi' and 'wf' for integer
+        and fractional wordlength are evaluated. QI['wi'] = 2 and QI['wf'] = 13
         e.g. define Q-Format '2.13'  with 2 integer, 13 fractional bits and 1 implied
         sign bit = 16 bits total.
 
     QO: dict
-        Quantization dict for output word format; the keys 'wi' and 'WF' for
+        Quantization dict for output word format; the keys 'wi' and 'wf' for
         integer and fractional wordlength are evaluated as well as the keys 'quant'
         and 'ovfl' describing requantization and overflow behaviour.
 
@@ -93,11 +93,11 @@ def requant(mod: Module, sig_i: Signal, QI: dict, QO: dict) -> Signal:
 
     """
     wi_i = QI['wi']         # number of integer bits (input signal)
-    wi_f = QI['WF']         # number of fractional bits (input signal)
+    wi_f = QI['wf']         # number of fractional bits (input signal)
     WI   = wi_i + wi_f + 1  # total word length (input signal)
 
     wo_i = QO['wi']         # number of integer bits (output signal)
-    wo_f = QO['WF']         # number of fractional bits (output signal)
+    wo_f = QO['wf']         # number of fractional bits (output signal)
     WO   = wo_i + wo_f + 1  # total word length (output signal)
 
     dWF = wi_f - wo_f       # difference of fractional lengths

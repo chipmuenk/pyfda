@@ -111,14 +111,14 @@ fil_ref = {
     #    (more subwidgets can be added by fixpoint widget if needed)
     #  Keys:
     #   'n_over': number of overflows during last quantization process
-    #   'WF': fractional bits, 'wi': integer bits
+    #   'wf': fractional bits, 'wi': integer bits
     #   'ovfl': overflow behaviour, 'quant': quantizer behaviour
     #   'w_a_m': word length automatic / manual calculation (not needed for 'QI', 'QO')
     'fxq':{
         # accumulator quantization
         'QACC': {
             'n_over': 0,
-            'WF': 28,
+            'wf': 28,
             'wi': 3,
             'ovfl': 'wrap',
             'quant': 'floor',
@@ -127,7 +127,7 @@ fil_ref = {
         # 'a' coefficient quantization
         'QCA': {
             'n_over': 0,
-            'WF': 12,
+            'wf': 12,
             'wi': 3,
             'ovfl': 'wrap',
             'quant': 'floor',
@@ -136,7 +136,7 @@ fil_ref = {
         # 'b' coefficient quantization
         'QCB': {
             'n_over': 0,
-            'WF': 15,
+            'wf': 15,
             'wi': 0,
             'ovfl': 'wrap',
             'quant': 'floor',
@@ -145,7 +145,7 @@ fil_ref = {
         # input quantization
         'QI': {
             'n_over': 0,
-            'WF': 15,
+            'wf': 15,
             'wi': 0,
             'ovfl': 'sat',
             'quant': 'round',
@@ -154,7 +154,7 @@ fil_ref = {
         # output quantization
         'QO': {
             'n_over': 0,
-            'WF': 15,
+            'wf': 15,
             'wi': 0,
             'ovfl': 'wrap',
             'quant': 'floor',

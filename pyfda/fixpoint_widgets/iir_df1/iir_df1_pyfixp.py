@@ -105,14 +105,14 @@ class IIRDF1Pyfixp():
         # word format for sum of partial products a_i * y_i
         self.q_mul_a.set_qdict(
             {'wi': self.p['QO']['wi'] + self.p['QCA']['wi'] + dw_a,
-             'WF': self.p['QO']['WF'] + self.p['QCA']['WF']})
+             'wf': self.p['QO']['wf'] + self.p['QCA']['wf']})
 
         # Quantizer dict for partial products xq * bq
         dw_b = int(np.ceil(np.log2(len(self.p['QCB']))))  # word growth
         # word format for sum of partial products b_i * x_i
         self.q_mul_b.set_qdict(
             {'wi': self.p['QI']['wi'] + self.p['QCB']['wi'] + dw_b,
-             'WF': self.p['QI']['WF'] + self.p['QCB']['WF']})
+             'wf': self.p['QI']['wf'] + self.p['QCB']['wf']})
 
         # Quantize coefficients and store them in local attributes
         # This also resets the overflow counters.
@@ -288,13 +288,13 @@ if __name__ == '__main__':
     # Run widget standalone with
     # `python -m pyfda.fixpoint_widgets.iir_df1.iir_df1_pyfixp`
     fb_set('ba', np.array([1.1, 2.2, 3.3, 2, 1], [1, 0, 0, 0, 0.81]))
-    p = {'QCB': {'wi': 0, 'WF': 5, 'w_a_m': 'a',
+    p = {'QCB': {'wi': 0, 'wf': 5, 'w_a_m': 'a',
                 'ovfl': 'wrap', 'quant': 'floor', 'n_over': 0},
-        'QCA': {'wi': 1, 'WF': 5, 'w_a_m': 'a',
+        'QCA': {'wi': 1, 'wf': 5, 'w_a_m': 'a',
                 'ovfl': 'wrap', 'quant': 'floor', 'n_over': 0},
-         'QACC': {'wi': 4, 'WF': 3, 'ovfl': 'wrap', 'quant': 'round'},
-         'QI': {'wi': 2, 'WF': 3, 'ovfl': 'sat', 'quant': 'round'},
-         'QO': {'wi': 5, 'WF': 3, 'ovfl': 'wrap', 'quant': 'round'}
+         'QACC': {'wi': 4, 'wf': 3, 'ovfl': 'wrap', 'quant': 'round'},
+         'QI': {'wi': 2, 'wf': 3, 'ovfl': 'sat', 'quant': 'round'},
+         'QO': {'wi': 5, 'wf': 3, 'ovfl': 'wrap', 'quant': 'round'}
          }
 
 
