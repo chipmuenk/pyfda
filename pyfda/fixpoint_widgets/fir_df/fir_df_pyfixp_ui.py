@@ -192,9 +192,9 @@ class FirDfPyfixpUI(QWidget):
         # calculate required accumulator word format and update filter dict
         if qget_cmb_box(self.wdg_wq_accu.cmb_w) in {'f', 'a'}:
             fb_set('fxq', 'QACC', 'wf',\
-                   fb_get('fxq', 'QI', 'wf') + fb_get('fxq', 'QCB', 'wf'))
+                   fb_get('fxq', 'q_i', 'wf') + fb_get('fxq', 'QCB', 'wf'))
             fb_set('fxq', 'QACC', 'wi',\
-                   fb_get('fxq', 'QI', 'wi') + fb_get('fxq', 'QCB', 'wi') + a_coeff)
+                   fb_get('fxq', 'q_i', 'wi') + fb_get('fxq', 'QCB', 'wi') + a_coeff)
 
         # update UI and Q.q_dict (quantization settings) from filter dict
         self.wdg_wq_accu.dict2ui(fb_get('fxq', 'QACC'))

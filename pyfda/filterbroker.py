@@ -690,7 +690,7 @@ if __name__ == '__main__':
 
     print('zpk: ' + str(fb_get('zpk', 0)))
     print('fxq QACC WF: ' + str(fb_get('fxq', 'QACC', 'wf')))
-    print('fxq QI WF: ' + str(fb_get('fxq', 'QI', 'wf')))
+    print('fxq QI WF: ' + str(fb_get('fxq', 'q_i', 'wf')))
     fb_set('ft', 'CIC')
     print('ft: ' + str(fb_get('ft')))
     print("Expected error: Wrong type, should be str:")

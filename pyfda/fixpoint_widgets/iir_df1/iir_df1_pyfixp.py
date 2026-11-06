@@ -111,8 +111,8 @@ class IIRDF1Pyfixp():
         dw_b = int(np.ceil(np.log2(len(self.p['QCB']))))  # word growth
         # word format for sum of partial products b_i * x_i
         self.q_mul_b.set_qdict(
-            {'wi': self.p['QI']['wi'] + self.p['QCB']['wi'] + dw_b,
-             'wf': self.p['QI']['wf'] + self.p['QCB']['wf']})
+            {'wi': self.p['q_i']['wi'] + self.p['QCB']['wi'] + dw_b,
+             'wf': self.p['q_i']['wf'] + self.p['QCB']['wf']})
 
         # Quantize coefficients and store them in local attributes
         # This also resets the overflow counters.
@@ -189,7 +189,7 @@ class IIRDF1Pyfixp():
         ----------
 
         x : array of float or float or None
-            input value(s) scaled and quantized according to the setting of `p['QI']`
+            input value(s) scaled and quantized according to the setting of `p['q_i']`
             - When x is a scalar, calculate impulse response with the
                 amplitude defined by the scalar.
             - When `x == None`, calculate impulse response with amplitude = 1.
@@ -293,7 +293,7 @@ if __name__ == '__main__':
         'QCA': {'wi': 1, 'wf': 5, 'w_a_m': 'a',
                 'ovfl': 'wrap', 'quant': 'floor', 'n_over': 0},
          'QACC': {'wi': 4, 'wf': 3, 'ovfl': 'wrap', 'quant': 'round'},
-         'QI': {'wi': 2, 'wf': 3, 'ovfl': 'sat', 'quant': 'round'},
+         'q_i': {'wi': 2, 'wf': 3, 'ovfl': 'sat', 'quant': 'round'},
          'q_o': {'wi': 5, 'wf': 3, 'ovfl': 'wrap', 'quant': 'round'}
          }
 

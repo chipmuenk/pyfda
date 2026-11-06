@@ -129,7 +129,7 @@ class FIRDFPyfixp():
         Parameters
         ----------
         x : array of float or float or None
-            input value(s) scaled and quantized according to the setting of `p['QI']`
+            input value(s) scaled and quantized according to the setting of `p['q_i']`
             and fb_get('qfrmt')
             - When x is a scalar, calculate impulse response with the
                 amplitude defined by the scalar.
@@ -197,7 +197,7 @@ if __name__ == '__main__':
     p = {'QCB': {'wi': 2, 'wf': 5, 'w_a_m': 'a',
                 'ovfl': 'wrap', 'quant': 'floor', 'n_over': 0},
          'QACC': {'wi': 6, 'wf': 3, 'ovfl': 'wrap', 'quant': 'round'},
-         'QI': {'wi': 2, 'wf': 3, 'ovfl': 'sat', 'quant': 'round'},
+         'q_i': {'wi': 2, 'wf': 3, 'ovfl': 'sat', 'quant': 'round'},
          'q_o': {'wi': 6, 'wf': 3, 'ovfl': 'wrap', 'quant': 'round'}
          }
     for frmt in ['qint', 'qfrac']:

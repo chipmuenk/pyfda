@@ -295,11 +295,11 @@ class IIRDF1PyfixpUI(QWidget):
 
         if qget_cmb_box(self.wdg_wq_accu.cmb_w) == 'a':
             fb_set('fxq', 'QACC', 'wf', max(
-                fb_get('fxq', 'QI', 'wf') + fb_get('fxq', 'QCB', 'wf'),
+                fb_get('fxq', 'q_i', 'wf') + fb_get('fxq', 'QCB', 'wf'),
                 fb_get('fxq', 'q_o', 'wf') + fb_get('fxq', 'QCA', 'wf')))
 
             fb_set('fxq', 'QACC', 'wi', max(
-                fb_get('fxq', 'QI', 'wi') + fb_get('fxq', 'QCB', 'wi'),
+                fb_get('fxq', 'q_i', 'wi') + fb_get('fxq', 'QCB', 'wi'),
                 fb_get('fxq', 'q_o', 'wi') + fb_get('fxq', 'QCA', 'wi')))
 
         # update UI and Q.q_dict (quantization settings) from filter dict

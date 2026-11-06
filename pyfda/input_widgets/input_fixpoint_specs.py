@@ -144,7 +144,7 @@ class InputFixpointSpecs(QWidget):
                 # input fixpoint word format to output word format. Do the same
                 # if but_lock has been activated.
                 #
-                fb_set('fxq', 'QI', self.wdg_wq_input.Q.q_dict)
+                fb_set('fxq', 'q_i', self.wdg_wq_input.Q.q_dict)
                 if dict_sig['ui_local_changed'] == 'but_lock'\
                         and not self.wdg_wq_input.but_lock.isChecked():
                     # but_lock was deactivitated, don't do anything
@@ -152,8 +152,8 @@ class InputFixpointSpecs(QWidget):
                 if self.wdg_wq_input.but_lock.isChecked():
                     # button lock was activated or wordlength settings have been changed
                     # with active lock -> copy input settings to output
-                    fb_set('fxq', 'q_o', 'wi', fb_get('fxq', 'QI', 'wi'))
-                    fb_set('fxq', 'q_o', 'wf', fb_get('fxq', 'QI', 'wf'))
+                    fb_set('fxq', 'q_o', 'wi', fb_get('fxq', 'q_i', 'wi'))
+                    fb_set('fxq', 'q_o', 'wf', fb_get('fxq', 'q_i', 'wf'))
 
             elif dict_sig['sender_name'] == 'fx_ui_wq_output':
                 # Output fixpoint format has been changed: Update filter dict with the
@@ -165,8 +165,8 @@ class InputFixpointSpecs(QWidget):
                 if self.wdg_wq_input.but_lock.isChecked():
                     # button lock was activated or wordlength settings have been changed
                     # with active lock -> copy output settings to input
-                    fb_set('fxq', 'QI', 'wi', fb_get('fxq', 'q_o', 'wi'))
-                    fb_set('fxq', 'QI', 'wf', fb_get('fxq', 'q_o', 'wf'))
+                    fb_set('fxq', 'q_i', 'wi', fb_get('fxq', 'q_o', 'wi'))
+                    fb_set('fxq', 'q_i', 'wf', fb_get('fxq', 'q_o', 'wf'))
 
             else:
                 logger.error("Unknown wdg_name / sender_name '%s' in dict_sig:\n%s",
@@ -360,7 +360,7 @@ class InputFixpointSpecs(QWidget):
         # -----------------------------------------------------------------
 
         self.wdg_wq_input = FxWqUI(
-            fb_get('fxq', 'QI'), objectName='fx_ui_wq_input',
+            fb_get('fxq', 'q_i'), objectName='fx_ui_wq_input',
             label='<b>Input Quantizer <i>Q<sub>I&nbsp;</sub></i>:</b>',
             lock_vis='on', cmb_w_vis='off')
         if HAS_DS:
@@ -721,7 +721,7 @@ class InputFixpointSpecs(QWidget):
             # refresh image in case of switching from float to fix
             self._resize_img()
             # update fixpoint widgets from the global filter dict
-            self.wdg_wq_input.dict2ui(fb_get('fxq', 'QI'))
+            self.wdg_wq_input.dict2ui(fb_get('fxq', 'q_i'))
             self.wdg_wq_output.dict2ui(fb_get('fxq', 'q_o'))
             try:
                 self.fx_filt_ui.dict2ui()

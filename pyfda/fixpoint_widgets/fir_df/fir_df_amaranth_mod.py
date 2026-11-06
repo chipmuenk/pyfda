@@ -90,11 +90,11 @@ class FIRDFAmaranthMod(Elaboratable):
         # Partial products: use accumulator settings and update word length
         # to sum of coefficient and input word lengths
         self.q_mul = fx.Fixed(p['QACC'].copy())  # partial products
-        self.q_mul.set_qdict({'wi': self.p['QI']['wi'] + self.p['QCB']['wi'] + delta_w,
-             'wf': self.p['QI']['wf'] + self.p['QCB']['wf']})
+        self.q_mul.set_qdict({'wi': self.p['q_i']['wi'] + self.p['QCB']['wi'] + delta_w,
+             'wf': self.p['q_i']['wf'] + self.p['QCB']['wf']})
         self.w_mul = self.q_mul.q_dict['wi'] + self.q_mul.q_dict['wf'] + 1
-        # self.w_mul = 1 + delta_w + self.p['QI']['wi'] + self.p['QCB']['wi']\
-        #    + self.p['QI']['wf'] + self.p['QCB']['wf']
+        # self.w_mul = 1 + delta_w + self.p['q_i']['wi'] + self.p['QCB']['wi']\
+        #    + self.p['q_i']['wf'] + self.p['QCB']['wf']
 
         # Input and output signal are quantized in FIR_DF_Amaranth()
 
@@ -112,7 +112,7 @@ class FIRDFAmaranthMod(Elaboratable):
                 self.zi = zi[:self.L - 1]
 
         # ------------- Define I/Os for amaranth module ---------------------------
-        self.WI = p['QI']['wi'] + p['QI']['wf'] + 1  # total input word length
+        self.WI = p['q_i']['wi'] + p['q_i']['wf'] + 1  # total input word length
         self.WO = p['q_o']['wi'] + p['q_o']['wf'] + 1  # total output word length
         self.i = Signal(signed(self.WI))  # input signal
         self.o = Signal(signed(self.WO))  # output signal
@@ -177,7 +177,7 @@ if __name__ == '__main__':
     p = {'QCB': {'wi': 2, 'wf': 5, 'w_a_m': 'a',
                 'ovfl': 'wrap', 'quant': 'floor', 'n_over': 0},
          'QACC': {'wi': 6, 'wf': 3, 'ovfl': 'wrap', 'quant': 'round'},
-         'QI': {'wi': 2, 'wf': 3, 'ovfl': 'sat', 'quant': 'round'},
+         'q_i': {'wi': 2, 'wf': 3, 'ovfl': 'sat', 'quant': 'round'},
          'q_o': {'wi': 6, 'wf': 3, 'ovfl': 'wrap', 'quant': 'round'}
          }
 
@@ -185,7 +185,7 @@ if __name__ == '__main__':
     b_q = fx.quant_coeffs([1, 2, 3, 2, 1], q_b, out_frmt="qint")
     p.update({'ba': b_q})
 
-    q_i = fx.Fixed(p['QI'])
+    q_i = fx.Fixed(p['q_i'])
     q_o = fx.Fixed(p['q_o'])
 
     dut = FIRDFAmaranthMod(p)

@@ -856,7 +856,7 @@ class Fixed():
     def requant(self, x_i, QI):
         """
         Change word length of input signal `x_i` with fractional and integer widths
-        defined by 'QI' to the word format defined by `self.q_dict` using the
+        defined by 'q_i' to the word format defined by `self.q_dict` using the
         quantization and saturation methods specified by `self.q_dict['quant']` and
         `self.q_dict['ovfl']`.
 
