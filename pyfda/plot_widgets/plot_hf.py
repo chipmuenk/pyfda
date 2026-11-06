@@ -21,18 +21,15 @@ from matplotlib import rcParams
 # import matplotlib.ticker as ticker
 from matplotlib.ticker import AutoMinorLocator
 
-from pyfda.libs.compat import (
-    QCheckBox, QWidget, QComboBox, QLabel, QLineEdit, QFrame, QHBoxLayout, QGridLayout,
-    pyqtSignal)
+from pyfda.libs.compat import QWidget, pyqtSignal
 from pyfda.config_file_parser import ConfigFileParser as CFP
 from pyfda.filter_tree_builder import FilterTreeBuilder as FTB
 from pyfda.filterbroker import fb_get
 from pyfda.pyfda_rc import params
 from pyfda.plot_widgets.mpl_widget import MplWidget
+from pyfda.plot_widgets.plot_hf_ui import PlotHfUI
 from pyfda.libs.pyfda_num_lib import safe_eval
-from pyfda.libs.pyfda_text_lib import to_html, pprint_log
-from pyfda.libs.pyfda_qt_lib import qtext_width, qcmb_box_populate
-from pyfda.libs.pyfda_qt_classes import PushButton
+from pyfda.libs.pyfda_text_lib import pprint_log
 
 logger = logging.getLogger(__name__)
 
@@ -53,18 +50,7 @@ class PlotHf(QWidget):
         self.tool_tip = "Magnitude and phase frequency response"
         self.tab_label = "|H(f)|"
 
-        self.log_bottom = -80
-        self.lin_neg_bottom = -10
-
-        self.cmb_units_a_items = [
-            "<span>Set unit for y-axis</span>",
-            ("Auto", "Auto", "Use same setting as in Ripple specifications"),
-            ("dB", "dB", "Attenuation in dB"),
-            ("V", "V", "Linear gain"),
-            ("W", "W", "Power gain")
-        ]
-        self.cmb_units_a_default = "auto"  # default setting
-
+        self.ui = PlotHfUI()  # create the UI control part
         self._construct_ui()
 
     # ------------------------------------------------------------------------------
@@ -87,7 +73,7 @@ class PlotHf(QWidget):
                 self.update_view()
                 self.needs_draw = False
             elif 'mpl_toolbar' in dict_sig and dict_sig['mpl_toolbar'] == 'ui_level':
-                self.frm_controls.setVisible(self.mplwidget.mpl_toolbar.a_ui_level == 0)
+                self.ui.setVisible(self.mplwidget.mpl_toolbar.a_ui_level == 0)
 
         else:
             if 'data_changed' in dict_sig or 'specs_changed' in dict_sig\
@@ -99,106 +85,16 @@ class PlotHf(QWidget):
     # ------------------------------------------------------------------------------
     def _construct_ui(self):
         """
-        Define and construct the subwidgets
+        Construct the UI from the matplotlib widget and the control part (`self.ui`),
+        initialize the axes and setup signal-slot connections
         """
-        self.lbl_show_h_abs = QLabel(to_html('| H |', frmt='b'))
-        self.chk_show_h_abs = QCheckBox(self)
-        self.chk_show_h_abs.setChecked(True)
-        self.chk_show_h_abs.setToolTip("Show magnitude of H(f)")
-        self.lbl_show_h_re = QLabel(to_html('re{H}&nbsp;', frmt='b'))
-        self.chk_show_h_re = QCheckBox(self)
-        self.chk_show_h_re.setToolTip("Show real part of H(f)")
-        self.lbl_show_h_im = QLabel(to_html('im{H}', frmt='b'))
-        self.chk_show_h_im = QCheckBox(self)
-        self.chk_show_h_im.setToolTip("Show imaginary part of H(f)")
-
-        lay_g_show_h = QGridLayout()
-        lay_g_show_h.addWidget(self.lbl_show_h_abs, 0, 0)
-        lay_g_show_h.addWidget(self.chk_show_h_abs, 0, 1)
-        lay_g_show_h.addWidget(self.lbl_show_h_re, 1, 0)
-        lay_g_show_h.addWidget(self.chk_show_h_re, 1, 1)
-        lay_g_show_h.addWidget(self.lbl_show_h_im, 2, 0)
-        lay_g_show_h.addWidget(self.chk_show_h_im, 2, 1)
-        lay_g_show_h.setContentsMargins(0,0,10,0)
-        lay_g_show_h.setSpacing(0)
-
-        self.lbl_in = QLabel(to_html("Unit:", frmt="b"), self)
-
-        self.cmb_units_a = QComboBox(self, objectName="cmb_units_a")
-        qcmb_box_populate(self.cmb_units_a, self.cmb_units_a_items,
-                          self.cmb_units_a_default)
-
-        self.lbl_log_bottom = QLabel(to_html("min =", 'bi'), self)
-        self.led_log_bottom = QLineEdit(self)
-        self.led_log_bottom.setText(str(self.log_bottom))
-        self.led_log_bottom.setMaximumWidth(qtext_width(n_x=8))
-        self.led_log_bottom.setToolTip(
-            "<span>Minimum display value for dB. scale.</span>")
-        self.lbl_log_unit = QLabel("dB", self)
-
-        self.cmb_units_a.setSizeAdjustPolicy(QComboBox.AdjustToContents)
-
-        self.but_zerophase = PushButton(self)
-        self.but_zerophase.setText("Zero Phase")
-        self.but_zerophase.setToolTip(
-            "<span>Subtract linear phase as calculated from filter order. "
-            "Only available for FIR filters and for unit 'V', it "
-            "only affects the display of phase and re / im components.</span>")
-
-        self.lbl_inset = QLabel(to_html("Inset", "bi"), self)
-        self.cmb_inset = QComboBox(self, objectName="cmb_inset")
-        self.cmb_inset.addItems(['off', 'edit', 'fixed'])
-        self.cmb_inset.setToolTip("Display/edit second inset plot")
-        self.cmb_inset.setCurrentIndex(0)
-        self.inset_idx = 0  # store previous index for comparison
-
-        self.but_specs = PushButton(self, "Specs")
-        self.but_specs.setToolTip("Display filter specs as hatched regions")
-
-        self.but_phase = PushButton(self, "Phase")
-        self.but_phase.setToolTip("Overlay phase")
-
-        self.but_align = PushButton(self, "Align")
-        self.but_align.setToolTip(
-            "<span>Try to align gridlines for magnitude and phase "
-            "(doesn't work in all cases).</span>")
-        self.but_align.setVisible(self.but_phase.isChecked())
-
-        # ----------------------------------------------------------------------
-        #               ### frm_controls ###
-        #
-        # This widget encompasses all control subwidgets
-        # ----------------------------------------------------------------------
-        lay_h_controls = QHBoxLayout()
-        lay_h_controls.addLayout(lay_g_show_h)
-        lay_h_controls.addWidget(self.lbl_in)
-        lay_h_controls.addWidget(self.cmb_units_a)
-        lay_h_controls.addStretch(1)
-        lay_h_controls.addWidget(self.lbl_log_bottom)
-        lay_h_controls.addWidget(self.led_log_bottom)
-        lay_h_controls.addWidget(self.lbl_log_unit)
-        lay_h_controls.addStretch(1)
-        lay_h_controls.addWidget(self.but_zerophase)
-        lay_h_controls.addStretch(1)
-        lay_h_controls.addWidget(self.lbl_inset)
-        lay_h_controls.addWidget(self.cmb_inset)
-        lay_h_controls.addStretch(1)
-        lay_h_controls.addWidget(self.but_specs)
-        lay_h_controls.addStretch(1)
-        lay_h_controls.addWidget(self.but_phase)
-        lay_h_controls.addWidget(self.but_align)
-        lay_h_controls.addStretch(10)
-
-        self.frm_controls = QFrame(self, objectName="frm_controls")
-        self.frm_controls.setLayout(lay_h_controls)
-
         # ----------------------------------------------------------------------
         #               ### mplwidget ###
         #
         # main widget, encompassing the other widgets
         # ----------------------------------------------------------------------
         self.mplwidget = MplWidget(self)
-        self.mplwidget.lay_v_main_mpl.addWidget(self.frm_controls)
+        self.mplwidget.lay_v_main_mpl.addWidget(self.ui)
         self.mplwidget.lay_v_main_mpl.setContentsMargins(*params['mpl_margins'])
         self.mplwidget.mpl_toolbar.a_he.setEnabled(True)
         self.mplwidget.mpl_toolbar.a_he.info = "manual/plot_hf.html"
@@ -217,18 +113,18 @@ class PlotHf(QWidget):
         # ----------------------------------------------------------------------
         # LOCAL SIGNALS & SLOTs
         # ----------------------------------------------------------------------
-        self.cmb_units_a.currentIndexChanged.connect(self.draw)
-        self.led_log_bottom.editingFinished.connect(self.update_view)
-        self.chk_show_h_abs.clicked.connect(self.draw)
-        self.chk_show_h_re.clicked.connect(self.draw)
-        self.chk_show_h_im.clicked.connect(self.draw)
+        self.ui.cmb_units_a.currentIndexChanged.connect(self.draw)
+        self.ui.led_log_bottom.editingFinished.connect(self.update_view)
+        self.ui.chk_show_h_abs.clicked.connect(self.draw)
+        self.ui.chk_show_h_re.clicked.connect(self.draw)
+        self.ui.chk_show_h_im.clicked.connect(self.draw)
 
-        self.but_zerophase.clicked.connect(self.draw)
-        self.cmb_inset.currentIndexChanged.connect(self.draw_inset)
+        self.ui.but_zerophase.clicked.connect(self.draw)
+        self.ui.cmb_inset.currentIndexChanged.connect(self.draw_inset)
 
-        self.but_specs.clicked.connect(self.draw)
-        self.but_phase.clicked.connect(self.draw)
-        self.but_align.clicked.connect(self.draw)
+        self.ui.but_specs.clicked.connect(self.draw)
+        self.ui.but_phase.clicked.connect(self.draw)
+        self.ui.but_align.clicked.connect(self.draw)
 
         self.mplwidget.mpl_toolbar.sig_tx.connect(self.process_sig_rx)
 
@@ -497,13 +393,13 @@ class PlotHf(QWidget):
         #        or specs (i.e. where is passband etc.)
 
 # DEBUG
-#            print(self.cmb_inset.currentIndex(), self.mplwidget.fig.axes) # list of axes in Figure
+#            print(self.ui.cmb_inset.currentIndex(), self.mplwidget.fig.axes) # list of axes in Figure
 #            for ax in self.mplwidget.fig.axes:
 #                print(ax)
-#                print("cmb_inset, inset_idx:",self.cmb_inset.currentIndex(), self.inset_idx)
+#                print("cmb_inset, inset_idx:",self.ui.cmb_inset.currentIndex(), self.ui.inset_idx)
 
-        if self.cmb_inset.currentIndex() > 0:
-            if self.inset_idx == 0:
+        if self.ui.cmb_inset.currentIndex() > 0:
+            if self.ui.inset_idx == 0:
                 # Inset was turned off before, create a new one
                 #  Add an axes at position rect [left, bottom, width, height]:
                 self.ax_i = self.mplwidget.fig.add_axes([0.65, 0.61, .3, .3])
@@ -522,17 +418,17 @@ class PlotHf(QWidget):
                 self.ax_i.add_patch(rect)
 
                 self.ax_i.set_xlim(fb_get('freq_specs_range'))
-                if self.chk_show_h_abs.isChecked():
+                if self.ui.chk_show_h_abs.isChecked():
                     self.ax_i.plot(self.f, self.h_plt_abs,  label=r'$|H(f)|$')
-                if self.chk_show_h_re.isChecked():
+                if self.ui.chk_show_h_re.isChecked():
                     self.ax_i.plot(self.f, self.h_plt_re, label=r'$\Re\{H(f)\}$')
-                if self.chk_show_h_im.isChecked():
+                if self.ui.chk_show_h_im.isChecked():
                     self.ax_i.plot(self.f, self.h_plt_im, label=r'$\Im\{H(f)\}$')
 
-            if self.cmb_inset.currentIndex() == 1: # edit / navigate inset
+            if self.ui.cmb_inset.currentIndex() == 1: # edit / navigate inset
                 self.ax_i.set_navigate(True)
                 self.ax.set_navigate(False)
-                if self.but_specs.isChecked():
+                if self.ui.but_specs.isChecked():
                     self.plot_spec_limits(self.ax_i)
             else: # edit / navigate main plot
                 self.ax_i.set_navigate(False)
@@ -545,7 +441,7 @@ class PlotHf(QWidget):
             except AttributeError:
                 pass
 
-        self.inset_idx = self.cmb_inset.currentIndex()  # update index
+        self.ui.inset_idx = self.ui.cmb_inset.currentIndex()  # update index
         self.draw()
 
     # ------------------------------------------------------------------------------
@@ -558,7 +454,7 @@ class PlotHf(QWidget):
             self.mplwidget.fig.delaxes(self.ax_p)
             del self.ax_p
 
-        if self.but_phase.isChecked():
+        if self.ui.but_phase.isChecked():
             self.ax_p = ax.twinx()  # second axes system with same x-axis for phase
             self.ax_p.is_twin = True  # mark this as 'twin' to suppress second grid in mpl_widget
 #
@@ -597,7 +493,7 @@ class PlotHf(QWidget):
         r"""
         Re-calculate \|H(f)\| and draw the figure
         """
-        self.but_align.setVisible(self.but_phase.isChecked())
+        self.ui.but_align.setVisible(self.ui.but_phase.isChecked())
         self.calc_hf()
         self.update_view()
 
@@ -634,22 +530,22 @@ class PlotHf(QWidget):
         if np.all(self.w) is None:  # H(f) has not been calculated yet
             self.calc_hf()
 
-        if self.cmb_units_a.currentText() == 'Auto':
+        if self.ui.cmb_units_a.currentText() == 'Auto':
             self.unit_a = fb_get('amp_specs_unit')
         else:
-            self.unit_a = self.cmb_units_a.currentText()
+            self.unit_a = self.ui.cmb_units_a.currentText()
 
         # only display log bottom widget for unit dB
-        self.lbl_log_bottom.setVisible(self.unit_a == 'dB')
-        self.led_log_bottom.setVisible(self.unit_a == 'dB')
-        self.lbl_log_unit.setVisible(self.unit_a == 'dB')
+        self.ui.lbl_log_bottom.setVisible(self.unit_a == 'dB')
+        self.ui.led_log_bottom.setVisible(self.unit_a == 'dB')
+        self.ui.lbl_log_unit.setVisible(self.unit_a == 'dB')
 
         # Linphase settings only makes sense for amplitude plot and
         # for plottin real/imag. part of H, not its magnitude
-        self.but_zerophase.setCheckable(self.unit_a == 'V' and fb_get('ft') == 'fir')
-        self.but_zerophase.setEnabled(self.unit_a == 'V' and fb_get('ft') == 'fir')
+        self.ui.but_zerophase.setCheckable(self.unit_a == 'V' and fb_get('ft') == 'fir')
+        self.ui.but_zerophase.setEnabled(self.unit_a == 'V' and fb_get('ft') == 'fir')
 
-        self.specs = self.but_specs.isChecked()
+        self.specs = self.ui.but_specs.isChecked()
 
         self.f_max = fb_get('f_max')
 
@@ -680,7 +576,7 @@ class PlotHf(QWidget):
             self.h_c = self.h_cmplx
 
         # remove linear phase if button is checked
-        if self.but_zerophase.isChecked():
+        if self.ui.but_zerophase.isChecked():
             self.h_c = self.h_c * np.exp(1j * self.w[0:len(self.f)] * fb_get('n_fil')/2.)
 
         h_str = r'$H(\mathrm{e}^{\mathrm{j} \Omega})$'
@@ -691,25 +587,28 @@ class PlotHf(QWidget):
             #-----------------------------------------------------------
             self.ax.clear()
             # Select abs / real / imaginary part and scale according to selected unit
-            if self.chk_show_h_abs.isChecked():
+            if self.ui.chk_show_h_abs.isChecked():
                 if self.unit_a == 'dB':
-                    self.h_plt_abs = np.maximum(20*np.log10(np.abs(self.h_c)), self.log_bottom)
+                    self.h_plt_abs = np.maximum(
+                        20*np.log10(np.abs(self.h_c)), self.ui.log_bottom)
                 elif self.unit_a == 'V':
                     self.h_plt_abs = np.abs(self.h_c)
                 elif self.unit_a == 'W':
                     self.h_plt_abs =  np.abs(self.h_c) * np.abs(self.h_c)
                 self.ax.plot(self.f, self.h_plt_abs, label = '$|H(f)|$')
-            if self.chk_show_h_re.isChecked():
+            if self.ui.chk_show_h_re.isChecked():
                 if self.unit_a == 'dB':
-                    self.h_plt_re = np.maximum(20*np.log10(np.abs(self.h_c.real)), self.log_bottom)
+                    self.h_plt_re = np.maximum(
+                        20*np.log10(np.abs(self.h_c.real)), self.ui.log_bottom)
                 elif self.unit_a == 'V':
                     self.h_plt_re = self.h_c.real
                 elif self.unit_a == 'W':
                     self.h_plt_re =  self.h_c.real * self.h_c.real
                 self.ax.plot(self.f, self.h_plt_re, label = r'$\Re\{H(f)\}$')
-            if self.chk_show_h_im.isChecked():
+            if self.ui.chk_show_h_im.isChecked():
                 if self.unit_a == 'dB':
-                    self.h_plt_im = np.maximum(20*np.log10(np.abs(self.h_c.imag)), self.log_bottom)
+                    self.h_plt_im = np.maximum(
+                        20*np.log10(np.abs(self.h_c.imag)), self.ui.log_bottom)
                 elif self.unit_a == 'V':
                     self.h_plt_im = self.h_c.imag
                 elif self.unit_a == 'W':
@@ -718,21 +617,21 @@ class PlotHf(QWidget):
 
             # calculate limits for selected curves depending on selected unit
             if self.unit_a == 'dB':
-                self.log_bottom = safe_eval(
-                    self.led_log_bottom.text(), self.log_bottom,
+                self.ui.log_bottom = safe_eval(
+                    self.ui.led_log_bottom.text(), self.ui.log_bottom,
                     return_type='float', sign='neg')
-                self.led_log_bottom.setText(str(self.log_bottom))
-                a_lim = [self.log_bottom, 2]
+                self.ui.led_log_bottom.setText(str(self.ui.log_bottom))
+                a_lim = [self.ui.log_bottom, 2]
                 h_str += ' in dB ' + r'$\rightarrow$'
 
             elif self.unit_a == 'V':  #  'lin'
                 a_min = 0
-                if self.chk_show_h_re.isChecked():  # H can be less than zero
+                if self.ui.chk_show_h_re.isChecked():  # H can be less than zero
                     a_min = min(a_min, np.nanmin(self.h_plt_re[np.isfinite(self.h_c)]))
-                if self.chk_show_h_im.isChecked():  # H can be less than zero
+                if self.ui.chk_show_h_im.isChecked():  # H can be less than zero
                     a_min = min(a_min, np.nanmin(self.h_plt_im[np.isfinite(self.h_c)]))
 
-                a_min = max(a_min, self.lin_neg_bottom)
+                a_min = max(a_min, self.ui.lin_neg_bottom)
                 a_lim = [a_min, (1.05 + a_max)]
                 h_str +=' in V ' + r'$\rightarrow $'
                 self.ax.axhline(linewidth=1, color='k') # horizontal line at 0
@@ -746,7 +645,7 @@ class PlotHf(QWidget):
             #-----------------------------------------------------------
 
             #============= Set Limits and draw specs =========================
-            if self.but_specs.isChecked():
+            if self.ui.but_specs.isChecked():
                 self.plot_spec_limits(self.ax)
 
             #     self.ax_bounds = [self.ax.get_ybound()[0], self.ax.get_ybound()[1]]#, self.ax.get]
@@ -756,11 +655,11 @@ class PlotHf(QWidget):
             self.ax.set_ylabel(h_str)
 
             title_str = ""
-            if self.chk_show_h_abs.isChecked():
+            if self.ui.chk_show_h_abs.isChecked():
                 title_str = "Magnitude "
-            elif self.chk_show_h_re.isChecked() or self.chk_show_h_im.isChecked():
+            elif self.ui.chk_show_h_re.isChecked() or self.ui.chk_show_h_im.isChecked():
                 title_str = "Amplitude "
-            if self.but_phase.isChecked():
+            if self.ui.but_phase.isChecked():
                 if title_str != "":
                     title_str += "and Phase "
                 else:
@@ -790,7 +689,7 @@ class PlotHf(QWidget):
         """
         Redraw the canvas when e.g. the canvas size has changed
         """
-        if hasattr(self, 'ax_p') and self.but_align.isChecked():
+        if hasattr(self, 'ax_p') and self.ui.but_align.isChecked():
             # Align gridlines between H(f) and phi nicely
             self.align_y_axes(self.ax, self.ax_p)
         self.mplwidget.redraw()
